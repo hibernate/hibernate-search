@@ -8,10 +8,11 @@ package org.hibernate.search.test.jmx;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.util.Map;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
@@ -30,6 +31,9 @@ import static org.junit.Assert.assertTrue;
  */
 @TestForIssue(jiraKey = "HSEARCH-1026")
 public class IndexControlMBeanWithSuffixTest extends SearchTestBase {
+
+	private static final String JNDI_APP_SUFFIX = "myapp";
+
 	MBeanServer mbeanServer;
 	ObjectName indexBeanObjectName;
 
@@ -45,12 +49,11 @@ public class IndexControlMBeanWithSuffixTest extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		String suffix = getConfigurationProperty( Environment.JMX_BEAN_SUFFIX );
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
 		indexBeanObjectName = new ObjectName(
 				JMXRegistrar.buildMBeanName(
 						IndexControlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME,
-						suffix
+						JNDI_APP_SUFFIX
 				)
 		);
 	}
@@ -66,28 +69,24 @@ public class IndexControlMBeanWithSuffixTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		File targetDir = TestConstants.getTargetDir( IndexControlMBeanWithSuffixTest.class );
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 
-		cfg.setProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" );
-		cfg.setProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
-		cfg.setProperty(
-				"hibernate.jndi.org.osjava.sj.factory",
-				"org.hibernate.search.test.jmx.IndexControlMBeanTest$CustomContextFactory"
-		);
-		cfg.setProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() );
-		cfg.setProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
+		cfg.put( "hibernate.session_factory_name", "java:comp/SessionFactory" );
+		cfg.put( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
+		cfg.put( "hibernate.jndi.org.osjava.sj.factory", "org.hibernate.search.test.jmx.IndexControlMBeanTest$CustomContextFactory" );
+		cfg.put( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() );
+		cfg.put( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
 
-		cfg.setProperty( "hibernate.search.indexing_strategy", "manual" );
-		cfg.setProperty( Environment.JMX_ENABLED, "true" );
-		cfg.setProperty( Environment.JMX_BEAN_SUFFIX, "myapp" );
+		cfg.put( "hibernate.search.indexing_strategy", "manual" );
+		cfg.put( Environment.JMX_ENABLED, "true" );
+		cfg.put( Environment.JMX_BEAN_SUFFIX, JNDI_APP_SUFFIX );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { Counter.class };
 	}
 }

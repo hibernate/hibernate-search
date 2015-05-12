@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
@@ -26,10 +27,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.junit.Test;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -894,13 +893,12 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.getProperties().put( Environment.MODEL_MAPPING, ProgrammaticSearchMappingFactory.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( Environment.MODEL_MAPPING, ProgrammaticSearchMappingFactory.class.getName() );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Address.class,
 				Country.class,

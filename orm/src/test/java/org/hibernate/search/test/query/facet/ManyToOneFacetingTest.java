@@ -72,7 +72,7 @@ public class ManyToOneFacetingTest extends AbstractFacetTest {
 		session.clear();
 	}
 
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Company.class, CompanyFacility.class };
 	}
 }

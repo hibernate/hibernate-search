@@ -105,7 +105,7 @@ public class CollectionFacetingTest extends SearchTestBase {
 		fullTextSession.close();
 	}
 
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Author.class, Book.class
 		};

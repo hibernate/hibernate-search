@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import org.hibernate.cfg.Configuration;
+import java.util.Map;
+
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -60,14 +61,13 @@ public class FetchSizeConfigurationTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Book.class, Nation.class };
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
 
 }

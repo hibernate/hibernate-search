@@ -8,6 +8,7 @@ package org.hibernate.search.test.performance.reader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -100,7 +101,7 @@ public abstract class ReaderPerformance extends SearchTestBase {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Detective.class,
 				Suspect.class
@@ -108,16 +109,13 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( "hibernate.search.default.indexBase", getIndexBaseDir() );
-		cfg.setProperty(
-				"hibernate.search.default.optimizer.transaction_limit.max", "10"
-		); // workaround too many open files
-		cfg.setProperty( "hibernate.search.default." + Environment.EXCLUSIVE_INDEX_USE, "true" );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		cfg.setProperty( Environment.READER_STRATEGY, getReaderStrategyName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.put( "hibernate.search.default.indexBase", getIndexBaseDir() );
+		cfg.put( "hibernate.search.default.optimizer.transaction_limit.max", "10" ); // prevent too many open files
+		cfg.put( "hibernate.search.default." + Environment.EXCLUSIVE_INDEX_USE, "true" );
+		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+		cfg.put( Environment.READER_STRATEGY, getReaderStrategyName() );
 	}
 
 	protected abstract String getReaderStrategyName();

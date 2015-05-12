@@ -277,7 +277,7 @@ public class IterableBridgeTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { IterableBridgeTestEntity.class, };
 	}
 }

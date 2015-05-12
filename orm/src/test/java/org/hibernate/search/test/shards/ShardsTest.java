@@ -8,6 +8,7 @@ package org.hibernate.search.test.shards;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
@@ -15,11 +16,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.store.FSDirectory;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -39,16 +37,15 @@ import static org.junit.Assert.assertTrue;
 public class ShardsTest extends SearchTestBase {
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
 		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+		cfg.put( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		//is the default when multiple shards are set up
 		//cfg.setProperty( "hibernate.search.Animal.sharding_strategy", IdHashShardingStrategy.class );
-		cfg.setProperty( "hibernate.search.Animal.sharding_strategy.nbr_of_shards", "2" );
-		cfg.setProperty( "hibernate.search.Animal.0.indexName", "Animal00" );
+		cfg.put( "hibernate.search.Animal.sharding_strategy.nbr_of_shards", "2" );
+		cfg.put( "hibernate.search.Animal.0.indexName", "Animal00" );
 	}
 
 	@Test
@@ -191,7 +188,7 @@ public class ShardsTest extends SearchTestBase {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Animal.class,
 				Furniture.class

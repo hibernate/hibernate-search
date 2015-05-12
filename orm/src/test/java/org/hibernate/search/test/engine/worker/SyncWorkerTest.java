@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test.engine.worker;
 
-import org.hibernate.cfg.Configuration;
+import java.util.Map;
+
 import org.hibernate.search.cfg.Environment;
 
 /**
@@ -15,9 +16,9 @@ import org.hibernate.search.cfg.Environment;
 public class SyncWorkerTest extends WorkerTestCase {
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.WORKER_SCOPE, "transaction" );
-		cfg.setProperty( "hibernate.search.default.worker.execution", "sync" );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( Environment.WORKER_SCOPE, "transaction" );
+		cfg.put( "hibernate.search.default.worker.execution", "sync" );
 	}
+
 }

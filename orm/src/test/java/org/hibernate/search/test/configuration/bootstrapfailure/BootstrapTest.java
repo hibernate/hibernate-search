@@ -41,7 +41,7 @@ public class BootstrapTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				// just adding NoSearchEntity causes an exception, even though it is not used from a Search perspective
 				IndexedEntity.class, EmbeddedEntity.class, NoSearchEntity.class

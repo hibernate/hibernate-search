@@ -88,7 +88,7 @@ public class FSDirectorySelectionTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { };
 	}
 }

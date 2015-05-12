@@ -94,7 +94,7 @@ public class InheritedCollectionFieldCollectionUpdateEventTest extends SearchTes
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				MappedSuperclassWithCollectionField.class,
 				EntityExtendingMappedSuperclassWithCollectionField.class

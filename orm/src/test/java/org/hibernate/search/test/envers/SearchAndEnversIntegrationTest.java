@@ -334,7 +334,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, Address.class };
 	}
 }

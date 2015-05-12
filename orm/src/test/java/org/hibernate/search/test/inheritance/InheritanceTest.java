@@ -22,7 +22,6 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,12 +35,6 @@ import static org.junit.Assert.fail;
 public class InheritanceTest extends SearchTestBase {
 
 	private static final Log log = LoggerFactory.make();
-
-	@Override
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-	}
 
 	@Test
 	public void testSearchUnindexClass() throws Exception {
@@ -256,40 +249,40 @@ public class InheritanceTest extends SearchTestBase {
 	}
 
 	private void createTestData() {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
+		try ( FullTextSession s = Search.getFullTextSession( openSession() ) ) {
+			Transaction tx = s.beginTransaction();
 
-		Fish shark = new Fish();
-		shark.setName( "White Pointer" );
-		shark.setNumberOfDorsalFins( 2 );
-		shark.setWeight( 1500 );
-		s.save( shark );
+			Fish shark = new Fish();
+			shark.setName( "White Pointer" );
+			shark.setNumberOfDorsalFins( 2 );
+			shark.setWeight( 1500 );
+			s.save( shark );
 
-		Mammal elephant = new Mammal();
-		elephant.setName( "Elephant" );
-		elephant.setHasSweatGlands( false );
-		elephant.setWeight( 4500 );
-		s.save( elephant );
+			Mammal elephant = new Mammal();
+			elephant.setName( "Elephant" );
+			elephant.setHasSweatGlands( false );
+			elephant.setWeight( 4500 );
+			s.save( elephant );
 
-		Mammal chimp = new Mammal();
-		chimp.setName( "Chimpanzee" );
-		chimp.setHasSweatGlands( true );
-		chimp.setWeight( 50 );
-		s.save( chimp );
+			Mammal chimp = new Mammal();
+			chimp.setName( "Chimpanzee" );
+			chimp.setHasSweatGlands( true );
+			chimp.setWeight( 50 );
+			s.save( chimp );
 
-		Bird dove = new Bird();
-		dove.setName( "Dove" );
-		dove.setNumberOfEggs( 2 );
-		s.save( dove );
+			Bird dove = new Bird();
+			dove.setName( "Dove" );
+			dove.setNumberOfEggs( 2 );
+			s.save( dove );
 
-		Eagle eagle = new Eagle();
-		eagle.setName( "Bald Eagle" );
-		eagle.setNumberOfEggs( 2 );
-		eagle.setWingType( Eagle.WingType.BROAD );
-		s.save( eagle );
+			Eagle eagle = new Eagle();
+			eagle.setName( "Bald Eagle" );
+			eagle.setNumberOfEggs( 2 );
+			eagle.setWingType( Eagle.WingType.BROAD );
+			s.save( eagle );
 
-		tx.commit();
-		s.clear();
+			tx.commit();
+		}
 	}
 
 	private void assertItsTheElephant(List result) {
@@ -301,7 +294,7 @@ public class InheritanceTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Animal.class,
 				Mammal.class,

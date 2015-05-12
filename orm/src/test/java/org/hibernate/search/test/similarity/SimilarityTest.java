@@ -7,14 +7,12 @@
 package org.hibernate.search.test.similarity;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -68,15 +66,15 @@ public class SimilarityTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Can.class
 		};
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		cfg.setProperty( Environment.SIMILARITY_CLASS, DummySimilarity2.class.getName() );
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( Environment.SIMILARITY_CLASS, DummySimilarity2.class.getName() );
 	}
+
 }

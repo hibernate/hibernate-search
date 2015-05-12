@@ -7,11 +7,11 @@
 package org.hibernate.search.test.query.dsl.mixedhierarchy;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
@@ -130,7 +130,7 @@ public class DslCrossHierarchyTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				EducationalInstitution.class,
 				University.class,
@@ -143,9 +143,8 @@ public class DslCrossHierarchyTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		// make sure the criteria initializer is used, just in case
-		cfg.getProperties().put( Environment.DATABASE_RETRIEVAL_METHOD, "query" );
+		cfg.put( Environment.DATABASE_RETRIEVAL_METHOD, "query" );
 	}
 }

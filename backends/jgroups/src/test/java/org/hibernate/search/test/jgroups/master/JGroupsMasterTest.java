@@ -8,6 +8,7 @@ package org.hibernate.search.test.jgroups.master;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.lucene.document.Document;
@@ -16,10 +17,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -180,16 +178,15 @@ public class JGroupsMasterTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		// JGroups configuration for master node
-		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
-		cfg.setProperty( DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( DispatchMessageSender.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
+		cfg.put( DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
+		cfg.put( DispatchMessageSender.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};

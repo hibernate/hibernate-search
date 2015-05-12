@@ -7,6 +7,7 @@
 package org.hibernate.search.test.performance.optimizer;
 
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -198,15 +199,14 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( OptimizerPerformanceTest.class ) );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( OptimizerPerformanceTest.class ) );
+		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Worker.class,
 				Construction.class

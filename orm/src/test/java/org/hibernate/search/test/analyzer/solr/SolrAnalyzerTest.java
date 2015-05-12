@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.test.analyzer.solr;
 
+import java.util.Map;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
@@ -178,15 +177,15 @@ public class SolrAnalyzerTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Team.class
 		};
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
+	public void configure(Map<String,Object> cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.lucene_version", org.apache.lucene.util.Version.LUCENE_30.toString() );
+		cfg.put( "hibernate.search.lucene_version", org.apache.lucene.util.Version.LUCENE_30.toString() );
 	}
 }

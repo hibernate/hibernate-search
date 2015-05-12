@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.jms.MessageConsumer;
@@ -30,7 +31,6 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
@@ -281,14 +281,13 @@ public class JMSMasterTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		// explicitly set the backend even though lucene is default.
-		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "lucene" );
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "lucene" );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};

@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.test.jgroups.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
-import org.hibernate.cfg.Configuration;
+import org.hibernate.search.test.DefaultTestResourceManager;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.util.ImmutableTestConfiguration;
+import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
 
 /**
@@ -32,50 +36,39 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 	 */
 	protected static final String slave = "/slave";
 
-
-	protected static SessionFactory slaveSessionFactory;
-
-	/**
-	 * Common configuration for all slave nodes
-	 */
-	private Configuration commonCfg;
+	private DefaultTestResourceManager slaveResources;
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-
+	public void configure(Map<String,Object> cfg) {
 		//master
-		cfg.setProperty(
+		cfg.put(
 				"hibernate.search.default.sourceBase",
 				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterCopy
 		);
-		cfg.setProperty(
+		cfg.put(
 				"hibernate.search.default.indexBase",
 				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterMain
 		);
-		cfg.setProperty( "hibernate.search.default.refresh", "1" );
-		cfg.setProperty(
+		cfg.put( "hibernate.search.default.refresh", "1" );
+		cfg.put(
 				"hibernate.search.default.directory_provider", "filesystem-master"
 		);
 	}
 
-	protected void commonConfigure(Configuration cfg) {
-		super.configure( cfg );
-
+	protected void configureSlave(Map<String,Object> cfg) {
 		//slave(s)
-		cfg.setProperty(
+		cfg.put(
 				"hibernate.search.default.sourceBase",
 				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterCopy
 		);
-		cfg.setProperty(
+		cfg.put(
 				"hibernate.search.default.indexBase",
 				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + slave
 		);
-		cfg.setProperty( "hibernate.search.default.refresh", "1" );
-		cfg.setProperty(
+		cfg.put( "hibernate.search.default.refresh", "1" );
+		cfg.put(
 				"hibernate.search.default.directory_provider", "filesystem-slave"
 		);
-		cfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 	}
 
 	@Override
@@ -87,43 +80,30 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 	@Override
 	public void tearDown() throws Exception {
 		//close session factories
-		if ( slaveSessionFactory != null ) {
-			slaveSessionFactory.close();
-			slaveSessionFactory = null;
+		if ( slaveResources != null ) {
+			slaveResources.closeSessionFactory();
+			slaveResources = null;
 		}
 		super.tearDown();
 	}
 
 	private void buildSlaveSessionFactory() throws Exception {
-		if ( slaveSessionFactory != null ) {
-			throw new IllegalStateException( "slaveSessionFactory already created" );
+		if ( slaveResources != null ) {
+			throw new IllegalStateException( "Slave SessionFactory already created" );
 		}
-		setCommonCfg( new Configuration() );
-		commonConfigure( commonCfg );
-		for ( Class<?> aClass : getCommonAnnotatedClasses() ) {
-			getCommonConfiguration().addAnnotatedClass( aClass );
-		}
-		slaveSessionFactory = getCommonConfiguration().buildSessionFactory();
-	}
-
-	private void setCommonCfg(Configuration configuration) {
-		this.commonCfg = configuration;
-	}
-
-	protected Configuration getCommonConfiguration() {
-		return commonCfg;
+		HashMap<String, Object> slaveConfiguration = new HashMap<String,Object>();
+		configureSlave( slaveConfiguration );
+		TestConfiguration slaveTestConfiguration = new ImmutableTestConfiguration( slaveConfiguration, getAnnotatedClasses() );
+		slaveResources = new DefaultTestResourceManager( slaveTestConfiguration );
+		slaveResources.openSessionFactory();
 	}
 
 	protected Session getSlaveSession() {
-		return slaveSessionFactory.openSession();
+		return slaveResources.openSession();
 	}
 
-	protected static SessionFactory getSlaveSessionFactory() {
-		return slaveSessionFactory;
+	protected SessionFactory getSlaveSessionFactory() {
+		return slaveResources.getSessionFactory();
 	}
 
-	@Override
-	protected abstract Class<?>[] getAnnotatedClasses();
-
-	protected abstract Class<?>[] getCommonAnnotatedClasses();
 }

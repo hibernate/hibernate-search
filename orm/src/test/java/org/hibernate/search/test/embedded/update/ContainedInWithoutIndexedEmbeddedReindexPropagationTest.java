@@ -135,7 +135,7 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { SimpleParentEntity.class, SimpleChildEntity.class, ProductArticle.class, ProductModel.class, ProductReferenceCode.class,
 				ProductShootingBrief.class };
 	}

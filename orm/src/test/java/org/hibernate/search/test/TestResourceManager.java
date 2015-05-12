@@ -10,10 +10,8 @@ package org.hibernate.search.test;
 import java.io.File;
 
 import org.apache.lucene.store.Directory;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.spi.SearchIntegrator;
 
@@ -23,8 +21,6 @@ import org.hibernate.search.spi.SearchIntegrator;
  * @author Hardy Ferentschik
  */
 public interface TestResourceManager {
-
-	String getConfigurationProperty(String propertyKey);
 
 	void openSessionFactory();
 
@@ -45,9 +41,5 @@ public interface TestResourceManager {
 	void ensureIndexesAreEmpty();
 
 	File getBaseIndexDir();
-
-	String[] generateDropSchemaScript(Dialect d);
-
-	String[] generateSchemaCreationScript(Dialect d);
 
 }

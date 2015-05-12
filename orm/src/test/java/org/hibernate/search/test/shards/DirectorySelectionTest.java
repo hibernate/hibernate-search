@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.test.shards;
 
-import org.apache.lucene.index.IndexReader;
+import java.util.Map;
 
+import org.apache.lucene.index.IndexReader;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
@@ -157,18 +156,17 @@ public class DirectorySelectionTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty(
+	public void configure(Map<String,Object> cfg) {
+		cfg.put(
 				"hibernate.search.Products.sharding_strategy",
 				ProductsAvailabilityShardingStrategy.class.getCanonicalName()
 		);
-		cfg.setProperty( "hibernate.search.Products.sharding_strategy.nbr_of_shards", "2" );
+		cfg.put( "hibernate.search.Products.sharding_strategy.nbr_of_shards", "2" );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Product.class
 		};

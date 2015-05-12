@@ -8,21 +8,18 @@
 package org.hibernate.search.test.embedded.nested.containedIn;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.testing.cache.CachingRegionFactory;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -149,13 +146,12 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( AvailableSettings.CACHE_REGION_FACTORY, CachingRegionFactory.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( AvailableSettings.CACHE_REGION_FACTORY, CachingRegionFactory.class.getName() );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Entity1ForDoc0.class,
 				Entity2ForDoc0.class,

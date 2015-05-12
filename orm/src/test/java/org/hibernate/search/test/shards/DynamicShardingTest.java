@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -125,19 +126,17 @@ public class DynamicShardingTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-
-		cfg.setProperty( "hibernate.search.Animal.sharding_strategy", AnimalShardIdentifierProvider.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.Animal.sharding_strategy", AnimalShardIdentifierProvider.class.getName() );
 
 		// use filesystem based directory provider to be able to assert against index
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
 		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+		cfg.put( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Animal.class
 		};
@@ -161,13 +160,13 @@ public class DynamicShardingTest extends SearchTestBase {
 	}
 
 	private void insertAnimals(Animal... animals) {
-		Session session = openSession();
-		Transaction tx = session.beginTransaction();
-		for ( Animal animal : animals ) {
-			session.persist( animal );
+		try ( Session session = openSession() ) {
+			Transaction tx = session.beginTransaction();
+			for ( Animal animal : animals ) {
+				session.persist( animal );
+			}
+			tx.commit();
 		}
-		tx.commit();
-		session.clear();
 	}
 
 	private ExtendedSearchIntegrator getIndependentNewSearchIntegrator() {

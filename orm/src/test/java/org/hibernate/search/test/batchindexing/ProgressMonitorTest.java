@@ -58,7 +58,7 @@ public class ProgressMonitorTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { LegacyCarPlant.class, LegacyCar.class, LegacyTire.class };
 	}
 }

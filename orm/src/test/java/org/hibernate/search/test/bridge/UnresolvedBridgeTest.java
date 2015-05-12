@@ -47,7 +47,7 @@ public class UnresolvedBridgeTest {
 		}
 	}
 
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Gangster.class
 		};

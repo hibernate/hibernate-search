@@ -491,7 +491,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				POI.class,
 				Event.class,

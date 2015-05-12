@@ -144,7 +144,7 @@ public class PurgeTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
 				Clock.class,
@@ -162,45 +162,46 @@ public class PurgeTest extends SearchTestBase {
 	}
 
 	private void assertNumberOfIndexedEntitiesForTypes(int expectedCount, Class<?>... types) {
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		Transaction tx = fullTextSession.beginTransaction();
+		try ( FullTextSession fullTextSession = Search.getFullTextSession( openSession() ) ) {
+			Transaction tx = fullTextSession.beginTransaction();
 
-		org.hibernate.Query query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), types );
-		@SuppressWarnings("unchecked")
-		List<Object> results = (List<Object>) query.list();
-		assertEquals( "Incorrect document count for type: " + Arrays.toString( types ), expectedCount, results.size() );
+			org.hibernate.Query query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), types );
+			@SuppressWarnings("unchecked")
+			List<Object> results = (List<Object>) query.list();
+			assertEquals( "Incorrect document count for type: " + Arrays.toString( types ), expectedCount, results.size() );
 
-		tx.commit();
+			tx.commit();
+		}
 	}
 
 	private void indexTestData() {
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		Transaction tx = fullTextSession.beginTransaction();
+		try ( FullTextSession fullTextSession = Search.getFullTextSession( openSession() ) ) {
+			Transaction tx = fullTextSession.beginTransaction();
 
-		// create a couple of clocks
-		Clock clock = new Clock( 1, "Seiko" );
-		fullTextSession.save( clock );
-		clock = new Clock( 2, "Festina" );
-		fullTextSession.save( clock );
+			//create a couple of clocks
+			Clock clock = new Clock( 1, "Seiko" );
+			fullTextSession.save( clock );
+			clock = new Clock( 2, "Festina" );
+			fullTextSession.save( clock );
 
-		// create a couple of books
-		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
-		);
-		fullTextSession.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
-		fullTextSession.save( book );
+			// create a couple of books
+			Book book = new Book(
+					1,
+					"La chute de la petite reine a travers les yeux de Festina",
+					"La chute de la petite reine a travers les yeux de Festina, blahblah"
+			);
+			fullTextSession.save( book );
+			book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
+			fullTextSession.save( book );
 
-		// create and index a tree
-		Tree tree = new Tree( "birch" );
-		for ( int i = 0; i < 4; i++ ) {
-			tree.growNewLeave();
+			// create and index a tree
+			Tree tree = new Tree( "birch" );
+			for ( int i = 0; i < 4; i++ ) {
+				tree.growNewLeave();
+			}
+			fullTextSession.save( tree );
+
+			tx.commit();
 		}
-		fullTextSession.save( tree );
-
-		tx.commit();
-		fullTextSession.close();
 	}
 }

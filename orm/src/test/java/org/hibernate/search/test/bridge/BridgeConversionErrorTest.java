@@ -124,7 +124,7 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				ClassBridged.class,
 				SimpleEntity.class,

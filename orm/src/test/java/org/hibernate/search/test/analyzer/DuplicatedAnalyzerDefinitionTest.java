@@ -35,7 +35,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
 	public static final Log log = LoggerFactory.make();
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { };
 	}
 

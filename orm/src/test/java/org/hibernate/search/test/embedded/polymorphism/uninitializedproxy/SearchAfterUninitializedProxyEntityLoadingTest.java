@@ -59,7 +59,7 @@ public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBa
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { AbstractEntity.class, ConcreteEntity.class, LazyAbstractEntityReference.class };
 	}
 
