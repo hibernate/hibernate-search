@@ -214,7 +214,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				SnowStorm.class
 		};

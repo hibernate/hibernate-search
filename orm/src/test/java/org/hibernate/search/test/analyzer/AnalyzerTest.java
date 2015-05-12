@@ -199,7 +199,7 @@ public class AnalyzerTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { MyEntity.class, Article.class };
 	}
 }

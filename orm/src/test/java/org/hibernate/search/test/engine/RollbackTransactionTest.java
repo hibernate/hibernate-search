@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.test.engine;
 
+import java.util.Map;
+
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -85,16 +85,15 @@ public class RollbackTransactionTest extends SearchTestBase {
 
 	// Test setup options - Entities
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { BusLine.class, BusStop.class };
 	}
 
 	// Test setup options - SessionFactory Properties
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration configuration) {
-		super.configure( configuration );
-		configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		configuration.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default.directory_provider", "ram" );
+		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 
 }

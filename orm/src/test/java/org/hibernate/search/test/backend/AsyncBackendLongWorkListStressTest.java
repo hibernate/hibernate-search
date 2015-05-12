@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.test.backend;
 
-import org.hibernate.cfg.Configuration;
+import java.util.Map;
 
 public class AsyncBackendLongWorkListStressTest extends SyncBackendLongWorkListStressTest {
 
 	@Override
-	protected void configure(Configuration cfg) {
+	public void configure(Map<String,Object> cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.worker.execution", "async" );
+		cfg.put( "hibernate.search.default.worker.execution", "async" );
 	}
+
 }

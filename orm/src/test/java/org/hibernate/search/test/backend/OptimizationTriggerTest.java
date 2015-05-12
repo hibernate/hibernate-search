@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.backend;
 
+import java.util.Map;
+
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -101,13 +103,12 @@ public class OptimizationTriggerTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.optimizer.operation_limit.max", "3" );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default.optimizer.operation_limit.max", "3" );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Clock.class };
 	}
 }

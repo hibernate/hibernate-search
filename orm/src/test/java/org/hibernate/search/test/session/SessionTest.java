@@ -7,11 +7,11 @@
 package org.hibernate.search.test.session;
 
 import java.lang.reflect.Proxy;
+import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SharedSessionContract;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.context.internal.ThreadLocalSessionContext;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.engine.jdbc.LobCreationContext;
@@ -86,7 +86,7 @@ public class SessionTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Email.class,
 				Domain.class
@@ -94,12 +94,11 @@ public class SessionTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		// for this test we explicitly set the auto commit mode since we are not explicitly starting a transaction
 		// which could be a problem in some databases.
-		cfg.setProperty( "hibernate.connection.autocommit", "true" );
+		cfg.put( "hibernate.connection.autocommit", "true" );
 		//needed for testThreadBoundSessionWrappingOutOfTransaction
-		cfg.setProperty( "hibernate.current_session_context_class", "thread" );
+		cfg.put( "hibernate.current_session_context_class", "thread" );
 	}
 }

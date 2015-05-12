@@ -90,7 +90,7 @@ public class AnalyzerInheritanceTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { SubClass.class };
 	}
 }

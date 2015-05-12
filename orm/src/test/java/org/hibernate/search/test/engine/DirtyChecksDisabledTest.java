@@ -7,7 +7,8 @@
 
 package org.hibernate.search.test.engine;
 
-import org.hibernate.cfg.Configuration;
+import java.util.Map;
+
 import org.hibernate.search.cfg.Environment;
 
 /**
@@ -24,8 +25,9 @@ public class DirtyChecksDisabledTest extends SkipIndexingWorkForUnaffectingChang
 	}
 
 	@Override
-	protected void configure(Configuration configuration) {
-		super.configure( configuration );
-		configuration.setProperty( Environment.ENABLE_DIRTY_CHECK, " false" ); //intentional space in the value
+	public void configure(Map<String,Object> cfg) {
+		super.configure( cfg );
+		cfg.put( Environment.ENABLE_DIRTY_CHECK, " false" ); //intentional space in the value
 	}
+
 }

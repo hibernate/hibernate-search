@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test.performance.reader;
 
-import org.hibernate.cfg.Configuration;
+import java.util.Map;
+
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 
@@ -14,9 +15,11 @@ import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
  * @author Emmanuel Bernard
  */
 public class SharedBufferedReaderPerformanceTest extends ReaderPerformanceTestCase {
+
 	@Override
-	protected void configure(Configuration cfg) {
+	public void configure(Map<String,Object> cfg) {
 		super.configure( cfg );
-		cfg.setProperty( Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getCanonicalName() );
+		cfg.put( Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getCanonicalName() );
 	}
+
 }

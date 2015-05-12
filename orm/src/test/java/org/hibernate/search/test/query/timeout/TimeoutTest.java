@@ -12,12 +12,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextQuery;
@@ -221,14 +221,13 @@ public class TimeoutTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { Clock.class };
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		cfg.setProperty( "hibernate.jdbc.batch_size", "1000" );
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.jdbc.batch_size", "1000" );
 	}
 
 }

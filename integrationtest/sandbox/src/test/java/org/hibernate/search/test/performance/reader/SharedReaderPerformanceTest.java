@@ -12,6 +12,7 @@ import org.hibernate.search.testsupport.TestConstants;
  * @author Sanne Grinovero
  */
 public class SharedReaderPerformanceTest extends ReaderPerformance {
+
 	@Override
 	protected String getReaderStrategyName() {
 		return "shared";

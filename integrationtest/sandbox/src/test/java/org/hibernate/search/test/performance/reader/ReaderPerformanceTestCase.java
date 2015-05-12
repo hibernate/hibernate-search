@@ -8,6 +8,7 @@ package org.hibernate.search.test.performance.reader;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,7 +20,6 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -71,7 +71,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Detective.class,
 				Suspect.class
@@ -275,14 +275,10 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty(
-				"hibernate.search.default.indexBase",
-				TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class )
-		);
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class ) );
+		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
 }

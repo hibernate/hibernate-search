@@ -211,7 +211,7 @@ public class NumericFieldTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { PinPoint.class, Location.class, Coordinate.class, PointOfInterest.class, Position.class };
 	}
 

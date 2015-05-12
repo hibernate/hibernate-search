@@ -122,7 +122,7 @@ public class IdIncludedInPathCaseEmbeddedTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { EntityA.class, EntityB.class, EntityC.class, DocumentEntity.class };
 	}
 }

@@ -39,29 +39,29 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		Session session = openSession();
-		Transaction tx = session.beginTransaction();
+		try ( Session session = openSession() ) {
+			Transaction tx = session.beginTransaction();
 
-		// used for the filtering tests
-		Author author = new Author();
-		author.setName( "Moo Cow" );
-		Music music = new Music();
-		music.addAuthor( author );
-		music.setTitle( "The moo moo mooing under the stars" );
-		Book book = new Book();
-		book.setBody( "This is the story of the Moo Cow, who sang the moo moo moo at night" );
-		book.setId( 1 );
-		session.persist( book );
-		session.persist( author );
-		session.persist( music );
+			// used for the filtering tests
+			Author author = new Author();
+			author.setName( "Moo Cow" );
+			Music music = new Music();
+			music.addAuthor( author );
+			music.setTitle( "The moo moo mooing under the stars" );
+			Book book = new Book();
+			book.setBody( "This is the story of the Moo Cow, who sang the moo moo moo at night" );
+			book.setId( 1 );
+			session.persist( book );
+			session.persist( author );
+			session.persist( music );
 
-		// used for the not found test
-		Author charles = new Author();
-		charles.setName( "Charles Dickens" );
-		session.persist( charles );
+			// used for the not found test
+			Author charles = new Author();
+			charles.setName( "Charles Dickens" );
+			session.persist( charles );
 
-		tx.commit();
-		session.clear();
+			tx.commit();
+		}
 
 		QueryParser parser = new QueryParser(
 				TestConstants.getTargetLuceneVersion(),
@@ -167,7 +167,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Author.class,
 				Music.class,

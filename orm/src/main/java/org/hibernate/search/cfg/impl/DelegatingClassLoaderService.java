@@ -8,9 +8,7 @@ package org.hibernate.search.cfg.impl;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;

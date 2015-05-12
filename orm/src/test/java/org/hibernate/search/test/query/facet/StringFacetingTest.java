@@ -81,7 +81,7 @@ public class StringFacetingTest extends AbstractFacetTest {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Car.class
 		};

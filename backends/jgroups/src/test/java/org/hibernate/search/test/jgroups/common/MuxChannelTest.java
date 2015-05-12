@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.test.jgroups.common;
 
+import java.util.Map;
 import java.util.Random;
 
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.backend.jgroups.impl.MessageSenderService;
@@ -64,19 +64,19 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
+	public void configure(Map<String,Object> cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, getMasterBackend() );
-		cfg.getProperties().put( DispatchMessageSender.CHANNEL_INJECT, channels[0] );
-		cfg.getProperties().put( DispatchMessageSender.MUX_ID, muxId );
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, getMasterBackend() );
+		cfg.put( DispatchMessageSender.CHANNEL_INJECT, channels[0] );
+		cfg.put( DispatchMessageSender.MUX_ID, muxId );
 	}
 
 	@Override
-	protected void commonConfigure(Configuration cfg) {
-		super.commonConfigure( cfg );
-		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, getSlaveBackend() );
-		cfg.getProperties().put( DispatchMessageSender.CHANNEL_INJECT, channels[1] );
-		cfg.getProperties().put( DispatchMessageSender.MUX_ID, muxId );
+	protected void configureSlave(Map<String,Object> cfg) {
+		super.configureSlave( cfg );
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, getSlaveBackend() );
+		cfg.put( DispatchMessageSender.CHANNEL_INJECT, channels[1] );
+		cfg.put( DispatchMessageSender.MUX_ID, muxId );
 	}
 
 	protected JChannel createChannel() throws Exception {

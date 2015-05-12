@@ -56,7 +56,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Event.class, Person.class, ParentOfBirthEvent.class };
 	}
 

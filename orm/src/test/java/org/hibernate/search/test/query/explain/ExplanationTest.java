@@ -59,7 +59,7 @@ public class ExplanationTest extends SearchTestBase {
 
 	}
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Dvd.class
 		};

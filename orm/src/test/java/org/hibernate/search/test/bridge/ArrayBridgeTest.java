@@ -269,7 +269,7 @@ public class ArrayBridgeTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { ArrayBridgeTestEntity.class, };
 	}
 }

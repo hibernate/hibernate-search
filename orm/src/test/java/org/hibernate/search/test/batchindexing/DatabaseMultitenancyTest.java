@@ -9,35 +9,23 @@ package org.hibernate.search.test.batchindexing;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
+import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
-import org.h2.Driver;
-import org.hibernate.HibernateException;
-import org.hibernate.MultiTenancyStrategy;
+import org.fest.util.Collections;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl;
-import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionProvider;
-import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.testing.RequiresDialect;
-import org.hibernate.tool.hbm2ddl.ConnectionHelper;
-import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +41,8 @@ import org.junit.Test;
  * where a hit is found in the search but it's from the wrong tenant.
  *
  * @author Davide D'Alto
+ * @author Sanne Grinovero
+ * @since 5.2
  */
 @RequiresDialect(
 	comment = "The connection provider for this test requires H2",
@@ -86,24 +76,9 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		};
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name() );
-		cfg.setProperty( AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, ClockMultitenantConnectionProvider.class.getName() );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
-
-		// Multi-tenancy does not work well with SchemaExport
-		cfg.getProperties().remove( AvailableSettings.HBM2DDL_AUTO );
-	}
-
-	@Override
 	@Before
 	public void setUp() throws Exception {
-		ClockMultitenantConnectionProvider.start();
 		super.setUp();
-
-		exportSchema( ClockMultitenantConnectionProvider.GEOCHRON_PROVIDER );
-		exportSchema( ClockMultitenantConnectionProvider.METAMEC_PROVIDER );
 
 		Session sessionMetamec = openSessionWithTenantId( METAMEC_TID );
 		persist( sessionMetamec, METAMEC_MODELS );
@@ -248,11 +223,6 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		return getSessionFactory().withOptions().tenantIdentifier( tenantId ).openSession();
 	}
 
-	@Override
-	protected Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { Clock.class };
-	}
-
 	private void persist(Session session, Clock... clocks) {
 		session.beginTransaction();
 		for ( Clock clock : clocks ) {
@@ -271,7 +241,6 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		session = openSessionWithTenantId( GEOCHRON_TID );
 		deleteClocks( session );
 		session.close();
-		ClockMultitenantConnectionProvider.stop();
 	}
 
 	private void deleteClocks(Session session) {
@@ -285,84 +254,16 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		session.clear();
 	}
 
-	/*
-	 * Hibernate does not generate the schema when using multi-tenancy.
-	 * We have to call the SchemaExport class explicitly.
-	 */
-	private void exportSchema(final ConnectionProvider provider) {
-		String[] dropSchemaScript = generateDropSchemaScript( DIALECT );
-		String[] createSchemaScript = generateSchemaCreationScript( DIALECT );
-		new SchemaExport( new ConnectionHelper() {
+	// Test setup configuration:
 
-			private Connection connection;
-
-			@Override
-			public void prepare(boolean needsAutoCommit) throws SQLException {
-				connection = provider.getConnection();
-			}
-
-			@Override
-			public Connection getConnection() throws SQLException {
-				return connection;
-			}
-
-			@Override
-			public void release() throws SQLException {
-				provider.closeConnection( connection );
-			}
-		},
-
-		dropSchemaScript, createSchemaScript ).execute( false, true, false, false );
+	@Override
+	public Class<?>[] getAnnotatedClasses() {
+		return new Class<?>[] { Clock.class };
 	}
 
-	public static class ClockMultitenantConnectionProvider extends AbstractMultiTenantConnectionProvider {
-
-		private static DriverManagerConnectionProviderImpl METAMEC_PROVIDER;
-		private static DriverManagerConnectionProviderImpl GEOCHRON_PROVIDER;
-
-		@Override
-		protected ConnectionProvider getAnyConnectionProvider() {
-			return GEOCHRON_PROVIDER;
-		}
-
-		@Override
-		protected ConnectionProvider selectConnectionProvider(String tenantIdentifier) {
-			if ( METAMEC_TID.equals( tenantIdentifier ) ) {
-				return METAMEC_PROVIDER;
-			}
-			else if ( GEOCHRON_TID.equals( tenantIdentifier ) ) {
-				return GEOCHRON_PROVIDER;
-			}
-			throw new HibernateException( "Unknown tenant identifier: " + tenantIdentifier );
-		}
-
-		private static DriverManagerConnectionProviderImpl buildConnectionProvider(String tenantId) {
-			DriverManagerConnectionProviderImpl connectionProvider = new DriverManagerConnectionProviderImpl();
-			connectionProvider.configure( getConnectionProviderProperties( tenantId + "-db" ) );
-			return connectionProvider;
-		}
-
-		public static Properties getConnectionProviderProperties(String dbName) {
-			Properties props = new Properties( null );
-			props.put( Environment.DRIVER, Driver.class.getName() );
-			props.put( Environment.URL, String.format( "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;MVCC=TRUE", dbName) );
-			props.put( Environment.USER, "sa" );
-			props.put( Environment.PASS, "" );
-			return props;
-		}
-
-		static void stop() {
-			METAMEC_PROVIDER.stop();
-			GEOCHRON_PROVIDER.stop();
-			//Cleanup hacky static variables
-			METAMEC_PROVIDER = null;
-			GEOCHRON_PROVIDER = null;
-		}
-
-		static void start() {
-			METAMEC_PROVIDER = buildConnectionProvider( METAMEC_TID );
-			GEOCHRON_PROVIDER = buildConnectionProvider( GEOCHRON_TID );
-		}
+	@Override
+	public Set<String> multiTenantIds() {
+		return Collections.set( METAMEC_TID, GEOCHRON_TID );
 	}
 
 }

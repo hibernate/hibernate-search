@@ -174,7 +174,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Man.class, Pet.class, Puppy.class, Woman.class };
 	}
 }

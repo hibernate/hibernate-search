@@ -8,13 +8,12 @@ package org.hibernate.search.test.engine;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -145,16 +144,15 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 
 	// Test setup options - Entities
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { BusLine.class, BusStop.class };
 	}
 
 	// Test setup options - SessionFactory Properties
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration configuration) {
-		super.configure( configuration );
-		configuration.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
-		configuration.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
+		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 
 }

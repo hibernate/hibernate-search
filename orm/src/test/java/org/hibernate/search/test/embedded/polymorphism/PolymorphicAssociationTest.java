@@ -82,7 +82,7 @@ public class PolymorphicAssociationTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Level1.class, Level2.class, DerivedLevel2.class, Level3.class };
 	}
 

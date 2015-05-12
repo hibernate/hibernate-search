@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
-
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
@@ -51,13 +51,12 @@ public class CustomMassIndexerFactoryTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( MASS_INDEXER_FACTORY_CLASSNAME, NoopMassIndexerFactory.class.getName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( MASS_INDEXER_FACTORY_CLASSNAME, NoopMassIndexerFactory.class.getName() );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Clock.class };
 	}
 

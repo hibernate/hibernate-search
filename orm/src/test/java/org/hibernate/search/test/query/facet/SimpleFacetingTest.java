@@ -342,7 +342,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Car.class,
 				Fruit.class

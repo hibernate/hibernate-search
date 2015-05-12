@@ -42,7 +42,7 @@ public class DocumentIdContainedInTest extends RecursiveGraphTest {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { PersonWithBrokenSocialSecurityNumber.class };
 	}
 

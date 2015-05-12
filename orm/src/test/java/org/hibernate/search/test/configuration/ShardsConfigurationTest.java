@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.configuration;
 
+import java.util.Map;
+
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -32,29 +34,29 @@ import static org.junit.Assert.assertTrue;
 public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
+	public void configure(Map<String,Object> cfg) {
 		super.configure( cfg );
 
-		cfg.setProperty( "hibernate.search.default.sharding_strategy.nbr_of_shards", "2" );// permit this?
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( "hibernate.search.default.2.directory_provider", "ram" );
-		cfg.setProperty( "hibernate.search.Documents.indexwriter.max_buffered_docs", "4" );
-		cfg.setProperty( "hibernate.search.Documents.indexwriter.max_merge_docs", "5" );
-		cfg.setProperty( "hibernate.search.Documents.sharding_strategy.nbr_of_shards", "4" );
-		cfg.setProperty( "hibernate.search.Documents.sharding_strategy", UselessShardingStrategy.class.getCanonicalName() );
-		cfg.setProperty( "hibernate.search.Documents.sharding_strategy.test.system.default", "45" );
-		cfg.setProperty( "hibernate.search.Documents.sharding_strategy.test.output", "70" );
-		cfg.setProperty( "hibernate.search.Documents.0.indexwriter.max_merge_docs", "57" );
+		cfg.put( "hibernate.search.default.sharding_strategy.nbr_of_shards", "2" );// permit this?
+		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.put( "hibernate.search.default.2.directory_provider", "ram" );
+		cfg.put( "hibernate.search.Documents.indexwriter.max_buffered_docs", "4" );
+		cfg.put( "hibernate.search.Documents.indexwriter.max_merge_docs", "5" );
+		cfg.put( "hibernate.search.Documents.sharding_strategy.nbr_of_shards", "4" );
+		cfg.put( "hibernate.search.Documents.sharding_strategy", UselessShardingStrategy.class.getCanonicalName() );
+		cfg.put( "hibernate.search.Documents.sharding_strategy.test.system.default", "45" );
+		cfg.put( "hibernate.search.Documents.sharding_strategy.test.output", "70" );
+		cfg.put( "hibernate.search.Documents.0.indexwriter.max_merge_docs", "57" );
 		//use fqcn to make sure it still works even after the introduction of the shortcuts
-		cfg.setProperty( "hibernate.search.Documents.0.directory_provider", RAMDirectoryProvider.class.getCanonicalName() );
-		cfg.setProperty( "hibernate.search.Documents.0.indexwriter.max_buffered_docs", "58" );
-		cfg.setProperty( "hibernate.search.Documents.1.indexwriter.max_merge_docs", "11" );
-		cfg.setProperty( "hibernate.search.Documents.1.indexwriter.max_buffered_docs", "12" );
-		cfg.setProperty( "hibernate.search.Documents.1.indexwriter.term_index_interval", "12" );
+		cfg.put( "hibernate.search.Documents.0.directory_provider", RAMDirectoryProvider.class.getCanonicalName() );
+		cfg.put( "hibernate.search.Documents.0.indexwriter.max_buffered_docs", "58" );
+		cfg.put( "hibernate.search.Documents.1.indexwriter.max_merge_docs", "11" );
+		cfg.put( "hibernate.search.Documents.1.indexwriter.max_buffered_docs", "12" );
+		cfg.put( "hibernate.search.Documents.1.indexwriter.term_index_interval", "12" );
 
 		//super contains these:
-		//cfg.setProperty( "hibernate.search.default.indexwriter.merge_factor", "100" );
-		//cfg.setProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
+		//cfg.put( "hibernate.search.default.indexwriter.merge_factor", "100" );
+		//cfg.put( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
 	}
 
 	@Test
@@ -103,7 +105,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
 				Author.class,

@@ -7,16 +7,14 @@
 package org.hibernate.search.test.query.initandlookup;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.fest.assertions.Condition;
-
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -291,15 +289,14 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
-		cfg.setProperty( "hibernate.search.default.worker.backend", GatedLuceneBackend.class.getName() );
-		cfg.setProperty( Environment.CACHE_REGION_FACTORY, CachingRegionFactory.class.getCanonicalName() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( Environment.USE_SECOND_LEVEL_CACHE, "true" );
+		cfg.put( "hibernate.search.default.worker.backend", GatedLuceneBackend.class.getName() );
+		cfg.put( Environment.CACHE_REGION_FACTORY, CachingRegionFactory.class.getCanonicalName() );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { Kernel.class };
 	}
 }

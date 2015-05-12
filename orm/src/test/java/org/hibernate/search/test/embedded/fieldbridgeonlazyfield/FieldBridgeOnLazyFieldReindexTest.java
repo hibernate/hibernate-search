@@ -33,10 +33,11 @@ public class FieldBridgeOnLazyFieldReindexTest extends SearchTestBase {
 		prepareEntities();
 		verifyMatchExistsWithName( "name", "name" );
 
-		Session session = openSession();
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		MassIndexer massIndexer = fullTextSession.createIndexer( Root.class );
-		massIndexer.startAndWait();
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			MassIndexer massIndexer = fullTextSession.createIndexer( Root.class );
+			massIndexer.startAndWait();
+		}
 		verifyMatchExistsWithName( "name", "name" );
 	}
 
@@ -84,7 +85,7 @@ public class FieldBridgeOnLazyFieldReindexTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { LazyItem.class, Leaf.class, Root.class };
 	}
 }

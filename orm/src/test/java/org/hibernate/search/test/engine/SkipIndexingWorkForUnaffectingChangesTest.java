@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.test.engine;
 
+import java.util.Map;
+
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
@@ -83,19 +83,15 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestBase {
 
 	// Test setup options - Entities
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { BusLine.class, BusStop.class };
 	}
 
 	// Test setup options - SessionFactory Properties
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration configuration) {
-		super.configure( configuration );
-		configuration.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
-		configuration.setProperty(
-				"hibernate.search.default.worker.backend",
-				LeakingLuceneBackend.class.getName()
-		);
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
 	}
 
 	protected boolean isDirtyCheckEnabled() {

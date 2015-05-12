@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.test.engine.worker;
 
+import java.util.Map;
+
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.hibernate.cfg.Configuration;
 
 /**
  * @author Emmanuel Bernard
@@ -31,12 +31,11 @@ public class AsyncWorkerTest extends WorkerTestCase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.worker.scope", "transaction" );
-		cfg.setProperty( "hibernate.search.default.worker.execution", "async" );
-		cfg.setProperty( "hibernate.search.default.worker.thread_pool.size", "1" );
-		cfg.setProperty( "hibernate.search.default.worker.buffer_queue.max", "10" );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.worker.scope", "transaction" );
+		cfg.put( "hibernate.search.default.worker.execution", "async" );
+		cfg.put( "hibernate.search.default.worker.thread_pool.size", "1" );
+		cfg.put( "hibernate.search.default.worker.buffer_queue.max", "10" );
 	}
 
 	@Override

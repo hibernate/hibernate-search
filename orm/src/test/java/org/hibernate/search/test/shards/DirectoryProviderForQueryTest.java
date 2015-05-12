@@ -7,13 +7,11 @@
 package org.hibernate.search.test.shards;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -29,11 +27,10 @@ import static org.junit.Assert.assertEquals;
 public class DirectoryProviderForQueryTest extends SearchTestBase {
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		// this strategy allows the caller to use a pre-search filter to define which index to hit
-		cfg.setProperty( "hibernate.search.Email.sharding_strategy", SpecificShardingStrategy.class.getCanonicalName() );
-		cfg.setProperty( "hibernate.search.Email.sharding_strategy.nbr_of_shards", "2" );
+		cfg.put( "hibernate.search.Email.sharding_strategy", SpecificShardingStrategy.class.getCanonicalName() );
+		cfg.put( "hibernate.search.Email.sharding_strategy.nbr_of_shards", "2" );
 	}
 
 	/**
@@ -80,7 +77,7 @@ public class DirectoryProviderForQueryTest extends SearchTestBase {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Email.class
 		};

@@ -141,7 +141,7 @@ public class WorkDuplicationTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
 	}
 }

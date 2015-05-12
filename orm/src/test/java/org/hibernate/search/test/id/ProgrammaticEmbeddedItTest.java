@@ -8,14 +8,12 @@ package org.hibernate.search.test.id;
 
 import java.lang.annotation.ElementType;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.SearchMapping;
@@ -71,8 +69,7 @@ public class ProgrammaticEmbeddedItTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
 			.entity( PlainPerson.class )
@@ -82,11 +79,11 @@ public class ProgrammaticEmbeddedItTest extends SearchTestBase {
 				.bridge( PersonPKBridge.class )
 			.property( "", ElementType.FIELD )
 				.field();
-		cfg.getProperties().put( Environment.MODEL_MAPPING, mapping );
+		cfg.put( Environment.MODEL_MAPPING, mapping );
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[]{ PlainPerson.class };
 	}
 

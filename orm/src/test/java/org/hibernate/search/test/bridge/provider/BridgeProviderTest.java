@@ -74,7 +74,7 @@ public class BridgeProviderTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Movie.class,
 				Theater.class

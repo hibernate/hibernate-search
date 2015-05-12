@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.test.configuration;
 
-import org.hibernate.HibernateException;
+import java.util.Map;
 
+import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -71,9 +72,8 @@ public abstract class ConfigurationReadTestCase extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 	}
 
 	public static void assertCfgIsInvalid(Configuration configuration, Class[] mapping) {

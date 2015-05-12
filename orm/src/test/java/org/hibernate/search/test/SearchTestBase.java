@@ -7,15 +7,16 @@
 package org.hibernate.search.test;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.store.Directory;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.After;
@@ -28,7 +29,7 @@ import org.junit.runner.RunWith;
  * @author Hardy Ferentschik
  */
 @RunWith(CustomRunner.class)
-public abstract class SearchTestBase implements TestResourceManager {
+public abstract class SearchTestBase implements TestResourceManager, TestConfiguration {
 
 	protected static final Boolean PERFORMANCE_TESTS_ENABLED = TestConstants.arePerformanceTestsEnabled();
 
@@ -43,11 +44,6 @@ public abstract class SearchTestBase implements TestResourceManager {
 	@After
 	public void tearDown() throws Exception {
 		getTestResourceManager().defaultTearDown();
-	}
-
-	@Override
-	public String getConfigurationProperty(String propertyKey) {
-		return getTestResourceManager().getConfigurationProperty( propertyKey );
 	}
 
 	@Override
@@ -101,25 +97,20 @@ public abstract class SearchTestBase implements TestResourceManager {
 	}
 
 	@Override
-	public String[] generateDropSchemaScript(Dialect d) {
-		return getTestResourceManager().generateDropSchemaScript( d );
+	public void configure(Map<String,Object> settings) {
+		//Empty by default
 	}
 
 	@Override
-	public String[] generateSchemaCreationScript(Dialect d) {
-		return getTestResourceManager().generateSchemaCreationScript( d );
-	}
-
-	protected abstract Class<?>[] getAnnotatedClasses();
-
-	protected void configure(Configuration cfg) {
-		getTestResourceManager().applyDefaultConfiguration( cfg );
+	public Set<String> multiTenantIds() {
+		//Empty by default; specify more than one tenant to enable multi-tenancy
+		return Collections.emptySet();
 	}
 
 	// synchronized due to lazy initialization
 	private synchronized DefaultTestResourceManager getTestResourceManager() {
 		if ( testResourceManager == null ) {
-			testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
+			testResourceManager = new DefaultTestResourceManager( this );
 		}
 		return testResourceManager;
 	}

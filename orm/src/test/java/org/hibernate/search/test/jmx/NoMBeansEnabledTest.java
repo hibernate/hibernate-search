@@ -8,10 +8,11 @@ package org.hibernate.search.test.jmx;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.util.Map;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
@@ -47,16 +48,15 @@ public class NoMBeansEnabledTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		File targetDir = TestConstants.getTargetDir( NoMBeansEnabledTest.class );
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 
-		cfg.setProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" );
-		cfg.setProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
-		cfg.setProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() );
-		cfg.setProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
+		cfg.put( "hibernate.session_factory_name", "java:comp/SessionFactory" );
+		cfg.put( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
+		cfg.put( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() );
+		cfg.put( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
 		// not setting the property is effectively the same as setting is explicitly to false
 		// cfg.setProperty( Environment.JMX_ENABLED, "false" );
 	}
@@ -85,7 +85,7 @@ public class NoMBeansEnabledTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { };
 	}
 }

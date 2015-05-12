@@ -127,7 +127,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Driver.class, Truck.class, Item.class };
 	}
 

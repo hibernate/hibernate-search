@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test.jgroups.common;
 
-import org.hibernate.cfg.Configuration;
+import java.util.Map;
+
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.backend.jgroups.impl.MessageSenderService;
@@ -57,19 +58,19 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
+	public void configure(Map<String,Object> cfg) {
 		//master jgroups configuration
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
-		cfg.getProperties().put( DispatchMessageSender.CHANNEL_INJECT, masterChannel );
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
+		cfg.put( DispatchMessageSender.CHANNEL_INJECT, masterChannel );
 	}
 
 	@Override
-	protected void commonConfigure(Configuration cfg) {
+	protected void configureSlave(Map<String,Object> cfg) {
 		//slave jgroups configuration
-		super.commonConfigure( cfg );
-		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.getProperties().put( DispatchMessageSender.CHANNEL_INJECT, slaveChannel );
+		super.configureSlave( cfg );
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
+		cfg.put( DispatchMessageSender.CHANNEL_INJECT, slaveChannel );
 	}
 
 	private static JChannel createChannel() throws Exception {

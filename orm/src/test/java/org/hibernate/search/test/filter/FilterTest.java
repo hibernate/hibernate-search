@@ -7,6 +7,7 @@
 package org.hibernate.search.test.filter;
 
 import java.util.Calendar;
+import java.util.Map;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.Term;
@@ -292,59 +293,60 @@ public class FilterTest extends SearchTestBase {
 	}
 
 	private void createData() {
-		Session s = openSession();
-		s.getTransaction().begin();
-		Calendar cal = Calendar.getInstance();
-		cal.set( 2006, 10, 11 );
-		Driver driver = new Driver();
-		driver.setDelivery( cal.getTime() );
-		driver.setId( 1 );
-		driver.setName( "Emmanuel" );
-		driver.setScore( 5 );
-		driver.setTeacher( "andre" );
-		s.persist( driver );
+		try ( Session s = openSession() ) {
+			s.getTransaction().begin();
+			Calendar cal = Calendar.getInstance();
+			cal.set( 2006, 10, 11 );
+			Driver driver = new Driver();
+			driver.setDelivery( cal.getTime() );
+			driver.setId( 1 );
+			driver.setName( "Emmanuel" );
+			driver.setScore( 5 );
+			driver.setTeacher( "andre" );
+			s.persist( driver );
 
-		cal.set( 2007, 10, 11 );
-		driver = new Driver();
-		driver.setDelivery( cal.getTime() );
-		driver.setId( 2 );
-		driver.setName( "Gavin" );
-		driver.setScore( 3 );
-		driver.setTeacher( "aaron" );
-		s.persist( driver );
+			cal.set( 2007, 10, 11 );
+			driver = new Driver();
+			driver.setDelivery( cal.getTime() );
+			driver.setId( 2 );
+			driver.setName( "Gavin" );
+			driver.setScore( 3 );
+			driver.setTeacher( "aaron" );
+			s.persist( driver );
 
-		cal.set( 2004, 10, 11 );
-		driver = new Driver();
-		driver.setDelivery( cal.getTime() );
-		driver.setId( 3 );
-		driver.setName( "Liz" );
-		driver.setScore( 5 );
-		driver.setTeacher( "max" );
-		s.persist( driver );
+			cal.set( 2004, 10, 11 );
+			driver = new Driver();
+			driver.setDelivery( cal.getTime() );
+			driver.setId( 3 );
+			driver.setName( "Liz" );
+			driver.setScore( 5 );
+			driver.setTeacher( "max" );
+			s.persist( driver );
 
-		String employer = "Red Hat";
-		Employee employee = new FullTimeEmployee();
-		employee.setId( 1 );
-		employee.setFullName( "John D Doe" );
-		employee.setRole( Role.ADMINISTRATOR );
-		employee.setEmployer( employer );
-		s.persist( employee );
+			String employer = "Red Hat";
+			Employee employee = new FullTimeEmployee();
+			employee.setId( 1 );
+			employee.setFullName( "John D Doe" );
+			employee.setRole( Role.ADMINISTRATOR );
+			employee.setEmployer( employer );
+			s.persist( employee );
 
-		employee = new FullTimeEmployee();
-		employee.setId( 2 );
-		employee.setFullName( "Mary S. Doe" );
-		employee.setRole( Role.DEVELOPER );
-		employee.setEmployer( employer );
-		s.persist( employee );
+			employee = new FullTimeEmployee();
+			employee.setId( 2 );
+			employee.setFullName( "Mary S. Doe" );
+			employee.setRole( Role.DEVELOPER );
+			employee.setEmployer( employer );
+			s.persist( employee );
 
-		employee = new PartTimeEmployee();
-		employee.setId( 3 );
-		employee.setFullName( "Dave Connor" );
-		employee.setRole( Role.CONSULTANT );
-		employee.setEmployer( employer );
-		s.persist( employee );
+			employee = new PartTimeEmployee();
+			employee.setId( 3 );
+			employee.setFullName( "Dave Connor" );
+			employee.setRole( Role.CONSULTANT );
+			employee.setEmployer( employer );
+			s.persist( employee );
 
-		s.getTransaction().commit();
+			s.getTransaction().commit();
+		}
 	}
 
 	@Override
@@ -366,7 +368,7 @@ public class FilterTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Driver.class,
 				Soap.class,
@@ -376,9 +378,8 @@ public class FilterTest extends SearchTestBase {
 	}
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.filter.cache_docidresults.size", "10" );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.filter.cache_docidresults.size", "10" );
 		InstanceBasedExcludeAllFilter.reset();
 	}
 

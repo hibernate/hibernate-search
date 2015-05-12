@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.test.backend;
 
+import java.util.Map;
+
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
@@ -58,17 +58,16 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Clock.class };
 	}
 
 	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
+	public void configure(Map<String,Object> cfg) {
 		//needs FSDirectory to have the index contents survive the SessionFactory close
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( "hibernate.search.default.max_queue_length", "5" );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.put( "hibernate.search.default.max_queue_length", "5" );
+		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
 }

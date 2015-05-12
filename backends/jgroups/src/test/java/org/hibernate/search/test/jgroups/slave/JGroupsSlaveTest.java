@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.test.jgroups.slave;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
@@ -43,72 +42,76 @@ public class JGroupsSlaveTest extends SearchTestBase {
 	@Test
 	public void testMessageSend() throws Exception {
 
+		TShirt ts;
 		JGroupsReceiver.reset();
 
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		TShirt ts = new TShirt();
-		ts.setLogo( "Boston" );
-		ts.setSize( "XXL" );
-		ts.setLength( 23.3d );
-		TShirt ts2 = new TShirt();
-		ts2.setLogo( "Mapple leaves" );
-		ts2.setSize( "L" );
-		ts2.setLength( 23.32d );
-		s.persist( ts );
-		s.persist( ts2 );
-		tx.commit();
+		try ( Session s = openSession() ) {
+			Transaction tx = s.beginTransaction();
+			ts = new TShirt();
+			ts.setLogo( "Boston" );
+			ts.setSize( "XXL" );
+			ts.setLength( 23.3d );
+			TShirt ts2 = new TShirt();
+			ts2.setLogo( "Mapple leaves" );
+			ts2.setSize( "L" );
+			ts2.setLength( 23.32d );
+			s.persist( ts );
+			s.persist( ts2 );
+			tx.commit();
 
-		boolean failed = true;
-		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
-			Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
-			if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 2 ) { //the condition we're waiting for
-				failed = false;
-				break; //enough time wasted
+			boolean failed = true;
+			for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
+				Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
+				if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 2 ) { //the condition we're waiting for
+					failed = false;
+					break; //enough time wasted
+				}
 			}
-		}
-		if ( failed ) {
-			Assert.fail( "Message not received after waiting for long!" );
-		}
-
-		JGroupsReceiver.reset();
-		s = openSession();
-		tx = s.beginTransaction();
-		ts = (TShirt) s.get( TShirt.class, ts.getId() );
-		ts.setLogo( "Peter pan" );
-		tx.commit();
-
-		failed = true;
-		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
-			Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
-			if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 ) { //the condition we're waiting for
-				failed = false;
-				break; //enough time wasted
+			if ( failed ) {
+				Assert.fail( "Message not received after waiting for long!" );
 			}
-		}
-		if ( failed ) {
-			Assert.fail( "Message not received after waiting for long!" );
 		}
 
 		JGroupsReceiver.reset();
-		s = openSession();
-		tx = s.beginTransaction();
-		s.delete( s.get( TShirt.class, ts.getId() ) );
-		tx.commit();
 
-		failed = true;
-		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
-			Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
-			if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 ) { //the condition we're waiting for
-				failed = false;
-				break; //enough time wasted
+		try ( Session s = openSession() ) {
+			Transaction tx = s.beginTransaction();
+			ts = (TShirt) s.get( TShirt.class, ts.getId() );
+			ts.setLogo( "Peter pan" );
+			tx.commit();
+
+			boolean failed = true;
+			for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
+				Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
+				if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 ) { //the condition we're waiting for
+					failed = false;
+					break; //enough time wasted
+				}
+			}
+			if ( failed ) {
+				Assert.fail( "Message not received after waiting for long!" );
 			}
 		}
-		if ( failed ) {
-			Assert.fail( "Message not received after waiting for long!" );
-		}
 
-		s.close();
+		JGroupsReceiver.reset();
+
+		try ( Session s = openSession() ) {
+			Transaction tx = s.beginTransaction();
+			s.delete( s.get( TShirt.class, ts.getId() ) );
+			tx.commit();
+
+			boolean failed = true;
+			for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
+				Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
+				if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 ) { //the condition we're waiting for
+					failed = false;
+					break; //enough time wasted
+				}
+			}
+			if ( failed ) {
+				Assert.fail( "Message not received after waiting for long!" );
+			}
+		}
 	}
 
 	private void prepareJGroupsChannel() throws Exception {
@@ -134,20 +137,19 @@ public class JGroupsSlaveTest extends SearchTestBase {
 	}
 
 	@Override
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};
 	}
 
 	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" );
-		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.MESSAGE_TIMEOUT_MS, "100" );
-		cfg.setProperty( DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( DispatchMessageSender.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
+		cfg.put( "hibernate.search.default." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" );
+		cfg.put( "hibernate.search.default." + JGroupsBackendQueueProcessor.MESSAGE_TIMEOUT_MS, "100" );
+		cfg.put( DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
+		cfg.put( DispatchMessageSender.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}
 
 }
