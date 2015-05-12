@@ -17,6 +17,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
@@ -36,6 +37,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Test utility class for managing ORM and Search test resources.
  *
+ * The Configuration instance cfg has a lifecycle coupled to the SessionFactory: it's
+ * created when the SessionFactory is started, and nulled when it's closed.
+ * It is not exposed for modification after the SessionFactory is started.
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
@@ -50,21 +55,16 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private SessionFactory sessionFactory;
 	private Session session;
 	private SearchFactory searchFactory;
-	private boolean needsConfigurationRebuild;
 
 	public DefaultTestResourceManager(Class<?>[] annotatedClasses) {
 		this.annotatedClasses = annotatedClasses == null ? new Class<?>[0] : annotatedClasses;
-		this.cfg = new Configuration();
 		this.baseIndexDir = createBaseIndexDir();
-		this.needsConfigurationRebuild = true;
 	}
 
 	@Override
 	public void openSessionFactory() {
 		if ( sessionFactory == null ) {
-			if ( cfg == null ) {
-				throw new IllegalStateException( "configuration was not built" );
-			}
+			buildConfiguration();
 			setSessionFactory( cfg.buildSessionFactory( /*new TestInterceptor()*/ ) );
 		}
 		else {
@@ -78,11 +78,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			sessionFactory.close();
 			sessionFactory = null;
 		}
-	}
-
-	@Override
-	public Configuration getCfg() {
-		return cfg;
+		cfg = null;
 	}
 
 	@Override
@@ -98,9 +94,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public SessionFactory getSessionFactory() {
-		if ( cfg == null ) {
-			throw new IllegalStateException( "Configuration should be already defined at this point" );
-		}
+		requireConfiguration();
 		if ( sessionFactory == null ) {
 			throw new IllegalStateException( "SessionFactory should be already defined at this point" );
 		}
@@ -117,7 +111,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public void ensureIndexesAreEmpty() {
-		if ( "jms".equals( getCfg().getProperty( "hibernate.search.worker.backend" ) ) ) {
+		if ( "jms".equals( getConfigurationProperty( "hibernate.search.worker.backend" ) ) ) {
 			log.debug( "JMS based test. Skipping index emptying" );
 			return;
 		}
@@ -143,17 +137,6 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	@Override
 	public File getBaseIndexDir() {
 		return baseIndexDir;
-	}
-
-	@Override
-	public void forceConfigurationRebuild() {
-		this.needsConfigurationRebuild = true;
-		this.cfg = new Configuration();
-	}
-
-	@Override
-	public boolean needsConfigurationRebuild() {
-		return this.needsConfigurationRebuild;
 	}
 
 	public void defaultTearDown() throws Exception {
@@ -193,10 +176,14 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		this.sessionFactory = sessionFactory;
 	}
 
-	public void buildConfiguration() {
+	private void buildConfiguration() {
+		if ( cfg != null ) {
+			throw new IllegalStateException( "Configuration was already created!" );
+		}
+		cfg = new Configuration();
 		try {
 			for ( Class<?> aClass : annotatedClasses ) {
-				getCfg().addAnnotatedClass( aClass );
+				cfg.addAnnotatedClass( aClass );
 			}
 		}
 		catch (HibernateException e) {
@@ -211,7 +198,6 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			e.printStackTrace();
 			throw new RuntimeException( e );
 		}
-		needsConfigurationRebuild = false;
 	}
 
 	private File createBaseIndexDir() {
@@ -233,4 +219,29 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			connection.rollback();
 		}
 	}
+
+	@Override
+	public String getConfigurationProperty(String propertyKey) {
+		requireConfiguration();
+		return cfg.getProperty( propertyKey );
+	}
+
+	private void requireConfiguration() {
+		if ( cfg == null ) {
+			throw new IllegalStateException( "Configuration should be already defined at this point" );
+		}
+	}
+
+	@Override
+	public String[] generateDropSchemaScript(Dialect d) {
+		requireConfiguration();
+		return cfg.generateDropSchemaScript( d );
+	}
+
+	@Override
+	public String[] generateSchemaCreationScript(Dialect d) {
+		requireConfiguration();
+		return cfg.generateSchemaCreationScript( d );
+	}
+
 }

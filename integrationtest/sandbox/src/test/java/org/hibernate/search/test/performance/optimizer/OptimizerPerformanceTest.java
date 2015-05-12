@@ -36,7 +36,6 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	@Override
 	@Before
 	public void setUp() throws Exception {
-		forceConfigurationRebuild();
 		String indexBase = TestConstants.getIndexDirectory( OptimizerPerformanceTest.class );
 		File indexDir = new File(indexBase);
 		FileHelper.delete( indexDir );

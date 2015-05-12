@@ -75,8 +75,6 @@ public class NoMBeansEnabledTest extends SearchTestBase {
 			mbeanServer.unregisterMBean( indexBeanObjectName );
 		}
 
-		// build the new configuration
-		forceConfigurationRebuild();
 		super.setUp();
 	}
 

@@ -13,8 +13,7 @@ import org.apache.lucene.store.Directory;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
-import org.hibernate.cfg.Configuration;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.spi.SearchIntegrator;
 
@@ -25,7 +24,7 @@ import org.hibernate.search.spi.SearchIntegrator;
  */
 public interface TestResourceManager {
 
-	Configuration getCfg();
+	String getConfigurationProperty(String propertyKey);
 
 	void openSessionFactory();
 
@@ -47,7 +46,8 @@ public interface TestResourceManager {
 
 	File getBaseIndexDir();
 
-	void forceConfigurationRebuild();
+	String[] generateDropSchemaScript(Dialect d);
 
-	boolean needsConfigurationRebuild();
+	String[] generateSchemaCreationScript(Dialect d);
+
 }

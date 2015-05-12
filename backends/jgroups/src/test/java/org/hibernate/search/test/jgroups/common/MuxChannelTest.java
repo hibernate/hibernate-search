@@ -45,7 +45,6 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 	public void setUp() throws Exception {
 		muxId = (short) new Random().nextInt();
 		channels = createChannels();
-		forceConfigurationRebuild();
 		super.setUp();
 	}
 

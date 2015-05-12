@@ -38,7 +38,6 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 	public void setUp() throws Exception {
 		masterChannel = createChannel();
 		slaveChannel = createChannel();
-		forceConfigurationRebuild();
 		super.setUp();
 	}
 

@@ -48,7 +48,6 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@Override
 	@Before
 	public void setUp() throws Exception {
-		forceConfigurationRebuild();
 		String indexBase = TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class );
 		File indexDir = new File(indexBase);
 		indexDir.mkdir();

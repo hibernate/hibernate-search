@@ -12,8 +12,8 @@ import org.apache.lucene.store.Directory;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
 import org.hibernate.cfg.Configuration;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.testsupport.TestConstants;
@@ -37,12 +37,7 @@ public abstract class SearchTestBase implements TestResourceManager {
 
 	@Before
 	public void setUp() throws Exception {
-		DefaultTestResourceManager testResourceManager = getTestResourceManager();
-		if ( testResourceManager.needsConfigurationRebuild() ) {
-			configure( testResourceManager.getCfg() );
-			testResourceManager.buildConfiguration();
-		}
-		testResourceManager.openSessionFactory();
+		getTestResourceManager().openSessionFactory();
 	}
 
 	@After
@@ -51,8 +46,8 @@ public abstract class SearchTestBase implements TestResourceManager {
 	}
 
 	@Override
-	public final Configuration getCfg() {
-		return getTestResourceManager().getCfg();
+	public String getConfigurationProperty(String propertyKey) {
+		return getTestResourceManager().getConfigurationProperty( propertyKey );
 	}
 
 	@Override
@@ -106,13 +101,13 @@ public abstract class SearchTestBase implements TestResourceManager {
 	}
 
 	@Override
-	public void forceConfigurationRebuild() {
-		getTestResourceManager().forceConfigurationRebuild();
+	public String[] generateDropSchemaScript(Dialect d) {
+		return getTestResourceManager().generateDropSchemaScript( d );
 	}
 
 	@Override
-	public boolean needsConfigurationRebuild() {
-		return getTestResourceManager().needsConfigurationRebuild();
+	public String[] generateSchemaCreationScript(Dialect d) {
+		return getTestResourceManager().generateSchemaCreationScript( d );
 	}
 
 	protected abstract Class<?>[] getAnnotatedClasses();
