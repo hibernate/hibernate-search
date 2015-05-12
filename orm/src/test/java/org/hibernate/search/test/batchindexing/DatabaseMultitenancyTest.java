@@ -102,8 +102,8 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		ClockMultitenantConnectionProvider.start();
 		super.setUp();
 
-		exportSchema( ClockMultitenantConnectionProvider.GEOCHRON_PROVIDER, getCfg() );
-		exportSchema( ClockMultitenantConnectionProvider.METAMEC_PROVIDER, getCfg() );
+		exportSchema( ClockMultitenantConnectionProvider.GEOCHRON_PROVIDER );
+		exportSchema( ClockMultitenantConnectionProvider.METAMEC_PROVIDER );
 
 		Session sessionMetamec = openSessionWithTenantId( METAMEC_TID );
 		persist( sessionMetamec, METAMEC_MODELS );
@@ -289,9 +289,9 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	 * Hibernate does not generate the schema when using multi-tenancy.
 	 * We have to call the SchemaExport class explicitly.
 	 */
-	private void exportSchema(final ConnectionProvider provider, Configuration cfg) {
-		String[] generateDropSchemaScript = cfg.generateDropSchemaScript( DIALECT );
-		String[] generateSchemaCreationScript = cfg.generateSchemaCreationScript( DIALECT );
+	private void exportSchema(final ConnectionProvider provider) {
+		String[] dropSchemaScript = generateDropSchemaScript( DIALECT );
+		String[] createSchemaScript = generateSchemaCreationScript( DIALECT );
 		new SchemaExport( new ConnectionHelper() {
 
 			private Connection connection;
@@ -312,7 +312,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 			}
 		},
 
-		generateDropSchemaScript, generateSchemaCreationScript ).execute( false, true, false, false );
+		dropSchemaScript, createSchemaScript ).execute( false, true, false, false );
 	}
 
 	public static class ClockMultitenantConnectionProvider extends AbstractMultiTenantConnectionProvider {
