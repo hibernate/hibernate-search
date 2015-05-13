@@ -1022,4 +1022,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 333, value = "Cannot query: there aren't any mapped entity. Don't forget to add @Indexed to at least one class." )
 	SearchException queryWithNoIndexedType();
+
+	@Message(id = 334, value = "The simple query parser does not support empty queries.")
+	EmptyQueryException simpleQueryParserDoesNotSupportEmptyQueries();
+
+	@Message(id = 335, value = "Unable to build a Lucene query from the query string '%1$s'.")
+	EmptyQueryException unableToBuildLuceneQueryFromQueryString(String query);
+
 }

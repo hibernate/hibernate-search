@@ -39,6 +39,8 @@ import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.dsl.impl.RemoteMatchQuery;
 import org.hibernate.search.query.dsl.impl.RemotePhraseQuery;
+import org.hibernate.search.query.dsl.impl.RemoteSimpleQueryStringQuery;
+import org.hibernate.search.query.dsl.impl.RemoteSimpleQueryStringQuery.Field;
 import org.hibernate.search.query.dsl.sort.impl.NativeSortField;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -73,6 +75,7 @@ public class ToElasticsearch {
 	private static final int DEFAULT_SLOP = 0;
 	private static final int DEFAULT_MAX_EDIT_DISTANCE = 0;
 	private static final float DEFAULT_BOOST = 1.0f;
+	private static final String BOOST_OPERATOR = "^";
 
 	private static final JsonParser JSON_PARSER = new JsonParser();
 
@@ -211,6 +214,9 @@ public class ToElasticsearch {
 		}
 		else if ( query instanceof RemoteMatchQuery ) {
 			return convertRemoteMatchQuery( (RemoteMatchQuery) query );
+		}
+		else if ( query instanceof RemoteSimpleQueryStringQuery ) {
+			return convertRemoteSimpleQueryStringQuery( (RemoteSimpleQueryStringQuery) query );
 		}
 		else if ( query instanceof ConstantScoreQuery ) {
 			return convertConstantScoreQuery( (ConstantScoreQuery) query );
@@ -419,6 +425,30 @@ public class ToElasticsearch {
 				).build();
 
 		return wrapQueryForNestedIfRequired( query.getField(), matchQuery );
+	}
+
+	private static JsonObject convertRemoteSimpleQueryStringQuery(RemoteSimpleQueryStringQuery query) {
+		JsonBuilder.Object queryBuilder = JsonBuilder.object()
+				.addProperty( "query", query.getQuery() )
+				.addProperty( "default_operator", query.isMatchAll() ? "and" : "or" );
+
+		// we always have at least one field defined
+		JsonArray fieldArray = new JsonArray();
+		for ( Field field : query.getFields() ) {
+			StringBuilder sb = new StringBuilder( field.getName() );
+			if ( field.getBoost() != DEFAULT_BOOST ) {
+				sb.append( BOOST_OPERATOR ).append( field.getBoost() );
+			}
+			fieldArray.add( sb.toString() );
+		}
+		queryBuilder.add( "fields", fieldArray );
+
+		JsonObject simpleQueryStringQuery = JsonBuilder.object()
+				.add( "simple_query_string",
+						queryBuilder.append( boostAppender( query ) ) )
+				.build();
+
+		return simpleQueryStringQuery;
 	}
 
 	private static JsonObject convertTermRangeQuery(TermRangeQuery query) {

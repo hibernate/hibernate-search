@@ -48,6 +48,11 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		return this;
 	}
 
+	// TODO: this is ugly: we probably need to rethink how this is built to not depend on Lucene behavior
+	public float getBoost() {
+		return boost;
+	}
+
 	public Query createQuery() {
 		Query finalQuery = wrappedQuery;
 		if ( wrappedQuery == null ) {
