@@ -136,7 +136,6 @@
 
     <properties>
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
-        <hibernate.search.module.slot>5.2</hibernate.search.module.slot>
         <infinispan.module.slot>ispn-7.2</infinispan.module.slot>
         <lucene.module.slot>4.10</lucene.module.slot>
         <jgroups.module.slot>ispn-7.2</jgroups.module.slot>
@@ -672,6 +671,21 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- This defines the properties 'parsedVersion.majorVersion'
+                    and 'parsedVersion.minorVersion' to be in synch with the current project version -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                    <id>parse-version</id>
+                    <goals>
+                        <goal>parse-version</goal>
+                    </goals>
+                  </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-maven-plugin</artifactId>
                 <configuration>
@@ -1011,6 +1025,19 @@
                                         <versionRange>[1.2,)</versionRange>
                                         <goals>
                                             <goal>generate-depends-file</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>build-helper-maven-plugin</artifactId>
+                                        <versionRange>[1.9.1,)</versionRange>
+                                        <goals>
+                                            <goal>parse-version</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>

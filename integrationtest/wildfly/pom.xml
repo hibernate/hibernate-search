@@ -27,7 +27,6 @@
         here due to dependency conflicts with specific versions of WildFly
         -->
         <enforcer.skip>true</enforcer.skip>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -68,13 +67,6 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-backend-jms</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Infinispan -->
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-core</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -185,13 +177,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <systemPropertyVariables>
-                        <hibernate.search.module.slot.version>${hibernate.search.module.slot}</hibernate.search.module.slot.version>
-                        <dependency.version.Lucene>${luceneVersion}</dependency.version.Lucene>
-                        <dependency.version.HibernateCommonsAnnotations>${hibernateCommonsAnnotationVersion}</dependency.version.HibernateCommonsAnnotations>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -221,22 +206,6 @@
                                     <outputDirectory>${project.build.directory}/node2</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.infinispan</groupId>
-                                    <artifactId>infinispan-as-embedded-modules</artifactId>
-                                    <version>${infinispanVersion}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.infinispan</groupId>
-                                    <artifactId>infinispan-as-embedded-modules</artifactId>
-                                    <version>${infinispanVersion}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-search-modules</artifactId>
                                     <version>${project.version}</version>
@@ -258,28 +227,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- Temporary workaround to make sure the same lucene version is used in infinispan and hibernate search modules -->
-            <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>replacer</artifactId>
-                <version>1.5.3</version>
-                <executions>
-                    <execution>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>replace</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>
-                        <include>${project.build.directory}/**/module.xml</include>
-                    </includes>
-                    <xpath><![CDATA[ //module[@name="org.apache.lucene"]/@slot ]]></xpath>
-                    <token>^.*$</token>
-                    <value>${lucene.module.slot}</value>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

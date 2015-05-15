@@ -43,13 +43,12 @@ public class ModuleMemberRegistrationIT {
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		WebArchive archive = ShrinkWrap
+		return ShrinkWrap
 				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
-		return archive;
 	}
 
 	private static Asset persistenceXml() {

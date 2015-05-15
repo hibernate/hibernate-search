@@ -22,9 +22,7 @@
         <module.xml.basedir>src/main/modules</module.xml.basedir>
         <aliases.xml.basedir>src/main/aliases</aliases.xml.basedir>
         <hibernate.search.version>${project.version}</hibernate.search.version>
-
-        <!-- Needs to match the SLOT being used by Infinispan -->
-        <infinispan.integration.slot>${infinispan.module.slot}</infinispan.integration.slot>
+        <hibernate.search.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot>
     </properties>
 
     <dependencies>

@@ -101,9 +101,6 @@
             <includes>
                 <include>org.apache.lucene:*</include>
             </includes>
-            <excludes>
-                <exclude>org.apache.lucene:lucene-sandbox</exclude>
-            </excludes>
         </dependencySet>
 
     </dependencySets>
