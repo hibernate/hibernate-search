@@ -1,6 +1,17 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.3.0.Beta2 (19-5-2015)
+------------------------
+
+** New Feature
+    * [HSEARCH-1866] - Revert changes to signatures of methods in TypeMetadata and PropertyMetadata
+
+** Task
+    * [HSEARCH-1864] - Module slot not following version name
+    * [HSEARCH-1873] - Upgrade integration tests and modules to target WildFly 9
+
+
 Version 5.3.0.Beta1 (6-5-2015)
 ------------------------
 
