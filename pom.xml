@@ -147,7 +147,7 @@
         <hibernateVersion>5.0.0.CR1</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.5.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
-        <bytemanVersion>2.2.1</bytemanVersion>
+        <bytemanVersion>3.0.0</bytemanVersion>
         <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>2.0.0.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>5.0.0.Final</narayanaVersion>
