@@ -190,6 +190,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-infinispan</artifactId>
+                <version>${hibernateVersion}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hibernate.common</groupId>
                 <artifactId>hibernate-commons-annotations</artifactId>
                 <version>${hibernateCommonsAnnotationVersion}</version>
