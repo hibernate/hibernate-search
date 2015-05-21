@@ -83,7 +83,7 @@ public class VersionTestHelper {
 	}
 
 	private static String getWildFlyModuleDependencies() {
-		return "org.hibernate.search.orm:" + getModuleSlotString() + " services, org.hibernate.search.hibernate-orm-repackage:"  + getModuleSlotString() + " services";
+		return "org.hibernate.search.orm:" + getModuleSlotString() + " services, org.hibernate.search.hibernate-orm-repackage:" + getModuleSlotString() + " export";
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class VersionTestHelper {
 		return systemProperty;
 	}
 
-	private static String injectVariables(String dependencies) {
+	public static String injectVariables(String inputString) {
 		Properties projectCompilationProperties = new Properties();
 		final InputStream resourceAsStream = VersionTestHelper.class.getClassLoader().getResourceAsStream( "module-versions.properties" );
 		try {
@@ -127,9 +127,9 @@ public class VersionTestHelper {
 		for ( Entry<Object,Object> entry : entrySet ) {
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
-			dependencies = dependencies.replace( "${" + key + "}", value );
+			inputString = inputString.replace( "${" + key + "}", value );
 		}
-		return dependencies;
+		return inputString;
 	}
 
 }

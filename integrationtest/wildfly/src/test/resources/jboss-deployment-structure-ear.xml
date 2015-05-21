@@ -2,8 +2,9 @@
 <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.1">
     <deployment>
         <dependencies>
-            <module name="org.hibernate.search.orm" services="export" export="true" slot="${hibernate.search.module.slot}"/>
-            <module name="org.hibernate.search.hibernate-orm-repackage" services="export" export="true" slot="${hibernate.search.module.slot}"/>
+            <!-- FIXME use properties rather than hardcode the slot -->
+            <module name="org.hibernate.search.orm" services="export" export="true" slot="5.4"/>
+            <module name="org.hibernate.search.hibernate-orm-repackage" services="export" export="true" slot="5.4"/>
         </dependencies>
     </deployment>
 </jboss-deployment-structure>
