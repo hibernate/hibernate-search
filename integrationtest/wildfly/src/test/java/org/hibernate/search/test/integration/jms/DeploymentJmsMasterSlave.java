@@ -8,6 +8,7 @@ package org.hibernate.search.test.integration.jms;
 
 import java.io.File;
 
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
@@ -98,7 +99,17 @@ public final class DeploymentJmsMasterSlave {
 				.createPersistenceUnit()
 					.name( "pu-" + name )
 					.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+					// The deployment Scanner is disabled as the JipiJapa integration is not available because of the custom Hibernate ORM module:
+					.clazz( RegisteredMember.class.getName() )
 					.getOrCreateProperties()
+						.createProperty()
+							.name( "jboss.as.jpa.providerModule" )
+							.value( VersionTestHelper.injectVariables( "org.hibernate.search.hibernate-orm-repackage:${dependency.version.HibernateSearch}" ) )
+							.up()
+						.createProperty()
+							.name( "hibernate.transaction.jta.platform" )
+							.value( "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" )
+							.up()
 						.createProperty()
 							.name( "hibernate.hbm2ddl.auto" )
 							.value( "create-drop" )

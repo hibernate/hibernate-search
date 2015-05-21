@@ -8,6 +8,7 @@ package org.hibernate.search.test.integration.cmp;
 
 import javax.inject.Inject;
 
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -70,10 +71,14 @@ public class ContainerManagedPersistenceWithMassIndexerIT {
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.clazz( Singer.class.getName() )
 				.getOrCreateProperties()
-				.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create" ).up()
-				.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
-				.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
-				.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
+					//Only needed because we override the Hibernate ORM module with a custom one:
+					.createProperty().name( "jboss.as.jpa.providerModule" ).value( VersionTestHelper.injectVariables( "org.hibernate.search.hibernate-orm-repackage:${dependency.version.HibernateSearch}" ) ).up()
+					//Only needed because the above custom module also disables the default integration adapters:
+					.createProperty().name( "hibernate.transaction.jta.platform" ).value( "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" ).up()
+					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create" ).up()
+					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
+					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
+					.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
 				.up().up()
 				.exportAsString();
 		return new StringAsset( persistenceXml );
