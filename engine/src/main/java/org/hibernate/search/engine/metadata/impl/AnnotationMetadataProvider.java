@@ -134,13 +134,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private XPackage packageInfo(Class<?> clazz) {
+		String packageName = clazz.getPackage().getName();
 		try {
-			return reflectionManager.packageForName( clazz.getPackage().getName() );
+			return reflectionManager.packageForName( packageName );
 		}
 		catch (ClassNotFoundException | ClassLoadingException e) {
 			// ClassNotFoundException: should not happen at this point
 			// ClassLoadingExceptionn: Package does not contain a package-info.java
-			log.debugf( "package-info not found for %s", e, clazz );
+			log.debugf( "package-info not found for package '%s'", packageName, clazz );
 			return null;
 		}
 	}
