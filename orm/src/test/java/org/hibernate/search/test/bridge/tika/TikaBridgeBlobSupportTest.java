@@ -16,6 +16,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
@@ -68,7 +69,6 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 	@SuppressWarnings("unchecked")
 	private void searchBook(Session session) throws ParseException {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		Transaction tx = session.beginTransaction();
 		QueryParser parser = new QueryParser(
 				TestConstants.getTargetLuceneVersion(),
 				"content",
@@ -90,7 +90,8 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 		result = fullTextSession.createFullTextQuery( query ).list();
 		assertEquals( "there should be match", 1, result.size() );
 
-		tx.commit();
+		result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
+		assertEquals( "there should be match", 2, result.size() );
 	}
 
 	private void persistBook(Session session, Blob data) throws IOException {
