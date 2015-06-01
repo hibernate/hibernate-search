@@ -76,13 +76,15 @@ public class TikaBridge implements FieldBridge {
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		Metadata metadata = metadataProcessor.prepareMetadata();
-		String fieldValue;
+		final Metadata metadata;
+		final String fieldValue;
 
 		if ( value != null ) {
+			metadata = metadataProcessor.prepareMetadata();
 			fieldValue = getFieldValue( name, value, metadata );
 		}
 		else if ( luceneOptions.indexNullAs() != null ) {
+			metadata = metadataProcessor.prepareMetadata();
 			fieldValue = luceneOptions.indexNullAs();
 		}
 		else {
