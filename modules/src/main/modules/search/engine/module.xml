@@ -18,8 +18,10 @@
         <!-- JMS backend support -->
         <module name="org.hibernate.search.backend-jms" export="true" optional="true" slot="${hibernate.search.version}" />
 
-        <!-- JGroups and Infinispan 7 integrations -->
+        <!-- JGroups integration -->
         <module name="org.jgroups" optional="true" slot="${jgroups.module.slot}" />
+
+        <!-- Infinispan extensions - provided by the Infinispan project -->
         <module name="org.infinispan.hibernate-search.directory-provider" slot="${infinispan.integration.slot}" services="import" optional="true" />
 
         <!-- optional Avro serialization -->

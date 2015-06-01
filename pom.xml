@@ -136,7 +136,6 @@
 
     <properties>
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
-        <infinispan.module.slot>ispn-7.2</infinispan.module.slot>
         <lucene.module.slot>4.10</lucene.module.slot>
         <jgroups.module.slot>ispn-7.2</jgroups.module.slot>
 
