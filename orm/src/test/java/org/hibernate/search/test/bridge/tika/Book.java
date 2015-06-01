@@ -7,6 +7,7 @@
 package org.hibernate.search.test.bridge.tika;
 
 import java.sql.Blob;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,7 +18,6 @@ import javax.persistence.Lob;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TikaBridge;
-
 
 /**
  * @author Hardy Ferentschik
@@ -41,7 +41,7 @@ public class Book {
 
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
-	@Field
+	@Field(indexNullAs = "<NULL>")
 	@TikaBridge
 	public Blob getContent() {
 		return content;
@@ -51,5 +51,3 @@ public class Book {
 		this.content = content;
 	}
 }
-
-

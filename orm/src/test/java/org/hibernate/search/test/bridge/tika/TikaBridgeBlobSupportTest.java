@@ -17,18 +17,16 @@ import org.apache.commons.io.FileUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
@@ -56,7 +54,9 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 	public void testDefaultTikaBridgeWithBlobData() throws Exception {
 		Session session = openSession();
 
-		persistBook( session );
+		persistBook( session, getBlobData( PATH_TO_TEST_DOCUMENT_PDF, session ) );
+		persistBook( session, null );
+
 		// we have to index manually. Using the Blob (streaming approach) the indexing would try to re-read the
 		// input stream of the blob after it was persisted into the database
 		indexBook( session );
@@ -85,14 +85,18 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 		result = fullTextSession.createFullTextQuery( query ).list();
 		assertEquals( "there should be match", 1, result.size() );
 
+		query = parser.parse( "<NULL>" );
+
+		result = fullTextSession.createFullTextQuery( query ).list();
+		assertEquals( "there should be match", 1, result.size() );
+
 		tx.commit();
 	}
 
-	private void persistBook(Session session) throws IOException {
+	private void persistBook(Session session, Blob data) throws IOException {
 		Transaction tx = session.beginTransaction();
 
 		Book book = new Book();
-		Blob data = getBlobData( PATH_TO_TEST_DOCUMENT_PDF, session );
 		book.setContent( data );
 
 		session.save( book );
