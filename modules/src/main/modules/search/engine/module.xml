@@ -24,8 +24,11 @@
         <!-- Infinispan extensions - provided by the Infinispan project -->
         <module name="org.infinispan.hibernate-search.directory-provider" slot="${infinispan.integration.slot}" services="import" optional="true" />
 
-        <!-- optional Avro serialization -->
+        <!-- optional Apache Avro serialization -->
         <module name="org.hibernate.search.serialization-avro" slot="${hibernate.search.version}" services="import" optional="true" />
+
+        <!-- optional Apache Tika integration -->
+        <module name="org.apache.tika" slot="${tika.module.slot}" optional="true" />
 
         <!-- For naming -->
         <module name="javax.api" />
