@@ -1,6 +1,18 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.3.0.CR1 (1-6-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1880] - Unresolved slot for Infinispan in hibernate-search-engine module
+
+** Improvement
+    * [HSEARCH-1877] - Gracefully handle null values in TikaBridge
+    * [HSEARCH-1883] - Allow an optional dependency of the JBoss Modules to Apache Tika
+    * [HSEARCH-1884] - Upgrade to Hibernate ORM 4.3.10.Final
+
+
 Version 5.3.0.Beta2 (19-5-2015)
 ------------------------
 
