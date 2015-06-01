@@ -66,11 +66,6 @@ public class TikaBridgeTest {
 		CustomTikaParseContextProvider.invocationCount = 0;
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNullDataThrowsException() {
-		bridgeUnderTest.set( testFieldName, null, testDocument, options );
-	}
-
 	@Test
 	public void testPdfToString() throws Exception {
 		URI pdfUri = TikaBridgeTest.class.getResource( TEST_DOCUMENT_PDF ).toURI();

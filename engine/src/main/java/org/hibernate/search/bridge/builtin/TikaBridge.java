@@ -22,7 +22,6 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.WriteOutContentHandler;
-
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
@@ -77,12 +76,31 @@ public class TikaBridge implements FieldBridge {
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		if ( value == null ) {
-			throw new IllegalArgumentException( "null cannot be passed to Tika bridge" );
+		Metadata metadata = metadataProcessor.prepareMetadata();
+		String fieldValue;
+
+		if ( value != null ) {
+			fieldValue = getFieldValue( name, value, metadata );
 		}
+		else if ( luceneOptions.indexNullAs() != null ) {
+			fieldValue = luceneOptions.indexNullAs();
+		}
+		else {
+			return;
+		}
+
+		luceneOptions.addFieldToDocument( name, fieldValue, document );
+
+		// allow for optional indexing of metadata by the user
+		metadataProcessor.set( name, value, document, luceneOptions, metadata );
+	}
+
+	/**
+	 * Opens an input stream for the given blob, byte array, file or URI and returns its contents.
+	 */
+	private String getFieldValue(String name, Object value, Metadata metadata) {
 		InputStream in = getInputStreamForData( value );
 		try {
-			Metadata metadata = metadataProcessor.prepareMetadata();
 			ParseContext parseContext = parseContextProvider.getParseContext( name, value );
 
 			StringWriter writer = new StringWriter();
@@ -90,10 +108,8 @@ public class TikaBridge implements FieldBridge {
 
 			Parser parser = new AutoDetectParser();
 			parser.parse( in, contentHandler, metadata, parseContext );
-			luceneOptions.addFieldToDocument( name, writer.toString(), document );
 
-			// allow for optional indexing of metadata by the user
-			metadataProcessor.set( name, value, document, luceneOptions, metadata );
+			return writer.toString();
 		}
 		catch (Exception e) {
 			throw log.unableToParseDocument( e );
