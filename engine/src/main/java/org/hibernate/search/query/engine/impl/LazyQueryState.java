@@ -30,6 +30,7 @@ import org.hibernate.search.metadata.PropertyDescriptor;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -38,6 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public final class LazyQueryState implements Closeable {
 
 	private static final Log log = LoggerFactory.make();
+	private static final Log QUERY_LOG = LoggerFactory.make( LogCategory.QUERY );
 
 	private final Query userQuery;
 	private final IndexSearcher searcher;
@@ -100,6 +102,7 @@ public final class LazyQueryState implements Closeable {
 
 	public void search(final Filter filter, final Collector collector) throws IOException {
 		validateQuery();
+		QUERY_LOG.executingLuceneQuery( userQuery );
 		searcher.search( rewrittenQuery(), filter, collector );
 	}
 

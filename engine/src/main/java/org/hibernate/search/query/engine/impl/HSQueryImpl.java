@@ -41,8 +41,8 @@ import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.ChainedFilter;
-import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.filter.impl.DefaultFilterKey;
+import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -68,6 +68,7 @@ import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResu
  * @author Hardy Ferentschik <hardy@hibernate.org>
  */
 public class HSQueryImpl implements HSQuery, Serializable {
+
 	private static final Log log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
