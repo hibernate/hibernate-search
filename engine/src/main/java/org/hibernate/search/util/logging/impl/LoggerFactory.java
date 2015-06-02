@@ -31,8 +31,7 @@ public final class LoggerFactory {
 		return Logger.getMessageLogger( logClass, directCaller.getClassName() );
 	}
 
-	public static Log make(String categoryName) {
-		return Logger.getMessageLogger( Log.class, categoryName );
+	public static Log make(LogCategory category) {
+		return Logger.getMessageLogger( Log.class, category.getName() );
 	}
-
 }

@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.util.logging.impl;
 
-import org.apache.lucene.util.InfoStream;
-
 import java.io.IOException;
+
+import org.apache.lucene.util.InfoStream;
 
 /**
  * An implementation of {@link org.apache.lucene.util.InfoStream}
@@ -16,17 +16,7 @@ import java.io.IOException;
  */
 public class LoggerInfoStream extends InfoStream {
 
-	/**
-	 * This is the category name of the Logger used to print out the Lucene infostream.
-	 * To enable the logger, the category needs to be enabled at TRACE level and configuration
-	 * property {@code org.hibernate.search.backend.configuration.impl.IndexWriterSetting#INFOSTREAM}
-	 * needs to be enabled on the index.
-	 *
-	 * @see org.hibernate.search.backend.configuration.impl.IndexWriterSetting#INFOSTREAM
-	 */
-	public static final String INFOSTREAM_LOGGER_CATEGORY = "org.hibernate.search.backend.lucene.infostream";
-
-	private final Log logger = LoggerFactory.make( INFOSTREAM_LOGGER_CATEGORY );
+	private final Log logger = LoggerFactory.make( LogCategory.INFOSTREAM_LOGGER_CATEGORY );
 
 	@Override
 	public void message(String component, String message) {
