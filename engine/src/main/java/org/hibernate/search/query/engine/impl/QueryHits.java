@@ -49,7 +49,6 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Counter;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.collector.impl.FacetsCollectorDecorator;
 import org.hibernate.search.query.collector.impl.FieldCacheCollector;
@@ -306,7 +305,7 @@ public class QueryHits {
 				facets = updateStringFacets( (DiscreteFacetRequest) facetRequest );
 			}
 			else {
-				facets = updateRangeFacets( (RangeFacetRequest) facetRequest );
+				facets = updateRangeFacets( (RangeFacetRequest<?>) facetRequest );
 			}
 
 			// sort if necessary
@@ -324,7 +323,7 @@ public class QueryHits {
 		}
 	}
 
-	private ArrayList<Facet> updateRangeFacets(RangeFacetRequest facetRequest) throws IOException {
+	private ArrayList<Facet> updateRangeFacets(RangeFacetRequest<?> facetRequest) throws IOException {
 		ArrayList<Facet> facets;
 		if ( ReflectionHelper.isIntegerType( facetRequest.getFacetValueType() )
 				|| Date.class.isAssignableFrom( facetRequest.getFacetValueType() ) ) {
@@ -354,12 +353,12 @@ public class QueryHits {
 		return facets;
 	}
 
-	private FacetResult getFacetResultForFloatingPointRange(RangeFacetRequest facetRequest) throws IOException {
-		List<FacetRange<?>> facetRanges = facetRequest.getFacetRangeList();
+	private FacetResult getFacetResultForFloatingPointRange(RangeFacetRequest<?> facetRequest) throws IOException {
+		List<? extends FacetRange<?>> facetRanges = facetRequest.getFacetRangeList();
 		DoubleRange[] ranges = new DoubleRange[facetRanges.size()];
 
 		int i = 0;
-		for ( FacetRange facetRange : facetRanges ) {
+		for ( FacetRange<?> facetRange : facetRanges ) {
 			ranges[i] = new DoubleRange(
 					facetRange.getRangeString(),
 					facetRange.getMin() == null ? Double.MIN_VALUE : ( (Number) facetRange.getMin() ).doubleValue(),
@@ -381,13 +380,13 @@ public class QueryHits {
 		);
 	}
 
-	private FacetResult getFacetResultForLongRange(RangeFacetRequest facetRequest)
+	private FacetResult getFacetResultForLongRange(RangeFacetRequest<?> facetRequest)
 			throws IOException {
-		List<FacetRange<?>> facetRanges = facetRequest.getFacetRangeList();
+		List<? extends FacetRange<?>> facetRanges = facetRequest.getFacetRangeList();
 		LongRange[] ranges = new LongRange[facetRanges.size()];
 
 		int i = 0;
-		for ( FacetRange facetRange : facetRanges ) {
+		for ( FacetRange<?> facetRange : facetRanges ) {
 			long min;
 			long max;
 

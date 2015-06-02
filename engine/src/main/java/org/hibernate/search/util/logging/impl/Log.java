@@ -511,7 +511,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 166, value = "IndexManager factory resolved alias '%1$s' to '%2$s'.")
-	void indexManagerAliasResolved(String alias, Class im);
+	void indexManagerAliasResolved(String alias, @FormatWith(ClassFormatter.class) Class<?> im);
 
 	@Message(id = 167, value = "More than one @DocumentId specified on entity '%1$s'")
 	SearchException duplicateDocumentIdFound(String beanXClassName);
@@ -522,7 +522,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 169, value = "FieldBridge '%1$s' does not have a objectToString method: field '%2$s' in '%3$s'" +
 			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query")
-	SearchException fieldBridgeNotTwoWay(Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
+	SearchException fieldBridgeNotTwoWay(@FormatWith(ClassFormatter.class) Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
 
 	@Message(id = 176, value = "Document could not be parsed")
 	SearchException unableToParseDocument(@Cause Throwable cause);
@@ -773,7 +773,7 @@ public interface Log extends BasicLogger {
 	void loadingNonExistentField(String name);
 
 	@Message(id = 259, value = "Unable to delete all %s matching Query: %s")
-	SearchException unableToDeleteByQuery(Class<?> entityClass, DeletionQuery deletionQuery, @Cause Exception e );
+	SearchException unableToDeleteByQuery(@FormatWith(ClassFormatter.class) Class<?> entityClass, DeletionQuery deletionQuery, @Cause Exception e );
 
 	// Only used in ORM; Defining it here for now until there is a Log interface in hibernate-search-orm
 	@LogMessage(level = Level.WARN)
