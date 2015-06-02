@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.util.logging;
 
+import java.util.List;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -17,12 +19,11 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
+import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerInfoStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
 
@@ -30,8 +31,8 @@ public class LoggerInfoStreamTest {
 
 	private static final Version VERSION = Version.LUCENE_48;
 	private Level hsearchLevel;
-	private Logger hsearchLogger = Logger.getLogger( "org.hibernate.search" );
-	private Logger rootLogger = Logger.getRootLogger();
+	private final Logger hsearchLogger = Logger.getLogger( "org.hibernate.search" );
+	private final Logger rootLogger = Logger.getRootLogger();
 	private TestAppender testAppender;
 
 	@Before
@@ -64,7 +65,7 @@ public class LoggerInfoStreamTest {
 		indexWriter.commit();
 		indexWriter.close();
 
-		List<LoggingEvent> loggingEvents = testAppender.searchByLoggerAndMessage( LoggerInfoStream.INFOSTREAM_LOGGER_CATEGORY, "IW:" );
+		List<LoggingEvent> loggingEvents = testAppender.searchByLoggerAndMessage( LogCategory.INFOSTREAM_LOGGER_CATEGORY.getName(), "IW:" );
 
 		assertFalse( loggingEvents.isEmpty() );
 	}
