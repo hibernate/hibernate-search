@@ -1874,6 +1874,16 @@ Query performance depends on several criteria:
 <<search-architecture-readerstrategy>>.
 * caching frequently extracted values from the index: see <<query-fieldcaches>>.
 
+[[query-logging]]
+==== Logging executed Lucene queries
+
+Knowing the executed queries is vital when working on performance optimizations. This is especially
+the case if your application accepts queries passed in by the user or e.g. dynamically builds queries
+using the Hibernate Search query DSL.
+
+In order to log all Lucene queries executed by Hibernate Search, enable `DEBUG` logging for the log
+category `org.hibernate.search.query`.
+
 [[query-fieldcaches]]
 ==== Caching index values: FieldCache
 
