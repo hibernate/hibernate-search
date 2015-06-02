@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.search.Query;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.backend.spi.DeletionQuery;
@@ -819,4 +820,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 273, value = "The indexed field '%1$s' in '%2$s' is analyzed and marked for faceting. Only un-analyzed fields can be faceted.")
 	SearchException attemptToFacetOnAnalyzedField(String fieldName, String entityName);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 274, value = "Executing Lucene query '%s'" )
+	void executingLuceneQuery(Query luceneQuery);
 }

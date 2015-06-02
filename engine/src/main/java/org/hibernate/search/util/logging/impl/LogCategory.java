@@ -14,6 +14,11 @@ package org.hibernate.search.util.logging.impl;
 public enum LogCategory {
 
 	/**
+	 * Category for logging executed Lucene queries.
+	 */
+	QUERY("org.hibernate.search.query"),
+
+	/**
 	 * This is the category of the Logger used to print out the Lucene infostream.
 	 * To enable the logger, the category needs to be enabled at TRACE level and configuration
 	 * property {@code org.hibernate.search.backend.configuration.impl.IndexWriterSetting#INFOSTREAM}
