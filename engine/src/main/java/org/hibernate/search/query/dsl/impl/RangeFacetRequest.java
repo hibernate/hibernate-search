@@ -55,7 +55,7 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 
 	private int findFacetRangeIndex(String value) {
 		int index = 0;
-		for ( FacetRange facetRange : facetRangeList ) {
+		for ( FacetRange<T> facetRange : facetRangeList ) {
 			if ( facetRange.getRangeString().equals( value ) ) {
 				return index;
 			}
