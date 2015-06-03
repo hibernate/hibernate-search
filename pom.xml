@@ -34,9 +34,9 @@
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/wildfly</module>
-        <module>integrationtest/performance</module>
+        <!-- <module>integrationtest/performance</module> -->
         <module>integrationtest/osgi/karaf-features</module>
-        <module>integrationtest/sandbox</module>
+        <!-- <module>integrationtest/sandbox</module> -->
     </modules>
 
     <issueManagement>
