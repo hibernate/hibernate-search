@@ -15,12 +15,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -159,14 +159,12 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	}
 
 	private void startTransformationToLuceneWork(BatchTransactionalContext transactionalContext, ErrorHandler errorHandler) {
-		final Runnable documentOutputter = new OptionallyWrapInJTATransaction( transactionalContext,
-				new IdentifierConsumerDocumentProducer(
-						primaryKeyStream, monitor, sessionFactory, producerEndSignal,
-						cacheMode, indexedType, extendedIntegrator,
-						idNameOfIndexedType, backend, errorHandler,
-						tenantId
-				),
-				tenantId);
+		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer(
+				primaryKeyStream, monitor, sessionFactory, producerEndSignal,
+				cacheMode, indexedType, extendedIntegrator,
+				idNameOfIndexedType, backend, errorHandler,
+				tenantId
+		);
 		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {
