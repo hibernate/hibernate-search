@@ -27,8 +27,8 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
@@ -125,17 +125,15 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 				(SessionImplementor) session
 		);
 		try {
-			Object take;
+			List<Serializable> idList;
 			do {
-				take = source.take();
-				if ( take != null ) {
-					@SuppressWarnings("unchecked")
-					List<Serializable> idList = (List<Serializable>) take;
+				idList = source.take();
+				if ( idList != null ) {
 					log.tracef( "received list of ids %s", idList );
 					loadList( idList, session, sessionInitializer );
 				}
 			}
-			while ( take != null );
+			while ( idList != null );
 		}
 		catch (InterruptedException e) {
 			// just quit
