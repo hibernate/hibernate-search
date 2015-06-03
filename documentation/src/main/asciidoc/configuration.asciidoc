@@ -10,7 +10,7 @@ Let's start with the most basic configuration question - how do I enable Hiberna
 ==== Enabling Hibernate Search
 
 The good news is that Hibernate Search is enabled out of the box when detected on the classpath by
-Hibernate Core. If, for some reason you need to disable it, set
+Hibernate ORM. If, for some reason you need to disable it, set
 `hibernate.search.autoregister_listeners` to false. Note that there is no performance penalty
 when the listeners are enabled but no entities are annotated as indexed.
 
@@ -1346,51 +1346,21 @@ level deployment, in META-INF (or WEB-INF for web deployments).
 
 ==== Update and activate latest Hibernate Search version in WildFly
 
-You can also download the latest Hibernate Search provided module and install it. This is often the
-best approach as you will benefit from all the latest improvements of
-Hibernate Search. Because of the modular design in WildFly, these additional modules can
-coexist with the embedded modules and won't affect any other application, unless you
-explicitly reconfigure it to use the newer module.
+*Temporarily disabled:*
 
-You can download the latest pre-packaged Hibernate Search modules from
-http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist.zip/download[Sourceforge].
-As a convenience these zip files are also distributed as Maven artifacts:
-link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist:zip].
-
-Unpack the modules in your WildFly `modules` directory: this will create modules for Hibernate Search and Apache Lucene.
-The Hibernate Search modules are:
-
-* _org.hibernate.search.orm_, for users of Hibernate Search with Hibernate; this will transitively include Hibernate ORM.
-* _org.hibernate.search.engine_, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.
-* _org.hibernate.search.backend-jms_, in case you want to use the JMS backend described in <<search-architecture-jms, JMS Architecture>>.
-
-
-Using the manifest:: Add the following entry to the `MANIFEST.MF` in your archive:
-
+[WARNING]
 ====
-[source]
-[subs="verbatim,attributes"]
-Dependencies: org.hibernate.search.orm:{hibernateSearchVersion} services
+This specific version being an early preview and requiring Hibernate ORM version 5,
+does not yet provide updated modules to run on WildFly.
+WildFly 10 will soon be updated to include these out of the box.
+
+We will again publish updated modules as usual in the near future.
 ====
 
+==== More about modules
 
-Using jboss-deployment-structure.xml:: add a resource named `jboss-deployment-structure.xml` in your top
-level deployment, in META-INF (or WEB-INF for web deployments).
-
-====
-[source, XML]
-[subs="verbatim,attributes"]
-<jboss-deployment-structure>
-    <deployment>
-        <dependencies>
-            <module
-                name="org.hibernate.search.orm"
-                slot="{hibernateSearchVersion}"
-                services="export" />
-        </dependencies>
-    </deployment>
-</jboss-deployment-structure>
-====
+More information about the modules configuration in WildFly can be found in the
+link:https://docs.jboss.org/author/display/WFLY9/Class+Loading+in+WildFly[Class Loading in WildFly 9] wiki.
 
 [TIP]
 ====
@@ -1399,9 +1369,6 @@ reading the wrong version of the user guide! JBoss EAP subscriptions include off
 Hibernate Search (as part of the WFK) and come with a different edition of this guide specifically
 tailored for EAP users.
 ====
-
-More information about the modules configuration in WildFly can be found in the
-link:https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+WildFly[Class Loading in WildFly 8] wiki.
 
 ==== Using Infinispan with Hibernate Search on WildFly
 

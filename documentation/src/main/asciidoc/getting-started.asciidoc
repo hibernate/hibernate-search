@@ -16,7 +16,7 @@ Hibernate new timer we recommend you start link:http://hibernate.org/quick-start
             runtime dependencies. You can get the jar artifacts either from
             the `dist/lib` directory of the link:http://sourceforge.net/projects/hibernate/files/hibernate-search/[Hibernate Search distribution] or you can download them from the
             link:http://repository.jboss.org/nexus/content/groups/public-jboss/org/hibernate/[JBoss maven repository].
-|Hibernate Core|You will need
+|Hibernate ORM|You will need
             `hibernate-core-{hibernateVersion}.jar` and its
             dependencies (either from the link:http://sourceforge.net/projects/hibernate/files/hibernate4/[distribution bundle] or the maven repository).
 |JPA 2.1|Hibernate Search can be used without JPA but the following instructions will use JPA annotations for basic
