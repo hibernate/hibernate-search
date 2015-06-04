@@ -63,11 +63,10 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 	public void testEventListenersAreNotRegisteredIfSearchIsExplicitlyDisabledInConfiguration() {
 		programConfigurationMock( SEARCH_DISABLED );
 
-		// no mock setup as the integrator should not call the mocks since Search is disabled
 		EasyMockUnitils.replay();
 
-		HibernateSearchIntegrator testedIntegrator = new HibernateSearchIntegrator();
-		testedIntegrator.integrate( mockMetadata, mockSessionFactoryImplementor, mockSessionFactoryServiceRegistry );
+		// Search should not care about the metadata or the factory if it's disabled
+		new HibernateSearchIntegrator().integrate( null, null, mockSessionFactoryServiceRegistry );
 	}
 
 	@Test
