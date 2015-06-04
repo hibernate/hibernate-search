@@ -43,7 +43,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * testing.
  *
  * It enforces some cleanup rules, and sets various configuration settings by default.
- * This class also takes care of schema creation for tests requireing multi-tenancy,
+ * This class also takes care of schema creation for tests requiring multi-tenancy,
  * which is normally not supported by the HBM2DDL_AUTO setting.
  *
  * @author Sanne Grinovero
