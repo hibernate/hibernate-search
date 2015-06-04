@@ -494,7 +494,7 @@ The following options can be different on each index; in fact they need the inde
 .Execution configuration
 |===============
 |*Property*|*Description*
-|hibernate.search.<indexName>.​worker.execution|`sync`: synchronous execution (default)
+|hibernate.search.<indexName>.worker.execution|`sync`: synchronous execution (default)
 
 `async`: asynchronous execution
 
@@ -512,7 +512,7 @@ configured differently for each index.
 
 |===============
 |*Property*|*Description*
-|hibernate.search.<indexName>.​worker.backend|`lucene`: The default backend which runs index updates in the same VM. Also used when the property is undefined or empty.
+|hibernate.search.<indexName>.worker.backend|`lucene`: The default backend which runs index updates in the same VM. Also used when the property is undefined or empty.
 
 `jms`: JMS backend. Index updates are send to a JMS queue to be processed by an indexing master. See <<table-jms-backend-configuration>> for additional configuration options and <<jms-backend>> for a more detailed description of this setup.
 
@@ -530,18 +530,18 @@ You can also specify the fully qualified name of a class implementing BackendQue
 
 |===============
 |*Property*|*Description*
-|hibernate.search.<indexName>.​worker.jndi.*|Defines the JNDI properties to initiate the InitialContext
+|hibernate.search.<indexName>.worker.jndi.*|Defines the JNDI properties to initiate the InitialContext
             (if needed). JNDI is only used by the JMS back end.
-|hibernate.search.<indexName>.​worker.jms.connection_factory|Mandatory for the JMS back end. Defines the JNDI name to
+|hibernate.search.<indexName>.worker.jms.connection_factory|Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS connection factory from
             (`/ConnectionFactory` by default in JBoss
             AS)
-|hibernate.search.<indexName>.​worker.jms.queue|Mandatory for the JMS back end. Defines the JNDI name to
+|hibernate.search.<indexName>.worker.jms.queue|Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS queue from. The queue will be used to post work
             messages.
-|hibernate.search.<indexName>.​worker.jms.login|Optional for the JMS slaves. Use it when your queue
+|hibernate.search.<indexName>.worker.jms.login|Optional for the JMS slaves. Use it when your queue
             requires login credentials to define your login.
-|hibernate.search.<indexName>.​worker.jms.login|Optional for the JMS slaves. Use it when your queue
+|hibernate.search.<indexName>.worker.jms.login|Optional for the JMS slaves. Use it when your queue
             requires login credentials to define your password.
 
 |===============
@@ -725,7 +725,7 @@ from their defaults.
               `true` when the backend is synchronous, to
               `false` when the backend is
               `async`.
-|hibernate.search.<indexName>.jgroups.​messages_timeout|The timeout of waiting for a single command to be
+|hibernate.search.<indexName>.jgroups.messages_timeout|The timeout of waiting for a single command to be
               acknowledged and executed when
               `block_waiting_ack` is `true`,
               or just acknowledged otherwise. Value in milliseconds, defaults
@@ -1004,13 +1004,13 @@ please refer to the Lucene documentation.
 |Description
 |Default Value
 
-|hibernate.search.​[default\|<indexname>].​exclusive_index_use
+|hibernate.search.[default\|<indexname>].exclusive_index_use
 |Set to `true` when no other process will need to write to the same index. This will enable
 Hibernate Search to work in exclusive mode on the index and improve performance when writing changes
 to the index.
 |`true` (improved performance, releases locks only at shutdown)
 
-|hibernate.search.​[default\|<indexname>].​max_queue_length
+|hibernate.search.[default\|<indexname>].max_queue_length
 |Each index has a separate "pipeline" which contains the updates to be applied to the index.
 When this queue is full adding more operations to the queue becomes a blocking operation. Configuring
 this setting doesn't make much sense unless the `worker.execution` is configured as `async`.
@@ -1020,24 +1020,24 @@ this setting doesn't make much sense unless the `worker.execution` is configured
 of write operations to the index storage. Ignored unless `worker.execution` is configured as `async`.
 |`1000`
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.max_buffered_delete_terms
+|hibernate.search.[default\|<indexname>].indexwriter.max_buffered_delete_terms
 |Determines the minimal number of delete terms required before the buffered in-memory delete terms
 are applied and flushed. If there are documents buffered in memory at the time, they are merged and
 a new segment is created.
 |Disabled (flushes by RAM usage)
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.max_buffered_docs
+|hibernate.search.[default\|<indexname>].indexwriter.max_buffered_docs
 |Controls the amount of documents buffered in memory during indexing. The bigger the more RAM is
 consumed.
 |Disabled (flushes by RAM usage)
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.max_merge_docs
+|hibernate.search.[default\|<indexname>].indexwriter.max_merge_docs
 |Defines the largest number of documents allowed in a segment. Smaller values perform better on
 frequently changing indexes, larger values provide better search performance if the index does not
 change often.
 |Unlimited (Integer.MAX_VALUE)
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.merge_factor
+|hibernate.search.[default\|<indexname>].indexwriter.merge_factor
 |Controls segment merge frequency and size. Determines how often segment indexes are merged when
 insertion occurs. With smaller values, less RAM is used while indexing, and searches on unoptimized
 indexes are faster, but indexing speed is slower. With larger values, more RAM is used during
@@ -1046,46 +1046,46 @@ values (> 10) are best for batch index creation, and smaller values (< 10) for i
 interactively maintained. The value must not be lower than 2.
 |10
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.merge_min_size
+|hibernate.search.[default\|<indexname>].indexwriter.merge_min_size
 |Controls segment merge frequency and size. Segments smaller than this size (in MB) are always
-considered for the next segment merge operation. `
+considered for the next segment merge operation.
 Setting this too large might result in expensive merge operations, even tough they are less frequent.
 See also `org.apache.lucene.index.LogDocMergePolicy.minMergeSize`.
 |0 MB (actually ~1K)
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.merge_max_size
+|hibernate.search.[default\|<indexname>].indexwriter.merge_max_size
 |Controls segment merge frequency and size. Segments larger than this size (in MB) are never merged
 in bigger segments. This helps reduce memory requirements and avoids some merging operations at the
-cost of optimal search speed. When optimizing an index this value is ignored. `
+cost of optimal search speed. When optimizing an index this value is ignored.
 See also `org.apache.lucene.index.LogDocMergePolicy.maxMergeSize`.
 |Unlimited
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.merge_max_optimize_size
+|hibernate.search.[default\|<indexname>].indexwriter.merge_max_optimize_size
 |Controls segment merge frequency and size. Segments larger than this size (in MB) are not merged
 in bigger segments even when optimizing the index (see `merge_max_size` setting as well).
 Applied to `org.apache.lucene.index.LogDocMergePolicy.maxMergeSizeForOptimize`.
 |Unlimited
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.merge_calibrate_by_deletes
+|hibernate.search.[default\|<indexname>].indexwriter.merge_calibrate_by_deletes
 |Controls segment merge frequency and size. Set to `false` to not consider deleted documents when
 estimating the merge policy. Applied to `org.apache.lucene.index.LogMergePolicy.calibrateSizeByDeletes`.
 |`true`
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.ram_buffer_size
+|hibernate.search.[default\|<indexname>].indexwriter.ram_buffer_size
 |Controls the amount of RAM in MB dedicated to document buffers. When used together max_buffered_docs
 a flush occurs for whichever event happens first.
 Generally for faster indexing performance it's best to flush by RAM usage instead of document count
 and use as large a RAM buffer as you can.
 |16 MB
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.term_index_interval
+|hibernate.search.[default\|<indexname>].indexwriter.term_index_interval
 |Expert: Set the interval between indexed terms.
 Large values cause less memory to be used by IndexReader, but slow random-access to terms.
 Small values cause more memory to be used by an IndexReader, and speed random-access to terms.
 See Lucene documentation for more details.
 |128
 
-|hibernate.search.​enable_dirty_check
+|hibernate.search.enable_dirty_check
 |Not all entity changes require an update of the Lucene index. If all of the updated entity
 properties (dirty properties) are not indexed Hibernate Search will skip the re-indexing work.
 Disable this option if you use a custom `FieldBridge` which need to be invoked at each update
@@ -1094,14 +1094,14 @@ This optimization will not be applied on classes using a `@ClassBridge` or a `@D
 Boolean parameter, use "true" or "false".
 |true
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.max_thread_states
+|hibernate.search.[default\|<indexname>].indexwriter.max_thread_states
 |Lucene's `IndexWriter` can apply writes in parallel, but this property controls the limit of
 parallelism. If you have many cores and contention on the internal structures of the `IndexWriter`
 becomes a bottleneck you should configure an higher value, at the cost of slightly higher memory
 consumption.
 |8
 
-|hibernate.search.​[default\|<indexname>].​indexwriter.infostream
+|hibernate.search.[default\|<indexname>].indexwriter.infostream
 |Enable low level trace information about Lucene's internal components.
 Will cause significant performance degradation: should only be used for troubleshooting purposes.
 |false
@@ -1181,7 +1181,7 @@ Apache Lucene allows to log a very detailed trace log from its internals using a
 To access these details, Hibernate Search can be configured to capture this internal trace from Apache Lucene and redirect it to your logger.
 
 * Enable `TRACE` level logging for the category `org.hibernate.search.backend.lucene.infostream`
-* Activate the feature on the index you want to inspect: `hibernate.search.​[default|<indexname>].​indexwriter.infostream=true`
+* Activate the feature on the index you want to inspect: `hibernate.search.[default|<indexname>].indexwriter.infostream=true`
 
 Keep in mind that this feature has a performance cost, and although most logger frameworks allow the `TRACE` level to be reconfigured at runtime,
 enabling the `infostream` property will slow you down even if the logger is disabled.
@@ -1208,18 +1208,18 @@ an implementation of `org.hibernate.search.store.LockFactoryProvider`.
 [options="header"]
 |===============
 |name|Class|Description
-|simple|org.apache.lucene.store.​SimpleFSLockFactory|Safe implementation based on Java's File API, it marks the usage of the index by creating a marker file.
+|simple|org.apache.lucene.store.SimpleFSLockFactory|Safe implementation based on Java's File API, it marks the usage of the index by creating a marker file.
 
 If for some reason you had to kill your application, you will need to remove this file before restarting it.
-|native|org.apache.lucene.store.​NativeFSLockFactory|As does `simple` this also marks the usage of the index by creating a marker file, but this one is using native OS file locks so that even if the JVM is terminated the locks will be cleaned up.
+|native|org.apache.lucene.store.NativeFSLockFactory|As does `simple` this also marks the usage of the index by creating a marker file, but this one is using native OS file locks so that even if the JVM is terminated the locks will be cleaned up.
 
 This implementation has known problems on NFS, avoid it on network shares.
 
 `native` is the default implementation for the `filesystem`, `filesystem-master` and `filesystem-slave` directory providers.
-|single|org.apache.lucene.store.​SingleInstanceLockFactory|This LockFactory doesn't use a file marker but is a Java object lock held in memory; therefore it's possible to use it only when you are sure the index is not going to be shared by any other process.
+|single|org.apache.lucene.store.SingleInstanceLockFactory|This LockFactory doesn't use a file marker but is a Java object lock held in memory; therefore it's possible to use it only when you are sure the index is not going to be shared by any other process.
 
 This is the default implementation for the `ram` directory provider.
-|none|org.apache.lucene.store.​NoLockFactory|All changes to this index are not coordinated by any lock; test your application carefully and make sure you know what it means.
+|none|org.apache.lucene.store.NoLockFactory|All changes to this index are not coordinated by any lock; test your application carefully and make sure you know what it means.
 
 |===============
 
