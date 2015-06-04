@@ -1,6 +1,13 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.4.0.Alpha1 (5-6-2015)
+------------------------
+
+** Task
+    * [HSEARCH-1874] - Upgrade to Hibernate ORM 5.0.0.CR1
+
+
 Version 5.3.0.CR1 (1-6-2015)
 ------------------------
 
