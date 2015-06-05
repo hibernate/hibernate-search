@@ -670,9 +670,9 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
     @PersistenceContext EntityManager em;
 
     @Override
-    protected SearchFactory getSearchFactory() {
+    protected SearchIntegrator getSearchIntegrator() {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
-        return fullTextEntityManager.getSearchFactory();
+        return fullTextEntityManager.getSearchFactory().unwrap(SearchIntegrator.class);
     }
 }
 ----
