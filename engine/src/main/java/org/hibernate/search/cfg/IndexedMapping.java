@@ -40,10 +40,14 @@ public class IndexedMapping {
 		return this;
 	}
 
+	/**
+	 * This feature will be removed, with no replacement
+	 * as caching fields is no longer effective.
+	 * @param type this argument will be ignored
+	 * @deprecated This will be removed with no replacement.
+	 */
+	@Deprecated
 	public IndexedMapping cacheFromIndex(FieldCacheType... type) {
-		Map<String, Object> cacheInMemory = new HashMap<String, Object>( 1 );
-		cacheInMemory.put( "value", type );
-		entity.setCacheInMemory( cacheInMemory );
 		return this;
 	}
 

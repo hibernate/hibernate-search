@@ -14,17 +14,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * While extracting values from the index might be faster than extracting
- * them from a Database, it might still involve costly IO operations.
- * Depending on the type of performed queries, it's often needed to extract
- * at least the entity type. Caches which aren't needed won't be used, but used
- * caches might take a significant amount of memory.
+ * This annotation will be ignored as the Field Cache in Apache Lucene
+ * feature does no longer exist.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @deprecated Remove the annotation. No alternative replacement necessary.
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Target({ ElementType.TYPE })
 @Documented
+@Deprecated
 public @interface CacheFromIndex {
 
 	/**

@@ -24,7 +24,6 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.collector.impl.FieldCacheCollector;
 
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
@@ -63,8 +62,6 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private int maxIndex;
 	private Query query;
 	private final Class singleClassIfPossible; //null when not possible
-	private final FieldCacheCollector classTypeCollector; //null when not used
-	private final FieldCacheCollector idsCollector; //null when not used
 	private final ConversionContext exceptionWrap = new ContextualExceptionBridgeHelper();
 
 	public DocumentExtractorImpl(QueryHits queryHits,
@@ -101,8 +98,6 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		this.query = query;
 		this.firstIndex = firstIndex;
 		this.maxIndex = maxIndex;
-		this.classTypeCollector = queryHits.getClassTypeCollector();
-		this.idsCollector = queryHits.getIdsCollector();
 		initFieldSelection( projection, idFieldNames );
 	}
 
@@ -151,10 +146,10 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				}
 			}
 		}
-		if ( singleClassIfPossible == null && classTypeCollector == null ) {
+		if ( singleClassIfPossible == null ) {
 			fields.add( ProjectionConstants.OBJECT_CLASS );
 		}
-		if ( needId && idsCollector == null ) {
+		if ( needId ) {
 			for ( String idFieldName : idFieldNames ) {
 				fields.add( idFieldName );
 			}
@@ -182,9 +177,6 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		if ( !needId ) {
 			return null;
 		}
-		else if ( this.idsCollector != null ) {
-			return (Serializable) this.idsCollector.getValue( docId );
-		}
 		else {
 			return DocumentBuilderHelper.getDocumentId( extendedIntegrator, clazz, document, exceptionWrap );
 		}
@@ -195,17 +187,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		if ( singleClassIfPossible != null ) {
 			return singleClassIfPossible;
 		}
-		String className;
-		if ( classTypeCollector != null ) {
-			className = (String) classTypeCollector.getValue( docId );
-			if ( className == null ) {
-				log.forceToUseDocumentExtraction();
-				className = forceClassNameExtraction( scoreDocIndex );
-			}
-		}
-		else {
-			className = document.get( ProjectionConstants.OBJECT_CLASS );
-		}
+		String className = document.get( ProjectionConstants.OBJECT_CLASS );
 		//and quite likely we can avoid the Reflect helper:
 		Class clazz = targetedClasses.get( className );
 		if ( clazz != null ) {

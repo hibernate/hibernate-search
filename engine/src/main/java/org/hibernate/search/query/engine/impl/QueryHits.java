@@ -51,8 +51,6 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Counter;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.collector.impl.FacetsCollectorDecorator;
-import org.hibernate.search.query.collector.impl.FieldCacheCollector;
-import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
@@ -99,21 +97,8 @@ public class QueryHits {
 	private FacetsCollector facetsCollector;
 	private DistanceCollector distanceCollector = null;
 
-	private final boolean enableFieldCacheOnClassName;
-
 	private Coordinates spatialSearchCenter = null;
 	private String spatialFieldName = null;
-
-	/**
-	 * If enabled, after hits collection it will contain the class name for each hit
-	 */
-	private FieldCacheCollector classTypeCollector;
-
-	/**
-	 * If enabled, a Collector will collect values from the primary keys
-	 */
-	private final FieldCacheCollectorFactory idFieldCollectorFactory;
-	private FieldCacheCollector idFieldCollector;
 
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 
@@ -122,8 +107,6 @@ public class QueryHits {
 			Sort sort,
 			TimeoutManagerImpl timeoutManager,
 			Map<String, FacetingRequestImpl> facetRequests,
-			boolean enableFieldCacheOnTypes,
-			FieldCacheCollectorFactory idFieldCollector,
 			TimeoutExceptionFactory timeoutExceptionFactory,
 			Coordinates spatialSearchCenter,
 			String spatialFieldName)
@@ -135,8 +118,6 @@ public class QueryHits {
 				DEFAULT_TOP_DOC_RETRIEVAL_SIZE,
 				timeoutManager,
 				facetRequests,
-				enableFieldCacheOnTypes,
-				idFieldCollector,
 				timeoutExceptionFactory,
 				spatialSearchCenter,
 				spatialFieldName
@@ -149,8 +130,6 @@ public class QueryHits {
 			Integer n,
 			TimeoutManagerImpl timeoutManager,
 			Map<String, FacetingRequestImpl> facetRequests,
-			boolean enableFieldCacheOnTypes,
-			FieldCacheCollectorFactory idFieldCollector,
 			TimeoutExceptionFactory timeoutExceptionFactory,
 			Coordinates spatialSearchCenter,
 			String spatialFieldName)
@@ -160,8 +139,6 @@ public class QueryHits {
 		this.filter = filter;
 		this.sort = sort;
 		this.facetRequests = facetRequests;
-		this.enableFieldCacheOnClassName = enableFieldCacheOnTypes;
-		this.idFieldCollectorFactory = idFieldCollector;
 		this.timeoutExceptionFactory = timeoutExceptionFactory;
 		this.spatialSearchCenter = spatialSearchCenter;
 		this.spatialFieldName = spatialFieldName;
@@ -257,8 +234,6 @@ public class QueryHits {
 			topDocCollector = createTopDocCollector( maxDocs );
 			hitCountCollector = null;
 			collector = topDocCollector;
-			collector = optionallyEnableFieldCacheOnTypes( collector, totalMaxDocs, maxDocs );
-			collector = optionallyEnableFieldCacheOnIds( collector, totalMaxDocs, maxDocs );
 			collector = optionallyEnableFacetingCollector( collector );
 			collector = optionallyEnableDistanceCollector( collector, maxDocs );
 		}
@@ -559,34 +534,6 @@ public class QueryHits {
 			);
 		}
 		return topCollector;
-	}
-
-	private Collector optionallyEnableFieldCacheOnIds(Collector collector, int totalMaxDocs, int maxDocs) {
-		if ( idFieldCollectorFactory != null ) {
-			idFieldCollector = idFieldCollectorFactory.createFieldCollector( collector, totalMaxDocs, maxDocs );
-			return idFieldCollector;
-		}
-		return collector;
-	}
-
-	private Collector optionallyEnableFieldCacheOnTypes(Collector collector, int totalMaxDocs, int expectedMatchesCount) {
-		if ( enableFieldCacheOnClassName ) {
-			classTypeCollector = FieldCacheCollectorFactory
-					.CLASS_TYPE_FIELD_CACHE_COLLECTOR_FACTORY
-					.createFieldCollector( collector, totalMaxDocs, expectedMatchesCount );
-			return classTypeCollector;
-		}
-		else {
-			return collector;
-		}
-	}
-
-	public FieldCacheCollector getClassTypeCollector() {
-		return classTypeCollector;
-	}
-
-	public FieldCacheCollector getIdsCollector() {
-		return idFieldCollector;
 	}
 
 	public static class FacetComparator implements Comparator<Facet>, Serializable {

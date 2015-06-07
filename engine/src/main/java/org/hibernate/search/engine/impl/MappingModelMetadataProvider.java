@@ -30,7 +30,6 @@ import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
 import org.hibernate.search.annotations.Boost;
-import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
@@ -559,15 +558,6 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 						annotation.setValue( entry.getKey(), entry.getValue() );
 					}
 					annotations.put( annotationType, createAnnotation( annotation ) );
-				}
-			}
-			{
-				if ( entity.getCacheInMemory() != null ) {
-					AnnotationDescriptor annotation = new AnnotationDescriptor( CacheFromIndex.class );
-					for ( Map.Entry<String, Object> entry : entity.getCacheInMemory().entrySet() ) {
-						annotation.setValue( entry.getKey(), entry.getValue() );
-					}
-					annotations.put( CacheFromIndex.class, createAnnotation( annotation ) );
 				}
 			}
 			{

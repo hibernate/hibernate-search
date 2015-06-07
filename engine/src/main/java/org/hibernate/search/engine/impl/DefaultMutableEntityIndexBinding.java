@@ -12,7 +12,6 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
@@ -61,12 +60,6 @@ public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBindi
 	@Override
 	public DocumentBuilderIndexedEntity getDocumentBuilder() {
 		return documentBuilder;
-	}
-
-	@Override
-	public FieldCacheCollectorFactory getIdFieldCacheCollectionFactory() {
-		//TODO remove this stuff from the DocumentBuilder, bring it here.
-		return documentBuilder.getIdFieldCacheCollectionFactory();
 	}
 
 	@Override

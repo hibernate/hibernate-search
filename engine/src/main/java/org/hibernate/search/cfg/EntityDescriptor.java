@@ -7,6 +7,7 @@
 package org.hibernate.search.cfg;
 
 import java.lang.annotation.ElementType;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -45,7 +46,6 @@ public class EntityDescriptor {
 	private final Map<FieldBridge, ClassBridge> classBridgeConfigurations = new IdentityHashMap<FieldBridge, ClassBridge>();
 	private final Set<Map<String, Object>> spatials = new HashSet<Map<String, Object>>();
 	private Map<String, Object> dynamicBoost;
-	private Map<String, Object> cacheInMemory;
 
 	public Map<String, Object> getIndexed() {
 		return indexed;
@@ -69,12 +69,26 @@ public class EntityDescriptor {
 		return properties.get( new PropertyKey( name, type ) );
 	}
 
+	/**
+	 * This feature will be removed, with no replacement
+	 * as caching fields is no longer effective.
+	 * @return This will always return an empty Map.
+	 * @deprecated This will be removed with no replacement.
+	 */
+	@Deprecated
 	public Map<String, Object> getCacheInMemory() {
-		return cacheInMemory;
+		return Collections.<String, Object>emptyMap();
 	}
 
+	/**
+	 * This feature will be removed, with no replacement
+	 * as caching fields is no longer effective.
+	 * @param cacheInMemory this parameter will be ignored.
+	 * @deprecated This will be removed with no replacement.
+	 */
+	@Deprecated
 	public void setCacheInMemory(Map<String, Object> cacheInMemory) {
-		this.cacheInMemory = cacheInMemory;
+		//No-op: this feature is no longer available
 	}
 
 	public void setBoost(Map<String, Object> boost) {
