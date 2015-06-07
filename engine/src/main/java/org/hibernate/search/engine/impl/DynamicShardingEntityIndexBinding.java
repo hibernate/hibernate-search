@@ -16,7 +16,6 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
@@ -84,12 +83,6 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 	@Override
 	public DocumentBuilderIndexedEntity getDocumentBuilder() {
 		return documentBuilder;
-	}
-
-	@Override
-	public FieldCacheCollectorFactory getIdFieldCacheCollectionFactory() {
-		//TODO remove this stuff from the DocumentBuilder, bring it here.
-		return documentBuilder.getIdFieldCacheCollectionFactory();
 	}
 
 	@Override

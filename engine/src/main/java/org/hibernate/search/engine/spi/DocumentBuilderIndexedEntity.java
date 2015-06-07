@@ -12,7 +12,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +33,6 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.analyzer.Discriminator;
-import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -62,9 +60,6 @@ import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
-import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
-import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -118,17 +113,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 */
 	private boolean idProvided;
 
-	/**
-	 * Type of allowed FieldCache usage
-	 */
-	private final Set<org.hibernate.search.annotations.FieldCacheType> fieldCacheUsage;
-
 	private final String identifierName;
-
-	/**
-	 * Which strategy to use to load values from the FieldCache
-	 */
-	private final FieldCacheCollectorFactory idFieldCacheCollectorFactory;
 
 	/**
 	 * The document field name of the document id
@@ -168,23 +153,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 		idFieldName = idPropertyMetadata.getFieldMetadata().iterator().next().getName();
 
-		CacheFromIndex fieldCacheOptions = clazz.getAnnotation( CacheFromIndex.class );
-		if ( fieldCacheOptions == null ) {
-			this.fieldCacheUsage = Collections.unmodifiableSet( EnumSet.of( org.hibernate.search.annotations.FieldCacheType.CLASS ) );
-		}
-		else {
-			EnumSet<org.hibernate.search.annotations.FieldCacheType> enabledTypes = EnumSet.noneOf( org.hibernate.search.annotations.FieldCacheType.class );
-			Collections.addAll( enabledTypes, fieldCacheOptions.value() );
-			if ( enabledTypes.size() != 1 && enabledTypes.contains( org.hibernate.search.annotations.FieldCacheType.NOTHING ) ) {
-				throw new SearchException(
-						"CacheFromIndex configured with conflicting parameters:" +
-								" if FieldCacheType.NOTHING is enabled, no other options can be added"
-				);
-			}
-			this.fieldCacheUsage = Collections.unmodifiableSet( enabledTypes );
-		}
 		checkAllowFieldSelection();
-		idFieldCacheCollectorFactory = figureIdFieldCacheUsage();
 		if ( log.isDebugEnabled() ) {
 			log.debugf(
 					"Field selection in projections is set to %b for entity %s.",
@@ -196,27 +165,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		this.identifierName = idProvided ? null : idPropertyMetadata.getPropertyAccessor().getName();
 	}
 
-	private FieldCacheCollectorFactory figureIdFieldCacheUsage() {
-		if ( this.fieldCacheUsage.contains( org.hibernate.search.annotations.FieldCacheType.ID ) ) {
-			FieldCacheLoadingType collectorTypeForId = ClassLoadingStrategySelector.guessAppropriateCollectorType(
-					getIdBridge()
-			);
-			if ( collectorTypeForId == null ) {
-				log.cannotExtractValueForIdentifier( getBeanClass() );
-				return null;
-			}
-			TwoWayStringBridge twoWayIdStringBridge = ClassLoadingStrategySelector.getTwoWayStringBridge( getIdBridge() );
-			return new FieldCacheCollectorFactory( getIdKeywordName(), collectorTypeForId, twoWayIdStringBridge );
-		}
-		return null;
-	}
-
 	public XMember getIdGetter() {
 		return idPropertyMetadata.getPropertyAccessor();
-	}
-
-	public FieldCacheCollectorFactory getIdFieldCacheCollectionFactory() {
-		return idFieldCacheCollectorFactory;
 	}
 
 	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {
@@ -841,8 +791,14 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return allowFieldSelectionInProjection;
 	}
 
+	/**
+	 * This method will be removed as Field caching is no longer implemented
+	 * (as it is no longer useful)
+	 * @return Always returns an empty Set.
+	 */
+	@Deprecated
 	public Set<org.hibernate.search.annotations.FieldCacheType> getFieldCacheOption() {
-		return fieldCacheUsage;
+		return Collections.emptySet();
 	}
 
 	public TwoWayFieldBridge getIdBridge() {

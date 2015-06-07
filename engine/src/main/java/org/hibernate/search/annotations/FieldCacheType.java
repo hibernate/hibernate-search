@@ -8,14 +8,12 @@
 package org.hibernate.search.annotations;
 
 /**
- * How should we interact with Lucene's {@code FieldCache}.
- * {@code FieldCache}s can provide a good performance boost
- * but will keep soft references to large arrays of values in memory.
- * This effectively caches stored values from the index to reduce seek times.
+ * This will be ignored as the Field Cache in Apache Lucene
+ * feature does no longer exist.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
- * @see org.apache.lucene.search.FieldCache
+ * @deprecated Remove the annotation. No alternative replacement necessary.
  */
+@Deprecated
 public enum FieldCacheType {
 
 	/**
@@ -25,15 +23,12 @@ public enum FieldCacheType {
 	NOTHING,
 
 	/**
-	 * Cache the entity type. This is a good tradeoff in most cases as
-	 * it enables some optimizations; Depending on the query the type might not be
-	 * needed, in which case the FieldCache won't be used.
+	 * Same effect as using {@literal NOTHING} as this feature was removed.
 	 */
 	CLASS,
 
 	/**
-	 * Attempts to the object identifier (@DocumentId).
-	 * Not all identifier types are supported.
+	 * Same effect as using {@literal NOTHING} as this feature was removed.
 	 */
 	ID
 }

@@ -26,7 +26,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -44,7 +43,6 @@ import org.hibernate.search.filter.impl.ChainedFilter;
 import org.hibernate.search.filter.impl.DefaultFilterKey;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -102,7 +100,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
-	private boolean useFieldCacheOnClassTypes = false;
 	private transient FacetManagerImpl facetManager;
 	private transient TimeoutExceptionFactory timeoutExceptionFactory;
 	private Coordinates spatialSearchCenter = null;
@@ -448,8 +445,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					sort,
 					getTimeoutManagerImpl(),
 					facetManager.getFacetRequests(),
-					useFieldCacheOnTypes(),
-					getAppropriateIdFieldCollectorFactory(),
 					this.timeoutExceptionFactory,
 					spatialSearchCenter,
 					spatialFieldName
@@ -462,8 +457,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					null,
 					0,
 					getTimeoutManagerImpl(),
-					null,
-					false,
 					null,
 					this.timeoutExceptionFactory,
 					spatialSearchCenter,
@@ -478,8 +471,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					n,
 					getTimeoutManagerImpl(),
 					facetManager.getFacetRequests(),
-					useFieldCacheOnTypes(),
-					getAppropriateIdFieldCollectorFactory(),
 					this.timeoutExceptionFactory,
 					spatialSearchCenter,
 					spatialFieldName
@@ -559,8 +550,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
-				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
-						.contains( FieldCacheType.CLASS );
 				populateIndexManagers( targetedIndexes, entityIndexBinding.getSelectionStrategy() );
 			}
 			classesAndSubclasses = null;
@@ -588,8 +577,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
-				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
-						.contains( FieldCacheType.CLASS );
 				populateIndexManagers( targetedIndexes, entityIndexBinding.getSelectionStrategy() );
 			}
 			this.classesAndSubclasses = involvedClasses;
@@ -951,39 +938,4 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return extendedIntegrator;
 	}
 
-	private boolean useFieldCacheOnTypes() {
-		if ( classesAndSubclasses.size() <= 1 ) {
-			// force it to false, as we won't need classes at all
-			return false;
-		}
-		return useFieldCacheOnClassTypes;
-	}
-
-	/**
-	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
-	 */
-	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
-		Map<Class<?>, EntityIndexBinding> builders = extendedIntegrator.getIndexBindings();
-		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
-		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
-		FieldCacheCollectorFactory anyImplementation = null;
-		for ( Class<?> clazz : classesAndSubclasses ) {
-			EntityIndexBinding docBuilder = builders.get( clazz );
-			FieldCacheCollectorFactory fieldCacheCollectionFactory = docBuilder.getIdFieldCacheCollectionFactory();
-			if ( fieldCacheCollectionFactory == null ) {
-				// some implementation disable it, so we won't use it
-				return null;
-			}
-			anyImplementation = fieldCacheCollectionFactory;
-			allCollectors.add( fieldCacheCollectionFactory );
-		}
-		if ( allCollectors.size() != 1 ) {
-			// some implementations have different requirements
-			return null;
-		}
-		else {
-			// they are all the same, return any:
-			return anyImplementation;
-		}
-	}
 }

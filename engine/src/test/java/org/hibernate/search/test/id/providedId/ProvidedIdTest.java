@@ -101,8 +101,6 @@ public class ProvidedIdTest {
 				lowLevelSearcher, null, null,
 				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, extendedIntegrator.getTimingSource() ),
 				null,
-				false,
-				null,
 				null,
 				null,
 				null
