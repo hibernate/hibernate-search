@@ -4,6 +4,7 @@
 In this final chapter we are offering a smörgåsbord of tips and tricks which might become useful as
 you dive deeper and deeper into Hibernate Search.
 
+[[AccessingSearchFactory]]
 === Accessing the SearchFactory
 
 The SearchFactory object keeps track of the underlying Lucene resources for Hibernate Search. It is
@@ -16,6 +17,20 @@ FullTextSession:
 ----
 FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
 SearchFactory searchFactory = fullTextSession.getSearchFactory();
+----
+====
+
+[[AccessingSearchIntegrator]]
+=== Accessing the SearchIntegrator
+
+The interface SearchIntegrator gives access to lower level APIs of Hibernate Search.
+You can access to the `SearchIntegrator` SPI using the SearchFactory (<<AccessingSearchFactory>>):
+
+.Accessing the SearchIntegrator
+====
+[source, JAVA]
+----
+SearchIntegrator searchIntegrator = searchFactory.unwrap(SearchIntegrator.class);
 ----
 ====
 
