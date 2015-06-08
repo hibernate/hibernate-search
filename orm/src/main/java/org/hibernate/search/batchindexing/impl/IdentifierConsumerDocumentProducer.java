@@ -103,13 +103,10 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	@Override
 	public void run() {
 		log.trace( "started" );
-		Session session;
-		if ( tenantId == null ) {
-			session = sessionFactory.openSession();
-		}
-		else {
-			session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession();
-		}
+		Session session = sessionFactory
+				.withOptions()
+				.tenantIdentifier( tenantId )
+				.openSession();
 		session.setFlushMode( FlushMode.MANUAL );
 		session.setCacheMode( cacheMode );
 		session.setDefaultReadOnly( true );
@@ -174,7 +171,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 					.add( Restrictions.in( idName, listIds ) );
 			List<?> list = criteria.list();
 			monitor.entitiesLoaded( list.size() );
-			indexAllQueue( tenantIdentifier( session ), session, list, sessionInitializer );
+			indexAllQueue( session, list, sessionInitializer );
 			session.clear();
 		}
 		finally {
@@ -206,16 +203,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		}
 	}
 
-	private String tenantIdentifier(Session session) {
-		String tenantId = null;
-		if ( session instanceof SessionImplementor ) {
-			SessionImplementor sessionImplementor = (SessionImplementor) session;
-			tenantId = sessionImplementor.getTenantIdentifier();
-		}
-		return tenantId;
-	}
-
-	private void indexAllQueue(String tenantId, Session session, List<?> entities, InstanceInitializer sessionInitializer) throws InterruptedException {
+	private void indexAllQueue(Session session, List<?> entities, InstanceInitializer sessionInitializer) throws InterruptedException {
 		ConversionContext contextualBridge = new ContextualExceptionBridgeHelper();
 
 		if ( entities == null || entities.isEmpty() ) {
@@ -225,7 +213,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 			log.tracef( "received a list of objects to index: %s", entities );
 			for ( Object object : entities ) {
 				try {
-					index( tenantId, object, session, sessionInitializer, contextualBridge );
+					index( object, session, sessionInitializer, contextualBridge );
 					monitor.documentsBuilt( 1 );
 				}
 				catch (RuntimeException e) {
@@ -240,7 +228,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void index(String tenantId, Object entity, Session session, InstanceInitializer sessionInitializer, ConversionContext conversionContext)
+	private void index(Object entity, Session session, InstanceInitializer sessionInitializer, ConversionContext conversionContext)
 			throws InterruptedException {
 
 		// abort if the thread has been interrupted while not in wait(), I/O or similar which themselves would have
