@@ -41,7 +41,7 @@
                         <configuration>
                             <backend>html</backend>
                             <outputDirectory>${basedir}/target/asciidoc-html</outputDirectory>
-                            <sourceHighlighter>coderay</sourceHighlighter>
+                            <sourceHighlighter>highlightjs</sourceHighlighter>
                         </configuration>
                     </execution>
                 </executions>
@@ -172,12 +172,6 @@
                           </imageResource>
                           <formats>
                               <format>
-                                  <formatName>pdf</formatName>
-                                  <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl
-                                  </stylesheetResource>
-                                  <finalName>hibernate_search_reference.pdf</finalName>
-                              </format>
-                              <format>
                                   <formatName>html_single</formatName>
                                   <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
                                   </stylesheetResource>
@@ -189,15 +183,26 @@
                                   </stylesheetResource>
                                   <finalName>index.html</finalName>
                               </format>
+                              <format>
+                                  <formatName>pdf</formatName>
+                                  <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl
+                                  </stylesheetResource>
+                                  <finalName>hibernate_search_reference.pdf</finalName>
+                              </format>
                           </formats>
                           <options>
                               <xincludeSupported>true</xincludeSupported>
                               <xmlTransformerType>saxon</xmlTransformerType>
                               <!-- needed for uri-resolvers; can be ommitted if using 'current' uri scheme -->
                               <!--     could also locate the docbook dependency and inspect its version... -->
-                              <docbookVersion>1.72.0</docbookVersion>
+                              <!--  docbookVersion>1.72.0</docbookVersioni -->
                               <localeSeparator>-</localeSeparator>
                               <injectionDateFormat>yyyy-MM-dd</injectionDateFormat>
+                              <transformerParameters>
+                                  <html.googleAnalyticsId>UA-45270411-3</html.googleAnalyticsId>
+                                  <html.googleTagManagerId>GTM-NJWS5L</html.googleTagManagerId>
+                                  <html.googleTagManagerChannel>Hibernate</html.googleTagManagerChannel>
+                              </transformerParameters>
                           </options>
                       </configuration>
                       <executions>
