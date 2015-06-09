@@ -18,7 +18,7 @@ Hibernate new timer we recommend you start link:http://hibernate.org/quick-start
             link:http://repository.jboss.org/nexus/content/groups/public-jboss/org/hibernate/[JBoss maven repository].
 |Hibernate ORM|You will need
             `hibernate-core-{hibernateVersion}.jar` and its
-            dependencies (either from the link:http://sourceforge.net/projects/hibernate/files/hibernate4/[distribution bundle] or the maven repository).
+            dependencies (either from the link:http://sourceforge.net/projects/hibernate/files/hibernate-orm/[distribution bundle] or the maven repository).
 |JPA 2.1|Hibernate Search can be used without JPA but the following instructions will use JPA annotations for basic
             entity configuration (`@Entity`, `@Id`, `@OneToMany`,...).
 |===============
@@ -93,7 +93,7 @@ http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearc
 dependencies. This includes - among others - the latest compatible version of Hibernate ORM. However,
 only the essential parts you need to start experimenting with are included. You will probably need
 to combine this with downloads from the other projects, for example the
-http://sourceforge.net/projects/hibernate/files/hibernate4/{hibernateVersion}/[Hibernate ORM distribution on Sourceforge]
+http://sourceforge.net/projects/hibernate/files/hibernate-orm/{hibernateVersion}/[Hibernate ORM distribution on Sourceforge]
 also provides the modules to enable caching or use a connection pool.
 
 === Deploying on WildFly
