@@ -68,7 +68,6 @@ All you have to add to your pom.xml is:
 ====
 [source, XML]
 [subs="verbatim,attributes"]
-<dependency>
 <!-- If using JPA, add: -->
 <dependency>
    <groupId>org.hibernate</groupId>
