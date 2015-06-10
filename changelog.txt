@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.3.0.Final (10-6-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1868] - References to getSearchFactory in AbstractJMSHibernateSearchController documentation are outdated
+    * [HSEARCH-1896] - Documentation: duplicate <dependency> tag in example
+
+** Improvement
+    * [HSEARCH-1812] - Documentation doesn't clearly explain how one obtains the existing SearchIntegrator
+
+** New Feature
+    * [HSEARCH-1878] - Add google analytics to the HTML documentation
+
+** Task
+    * [HSEARCH-1875] - Upgrade to JBoss Byteman 3.0.0
+
+
 Version 5.3.0.CR1 (1-6-2015)
 ------------------------
 
