@@ -40,6 +40,9 @@ import static org.apache.tika.io.IOUtils.closeQuietly;
 public class TikaBridge implements FieldBridge {
 	private static final Log log = LoggerFactory.make();
 
+	// Expensive, so only do it once. The Parser is threadsafe.
+	private final Parser parser = new AutoDetectParser();
+
 	private TikaMetadataProcessor metadataProcessor;
 	private TikaParseContextProvider parseContextProvider;
 
@@ -108,7 +111,6 @@ public class TikaBridge implements FieldBridge {
 			StringWriter writer = new StringWriter();
 			WriteOutContentHandler contentHandler = new WriteOutContentHandler( writer );
 
-			Parser parser = new AutoDetectParser();
 			parser.parse( in, contentHandler, metadata, parseContext );
 
 			return writer.toString();
