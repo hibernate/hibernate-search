@@ -10,7 +10,9 @@
     xsi:schemaLocation="http://jboss.org/schema/arquillian
         http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
-    <container qualifier="wildfly" default="true">
+    <defaultProtocol type="jmx-as7" />
+
+    <container qualifier="wildfly" mode="suite" default="true">
         <configuration>
             <property name="jbossHome">${project.build.directory}/wildfly-${wildflyVersion}</property>
             <!-- Needed for JMS tests -->

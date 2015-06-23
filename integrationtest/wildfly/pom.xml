@@ -98,6 +98,14 @@
                 <!-- This exclusion is needed to be able to setup the project in Windows:
                      it otherwise includes transitive dependency to the JDK JConsole -->
                 <exclusion>
+                    <groupId>org.jboss.logmanager</groupId>
+                    <artifactId>jboss-logmanager</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.logmanager</groupId>
+                    <artifactId>log4j-jboss-logmanager</artifactId>
+                </exclusion>
+                <exclusion>
                     <artifactId>wildfly-patching</artifactId>
                     <groupId>org.wildfly</groupId>
                 </exclusion>
