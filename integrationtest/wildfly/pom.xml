@@ -225,15 +225,7 @@
                                     <version>${wildflyVersion}</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.wildfly</groupId>
-                                    <artifactId>wildfly-dist</artifactId>
-                                    <version>${wildflyVersion}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node2</outputDirectory>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
@@ -242,16 +234,7 @@
                                     <classifier>wildfly-8-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-modules</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>wildfly-8-dist</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -270,23 +253,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/wildflyConfig</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>configure-as-node-node2</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}</outputDirectory>
+                            <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
