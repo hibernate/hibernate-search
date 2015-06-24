@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<assembly>
+    <id>testing-modules-dist</id>
+    <formats>
+        <format>zip</format>
+        <!-- When in need of debugging this might be useful: -->
+        <!-- <format>dir</format> -->
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <baseDirectory>/</baseDirectory>
+
+    <files>
+        <file>
+            <source>${module.xml.basedir}/tika/module.xml</source>
+            <outputDirectory>org/apache/tika/${tika.module.slot}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+    </files>
+
+    <dependencySets>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/apache/tika/${tika.module.slot}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.apache.tika:tika-parsers</include>
+                <include>org.apache.tika:tika-core</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
+</assembly>
