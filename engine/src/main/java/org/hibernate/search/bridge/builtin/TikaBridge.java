@@ -6,16 +6,6 @@
  */
 package org.hibernate.search.bridge.builtin;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.sql.Blob;
-import java.sql.SQLException;
-
 import org.apache.lucene.document.Document;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -30,6 +20,16 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.sql.Blob;
+import java.sql.SQLException;
+
 import static org.apache.tika.io.IOUtils.closeQuietly;
 
 /**
@@ -39,6 +39,9 @@ import static org.apache.tika.io.IOUtils.closeQuietly;
  */
 public class TikaBridge implements FieldBridge {
 	private static final Log log = LoggerFactory.make();
+
+	// Expensive, so only do it once...
+	private final Parser PARSER = new AutoDetectParser();
 
 	private TikaMetadataProcessor metadataProcessor;
 	private TikaParseContextProvider parseContextProvider;
@@ -108,8 +111,7 @@ public class TikaBridge implements FieldBridge {
 			StringWriter writer = new StringWriter();
 			WriteOutContentHandler contentHandler = new WriteOutContentHandler( writer );
 
-			Parser parser = new AutoDetectParser();
-			parser.parse( in, contentHandler, metadata, parseContext );
+			PARSER.parse( in, contentHandler, metadata, parseContext );
 
 			return writer.toString();
 		}
