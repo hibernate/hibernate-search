@@ -92,7 +92,7 @@
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <version>1.0.0.Alpha5</version>
+            <version>1.0.0.Final</version>
             <scope>test</scope>
             <exclusions>
                 <!-- This exclusion is needed to be able to setup the project in Windows:

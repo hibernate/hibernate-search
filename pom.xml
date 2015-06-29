@@ -163,9 +163,9 @@
         <commonsLangVersion>2.6</commonsLangVersion>
 
         <!-- Integration tests -->
-        <arquillianVersion>1.1.2.Final</arquillianVersion>
+        <arquillianVersion>1.1.8.Final</arquillianVersion>
         <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
-        <wildflyVersion>9.0.0.CR1</wildflyVersion>
+        <wildflyVersion>9.0.0.CR2</wildflyVersion>
 
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
