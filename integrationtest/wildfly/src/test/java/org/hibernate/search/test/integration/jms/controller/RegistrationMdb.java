@@ -16,12 +16,13 @@ import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchControlle
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-		@ActivationConfigProperty(propertyName = "destination", propertyValue = RegistrationConfiguration.DESTINATION_QUEUE) })
+		@ActivationConfigProperty(propertyName = "destination", propertyValue = RegistrationMdb.DESTINATION_QUEUE) })
 public class RegistrationMdb extends AbstractJMSHibernateSearchController implements MessageListener {
+
+	public static final String DESTINATION_QUEUE = "jms/queue/hsearch";
 
 	@PersistenceContext
 	private EntityManager em;

@@ -15,7 +15,6 @@ import java.io.File;
  */
 public final class RegistrationConfiguration {
 
-	public static final String DESTINATION_QUEUE = "jms/queue/hsearch";
 	private static final int MAX_ATTEMPTS = 3;
 
 	private RegistrationConfiguration() {

@@ -77,7 +77,7 @@ public final class DeploymentJmsMasterSlave {
 						.up()
 					.createProperty()
 						.name( "hibernate.search.default.worker.jms.queue" )
-						.value( RegistrationConfiguration.DESTINATION_QUEUE )
+						.value( RegistrationMdb.DESTINATION_QUEUE )
 						.up()
 					//Authentication credentials are specified in the AS7 configuration files
 					//See properties files in server/standalone/configuration
@@ -147,7 +147,7 @@ public final class DeploymentJmsMasterSlave {
 				+ "<hornetq-server>"
 					+ "<jms-destinations>"
 						+ "<jms-queue name=\"hsearchQueue\">"
-							+ "<entry name=\"" + RegistrationConfiguration.DESTINATION_QUEUE + "\"/>"
+							+ "<entry name=\"" + RegistrationMdb.DESTINATION_QUEUE + "\"/>"
 						+ "</jms-queue>"
 					+ "</jms-destinations>"
 				+ "</hornetq-server>"

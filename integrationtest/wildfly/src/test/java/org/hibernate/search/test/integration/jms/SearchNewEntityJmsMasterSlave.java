@@ -33,7 +33,7 @@ public abstract class SearchNewEntityJmsMasterSlave {
 	/**
 	 * Affects how often the Master and Slave directories should start the refresh copy work
 	 */
-	static final int REFRESH_PERIOD_IN_SEC = 2;
+	public static final int REFRESH_PERIOD_IN_SEC = 2;
 
 	/**
 	 * Idle loop to wait for results to be transmitted
