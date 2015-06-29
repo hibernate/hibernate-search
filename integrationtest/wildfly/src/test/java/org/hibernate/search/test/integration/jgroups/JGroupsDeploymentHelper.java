@@ -11,7 +11,7 @@ import static org.hibernate.search.test.integration.VersionTestHelper.addDepende
 import java.io.File;
 
 import org.hibernate.search.test.integration.VersionTestHelper;
-import org.hibernate.search.test.integration.jms.SearchNewEntityJmsMasterSlave;
+import org.hibernate.search.test.integration.jms.MasterSlaveTestTemplate;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
@@ -51,7 +51,7 @@ public class JGroupsDeploymentHelper {
 	private static WebArchive baseArchive(String name, PersistenceDescriptor unitDef) throws Exception {
 		WebArchive webArchive = ShrinkWrap
 				.create( WebArchive.class, name + ".war" )
-				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, SearchNewEntityJmsMasterSlave.class )
+				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, MasterSlaveTestTemplate.class )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return webArchive;

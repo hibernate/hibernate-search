@@ -25,14 +25,14 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenStrategyStage;
 import org.junit.runner.RunWith;
 
 /**
- * Execute the tests in {@link SearchNewEntityJmsMasterSlave} adding the the dependencies as jars in the
+ * Execute the tests in {@link MasterSlaveTestTemplate} adding the the dependencies as jars in the
  * deployments.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSlave {
+public class SearchNewEntityJmsMasterSlaveIT extends MasterSlaveTestTemplate {
 
 	private static final File tmpDir = RegistrationConfiguration.createTempDir();
 

@@ -51,7 +51,7 @@ public final class DeploymentJmsMasterSlave {
 	private static WebArchive baseArchive(String name, PersistenceDescriptor unitDef) throws Exception {
 		WebArchive webArchive = ShrinkWrap
 				.create( WebArchive.class, name + ".war" )
-				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, SearchNewEntityJmsMasterSlave.class )
+				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, MasterSlaveTestTemplate.class )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return webArchive;
