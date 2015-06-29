@@ -675,6 +675,20 @@
                 </configuration>
             </plugin>
             <plugin>
+               <groupId>com.github.marschall</groupId>
+               <artifactId>jdeps-maven-plugin</artifactId>
+               <!--
+                   Not enabling automatic executions; run:
+                    > mvn jdeps:jdeps
+                    to get a report.
+               -->
+               <configuration>
+                  <!-- Allows to see which JRE profiles will be needed -->
+                  <profile>true</profile>
+                  <failOnWarning>true</failOnWarning>
+               </configuration>
+            </plugin>
+            <plugin>
                 <!-- This defines the properties 'parsedVersion.majorVersion'
                     and 'parsedVersion.minorVersion' to be in synch with the current project version -->
                 <groupId>org.codehaus.mojo</groupId>
@@ -774,6 +788,11 @@
         </plugins>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>com.github.marschall</groupId>
+                    <artifactId>jdeps-maven-plugin</artifactId>
+                    <version>0.4.0</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
