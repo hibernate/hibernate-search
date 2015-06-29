@@ -16,14 +16,14 @@ import org.junit.runner.RunWith;
 import static org.hibernate.search.test.integration.VersionTestHelper.addDependencyToSearchModule;
 
 /**
- * Execute the tests in {@link SearchNewEntityJmsMasterSlave} using the modules in JBoss AS to add the required
+ * Execute the tests in {@link MasterSlaveTestTemplate} using the modules in JBoss AS to add the required
  * dependencies.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends SearchNewEntityJmsMasterSlave {
+public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends MasterSlaveTestTemplate {
 
 	private static final File tmpDir = RegistrationConfiguration.createTempDir();
 

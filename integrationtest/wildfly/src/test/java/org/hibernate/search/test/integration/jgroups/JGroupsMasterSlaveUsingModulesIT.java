@@ -8,7 +8,7 @@ package org.hibernate.search.test.integration.jgroups;
 
 import java.io.File;
 
-import org.hibernate.search.test.integration.jms.SearchNewEntityJmsMasterSlave;
+import org.hibernate.search.test.integration.jms.MasterSlaveTestTemplate;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -18,12 +18,12 @@ import org.junit.runner.RunWith;
 import static org.hibernate.search.test.integration.VersionTestHelper.addDependencyToSearchModule;
 
 /**
- * Execute the tests in {@link SearchNewEntityJmsMasterSlave} using the JGroups backend modules.
+ * Execute the tests in {@link MasterSlaveTestTemplate} using the JGroups backend modules.
  *
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends SearchNewEntityJmsMasterSlave {
+public class JGroupsMasterSlaveUsingModulesIT extends MasterSlaveTestTemplate {
 
 	private static final File tmpDir = RegistrationConfiguration.createTempDir();
 
