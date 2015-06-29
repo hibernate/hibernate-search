@@ -33,7 +33,7 @@
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
-        <module>integrationtest/wildfly</module>
+        <!-- <module>integrationtest/wildfly</module>  -->
         <!-- <module>integrationtest/performance</module> -->
         <module>integrationtest/osgi/karaf-features</module>
         <!-- <module>integrationtest/sandbox</module> -->
@@ -1128,6 +1128,17 @@
             </activation>
             <modules>
                 <module>integrationtest/osgi/karaf-it</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>integration-wildfly</id>
+            <activation>
+                <!-- WildFly9 & HornetQ won't work on JDK9  -->
+                <jdk>[1.7,1.8]</jdk>
+            </activation>
+            <modules>
+                <module>integrationtest/wildfly</module>
             </modules>
         </profile>
 
