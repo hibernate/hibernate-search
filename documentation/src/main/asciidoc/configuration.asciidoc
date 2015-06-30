@@ -894,7 +894,68 @@ hibernate.search.[default|<indexname>].reader.strategy = my.corp.myapp.CustomRea
 
 where my.corp.myapp.CustomReaderProvider is the custom strategy implementation.
 
+=== Serialization
 
+When using clustering features, Hibernate Search needs to find an implementation of the
+`SerializationProvider` service on the classpath.
+
+An implementation of the service based on link:https://avro.apache.org[Apache Avro] can be found
+using the following GAV coordinates:
+
+`org.hibernate:hibernate-search-serialization-avro:{hibernateSearchVersion}`
+
+You can add the coordinates to your pom file or download all the required dependecies and add them
+to your classpath. Hibernate Search will find the service implementation without any additional
+configuration.
+
+Alternatively, you can create a custom service implementation:
+
+[[example-serialization-provider]]
+.Serialization strategy definition
+====
+[source, JAVA]
+----
+package example.provider.serializer
+
+import org.hibernate.search.indexes.serialization.spi.Deserializer;
+import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
+import org.hibernate.search.indexes.serialization.spi.Serializer;
+
+public class ExampleOfSerializationProvider implements SerializationProvider {
+
+   @Override
+    public Serializer getSerializer() {
+        Serializer serializer = ...
+        return serializer;
+    }
+
+    @Override
+    public Deserializer getDeserializer() {
+        Deserializer deserializer = ...
+        return deserializer;
+    }
+}
+----
+====
+
+Hibernate Search uses the Java ServiceLoader mechanism to transparently discover services.
+In this case you will add the following file in your classpath:
+
+.Service file for the SerializationProvider service
+====
+----
+/META-INF/services/org.hibernate.search.indexes.serialization.spi.SerializationProvider 
+----
+====
+
+.Content of /META-INF/services/org.hibernate.search.indexes.serialization.spi.SerializationProvider 
+====
+----
+example.provider.serializer.ExampleOfSerializationProvider
+----
+====
+
+You will find more details about services in the section <<section-services>>.
 
 === Exception handling
 
