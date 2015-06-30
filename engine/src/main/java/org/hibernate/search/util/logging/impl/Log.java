@@ -824,4 +824,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 274, value = "Executing Lucene query '%s'" )
 	void executingLuceneQuery(Query luceneQuery);
+
+	@Message(id = 275, value = "SerializationProvider service not found on the classpath. You should check that an implementation exists and it's correctly registered as a service."
+			+ " If that's not the case, you can also create a custom implementation or add \"org.hibernate:hibernate-search-serialization-avro\" on the classpath")
+	SearchException serializationProviderNotFoundException(@Cause Exception cause);
 }
