@@ -42,10 +42,17 @@ public class PackagerHelper {
 			.using( new RejectDependenciesStrategy(
 				false, //we need some dependencies at the right version: Lucene, search-engine, etc..
 				"org.hibernate:hibernate-core",
-				"org.hibernate:hibernate-commons-annotations",
 				"org.hibernate.javax.persistence:hibernate-jpa-2.1-api",
-				"org.jboss.logging:jboss-logging") )
-				.as( JavaArchive.class );
+				"org.jboss.logging:jboss-logging",
+				"org.jboss.logging:jboss-logging-processor",
+				"dom4j:dom4j",
+				"xml-apis:xml-apis",
+				"org.jboss:jandex",
+				"antlr:antlr",
+				"org.apache.geronimo.specs:geronimo-jta_1.1_spec",
+				"org.javassist:javassist",
+				"org.jboss.jdeparser:jdeparser" ) )
+			.as( JavaArchive.class );
 		// To debug dependencies, have it dump a zip export:
 		//archive.as( ZipExporter.class ).exportTo( new File("test-app.war"), true );
 	}
