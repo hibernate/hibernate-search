@@ -29,10 +29,11 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 
 	private final StatelessSessionAwareRunnable statelessSessionAwareRunnable;
 	private final BatchTransactionalContext batchContext;
+	private final Integer transactionTimeout;
 	private final boolean wrapInTransaction;
 	private final String tenantId;
 
-	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext, StatelessSessionAwareRunnable statelessSessionAwareRunnable, String tenantId) {
+	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext, StatelessSessionAwareRunnable statelessSessionAwareRunnable, Integer transactionTimeout, String tenantId) {
 		super( batchContext.extendedIntegrator );
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
@@ -40,6 +41,7 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 		 *  - start it
 		 */
 		this.batchContext = batchContext;
+		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
 		this.statelessSessionAwareRunnable = statelessSessionAwareRunnable;
 		this.wrapInTransaction = batchContext.wrapInTransaction();
@@ -54,6 +56,9 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 					.tenantIdentifier( tenantId )
 					.openStatelessSession();
 
+			if ( transactionTimeout != null ) {
+				batchContext.transactionManager.setTransactionTimeout( transactionTimeout );
+			}
 			batchContext.transactionManager.begin();
 			statelessSessionAwareRunnable.run( statelessSession );
 			batchContext.transactionManager.commit();

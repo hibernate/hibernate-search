@@ -14,15 +14,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.spi.BatchBackend;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.CacheMode;
-import org.hibernate.search.backend.PurgeAllLuceneWork;
-import org.hibernate.search.backend.spi.BatchBackend;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -49,6 +49,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
+	private final Integer transactionTimeout;
 	private final String tenantId;
 	private final List<Future<?>> indexingTasks = new ArrayList<>();
 
@@ -65,9 +66,11 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 							boolean optimizeAfterPurge,
 							MassIndexerProgressMonitor monitor,
 							int idFetchSize,
+							Integer transactionTimeout,
 							String tenantId) {
 		super( extendedIntegrator );
 		this.idFetchSize = idFetchSize;
+		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
 		this.sessionFactory = sessionFactory;
@@ -97,7 +100,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		catch (InterruptedException | ExecutionException e) {
 			log.interruptedBatchIndexing();
 			// on thread interruption cancel each pending task - thread executing the task must be interrupted
-			for ( Future task : indexingTasks ) {
+			for ( Future<?> task : indexingTasks ) {
 				if ( !task.isDone() ) {
 					task.cancel( true );
 				}
@@ -126,7 +129,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		ExecutorService executor = Executors.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
 			indexingTasks.add( executor.submit( new BatchIndexingWorkspace( extendedIntegrator, sessionFactory, type, documentBuilderThreads, cacheMode,
-					objectLoadingBatchSize, endAllSignal, monitor, backend, objectsLimit, idFetchSize, tenantId ) ) );
+					objectLoadingBatchSize, endAllSignal, monitor, backend, objectsLimit, idFetchSize, transactionTimeout, tenantId ) ) );
 
 		}
 		executor.shutdown();

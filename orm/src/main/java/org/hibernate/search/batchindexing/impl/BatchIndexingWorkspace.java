@@ -59,6 +59,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private final long objectsLimit;
 
 	private final int idFetchSize;
+	private final Integer transactionTimeout;
 
 	private final String tenantId;
 
@@ -75,10 +76,12 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 								BatchBackend backend,
 								long objectsLimit,
 								int idFetchSize,
+								Integer transactionTimeout,
 								String tenantId) {
 		super( extendedIntegrator );
 		this.indexedType = entityType;
 		this.idFetchSize = idFetchSize;
+		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
 		this.idNameOfIndexedType = extendedIntegrator.getIndexBinding( entityType )
 				.getDocumentBuilder()
@@ -147,6 +150,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 						objectsLimit, errorHandler, idFetchSize,
 						tenantId
 				),
+				transactionTimeout,
 				tenantId);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
@@ -163,7 +167,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 				primaryKeyStream, monitor, sessionFactory, producerEndSignal,
 				cacheMode, indexedType, extendedIntegrator,
 				idNameOfIndexedType, backend, errorHandler,
-				tenantId
+				transactionTimeout, tenantId
 		);
 		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
 		try {

@@ -28,15 +28,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
- * Reproducer for timeouts during mass indexing.
+ * Test for applying the transaction timeout during id production in mass indexing.
  *
  * @author Gunnar Morling
  */
 @RunWith(Arquillian.class)
-@TestForIssue(jiraKey = "HSEARCH-1783")
+@TestForIssue(jiraKey = "HSEARCH-1474")
 public class MassIndexingTimeoutIT {
 
 	private static final int NUMBER_OF_ENTIIES = 2000;
@@ -78,15 +77,18 @@ public class MassIndexingTimeoutIT {
 	private ConcertManager concertManager;
 
 	/**
-	 * Triggers a timeout during id production. The TX timeout, batch size and test data is chosen to ensure that id
-	 * consumption applies back-pressure on the {@code ProducerConsumerQueue}, causing the id producer to run into a TX
-	 * timeout. More specifically, consumption of the ids takes that long (by means of artificial slow-down in
-	 * {@link Concert}, that the id producer cannot emit all 2000 ids before its transaction timesout.
+	 * Asserts that the configured transaction timeout is applied during id production. The batch size and test data are
+	 * chosen to ensure that id consumption applies back-pressure on the {@code ProducerConsumerQueue}, causing the id
+	 * producer to run into a TX timeout if the configured default timeout applied.
+	 * <p>
+	 * More specifically, consumption of the ids takes that long (by means of artificial slow-down in {@link Concert},
+	 * that the id producer cannot emit all 2000 ids before the default transaction time out applied. So this test only
+	 * passes if the default timeout is overridden by the timeout given for the mass indexer.
 	 * <p>
 	 * The timeout is given via {@code coordinator-environment#default-timeout} in standalone-full-testqueues.xml.
 	 */
 	@Test
-	public void timeoutDuringIdProduction() throws Exception {
+	public void configuredTimeoutIsAppliedDuringIdProduction() throws Exception {
 		insertTestData();
 
 		assertEquals( 0, concertManager.findConcertsByArtist( "Hruce Bronsby" ).size() );
@@ -97,11 +99,12 @@ public class MassIndexingTimeoutIT {
 
 		List<Concert> artists = concertManager.findConcertsByArtist( "Hruce Bronsby" );
 
-		assertTrue( "Expecting more than 1000 entries to be indexed, as the first 1000 items can be added to the"
-				+ "ProducerConsumerQueue without any delay; Actual: " + artists.size(), artists.size() > 1000 );
-
-		assertTrue( "Expecting not all entries to be indexed, as the transaction timeout is too short to produce all"
-				+ "items; Actual: " + artists.size(), artists.size() < NUMBER_OF_ENTIIES );
+		assertEquals(
+				"Expecting all entries to be indexed, as the configured transaction timeout is long enough  to " +
+						"produce all items",
+				NUMBER_OF_ENTIIES,
+				artists.size()
+		);
 	}
 
 	private void insertTestData() {
