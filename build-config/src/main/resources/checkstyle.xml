@@ -94,11 +94,6 @@
         <module name="DefaultComesLast" />
         <module name="WhitespaceAround" />
         <module name="TypecastParenPad" />
-        <module name="RedundantThrows">
-            <!-- Needed to workaround a CheckStyle bug: can't find exception types which are
-            a dependency which is only available in scope test (to check style of our tests) -->
-            <property name="suppressLoadErrors" value="true"/>
-        </module>
         <module name="HideUtilityClassConstructor"/>
         <module name="MutableException"/>
         <module name="CovariantEquals" />
