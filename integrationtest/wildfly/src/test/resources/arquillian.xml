@@ -12,6 +12,10 @@
 
     <defaultProtocol type="jmx-as7" />
 
+    <engine>
+        <property name="deploymentExportPath">target/deployments</property>
+    </engine>
+
     <group qualifier="Grid" default="true">
         <container qualifier="container.active-1" mode="suite" default="true">
             <configuration>

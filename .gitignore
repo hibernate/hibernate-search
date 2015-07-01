@@ -33,4 +33,4 @@ atlassian-ide-plugin.xml
 *.log
 *.sh
 .clover
-
+.DS_Store
