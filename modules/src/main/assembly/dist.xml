@@ -65,6 +65,11 @@
             <outputDirectory>/org/hibernate/search/serialization-avro/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
+        <file>
+            <source>${module.xml.basedir}/search/backend-jgroups/module.xml</source>
+            <outputDirectory>/org/hibernate/search/backend-jgroups/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
     </files>
 
     <dependencySets>
@@ -85,6 +90,16 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-serialization-avro</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/backend-jgroups/${hibernate.search.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-search-backend-jgroups</include>
             </includes>
         </dependencySet>
 

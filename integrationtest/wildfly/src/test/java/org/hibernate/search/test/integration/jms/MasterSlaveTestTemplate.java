@@ -21,19 +21,17 @@ import org.jboss.arquillian.junit.InSequence;
 import org.junit.Test;
 
 /**
- * In a JMS Master/Slave configuration, every node should be able to find
+ * In a JMS or JGroups Master/Slave configuration, every node should be able to find
  * entities created by some other nodes after the synchronization succeed.
- * <p>
- * Search dependencies are not added to the archives.
  *
  * @author Davide D'Alto <davide@hibernate.org>
  */
-public abstract class SearchNewEntityJmsMasterSlave {
+public abstract class MasterSlaveTestTemplate {
 
 	/**
 	 * Affects how often the Master and Slave directories should start the refresh copy work
 	 */
-	static final int REFRESH_PERIOD_IN_SEC = 2;
+	public static final int REFRESH_PERIOD_IN_SEC = 2;
 
 	/**
 	 * Idle loop to wait for results to be transmitted
