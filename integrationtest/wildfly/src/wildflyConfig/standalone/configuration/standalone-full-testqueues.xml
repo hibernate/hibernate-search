@@ -414,6 +414,9 @@
                 </process-id>
             </core-environment>
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
+
+            <!-- TX timeout of 2 sec is required by MassIndexingTimeoutIT -->
+            <coordinator-environment default-timeout="2"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:undertow:1.1">
             <buffer-cache name="default"/>

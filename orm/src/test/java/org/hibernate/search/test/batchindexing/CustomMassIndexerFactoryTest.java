@@ -152,5 +152,10 @@ public class CustomMassIndexerFactoryTest extends SearchTestBase {
 		public MassIndexer idFetchSize(int idFetchSize) {
 			return null;
 		}
+
+		@Override
+		public MassIndexer transactionTimeout(int timeoutInSeconds) {
+			return null;
+		}
 	}
 }

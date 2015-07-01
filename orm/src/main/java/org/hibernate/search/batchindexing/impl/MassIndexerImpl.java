@@ -52,6 +52,7 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	private MassIndexerProgressMonitor monitor;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private String tenantIdentifier;
+	private Integer idLoadingTransactionTimeout;
 
 	protected MassIndexerImpl(SearchIntegrator searchIntegrator, SessionFactoryImplementor sessionFactory, Class<?>... entities) {
 		this.extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
@@ -182,6 +183,12 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	}
 
 	@Override
+	public MassIndexer transactionTimeout(int timeoutInSeconds) {
+		this.idLoadingTransactionTimeout = timeoutInSeconds;
+		return this;
+	}
+
+	@Override
 	public MassIndexerWithTenant tenantIdentifier(String tenantIdentifier) {
 		this.tenantIdentifier = tenantIdentifier;
 		return this;
@@ -215,7 +222,8 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor, idFetchSize, tenantIdentifier
+				monitor, idFetchSize, idLoadingTransactionTimeout,
+				tenantIdentifier
 		);
 	}
 
