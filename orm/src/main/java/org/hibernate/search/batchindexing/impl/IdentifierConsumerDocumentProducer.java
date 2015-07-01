@@ -65,6 +65,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	private final ErrorHandler errorHandler;
 	private final BatchBackend backend;
 	private final CountDownLatch producerEndSignal;
+	private final Integer transactionTimeout;
 	private final String tenantId;
 
 	/**
@@ -80,6 +81,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 			CacheMode cacheMode, Class<?> type,
 			ExtendedSearchIntegrator searchFactory,
 			String idName, BatchBackend backend, ErrorHandler errorHandler,
+			Integer transactionTimeout,
 			String tenantId) {
 		this.source = fromIdentifierListToEntities;
 		this.monitor = monitor;
@@ -91,6 +93,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		this.errorHandler = errorHandler;
 		this.producerEndSignal = producerEndSignal;
 		this.entityIndexBindings = searchFactory.getIndexBindings();
+		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
 		this.transactionManager = ( (SessionFactoryImplementor) sessionFactory )
 				.getServiceRegistry()
@@ -182,6 +185,10 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 
 	private void beginTransaction(Session session) throws Exception {
 		if ( transactionManager != null ) {
+			if ( transactionTimeout != null ) {
+				transactionManager.setTransactionTimeout( transactionTimeout );
+			}
+
 			transactionManager.begin();
 		}
 		else {

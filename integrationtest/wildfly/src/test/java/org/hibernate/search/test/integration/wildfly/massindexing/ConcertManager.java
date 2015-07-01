@@ -63,6 +63,7 @@ public class ConcertManager {
 				.createIndexer()
 				.batchSizeToLoadObjects( 1 )
 				.threadsToLoadObjects( 1 )
+				.transactionTimeout( 5 )
 				.cacheMode( CacheMode.IGNORE )
 				.startAndWait();
 		}
