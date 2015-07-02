@@ -8,7 +8,6 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -16,6 +15,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -43,7 +43,7 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDriver driver, IndexingMonitor monitor) {
 		DeleteByQueryLuceneWork deleteWork = (DeleteByQueryLuceneWork) work;
 
 		final Class<?> entityType = work.getEntityClass();
@@ -56,7 +56,6 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
 		{
-
 			ScopedAnalyzer analyzer = this.workspace.getDocumentBuilder( entityType ).getAnalyzer();
 			Query queryToDelete = query.toLuceneQuery( analyzer );
 
@@ -70,14 +69,13 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 		addTenantQueryTerm( work.getTenantId(), entityDeletionQuery );
 
 		try {
-			writer.deleteDocuments( entityDeletionQuery );
+			driver.deleteDocuments( entityDeletionQuery );
 		}
 		catch (IOException e) {
 			SearchException ex = log.unableToDeleteByQuery( entityType, query, e );
 			throw ex;
 		}
 		this.workspace.notifyWorkApplied( work );
-
 	}
 
 	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {

@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
-
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -193,4 +192,29 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	public String getIndexName() {
 		return this.indexManager.getIndexName();
 	}
+
+	@Override
+	public IndexWriterDriver getIndexWriterDriver(ErrorContextBuilder errorContextBuilder) {
+		IndexWriter indexWriter = getIndexWriter( errorContextBuilder );
+		//This to respect the existing semantics of returning null on failure of IW opening
+		if ( indexWriter != null ) {
+			return new IndexWriterDriver( indexWriter );
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	public IndexWriterDriver getIndexWriterDriver() {
+		IndexWriter indexWriter = getIndexWriter();
+		//This to respect the existing semantics of returning null on failure of IW opening
+		if ( indexWriter != null ) {
+			return new IndexWriterDriver( indexWriter );
+		}
+		else {
+			return null;
+		}
+	}
+
 }

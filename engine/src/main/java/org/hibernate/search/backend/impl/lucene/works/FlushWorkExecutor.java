@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.impl.lucene.works;
 
-import org.apache.lucene.index.IndexWriter;
-
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -33,7 +32,7 @@ class FlushWorkExecutor implements LuceneWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDriver driver, IndexingMonitor monitor) {
 		log.debug( "performing FlushWorkDelegate" );
 		workspace.flush();
 	}

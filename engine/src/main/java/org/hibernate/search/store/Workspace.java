@@ -12,11 +12,16 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.CommitPolicy;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.exception.impl.ErrorContextBuilder;
 
 /**
+ * @deprecated This interface will be moved and should be considered non-public API
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
+@Deprecated
 public interface Workspace {
 
 	DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entity);
@@ -105,5 +110,9 @@ public interface Workspace {
 	 * Returns the name of the index this workspace is being used for.
 	 */
 	String getIndexName();
+
+	IndexWriterDriver getIndexWriterDriver(ErrorContextBuilder errorContextBuilder);
+
+	IndexWriterDriver getIndexWriterDriver();
 
 }

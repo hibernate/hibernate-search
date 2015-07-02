@@ -10,7 +10,6 @@ package org.hibernate.search.backend.impl.lucene.works;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -19,6 +18,7 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
@@ -48,7 +48,7 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDriver driver, IndexingMonitor monitor) {
 		final Serializable id = work.getId();
 		final String tenantId = work.getTenantId();
 		final Class<?> managedType = work.getEntityClass();
@@ -67,9 +67,9 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 					TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 					deleteDocumentsQuery.add( tenantTermQuery, Occur.MUST );
 				}
-				writer.deleteDocuments( deleteDocumentsQuery );
+				driver.deleteDocuments( deleteDocumentsQuery );
 				// no need to log the Add operation as we'll log in the delegate
-				this.addDelegate.performWork( work, writer, monitor );
+				this.addDelegate.performWork( work, driver, monitor );
 			}
 			else {
 				log.tracef( "Updating %s#%s by id using an IndexWriter#updateDocument.", managedType, id );
@@ -77,7 +77,7 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 				Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
 				ScopedAnalyzer analyzer = builder.getAnalyzer();
 				analyzer = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
-				writer.updateDocument( idTerm, work.getDocument(), analyzer );
+				driver.updateDocument( idTerm, work.getDocument(), analyzer );
 			}
 			workspace.notifyWorkApplied( work );
 		}

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.impl.lucene.works;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -18,6 +17,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -39,14 +39,14 @@ class PurgeAllWorkExecutor implements LuceneWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDriver driver, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		final String tenantId = work.getTenantId();
 		try {
 			Term entityTypeTerm = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 			if ( tenantId == null ) {
 				log.tracef( "purgeAll Lucene index using IndexWriter for type: %s", entityType );
-				writer.deleteDocuments( entityTypeTerm );
+				driver.deleteDocuments( entityTypeTerm );
 			}
 			else {
 				log.tracef( "purgeAll Lucene index using IndexWriter for type $1%s and tenant $2%s", entityType, tenantId );
@@ -54,7 +54,7 @@ class PurgeAllWorkExecutor implements LuceneWorkExecutor {
 				BooleanQuery deleteDocumentsQuery = new BooleanQuery();
 				deleteDocumentsQuery.add( new TermQuery( entityTypeTerm ), Occur.MUST );
 				deleteDocumentsQuery.add( new TermQuery( tenantIdTerm ), Occur.MUST );
-				writer.deleteDocuments( deleteDocumentsQuery );
+				driver.deleteDocuments( deleteDocumentsQuery );
 			}
 		}
 		catch (Exception e) {

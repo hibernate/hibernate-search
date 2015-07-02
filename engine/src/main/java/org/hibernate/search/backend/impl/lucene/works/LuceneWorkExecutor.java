@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.impl.lucene.works;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 
 /**
  * <p>LuceneWorkDelegate interface.</p>
@@ -21,10 +21,10 @@ public interface LuceneWorkExecutor {
 	 * Will perform work on an IndexWriter.
 	 *
 	 * @param work the LuceneWork to apply to the IndexWriter.
-	 * @param writer the IndexWriter to use.
+	 * @param writer the IndexWriterDriver to use.
 	 * @param monitor will be notified of performed operations
 	 * @throws java.lang.UnsupportedOperationException when the work is not compatible with an IndexWriter.
 	 */
-	void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor);
+	void performWork(LuceneWork work, IndexWriterDriver driver, IndexingMonitor monitor);
 
 }

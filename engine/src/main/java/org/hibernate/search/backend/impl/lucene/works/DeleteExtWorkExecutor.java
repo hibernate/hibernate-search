@@ -8,12 +8,12 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import java.io.Serializable;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
@@ -43,17 +43,17 @@ public final class DeleteExtWorkExecutor extends DeleteWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDriver driver, IndexingMonitor monitor) {
 		checkType( work );
 		Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by id using an IndexWriter.", managedType, id );
 		try {
 			if ( idIsNumeric ) {
-				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
+				driver.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
 			}
 			else {
 				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
-				writer.deleteDocuments( idTerm );
+				driver.deleteDocuments( idTerm );
 			}
 			workspace.notifyWorkApplied( work );
 		}

@@ -10,11 +10,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -41,7 +41,7 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDriver driver, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
@@ -51,7 +51,7 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 			log.trace( "add to Lucene index: " + entityType + "#" + work.getId() + ":" + work.getDocument() );
 		}
 		try {
-			writer.addDocument( work.getDocument(), analyzer );
+			driver.addDocument( work.getDocument(), analyzer );
 			workspace.notifyWorkApplied( work );
 		}
 		catch (IOException e) {

@@ -9,7 +9,6 @@ package org.hibernate.search.backend.impl.lucene.works;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -18,6 +17,7 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDriver;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
@@ -41,7 +41,7 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDriver driver, IndexingMonitor monitor) {
 		final Class<?> managedType = work.getEntityClass();
 		final String tenantId = work.getTenantId();
 		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( managedType );
@@ -49,10 +49,10 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 		log.tracef( "Removing %s#%s by id using an IndexWriter.", managedType, id );
 		try {
 			if ( tenantId == null ) {
-				deleteWithoutTenant( work, writer, builder, id );
+				deleteWithoutTenant( work, driver, builder, id );
 			}
 			else {
-				deleteWithTenant( work, writer, tenantId, builder, id );
+				deleteWithTenant( work, driver, tenantId, builder, id );
 			}
 			workspace.notifyWorkApplied( work );
 		}
@@ -62,7 +62,7 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 		}
 	}
 
-	private void deleteWithTenant(LuceneWork work, IndexWriter writer, final String tenantId, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
+	private void deleteWithTenant(LuceneWork work, IndexWriterDriver driver, final String tenantId, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
 		BooleanQuery termDeleteQuery = new BooleanQuery();
 		TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 		termDeleteQuery.add( tenantTermQuery, Occur.MUST );
@@ -74,17 +74,17 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 			termDeleteQuery.add( new TermQuery( idTerm ), Occur.MUST );
 		}
-		writer.deleteDocuments( termDeleteQuery );
+		driver.deleteDocuments( termDeleteQuery );
 	}
 
-	private void deleteWithoutTenant(LuceneWork work, IndexWriter writer, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
+	private void deleteWithoutTenant(LuceneWork work, IndexWriterDriver driver, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
 		if ( isIdNumeric( builder ) ) {
-			writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
+			driver.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
 		}
 		else {
 			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 			//The point to this class is to avoid using a Query to perform the delete operation!
-			writer.deleteDocuments( idTerm );
+			driver.deleteDocuments( idTerm );
 		}
 	}
 
