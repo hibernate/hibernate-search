@@ -90,4 +90,20 @@ public class POI {
 		return type;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append( "POI [id=" );
+		builder.append( id );
+		builder.append( ", name=" );
+		builder.append( name );
+		builder.append( ", type=" );
+		builder.append( type );
+		builder.append( ", latitude=" );
+		builder.append( latitude );
+		builder.append( ", longitude=" );
+		builder.append( longitude );
+		builder.append( "]" );
+		return builder.toString();
+	}
 }
