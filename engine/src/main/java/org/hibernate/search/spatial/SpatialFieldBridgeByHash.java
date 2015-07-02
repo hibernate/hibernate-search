@@ -8,9 +8,11 @@ package org.hibernate.search.spatial;
 
 import org.apache.lucene.document.Document;
 
+import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.spatial.impl.SpatialHelper;
+import org.hibernate.search.spatial.impl.SpatialNumericDocValueField;
 import org.hibernate.search.spatial.impl.Point;
 
 import java.util.Map;
@@ -83,6 +85,12 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 							longitude,
 							document
 					);
+
+					Field latitudeDocValuesField = new SpatialNumericDocValueField( SpatialHelper.formatLatitude( name ), getLatitude( value ) );
+					document.add( latitudeDocValuesField );
+
+					Field longitudeDocValuesField = new SpatialNumericDocValueField( SpatialHelper.formatLongitude( name ), getLongitude( value ) );
+					document.add( longitudeDocValuesField );
 				}
 			}
 		}

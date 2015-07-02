@@ -7,8 +7,10 @@
 package org.hibernate.search.spatial;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.spatial.impl.SpatialHelper;
+import org.hibernate.search.spatial.impl.SpatialNumericDocValueField;
 
 /**
  * Hibernate Search field bridge using Range Spatial, binding a Coordinates to two numeric fields for latitude and Longitude
@@ -53,6 +55,12 @@ public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 						longitude,
 						document
 				);
+
+				Field latitudeDocValuesField = new SpatialNumericDocValueField( SpatialHelper.formatLatitude( name ), getLatitude( value ) );
+				document.add( latitudeDocValuesField );
+
+				Field longitudeDocValuesField = new SpatialNumericDocValueField( SpatialHelper.formatLongitude( name ), getLongitude( value ) );
+				document.add( longitudeDocValuesField );
 			}
 		}
 	}
