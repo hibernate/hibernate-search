@@ -7,27 +7,30 @@
 package org.hibernate.search.test.integration.wildfly.massindexing;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.CacheMode;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.jboss.ejb3.annotation.TransactionTimeout;
 
 /**
  * @author Gunnar Morling
  */
-@ApplicationScoped
+@Stateless
 public class ConcertManager {
 
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Transactional
+	@TransactionTimeout(value = 5, unit = TimeUnit.MINUTES)
 	public void saveConcerts(Iterable<Concert> concerts) {
 		int i = 0;
 		for ( Concert concert : concerts ) {
@@ -42,7 +45,6 @@ public class ConcertManager {
 		}
 	}
 
-	@Transactional
 	public List<Concert> findConcertsByArtist(String artist) {
 		FullTextEntityManager fem = Search.getFullTextEntityManager( entityManager );
 
@@ -57,6 +59,7 @@ public class ConcertManager {
 		return result;
 	}
 
+	@TransactionAttribute(TransactionAttributeType.NEVER)
 	public void indexConcerts() {
 		try {
 			Search.getFullTextEntityManager( entityManager )
