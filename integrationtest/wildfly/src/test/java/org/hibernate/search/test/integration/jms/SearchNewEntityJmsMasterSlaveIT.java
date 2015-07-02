@@ -25,7 +25,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenStrategyStage;
 import org.junit.runner.RunWith;
 
 /**
- * Execute the tests in {@link MasterSlaveTestTemplate} adding the the dependencies as jars in the
+ * Execute the tests in {@link MasterSlaveTestTemplate} adding the dependencies as jars in the
  * deployments.
  *
  * @author Davide D'Alto
