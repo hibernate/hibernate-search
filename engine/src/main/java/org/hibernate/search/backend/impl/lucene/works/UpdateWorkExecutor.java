@@ -7,9 +7,9 @@
 
 package org.hibernate.search.backend.impl.lucene.works;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -25,11 +25,11 @@ public class UpdateWorkExecutor implements LuceneWorkExecutor {
 	}
 
 	@Override
-	public void performWork(final LuceneWork work, final IndexWriter writer, final IndexingMonitor monitor) {
+	public void performWork(final LuceneWork work, IndexWriterDelegate delegate, final IndexingMonitor monitor) {
 		// This is the slowest implementation, needing to remove and then add to the index;
 		// see also org.hibernate.search.backend.impl.lucene.works.UpdateExtWorkDelegate
-		this.deleteDelegate.performWork( work, writer, monitor );
-		this.addDelegate.performWork( work, writer, monitor );
+		this.deleteDelegate.performWork( work, delegate, monitor );
+		this.addDelegate.performWork( work, delegate, monitor );
 	}
 
 }

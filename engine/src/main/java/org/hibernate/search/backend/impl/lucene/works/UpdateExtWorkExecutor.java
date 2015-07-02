@@ -10,12 +10,12 @@ package org.hibernate.search.backend.impl.lucene.works;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
@@ -52,15 +52,15 @@ public final class UpdateExtWorkExecutor extends UpdateWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
 		checkType( work );
 		final Serializable id = work.getId();
 		try {
 			if ( idIsNumeric ) {
 				log.tracef( "Deleting %s#%s by query using an IndexWriter#updateDocument as id is Numeric", managedType, id );
-				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
+				delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
 				// no need to log the Add operation as we'll log in the delegate
-				this.addDelegate.performWork( work, writer, monitor );
+				this.addDelegate.performWork( work, delegate, monitor );
 			}
 			else {
 				log.tracef( "Updating %s#%s by id using an IndexWriter#updateDocument.", managedType, id );
@@ -68,7 +68,7 @@ public final class UpdateExtWorkExecutor extends UpdateWorkExecutor {
 				Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
 				ScopedAnalyzer analyzer = builder.getAnalyzer();
 				analyzer = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
-				writer.updateDocument( idTerm, work.getDocument(), analyzer );
+				delegate.updateDocument( idTerm, work.getDocument(), analyzer );
 			}
 			workspace.notifyWorkApplied( work );
 		}

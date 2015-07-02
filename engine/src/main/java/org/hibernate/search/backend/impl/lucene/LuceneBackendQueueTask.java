@@ -9,7 +9,6 @@ package org.hibernate.search.backend.impl.lucene;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
@@ -78,8 +77,8 @@ final class LuceneBackendQueueTask implements Runnable {
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
 		errorContextBuilder.allWorkToBeDone( workList );
 
-		IndexWriter indexWriter = workspace.getIndexWriter( errorContextBuilder );
-		if ( indexWriter == null ) {
+		IndexWriterDelegate delegate = workspace.getIndexWriterDelegate( errorContextBuilder );
+		if ( delegate == null ) {
 			log.cannotOpenIndexWriterCausePreviousError();
 			return;
 		}
@@ -89,7 +88,7 @@ final class LuceneBackendQueueTask implements Runnable {
 		try {
 			for ( LuceneWork luceneWork : workList ) {
 				currentOperation = luceneWork;
-				performWork( luceneWork, resources, indexWriter, monitor );
+				performWork( luceneWork, resources, delegate, monitor );
 				errorContextBuilder.workCompleted( currentOperation );
 			}
 			currentOperation = null;
@@ -107,7 +106,8 @@ final class LuceneBackendQueueTask implements Runnable {
 		}
 	}
 
-	static void performWork(final LuceneWork work, final LuceneBackendResources resources, final IndexWriter indexWriter, final IndexingMonitor monitor) {
-		work.acceptIndexWorkVisitor( resources.getWorkVisitor(), null ).performWork( work, indexWriter, monitor );
+	static void performWork(final LuceneWork work, final LuceneBackendResources resources, final IndexWriterDelegate delegate, final IndexingMonitor monitor) {
+		work.acceptIndexWorkVisitor( resources.getWorkVisitor(), null ).performWork( work, delegate, monitor );
 	}
+
 }

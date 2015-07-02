@@ -8,7 +8,6 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.concurrent.locks.Lock;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkExecutor;
@@ -42,15 +41,15 @@ final class LuceneBackendTaskStreamer {
 	public void doWork(final LuceneWork work, final IndexingMonitor monitor) {
 		modificationLock.lock();
 		try {
-			IndexWriter indexWriter = workspace.getIndexWriter();
-			if ( indexWriter == null ) {
+			IndexWriterDelegate delegate = workspace.getIndexWriterDelegate();
+			if ( delegate == null ) {
 				log.cannotOpenIndexWriterCausePreviousError();
 				return;
 			}
 			boolean errors = true;
 			try {
 				LuceneWorkExecutor executor = work.acceptIndexWorkVisitor( resources.getWorkVisitor(), null );
-				executor.performWork( work, indexWriter, monitor );
+				executor.performWork( work, delegate, monitor );
 				errors = false;
 			}
 			finally {

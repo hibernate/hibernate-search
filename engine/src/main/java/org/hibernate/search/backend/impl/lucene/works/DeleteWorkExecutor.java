@@ -8,7 +8,6 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import java.io.Serializable;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -24,6 +23,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -46,7 +46,7 @@ class DeleteWorkExecutor implements LuceneWorkExecutor {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		final Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by query.", entityType, id );
@@ -71,7 +71,7 @@ class DeleteWorkExecutor implements LuceneWorkExecutor {
 		addTenantQueryTerm( work.getTenantId(), entityDeletionQuery );
 
 		try {
-			writer.deleteDocuments( entityDeletionQuery );
+			delegate.deleteDocuments( entityDeletionQuery );
 		}
 		catch (Exception e) {
 			String message = "Unable to remove " + entityType + "#" + id + " from index.";

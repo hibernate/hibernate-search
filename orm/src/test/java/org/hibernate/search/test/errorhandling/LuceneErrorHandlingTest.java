@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.StreamingOperationExecutorSelector;
+import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkExecutor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
@@ -138,7 +138,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 		}
 
 		@Override
-		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+		public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
 			WORK_COUNTER.incrementAndGet();
 		}
 
@@ -179,7 +179,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 		}
 
 		@Override
-		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+		public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
 			throw new SearchException( "failed work message" );
 		}
 	}
