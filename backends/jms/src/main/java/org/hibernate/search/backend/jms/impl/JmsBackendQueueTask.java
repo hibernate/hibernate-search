@@ -27,6 +27,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Yoann Gendre
  */
 public class JmsBackendQueueTask implements Runnable {
 
@@ -60,23 +61,31 @@ public class JmsBackendQueueTask implements Runnable {
 		LuceneWorkSerializer serializer = indexManager.getSerializer();
 		byte[] data = serializer.toSerializedModel( filteredQueue );
 		QueueSender sender;
-		QueueSession session;
-		QueueConnection connection;
+		QueueSession session = null;
+		QueueConnection connection = null;
 		try {
 			connection = processor.getJMSConnection();
-			//TODO make transacted parameterized
-			session = connection.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
+			// TODO make transacted parameterized
+			if ( processor.isTransactional() ) {
+				session = connection.createQueueSession( true, QueueSession.SESSION_TRANSACTED );
+			}
+			else {
+				session = connection.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
+			}
 			ObjectMessage message = session.createObjectMessage();
 			message.setObject( data );
 			message.setStringProperty( Environment.INDEX_NAME_JMS_PROPERTY, indexName );
 
 			sender = session.createSender( processor.getJmsQueue() );
 			sender.send( message );
-
+			sender.close();
 			session.close();
 		}
 		catch (JMSException e) {
 			throw log.unableToSendJMSWork( indexName, processor.getJmsQueueName(), e );
+		}
+		finally {
+			processor.releaseJMSConnection( connection );
 		}
 	}
 }
