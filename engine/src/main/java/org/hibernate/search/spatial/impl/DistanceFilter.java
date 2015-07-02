@@ -10,9 +10,8 @@ import java.io.IOException;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.FieldCache;
-import org.apache.lucene.search.FieldCache.Doubles;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredDocIdSet;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -93,8 +92,6 @@ public final class DistanceFilter extends Filter {
 	@Override
 	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
 		final AtomicReader atomicReader = context.reader();
-		final Doubles latitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, getLatitudeField(), false );
-		final Doubles longitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, getLongitudeField(), false );
 
 		DocIdSet docs = previousFilter.getDocIdSet( context, acceptDocs );
 
@@ -102,11 +99,15 @@ public final class DistanceFilter extends Filter {
 			return null;
 		}
 
+		final NumericDocValues latitudeValues = atomicReader.getNumericDocValues( getLatitudeField() );
+		final NumericDocValues longitudeValues = atomicReader.getNumericDocValues( getLongitudeField() );
+
 		return new FilteredDocIdSet( docs ) {
 			@Override
 			protected boolean match(int documentIndex) {
-
-				if ( center.getDistanceTo( latitudeValues.get( documentIndex ), longitudeValues.get( documentIndex ) ) <= radius ) {
+				double lat = Double.longBitsToDouble( latitudeValues.get( documentIndex ) );
+				double lon = Double.longBitsToDouble( longitudeValues.get( documentIndex ) );
+				if ( center.getDistanceTo( lat, lon ) <= radius ) {
 					return true;
 				}
 				else {

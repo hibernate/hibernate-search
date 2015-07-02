@@ -11,9 +11,8 @@ import java.util.ArrayList;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.FieldCache;
-import org.apache.lucene.search.FieldCache.Doubles;
 import org.apache.lucene.search.Scorer;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spatial.Coordinates;
@@ -34,8 +33,8 @@ public class DistanceCollector extends Collector {
 	private final String longitudeField;
 
 	private int docBase = 0;
-	private Doubles latitudeValues;
-	private Doubles longitudeValues;
+	private NumericDocValues latitudeValues;
+	private NumericDocValues longitudeValues;
 
 	public DistanceCollector(Collector delegate, Coordinates centerCoordinates, int hitsCount, String fieldname) {
 		this.delegate = delegate;
@@ -55,15 +54,17 @@ public class DistanceCollector extends Collector {
 	public void collect(final int doc) throws IOException {
 		delegate.collect( doc );
 		final int absolute = docBase + doc;
-		distances.put( absolute, latitudeValues.get( doc ), longitudeValues.get( doc ) );
+		double lat = Double.longBitsToDouble( latitudeValues.get( doc ) );
+		double lon = Double.longBitsToDouble( longitudeValues.get( doc ) );
+		distances.put( absolute, lat, lon );
 	}
 
 	@Override
 	public void setNextReader(AtomicReaderContext newContext) throws IOException {
 		delegate.setNextReader( newContext );
 		final AtomicReader atomicReader = newContext.reader();
-		latitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
-		longitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
+		latitudeValues = atomicReader.getNumericDocValues( latitudeField );
+		longitudeValues = atomicReader.getNumericDocValues( longitudeField );
 		this.docBase = newContext.docBase;
 	}
 
