@@ -8,9 +8,9 @@ package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
 
+import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
-import org.apache.lucene.search.FieldCache;
-import org.apache.lucene.search.FieldCache.Doubles;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.FieldComparator;
 
 public final class DistanceComparator extends FieldComparator<Double> {
@@ -19,8 +19,8 @@ public final class DistanceComparator extends FieldComparator<Double> {
 	private final String latitudeField;
 	private final String longitudeField;
 	private double[] distances;
-	private Doubles latitudeValues;
-	private Doubles longitudeValues;
+	private NumericDocValues latitudeValues;
+	private NumericDocValues longitudeValues;
 	private Double bottomDistance;
 	private Double topValue;
 
@@ -50,8 +50,16 @@ public final class DistanceComparator extends FieldComparator<Double> {
 	public int compareBottom(final int doc) throws IOException {
 		return Double.compare(
 				bottomDistance,
-				center.getDistanceTo( latitudeValues.get( doc ), longitudeValues.get( doc ) )
+				center.getDistanceTo( latitude( doc ), longitude( doc ) )
 		);
+	}
+
+	private double longitude(final int doc) {
+		return Double.longBitsToDouble( longitudeValues.get( doc ) );
+	}
+
+	private double latitude(final int doc) {
+		return Double.longBitsToDouble( latitudeValues.get( doc ) );
 	}
 
 	@Override
@@ -60,22 +68,23 @@ public final class DistanceComparator extends FieldComparator<Double> {
 			return 1; //we consider any doc "higher" than null
 		}
 
-		final double distanceTo = center.getDistanceTo( latitudeValues.get( doc ), longitudeValues.get( doc ) );
+		final double distanceTo = center.getDistanceTo( latitude( doc ), longitude( doc ) );
 		return Double.compare( distanceTo, topValue );
 	}
 
 	@Override
 	public void copy(final int slot, final int doc) throws IOException {
 		distances[slot] = center.getDistanceTo(
-				latitudeValues.get( doc ),
-				longitudeValues.get( doc )
+				latitude( doc ),
+				longitude( doc )
 		);
 	}
 
 	@Override
 	public DistanceComparator setNextReader(final AtomicReaderContext context) throws IOException {
-		latitudeValues = FieldCache.DEFAULT.getDoubles( context.reader(), latitudeField, false );
-		longitudeValues = FieldCache.DEFAULT.getDoubles( context.reader(), longitudeField, false );
+		final AtomicReader atomicReader = context.reader();
+		latitudeValues = atomicReader.getNumericDocValues( latitudeField );
+		longitudeValues = atomicReader.getNumericDocValues( longitudeField );
 		return this;
 	}
 
