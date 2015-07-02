@@ -1872,7 +1872,6 @@ Query performance depends on several criteria:
 * the number of loaded objects: use pagination and / or index projection (if needed).
 * the way Hibernate Search interacts with the Lucene readers: defines the appropriate
 <<search-architecture-readerstrategy>>.
-* caching frequently extracted values from the index: see <<query-fieldcaches>>.
 
 [[query-logging]]
 ==== Logging executed Lucene queries
@@ -1884,70 +1883,3 @@ using the Hibernate Search query DSL.
 In order to log all Lucene queries executed by Hibernate Search, enable `DEBUG` logging for the log
 category `org.hibernate.search.query`.
 
-[[query-fieldcaches]]
-==== Caching index values: FieldCache
-
-The primary function of a Lucene index is to identify matches to your queries, still after the query
-is performed the results must be analyzed to extract useful information: typically Hibernate Search
-might need to extract the Class type and the primary key.
-
-Extracting the needed values from the index has a performance cost, which in some cases might be
-very low and not noticeable, but in some other cases might be a good candidate for caching.
-
-What is exactly needed depends on the kind of Projections being used (see <<projections>>), and in
-some cases the Class type is not needed as it can be inferred from the query context or other means.
-
-Using the `@CacheFromIndex` annotation you can experiment different kinds of caching of the main
-metadata fields required by Hibernate Search:
-
-
-====
-[source, JAVA]
-----
-
-import static org.hibernate.search.annotations.FieldCacheType.CLASS;
-import static org.hibernate.search.annotations.FieldCacheType.ID;
-
-@Indexed
-@CacheFromIndex( { CLASS, ID } )
-public class Essay {
-// ...
-}
-
-----
-====
-
-It is currently possible to cache Class types and IDs using this annotation:
-
-* `CLASS`: Hibernate Search will use a Lucene FieldCache to improve performance of the Class type
-extraction from the index.
-
-This value is enabled by default, and is what Hibernate Search will apply if you don't specify
-the `@CacheFromIndex` annotation.
-
-* `ID`: Extracting the primary identifier will use a cache. This is likely providing the best
-performing queries, but will consume much more memory which in turn might reduce performance.
-
-
-[NOTE]
-====
-Measure the performance and memory consumption impact after warm-up (executing some queries):
-enabling Field Caches is likely to improve performance but this is not always the case.
-====
-
-
-Using a FieldCache has two downsides to consider:
-
-* Memory usage: these caches can be quite memory hungry. Typically the CLASS cache has lower
-requirements than the ID cache.
-
-* Index warm-up: when using field caches, the first query on a new index or segment will be slower
-than when you don't have caching enabled.
-
-With some queries the class type won't be needed at all, in that case even if you enabled the CLASS
-field cache, this might not be used; for example if you are targeting a single class, obviously all
-returned values will be of that type (this is evaluated at each Query execution).
-
-For the ID FieldCache to be used, the ids of targeted entities must be using a `TwoWayFieldBridge` (as
-all built-in bridges), and all types being loaded in a specific query must use the field name for the
-id, and have ids of the same type (this is evaluated at each Query execution).
