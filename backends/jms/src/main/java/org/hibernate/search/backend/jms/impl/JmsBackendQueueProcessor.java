@@ -30,12 +30,15 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * Backend sending the workload via JMS.
+ * Optionally support transactions: the JMS messages can be sent as part of the current transaction.
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @author Yoann Gendre
  */
-public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor {
+public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor, BackendQueueProcessor.Transactional {
 
 	private String jmsQueueName;
 	protected static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";

@@ -831,4 +831,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityClass);
+
+	@Message(id = 277, value = "Worker configured to be enlisted in transaction but the backend %1$s is not transactional for index %2$s")
+	SearchException backendNonTransactional(String indexName, String backend);
 }
