@@ -44,11 +44,11 @@ public final class ConcurrentlyMutableAnalyzer extends DelegatingAnalyzerWrapper
 	 * replacements or locking.
 	 * Correct concurrency control requires external locking!
 	 * @param analyzer
-	 * @return
+	 * @return true if there is no needto replace the current Analyzer
 	 */
 	public boolean isCompatibleWith(ScopedAnalyzer analyzer) {
-		// TODO Optimise this
-		return false;
+		ScopedAnalyzer currentAnalyzer = current.get();
+		return currentAnalyzer.isCompositeOfSameInstances( analyzer );
 	}
 
 	/**
