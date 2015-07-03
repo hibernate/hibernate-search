@@ -7,11 +7,15 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.io.IOException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.hibernate.search.backend.impl.lucene.analysis.ConcurrentlyMutableAnalyzer;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 
 /**
@@ -21,12 +25,19 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2015 Red Hat Inc.
  */
-public class IndexWriterDriver {
+public final class IndexWriterDriver {
 
-	final IndexWriter indexWriter;
+	private final IndexWriter indexWriter;
+	private final ConcurrentlyMutableAnalyzer mutableAnalyzer;
+	private final Lock readLock;
+	private final Lock writeLock;
 
 	public IndexWriterDriver(final IndexWriter indexWriter) {
 		this.indexWriter = indexWriter;
+		this.mutableAnalyzer = (ConcurrentlyMutableAnalyzer) indexWriter.getAnalyzer();
+		ReadWriteLock lock = new ReentrantReadWriteLock();
+		this.readLock = lock.readLock();
+		this.writeLock = lock.writeLock();
 	}
 
 	public void deleteDocuments(final Query termDeleteQuery) throws IOException {
@@ -43,7 +54,29 @@ public class IndexWriterDriver {
 	}
 
 	public void updateDocument(final Term idTerm, final Document document, final ScopedAnalyzer analyzer) throws IOException {
-		indexWriter.updateDocument( idTerm, document, analyzer );
+		// Try being optimistic first:
+		final boolean applyWithinReadLock;
+		readLock.lock();
+		try {
+			applyWithinReadLock = mutableAnalyzer.isCompatibleWith( analyzer );
+			if ( applyWithinReadLock ) {
+				indexWriter.updateDocument( idTerm, document );
+			}
+		}
+		finally {
+			readLock.unlock();
+		}
+		// If that failed, take the pessimistic lock:
+		if ( ! applyWithinReadLock ) {
+			writeLock.lock();
+			try {
+				mutableAnalyzer.deployNewAnalyzer( analyzer );
+				indexWriter.updateDocument( idTerm, document );
+			}
+			finally {
+				writeLock.unlock();
+			}
+		}
 	}
 
 	/**
