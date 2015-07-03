@@ -34,7 +34,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class TransactionalWorker implements Worker {
+public class PerTransactionWorker implements Worker {
 
 	//note: there is only one Worker instance, reused concurrently for all sessions.
 

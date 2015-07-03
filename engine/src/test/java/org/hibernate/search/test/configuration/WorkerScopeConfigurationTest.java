@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.impl.QueueingProcessor;
-import org.hibernate.search.backend.impl.TransactionalWorker;
+import org.hibernate.search.backend.impl.PerTransactionWorker;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
@@ -53,7 +53,7 @@ public class WorkerScopeConfigurationTest {
 		SearchIntegrator searchIntegrator =
 				new SearchIntegratorBuilder().configuration( manualConfiguration ).buildSearchIntegrator();
 		assertNotNull( "Worker should have been created", searchIntegrator.getWorker() );
-		assertTrue( "Wrong worker class", searchIntegrator.getWorker() instanceof TransactionalWorker );
+		assertTrue( "Wrong worker class", searchIntegrator.getWorker() instanceof PerTransactionWorker );
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class WorkerScopeConfigurationTest {
 		SearchIntegrator searchIntegrator =
 				new SearchIntegratorBuilder().configuration( manualConfiguration ).buildSearchIntegrator();
 		assertNotNull( "Worker should have been created", searchIntegrator.getWorker() );
-		assertTrue( "Wrong worker class", searchIntegrator.getWorker() instanceof TransactionalWorker );
+		assertTrue( "Wrong worker class", searchIntegrator.getWorker() instanceof PerTransactionWorker );
 	}
 
 	@Test

@@ -29,7 +29,7 @@ public abstract class WorkerFactory {
 		String workerImplClassName = properties.getProperty( Environment.WORKER_SCOPE );
 		Worker worker;
 		if ( StringHelper.isEmpty( workerImplClassName ) || "transaction".equalsIgnoreCase( workerImplClassName ) ) {
-			worker = new TransactionalWorker();
+			worker = new PerTransactionWorker();
 		}
 		else {
 			worker = instantiateExplicitlyConfiguredWorker( buildContext, workerImplClassName );
