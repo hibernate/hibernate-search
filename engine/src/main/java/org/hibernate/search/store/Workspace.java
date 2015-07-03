@@ -15,8 +15,11 @@ import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 
 /**
+ * @deprecated This interface will be moved and should be considered non-public API [HSEARCH-1915]
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
+@Deprecated
 public interface Workspace {
 
 	DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entity);
