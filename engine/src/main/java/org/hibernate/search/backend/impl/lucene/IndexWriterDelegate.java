@@ -38,7 +38,8 @@ public final class IndexWriterDelegate {
 	}
 
 	public void addDocument(final Document document, final ScopedAnalyzer analyzer) throws IOException {
-		indexWriter.addDocument( document, analyzer );
+		//This is now equivalent to the old "addDocument" method:
+		updateDocument( null, document, analyzer );
 	}
 
 	public void updateDocument(final Term idTerm, final Document document, final ScopedAnalyzer analyzer) throws IOException {
