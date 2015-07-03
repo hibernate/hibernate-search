@@ -4,7 +4,8 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.integration.jms;
+
+package org.hibernate.search.test.integration.jms.transaction;
 
 import java.io.File;
 import java.util.Arrays;
@@ -12,9 +13,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.engine.Version;
-import org.hibernate.search.test.integration.VersionTestHelper;
-import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -24,15 +22,21 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenFormatStage;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenStrategyStage;
 import org.junit.runner.RunWith;
 
+import org.hibernate.search.engine.Version;
+import org.hibernate.search.test.integration.VersionTestHelper;
+import org.hibernate.search.test.integration.jms.DeploymentJmsMasterSlave;
+import org.hibernate.search.test.integration.jms.SearchNewEntityJmsMasterSlave;
+import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
+
 /**
- * Execute the tests in {@link MasterSlaveTestTemplate} adding the dependencies as jars in the
+ * Execute the tests in {@link SearchNewEntityJmsMasterSlave} adding the the dependencies as jars in the
  * deployments.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-public class SearchNewEntityJmsMasterSlaveIT extends MasterSlaveTestTemplate {
+public class TransactionalJmsMasterSlaveIT extends TransactionalJmsMasterSlave {
 
 	private static final File tmpDir = RegistrationConfiguration.createTempDir();
 
@@ -97,7 +101,7 @@ public class SearchNewEntityJmsMasterSlaveIT extends MasterSlaveTestTemplate {
 
 	@Deployment(name = "slave-1", order = 2)
 	public static Archive<?> createDeploymentSlave1() throws Exception {
-		WebArchive slave = DeploymentJmsMasterSlave.createSlave( "slave-1", REFRESH_PERIOD_IN_SEC, tmpDir, false )
+		WebArchive slave = DeploymentJmsMasterSlave.createSlave( "slave-1", REFRESH_PERIOD_IN_SEC, tmpDir, true )
 				.as( WebArchive.class );
 		addLibraries( slave );
 		return slave;
@@ -105,7 +109,7 @@ public class SearchNewEntityJmsMasterSlaveIT extends MasterSlaveTestTemplate {
 
 	@Deployment(name = "slave-2", order = 3)
 	public static Archive<?> createDeploymentSlave2() throws Exception {
-		WebArchive slave = DeploymentJmsMasterSlave.createSlave( "slave-2", REFRESH_PERIOD_IN_SEC, tmpDir, false )
+		WebArchive slave = DeploymentJmsMasterSlave.createSlave( "slave-2", REFRESH_PERIOD_IN_SEC, tmpDir, true )
 				.as( WebArchive.class );
 		addLibraries( slave );
 		return slave;
