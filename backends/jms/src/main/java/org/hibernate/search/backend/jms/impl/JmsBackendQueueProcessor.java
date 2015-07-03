@@ -25,7 +25,6 @@ import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -52,7 +51,6 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
 	public static final String JMS_CONNECTION_LOGIN = Environment.WORKER_PREFIX + "jms.login";
 	public static final String JMS_CONNECTION_PASSWORD = Environment.WORKER_PREFIX + "jms.password";
-	public static final String JMS_TRANSACTIONAL = Environment.WORKER_PREFIX + "jms.transactional";
 
 	private IndexManager indexManager;
 
@@ -64,7 +62,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		this.props = props;
-		this.isTransactional = ConfigurationParseHelper.getBooleanValue( props, JMS_TRANSACTIONAL, false );
+		this.isTransactional = context.enlistWorkerInTransaction();
 		this.indexManager = indexManager;
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();

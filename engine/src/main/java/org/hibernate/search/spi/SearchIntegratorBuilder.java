@@ -565,6 +565,11 @@ public class SearchIntegratorBuilder {
 		}
 
 		@Override
+		public boolean enlistWorkerInTransaction() {
+			return factoryState.enlistWorkerInTransaction();
+		}
+
+		@Override
 		public boolean isIndexMetadataComplete() {
 			return factoryState.isIndexMetadataComplete();
 		}
