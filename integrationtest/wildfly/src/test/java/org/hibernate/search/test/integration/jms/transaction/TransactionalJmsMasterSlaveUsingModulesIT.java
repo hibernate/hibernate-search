@@ -4,26 +4,30 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.integration.jms;
+
+package org.hibernate.search.test.integration.jms.transaction;
 
 import java.io.File;
 
-import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.runner.RunWith;
+
+import org.hibernate.search.test.integration.jms.DeploymentJmsMasterSlave;
+import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
+
 import static org.hibernate.search.test.integration.VersionTestHelper.addDependencyToSearchModule;
 
 /**
- * Execute the tests in {@link MasterSlaveTestTemplate} using the modules in JBoss AS to add the required
+ * Execute the tests in {@link SearchNewEntityJmsMasterSlave} using the modules in JBoss AS to add the required
  * dependencies.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends MasterSlaveTestTemplate {
+public class TransactionalJmsMasterSlaveUsingModulesIT extends TransactionalJmsMasterSlave {
 
 	private static final File tmpDir = RegistrationConfiguration.createTempDir();
 
@@ -36,14 +40,14 @@ public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends MasterSlaveTest
 
 	@Deployment(name = "slave-1", order = 2)
 	public static Archive<?> createDeploymentSlave1() throws Exception {
-		Archive<?> slave = DeploymentJmsMasterSlave.createSlave( "slave-1", REFRESH_PERIOD_IN_SEC, tmpDir, false );
+		Archive<?> slave = DeploymentJmsMasterSlave.createSlave( "slave-1", REFRESH_PERIOD_IN_SEC, tmpDir, true );
 		addDependencyToSearchModule( slave );
 		return slave;
 	}
 
 	@Deployment(name = "slave-2", order = 3)
 	public static Archive<?> createDeploymentSlave2() throws Exception {
-		Archive<?> slave = DeploymentJmsMasterSlave.createSlave( "slave-2", REFRESH_PERIOD_IN_SEC, tmpDir, false );
+		Archive<?> slave = DeploymentJmsMasterSlave.createSlave( "slave-2", REFRESH_PERIOD_IN_SEC, tmpDir, true );
 		addDependencyToSearchModule( slave );
 		return slave;
 	}
