@@ -7,6 +7,12 @@
 
 package org.hibernate.search.util.logging.impl;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.TRACE;
+import static org.jboss.logging.Logger.Level.WARN;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -30,12 +36,6 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
-
-import static org.jboss.logging.Logger.Level.DEBUG;
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.TRACE;
-import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -848,4 +848,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 281, value = "Unable to read directory: '%1$s")
 	SearchException directoryIsNotReadable(String directory);
 
+	@Message(id = 282, value = "Distance sort can only be used with spatial fields: '%1$s' is not spatial")
+	SearchException distanceSortRequiresSpatialField(String field);
+
+	@Message(id = 283, value = "Sorting using '%1$s' requires an indexed field: '%2$s' is not valid")
+	SearchException sortRequiresIndexedField(@FormatWith(ClassFormatter.class) Class<?> sortFieldType, String field);
 }
