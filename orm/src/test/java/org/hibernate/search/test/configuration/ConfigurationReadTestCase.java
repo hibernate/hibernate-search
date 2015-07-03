@@ -12,10 +12,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.configuration.impl.IndexWriterSetting;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Before;
@@ -73,7 +73,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
+		cfg.put( "hibernate.search.default.indexBase", getBaseIndexDir().toAbsolutePath().toString() );
 	}
 
 	public static void assertCfgIsInvalid(Configuration configuration, Class[] mapping) {

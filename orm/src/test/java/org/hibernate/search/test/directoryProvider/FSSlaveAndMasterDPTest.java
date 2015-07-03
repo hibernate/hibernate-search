@@ -7,15 +7,15 @@
 package org.hibernate.search.test.directoryProvider;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
-
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -155,7 +155,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return getSessionFactories()[1].openSession();
 	}
 
-	static File prepareDirectories(String testId) {
+	static File prepareDirectories(String testId) throws IOException {
 
 		String superRootPath = TestConstants.getIndexDirectory( FSSlaveAndMasterDPTest.class );
 		File root = new File( superRootPath, testId );
@@ -203,7 +203,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cleanupDirectories( root );
 	}
 
-	static void cleanupDirectories( File root ) {
+	static void cleanupDirectories( File root ) throws IOException {
 		log.debugf( "Deleting test directory %s ", root.getAbsolutePath() );
 		FileHelper.delete( root );
 	}

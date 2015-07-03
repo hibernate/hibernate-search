@@ -11,6 +11,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -172,30 +177,38 @@ public class FileHelper {
 		}
 	}
 
+	public static void delete(File file) throws IOException {
+		delete( file.toPath() );
+	}
+
 	/**
 	 * Attempts to delete a file. If the file is a directory delete recursively all content.
 	 *
 	 * @param file the file or directory to be deleted
 	 *
-	 * @return {@code false} if it wasn't possible to delete all content which is a common problem on Windows systems.
+	 * @throws IOException if it wasn't possible to delete all content which is a common problem on Windows systems.
 	 */
-	public static boolean delete(File file) {
-		if ( file == null ) {
+	public static void delete(Path path) throws IOException {
+		if ( path == null ) {
 			throw new IllegalArgumentException();
 		}
-		boolean allok = true;
-		if ( file.isDirectory() ) {
-			for ( File subFile : file.listFiles() ) {
-				boolean deleted = delete( subFile );
-				allok = allok && deleted;
-			}
+
+		if ( !Files.exists( path ) ) {
+			return;
 		}
-		if ( allok && file.exists() ) {
-			if ( !file.delete() ) {
-				log.notDeleted( file );
-				return false;
+
+		Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				Files.delete( file );
+				return FileVisitResult.CONTINUE;
 			}
-		}
-		return allok;
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+				Files.delete( dir );
+				return FileVisitResult.CONTINUE;
+			}
+		});
 	}
 }
