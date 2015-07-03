@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.spatial.impl;
 
+import static org.hibernate.search.spatial.impl.CoordinateHelper.coordinate;
+
 import java.io.IOException;
 
 import org.apache.lucene.index.AtomicReader;
@@ -105,8 +107,8 @@ public final class DistanceFilter extends Filter {
 		return new FilteredDocIdSet( docs ) {
 			@Override
 			protected boolean match(int documentIndex) {
-				double lat = Double.longBitsToDouble( latitudeValues.get( documentIndex ) );
-				double lon = Double.longBitsToDouble( longitudeValues.get( documentIndex ) );
+				double lat = coordinate( latitudeValues, documentIndex );
+				double lon = coordinate( longitudeValues, documentIndex );
 				if ( center.getDistanceTo( lat, lon ) <= radius ) {
 					return true;
 				}

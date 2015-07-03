@@ -831,4 +831,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityClass);
+
+	@Message(id = 277, value = "Distance sort can only be used with spatial fields: '%1$s' is not spatial")
+	SearchException distanceSortRequiresSpatialField(String field);
+
+	@Message(id = 278, value = "Sorting using '%1$s' requires an indexed field: '%2$s' is not valid")
+	SearchException sortRequiresIndexedField(@FormatWith(ClassFormatter.class) Class<?> sortFieldType, String field);
+
 }

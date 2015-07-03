@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.spatial.impl;
 
+import static org.hibernate.search.spatial.impl.CoordinateHelper.coordinate;
+
 import java.io.IOException;
 
 import org.apache.lucene.index.AtomicReader;
@@ -55,11 +57,11 @@ public final class DistanceComparator extends FieldComparator<Double> {
 	}
 
 	private double longitude(final int doc) {
-		return Double.longBitsToDouble( longitudeValues.get( doc ) );
+		return coordinate( longitudeValues, doc );
 	}
 
 	private double latitude(final int doc) {
-		return Double.longBitsToDouble( latitudeValues.get( doc ) );
+		return coordinate( latitudeValues, doc );
 	}
 
 	@Override
