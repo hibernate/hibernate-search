@@ -47,6 +47,28 @@ public final class ScopedAnalyzer extends AnalyzerWrapper {
 		scopedAnalyzers.put( scope, scopedAnalyzer );
 	}
 
+	/**
+	 * Compares the references of the global analyzer backing this ScopedAnalyzer
+	 * and each scoped analyzer.
+	 * @param other ScopedAnalyzer to compare to
+	 * @return true if and only if the same instance of global analyzer is being used
+	 * and all scoped analyzers also match, by reference.
+	 */
+	public boolean isCompositeOfSameInstances(ScopedAnalyzer other) {
+		if ( this.globalAnalyzer != other.globalAnalyzer ) {
+			return false;
+		}
+		if ( this.scopedAnalyzers.size() != other.scopedAnalyzers.size() ) {
+			return false;
+		}
+		for ( String fieldname : scopedAnalyzers.keySet() ) {
+			if ( this.scopedAnalyzers.get( fieldname ) != other.scopedAnalyzers.get( fieldname ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	protected Analyzer getWrappedAnalyzer(String fieldName) {
 		final Analyzer analyzer = scopedAnalyzers.get( fieldName );
