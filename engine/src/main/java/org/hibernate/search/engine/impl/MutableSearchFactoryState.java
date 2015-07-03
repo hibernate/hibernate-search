@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -29,6 +30,7 @@ import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
 /**
  * Shared factory state
@@ -60,6 +62,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private boolean deleteByTermEnforced;
 	private boolean isIdProvidedImplicit;
 	private IndexManagerFactory indexManagerFactory;
+	private boolean enlistWorkerInTransaction;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingMode = oldFactoryState.getIndexingMode();
@@ -84,6 +87,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		deleteByTermEnforced = oldFactoryState.isDeleteByTermEnforced();
 		isIdProvidedImplicit = oldFactoryState.isIdProvidedImplicit();
 		indexManagerFactory = oldFactoryState.getIndexManagerFactory();
+		enlistWorkerInTransaction = oldFactoryState.enlistWorkerInTransaction();
 	}
 
 	@Override
@@ -187,6 +191,9 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setConfigurationProperties(Properties configurationProperties) {
 		this.configurationProperties = configurationProperties;
+		this.enlistWorkerInTransaction = ConfigurationParseHelper.getBooleanValue(
+				configurationProperties, Environment.WORKER_ENLIST_IN_TRANSACTION, false
+		);
 	}
 
 	public void setIndexHierarchy(PolymorphicIndexHierarchy indexHierarchy) {
@@ -294,6 +301,11 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	@Override
 	public IndexManagerFactory getIndexManagerFactory() {
 		return indexManagerFactory;
+	}
+
+	@Override
+	public boolean enlistWorkerInTransaction() {
+		return enlistWorkerInTransaction;
 	}
 
 	public void setIndexManagerFactory(IndexManagerFactory indexManagerFactory) {

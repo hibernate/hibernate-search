@@ -41,6 +41,11 @@ public class WorkerBuildContextForTest extends BuildContextForTest implements Wo
 	public InstanceInitializer getInstanceInitializer() {
 		return DefaultInstanceInitializer.DEFAULT_INITIALIZER;
 	}
+
+	@Override
+	public boolean enlistWorkerInTransaction() {
+		return false;
+	}
 }
 
 
