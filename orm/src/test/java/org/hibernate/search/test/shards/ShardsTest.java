@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.shards;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +18,9 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.store.FSDirectory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.test.SearchTestBase;
@@ -39,8 +39,8 @@ public class ShardsTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
-		File sub = getBaseIndexDir();
-		cfg.put( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+		Path sub = getBaseIndexDir();
+		cfg.put( "hibernate.search.default.indexBase", sub.toAbsolutePath().toString() );
 		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		//is the default when multiple shards are set up
 		//cfg.setProperty( "hibernate.search.Animal.sharding_strategy", IdHashShardingStrategy.class );
@@ -76,7 +76,7 @@ public class ShardsTest extends SearchTestBase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		a = (Animal) s.get( Animal.class, 1 );
+		a = s.get( Animal.class, 1 );
 		a.setName( "Mouse" );
 		Furniture fur = new Furniture();
 		fur.setColor( "dark blue" );
@@ -119,7 +119,7 @@ public class ShardsTest extends SearchTestBase {
 
 		s.clear();
 
-		FSDirectory animal00Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal00" ) );
+		FSDirectory animal00Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal00" ).toFile() );
 		try {
 			IndexReader reader = DirectoryReader.open( animal00Directory );
 			try {
@@ -134,7 +134,7 @@ public class ShardsTest extends SearchTestBase {
 			animal00Directory.close();
 		}
 
-		FSDirectory animal01Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.1" ) );
+		FSDirectory animal01Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal.1" ).toFile() );
 		try {
 			IndexReader reader = DirectoryReader.open( animal01Directory );
 			try {
@@ -150,13 +150,13 @@ public class ShardsTest extends SearchTestBase {
 		}
 
 		tx = s.beginTransaction();
-		a = (Animal) s.get( Animal.class, 1 );
+		a = s.get( Animal.class, 1 );
 		a.setName( "Mouse" );
 		tx.commit();
 
 		s.clear();
 
-		animal01Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.1" ) );
+		animal01Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal.1" ).toFile() );
 		try {
 			IndexReader reader = DirectoryReader.open( animal01Directory );
 			try {

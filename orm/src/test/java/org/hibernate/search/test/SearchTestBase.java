@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -82,12 +83,12 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 	}
 
 	@Override
-	public void ensureIndexesAreEmpty() {
+	public void ensureIndexesAreEmpty() throws IOException {
 		getTestResourceManager().ensureIndexesAreEmpty();
 	}
 
 	@Override
-	public File getBaseIndexDir() {
+	public Path getBaseIndexDir() {
 		return getTestResourceManager().getBaseIndexDir();
 	}
 

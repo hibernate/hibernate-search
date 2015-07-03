@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class DirectoryHelperTest {
 
 	@Test
-	public void testMkdirsDetermineIndex() {
+	public void testMkdirsDetermineIndex() throws Exception {
 		String root = "./testDir/dir1/dir2";
 		String relative = "dir3";
 

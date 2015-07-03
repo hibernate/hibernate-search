@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,7 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		Directory dir = FSDirectory.open( new File( getBaseIndexDir().toString(), "Documents" ) );
+		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
 		try {
 			IndexReader reader = DirectoryReader.open( dir );
 			try {
@@ -68,7 +67,7 @@ public class FSDirectoryTest extends SearchTestBase {
 
 			s = getSessionFactory().openSession();
 			s.getTransaction().begin();
-			Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
+			Document entity = s.get( Document.class, Long.valueOf( 1 ) );
 			entity.setSummary( "Object/relational mapping with EJB3" );
 			s.persist( new Document( "Seam in Action", "", "blah blah blah blah" ) );
 			s.getTransaction().commit();
@@ -146,7 +145,7 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		FSDirectory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
+		FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
 		IndexReader indexReader = DirectoryReader.open( dir );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		try {
@@ -182,7 +181,7 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		Directory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
+		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
 		IndexReader indexReader = DirectoryReader.open( dir );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		// deleting before search, but after IndexSearcher creation:

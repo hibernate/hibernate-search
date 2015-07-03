@@ -7,7 +7,8 @@
 
 package org.hibernate.search.test;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
@@ -38,8 +39,8 @@ public interface TestResourceManager {
 
 	Directory getDirectory(Class<?> clazz);
 
-	void ensureIndexesAreEmpty();
+	void ensureIndexesAreEmpty() throws IOException;
 
-	File getBaseIndexDir();
+	Path getBaseIndexDir();
 
 }

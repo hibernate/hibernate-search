@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 public class DirectoryProviderHelperTest {
 
 	@Test
-	public void testMkdirsGetSource() {
+	public void testMkdirsGetSource() throws Exception {
 		String root = "./testDir";
 		String relative = "dir1/dir2/dir3";
 

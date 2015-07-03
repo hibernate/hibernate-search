@@ -18,14 +18,8 @@ import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
 
-import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImple;
-
 import org.apache.lucene.search.Query;
 import org.h2.jdbcx.JdbcDataSource;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.H2Dialect;
@@ -34,10 +28,16 @@ import org.hibernate.engine.transaction.jta.platform.internal.JBossStandAloneJta
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImple;
 
 /**
  * @author Emmanuel Bernard
@@ -97,7 +97,7 @@ public class JBossTSIT {
 	}
 
 	@AfterClass
-	public static void tearDown() {
+	public static void tearDown() throws Exception {
 		if ( factory != null ) {
 			factory.close();
 		}

@@ -9,18 +9,18 @@ package org.hibernate.search.infinispan;
 import java.io.File;
 import java.util.List;
 
-import org.infinispan.hibernate.search.impl.DefaultCacheManagerService;
-import org.junit.Assert;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
+import org.infinispan.hibernate.search.impl.DefaultCacheManagerService;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -174,7 +174,7 @@ public class StoredIndexTest {
 	 * as the binary format is not necessarily compatible across releases.
 	 */
 	@AfterClass
-	public static void removeFileSystemStoredIndexes() {
+	public static void removeFileSystemStoredIndexes() throws Exception {
 		File targetDir = TestConstants.getTargetDir( StoredIndexTest.class );
 		FileHelper.delete( new File( targetDir, "LuceneIndexesData" ) );
 		FileHelper.delete( new File( targetDir, "LuceneIndexesMetaData" ) );

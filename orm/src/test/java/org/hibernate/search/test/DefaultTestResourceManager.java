@@ -7,6 +7,8 @@
 package org.hibernate.search.test;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -68,6 +70,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		this.baseIndexDir = createBaseIndexDir();
 	}
 
+	@Override
 	public void openSessionFactory() {
 		if ( sessionFactory == null ) {
 			sessionFactory = buildSessionFactory();
@@ -110,7 +113,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			configurationSettings = new HashMap<>();
 			configurationSettings.put( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
 			configurationSettings.put( "hibernate.search.default.directory_provider", "ram" );
-			configurationSettings.put( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
+			configurationSettings.put( "hibernate.search.default.indexBase", getBaseIndexDir().toAbsolutePath().toString() );
 			configurationSettings.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 			configurationSettings.put( "hibernate.search.default.indexwriter.merge_factor", "100" );
 			configurationSettings.put( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
@@ -120,6 +123,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		return configurationSettings;
 	}
 
+	@Override
 	public void closeSessionFactory() {
 		if ( sessionFactory != null ) {
 			sessionFactory.close();
@@ -135,6 +139,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		searchFactory = null;
 	}
 
+	@Override
 	public Session openSession() {
 		if ( session != null && session.isOpen() ) {
 			throw new IllegalStateException( "Previously opened Session wasn't closed!" );
@@ -143,10 +148,12 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		return session;
 	}
 
+	@Override
 	public Session getSession() {
 		return session;
 	}
 
+	@Override
 	public SessionFactory getSessionFactory() {
 		if ( sessionFactory == null ) {
 			throw new IllegalStateException( "SessionFactory should be already defined at this point" );
@@ -154,17 +161,20 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		return sessionFactory;
 	}
 
+	@Override
 	public Directory getDirectory(Class<?> clazz) {
-		ExtendedSearchIntegrator integrator = ContextHelper.getSearchintegratorBySFI( (SessionFactoryImplementor) sessionFactory );
+		ExtendedSearchIntegrator integrator = ContextHelper.getSearchintegratorBySFI( sessionFactory );
 		IndexManager[] indexManagers = integrator.getIndexBinding( clazz ).getIndexManagers();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 		return indexManager.getDirectoryProvider().getDirectory();
 	}
 
-	public void ensureIndexesAreEmpty() {
+	@Override
+	public void ensureIndexesAreEmpty() throws IOException {
 		FileHelper.delete( getBaseIndexDir() );
 	}
 
+	@Override
 	public SearchFactory getSearchFactory() {
 		if ( searchFactory == null ) {
 			//Don't use this#openSession() as that would interfere with our sanity
@@ -176,12 +186,14 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		return searchFactory;
 	}
 
+	@Override
 	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
 		return getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
 	}
 
-	public File getBaseIndexDir() {
-		return baseIndexDir;
+	@Override
+	public Path getBaseIndexDir() {
+		return baseIndexDir.toPath();
 	}
 
 	public void defaultTearDown() throws Exception {

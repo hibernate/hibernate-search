@@ -16,8 +16,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -81,7 +81,7 @@ public class FSDirectorySelectionTest extends SearchTestBase {
 	private SessionFactory createSessionFactoryUsingDirectoryType(String directoryType) {
 		Configuration config = new Configuration();
 		config.addAnnotatedClass( SnowStorm.class );
-		config.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
+		config.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().toAbsolutePath().toString() );
 		config.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		config.setProperty( "hibernate.search.default.filesystem_access_type", directoryType );
 		return config.buildSessionFactory();

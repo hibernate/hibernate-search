@@ -7,6 +7,7 @@
 package org.hibernate.search.test.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -149,7 +150,12 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 		}
 		finally {
 			if ( usingFileSystem ) {
-				cleanupFilesystem();
+				try {
+					cleanupFilesystem();
+				}
+				catch (IOException e) {
+					throw new RuntimeException( e );
+				}
 			}
 		}
 		sessionFactory = null;
@@ -220,7 +226,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 		return mapping;
 	}
 
-	public void cleanupFilesystem() {
+	public void cleanupFilesystem() throws IOException {
 		FileHelper.delete( indexRootDirectory );
 	}
 

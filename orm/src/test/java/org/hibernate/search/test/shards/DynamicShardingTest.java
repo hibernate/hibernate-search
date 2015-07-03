@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.test.shards;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +39,9 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -131,8 +131,8 @@ public class DynamicShardingTest extends SearchTestBase {
 
 		// use filesystem based directory provider to be able to assert against index
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
-		File sub = getBaseIndexDir();
-		cfg.put( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+		Path sub = getBaseIndexDir();
+		cfg.put( "hibernate.search.default.indexBase", sub.toAbsolutePath().toString() );
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class DynamicShardingTest extends SearchTestBase {
 	}
 
 	private void assertNumberOfEntitiesInIndex(String indexName, int expectedCount) throws IOException {
-		FSDirectory fsDirectory = FSDirectory.open( new File( getBaseIndexDir(), indexName ) );
+		FSDirectory fsDirectory = FSDirectory.open( getBaseIndexDir().resolve( indexName ).toFile() );
 		try {
 			IndexReader reader = DirectoryReader.open( fsDirectory );
 			try {
@@ -180,8 +180,8 @@ public class DynamicShardingTest extends SearchTestBase {
 
 		// use filesystem based directory provider to be able to assert against index
 		config.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		File sub = getBaseIndexDir();
-		config.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+		Path sub = getBaseIndexDir();
+		config.setProperty( "hibernate.search.default.indexBase", sub.toAbsolutePath().toString() );
 
 		config.addAnnotatedClass( Animal.class );
 
