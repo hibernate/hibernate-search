@@ -108,6 +108,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final IndexManagerFactory indexManagerFactory;
 	private final ObjectLookupMethod defaultObjectLookupMethod;
 	private final DatabaseRetrievalMethod defaultDatabaseRetrievalMethod;
+	private final boolean enlistWorkerInTransaction;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -154,6 +155,9 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 		this.defaultObjectLookupMethod = determineDefaultObjectLookupMethod();
 		this.defaultDatabaseRetrievalMethod = determineDefaultDatabaseRetrievalMethod();
+		this.enlistWorkerInTransaction = ConfigurationParseHelper.getBooleanValue(
+				configurationProperties, Environment.WORKER_ENLIST_IN_TRANSACTION, false
+		);
 	}
 
 	private ObjectLookupMethod determineDefaultObjectLookupMethod() {
@@ -516,6 +520,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public IndexManagerFactory getIndexManagerFactory() {
 		return indexManagerFactory;
+	}
+
+	@Override
+	public boolean enlistWorkerInTransaction() {
+		return enlistWorkerInTransaction;
 	}
 
 	@Override
