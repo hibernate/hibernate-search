@@ -4,11 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
+
 package org.hibernate.search.backend.impl;
 
 import java.util.concurrent.ConcurrentMap;
-
-import javax.transaction.Status;
 
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -16,11 +15,11 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Execute final work in the after transaction synchronization.
+ * Execute final work inside a transaction.
  *
  * @author Emmanuel Bernard
  */
-public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchronization {
+public class InTransactionWorkQueueSynchronization implements WorkQueueSynchronization {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -40,9 +39,9 @@ public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchro
 	/**
 	 * in transaction work
 	 */
-	public PostTransactionWorkQueueSynchronization(Object transactionIdentifier, QueueingProcessor queueingProcessor,
-			ConcurrentMap<Object, WorkQueueSynchronization> queuePerTransaction,
-			ExtendedSearchIntegrator extendedIntegrator) {
+	public InTransactionWorkQueueSynchronization(Object transactionIdentifier, QueueingProcessor queueingProcessor,
+												ConcurrentMap<Object, WorkQueueSynchronization> queuePerTransaction,
+												ExtendedSearchIntegrator extendedIntegrator) {
 		this.transactionIdentifier = transactionIdentifier;
 		this.queueingProcessor = queueingProcessor;
 		this.queuePerTransaction = queuePerTransaction;
@@ -59,43 +58,29 @@ public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchro
 
 	@Override
 	public void beforeCompletion() {
-		if ( prepared ) {
-			if ( log.isTraceEnabled() ) {
-				log.tracef(
-						"Transaction's beforeCompletion() phase already been processed, ignoring: %s", this.toString()
-				);
-			}
-		}
-		else {
-			if ( log.isTraceEnabled() ) {
-				log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this.toString() );
-			}
-			queueingProcessor.prepareWorks( queue );
-			prepared = true;
-		}
-	}
-
-	@Override
-	public void afterCompletion(int i) {
+		// we are doing all the work in the before completion phase so that it is part of the transaction
 		try {
-			if ( Status.STATUS_COMMITTED == i ) {
+			if ( prepared ) {
 				if ( log.isTraceEnabled() ) {
 					log.tracef(
-							"Processing Transaction's afterCompletion() phase for %s. Performing work.", this.toString()
+							"Transaction's beforeCompletion() phase already been processed, ignoring: %s", this.toString()
 					);
 				}
-				queueingProcessor.performWorks( queue );
 			}
 			else {
 				if ( log.isTraceEnabled() ) {
-					log.tracef(
-							"Processing Transaction's afterCompletion() phase for %s. Cancelling work due to transaction status %d",
-							this.toString(),
-							i
-					);
+					log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this.toString() );
 				}
-				queueingProcessor.cancelWorks( queue );
+				queueingProcessor.prepareWorks( queue );
+				prepared = true;
 			}
+
+			if ( log.isTraceEnabled() ) {
+				log.tracef(
+						"Processing Transaction's afterCompletion() phase for %s. Performing work.", this.toString()
+				);
+			}
+			queueingProcessor.performWorks( queue );
 		}
 		finally {
 			consumed = true;
@@ -105,6 +90,11 @@ public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchro
 				queuePerTransaction.remove( transactionIdentifier );
 			}
 		}
+	}
+
+	@Override
+	public void afterCompletion(int status) {
+		// nothing to do, everything was done in beforeCompletion
 	}
 
 	public void flushWorks() {
