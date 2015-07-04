@@ -60,16 +60,10 @@ public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchro
 	@Override
 	public void beforeCompletion() {
 		if ( prepared ) {
-			if ( log.isTraceEnabled() ) {
-				log.tracef(
-						"Transaction's beforeCompletion() phase already been processed, ignoring: %s", this.toString()
-				);
-			}
+			log.tracef( "Transaction's beforeCompletion() phase already been processed, ignoring: %s", this );
 		}
 		else {
-			if ( log.isTraceEnabled() ) {
-				log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this.toString() );
-			}
+			log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this );
 			queueingProcessor.prepareWorks( queue );
 			prepared = true;
 		}
@@ -79,21 +73,15 @@ public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchro
 	public void afterCompletion(int i) {
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {
-				if ( log.isTraceEnabled() ) {
-					log.tracef(
-							"Processing Transaction's afterCompletion() phase for %s. Performing work.", this.toString()
-					);
-				}
+				log.tracef( "Processing Transaction's afterCompletion() phase for %s. Performing work.", this );
 				queueingProcessor.performWorks( queue );
 			}
 			else {
-				if ( log.isTraceEnabled() ) {
-					log.tracef(
-							"Processing Transaction's afterCompletion() phase for %s. Cancelling work due to transaction status %d",
-							this.toString(),
-							i
-					);
-				}
+				log.tracef(
+						"Processing Transaction's afterCompletion() phase for %s. Cancelling work due to transaction status %d",
+						this,
+						i
+				);
 				queueingProcessor.cancelWorks( queue );
 			}
 		}
