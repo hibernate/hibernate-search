@@ -61,25 +61,19 @@ public class InTransactionWorkQueueSynchronization implements WorkQueueSynchroni
 		// we are doing all the work in the before completion phase so that it is part of the transaction
 		try {
 			if ( prepared ) {
-				if ( log.isTraceEnabled() ) {
-					log.tracef(
-							"Transaction's beforeCompletion() phase already been processed, ignoring: %s", this.toString()
-					);
-				}
+				log.tracef(
+						"Transaction's beforeCompletion() phase already been processed, ignoring: %s", this
+				);
 			}
 			else {
-				if ( log.isTraceEnabled() ) {
-					log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this.toString() );
-				}
+				log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this );
 				queueingProcessor.prepareWorks( queue );
 				prepared = true;
 			}
 
-			if ( log.isTraceEnabled() ) {
-				log.tracef(
-						"Processing Transaction's afterCompletion() phase for %s. Performing work.", this.toString()
-				);
-			}
+			log.tracef(
+					"Processing Transaction's afterCompletion() phase for %s. Performing work.", this
+			);
 			queueingProcessor.performWorks( queue );
 		}
 		finally {
