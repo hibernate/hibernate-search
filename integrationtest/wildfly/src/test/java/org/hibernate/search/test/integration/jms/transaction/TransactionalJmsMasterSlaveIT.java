@@ -22,10 +22,8 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenFormatStage;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenStrategyStage;
 import org.junit.runner.RunWith;
 
-import org.hibernate.search.engine.Version;
 import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jms.DeploymentJmsMasterSlave;
-import org.hibernate.search.test.integration.jms.SearchNewEntityJmsMasterSlave;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 /**
@@ -47,7 +45,7 @@ public class TransactionalJmsMasterSlaveIT extends TransactionalJmsMasterSlave {
 		public static final File[] LIBRARIES = init();
 
 		private static File[] init() {
-			final String currentVersion = Version.getVersionString();
+			final String currentVersion = VersionTestHelper.getDependencyVersionHibernateSearch();
 			Set<File> libraryFiles = new HashSet<>();
 			libraryFiles.addAll( dependency( "org.hibernate:hibernate-search-orm:" + currentVersion, false ) );
 			libraryFiles.addAll( dependency( "org.hibernate:hibernate-search-engine:" + currentVersion, false ) );
