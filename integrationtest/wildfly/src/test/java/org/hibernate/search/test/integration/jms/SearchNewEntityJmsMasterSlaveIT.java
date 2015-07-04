@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.engine.Version;
 import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -43,7 +42,7 @@ public class SearchNewEntityJmsMasterSlaveIT extends MasterSlaveTestTemplate {
 		public static final File[] LIBRARIES = init();
 
 		private static File[] init() {
-			final String currentVersion = Version.getVersionString();
+			final String currentVersion = VersionTestHelper.getDependencyVersionHibernateSearch();
 			Set<File> libraryFiles = new HashSet<>();
 			libraryFiles.addAll( dependency( "org.hibernate:hibernate-search-orm:" + currentVersion, false ) );
 			libraryFiles.addAll( dependency( "org.hibernate:hibernate-search-engine:" + currentVersion, false ) );
