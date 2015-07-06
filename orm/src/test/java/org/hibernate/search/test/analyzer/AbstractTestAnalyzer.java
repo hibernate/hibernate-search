@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import java.io.Reader;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Tokenizer;
 
@@ -20,8 +18,8 @@ public abstract class AbstractTestAnalyzer extends Analyzer {
 	protected abstract String[] getTokens();
 
 	@Override
-	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-		Tokenizer tokenizer = new StreamWrappingTokenizer( reader, getTokens() );
+	protected TokenStreamComponents createComponents(String fieldName) {
+		Tokenizer tokenizer = new StreamWrappingTokenizer( getTokens() );
 		return new TokenStreamComponents( tokenizer );
 	}
 

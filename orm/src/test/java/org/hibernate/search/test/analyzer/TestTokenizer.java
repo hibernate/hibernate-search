@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import java.io.Reader;
 import java.util.Map;
 
 import org.apache.lucene.analysis.util.TokenizerFactory;
@@ -20,22 +19,21 @@ public abstract class TestTokenizer extends TokenizerFactory {
 
 	protected TestTokenizer(Map<String, String> args) {
 		super( args );
-		assureMatchVersion();
 		if ( !args.isEmpty() ) {
 			throw new IllegalArgumentException( "Unknown parameters: " + args );
 		}
 	}
 
 	@Override
-	public abstract StreamWrappingTokenizer create(AttributeFactory factory, Reader input);
+	public abstract StreamWrappingTokenizer create(AttributeFactory factory);
 
 	public static class TestTokenizer1 extends TestTokenizer {
 		public TestTokenizer1(Map<String, String> args) {
 			super( args );
 		}
 		@Override
-		public StreamWrappingTokenizer create(AttributeFactory factory, Reader input) {
-			return new StreamWrappingTokenizer( input, new String[]{ "dog" } );
+		public StreamWrappingTokenizer create(AttributeFactory factory) {
+			return new StreamWrappingTokenizer( new String[]{ "dog" } );
 		}
 	}
 
@@ -44,8 +42,8 @@ public abstract class TestTokenizer extends TokenizerFactory {
 			super( args );
 		}
 		@Override
-		public StreamWrappingTokenizer create(AttributeFactory factory, Reader input) {
-			return new StreamWrappingTokenizer( input, new String[]{ "cat" } );
+		public StreamWrappingTokenizer create(AttributeFactory factory) {
+			return new StreamWrappingTokenizer( new String[]{ "cat" } );
 		}
 	}
 
@@ -54,8 +52,8 @@ public abstract class TestTokenizer extends TokenizerFactory {
 			super( args );
 		}
 		@Override
-		public StreamWrappingTokenizer create(AttributeFactory factory, Reader input) {
-			return new StreamWrappingTokenizer( input, new String[]{ "mouse" } );
+		public StreamWrappingTokenizer create(AttributeFactory factory) {
+			return new StreamWrappingTokenizer( new String[]{ "mouse" } );
 		}
 	}
 }
