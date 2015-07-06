@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
@@ -52,14 +52,13 @@ public class FieldConstraintFilterWithoutKeyMethod extends Filter {
 	}
 
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
 		Query q = new TermQuery( new Term( field, value ) );
 		Filter filter = new QueryWrapperFilter( q );
 		filter = new CachingWrapperFilter( filter );
 
 		return filter.getDocIdSet( context, acceptDocs );
 	}
-
 
 	public static List<FieldConstraintFilterWithoutKeyMethod> getInstances() {
 		return instances;
