@@ -16,6 +16,7 @@ import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
+import org.apache.lucene.util.OpenBitSet;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.filter.FilterKey;
@@ -67,6 +68,9 @@ public class SecurityFilterFactory {
 			return bitSet;
 		}
 
+		@Override
+		public String toString(String field) {
+			return "";
+		}
 	}
-
 }

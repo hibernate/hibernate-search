@@ -15,6 +15,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
+import org.apache.lucene.util.OpenBitSet;
 
 /**
  * @author Emmanuel Bernard
@@ -38,4 +39,8 @@ public class BestDriversFilter extends Filter {
 		return bitSet;
 	}
 
+	@Override
+	public String toString(String field) {
+		return "";
+	}
 }
