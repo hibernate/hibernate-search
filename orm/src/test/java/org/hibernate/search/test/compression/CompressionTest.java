@@ -21,20 +21,18 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-
 import org.hibernate.Session;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -61,7 +59,7 @@ public class CompressionTest extends SearchTestBase {
 			{
 				IndexableField[] fields = document.getFields( "title" );
 				assertEquals( 1, fields.length );
-				assertTrue( fields[0].fieldType().indexed() );
+				assertNotNull( fields[0].fieldType().indexOptions() );
 				assertTrue( fields[0].fieldType().stored() );
 				assertFalse( isCompressed( fields[0] ) );
 				assertEquals(
