@@ -6,27 +6,27 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.LockFactory;
-import org.apache.lucene.store.NativeFSLockFactory;
-import org.apache.lucene.store.SimpleFSLockFactory;
-import org.apache.lucene.store.SingleInstanceLockFactory;
-import org.hibernate.search.exception.SearchException;
+import org.apache.lucene.store.Lock;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 /**
  * @author Sanne Grinovero
  */
 public class CustomLockProviderTest {
+
+	private static final String SINGLE_INSTANCE_LOCK_FQN = "org.hibernate.search.test.directoryProvider.SingleInstanceLock";
+	private static final String NATIVE_LOCK_FQN = "org.apache.lucene.store.NativeFSLockFactory.NativeFSLock";
 
 	@Test
 	public void testUseOfCustomLockingFactory() {
@@ -62,24 +62,24 @@ public class CustomLockProviderTest {
 
 	@Test
 	public void testUseOfNativeLockingFactory() {
-		testUseOfSelectedLockingFactory( null, NativeFSLockFactory.class, false );
-		testUseOfSelectedLockingFactory( "native", NativeFSLockFactory.class, false );
+		testUseOfSelectedLockingFactory( null, NATIVE_LOCK_FQN, false );
+		testUseOfSelectedLockingFactory( "native", NATIVE_LOCK_FQN, false );
 	}
 
 	@Test
 	public void testUseOfSingleLockingFactory() {
-		testUseOfSelectedLockingFactory( "single", SingleInstanceLockFactory.class, false );
-		testUseOfSelectedLockingFactory( "single", SingleInstanceLockFactory.class, true );
+		testUseOfSelectedLockingFactory( "single", SINGLE_INSTANCE_LOCK_FQN, false );
+		testUseOfSelectedLockingFactory( "single", SINGLE_INSTANCE_LOCK_FQN, true );
 		//default for RAMDirectory:
-		testUseOfSelectedLockingFactory( null, SingleInstanceLockFactory.class, true );
+		testUseOfSelectedLockingFactory( null, SINGLE_INSTANCE_LOCK_FQN, true );
 	}
 
 	@Test
 	public void testUseOfSimpleLockingFactory() {
-		testUseOfSelectedLockingFactory( "simple", SimpleFSLockFactory.class, false );
+		testUseOfSelectedLockingFactory( "simple", SINGLE_INSTANCE_LOCK_FQN, false );
 	}
 
-	private void testUseOfSelectedLockingFactory(String optionName, Class expectedType, boolean useRamDirectory) {
+	private void testUseOfSelectedLockingFactory(String optionName, String expectedLockTypeName, boolean useRamDirectory) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		FullTextSessionBuilder fullTextSessionBuilder = builder.addAnnotatedClass( SnowStorm.class );
 		if ( optionName != null ) {
@@ -93,10 +93,10 @@ public class CustomLockProviderTest {
 			SearchIntegrator integrator = ftsb.getSearchFactory().unwrap( SearchIntegrator.class );
 			EntityIndexBinding indexBindingForEntity = integrator.getIndexBinding( SnowStorm.class );
 			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
-			DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();
+			DirectoryProvider<?> directoryProvider = indexManager.getDirectoryProvider();
 			Directory directory = directoryProvider.getDirectory();
-			LockFactory lockFactory = directory.getLockFactory();
-			assertEquals( expectedType, lockFactory.getClass() );
+			Lock lock = directory.makeLock( "my-lock" );
+			assertEquals( expectedLockTypeName, lock.getClass().getName() );
 		}
 		finally {
 			builder.close();
