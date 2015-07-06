@@ -8,15 +8,14 @@ package org.hibernate.search.test.configuration;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.DocsEnum;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.OpenBitSet;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.filter.FilterKey;
@@ -52,8 +51,8 @@ public class SecurityFilterFactory {
 		}
 
 		@Override
-		public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
-			final AtomicReader reader = context.reader();
+		public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+			final LeafReader reader = context.reader();
 			OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
 			DocsEnum termDocsEnum = reader.termDocsEnum( new Term( "owner", ownerName ) );
 			if ( termDocsEnum == null ) {
