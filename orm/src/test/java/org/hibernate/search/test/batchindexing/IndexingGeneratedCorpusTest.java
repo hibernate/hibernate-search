@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,11 +14,6 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.Lock;
-import org.apache.lucene.store.LockFactory;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.Assert;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
@@ -36,8 +28,14 @@ import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests the fullTextSession.createIndexer() API for basic functionality.
@@ -87,7 +85,7 @@ public class IndexingGeneratedCorpusTest {
 				TitleAble instance = entityType.newInstance();
 				instance.setTitle( sentenceInventor.nextSentence() );
 				//to test for HSEARCH-512 we make all entities share some proxy
-				Nation country = (Nation) fullTextSession.load( Nation.class, 1 );
+				Nation country = fullTextSession.load( Nation.class, 1 );
 				instance.setFirstPublishedIn( country );
 				fullTextSession.persist( instance );
 				totalEntitiesInDB++;
@@ -114,7 +112,7 @@ public class IndexingGeneratedCorpusTest {
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
 			List<Book> allBooks = fullTextSession.createCriteria( Book.class ).list();
-			Nation italy = (Nation) fullTextSession.load( Nation.class, 1 );
+			Nation italy = fullTextSession.load( Nation.class, 1 );
 			italy.getLibrariesHave().addAll( allBooks );
 			tx.commit();
 		}
@@ -177,8 +175,7 @@ public class IndexingGeneratedCorpusTest {
 		SearchIntegrator searchIntegrator = builder.getSearchFactory().unwrap( SearchIntegrator.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchIntegrator.getIndexBinding( type ).getIndexManagers()[0];
 		Directory directory = indexManager.getDirectoryProvider().getDirectory();
-		LockFactory lockFactory = directory.getLockFactory();
-		Lock writeLock = lockFactory.makeLock( "write.lock" );
+		Lock writeLock = directory.makeLock( "write.lock" );
 		Assert.assertEquals( isLocked, writeLock.isLocked() );
 	}
 
