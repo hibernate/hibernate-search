@@ -13,8 +13,11 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Latitude;
+import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
@@ -23,6 +26,7 @@ import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
  * @author Hardy Ferentschik
  */
 @Indexed
+@Spatial(name = "location")
 public class Snafu {
 	@DocumentId
 	private long id;
@@ -43,6 +47,12 @@ public class Snafu {
 	@Field
 	@NumericField(precisionStep = 8)
 	private short numericShortField;
+
+	@Latitude(of = "location")
+	double latitude;
+
+	@Longitude(of = "location")
+	double longitude;
 
 	@Field
 	@NumericField(precisionStep = 4)
