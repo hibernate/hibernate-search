@@ -24,6 +24,7 @@ import org.hibernate.search.metadata.FieldSettingsDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
+import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
@@ -139,6 +140,36 @@ public class FieldDescriptorTest {
 				expectedNumericEncodingType,
 				numericFieldSettingsDescriptor.encodingType()
 		);
+	}
+
+	@Test
+	public void testFieldDescriptorWithCoordinates() {
+		FieldDescriptor fieldDescriptor = getFieldDescriptor( SnafuWithCoordinates.class, "location" );
+
+		assertNotNull( fieldDescriptor.getFieldBridge() );
+		assertTrue( fieldDescriptor.getFieldBridge() instanceof SpatialFieldBridge );
+
+		assertTrue( FieldSettingsDescriptor.Type.SPATIAL.equals( fieldDescriptor.getType() ) );
+	}
+
+	@Test
+	public void testFieldDescriptorWithCoordinatesWithoutSpatialAnnotation() {
+		FieldDescriptor fieldDescriptor = getFieldDescriptor( SnafuWithCoordinatesWithoutSpatial.class, "location" );
+
+		assertNotNull( fieldDescriptor.getFieldBridge() );
+		assertTrue( fieldDescriptor.getFieldBridge() instanceof SpatialFieldBridge );
+
+		assertTrue( FieldSettingsDescriptor.Type.SPATIAL.equals( fieldDescriptor.getType() ) );
+	}
+
+	@Test
+	public void testFieldDescriptorSpatialFieldBridge() {
+		FieldDescriptor fieldDescriptor = getFieldDescriptor( Snafu.class, "location" );
+
+		assertNotNull( fieldDescriptor.getFieldBridge() );
+		assertTrue( fieldDescriptor.getFieldBridge() instanceof SpatialFieldBridge );
+
+		assertTrue( FieldSettingsDescriptor.Type.SPATIAL.equals( fieldDescriptor.getType() ) );
 	}
 
 	@Test
