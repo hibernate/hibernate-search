@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -49,7 +50,7 @@ public class FSDirectoryTest extends SearchTestBase {
 
 		Document entity;
 
-		try ( Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() ) ) {
+		try ( Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ) ) ) {
 			try ( IndexReader reader = DirectoryReader.open( dir ) ) {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
@@ -123,7 +124,7 @@ public class FSDirectoryTest extends SearchTestBase {
 			s.getTransaction().commit();
 		}
 
-		try ( FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() ) ) {
+		try ( FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ) ) ) {
 			try ( IndexReader indexReader = DirectoryReader.open( dir ) ) {
 				IndexSearcher searcher = new IndexSearcher( indexReader );
 				QueryParser qp = new QueryParser( "id", TestConstants.standardAnalyzer );
