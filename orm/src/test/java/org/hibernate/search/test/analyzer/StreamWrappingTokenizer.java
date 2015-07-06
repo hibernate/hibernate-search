@@ -7,7 +7,6 @@
 package org.hibernate.search.test.analyzer;
 
 import java.io.IOException;
-import java.io.Reader;
 
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -27,8 +26,7 @@ final class StreamWrappingTokenizer extends Tokenizer {
 	private final String[] tokens;
 	private int position = 0;
 
-	public StreamWrappingTokenizer(Reader input, String[] tokens) {
-		super( input );
+	public StreamWrappingTokenizer(String[] tokens) {
 		this.tokens = tokens;
 	}
 
