@@ -137,7 +137,7 @@ public class DynamicShardingTest extends SearchTestBase {
 	}
 
 	private void assertNumberOfEntitiesInIndex(String indexName, int expectedCount) throws IOException {
-		FSDirectory fsDirectory = FSDirectory.open( getBaseIndexDir().resolve( indexName ).toFile() );
+		FSDirectory fsDirectory = FSDirectory.open( getBaseIndexDir().resolve( indexName ) );
 		try {
 			IndexReader reader = DirectoryReader.open( fsDirectory );
 			try {
