@@ -6,11 +6,6 @@
  */
 package org.hibernate.search.test.filter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +23,11 @@ import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.packed.EliasFanoDocIdSet;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Functionality testcase for org.hibernate.search.filter.AndDocIdSet.
@@ -313,6 +313,9 @@ public class AndDocIdSetsTest {
 	}
 
 	// HSEARCH-610
+	/*
+	 * FIXME: See if there is a new BitSet implementation in Lucene 5 which
+	 * could expose the same semantics as Lucene 4's EliasFanoDocIdSet
 	@Test
 	public void testWithEliasFanoBitSet() throws IOException {
 		EliasFanoDocIdSet idSet1 = new EliasFanoDocIdSet( 4, 12 );
@@ -324,6 +327,7 @@ public class AndDocIdSetsTest {
 		DocIdSet expected = integersToDocIdSet( 6 );
 		assertTrue( docIdSetsEqual( expected, actual ) );
 	}
+	*/
 
 	@Test
 	public void testEmptyDocIdSet() throws Exception {
