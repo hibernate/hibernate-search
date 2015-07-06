@@ -10,7 +10,7 @@ package org.hibernate.search.test.filter;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
@@ -24,7 +24,7 @@ import org.apache.lucene.util.Bits;
 public class NullReturningEmptyFilter extends Filter implements Serializable {
 
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
 		return null;
 	}
 
