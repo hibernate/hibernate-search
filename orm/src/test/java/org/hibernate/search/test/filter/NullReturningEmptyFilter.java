@@ -28,4 +28,8 @@ public class NullReturningEmptyFilter extends Filter implements Serializable {
 		return null;
 	}
 
+	@Override
+	public String toString(String field) {
+		return "";
+	}
 }

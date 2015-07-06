@@ -11,13 +11,13 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.util.Bits;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SegmentReader;
+import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.Bits;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 
@@ -47,4 +47,9 @@ public class ExcludeAllFilter extends Filter implements Serializable {
 		}
 	}
 
+
+	@Override
+	public String toString(String field) {
+		return "";
+	}
 }
