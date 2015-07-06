@@ -72,6 +72,7 @@ public final class DeploymentJmsMasterSlave {
 
 	private static PersistenceDescriptor slavePersistenceXml(String name, int refreshPeriod, File tmpDir, Boolean transactional)
 			throws Exception {
+		String jmsConnectionFactory = transactional ? "java:jboss/DefaultJMSConnectionFactory" : "jboss/exported/jms/RemoteConnectionFactory";
 		return commonUnitDef( name, "filesystem-slave", refreshPeriod, tmpDir )
 					.createProperty()
 						.name( "hibernate.search.default.worker.backend" )
@@ -85,7 +86,7 @@ public final class DeploymentJmsMasterSlave {
 					//we actually want to verify we're able to authenticate
 					.createProperty()
 						.name( "hibernate.search.default.worker.jms.connection_factory" )
-						.value( "jboss/exported/jms/RemoteConnectionFactory" )
+						.value( jmsConnectionFactory )
 						.up()
 					.createProperty()
 						.name( "hibernate.search.default.worker.jms.queue" )
