@@ -105,7 +105,7 @@ public class FieldConstraintFilterWithoutKeyMethod extends Filter {
 	}
 
 	@Override
-	public String toString() {
-		return "FieldConstraintFilterWithoutKeyMethod [field=" + field + ", value=" + value + "]";
+	public String toString(String field) {
+		return field + "=" + value;
 	}
 }

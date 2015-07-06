@@ -46,4 +46,8 @@ public class InstanceBasedExcludeAllFilter extends Filter implements Serializabl
 		}
 	}
 
+	@Override
+	public String toString(String field) {
+		return "";
+	}
 }
