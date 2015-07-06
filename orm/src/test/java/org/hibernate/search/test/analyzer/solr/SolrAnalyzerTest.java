@@ -186,6 +186,6 @@ public class SolrAnalyzerTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		super.configure( cfg );
-		cfg.put( "hibernate.search.lucene_version", org.apache.lucene.util.Version.LUCENE_30.toString() );
+		cfg.put( "hibernate.search.lucene_version", org.apache.lucene.util.Version.LATEST.toString() );
 	}
 }
