@@ -37,6 +37,7 @@ public class DocumentFieldMetadata {
 	private final boolean isIdInEmbedded;
 	private final String nullToken;
 	private final boolean isNumeric;
+	private final boolean isSpatial;
 	private final int precisionStep;
 	private final NumericEncodingType numericEncodingType;
 	private final Set<FacetMetadata> facetMetadata;
@@ -53,6 +54,7 @@ public class DocumentFieldMetadata {
 		this.isIdInEmbedded = builder.isIdInEmbedded;
 		this.nullToken = builder.nullToken;
 		this.isNumeric = builder.isNumeric;
+		this.isSpatial = builder.isSpatial;
 		this.precisionStep = builder.precisionStep;
 		this.numericEncodingType = builder.numericEncodingType;
 		this.facetMetadata = Collections.unmodifiableSet( builder.facetMetadata );
@@ -102,6 +104,10 @@ public class DocumentFieldMetadata {
 		return isNumeric;
 	}
 
+	public boolean isSpatial() {
+		return isSpatial;
+	}
+
 	public Integer getPrecisionStep() {
 		return precisionStep;
 	}
@@ -136,6 +142,7 @@ public class DocumentFieldMetadata {
 				", isIdInEmbedded=" + isIdInEmbedded +
 				", nullToken='" + nullToken + '\'' +
 				", isNumeric=" + isNumeric +
+				", isSpatial=" + isSpatial +
 				", precisionStep=" + precisionStep +
 				", numericEncodingType=" + numericEncodingType +
 				", facetMetadata=" + facetMetadata +
@@ -157,6 +164,7 @@ public class DocumentFieldMetadata {
 		private boolean isIdInEmbedded;
 		private String nullToken;
 		private boolean isNumeric;
+		private boolean isSpatial;
 		private int precisionStep = NumericField.PRECISION_STEP_DEFAULT;
 		private NumericEncodingType numericEncodingType;
 		private Set<FacetMetadata> facetMetadata;
@@ -208,6 +216,11 @@ public class DocumentFieldMetadata {
 			return this;
 		}
 
+		public Builder spatial() {
+			this.isSpatial = true;
+			return this;
+		}
+
 		public Builder precisionStep(int precisionStep) {
 			this.precisionStep = precisionStep;
 			return this;
@@ -234,6 +247,7 @@ public class DocumentFieldMetadata {
 					'}';
 		}
 	}
+
 }
 
 
