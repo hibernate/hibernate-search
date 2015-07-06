@@ -78,6 +78,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -615,6 +616,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
 				.boost( AnnotationProcessingHelper.getBoost( member, spatialAnnotation ) )
 				.fieldBridge( fieldBridge )
+				.spatial()
 				.build();
 
 		PropertyMetadata propertyMetadata = new PropertyMetadata.Builder( member )
@@ -652,6 +654,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
 				.boost( spatialAnnotation.boost().value() )
 				.fieldBridge( spatialBridge )
+				.spatial()
 				.build();
 
 		typeMetadataBuilder.addClassBridgeField( fieldMetadata );
@@ -990,6 +993,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					.fieldBridge( fieldBridge )
 					.analyzer( analyzer )
 					.indexNullAs( nullToken );
+			if ( fieldBridge instanceof SpatialFieldBridge ) {
+				fieldMetadataBuilder.spatial();
+			}
 		}
 
 		for ( Facet facetAnnotation : facetAnnotations ) {
