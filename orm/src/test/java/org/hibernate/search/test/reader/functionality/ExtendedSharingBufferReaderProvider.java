@@ -101,7 +101,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	}
 
 	@Override
-	protected DirectoryReader readerFactory(Directory directory) {
+	protected DirectoryReader readerFactory(Directory directory) throws IOException {
 		TestManipulatorPerDP manipulatorPerDP = manipulators.get( directory );
 		if ( !manipulatorPerDP.isReaderCreated.compareAndSet( false, true ) ) {
 			throw new IllegalStateException( "IndexReader created twice" );
@@ -130,7 +130,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	 */
 	public class MockDirectoryBasedIndexManager extends DirectoryBasedIndexManager {
 
-		private MockDirectoryProvider provider = new MockDirectoryProvider();
+		private final MockDirectoryProvider provider = new MockDirectoryProvider();
 
 		@Override
 		public DirectoryProvider getDirectoryProvider() {
@@ -165,7 +165,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		private final AtomicBoolean hasAlreadyBeenReOpened = new AtomicBoolean( false );
 		private final AtomicBoolean isIndexReaderCurrent;
 
-		MockIndexReader(AtomicBoolean isIndexReaderCurrent) {
+		MockIndexReader(AtomicBoolean isIndexReaderCurrent) throws IOException {
 			//make the super constructor happy as the class is "locked down"
 			super( new RAMDirectory(), new LeafReader[0] );
 			this.isIndexReaderCurrent = isIndexReaderCurrent;
