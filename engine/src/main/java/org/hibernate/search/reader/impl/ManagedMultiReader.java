@@ -58,7 +58,7 @@ public class ManagedMultiReader extends MultiReader {
 
 	@Override
 	public String toString() {
-		return "CacheableMultiReader [subReaders=" + Arrays.toString( subReaders ) + ", managers=" + Arrays.toString( managers ) + "]";
+		return ManagedMultiReader.class.getSimpleName() + " [subReaders=" + Arrays.toString( subReaders ) + ", managers=" + Arrays.toString( managers ) + "]";
 	}
 
 }
