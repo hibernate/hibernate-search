@@ -7,6 +7,7 @@
 package org.hibernate.search.test.directoryProvider;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,6 @@ import org.hibernate.Session;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.FileHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,7 +50,8 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
+		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ) );
+
 		try {
 			IndexReader reader = DirectoryReader.open( dir );
 			try {
@@ -145,7 +146,7 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
+		FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ) );
 		IndexReader indexReader = DirectoryReader.open( dir );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		try {
@@ -181,12 +182,13 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
+		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ) );
+
 		IndexReader indexReader = DirectoryReader.open( dir );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		// deleting before search, but after IndexSearcher creation:
 		// ( fails when deleting -concurrently- to IndexSearcher initialization! )
-		FileHelper.delete( getBaseIndexDir() );
+		Files.delete( getBaseIndexDir() );
 		TermQuery query = new TermQuery( new Term( "title", "action" ) );
 		TopDocs hits = searcher.search( query, 1000 );
 		assertEquals( 1, hits.totalHits );

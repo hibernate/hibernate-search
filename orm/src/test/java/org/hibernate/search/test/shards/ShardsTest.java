@@ -119,7 +119,8 @@ public class ShardsTest extends SearchTestBase {
 
 		s.clear();
 
-		FSDirectory animal00Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal00" ).toFile() );
+		FSDirectory animal00Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal00" ) );
+
 		try {
 			IndexReader reader = DirectoryReader.open( animal00Directory );
 			try {
@@ -134,7 +135,8 @@ public class ShardsTest extends SearchTestBase {
 			animal00Directory.close();
 		}
 
-		FSDirectory animal01Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal.1" ).toFile() );
+		FSDirectory animal01Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal.1" ) );
+
 		try {
 			IndexReader reader = DirectoryReader.open( animal01Directory );
 			try {
@@ -156,7 +158,7 @@ public class ShardsTest extends SearchTestBase {
 
 		s.clear();
 
-		animal01Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal.1" ).toFile() );
+		animal01Directory = FSDirectory.open( getBaseIndexDir().resolve( "Animal.1" ) );
 		try {
 			IndexReader reader = DirectoryReader.open( animal01Directory );
 			try {
