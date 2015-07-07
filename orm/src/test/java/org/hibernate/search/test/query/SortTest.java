@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.test.query;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
@@ -18,11 +14,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.FieldCache;
-import org.apache.lucene.search.FieldCache.Ints;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -35,13 +32,20 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -271,6 +275,7 @@ public class SortTest extends SearchTestBase {
 
 	@Entity
 	@Indexed
+	@ClassBridge(impl = SortFieldCreatingClassBridge.class)
 	public static class NumberHolder {
 		@Id
 		@GeneratedValue
@@ -306,6 +311,22 @@ public class SortTest extends SearchTestBase {
 		}
 	}
 
+	/**
+	 * Class bridge creating doc value fields for custom sorting.
+	 *
+	 * @author Gunnar Morling
+	 */
+	public static class SortFieldCreatingClassBridge implements FieldBridge {
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			NumberHolder numberHolder = (NumberHolder) value;
+
+			document.add( new NumericDocValuesField( "num1", numberHolder.num1 ) );
+			document.add( new NumericDocValuesField( "num2", numberHolder.num2 ) );
+		}
+	}
+
 	public static class SumFieldComparatorSource extends FieldComparatorSource {
 		@Override
 		public FieldComparator<?> newComparator(String fieldName, int numHits, int sortPos, boolean reversed)
@@ -320,8 +341,8 @@ public class SortTest extends SearchTestBase {
 		private final int[] field1Values;
 		private final int[] field2Values;
 
-		private Ints currentReaderValuesField1;
-		private Ints currentReaderValuesField2;
+		private NumericDocValues currentReaderValuesField1;
+		private NumericDocValues currentReaderValuesField2;
 		private int bottom;
 		private Integer topValue;
 
@@ -354,7 +375,7 @@ public class SortTest extends SearchTestBase {
 
 		@Override
 		public int compareBottom(int doc) {
-			int v = currentReaderValuesField1.get( doc ) + currentReaderValuesField2.get( doc );
+			int v = (int) ( currentReaderValuesField1.get( doc ) + currentReaderValuesField2.get( doc ) );
 			return compareValues( bottom, v );
 		}
 
@@ -365,20 +386,18 @@ public class SortTest extends SearchTestBase {
 
 		@Override
 		public void copy(int slot, int doc) {
-			int v1 = currentReaderValuesField1.get( doc );
+			int v1 = (int) currentReaderValuesField1.get( doc );
 			field1Values[slot] = v1;
 
-			int v2 = currentReaderValuesField2.get( doc );
+			int v2 = (int) currentReaderValuesField2.get( doc );
 			field2Values[slot] = v2;
 		}
 
 		@Override
 		public FieldComparator<Integer> setNextReader(AtomicReaderContext context) throws IOException {
 			final AtomicReader reader = context.reader();
-			currentReaderValuesField1 = FieldCache.DEFAULT
-					.getInts( reader, field1, false );
-			currentReaderValuesField2 = FieldCache.DEFAULT
-					.getInts( reader, field2, false );
+			currentReaderValuesField1 = reader.getNumericDocValues( field1 );
+			currentReaderValuesField2 = reader.getNumericDocValues( field2 );
 			return this;
 		}
 
