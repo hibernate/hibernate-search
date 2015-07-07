@@ -323,6 +323,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
+	public boolean enlistWorkerInTransaction() {
+		return delegate.enlistWorkerInTransaction();
+	}
+
+	@Override
 	public IndexManager getIndexManager(String indexName) {
 		return delegate.getIndexManager( indexName );
 	}

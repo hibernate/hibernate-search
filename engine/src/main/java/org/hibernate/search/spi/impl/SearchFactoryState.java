@@ -75,4 +75,6 @@ public interface SearchFactoryState {
 	boolean isIdProvidedImplicit();
 
 	IndexManagerFactory getIndexManagerFactory();
+
+	boolean enlistWorkerInTransaction();
 }

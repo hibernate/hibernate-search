@@ -9,6 +9,7 @@ package org.hibernate.search.backend.impl;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
@@ -17,6 +18,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.Maps;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.SearchException;
@@ -34,7 +36,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class TransactionalWorker implements Worker {
+public class PerTransactionWorker implements Worker {
 
 	//note: there is only one Worker instance, reused concurrently for all sessions.
 
@@ -42,12 +44,13 @@ public class TransactionalWorker implements Worker {
 
 	//this is being used from different threads, but doesn't need a
 	//synchronized map since for a given transaction, we have not concurrent access
-	protected final ConcurrentMap<Object, PostTransactionWorkQueueSynchronization> synchronizationPerTransaction = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
+	protected final ConcurrentMap<Object, WorkQueueSynchronization> synchronizationPerTransaction = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 	private QueueingProcessor queueingProcessor;
 	private ExtendedSearchIntegrator factory;
 	private InstanceInitializer instanceInitializer;
 
 	private boolean transactionExpected;
+	private boolean enlistInTransaction;
 
 	@Override
 	public void performWork(Work work, TransactionContext transactionContext) {
@@ -64,11 +67,9 @@ public class TransactionalWorker implements Worker {
 		}
 		if ( transactionContext.isTransactionInProgress() ) {
 			final Object transactionIdentifier = transactionContext.getTransactionIdentifier();
-			PostTransactionWorkQueueSynchronization txSync = synchronizationPerTransaction.get( transactionIdentifier );
+			WorkQueueSynchronization txSync = synchronizationPerTransaction.get( transactionIdentifier );
 			if ( txSync == null || txSync.isConsumed() ) {
-				txSync = new PostTransactionWorkQueueSynchronization( transactionIdentifier,
-						queueingProcessor, synchronizationPerTransaction, factory
-				);
+				txSync = createTransactionWorkQueueSynchronization( transactionIdentifier );
 				transactionContext.registerSynchronization( txSync );
 				synchronizationPerTransaction.put( transactionIdentifier, txSync );
 			}
@@ -84,6 +85,21 @@ public class TransactionalWorker implements Worker {
 			queueingProcessor.add( work, queue );
 			queueingProcessor.prepareWorks( queue );
 			queueingProcessor.performWorks( queue );
+		}
+	}
+
+	private WorkQueueSynchronization createTransactionWorkQueueSynchronization(Object transactionIdentifier) {
+		if ( enlistInTransaction ) {
+			return new InTransactionWorkQueueSynchronization(
+					transactionIdentifier,
+					queueingProcessor, synchronizationPerTransaction, factory
+			);
+		}
+		else {
+			return new PostTransactionWorkQueueSynchronization(
+					transactionIdentifier,
+					queueingProcessor, synchronizationPerTransaction, factory
+			);
 		}
 	}
 
@@ -149,6 +165,11 @@ public class TransactionalWorker implements Worker {
 		this.factory = context.getUninitializedSearchIntegrator();
 		this.transactionExpected = context.isTransactionManagerExpected();
 		this.instanceInitializer = context.getInstanceInitializer();
+		this.enlistInTransaction = ConfigurationParseHelper.getBooleanValue(
+				props,
+				Environment.WORKER_ENLIST_IN_TRANSACTION,
+				false
+		);
 	}
 
 	@Override
@@ -159,8 +180,7 @@ public class TransactionalWorker implements Worker {
 	public void flushWorks(TransactionContext transactionContext) {
 		if ( transactionContext.isTransactionInProgress() ) {
 			Object transaction = transactionContext.getTransactionIdentifier();
-			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
-					synchronizationPerTransaction.get( transaction );
+			WorkQueueSynchronization txSync = synchronizationPerTransaction.get( transaction );
 			if ( txSync != null && !txSync.isConsumed() ) {
 				txSync.flushWorks();
 			}

@@ -169,7 +169,7 @@ public class HibernateSearchWithKarafIT {
 	 * bundles contributed by the HSEARCH Karaf feature.
 	 */
 	@Test
-	@TestForIssue(jiraKey="HSEARCH-1774")
+	@TestForIssue(jiraKey = "HSEARCH-1774")
 	public void testStartingAllBundles() throws Exception {
 		for ( Bundle bundle : bundleContext.getBundles() ) {
 			if ( !isFragmentBundle( bundle ) ) {

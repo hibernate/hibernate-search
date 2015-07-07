@@ -21,6 +21,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.DirectoryProviderService;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -33,6 +34,8 @@ import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -88,6 +91,20 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.indexingParameters = PropertiesParseHelper.extractIndexingPerformanceOptions( properties );
 		this.optimizer = PropertiesParseHelper.getOptimizerStrategy( this, properties, buildContext );
 		this.backend = createBackend( indexName, properties, buildContext );
+		boolean enlistInTransaction = ConfigurationParseHelper.getBooleanValue(
+				properties,
+				Environment.WORKER_ENLIST_IN_TRANSACTION,
+				false
+		);
+		if ( enlistInTransaction && ! ( backend instanceof BackendQueueProcessor.Transactional ) ) {
+			// We are expecting to use a transactional worker but the backend is not
+			// this is war!
+			// TODO would be better to have this chec in the indexManager factory but we need access to the backend
+			String backend = properties.getProperty( Environment.WORKER_BACKEND );
+			backend = StringHelper.isEmpty( backend ) ? "lucene" : backend;
+			throw log.backendNonTransactional( indexName, backend );
+
+		}
 		this.directoryProvider.start( this );
 		this.readers = createIndexReader( indexName, properties, buildContext );
 	}

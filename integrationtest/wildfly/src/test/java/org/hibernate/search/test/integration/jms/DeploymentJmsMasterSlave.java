@@ -8,10 +8,12 @@ package org.hibernate.search.test.integration.jms;
 
 import java.io.File;
 
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
+import org.hibernate.search.test.integration.jms.transaction.TransactionalJmsMasterSlave;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -44,14 +46,20 @@ public final class DeploymentJmsMasterSlave {
 				;
 	}
 
-	public static Archive<?> createSlave(String deploymentName, int refreshPeriod, File tmpDir) throws Exception {
-		return baseArchive( deploymentName, slavePersistenceXml( deploymentName, refreshPeriod, tmpDir ) );
+	public static Archive<?> createSlave(String deploymentName, int refreshPeriod, File tmpDir, boolean transactional) throws Exception {
+		return baseArchive( deploymentName, slavePersistenceXml( deploymentName, refreshPeriod, tmpDir, transactional ) );
 	}
 
 	private static WebArchive baseArchive(String name, PersistenceDescriptor unitDef) throws Exception {
 		WebArchive webArchive = ShrinkWrap
 				.create( WebArchive.class, name + ".war" )
-				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, MasterSlaveTestTemplate.class )
+				.addClasses(
+						RegistrationController.class,
+						RegisteredMember.class,
+						RegistrationConfiguration.class,
+						MasterSlaveTestTemplate.class,
+						TransactionalJmsMasterSlave.class
+				)
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return webArchive;
@@ -62,18 +70,23 @@ public final class DeploymentJmsMasterSlave {
 		return commonUnitDef( name, "filesystem-master", refreshPeriod, tmpDir ).up().up();
 	}
 
-	private static PersistenceDescriptor slavePersistenceXml(String name, int refreshPeriod, File tmpDir)
+	private static PersistenceDescriptor slavePersistenceXml(String name, int refreshPeriod, File tmpDir, Boolean transactional)
 			throws Exception {
+		String jmsConnectionFactory = transactional ? "java:jboss/DefaultJMSConnectionFactory" : "jboss/exported/jms/RemoteConnectionFactory";
 		return commonUnitDef( name, "filesystem-slave", refreshPeriod, tmpDir )
 					.createProperty()
 						.name( "hibernate.search.default.worker.backend" )
 						.value( "jms" )
 						.up()
+					.createProperty()
+						.name( Environment.WORKER_ENLIST_IN_TRANSACTION )
+						.value( transactional.toString() )
+						.up()
 					//We could use a Local ConnectionFactory but then we would bypass the authentication:
 					//we actually want to verify we're able to authenticate
 					.createProperty()
 						.name( "hibernate.search.default.worker.jms.connection_factory" )
-						.value( "jboss/exported/jms/RemoteConnectionFactory" )
+						.value( jmsConnectionFactory )
 						.up()
 					.createProperty()
 						.name( "hibernate.search.default.worker.jms.queue" )

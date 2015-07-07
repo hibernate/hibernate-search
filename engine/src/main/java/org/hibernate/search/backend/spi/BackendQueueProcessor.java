@@ -70,4 +70,11 @@ public interface BackendQueueProcessor {
 	 */
 	void indexMappingChanged();
 
+	/**
+	 * Marker insterface describing a backend processor that is transactional
+	 */
+	interface Transactional {
+
+	}
+
 }
