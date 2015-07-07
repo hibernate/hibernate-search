@@ -134,6 +134,7 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.apache.lucene:lucene-backward-codecs</include>
+                <include>org.apache.lucene:lucene-misc</include>
             </includes>
         </dependencySet>
 
