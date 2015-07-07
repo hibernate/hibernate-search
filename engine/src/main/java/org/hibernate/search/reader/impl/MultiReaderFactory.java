@@ -9,6 +9,7 @@ package org.hibernate.search.reader.impl;
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.Sort;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.util.logging.impl.Log;
@@ -28,6 +29,10 @@ public final class MultiReaderFactory {
 	}
 
 	public static IndexReader openReader(IndexManager... indexManagers) {
+		return openReader( null, indexManagers );
+	}
+
+	public static IndexReader openReader(Sort sort, IndexManager[] indexManagers) {
 		final int length = indexManagers.length;
 		IndexReader[] readers = new IndexReader[length];
 		ReaderProvider[] managers = new ReaderProvider[length];
@@ -44,7 +49,7 @@ public final class MultiReaderFactory {
 		else {
 			//everything should be the same so wrap in an MultiReader
 			try {
-				return new ManagedMultiReader( readers, managers );
+				return ManagedMultiReader.createInstance( readers, managers, sort );
 			}
 			catch (IOException e) {
 				throw log.ioExceptionOnMultiReaderRefresh( e );
