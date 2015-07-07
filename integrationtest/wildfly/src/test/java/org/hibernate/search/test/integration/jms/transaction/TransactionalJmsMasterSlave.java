@@ -20,7 +20,6 @@ import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * In a JMS Master/Slave configuration, every node should be able to find
@@ -152,7 +151,7 @@ public abstract class TransactionalJmsMasterSlave {
 			waitForIndexSynchronization();
 		}
 		List<RegisteredMember> members = search( "Emmanuel" );
-		assertTrue( members.size() == 0 );
+		assertEquals( 0, members.size() );
 	}
 
 	private void assertSearchResult(String expectedResult, List<RegisteredMember> results) {
