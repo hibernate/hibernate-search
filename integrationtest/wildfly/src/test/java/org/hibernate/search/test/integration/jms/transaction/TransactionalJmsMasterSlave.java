@@ -131,7 +131,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@Test
 	@InSequence(7)
 	@OperateOnDeployment("slave-2")
-	public void rollbackRegisterNewMenberOnSlave2() throws Exception {
+	public void rollbackRegisterNewMemberOnSlave2() throws Exception {
 		RegisteredMember newMember = memberRegistration.getNewMember();
 
 		newMember.setName( "Emmanuel Bernard" );
