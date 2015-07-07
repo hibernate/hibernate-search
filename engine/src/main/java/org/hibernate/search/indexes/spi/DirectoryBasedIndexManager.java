@@ -99,7 +99,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		if ( enlistInTransaction && ! ( backend instanceof BackendQueueProcessor.Transactional ) ) {
 			// We are expecting to use a transactional worker but the backend is not
 			// this is war!
-			// TODO would be better to have this chec in the indexManager factory but we need access to the backend
+			// TODO would be better to have this check in the indexManager factory but we need access to the backend
 			String backend = properties.getProperty( Environment.WORKER_BACKEND );
 			backend = StringHelper.isEmpty( backend ) ? "lucene" : backend;
 			throw log.backendNonTransactional( indexName, backend );
