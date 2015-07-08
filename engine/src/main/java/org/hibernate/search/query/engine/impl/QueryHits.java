@@ -30,9 +30,9 @@ import org.apache.lucene.facet.range.LongRangeFacetCounts;
 import org.apache.lucene.facet.sortedset.DefaultSortedSetDocValuesReaderState;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetCounts;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesReaderState;
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -452,13 +452,13 @@ public class QueryHits {
 	 */
 	private Set<String> findAllTermsForField(String fieldName, IndexReader reader) throws IOException {
 		Set<String> termValues = new HashSet<>();
-		for ( AtomicReaderContext leaf : reader.leaves() ) {
-			final AtomicReader atomicReader = leaf.reader();
+		for ( LeafReaderContext leaf : reader.leaves() ) {
+			final LeafReader atomicReader = leaf.reader();
 			Terms terms = atomicReader.terms( fieldName );
 			if ( terms == null ) {
 				continue;
 			}
-			final TermsEnum iterator = terms.iterator( null ); //we have no TermsEnum to reuse
+			final TermsEnum iterator = terms.iterator();
 			BytesRef byteRef;
 			while ( ( byteRef = iterator.next() ) != null ) {
 				termValues.add( byteRef.utf8ToString() );
@@ -520,7 +520,7 @@ public class QueryHits {
 	private TopDocsCollector<?> createTopDocCollector(int maxDocs) throws IOException {
 		TopDocsCollector<?> topCollector;
 		if ( sort == null ) {
-			topCollector = TopScoreDocCollector.create( maxDocs, !searcher.scoresDocsOutOfOrder() );
+			topCollector = TopScoreDocCollector.create( maxDocs );
 		}
 		else {
 			boolean fillFields = true;
@@ -529,8 +529,7 @@ public class QueryHits {
 					maxDocs,
 					fillFields,
 					searcher.isFieldSortDoTrackScores(),
-					searcher.isFieldSortDoMaxScore(),
-					!searcher.scoresDocsOutOfOrder()
+					searcher.isFieldSortDoMaxScore()
 			);
 		}
 		return topCollector;

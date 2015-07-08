@@ -36,6 +36,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;
+import org.apache.lucene.util.ArrayUtil;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.IOUtils;
@@ -438,12 +439,16 @@ public class MoreLikeThisBuilder<T> {
 	 * @param vector List of terms and their frequencies for a doc/field
 	 */
 	private void addTermFrequencies(Map<String, Int> termFreqMap, Terms vector) throws IOException {
-		final TermsEnum termsEnum = vector.iterator( null );
-		final CharsRef spare = new CharsRef();
+		final TermsEnum termsEnum = vector.iterator();
+		char[] charBuffer = new char[0];
+		CharsRef outputReference = new CharsRef();
 		BytesRef text;
 		while ( ( text = termsEnum.next() ) != null ) {
-			UnicodeUtil.UTF8toUTF16( text, spare );
-			final String term = spare.toString();
+			charBuffer = ArrayUtil.grow( charBuffer, text.length );
+			final int stringLenght = UnicodeUtil.UTF8toUTF16( text, charBuffer );
+			outputReference.chars = charBuffer;
+			outputReference.length = stringLenght;
+			final String term = outputReference.toString();
 			if ( isNoiseWord( term ) ) {
 				continue;
 			}

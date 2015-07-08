@@ -12,18 +12,20 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
-import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfo.DocValuesType;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
-import org.apache.lucene.index.FilterAtomicReader;
 import org.apache.lucene.index.FilterDirectoryReader;
 import org.apache.lucene.index.FilterDirectoryReader.SubReaderWrapper;
+import org.apache.lucene.index.FilterLeafReader;
+import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.index.StoredFieldVisitor.Status;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.NotSharedReaderProvider;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.query.engine.impl.ReusableDocumentStoredFieldVisitor;
@@ -66,9 +68,9 @@ public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderPro
 	static FieldInfo forgeFieldInfo(String fieldName) {
 		//Specific options besides the field name aren't important:
 		//we just need to satisfy the constructor
-		return new FieldInfo( fieldName, true, 0, false, true, false,
-				IndexOptions.DOCS_ONLY, DocValuesType.SORTED, DocValuesType.SORTED,
-				1l, null );
+		return new FieldInfo( fieldName, 0, false, true, false,
+				IndexOptions.DOCS, DocValuesType.SORTED,
+				1l, Collections.<String,String>emptyMap() );
 	}
 
 	public static void assertFieldSelectorDisabled() {
@@ -79,29 +81,34 @@ public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderPro
 
 	public DirectoryReader openIndexReader() {
 		DirectoryReader originalReader = super.openIndexReader();
-		LeakingDirectoryReader wrappedReader = new LeakingDirectoryReader( originalReader );
-		return wrappedReader;
+		try {
+			LeakingDirectoryReader wrappedReader = new LeakingDirectoryReader( originalReader );
+			return wrappedReader;
+		}
+		catch (IOException ioe) {
+			throw new SearchException( ioe );
+		}
 	}
 
 	private final class LeakingDirectoryReader extends FilterDirectoryReader {
-		public LeakingDirectoryReader(DirectoryReader in) {
+		public LeakingDirectoryReader(DirectoryReader in) throws IOException {
 			super( in, new LeakingSubReaderWrapper() );
 		}
 		@Override
-		protected DirectoryReader doWrapDirectoryReader(DirectoryReader in) {
+		protected DirectoryReader doWrapDirectoryReader(DirectoryReader in) throws IOException {
 			return new LeakingDirectoryReader( in );
 		}
 	}
 
 	private final class LeakingSubReaderWrapper extends SubReaderWrapper {
 		@Override
-		public AtomicReader wrap(AtomicReader reader) {
+		public LeafReader wrap(LeafReader reader) {
 			return new LeakingAtomicReader( reader );
 		}
 	}
 
-	private final class LeakingAtomicReader extends FilterAtomicReader {
-		public LeakingAtomicReader(AtomicReader in) {
+	private final class LeakingAtomicReader extends FilterLeafReader {
+		public LeakingAtomicReader(LeafReader in) {
 			super( in );
 		}
 		@Override

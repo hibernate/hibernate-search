@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.OpenBitSet;
 
 import static java.lang.Math.max;
@@ -155,22 +154,18 @@ public class AndDocIdSet extends DocIdSet {
 		return targetPosition;
 	}
 
-	public static final DocIdSet EMPTY_DOCIDSET = new DocIdSet() {
+	public static final DocIdSet EMPTY_DOCIDSET = DocIdSet.EMPTY;
 
-		@Override
-		public DocIdSetIterator iterator() {
-			return DocIdSetIterator.empty();
+	/* (non-Javadoc)
+	 * @see org.apache.lucene.util.Accountable#ramBytesUsed()
+	 */
+	@Override
+	public long ramBytesUsed() {
+		long memoryEstimate = docIdBitSet.ramBytesUsed();
+		for ( DocIdSet sets : andedDocIdSets ) {
+			memoryEstimate += sets.ramBytesUsed();
 		}
-
-		@Override
-		public boolean isCacheable() {
-			return true;
-		}
-
-		@Override
-		public Bits bits() {
-			return null;
-		}
-	};
+		return memoryEstimate;
+	}
 
 }
