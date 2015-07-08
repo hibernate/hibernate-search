@@ -70,7 +70,6 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 	private void searchBook(Session session) throws ParseException {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
 				"content",
 				TestConstants.standardAnalyzer
 		);

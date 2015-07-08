@@ -18,9 +18,9 @@ import javax.persistence.Id;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
@@ -63,7 +63,6 @@ public class SortTest extends SearchTestBase {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
 		queryParser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
 				"title",
 				TestConstants.stopAnalyzer
 		);
@@ -396,8 +395,8 @@ public class SortTest extends SearchTestBase {
 		}
 
 		@Override
-		public FieldComparator<Integer> setNextReader(AtomicReaderContext context) throws IOException {
-			final AtomicReader reader = context.reader();
+		public FieldComparator<Integer> setNextReader(LeafReaderContext context) throws IOException {
+			final LeafReader reader = context.reader();
 			currentReaderValuesField1 = reader.getNumericDocValues( field1 );
 			currentReaderValuesField2 = reader.getNumericDocValues( field2 );
 			return this;

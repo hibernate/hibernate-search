@@ -41,7 +41,7 @@ public class QueryUnindexedEntityTest extends SearchTestBase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		Query query = parser.parse( "name:foo" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query );
 		try {

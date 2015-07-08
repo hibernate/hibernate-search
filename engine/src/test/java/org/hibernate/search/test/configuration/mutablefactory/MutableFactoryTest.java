@@ -67,7 +67,6 @@ public class MutableFactoryTest {
 		tc.end();
 
 		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
 				"name",
 				TestConstants.standardAnalyzer
 		);
@@ -114,11 +113,7 @@ public class MutableFactoryTest {
 
 		tc.end();
 
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
-				"name",
-				TestConstants.standardAnalyzer
-		);
+		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
 		IndexReader indexReader = sf.getIndexReaderAccessor().open( A.class );
@@ -164,11 +159,7 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testMultiThreadedAddClasses() throws Exception {
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
-				"name",
-				TestConstants.standardAnalyzer
-		);
+		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
 			List<DoAddClasses> runnables = new ArrayList<DoAddClasses>( 10 );
 			final int nbrOfThread = 10;
@@ -248,11 +239,7 @@ public class MutableFactoryTest {
 		public DoAddClasses(SearchIntegrator si, int factorOfClassesPerThread, int nbrOfClassesPerThread) {
 			this.extendedIntegrator = si.unwrap( ExtendedSearchIntegrator.class );
 			this.factorOfClassesPerThread = factorOfClassesPerThread;
-			this.parser = new QueryParser(
-					TestConstants.getTargetLuceneVersion(),
-					"name",
-					TestConstants.standardAnalyzer
-			);
+			this.parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 			this.nbrOfClassesPerThread = nbrOfClassesPerThread;
 		}
 

@@ -17,7 +17,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.jpa.JPATestCase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
@@ -101,9 +100,8 @@ public class EventBasedEmbeddableCollectionUpdateTest extends JPATestCase {
 	@SuppressWarnings("unchecked")
 	private List<Book> search(String searchQuery) throws ParseException {
 		QueryParser parser = new MultiFieldQueryParser(
-				TestConstants.getTargetLuceneVersion(),
 				new String[] { },
-				new StandardAnalyzer( TestConstants.getTargetLuceneVersion() )
+				new StandardAnalyzer()
 		);
 		FullTextQuery query = Search.getFullTextEntityManager( entityManager )
 				.createFullTextQuery( parser.parse( searchQuery ), Book.class );

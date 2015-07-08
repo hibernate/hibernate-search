@@ -39,7 +39,7 @@ public class FieldAccessTest extends SearchTestBase {
 
 		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
-		QueryParser p = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+		QueryParser p = new QueryParser( "id", TestConstants.standardAnalyzer );
 		List result = session.createFullTextQuery( p.parse( "Abstract:Hibernate" ) ).list();
 		assertEquals( "Query by field", 1, result.size() );
 		s.delete( result.get( 0 ) );
@@ -62,7 +62,7 @@ public class FieldAccessTest extends SearchTestBase {
 
 		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
-		QueryParser p = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+		QueryParser p = new QueryParser( "id", TestConstants.standardAnalyzer );
 		List result = session.createFullTextQuery( p.parse( "title:Action OR Abstract:Action" ) ).list();
 		assertEquals( "Query by field", 2, result.size() );
 		assertEquals( "@Boost fails", "Hibernate in Action", ( (Document) result.get( 0 ) ).getTitle() );

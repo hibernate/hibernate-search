@@ -49,7 +49,7 @@ public class ProgrammaticIndexAndQueryNullTest extends SearchTestBase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
 		parser.setAllowLeadingWildcard( true );
 		Query query = parser.parse( "*" );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, ProgrammaticConfiguredValue.class );
