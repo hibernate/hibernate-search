@@ -7,7 +7,6 @@
 package org.hibernate.search.test.directoryProvider;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +27,7 @@ import org.hibernate.Session;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.util.impl.FileHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -188,7 +188,7 @@ public class FSDirectoryTest extends SearchTestBase {
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		// deleting before search, but after IndexSearcher creation:
 		// ( fails when deleting -concurrently- to IndexSearcher initialization! )
-		Files.delete( getBaseIndexDir() );
+		FileHelper.delete( getBaseIndexDir() );
 		TermQuery query = new TermQuery( new Term( "title", "action" ) );
 		TopDocs hits = searcher.search( query, 1000 );
 		assertEquals( 1, hits.totalHits );

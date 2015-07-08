@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
@@ -100,7 +101,7 @@ public final class DirectoryProviderHelper {
 	public static FSDirectory createFSIndex(File indexDir, Properties properties, ServiceManager serviceManager) throws IOException {
 		LockFactory lockFactory = getLockFactory( indexDir, properties, serviceManager );
 		FSDirectoryType fsDirectoryType = FSDirectoryType.getType( properties );
-		FSDirectory fsDirectory = fsDirectoryType.getDirectory( indexDir, lockFactory );
+		FSDirectory fsDirectory = fsDirectoryType.getDirectory( indexDir.toPath(), lockFactory );
 		log.debugf( "Initialize index: '%s'", indexDir.getAbsolutePath() );
 		DirectoryHelper.initializeIndexIfNeeded( fsDirectory );
 		return fsDirectory;
@@ -227,14 +228,14 @@ public final class DirectoryProviderHelper {
 			this.fsDirectoryClass = fsDirectoryClass;
 		}
 
-		public FSDirectory getDirectory(File indexDir, LockFactory factory) throws IOException {
+		public FSDirectory getDirectory(Path indexDir, LockFactory factory) throws IOException {
 			FSDirectory directory;
 			if ( fsDirectoryClass == null ) {
-				directory = FSDirectory.open( indexDir.toPath(), factory );
+				directory = FSDirectory.open( indexDir, factory );
 			}
 			else {
 				try {
-					Constructor constructor = fsDirectoryClass.getConstructor( File.class, LockFactory.class );
+					Constructor constructor = fsDirectoryClass.getConstructor( Path.class, LockFactory.class );
 					directory = (FSDirectory) constructor.newInstance( indexDir, factory );
 				}
 				catch (NoSuchMethodException e) {
