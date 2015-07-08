@@ -47,7 +47,7 @@ public class TestReporter {
 	private TestReporter() {
 	}
 
-	public static void printReport(TestContext ctx) {
+	public static void printReport(TestContext ctx) throws IOException {
 		PrintStream outStream = createOutputStream( ctx.scenario.getClass().getSimpleName() );
 		PrintWriter outWriter = new PrintWriter( outStream );
 

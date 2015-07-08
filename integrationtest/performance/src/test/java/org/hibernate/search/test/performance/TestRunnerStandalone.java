@@ -8,6 +8,7 @@ package org.hibernate.search.test.performance;
 
 import static org.hibernate.search.test.performance.util.Util.setDefaultProperty;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
@@ -48,7 +49,7 @@ public class TestRunnerStandalone {
 	}
 
 	@Test
-	public void runPerformanceTest() {
+	public void runPerformanceTest() throws IOException {
 		SessionFactory sf = getSessionFactory();
 		try {
 			scenario.run( sf );

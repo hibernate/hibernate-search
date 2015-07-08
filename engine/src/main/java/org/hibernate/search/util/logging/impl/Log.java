@@ -842,4 +842,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 279, value = "Unable to load the UTF-8 Charset!")
 	AssertionFailure assertionNotLoadingUTF8Charset(@Cause UnsupportedEncodingException e);
 
+	@Message(id = 280, value = "An IOException happened while opening multiple indexes" )
+	SearchException ioExceptionOnMultiReaderRefresh(@Cause IOException e);
+
 }
