@@ -28,7 +28,6 @@
         <module>backends/jms</module>
         <module>orm</module>
         <module>testing</module>
-        <module>infinispan</module>
         <module>modules</module>
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
