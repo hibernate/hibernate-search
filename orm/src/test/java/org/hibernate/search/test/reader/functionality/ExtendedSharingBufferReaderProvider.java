@@ -64,7 +64,8 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		private final RAMDirectoryProvider dp = new RAMDirectoryProvider();
 
 		TestManipulatorPerDP(int seed) {
-			dp.initialize( String.valueOf( seed ), null, new BuildContextForTest( new SearchConfigurationForTest() ) );
+			dp.initialize( String.valueOf( seed ), new Properties(), new BuildContextForTest( new SearchConfigurationForTest() ) );
+			dp.start( null );
 		}
 
 		public void setIndexChanged() {
