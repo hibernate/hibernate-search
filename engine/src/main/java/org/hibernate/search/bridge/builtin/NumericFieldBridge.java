@@ -11,7 +11,6 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 
 /**
  * Stateless field bridges for the conversion of numbers to numeric field values.
@@ -25,11 +24,6 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 	 * Persists byte properties in int index fields. Takes care of all the required conversion.
 	 */
 	BYTE_FIELD_BRIDGE {
-		@Override
-		public FieldCacheLoadingType getFieldCacheLoadingType() {
-			return FieldCacheLoadingType.BYTE_AS_SHORT;
-		}
-
 		@Override
 		public Object get(final String name, final Document document) {
 			final IndexableField field = document.getField( name );
@@ -46,11 +40,6 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 	 */
 	SHORT_FIELD_BRIDGE {
 		@Override
-		public FieldCacheLoadingType getFieldCacheLoadingType() {
-			return FieldCacheLoadingType.INT_AS_SHORT;
-		}
-
-		@Override
 		public Object get(final String name, final Document document) {
 			final IndexableField field = document.getField( name );
 			return field != null ? field.numericValue().shortValue() : null;
@@ -65,37 +54,21 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 	 * Persists int properties in int index fields. Takes care of all the required conversion.
 	 */
 	INT_FIELD_BRIDGE {
-		@Override
-		public FieldCacheLoadingType getFieldCacheLoadingType() {
-			return FieldCacheLoadingType.INT;
-		}
 	},
 	/**
 	 * Persists float properties in float index fields. Takes care of all the required conversion.
 	 */
 	FLOAT_FIELD_BRIDGE {
-		@Override
-		public FieldCacheLoadingType getFieldCacheLoadingType() {
-			return FieldCacheLoadingType.FLOAT;
-		}
 	},
 	/**
 	 * Persists double properties in double index fields. Takes care of all the required conversion.
 	 */
 	DOUBLE_FIELD_BRIDGE {
-		@Override
-		public FieldCacheLoadingType getFieldCacheLoadingType() {
-			return FieldCacheLoadingType.DOUBLE;
-		}
 	},
 	/**
 	 * Persists long properties in long index fields. Takes care of all the required conversion.
 	 */
 	LONG_FIELD_BRIDGE {
-		@Override
-		public FieldCacheLoadingType getFieldCacheLoadingType() {
-			return FieldCacheLoadingType.LONG;
-		}
 	};
 
 	@Override
@@ -129,7 +102,5 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 	protected void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
 		luceneOptions.addNumericFieldToDocument( name, value, document );
 	}
-
-	public abstract FieldCacheLoadingType getFieldCacheLoadingType();
 
 }

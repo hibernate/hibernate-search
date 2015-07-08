@@ -13,6 +13,7 @@ import static org.hibernate.search.test.performance.util.CheckerUncaughtExceptio
 import static org.hibernate.search.test.performance.util.Util.log;
 
 import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -88,7 +89,7 @@ public abstract class TestScenario {
 		return properties;
 	}
 
-	public final void run(SessionFactory sf) {
+	public final void run(SessionFactory sf) throws IOException {
 		initUncaughtExceptionHandler();
 		initDatabase( sf );
 		performWarmUp( sf );
@@ -185,7 +186,7 @@ public abstract class TestScenario {
 		}
 	}
 
-	protected void performMeasuring(SessionFactory sf) {
+	protected void performMeasuring(SessionFactory sf) throws IOException {
 		log( "starting measuring" );
 
 		TestContext ctx = new TestContext( this, sf );

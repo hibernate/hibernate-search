@@ -16,7 +16,7 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
+import org.apache.lucene.index.IndexOptions;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -34,10 +34,9 @@ public class LuceneOptionsImpl implements LuceneOptions {
 
 	private static final FieldType TYPE_COMPRESSED = new FieldType();
 	static {
-		TYPE_COMPRESSED.setIndexed( false );
 		TYPE_COMPRESSED.setTokenized( false );
 		TYPE_COMPRESSED.setOmitNorms( true );
-		TYPE_COMPRESSED.setIndexOptions( IndexOptions.DOCS_ONLY );
+		TYPE_COMPRESSED.setIndexOptions( IndexOptions.NONE );
 		TYPE_COMPRESSED.setStored( true );
 		TYPE_COMPRESSED.freeze();
 	}

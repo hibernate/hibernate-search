@@ -11,8 +11,8 @@ import java.io.Serializable;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
+import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
@@ -44,7 +44,7 @@ public final class LuceneFieldContext {
 	}
 
 	public SerializableIndex getIndex() {
-		Field.Index index = Field.Index.toIndex( fieldType.indexed(), fieldType.tokenized(), fieldType.omitNorms() );
+		Field.Index index = Field.Index.toIndex( fieldType.indexOptions() != IndexOptions.NONE , fieldType.tokenized(), fieldType.omitNorms() );
 		switch ( index ) {
 			case ANALYZED:
 				return SerializableIndex.ANALYZED;
@@ -80,7 +80,7 @@ public final class LuceneFieldContext {
 	}
 
 	public SerializableDocValuesType getDocValuesType() {
-		FieldInfo.DocValuesType docValuesType = field.fieldType().docValueType();
+		DocValuesType docValuesType = field.fieldType().docValuesType();
 		switch ( docValuesType ) {
 			// data is a long value
 			case NUMERIC: {
@@ -116,7 +116,7 @@ public final class LuceneFieldContext {
 	}
 
 	public boolean isOmitTermFreqAndPositions() {
-		return fieldType.indexOptions() == IndexOptions.DOCS_ONLY;
+		return fieldType.indexOptions() == IndexOptions.DOCS;
 	}
 
 	public String getStringValue() {

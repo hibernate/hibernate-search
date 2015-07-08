@@ -13,7 +13,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FieldType.NumericType;
-import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -165,7 +165,7 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 				continue;
 			}
 
-			FieldInfo.DocValuesType docValuesType = fieldType.docValueType();
+			DocValuesType docValuesType = fieldType.docValuesType();
 			if ( docValuesType != null ) {
 				serializeDocValues( serializer, (Field) fieldable );
 				continue;
@@ -182,7 +182,7 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 	}
 
 	private void serializeDocValues(Serializer serializer, Field field) {
-		FieldInfo.DocValuesType docValuesType = field.fieldType().docValueType();
+		DocValuesType docValuesType = field.fieldType().docValuesType();
 		switch ( docValuesType ) {
 			// data is a long value
 			case NUMERIC: {

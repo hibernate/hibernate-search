@@ -28,7 +28,7 @@ public class ManagedMultiReader extends MultiReader {
 	final IndexReader[] subReaders;
 	final ReaderProvider[] managers;
 
-	public ManagedMultiReader(IndexReader[] subReaders, ReaderProvider[] managers) {
+	public ManagedMultiReader(IndexReader[] subReaders, ReaderProvider[] managers) throws IOException {
 		// If this flag isn't set to true, the MultiReader will increase the usage counter!
 		super( subReaders, true );
 		this.subReaders = subReaders;

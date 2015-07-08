@@ -46,7 +46,7 @@ public class IndexWriterTuningAppliedTest {
 			Assert.assertEquals( 23, dvdsIndexWriter.getConfig().getMaxThreadStates() );
 		}
 		finally {
-			dvdsIndexWriter.close( false );
+			dvdsIndexWriter.close();
 		}
 	}
 
@@ -63,8 +63,8 @@ public class IndexWriterTuningAppliedTest {
 			Assert.assertTrue( booksIndexWriter.getConfig().getInfoStream().isEnabled( "IW" ) );
 		}
 		finally {
-			booksIndexWriter.close( false );
-			dvdsIndexWriter.close( false );
+			booksIndexWriter.close();
+			dvdsIndexWriter.close();
 		}
 	}
 
@@ -76,7 +76,7 @@ public class IndexWriterTuningAppliedTest {
 			Assert.assertEquals( 7, booksIndexWriter.getConfig().getMaxThreadStates() );
 		}
 		finally {
-			booksIndexWriter.close( false );
+			booksIndexWriter.close();
 		}
 	}
 

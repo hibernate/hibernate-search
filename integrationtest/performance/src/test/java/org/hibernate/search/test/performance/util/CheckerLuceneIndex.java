@@ -34,7 +34,7 @@ public class CheckerLuceneIndex {
 	}
 
 	@SuppressWarnings("deprecation") // performance tests can be run against older hsearch versions, where isn't getIndexManagerHolder yet
-	public static void printIndexReport(TestContext ctx, PrintStream out) {
+	public static void printIndexReport(TestContext ctx, PrintStream out) throws IOException {
 		if ( !CHECK_INDEX_STATE ) {
 			return;
 		}

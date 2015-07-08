@@ -853,4 +853,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 283, value = "Sorting using '%1$s' requires an indexed field: '%2$s' is not valid")
 	SearchException sortRequiresIndexedField(@FormatWith(ClassFormatter.class) Class<?> sortFieldType, String field);
+
+	@Message(id = 284, value = "An IOException happened while opening multiple indexes" )
+	SearchException ioExceptionOnMultiReaderRefresh(@Cause IOException e);
+
 }

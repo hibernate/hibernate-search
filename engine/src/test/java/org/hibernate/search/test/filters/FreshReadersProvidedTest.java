@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.CompositeReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -22,9 +22,10 @@ import org.apache.lucene.search.BitsFilteredDocIdSet;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.BitDocIdSet;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.OpenBitSet;
+import org.apache.lucene.util.FixedBitSet;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -164,7 +165,7 @@ public class FreshReadersProvidedTest {
 		CompositeReaderContext compositeReaderContext = compositeReader.getContext();
 		ArrayList<IndexReader> segmentReaders = new ArrayList<IndexReader>( 20 );
 
-		for ( AtomicReaderContext readerContext : compositeReaderContext.leaves() ) {
+		for ( LeafReaderContext readerContext : compositeReaderContext.leaves() ) {
 			segmentReaders.add( readerContext.reader() );
 		}
 
@@ -188,21 +189,26 @@ public class FreshReadersProvidedTest {
 		}
 
 		@Override
-		public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
-			final AtomicReader reader = context.reader();
+		public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+			final LeafReader reader = context.reader();
 			this.visitedReaders.add( reader );
-			OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
+			FixedBitSet bitSet = new FixedBitSet( reader.maxDoc() );
 			for ( int i = 0; i < reader.maxDoc(); i++ ) {
-				bitSet.fastSet( i );
+				bitSet.set( i );
 			}
 			Terms terms = reader.terms( fieldName );
-			TermsEnum iterator = terms.iterator( null );
+			TermsEnum iterator = terms.iterator();
 			BytesRef next = iterator.next();
 			while ( next != null ) {
 				seenTerms.add( next.utf8ToString() );
 				next = iterator.next();
 			}
-			return BitsFilteredDocIdSet.wrap( bitSet, acceptDocs );
+			return BitsFilteredDocIdSet.wrap( new BitDocIdSet( bitSet ), acceptDocs );
+		}
+
+		@Override
+		public String toString(String fieldName) {
+			return toString();
 		}
 	}
 

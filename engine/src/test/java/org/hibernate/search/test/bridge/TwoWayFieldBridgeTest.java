@@ -48,13 +48,16 @@ public class TwoWayFieldBridgeTest {
 			// the NumericFieldBridge is an emum (go figure) - we need special massaging here
 			if ( Enum.class.isAssignableFrom( clazz ) ) {
 				assertTrue( "Unexpected enum class" + clazz, NumericFieldBridge.class.isAssignableFrom( clazz ) );
-				for ( Object o : clazz.getEnclosingClass().getEnumConstants() ) {
-					TwoWayFieldBridge bridge = (TwoWayFieldBridge) o;
-					assertEquals(
-							"All TwoWayFieldBridgeTest should return 'null' for 'null' passed to 'objectToString",
-							null,
-							bridge.objectToString( null )
-					);
+				Class<?> enclosingClass = clazz.getEnclosingClass();
+				if ( enclosingClass != null ) {
+					for ( Object o : enclosingClass.getEnumConstants() ) {
+						TwoWayFieldBridge bridge = (TwoWayFieldBridge) o;
+						assertEquals(
+								"All TwoWayFieldBridgeTest should return 'null' for 'null' passed to 'objectToString",
+								null,
+								bridge.objectToString( null )
+						);
+					}
 				}
 			}
 			else {

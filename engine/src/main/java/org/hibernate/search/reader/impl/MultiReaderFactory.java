@@ -43,7 +43,12 @@ public final class MultiReaderFactory {
 		}
 		else {
 			//everything should be the same so wrap in an MultiReader
-			return new ManagedMultiReader( readers, managers );
+			try {
+				return new ManagedMultiReader( readers, managers );
+			}
+			catch (IOException e) {
+				throw log.ioExceptionOnMultiReaderRefresh( e );
+			}
 		}
 	}
 

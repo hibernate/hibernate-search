@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.spatial.impl;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.DocsEnum;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
@@ -43,12 +43,12 @@ public final class SpatialHashFilter extends Filter {
 	 * @param reader reader to the index
 	 */
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
 		if ( spatialHashCellsIds.size() == 0 ) {
 			return null;
 		}
 
-		final AtomicReader atomicReader = context.reader();
+		final LeafReader atomicReader = context.reader();
 
 		OpenBitSet matchedDocumentsIds = new OpenBitSet( atomicReader.maxDoc() );
 		Boolean found = false;
@@ -80,7 +80,7 @@ public final class SpatialHashFilter extends Filter {
 	}
 
 	@Override
-	public String toString() {
+	public String toString(String field) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "SpatialHashFilter" );
 		sb.append( "{spatialHashCellsIds=" ).append( spatialHashCellsIds );

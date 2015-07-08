@@ -10,8 +10,8 @@ import static org.hibernate.search.spatial.impl.CoordinateHelper.coordinate;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
@@ -92,8 +92,8 @@ public final class DistanceFilter extends Filter {
 	 * @param reader reader to the index
 	 */
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
-		final AtomicReader atomicReader = context.reader();
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+		final LeafReader atomicReader = context.reader();
 
 		DocIdSet docs = previousFilter.getDocIdSet( context, acceptDocs );
 
@@ -138,7 +138,7 @@ public final class DistanceFilter extends Filter {
 	}
 
 	@Override
-	public String toString() {
+	public String toString(String field) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "DistanceFilter" );
 		sb.append( "{previousFilter=" ).append( previousFilter );
