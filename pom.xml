@@ -144,8 +144,8 @@
         <luceneVersion>4.10.4</luceneVersion>
         <infinispanVersion>7.2.0.Final</infinispanVersion>
         <jgroupsVersion>3.6.2.Final</jgroupsVersion>
-        <hibernateVersion>5.0.0.CR1</hibernateVersion>
-        <hibernateCommonsAnnotationVersion>4.0.5.Final</hibernateCommonsAnnotationVersion>
+        <hibernateVersion>5.0.0.CR2</hibernateVersion>
+        <hibernateCommonsAnnotationVersion>5.0.0.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>3.0.0</bytemanVersion>
         <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
@@ -182,12 +182,6 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${hibernateVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-annotations</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -198,12 +192,6 @@
                 <groupId>org.hibernate.common</groupId>
                 <artifactId>hibernate-commons-annotations</artifactId>
                 <version>${hibernateCommonsAnnotationVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-annotations</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
@@ -477,12 +465,6 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>${hibernateVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-annotations</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
