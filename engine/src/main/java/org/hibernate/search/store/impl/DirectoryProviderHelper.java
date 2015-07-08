@@ -222,9 +222,9 @@ public final class DirectoryProviderHelper {
 		NIO( NIOFSDirectory.class ),
 		MMAP( MMapDirectory.class );
 
-		private Class<?> fsDirectoryClass;
+		private Class<? extends FSDirectory> fsDirectoryClass;
 
-		FSDirectoryType(Class<?> fsDirectoryClass) {
+		FSDirectoryType(Class<? extends FSDirectory> fsDirectoryClass) {
 			this.fsDirectoryClass = fsDirectoryClass;
 		}
 
@@ -235,8 +235,8 @@ public final class DirectoryProviderHelper {
 			}
 			else {
 				try {
-					Constructor constructor = fsDirectoryClass.getConstructor( Path.class, LockFactory.class );
-					directory = (FSDirectory) constructor.newInstance( indexDir, factory );
+					Constructor<? extends FSDirectory> constructor = fsDirectoryClass.getConstructor( Path.class, LockFactory.class );
+					directory = constructor.newInstance( indexDir, factory );
 				}
 				catch (NoSuchMethodException e) {
 					throw new SearchException( "Unable to find appropriate FSDirectory constructor", e );
