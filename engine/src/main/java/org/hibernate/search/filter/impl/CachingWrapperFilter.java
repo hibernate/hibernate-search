@@ -8,8 +8,8 @@ package org.hibernate.search.filter.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
@@ -75,8 +75,8 @@ public class CachingWrapperFilter extends Filter {
 	}
 
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
-		final AtomicReader reader = context.reader();
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+		final LeafReader reader = context.reader();
 		Object cached = cache.get( reader );
 		if ( cached != null ) {
 			if ( cached == NULL_OBJECT ) {
@@ -109,8 +109,8 @@ public class CachingWrapperFilter extends Filter {
 	}
 
 	@Override
-	public String toString() {
-		return this.getClass().getName() + "(" + filter + ")";
+	public String toString(String field) {
+		return "CachingWrapperFilter(" + filter.toString( field ) + ")";
 	}
 
 	@Override

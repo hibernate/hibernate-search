@@ -831,4 +831,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityClass);
+
+	@Message(id = 277, value = "An IOException happened while opening multiple indexes" )
+	SearchException ioExceptionOnMultiReaderRefresh(@Cause IOException e);
 }

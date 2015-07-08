@@ -7,7 +7,7 @@
 package org.hibernate.search.indexes.serialization.spi;
 
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
+import org.apache.lucene.index.IndexOptions;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -38,7 +38,7 @@ public class LuceneNumericFieldContext {
 	}
 
 	public boolean isIndexed() {
-		return field.indexed();
+		return field.indexOptions() != IndexOptions.NONE;
 	}
 
 	public float getBoost() {
@@ -50,7 +50,7 @@ public class LuceneNumericFieldContext {
 	}
 
 	public boolean getOmitTermFreqAndPositions() {
-		return field.indexOptions() == IndexOptions.DOCS_ONLY;
+		return field.indexOptions() == IndexOptions.DOCS;
 	}
 
 }

@@ -8,14 +8,13 @@ package org.hibernate.search.test.filter;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.DocsEnum;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.OpenBitSet;
 
 /**
  * @author Emmanuel Bernard
@@ -23,8 +22,8 @@ import org.apache.lucene.util.OpenBitSet;
 public class BestDriversFilter extends Filter {
 
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
-		AtomicReader reader = context.reader();
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+		LeafReader reader = context.reader();
 		OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
 		DocsEnum termDocsEnum = reader.termDocsEnum( new Term( "score", "5" ) );
 		if ( termDocsEnum == null ) {

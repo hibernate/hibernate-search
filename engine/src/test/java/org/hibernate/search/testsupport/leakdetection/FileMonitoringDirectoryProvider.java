@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.testsupport.leakdetection;
 
+import org.apache.lucene.store.LockFactory;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 
@@ -18,7 +19,7 @@ import org.hibernate.search.store.impl.RAMDirectoryProvider;
 public class FileMonitoringDirectoryProvider extends RAMDirectoryProvider {
 
 	@Override
-	protected FileMonitoringDirectory makeRAMDirectory() {
+	protected FileMonitoringDirectory makeRAMDirectory(LockFactory lockFactory) {
 		return new FileMonitoringDirectory();
 	}
 

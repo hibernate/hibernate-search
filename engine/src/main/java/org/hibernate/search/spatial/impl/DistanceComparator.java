@@ -8,12 +8,13 @@ package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.SimpleFieldComparator;
 
-public final class DistanceComparator extends FieldComparator<Double> {
+//FIXME don't extend SimpleFieldComparator
+public final class DistanceComparator extends SimpleFieldComparator<Double> {
 
 	private final Point center;
 	private final String latitudeField;
@@ -81,11 +82,10 @@ public final class DistanceComparator extends FieldComparator<Double> {
 	}
 
 	@Override
-	public DistanceComparator setNextReader(final AtomicReaderContext context) throws IOException {
-		final AtomicReader atomicReader = context.reader();
+	public void doSetNextReader(final LeafReaderContext context) throws IOException {
+		final LeafReader atomicReader = context.reader();
 		latitudeValues = atomicReader.getNumericDocValues( latitudeField );
 		longitudeValues = atomicReader.getNumericDocValues( longitudeField );
-		return this;
 	}
 
 	@Override

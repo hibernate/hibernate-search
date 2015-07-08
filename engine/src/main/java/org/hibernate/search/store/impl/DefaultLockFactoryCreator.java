@@ -51,19 +51,19 @@ public class DefaultLockFactoryCreator implements LockFactoryCreator, Startable 
 			if ( indexDir == null ) {
 				throw LOG.indexBasePathRequiredForLockingStrategy( "simple" );
 			}
-			return new SimpleFSLockFactory( indexDir );
+			return SimpleFSLockFactory.INSTANCE;
 		}
 		else if ( "native".equals( lockFactoryName ) ) {
 			if ( indexDir == null ) {
 				throw LOG.indexBasePathRequiredForLockingStrategy( "native" );
 			}
-			return new NativeFSLockFactory( indexDir );
+			return NativeFSLockFactory.INSTANCE;
 		}
 		else if ( "single".equals( lockFactoryName ) ) {
 			return new SingleInstanceLockFactory();
 		}
 		else if ( "none".equals( lockFactoryName ) ) {
-			return NoLockFactory.getNoLockFactory();
+			return NoLockFactory.INSTANCE;
 		}
 		else {
 			LockFactoryProvider lockFactoryFactory = ClassLoaderHelper.instanceFromName(

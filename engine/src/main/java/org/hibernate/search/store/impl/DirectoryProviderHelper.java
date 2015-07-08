@@ -100,11 +100,7 @@ public final class DirectoryProviderHelper {
 	public static FSDirectory createFSIndex(File indexDir, Properties properties, ServiceManager serviceManager) throws IOException {
 		LockFactory lockFactory = getLockFactory( indexDir, properties, serviceManager );
 		FSDirectoryType fsDirectoryType = FSDirectoryType.getType( properties );
-		FSDirectory fsDirectory = fsDirectoryType.getDirectory( indexDir, null );
-
-		// must use the setter (instead of using the constructor) to set the lockFactory, or Lucene will
-		// throw an exception if it's different than a previous setting.
-		fsDirectory.setLockFactory( lockFactory );
+		FSDirectory fsDirectory = fsDirectoryType.getDirectory( indexDir, lockFactory );
 		log.debugf( "Initialize index: '%s'", indexDir.getAbsolutePath() );
 		DirectoryHelper.initializeIndexIfNeeded( fsDirectory );
 		return fsDirectory;
@@ -234,7 +230,7 @@ public final class DirectoryProviderHelper {
 		public FSDirectory getDirectory(File indexDir, LockFactory factory) throws IOException {
 			FSDirectory directory;
 			if ( fsDirectoryClass == null ) {
-				directory = FSDirectory.open( indexDir, factory );
+				directory = FSDirectory.open( indexDir.toPath(), factory );
 			}
 			else {
 				try {

@@ -9,10 +9,11 @@ package org.hibernate.search.spatial.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Scorer;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spatial.Coordinates;
@@ -23,58 +24,41 @@ import org.hibernate.search.spatial.Coordinates;
  * @author Sanne Grinovero
  * @author Nicolas Helleringer
  */
-public class DistanceCollector extends Collector {
+public class DistanceCollector implements Collector {
 
 	private final Point center;
-	private final boolean acceptsDocsOutOfOrder;
 	private final Collector delegate;
 	private final SpatialResultsCollector distances;
 	private final String latitudeField;
 	private final String longitudeField;
 
-	private int docBase = 0;
-	private NumericDocValues latitudeValues;
-	private NumericDocValues longitudeValues;
-
 	public DistanceCollector(Collector delegate, Coordinates centerCoordinates, int hitsCount, String fieldname) {
 		this.delegate = delegate;
-		this.acceptsDocsOutOfOrder = delegate.acceptsDocsOutOfOrder();
 		this.center = Point.fromCoordinates( centerCoordinates );
 		this.distances = new SpatialResultsCollector( hitsCount );
 		this.latitudeField = SpatialHelper.formatLatitude( fieldname );
 		this.longitudeField = SpatialHelper.formatLongitude( fieldname );
 	}
 
-	@Override
-	public void setScorer(final Scorer scorer) throws IOException {
-		delegate.setScorer( scorer );
-	}
-
-	@Override
-	public void collect(final int doc) throws IOException {
-		delegate.collect( doc );
-		final int absolute = docBase + doc;
-		double lat = Double.longBitsToDouble( latitudeValues.get( doc ) );
-		double lon = Double.longBitsToDouble( longitudeValues.get( doc ) );
-		distances.put( absolute, lat, lon );
-	}
-
-	@Override
-	public void setNextReader(AtomicReaderContext newContext) throws IOException {
-		delegate.setNextReader( newContext );
-		final AtomicReader atomicReader = newContext.reader();
-		latitudeValues = atomicReader.getNumericDocValues( latitudeField );
-		longitudeValues = atomicReader.getNumericDocValues( longitudeField );
-		this.docBase = newContext.docBase;
-	}
-
-	@Override
-	public boolean acceptsDocsOutOfOrder() {
-		return acceptsDocsOutOfOrder;
-	}
-
 	public double getDistance(final int index) {
 		return distances.get( index, center );
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.lucene.search.Collector#getLeafCollector(org.apache.lucene.index.LeafReaderContext)
+	 */
+	@Override
+	public LeafCollector getLeafCollector(LeafReaderContext context) throws IOException {
+		LeafCollector leafCollectorDelegate = delegate.getLeafCollector( context );
+		return new DistanceLeafCollector( leafCollectorDelegate, context );
+	}
+
+	/* (non-Javadoc)
+	 * @see org.apache.lucene.search.Collector#needsScores()
+	 */
+	@Override
+	public boolean needsScores() {
+		return delegate.needsScores();
 	}
 
 	/**
@@ -149,4 +133,39 @@ public class DistanceCollector extends Collector {
 		}
 	}
 
+	private class DistanceLeafCollector implements LeafCollector {
+
+		private final LeafCollector delegate;
+		private final int docBase;
+		private final NumericDocValues latitudeValues;
+		private final NumericDocValues longitudeValues;
+
+		DistanceLeafCollector(LeafCollector delegate, LeafReaderContext context) throws IOException {
+			this.delegate = delegate;
+			final LeafReader atomicReader = context.reader();
+			this.latitudeValues = atomicReader.getNumericDocValues( latitudeField );
+			this.longitudeValues = atomicReader.getNumericDocValues( longitudeField );
+			this.docBase = context.docBase;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.apache.lucene.search.LeafCollector#setScorer(org.apache.lucene.search.Scorer)
+		 */
+		@Override
+		public void setScorer(Scorer scorer) throws IOException {
+			delegate.setScorer( scorer );
+		}
+
+		/* (non-Javadoc)
+		 * @see org.apache.lucene.search.LeafCollector#collect(int)
+		 */
+		@Override
+		public void collect(int doc) throws IOException {
+			this.delegate.collect( doc );
+			final int absolute = docBase + doc;
+			double lat = Double.longBitsToDouble( latitudeValues.get( doc ) );
+			double lon = Double.longBitsToDouble( longitudeValues.get( doc ) );
+			distances.put( absolute, lat, lon );
+		}
+	}
 }

@@ -9,16 +9,17 @@ package org.hibernate.search.query.collector.impl;
 import java.io.IOException;
 
 import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.LeafCollector;
 
 /**
  * A custom {@code Collector} used for handling facet requests.
  *
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
-public class FacetsCollectorDecorator extends Collector {
+public class FacetsCollectorDecorator implements Collector {
 	/**
 	 * The next collector in the delegation chain
 	 */
@@ -32,7 +33,19 @@ public class FacetsCollectorDecorator extends Collector {
 	}
 
 	@Override
-	public void setNextReader(AtomicReaderContext context) throws IOException {
+	public LeafCollector getLeafCollector(LeafReaderContext context) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean needsScores() {
+		return facetsCollector.needsScores() || nextInChainCollector.needsScores();
+	}
+
+	/*
+	@Override
+	public void setNextReader(LeafReaderContext context) throws IOException {
 		facetsCollector.setNextReader( context );
 		nextInChainCollector.setNextReader( context );
 	}
@@ -42,15 +55,5 @@ public class FacetsCollectorDecorator extends Collector {
 		facetsCollector.collect( doc );
 		nextInChainCollector.collect( doc );
 	}
-
-	@Override
-	public void setScorer(Scorer scorer) throws IOException {
-		facetsCollector.setScorer( scorer );
-		nextInChainCollector.setScorer( scorer );
-	}
-
-	@Override
-	public boolean acceptsDocsOutOfOrder() {
-		return nextInChainCollector.acceptsDocsOutOfOrder();
-	}
+	*/
 }

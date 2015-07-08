@@ -75,10 +75,6 @@ public final class LazyQueryState implements Closeable {
 		return fieldSortDoMaxScore;
 	}
 
-	public boolean scoresDocsOutOfOrder() throws IOException {
-		return getWeight().scoresDocsOutOfOrder();
-	}
-
 	public Explanation explain(int documentId) throws IOException {
 		return searcher.explain( rewrittenQuery(), documentId );
 	}
@@ -190,7 +186,8 @@ public final class LazyQueryState implements Closeable {
 
 	private Weight getWeight() throws IOException {
 		if ( queryWeight == null ) {
-			queryWeight = rewrittenQuery().createWeight( searcher );
+			//FIXME don't hardcode 'boolean needsScores'
+			queryWeight = rewrittenQuery().createWeight( searcher, true );
 		}
 		return queryWeight;
 	}
