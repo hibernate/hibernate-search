@@ -9,9 +9,9 @@ package org.hibernate.search.spatial.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Scorer;
@@ -27,13 +27,11 @@ import org.hibernate.search.spatial.Coordinates;
 public class DistanceCollector implements Collector {
 
 	private final Point center;
-	private final Collector delegate;
 	private final SpatialResultsCollector distances;
 	private final String latitudeField;
 	private final String longitudeField;
 
-	public DistanceCollector(Collector delegate, Coordinates centerCoordinates, int hitsCount, String fieldname) {
-		this.delegate = delegate;
+	public DistanceCollector(Coordinates centerCoordinates, int hitsCount, String fieldname) {
 		this.center = Point.fromCoordinates( centerCoordinates );
 		this.distances = new SpatialResultsCollector( hitsCount );
 		this.latitudeField = SpatialHelper.formatLatitude( fieldname );
@@ -44,21 +42,14 @@ public class DistanceCollector implements Collector {
 		return distances.get( index, center );
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.lucene.search.Collector#getLeafCollector(org.apache.lucene.index.LeafReaderContext)
-	 */
 	@Override
 	public LeafCollector getLeafCollector(LeafReaderContext context) throws IOException {
-		LeafCollector leafCollectorDelegate = delegate.getLeafCollector( context );
-		return new DistanceLeafCollector( leafCollectorDelegate, context );
+		return new DistanceLeafCollector( context );
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.lucene.search.Collector#needsScores()
-	 */
 	@Override
 	public boolean needsScores() {
-		return delegate.needsScores();
+		return false;
 	}
 
 	/**
@@ -135,33 +126,23 @@ public class DistanceCollector implements Collector {
 
 	private class DistanceLeafCollector implements LeafCollector {
 
-		private final LeafCollector delegate;
 		private final int docBase;
 		private final NumericDocValues latitudeValues;
 		private final NumericDocValues longitudeValues;
 
-		DistanceLeafCollector(LeafCollector delegate, LeafReaderContext context) throws IOException {
-			this.delegate = delegate;
+		DistanceLeafCollector(LeafReaderContext context) throws IOException {
 			final LeafReader atomicReader = context.reader();
 			this.latitudeValues = atomicReader.getNumericDocValues( latitudeField );
 			this.longitudeValues = atomicReader.getNumericDocValues( longitudeField );
 			this.docBase = context.docBase;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.apache.lucene.search.LeafCollector#setScorer(org.apache.lucene.search.Scorer)
-		 */
 		@Override
 		public void setScorer(Scorer scorer) throws IOException {
-			delegate.setScorer( scorer );
 		}
 
-		/* (non-Javadoc)
-		 * @see org.apache.lucene.search.LeafCollector#collect(int)
-		 */
 		@Override
 		public void collect(int doc) throws IOException {
-			this.delegate.collect( doc );
 			final int absolute = docBase + doc;
 			double lat = Double.longBitsToDouble( latitudeValues.get( doc ) );
 			double lon = Double.longBitsToDouble( longitudeValues.get( doc ) );
