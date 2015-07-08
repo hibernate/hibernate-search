@@ -147,11 +147,28 @@ public abstract class TransactionalJmsMasterSlave {
 	public void searchRollbackedMemberAfterSynchronizationOnSlave2() throws Exception {
 		// we need to explicitly wait because we need to detect the *effective* non operation execution (rollback)
 		// so the current search wait algorithm does not work
-		for ( int i = 0 ; i < MAX_PERIOD_RETRIES ; i++ ) {
+		for ( int i = 0; i < MAX_PERIOD_RETRIES; i++ ) {
 			waitForIndexSynchronization();
 		}
+
+		// Test that the value is not in the db
+		// We could still have an entry in the index
 		List<RegisteredMember> members = search( "Emmanuel" );
 		assertEquals( 0, members.size() );
+
+		// Search using a projection to make sure
+		// that the entry is not in the index
+		List<String> names = searchName( "Emmanuel" );
+		assertEquals( 0, names.size() );
+	}
+
+	@Test
+	@InSequence(9)
+	@OperateOnDeployment("slave-2")
+	public void searchNameShouldWorkOnSlave2() throws Exception {
+		assertEquals( "Davide D'Alto", searchName( "davide" ).get( 0 ) );
+		assertEquals( "Peter O'Tall", searchName( "peter" ).get( 0 ) );
+		assertEquals( "Richard Mayhew", searchName( "richard" ).get( 0 ) );
 	}
 
 	private void assertSearchResult(String expectedResult, List<RegisteredMember> results) {
@@ -171,6 +188,18 @@ public abstract class TransactionalJmsMasterSlave {
 			attempts++;
 			waitForIndexSynchronization();
 			results = memberRegistration.search( name );
+		}
+		return results;
+	}
+
+	private List<String> searchName(String name) throws InterruptedException {
+		List<String> results = memberRegistration.searchName( name );
+
+		int attempts = 0;
+		while ( results.size() == 0 && attempts < MAX_SEARCH_ATTEMPTS ) {
+			attempts++;
+			waitForIndexSynchronization();
+			results = memberRegistration.searchName( name );
 		}
 		return results;
 	}
