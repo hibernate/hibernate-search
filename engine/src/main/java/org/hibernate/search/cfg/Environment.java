@@ -214,9 +214,10 @@ public final class Environment {
 	public static final String INDEX_MANAGER_IMPL_NAME = "indexmanager";
 
 	/**
-	 * Name of the JMS message property containing the index name to which to apply remote work.
+	 * Name of the JMS message property containing the index name to which to apply remote work. <i>JMSXGroupID</i> is
+	 * actually a standard JMS header field which is used for message grouping. See HSEARCH-1922.
 	 */
-	public static final String INDEX_NAME_JMS_PROPERTY = "HSearchIndexName";
+	public static final String INDEX_NAME_JMS_PROPERTY = "JMSXGroupID";
 
 	/**
 	 * Option for setting the locking strategy to be used for locking Lucene directories. Supported values are:
