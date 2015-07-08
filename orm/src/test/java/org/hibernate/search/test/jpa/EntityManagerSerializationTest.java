@@ -69,11 +69,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 		em.getTransaction().begin();
 
 		// execute a non matching query
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
-				"title",
-				TestConstants.stopAnalyzer
-		);
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 		Query query = NumericRangeQuery.newIntRange( "saltQty", 0, 0, true, true );
 		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
 

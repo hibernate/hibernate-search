@@ -73,7 +73,7 @@ public class MassIndexTest extends SearchTestBase {
 		tx.commit(); // if you get a LazyInitializationException, that's because we clear() the session in the loop.. it only works with a batch size of 5 (the point of the test)
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 14, result.size() );
 		for ( Object object : result ) {
@@ -102,7 +102,7 @@ public class MassIndexTest extends SearchTestBase {
 		//check non created object does get found!!1
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 0, result.size() );
 		tx.commit();
@@ -134,7 +134,7 @@ public class MassIndexTest extends SearchTestBase {
 
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
-		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+		parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
 		assertEquals( 0, result.size() );
 		result = s.createCriteria( Email.class ).list();

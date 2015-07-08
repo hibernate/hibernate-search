@@ -143,7 +143,6 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				QueryParser parser = new MultiFieldQueryParser(
-						TestConstants.getTargetLuceneVersion(),
 						new String[] { "name", "physicalDescription", "suspectCharge" },
 						TestConstants.standardAnalyzer
 				);
@@ -232,7 +231,6 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 			Session s = sf.openSession();
 			Transaction tx = s.beginTransaction();
 			QueryParser parser = new MultiFieldQueryParser(
-					TestConstants.getTargetLuceneVersion(),
 					new String[] { "name", "physicalDescription", "suspectCharge" },
 					TestConstants.standardAnalyzer
 			);

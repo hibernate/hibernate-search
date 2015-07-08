@@ -42,7 +42,7 @@ public class MixedCriteriaTest extends SearchTestBase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser( TestConstants.getTargetLuceneVersion(),
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(
 				new String[] { "kurztext" }, TestConstants.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );
@@ -67,9 +67,7 @@ public class MixedCriteriaTest extends SearchTestBase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser( TestConstants.getTargetLuceneVersion(),
-				new String[] { "kurztext" }, TestConstants.standardAnalyzer
-		);
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[] { "kurztext" }, TestConstants.standardAnalyzer );
 		Query query = parser.parse( "combi OR sport" );
 
 		Criteria criteria = session.createCriteria( AbstractCar.class );
@@ -92,7 +90,7 @@ public class MixedCriteriaTest extends SearchTestBase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser( TestConstants.getTargetLuceneVersion(),
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(
 				new String[] { "kurztext" }, TestConstants.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );

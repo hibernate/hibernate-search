@@ -98,10 +98,7 @@ public class WorkerTestCase extends SearchTestBase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				QueryParser parser = new QueryParser(
-						TestConstants.getTargetLuceneVersion(), "id",
-						TestConstants.stopAnalyzer
-				);
+				QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 				Query query;
 				try {
 					query = parser.parse( "name:emmanuel2" );

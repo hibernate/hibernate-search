@@ -45,7 +45,7 @@ public class OptimizeTest extends SearchTestBase {
 		//check non indexed object get indexed by s.index
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 		int result = s.createFullTextQuery( parser.parse( "body:wrote" ) ).getResultSize();
 		assertEquals( 2000, result );
 		s.createQuery( "delete " + Email.class.getName() ).executeUpdate();

@@ -40,7 +40,7 @@ public class InheritanceTest extends SearchTestBase {
 	public void testSearchUnindexClass() throws Exception {
 		createTestData();
 
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -71,7 +71,7 @@ public class InheritanceTest extends SearchTestBase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
 		assertItsTheElephant( hibQuery.list() );
@@ -109,7 +109,7 @@ public class InheritanceTest extends SearchTestBase {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
@@ -241,7 +241,7 @@ public class InheritanceTest extends SearchTestBase {
 	}
 
 	private void assertNumberOfAnimals(FullTextSession s, int count) throws Exception {
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant OR White Pointer OR Chimpanzee OR Dove or Eagle" );
 		List result = s.createFullTextQuery( query, Animal.class ).list();
 		assertNotNull( result );

@@ -39,7 +39,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.hibernate.search.query.engine.impl.FieldNameCollector;
-import org.hibernate.search.testsupport.TestConstants;
 
 import static org.junit.Assert.fail;
 
@@ -184,9 +183,7 @@ public class FieldNameCollectorTest {
 	}
 
 	private void indexTestDocuments(Directory directory) throws IOException {
-		IndexWriterConfig indexWriterConfig = new IndexWriterConfig(
-				TestConstants.getTargetLuceneVersion(), new StandardAnalyzer()
-		);
+		IndexWriterConfig indexWriterConfig = new IndexWriterConfig( new StandardAnalyzer() );
 		indexWriterConfig.setOpenMode( IndexWriterConfig.OpenMode.CREATE );
 		IndexWriter indexWriter = new IndexWriter( directory, indexWriterConfig );
 		Document document = new Document();
