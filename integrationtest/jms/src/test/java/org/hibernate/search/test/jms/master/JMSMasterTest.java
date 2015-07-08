@@ -32,14 +32,14 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.SearchTestBase;
@@ -91,7 +91,7 @@ public class JMSMasterTest extends SearchTestBase {
 		{
 			FullTextSession ftSess = Search.getFullTextSession( openSession() );
 			ftSess.getTransaction().begin();
-			QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+			QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 			Query luceneQuery = parser.parse( "logo:jboss" );
 			org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
 			List result = query.list();
@@ -118,7 +118,7 @@ public class JMSMasterTest extends SearchTestBase {
 			{
 				FullTextSession ftSess = Search.getFullTextSession( openSession() );
 				ftSess.getTransaction().begin();
-				QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+				QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 				Query luceneQuery = parser.parse( "logo:jboss" );
 				{
 					org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
@@ -243,7 +243,7 @@ public class JMSMasterTest extends SearchTestBase {
 				statement.close();
 			}
 		} );
-		TShirt ts = (TShirt) s.get( TShirt.class, 1 );
+		TShirt ts = s.get( TShirt.class, 1 );
 		s.getTransaction().commit();
 		s.close();
 		return ts;

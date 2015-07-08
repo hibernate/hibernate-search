@@ -46,7 +46,6 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		FullTextSession masterSession;
 
 		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
 				"id",
 				TestConstants.stopAnalyzer
 		);

@@ -67,7 +67,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		// assert that the slave index is empty
 		FullTextSession fullTextSession = Search.getFullTextSession( getSlaveSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 		List result = fullTextSession.createFullTextQuery( parser.parse( "location:texas" ) ).list();
 		assertEquals( "No copy yet, fresh index expected", 0, result.size() );
 		tx.commit();

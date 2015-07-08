@@ -110,7 +110,7 @@ public class CompressionTest extends SearchTestBase {
 		openSession().beginTransaction();
 		try {
 			FullTextSession fullTextSession = Search.getFullTextSession( getSession() );
-			QueryParser queryParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "", new SimpleAnalyzer( TestConstants.getTargetLuceneVersion() ) );
+			QueryParser queryParser = new QueryParser( "", new SimpleAnalyzer() );
 			Query query = queryParser.parse( queryString );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
 					query,

@@ -16,7 +16,6 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -54,7 +53,7 @@ public class AnalyzerInheritanceTest extends SearchTestBase {
 		tx = s.beginTransaction();
 
 
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", s.getSearchFactory().getAnalyzer( SubClass.class ) );
+		QueryParser parser = new QueryParser( "name", s.getSearchFactory().getAnalyzer( SubClass.class ) );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "name:Proca\u00EFne" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery, SubClass.class );
 		assertEquals( 1, query.getResultSize() );
