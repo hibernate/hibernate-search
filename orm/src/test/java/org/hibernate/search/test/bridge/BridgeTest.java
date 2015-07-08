@@ -79,7 +79,7 @@ public class BridgeTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
 		Query query;
 		List result;
 
@@ -156,7 +156,7 @@ public class BridgeTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.simpleAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.simpleAnalyzer );
 		Query query;
 		List result;
 

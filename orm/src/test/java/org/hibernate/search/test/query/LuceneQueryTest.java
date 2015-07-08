@@ -52,7 +52,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testList() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
@@ -96,7 +96,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testResultSize() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
 		Statistics stats = fullTextSession.getSessionFactory().getStatistics();
@@ -126,7 +126,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testResultSizeWithOffset() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
@@ -143,7 +143,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testMaxResultLessThanTotalNumberOfHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
@@ -161,7 +161,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testMaxResultMoreThanTotalNumberOfHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
@@ -179,7 +179,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testMaxResultWithOffset() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
@@ -198,7 +198,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testIterator() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
@@ -233,7 +233,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testScrollableResultSet() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
@@ -264,7 +264,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testDefaultFetchSize() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -286,7 +286,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testFetchSizeLargerThanHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -307,7 +307,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testFetchSizeDefaultFirstAndMax() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -340,7 +340,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testFetchSizeNonDefaultFirstAndMax() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -381,7 +381,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testFetchSizeNonDefaultFirstAndMaxNoHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:XXX" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -408,7 +408,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testMaxResultZero() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 		Query query = parser.parse( "dept:foo" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setFirstResult( 0 );
@@ -431,7 +431,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testCurrent() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -485,7 +485,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		tx.commit();
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
@@ -532,7 +532,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testCriteria() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
@@ -559,7 +559,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testScrollEmptyHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:XXX" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -586,7 +586,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testListEmptyHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:XXX" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -605,7 +605,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	public void testIterateEmptyHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:XXX" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );

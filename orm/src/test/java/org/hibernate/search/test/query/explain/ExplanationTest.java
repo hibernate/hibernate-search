@@ -43,7 +43,7 @@ public class ExplanationTest extends SearchTestBase {
 		Map<String, Float> boosts = new HashMap<String, Float>(2);
 		boosts.put( "title", new Float(4) );
 		boosts.put( "description", new Float(1) );
-		MultiFieldQueryParser parser = new MultiFieldQueryParser( TestConstants.getTargetLuceneVersion(), new String[] {"title", "description"},
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[] {"title", "description"},
 				TestConstants.standardAnalyzer, boosts );
 		Query luceneQuery = parser.parse( "dark" );
 		FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )

@@ -15,11 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
@@ -167,7 +167,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 
 		MockIndexReader(AtomicBoolean isIndexReaderCurrent) {
 			//make the super constructor happy as the class is "locked down"
-			super( new RAMDirectory(), new AtomicReader[0] );
+			super( new RAMDirectory(), new LeafReader[0] );
 			this.isIndexReaderCurrent = isIndexReaderCurrent;
 			if ( !isIndexReaderCurrent.compareAndSet( false, true ) ) {
 				throw new IllegalStateException( "Unnecessarily reopened" );

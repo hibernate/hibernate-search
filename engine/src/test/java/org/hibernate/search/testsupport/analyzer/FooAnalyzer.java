@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.testsupport.analyzer;
 
-import java.io.Reader;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.LowerCaseTokenizer;
-import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * @author Hardy Ferentschik
@@ -22,9 +19,9 @@ public final class FooAnalyzer extends Analyzer {
 	}
 
 	@Override
-	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+	protected TokenStreamComponents createComponents(String fieldName) {
 		//Not particularly important, but at least it's a fully functional Analyzer:
-		return new TokenStreamComponents( new LowerCaseTokenizer( TestConstants.getTargetLuceneVersion(), reader ) );
+		return new TokenStreamComponents( new LowerCaseTokenizer() );
 	}
 
 }
