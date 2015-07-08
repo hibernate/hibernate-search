@@ -25,8 +25,9 @@ import static org.junit.Assert.fail;
  */
 public class CustomLockProviderTest {
 
-	private static final String SINGLE_INSTANCE_LOCK_FQN = "org.hibernate.search.test.directoryProvider.SingleInstanceLock";
-	private static final String NATIVE_LOCK_FQN = "org.apache.lucene.store.NativeFSLockFactory.NativeFSLock";
+	private static final String SINGLE_INSTANCE_LOCK_FQN = "org.apache.lucene.store.SingleInstanceLockFactory$SingleInstanceLock";
+	private static final String SIMPLE_LOCK_FQN = "org.apache.lucene.store.SimpleFSLockFactory$SimpleFSLock";
+	private static final String NATIVE_LOCK_FQN = "org.apache.lucene.store.NativeFSLockFactory$NativeFSLock";
 
 	@Test
 	public void testUseOfCustomLockingFactory() {
@@ -76,7 +77,7 @@ public class CustomLockProviderTest {
 
 	@Test
 	public void testUseOfSimpleLockingFactory() {
-		testUseOfSelectedLockingFactory( "simple", SINGLE_INSTANCE_LOCK_FQN, false );
+		testUseOfSelectedLockingFactory( "simple", SIMPLE_LOCK_FQN, false );
 	}
 
 	private void testUseOfSelectedLockingFactory(String optionName, String expectedLockTypeName, boolean useRamDirectory) {
