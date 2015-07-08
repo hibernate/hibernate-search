@@ -17,10 +17,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.util.BitDocIdSet;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.FixedBitSet;
 import org.apache.lucene.util.OpenBitSet;
-import org.apache.lucene.util.packed.EliasFanoDocIdSet;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 import org.junit.Test;
 
@@ -306,7 +306,7 @@ public class AndDocIdSetsTest {
 		idSet1.or( integersToDocIdSet( 0, 5, 6, 10 ).iterator() );
 		FixedBitSet idSet2 = new FixedBitSet( 7 );
 		idSet2.set( 6 );
-		AndDocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
+		AndDocIdSet actual = createAndDocIdSet( new BitDocIdSet( idSet1 ), new BitDocIdSet( idSet2 ) );
 
 		DocIdSet expected = integersToDocIdSet( 6 );
 		assertTrue( docIdSetsEqual( expected, actual ) );
