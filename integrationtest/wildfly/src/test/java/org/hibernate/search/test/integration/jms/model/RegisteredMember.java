@@ -31,7 +31,7 @@ public class RegisteredMember implements Serializable {
 	@GeneratedValue
 	private Long id;
 
-	@Field(index = Index.YES, store = Store.NO)
+	@Field(index = Index.YES, store = Store.YES)
 	private String name;
 
 	@Field(index = Index.YES, store = Store.NO)
