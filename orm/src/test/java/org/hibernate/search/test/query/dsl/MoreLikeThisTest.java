@@ -43,8 +43,9 @@ public class MoreLikeThisTest extends SearchTestBase {
 	private static final Log log = LoggerFactory.make();
 
 	private FullTextSession fullTextSession;
-	private boolean outputLogs = false;
+	private final boolean outputLogs = false;
 
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -66,7 +67,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.comparingAllFields()
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			List<Object[]> results = (List<Object[]>) fullTextSession
+			List<Object[]> results = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -99,7 +100,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			results = (List<Object[]>) fullTextSession
+			results = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -147,7 +148,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			List<Object[]> results = (List<Object[]>) fullTextSession
+			List<Object[]> results = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -159,7 +160,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntity( decaffInstance )
 					.createQuery();
-			List<Object[]> entityResults = (List<Object[]>) fullTextSession
+			List<Object[]> entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -192,7 +193,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntity( copyOfDecaffInstance )
 					.createQuery();
-			entityResults = (List<Object[]>) fullTextSession
+			entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -222,7 +223,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntity( copyOfDecaffInstance )
 					.createQuery();
-			entityResults = (List<Object[]>) fullTextSession
+			entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -261,7 +262,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			results = (List<Object[]>) fullTextSession
+			results = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -272,7 +273,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			List<Object[]> resultsWoComparingEntity = (List<Object[]>) fullTextSession
+			List<Object[]> resultsWoComparingEntity = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -305,7 +306,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.comparingField( "brand.description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			entityResults = (List<Object[]>) fullTextSession
+			entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -344,7 +345,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.comparingField( "brand.name" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			entityResults = (List<Object[]>) fullTextSession
+			entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
