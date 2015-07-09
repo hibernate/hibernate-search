@@ -67,7 +67,7 @@ public class WorkDuplicationTest extends SearchTestBase {
 		// search if the record made it into the index
 		tx = s.beginTransaction();
 		String searchQuery = "Joe";
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "Content", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "Content", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( searchQuery );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		List results = query.list();

@@ -63,11 +63,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 			tx.commit();
 		}
 
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
-				"title",
-				TestConstants.keywordAnalyzer
-		);
+		QueryParser parser = new QueryParser( "title", TestConstants.keywordAnalyzer );
 		luceneQuery = parser.parse( "name:moo OR title:moo OR body:moo" );
 	}
 
@@ -88,11 +84,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 		);
 
 		FullTextSession s = Search.getFullTextSession( session );
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
-				"title",
-				TestConstants.keywordAnalyzer
-		);
+		QueryParser parser = new QueryParser( "title", TestConstants.keywordAnalyzer );
 		Query query = parser.parse( "name:charles" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Author.class, Music.class );
 		List result = hibQuery.list();

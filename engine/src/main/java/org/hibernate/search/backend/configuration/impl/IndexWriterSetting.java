@@ -107,13 +107,11 @@ public enum IndexWriterSetting implements Serializable {
 			writerConfig.setRAMBufferSizeMB( value );
 		}
 	},
-	/**
-	 * @see org.apache.lucene.index.IndexWriterConfig#setTermIndexInterval(int)
-	 */
+	@Deprecated
 	TERM_INDEX_INTERVAL( "term_index_interval" ) {
 		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
-			writerConfig.setTermIndexInterval( value );
+			//TODO update documentation
 		}
 	},
 	/**

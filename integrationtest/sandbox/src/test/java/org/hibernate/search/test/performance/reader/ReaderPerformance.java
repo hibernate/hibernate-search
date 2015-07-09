@@ -82,8 +82,8 @@ public abstract class ReaderPerformance extends SearchTestBase {
 		FSDirectory directory = FSDirectory.open(
 				new File( getIndexBaseDir(), Detective.class.getCanonicalName() )
 		);
-		SimpleAnalyzer analyzer = new SimpleAnalyzer( Version.LUCENE_CURRENT );
-		IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_CURRENT, analyzer);
+		SimpleAnalyzer analyzer = new SimpleAnalyzer();
+		IndexWriterConfig cfg = new IndexWriterConfig( analyzer );
 		IndexWriter iw = new IndexWriter( directory, cfg );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );

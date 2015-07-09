@@ -11,23 +11,22 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
-import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
-import org.apache.lucene.analysis.miscellaneous.LengthFilterFactory;
+import org.apache.lucene.analysis.charfilter.MappingCharFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseTokenizerFactory;
-import org.apache.lucene.analysis.charfilter.MappingCharFilterFactory;
+import org.apache.lucene.analysis.core.StopFilterFactory;
 import org.apache.lucene.analysis.en.PorterStemFilterFactory;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
+import org.apache.lucene.analysis.miscellaneous.LengthFilterFactory;
+import org.apache.lucene.analysis.miscellaneous.TrimFilterFactory;
+import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilterFactory;
+import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
+import org.apache.lucene.analysis.phonetic.PhoneticFilterFactory;
 import org.apache.lucene.analysis.shingle.ShingleFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.apache.lucene.analysis.core.StopFilterFactory;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
-import org.apache.lucene.analysis.miscellaneous.TrimFilterFactory;
-import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilterFactory;
-import org.apache.lucene.analysis.phonetic.PhoneticFilterFactory;
-import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
-
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -125,8 +124,11 @@ import org.hibernate.search.annotations.TokenizerDef;
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = SynonymFilterFactory.class, params = {
-								@Parameter(name = "synonyms",
-										value = "org/hibernate/search/test/analyzer/synonyms.properties")
+								@Parameter(
+										name = "synonyms",
+										value = "org/hibernate/search/test/analyzer/synonyms.properties"
+								),
+								@Parameter(name = "expand", value = "false")
 						})
 				}),
 

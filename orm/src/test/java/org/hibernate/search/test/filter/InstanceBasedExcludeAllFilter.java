@@ -9,10 +9,10 @@ package org.hibernate.search.test.filter;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
-import org.apache.lucene.search.Filter;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.impl.AndDocIdSet;
@@ -30,8 +30,8 @@ public class InstanceBasedExcludeAllFilter extends Filter implements Serializabl
 	}
 
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
-		AtomicReader reader = context.reader();
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+		LeafReader reader = context.reader();
 		ExcludeAllFilter.verifyItsAReadOnlySegmentReader( reader );
 		return AndDocIdSet.EMPTY_DOCIDSET;
 	}
@@ -46,4 +46,8 @@ public class InstanceBasedExcludeAllFilter extends Filter implements Serializabl
 		}
 	}
 
+	@Override
+	public String toString(String field) {
+		return "";
+	}
 }

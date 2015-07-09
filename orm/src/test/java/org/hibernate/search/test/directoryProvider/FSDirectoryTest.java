@@ -10,11 +10,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -50,7 +50,8 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
+		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ) );
+
 		try {
 			IndexReader reader = DirectoryReader.open( dir );
 			try {
@@ -117,8 +118,8 @@ public class FSDirectoryTest extends SearchTestBase {
 	 */
 	private String projectSingleField(IndexReader reader, String fieldName, Term term) throws IOException {
 		String projection = null;
-		for ( AtomicReaderContext leaf : reader.leaves() ) {
-			final AtomicReader atomicReader = leaf.reader();
+		for ( LeafReaderContext leaf : reader.leaves() ) {
+			final LeafReader atomicReader = leaf.reader();
 			final DocsEnum termDocsEnum = atomicReader.termDocsEnum( term );
 			while ( termDocsEnum.nextDoc() != DocsEnum.NO_MORE_DOCS ) {
 				final int docID = termDocsEnum.docID();
@@ -145,11 +146,11 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
+		FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ) );
 		IndexReader indexReader = DirectoryReader.open( dir );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		try {
-			QueryParser qp = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+			QueryParser qp = new QueryParser( "id", TestConstants.standardAnalyzer );
 			Query query = qp.parse( "title:Action OR Abstract:Action" );
 			TopDocs hits = searcher.search( query, 1000 );
 			assertEquals( 2, hits.totalHits );
@@ -181,7 +182,8 @@ public class FSDirectoryTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
+		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ) );
+
 		IndexReader indexReader = DirectoryReader.open( dir );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		// deleting before search, but after IndexSearcher creation:

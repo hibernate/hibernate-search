@@ -32,8 +32,8 @@ import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.document.StoredField;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
+import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
@@ -344,9 +344,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addDocValuesFieldWithBinaryData(String name, String type, byte[] value, int offset, int length) {
-		FieldInfo.DocValuesType docValuesType = Enum.valueOf(
-				FieldInfo.DocValuesType.class, type
-		);
+		DocValuesType docValuesType = Enum.valueOf( DocValuesType.class, type );
 		Field docValuesField;
 		switch ( docValuesType ) {
 			// data is ByteRef
@@ -372,9 +370,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addDocValuesFieldWithNumericData(String name, String type, long value) {
-		FieldInfo.DocValuesType docValuesType = Enum.valueOf(
-				FieldInfo.DocValuesType.class, type
-		);
+		DocValuesType docValuesType = Enum.valueOf( DocValuesType.class, type );
 		Field docValuesField;
 		switch ( docValuesType ) {
 			case NUMERIC: {
@@ -416,14 +412,13 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private FieldType identifyFieldType(boolean stored, boolean indexed, boolean analyzed, SerializableTermVector termVector, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		final FieldType type = new FieldType();
 		type.setStored( stored );
-		type.setIndexed( indexed );
 		type.setTokenized( analyzed );
 		type.setStoreTermVectors( termVector != SerializableTermVector.NO );
 		type.setStoreTermVectorOffsets( termVector == SerializableTermVector.WITH_OFFSETS || termVector == SerializableTermVector.WITH_POSITIONS_OFFSETS );
 		type.setStoreTermVectorPayloads( termVector == SerializableTermVector.YES );
 		type.setStoreTermVectorPositions( termVector == SerializableTermVector.WITH_POSITIONS || termVector == SerializableTermVector.WITH_POSITIONS_OFFSETS );
 		type.setOmitNorms( omitNorms );
-		type.setIndexOptions( omitTermFreqAndPositions ? IndexOptions.DOCS_ONLY : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
+		type.setIndexOptions( omitTermFreqAndPositions ? IndexOptions.DOCS : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
 		return type;
 	}
 

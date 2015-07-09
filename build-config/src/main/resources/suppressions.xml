@@ -10,4 +10,7 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
     <suppress checks="." files="ConcurrentReferenceHashMap\.java$" />
+    <suppress checks="." files="OpenBitSetIterator\.java$" />
+    <suppress checks="." files="OpenBitSet\.java$" />
+    <suppress checks="." files="DocIdBitSet\.java$" />
 </suppressions>

@@ -28,7 +28,6 @@
         <module>backends/jms</module>
         <module>orm</module>
         <module>testing</module>
-        <module>infinispan</module>
         <module>modules</module>
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
@@ -136,12 +135,12 @@
 
     <properties>
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
-        <lucene.module.slot>4.10</lucene.module.slot>
+        <lucene.module.slot>5.2</lucene.module.slot>
         <jgroups.module.slot>ispn-7.2</jgroups.module.slot>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>4.10.4</luceneVersion>
+        <luceneVersion>5.2.1</luceneVersion>
         <infinispanVersion>7.2.0.Final</infinispanVersion>
         <jgroupsVersion>3.6.2.Final</jgroupsVersion>
         <hibernateVersion>5.0.0.CR2</hibernateVersion>
@@ -156,7 +155,6 @@
         <commonsCompressVersion>1.5</commonsCompressVersion>
         <commonsIoVersion>2.1</commonsIoVersion>
         <jbossTransactionApiVersion>1.0.0.Final</jbossTransactionApiVersion>
-        <commonsCodecVersion>1.6</commonsCodecVersion>
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <activeMQVersion>5.8.0</activeMQVersion>
         <commonsIoVersion>2.1</commonsIoVersion>
@@ -201,6 +199,16 @@
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
+                <version>${luceneVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-backward-codecs</artifactId>
+                <version>${luceneVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-misc</artifactId>
                 <version>${luceneVersion}</version>
             </dependency>
             <dependency>
@@ -445,11 +453,6 @@
                 <artifactId>hibernate-search-documentation</artifactId>
                 <type>pom</type>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>${commonsCodecVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>

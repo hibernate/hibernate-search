@@ -23,7 +23,6 @@ import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
@@ -318,11 +317,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 
 	private Query createLuceneQuery(String term, String value) {
 		String searchQuery = term + ":" + value;
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
-				term,
-				new StopAnalyzer( TestConstants.getTargetLuceneVersion() )
-		);
+		QueryParser parser = new QueryParser( term, new StopAnalyzer() );
 		Query luceneQuery;
 		try {
 			luceneQuery = parser.parse( searchQuery );

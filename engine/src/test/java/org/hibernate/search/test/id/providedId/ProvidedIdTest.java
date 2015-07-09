@@ -71,9 +71,7 @@ public class ProvidedIdTest {
 
 		tc.end();
 
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer
-		);
+		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Goat" );
 
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Search Query extension

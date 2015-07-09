@@ -70,7 +70,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestBase {
 		tx.commit();
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 14, result.size() );
 		for ( Object object : result ) {

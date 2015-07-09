@@ -13,18 +13,18 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FieldType.NumericType;
-import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexableField;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
-import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;
@@ -165,8 +165,8 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 				continue;
 			}
 
-			FieldInfo.DocValuesType docValuesType = fieldType.docValueType();
-			if ( docValuesType != null ) {
+			DocValuesType docValuesType = fieldType.docValuesType();
+			if ( docValuesType != null && docValuesType != DocValuesType.NONE ) {
 				serializeDocValues( serializer, (Field) fieldable );
 				continue;
 			}
@@ -182,7 +182,7 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 	}
 
 	private void serializeDocValues(Serializer serializer, Field field) {
-		FieldInfo.DocValuesType docValuesType = field.fieldType().docValueType();
+		DocValuesType docValuesType = field.fieldType().docValuesType();
 		switch ( docValuesType ) {
 			// data is a long value
 			case NUMERIC: {
@@ -209,6 +209,9 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 			}
 			case SORTED_SET: {
 				serializer.addDocValuesFieldWithBinaryValue( new LuceneFieldContext( field ) );
+				break;
+			}
+			case NONE: {
 				break;
 			}
 			default: {

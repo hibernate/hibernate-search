@@ -39,7 +39,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	public void setUp() {
 		super.setUp();
 		em = org.hibernate.search.jpa.Search.getFullTextEntityManager( factory.createEntityManager() );
-		queryParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "header", TestConstants.stopAnalyzer );
+		queryParser = new QueryParser( "header", TestConstants.stopAnalyzer );
 		createArticles();
 	}
 

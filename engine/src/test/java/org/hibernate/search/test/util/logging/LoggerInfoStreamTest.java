@@ -29,7 +29,7 @@ import static junit.framework.TestCase.assertFalse;
 
 public class LoggerInfoStreamTest {
 
-	private static final Version VERSION = Version.LUCENE_48;
+	private static final Version VERSION = Version.LUCENE_5_2_1;
 	private Level hsearchLevel;
 	private final Logger hsearchLogger = Logger.getLogger( "org.hibernate.search" );
 	private final Logger rootLogger = Logger.getRootLogger();
@@ -54,7 +54,7 @@ public class LoggerInfoStreamTest {
 		LoggerInfoStream infoStream = new LoggerInfoStream();
 
 		RAMDirectory directory = new RAMDirectory();
-		IndexWriterConfig indexWriterConfig = new IndexWriterConfig( VERSION, new StandardAnalyzer( VERSION ) );
+		IndexWriterConfig indexWriterConfig = new IndexWriterConfig( new StandardAnalyzer() );
 		indexWriterConfig.setInfoStream( infoStream );
 
 		IndexWriter indexWriter = new IndexWriter( directory, indexWriterConfig );

@@ -98,11 +98,7 @@ public class DynamicShardingTest extends SearchTestBase {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( session );
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
-				"id",
-				TestConstants.stopAnalyzer
-		);
+		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:bear OR name:elephant OR name:spider" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 3, results.size() );
@@ -143,7 +139,7 @@ public class DynamicShardingTest extends SearchTestBase {
 	}
 
 	private void assertNumberOfEntitiesInIndex(String indexName, int expectedCount) throws IOException {
-		FSDirectory fsDirectory = FSDirectory.open( getBaseIndexDir().resolve( indexName ).toFile() );
+		FSDirectory fsDirectory = FSDirectory.open( getBaseIndexDir().resolve( indexName ) );
 		try {
 			IndexReader reader = DirectoryReader.open( fsDirectory );
 			try {
