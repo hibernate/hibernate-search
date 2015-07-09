@@ -9,8 +9,6 @@ package org.hibernate.search.test.integration.jms.controller;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateful;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -28,9 +26,6 @@ public class RegistrationController {
 	@PersistenceContext
 	private EntityManager em;
 
-	@Resource
-	private SessionContext sessionContext;
-
 	private RegisteredMember newMember;
 
 	@Named
@@ -46,10 +41,10 @@ public class RegistrationController {
 	public void rollbackedRegister() throws Exception {
 		em.persist( newMember );
 		resetNewMember();
-		// forces to send a JMS messages
 		em.flush();
+		// force to flush the backend to send the JMS messages into the queue
 		Search.getFullTextEntityManager( em ).flushToIndexes();
-		sessionContext.setRollbackOnly();
+		throw new RuntimeException( "Shit happens" );
 	}
 
 	public int deleteAllMembers() throws Exception {

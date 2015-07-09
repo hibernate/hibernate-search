@@ -8,12 +8,13 @@
 package org.hibernate.search.test.integration.jms.transaction;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.InSequence;
+import org.junit.Assert;
 import org.junit.Test;
-
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 
@@ -136,9 +137,16 @@ public abstract class TransactionalJmsMasterSlave {
 
 		newMember.setName( "Emmanuel Bernard" );
 		newMember.setEmail( "e@slave2.fake.email" );
-		memberRegistration.rollbackedRegister();
-
-		assertNotNull( "A registered member should have an ID", newMember.getId() );
+		boolean gotAnException = false;
+		try {
+			memberRegistration.rollbackedRegister();
+		}
+		catch (RuntimeException e) {
+			assertEquals( RuntimeException.class, e.getCause().getClass() );
+			assertEquals( "Shit happens", e.getCause().getMessage() );
+			gotAnException = true;
+		}
+		Assert.assertTrue( gotAnException );
 	}
 
 	@Test
