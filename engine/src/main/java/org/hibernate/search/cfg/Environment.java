@@ -58,7 +58,15 @@ public final class Environment {
 
 
 	public static final String WORKER_SCOPE = "hibernate.search.worker.scope";
+
+	/**
+	 * When set to {@code true} the indexing operations will be passed to the indexing backend within
+	 * the transaction. When {@code false} the indexing backends are invoked as a post-transaction hook.
+	 * Setting this to {@code true} is currently only supported when you use the JMS backends exclusively.
+	 * Defaults to {@code false}.
+	 */
 	public static final String WORKER_ENLIST_IN_TRANSACTION = "hibernate.search.worker.enlist_in_transaction";
+
 	public static final String WORKER_PREFIX = "worker.";
 	public static final String WORKER_BACKEND = WORKER_PREFIX + "backend";
 	public static final String WORKER_EXECUTION = WORKER_PREFIX + "execution";

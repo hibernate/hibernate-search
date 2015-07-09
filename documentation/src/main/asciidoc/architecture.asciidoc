@@ -98,14 +98,22 @@ All index update operations applied on a given node are sent to a JMS queue. A u
 then process the queue and update the master index. The master index is then replicated on a regular
 basis to the slave copies. This is known as the master/slaves pattern. The master is the sole
 responsible for updating the Lucene index. The slaves can accept read as well as write operations.
-However, they only process the read operation on their local index copy and delegate the update
-operations to the master.
+However, while they process the read operations on their local index copy, they will delegate the
+update operations to the master.
 
 image::jms-backend.png[JMS back end configuration]
 
 This mode targets clustered environments where throughput is critical, and index update delays are
 affordable. Reliability is ensured by the JMS provider and by having the slaves working on a local
 copy of the index.
+
+The JMS integration can be transactional. With this backend (and currently only this backend) you
+can have Hibernate Search send the indexing work into the queue within the same transaction
+applying changes to the relational database. This options requires you to use an XA transaction.
+
+By default this backend's transactional capabilities are disabled: messages will be
+enqueued as a post-transaction event, consistently with other backends.
+To change this configuration see also <<configuration-worker>>.
 
 
 ==== JGroups
