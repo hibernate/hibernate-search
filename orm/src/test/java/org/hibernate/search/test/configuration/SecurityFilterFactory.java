@@ -15,8 +15,9 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.BitDocIdSet;
 import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.OpenBitSet;
+import org.apache.lucene.util.FixedBitSet;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.filter.FilterKey;
@@ -54,18 +55,18 @@ public class SecurityFilterFactory {
 		@Override
 		public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
 			final LeafReader reader = context.reader();
-			OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
+			FixedBitSet bits = new FixedBitSet( reader.maxDoc() );
 			DocsEnum termDocsEnum = reader.termDocsEnum( new Term( "owner", ownerName ) );
 			if ( termDocsEnum == null ) {
-				return bitSet;//All bits already correctly set
+				return new BitDocIdSet( bits );//All bits already correctly set
 			}
 			while ( termDocsEnum.nextDoc() != DocsEnum.NO_MORE_DOCS ) {
 				final int docID = termDocsEnum.docID();
 				if ( acceptDocs == null || acceptDocs.get( docID ) ) {
-					bitSet.set( docID );
+					bits.set( docID );
 				}
 			}
-			return bitSet;
+			return new BitDocIdSet( bits );
 		}
 
 		@Override

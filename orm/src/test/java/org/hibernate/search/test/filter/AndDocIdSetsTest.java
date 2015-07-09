@@ -20,7 +20,6 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BitDocIdSet;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.FixedBitSet;
-import org.apache.lucene.util.OpenBitSet;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 import org.junit.Test;
 
@@ -275,17 +274,6 @@ public class AndDocIdSetsTest {
 			fail( "these DocIdSetIterator instances should not throw any exceptions" );
 		}
 		return true;
-	}
-
-	// HSEARCH-610
-	@Test
-	public void testWithOpenBitSet() {
-		DocIdSet idSet1 = new OpenBitSet( new long[] { 1121 }, 1 ); // bits 0, 5, 6, 10
-		DocIdSet idSet2 = new OpenBitSet( new long[] { 64 }, 1 ); // bit 6
-		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
-
-		DocIdSet expected = integersToDocIdSet( 6 );
-		assertTrue( docIdSetsEqual( expected, actual ) );
 	}
 
 	// HSEARCH-610
