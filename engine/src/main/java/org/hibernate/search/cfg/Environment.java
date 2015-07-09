@@ -58,6 +58,7 @@ public final class Environment {
 
 
 	public static final String WORKER_SCOPE = "hibernate.search.worker.scope";
+	public static final String WORKER_ENLIST_IN_TRANSACTION = "hibernate.search.worker.enlist_in_transaction";
 	public static final String WORKER_PREFIX = "worker.";
 	public static final String WORKER_BACKEND = WORKER_PREFIX + "backend";
 	public static final String WORKER_EXECUTION = WORKER_PREFIX + "execution";

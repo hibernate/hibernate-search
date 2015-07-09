@@ -51,7 +51,7 @@ public class VersionTestHelper {
 		return hibernateSearchModuleSlot;
 	}
 
-	private static synchronized String getDependencyVersionHibernateSearch() {
+	public static synchronized String getDependencyVersionHibernateSearch() {
 		if ( hibernateSearchVersion == null ) {
 			hibernateSearchVersion = injectVariables( "${dependency.version.HibernateSearch}" );
 		}

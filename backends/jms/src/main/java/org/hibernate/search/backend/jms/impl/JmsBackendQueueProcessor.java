@@ -29,15 +29,20 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * Backend sending the workload via JMS.
+ * Optionally support transactions: the JMS messages can be sent as part of the current transaction.
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Yoann Gendre
  */
-public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor {
+public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor, BackendQueueProcessor.Transactional {
 
 	private String jmsQueueName;
 	protected static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
 	private Queue jmsQueue;
+	private QueueConnectionFactory factory;
 	private String indexName;
 	private SearchIntegrator integrator;
 	private QueueConnection connection;
@@ -51,19 +56,33 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 
 	private static final Log log = LoggerFactory.make();
 
+	private Properties props = null;
+	private boolean isTransactional;
+
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
+		this.props = props;
+		this.isTransactional = context.enlistWorkerInTransaction();
 		this.indexManager = indexManager;
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
 		this.integrator = context.getUninitializedSearchIntegrator();
-		QueueConnectionFactory factory = initializeJMSQueueConnectionFactory( props );
-		this.jmsQueue = initializeJMSQueue( factory, props );
-		this.connection = initializeJMSConnection( factory, props );
+		this.factory = initializeJMSQueueConnectionFactory( props );
+		if ( ! isTransactional ) {
+			// if we are not transactional, we can eagerly initialize the queue and connection
+			this.jmsQueue = initializeJMSQueue( factory, props );
+			this.connection = initializeJMSConnection( factory, props );
+		}
 	}
 
 	public Queue getJmsQueue() {
-		return jmsQueue;
+		if ( isTransactional ) {
+			// return jmsQueue;
+			return initializeJMSQueue( factory, props );
+		}
+		else {
+			return jmsQueue;
+		}
 	}
 
 	public String getJmsQueueName() {
@@ -105,7 +124,36 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 	}
 
 	public QueueConnection getJMSConnection() {
-		return connection;
+		// return connection;
+		if ( isTransactional ) {
+			return initializeJMSConnection( factory, props );
+		}
+		else {
+			return connection;
+		}
+	}
+
+	public void releaseJMSConnection(QueueConnection queueConnection) {
+		if ( isTransactional ) {
+			// we create the connection each time
+			// let's close it
+			try {
+				if ( queueConnection != null ) {
+					queueConnection.close();
+				}
+			}
+			catch (JMSException e) {
+				log.unableToCloseJmsConnection( jmsQueueName, e );
+			}
+		}
+		else {
+			// we share the connection accross calls
+			// noop
+		}
+	}
+
+	public boolean isTransactional() {
+		return isTransactional;
 	}
 
 	@Override

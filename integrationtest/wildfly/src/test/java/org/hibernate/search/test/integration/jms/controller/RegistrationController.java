@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.test.integration.jms.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateful;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -25,6 +28,9 @@ public class RegistrationController {
 	@PersistenceContext
 	private EntityManager em;
 
+	@Resource
+	private SessionContext sessionContext;
+
 	private RegisteredMember newMember;
 
 	@Named
@@ -35,6 +41,15 @@ public class RegistrationController {
 	public void register() throws Exception {
 		em.persist( newMember );
 		resetNewMember();
+	}
+
+	public void rollbackedRegister() throws Exception {
+		em.persist( newMember );
+		resetNewMember();
+		// forces to send a JMS messages
+		em.flush();
+		Search.getFullTextEntityManager( em ).flushToIndexes();
+		sessionContext.setRollbackOnly();
 	}
 
 	public int deleteAllMembers() throws Exception {
@@ -53,6 +68,20 @@ public class RegistrationController {
 				.keyword().onField( "name" ).matching( name ).createQuery();
 
 		return fullTextEm.createFullTextQuery( luceneQuery ).getResultList();
+	}
+
+	public List<String> searchName(String name) {
+		FullTextEntityManager fullTextEm = Search.getFullTextEntityManager( em );
+		Query luceneQuery = fullTextEm.getSearchFactory().buildQueryBuilder()
+				.forEntity( RegisteredMember.class ).get()
+				.keyword().onField( "name" ).matching( name ).createQuery();
+
+		List<?> resultList = fullTextEm.createFullTextQuery( luceneQuery ).setProjection( "name" ).getResultList();
+		List<String> names = new ArrayList<>( resultList.size() );
+		for ( Object projection : resultList ) {
+			names.add( (String) ( ( (Object[]) projection )[0] ) );
+		}
+		return names;
 	}
 
 	@PostConstruct
