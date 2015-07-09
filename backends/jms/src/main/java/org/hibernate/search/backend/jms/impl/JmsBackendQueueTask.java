@@ -9,6 +9,7 @@ package org.hibernate.search.backend.jms.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
@@ -19,7 +20,6 @@ import javax.jms.Session;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
@@ -71,6 +71,9 @@ public class JmsBackendQueueTask implements Runnable {
 			ObjectMessage message = session.createObjectMessage();
 			message.setObject( data );
 			message.setStringProperty( Environment.INDEX_NAME_JMS_PROPERTY, indexName );
+			if ( log.isDebugEnabled() ) {
+				attachDebugDetails( message );
+			}
 
 			sender = session.createSender( processor.getJmsQueue() );
 			sender.send( message );
@@ -84,4 +87,10 @@ public class JmsBackendQueueTask implements Runnable {
 			processor.releaseJMSConnection( connection );
 		}
 	}
+
+	private void attachDebugDetails(ObjectMessage message) throws JMSException {
+		UUID randomUUID = UUID.randomUUID();
+		message.setStringProperty( "HSearchMsgId", randomUUID.toString() );
+	}
+
 }
