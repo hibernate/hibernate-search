@@ -9,11 +9,13 @@ package org.hibernate.search.backend.jms.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
 import javax.jms.QueueConnection;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
+import javax.jms.Session;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.util.logging.impl.Log;
@@ -65,13 +67,7 @@ public class JmsBackendQueueTask implements Runnable {
 		QueueConnection connection = null;
 		try {
 			connection = processor.getJMSConnection();
-			// TODO make transacted parameterized
-			if ( processor.isTransactional() ) {
-				session = connection.createQueueSession( true, QueueSession.SESSION_TRANSACTED );
-			}
-			else {
-				session = connection.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
-			}
+			session = connection.createQueueSession( processor.isTransactional(), Session.DUPS_OK_ACKNOWLEDGE );
 			ObjectMessage message = session.createObjectMessage();
 			message.setObject( data );
 			message.setStringProperty( Environment.INDEX_NAME_JMS_PROPERTY, indexName );
