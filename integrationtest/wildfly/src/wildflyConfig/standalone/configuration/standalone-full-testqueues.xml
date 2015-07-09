@@ -84,7 +84,7 @@
     <profile>
         <subsystem xmlns="urn:jboss:domain:logging:3.0">
             <console-handler name="CONSOLE">
-                <level name="INFO"/>
+                <level name="DEBUG"/>
                 <formatter>
                     <named-formatter name="COLOR-PATTERN"/>
                 </formatter>
@@ -104,6 +104,9 @@
                 <level name="WARN"/>
             </logger>
             <logger category="org.jboss.as.config">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="org.hibernate.search">
                 <level name="DEBUG"/>
             </logger>
             <logger category="sun.rmi">
