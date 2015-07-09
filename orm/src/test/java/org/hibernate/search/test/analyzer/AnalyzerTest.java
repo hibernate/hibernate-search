@@ -105,7 +105,7 @@ public class AnalyzerTest extends SearchTestBase {
 		tx.commit();
 
 		tx = s.beginTransaction();
- 		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "entity:alarm" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery, MyEntity.class );
 		assertEquals( 1, query.getResultSize() );
