@@ -127,6 +127,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void performOperations(List<LuceneWork> workList, IndexingMonitor monitor) {
+		if ( log.isDebugEnabled() ) {
+			log.debug( "Sending work to backend of type " + backend.getClass() );
+		}
 		backend.applyWork( workList, monitor );
 	}
 

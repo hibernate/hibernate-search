@@ -62,7 +62,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		try {
 			indexName = extractIndexName( objectMessage );
 			if ( log.isDebugEnabled() ) {
-				logMessageDetials( objectMessage, indexName );
+				logMessageDetails( objectMessage, indexName );
 			}
 			indexManager = integrator.getIndexManager( indexName );
 			if ( indexManager == null ) {
@@ -85,9 +85,9 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		}
 	}
 
-	private void logMessageDetials(ObjectMessage objectMessage, String indexName) throws JMSException {
+	private void logMessageDetails(ObjectMessage objectMessage, String indexName) throws JMSException {
 		String id = objectMessage.getStringProperty( "HSearchMsgId" );
-		log.debug( "Message Received for index: '" + indexName + "' : " + id );
+		log.debug( "Message Received for index '" + indexName + "': " + id );
 	}
 
 	private String extractIndexName(ObjectMessage objectMessage) throws JMSException {

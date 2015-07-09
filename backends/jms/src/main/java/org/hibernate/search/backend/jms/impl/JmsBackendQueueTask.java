@@ -72,7 +72,7 @@ public class JmsBackendQueueTask implements Runnable {
 			message.setObject( data );
 			message.setStringProperty( Environment.INDEX_NAME_JMS_PROPERTY, indexName );
 			if ( log.isDebugEnabled() ) {
-				attachDebugDetails( message );
+				attachDebugDetails( message, indexName );
 			}
 
 			sender = session.createSender( processor.getJmsQueue() );
@@ -88,9 +88,10 @@ public class JmsBackendQueueTask implements Runnable {
 		}
 	}
 
-	private void attachDebugDetails(ObjectMessage message) throws JMSException {
-		UUID randomUUID = UUID.randomUUID();
-		message.setStringProperty( "HSearchMsgId", randomUUID.toString() );
+	private static void attachDebugDetails(ObjectMessage message, String indexName) throws JMSException {
+		String randomUUID = UUID.randomUUID().toString();
+		message.setStringProperty( "HSearchMsgId", randomUUID );
+		log.debug( "Enqueueing List<LuceneWork> for index '" + indexName + "' having id " + randomUUID );
 	}
 
 }

@@ -17,6 +17,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,6 +33,8 @@ import static org.junit.Assert.assertNull;
  * @author Davide D'Alto <davide@hibernate.org>
  */
 public abstract class TransactionalJmsMasterSlave {
+
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * Affects how often the Master and Slave directories should start the refresh copy work
@@ -56,6 +60,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(0)
 	@OperateOnDeployment("master")
 	public void deleteExistingMembers() throws Exception {
+		log.debug( "Test Sequence 0 / master" );
 		int deletedMembers = memberRegistration.deleteAllMembers();
 		assertEquals( "At the start of the test there should be no members", 0, deletedMembers );
 	}
@@ -64,6 +69,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(1)
 	@OperateOnDeployment("slave-1")
 	public void registerNewMemberOnSlave1() throws Exception {
+		log.debug( "Test Sequence 1 / slave-1" );
 		RegisteredMember newMember = memberRegistration.getNewMember();
 		assertNull( "A non registered member should have null ID", newMember.getId() );
 
@@ -78,6 +84,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(2)
 	@OperateOnDeployment("slave-2")
 	public void registerNewMemberOnSlave2() throws Exception {
+		log.debug( "Test Sequence 2 / slave-2" );
 		RegisteredMember newMember = memberRegistration.getNewMember();
 		assertNull( "A non registered member should have null ID", newMember.getId() );
 
@@ -92,6 +99,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(3)
 	@OperateOnDeployment("master")
 	public void registerNewMemberOnMaster() throws Exception {
+		log.debug( "Test Sequence 3 / master" );
 		RegisteredMember newMember = memberRegistration.getNewMember();
 		assertNull( "A non registered member should have null ID", newMember.getId() );
 
@@ -106,6 +114,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(4)
 	@OperateOnDeployment("slave-1")
 	public void searchNewMembersAfterSynchronizationOnSlave1() throws Exception {
+		log.debug( "Test Sequence 4 / slave-1" );
 		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
 		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
 		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
@@ -115,6 +124,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(5)
 	@OperateOnDeployment("slave-2")
 	public void searchNewMembersAfterSynchronizationOnSlave2() throws Exception {
+		log.debug( "Test Sequence 5 / slave-2" );
 		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
 		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
 		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
@@ -124,6 +134,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(6)
 	@OperateOnDeployment("master")
 	public void searchNewMembersAfterSynchronizationOnMaster() throws Exception {
+		log.debug( "Test Sequence 6 / master" );
 		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
 		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
 		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
@@ -133,6 +144,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(7)
 	@OperateOnDeployment("slave-2")
 	public void rollbackRegisterNewMemberOnSlave2() throws Exception {
+		log.debug( "Test Sequence 7 / slave-2" );
 		RegisteredMember newMember = memberRegistration.getNewMember();
 
 		newMember.setName( "Emmanuel Bernard" );
@@ -153,6 +165,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(8)
 	@OperateOnDeployment("slave-2")
 	public void searchRollbackedMemberAfterSynchronizationOnSlave2() throws Exception {
+		log.debug( "Test Sequence 8 / slave-2" );
 		// we need to explicitly wait because we need to detect the *effective* non operation execution (rollback)
 		// so the current search wait algorithm does not work
 		for ( int i = 0; i < MAX_PERIOD_RETRIES; i++ ) {
@@ -174,6 +187,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(9)
 	@OperateOnDeployment("slave-2")
 	public void searchNameShouldWorkOnSlave2() throws Exception {
+		log.debug( "Test Sequence 9 / slave-2" );
 		assertEquals( "Davide D'Alto", searchName( "davide" ).get( 0 ) );
 		assertEquals( "Peter O'Tall", searchName( "peter" ).get( 0 ) );
 		assertEquals( "Richard Mayhew", searchName( "richard" ).get( 0 ) );
