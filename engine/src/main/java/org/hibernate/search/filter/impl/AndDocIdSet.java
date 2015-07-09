@@ -12,7 +12,8 @@ import java.util.List;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.util.OpenBitSet;
+import org.apache.lucene.util.BitDocIdSet;
+import org.apache.lucene.util.FixedBitSet;
 
 import static java.lang.Math.max;
 
@@ -76,7 +77,7 @@ public class AndDocIdSet extends DocIdSet {
 	}
 
 	private DocIdSet makeDocIdSetOnAgreedBits(final DocIdSetIterator[] iterators) throws IOException {
-		final OpenBitSet result = new OpenBitSet( maxDocNumber );
+		final FixedBitSet result = new FixedBitSet( maxDocNumber );
 		final int numberOfIterators = iterators.length;
 
 		int targetPosition = findFirstTargetPosition( iterators, result );
@@ -100,11 +101,11 @@ public class AndDocIdSet extends DocIdSet {
 				position = iterator.advance( targetPosition );
 			}
 			if ( position == DocIdSetIterator.NO_MORE_DOCS ) {
-				return result;
+				return new BitDocIdSet( result );
 			} //exit condition
 			if ( position == targetPosition ) {
 				if ( ++votes == numberOfIterators ) {
-					result.fastSet( position );
+					result.set( position );
 					votes = 0;
 					targetPosition++;
 				}
@@ -122,7 +123,7 @@ public class AndDocIdSet extends DocIdSet {
 		return iterator.docID() == targetPosition;
 	}
 
-	private int findFirstTargetPosition(final DocIdSetIterator[] iterators, OpenBitSet result) throws IOException {
+	private int findFirstTargetPosition(final DocIdSetIterator[] iterators, FixedBitSet result) throws IOException {
 		int targetPosition = iterators[0].nextDoc();
 		if ( targetPosition == DocIdSetIterator.NO_MORE_DOCS ) {
 			// first iterator has no values, so skip all
@@ -147,7 +148,7 @@ public class AndDocIdSet extends DocIdSet {
 		// end iterator initialize
 
 		if ( allIteratorsShareSameFirstTarget ) {
-			result.fastSet( targetPosition );
+			result.set( targetPosition );
 			targetPosition++;
 		}
 

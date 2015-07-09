@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.DocIdBitSet;
-import org.apache.lucene.util.OpenBitSet;
 
 /**
  * Helper class to apply some common optimizations when
@@ -35,26 +34,19 @@ public final class FilterOptimizationHelper {
 	 */
 	public static List<DocIdSet> mergeByBitAnds(List<DocIdSet> docIdSets) {
 		int size = docIdSets.size();
-		List<OpenBitSet> openBitSets = new ArrayList<OpenBitSet>( size );
 		List<DocIdBitSet> docIdBitSets = new ArrayList<DocIdBitSet>( size );
 		List<DocIdSet> nonMergeAble = new ArrayList<DocIdSet>( size );
 		for ( DocIdSet set : docIdSets ) {
-			if ( set instanceof OpenBitSet ) {
-				openBitSets.add( (OpenBitSet) set );
-			}
-			else if (set instanceof DocIdBitSet) {
+			if ( set instanceof DocIdBitSet ) {
 				docIdBitSets.add( (DocIdBitSet) set );
 			}
 			else {
 				nonMergeAble.add( set );
 			}
 		}
-		if ( openBitSets.size() <= 1 && docIdBitSets.size() <= 1 ) {
+		if ( docIdBitSets.size() <= 1 ) {
 			//skip all work as no optimization is possible
 			return docIdSets;
-		}
-		if ( openBitSets.size() > 0 ) {
-			nonMergeAble.add( mergeByBitAndsForOpenBitSet( openBitSets ) );
 		}
 		if ( docIdBitSets.size() > 0 ) {
 			nonMergeAble.add( mergeByBitAndsForDocIdBitSet( docIdBitSets ) );
@@ -83,27 +75,4 @@ public final class FilterOptimizationHelper {
 		}
 		return new DocIdBitSet( result );
 	}
-
-	/**
-	 * Merges all OpenBitSet in a new OpenBitSet using
-	 * binary AND operations, which is usually more efficient
-	 * than using an iterator.
-	 * @param openBitSets
-	 * @return a new OpenBitSet, or the first element if only
-	 * one element was found in the list.
-	 */
-	private static OpenBitSet mergeByBitAndsForOpenBitSet(List<OpenBitSet> openBitSets) {
-		int listSize = openBitSets.size();
-		if ( listSize == 1 ) {
-			return openBitSets.get( 0 );
-		}
-		//we need to copy the first OpenBitSet because BitSet is modified by .logicalOp
-		OpenBitSet result = (OpenBitSet) openBitSets.get( 0 ).clone();
-		for ( int i = 1; i < listSize; i++ ) {
-			OpenBitSet openSet = openBitSets.get( i );
-			result.intersect( openSet );
-		}
-		return result;
-	}
-
 }
