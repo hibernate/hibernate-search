@@ -14,7 +14,6 @@ import java.util.List;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
-import org.apache.lucene.util.OpenBitSet;
 import org.hibernate.search.filter.impl.FilterOptimizationHelper;
 import org.junit.Test;
 
@@ -39,33 +38,11 @@ public class FiltersOptimizationTest {
 	@Test
 	public void testSkipMerging() {
 		List<DocIdSet> dataIn = new ArrayList<DocIdSet>( 3 );
-		dataIn.add( makeOpenBitSetTestSet( 1,2,3,5,8,9,10,11 ) );
 		dataIn.add( makeBitSetTestSet( 1,2,3,5,8,9,10,11,20 ) );
 		dataIn.add( makeAnonymousTestSet( 1,2,3,5,8,9,10,11 ) );
 		dataIn.add( makeAnonymousTestSet( 1,2,3,5,8,9,10,11,12 ) );
 		List<DocIdSet> merge = FilterOptimizationHelper.mergeByBitAnds( dataIn );
 		assertSame( dataIn, merge );
-	}
-
-	/**
-	 * In case two filters are of OpenBitSet implementation,
-	 * they should be AND-ed by using bit operations
-	 * (rather than build the iterator).
-	 * @throws IOException should not be thrown
-	 */
-	@Test
-	public void testDoMergingOnOpenBitSet() throws IOException {
-		List<DocIdSet> dataIn = new ArrayList<DocIdSet>( 3 );
-		dataIn.add( makeOpenBitSetTestSet( 1,2,5,8,9,10,11 ) );
-		dataIn.add( makeOpenBitSetTestSet( 1,2,3,5,8,11 ) );
-		DocIdSet unmergedSet = makeAnonymousTestSet( 1,2,3,5,8,9,10,11 );
-		dataIn.add( unmergedSet );
-		List<DocIdSet> merge = FilterOptimizationHelper.mergeByBitAnds( dataIn );
-		assertNotSame( dataIn, merge );
-
-		assertEquals( 2, merge.size() );
-		assertSame( unmergedSet, merge.get( 0 ) );
-		assertTrue( isIdSetSequenceSameTo( merge.get( 1 ), 1,2,5,8,11 ) );
 	}
 
 	/**
@@ -96,13 +73,13 @@ public class FiltersOptimizationTest {
 	@Test
 	public void testSelfIdSequenceTester() throws IOException {
 		assertTrue( isIdSetSequenceSameTo(
-				makeOpenBitSetTestSet( 1,2,3,5,8,11 ),
+				makeBitSetTestSet( 1,2,3,5,8,11 ),
 				1,2,3,5,8,11 ) );
 		assertFalse( isIdSetSequenceSameTo(
-				makeOpenBitSetTestSet( 1,2,3,5,8 ),
+				makeBitSetTestSet( 1,2,3,5,8 ),
 				1,2,3,5,8,11 ) );
 		assertFalse( isIdSetSequenceSameTo(
-				makeOpenBitSetTestSet( 1,2,3,5,8,11 ),
+				makeBitSetTestSet( 1,2,3,5,8,11 ),
 				1,2,3,5,8 ) );
 	}
 
@@ -135,23 +112,8 @@ public class FiltersOptimizationTest {
 	 * @return
 	 */
 	private DocIdSet makeAnonymousTestSet(int... docIds) {
-		DocIdSet idSet = makeOpenBitSetTestSet( docIds );
+		DocIdSet idSet = makeBitSetTestSet( docIds );
 		return new DocIdSetHiddenType( idSet );
-	}
-
-	/**
-	 * test helper, makes a prefilled OpenBitSet
-	 * @param enabledBits the ids it should contain
-	 * @return a new OpenBitSet
-	 */
-	private OpenBitSet makeOpenBitSetTestSet(int... enabledBits) {
-		OpenBitSet set = new OpenBitSet();
-		for ( int position : enabledBits ) {
-			// a minimal check for input duplicates:
-			assertFalse( set.get( position ) );
-			set.set( position );
-		}
-		return set;
 	}
 
 	/**
