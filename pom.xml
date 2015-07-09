@@ -156,7 +156,6 @@
         <commonsCompressVersion>1.5</commonsCompressVersion>
         <commonsIoVersion>2.1</commonsIoVersion>
         <jbossTransactionApiVersion>1.0.0.Final</jbossTransactionApiVersion>
-        <commonsCodecVersion>1.6</commonsCodecVersion>
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <activeMQVersion>5.8.0</activeMQVersion>
         <commonsIoVersion>2.1</commonsIoVersion>
@@ -439,11 +438,6 @@
                 <artifactId>hibernate-search-documentation</artifactId>
                 <type>pom</type>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>${commonsCodecVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>

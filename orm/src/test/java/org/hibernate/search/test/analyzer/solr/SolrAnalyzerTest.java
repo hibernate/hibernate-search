@@ -130,9 +130,9 @@ public class SolrAnalyzerTest extends SearchTestBase {
 		assertTokensEqual( tokens, new String[] { "Camel", "Case" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "synonym_analyzer" );
-		text = "ipod cosmos";
+		text = "ipod universe cosmos";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		assertTokensEqual( tokens, new String[] { "ipod", "i-pod", "universe", "cosmos" } );
+		assertTokensEqual( tokens, new String[] { "ipod", "universe", "universe" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "shingle_analyzer" );
 		text = "please divide this sentence into shingles";
