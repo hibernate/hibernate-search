@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.spatial.impl;
 
+import static org.hibernate.search.spatial.impl.CoordinateHelper.coordinate;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -54,8 +56,8 @@ public class DistanceCollector extends Collector {
 	public void collect(final int doc) throws IOException {
 		delegate.collect( doc );
 		final int absolute = docBase + doc;
-		double lat = Double.longBitsToDouble( latitudeValues.get( doc ) );
-		double lon = Double.longBitsToDouble( longitudeValues.get( doc ) );
+		double lat = coordinate( latitudeValues, doc );
+		double lon = coordinate( longitudeValues, doc );
 		distances.put( absolute, lat, lon );
 	}
 

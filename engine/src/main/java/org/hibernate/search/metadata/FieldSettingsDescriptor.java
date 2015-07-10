@@ -87,7 +87,12 @@ public interface FieldSettingsDescriptor {
 		/**
 		 * A numeric field
 		 */
-		NUMERIC
+		NUMERIC,
+
+		/**
+		 * A spatial field
+		 */
+		SPATIAL
 	}
 }
 

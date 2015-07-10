@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.lucene.search.Sort;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.hibernate.Transaction;
@@ -175,9 +174,33 @@ public class SpatialIndexingTest extends SearchTestBase {
 	}
 
 	@Test
-	@Ignore
 	@TestForIssue(jiraKey = "HSEARCH-1708")
-	public void testNonGeoDistanceSort() throws Exception {
+	public void testNonGeoDistanceSortOnNonSpatialField() throws Exception {
+		double centerLatitude = 24.0d;
+		double centerLongitude = 32.0d;
+
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( NonGeoPOI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
+
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, NonGeoPOI.class );
+		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "name" ) );
+		hibQuery.setSort( distanceSort );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		try {
+			hibQuery.list();
+			fail( "Sorting on a field that it is not a coordinate should fail" );
+		}
+		catch (SearchException e) {
+			assertTrue( "Wrong error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000277: " ) );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1708")
+	public void testNonGeoDistanceSortOnMissingField() throws Exception {
 		double centerLatitude = 24.0d;
 		double centerLongitude = 32.0d;
 
@@ -191,9 +214,13 @@ public class SpatialIndexingTest extends SearchTestBase {
 		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
-
-		// TODO - unclear what this should to. See HSEARCH-1708. ATM the calculated distance is the same for all points.
-		hibQuery.list();
+		try {
+			hibQuery.list();
+			fail( "Sorting on a field not indexed should fail" );
+		}
+		catch (SearchException e) {
+			assertTrue( "Wrong error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000278: " ) );
+		}
 	}
 
 	@Test

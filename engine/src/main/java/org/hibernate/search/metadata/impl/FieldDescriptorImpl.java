@@ -149,6 +149,9 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		if ( documentFieldMetadata.isNumeric() ) {
 			return Type.NUMERIC;
 		}
+		else if ( documentFieldMetadata.isSpatial() ) {
+			return Type.SPATIAL;
+		}
 		else {
 			return Type.BASIC;
 		}
