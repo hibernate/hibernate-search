@@ -35,6 +35,8 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
  */
 public final class DeploymentJmsMasterSlave {
 
+	public static final String CONFIGURATION_PROPERTIES_RESOURCENAME = "configuration.properties";
+
 	private DeploymentJmsMasterSlave() {
 		//not allowed
 	}
@@ -60,6 +62,7 @@ public final class DeploymentJmsMasterSlave {
 						MasterSlaveTestTemplate.class,
 						TransactionalJmsMasterSlave.class
 				)
+				.addAsResource( new StringAsset( "deploymentName=" + name ), CONFIGURATION_PROPERTIES_RESOURCENAME )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return webArchive;
