@@ -465,7 +465,7 @@ shown in <<table-worker-configuration>>.
 
 |===============
 |*Property*|*Description*
-|hibernate.search.default.worker.scope|The fully qualified class name of the
+|hibernate.search.worker.scope|The fully qualified class name of the
             Worker implementation to use. If this
             property is not set, empty or `transaction` the
             default TransactionalWorker is
@@ -474,6 +474,10 @@ shown in <<table-worker-configuration>>.
             `hibernate.search.default.worker` are passed to the
             Worker during initialization. This allows adding custom, worker
             specific parameters.
+|hibernate.search.worker.enlist_in_transaction|Defaults to `false`. Set it to `true`
+            to have all indexing work sent to the queue within the same transaction
+            as the Hibernate ORM Sesssion. This options should only be enabled when all
+            backends use JMS and the queues are configured to be transactional, XA enabled.
 
 |===============
 
@@ -601,10 +605,25 @@ hibernate.search.default.worker.jms.login = myname
 hibernate.search.default.worker.jms.password = wonttellyou
 #optional jndi configuration (check your JMS provider for more information)
 
-## Optional asynchronous execution strategy
-# hibernate.search.default.worker.execution = async
+## Enqueue indexing tasks within an XA transaction with the database (optional)
+hibernate.search.worker.enlist_in_transaction = true
 ----
 ====
+
+The `enlist_in_transaction` option can be enabled if you need strict guarantees of
+indexing work to be stored in the queue within the same transaction of the database
+changes, however this will require both the RDBMs datasource and the JMS queue to be XA enabled.
+
+Make sure to use a XA JMS queue
+and that your database supports XA as we are talking about coordinated transactional systems.
+
+The default for `enlist_in_transaction` is `false` as often it is desirable to not have
+the database transaction fail in case there are issues with indexing.
+
+It is possible to apply compensating operations to the index by implementing a custom
+`ErrorHandler` (see <<exception-handling>>), or simply re-synchronize the whole index
+state by starting the MassIndexer (see <<search-batchindex-massindexer>>.
+
 
 [TIP]
 ====
@@ -957,6 +976,7 @@ example.provider.serializer.ExampleOfSerializationProvider
 
 You will find more details about services in the section <<section-services>>.
 
+[[exception-handling]]
 === Exception handling
 
 Hibernate Search allows you to configure how exceptions are handled during the indexing process. If
