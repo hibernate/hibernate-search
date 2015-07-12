@@ -15,7 +15,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
@@ -70,10 +69,6 @@ public class MemberRegistrationEarArchiveIT {
 				// The deployment Scanner is disabled as the JipiJapa integration is not available because of the custom Hibernate ORM module:
 				.clazz( Member.class.getName() )
 				.getOrCreateProperties()
-					//Only needed because we override the Hibernate ORM module with a custom one:
-					.createProperty().name( "jboss.as.jpa.providerModule" ).value( VersionTestHelper.injectVariables( "org.hibernate.search.hibernate-orm-repackage:${dependency.version.HibernateSearch}" ) ).up()
-					//Only needed because the above custom module also disables the default integration adapters:
-					.createProperty().name( "hibernate.transaction.jta.platform" ).value( "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" ).up()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()

@@ -1,7 +1,1 @@
-RULE Disable all JPA Persistence adaptors
-CLASS org.jboss.as.jpa.processor.PersistenceProviderAdaptorLoader
-METHOD loadPersistenceAdapter(PersistenceProvider, Platform)
-AT ENTRY
-IF true
-DO return org.jboss.as.jpa.processor.PersistenceProviderAdaptorLoader.noopAdaptor;
-ENDRULE
+# Currently empty. Leaving this file to make it easy to enable Byteman rules as needed.

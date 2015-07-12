@@ -82,7 +82,7 @@ public class VersionTestHelper {
 	}
 
 	private static String getWildFlyModuleDependencies() {
-		return "org.hibernate.search.orm:" + getModuleSlotString() + " services, org.hibernate.search.hibernate-orm-repackage:" + getModuleSlotString() + " export";
+		return "org.hibernate.search.orm:" + getModuleSlotString() + " services";
 	}
 
 	/**

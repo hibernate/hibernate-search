@@ -10,7 +10,6 @@ import static org.hibernate.search.test.integration.VersionTestHelper.addDepende
 
 import java.io.File;
 
-import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jms.MasterSlaveTestTemplate;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
@@ -92,14 +91,6 @@ public class JGroupsDeploymentHelper {
 						.createProperty()
 							.name( "hibernate.search.services.jgroups.configurationFile" )
 							.value( "testing-flush-loopback.xml" )
-							.up()
-						.createProperty()
-							.name( "jboss.as.jpa.providerModule" )
-							.value( VersionTestHelper.injectVariables( "org.hibernate.search.hibernate-orm-repackage:${dependency.version.HibernateSearch}" ) )
-							.up()
-						.createProperty()
-							.name( "hibernate.transaction.jta.platform" )
-							.value( "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" )
 							.up()
 						.createProperty()
 							.name( "hibernate.hbm2ddl.auto" )

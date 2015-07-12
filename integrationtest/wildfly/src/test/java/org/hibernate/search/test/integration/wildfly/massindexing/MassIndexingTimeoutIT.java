@@ -59,10 +59,6 @@ public class MassIndexingTimeoutIT {
 				.clazz( Concert.class.getName() )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
-					//Only needed because we override the Hibernate ORM module with a custom one:
-					.createProperty().name( "jboss.as.jpa.providerModule" ).value( VersionTestHelper.injectVariables( "org.hibernate.search.hibernate-orm-repackage:${dependency.version.HibernateSearch}" ) ).up()
-					//Only needed because the above custom module also disables the default integration adapters:
-					.createProperty().name( "hibernate.transaction.jta.platform" ).value( "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" ).up()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
