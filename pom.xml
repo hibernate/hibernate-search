@@ -1116,8 +1116,8 @@
         <profile>
             <id>integration-wildfly</id>
             <activation>
-                <!-- WildFly9 & HornetQ won't work on JDK9  -->
-                <jdk>[1.7,1.8]</jdk>
+                <!-- WildFly 10 requires JDK8 at least, works fine on JDK9  -->
+                <jdk>[1.8,1.9]</jdk>
             </activation>
             <modules>
                 <module>integrationtest/wildfly</module>
