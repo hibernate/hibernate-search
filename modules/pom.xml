@@ -71,13 +71,6 @@
     <build>
         <plugins>
             <plugin>
-                <!-- Temporary: see HSEARCH-1893 -->
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <finalName>${project.artifactId}-${project.version}</finalName>
