@@ -31,21 +31,6 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${aliases.xml.basedir}/search/hibernate-orm-repackage/module.xml</source>
-            <outputDirectory>/org/hibernate/search/hibernate-orm-repackage/${hibernate.search.module.slot}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/search/hibernate-orm-repackage/module.xml</source>
-            <outputDirectory>/org/hibernate/search/hibernate-orm-repackage/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${module.xml.basedir}/search/hibernate-infinispan-repackage/module.xml</source>
-            <outputDirectory>/org/hibernate/search/hibernate-infinispan-repackage/${hibernate.search.version}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
             <source>${module.xml.basedir}/search/orm/module.xml</source>
             <outputDirectory>/org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
@@ -130,28 +115,6 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.apache.lucene:*</include>
-            </includes>
-        </dependencySet>
-
-        <!-- Include custom version of Hibernate ORM -->
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/hibernate-orm-repackage/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.hibernate:hibernate-core</include>
-                <include>org.hibernate:hibernate-entitymanager</include>
-                <include>org.hibernate:hibernate-envers</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/hibernate-infinispan-repackage/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.hibernate:hibernate-infinispan</include>
             </includes>
         </dependencySet>
 
