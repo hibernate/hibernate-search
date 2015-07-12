@@ -1382,14 +1382,16 @@ configuration.
 [[search-configuration-deploy-on-wildfly]]
 === Hibernate Search as a WildFly module
 
-Hibernate Search is included in the WildFly 8 application server, but you need to activate the module
+Hibernate Search is included in the WildFly application server, but you need to activate the module
 for your deployment to be able to take advantage of it.
 
 You can either activate the modules already included in your WildFly distribution, or download and
-unzip a different version provided by Hibernate Search. The modules system in WildFly
-allows to safely run multiple versions of Hibernate ORM and Hibernate Search in parallel.
-You can pick the one you need for each deployment.
+unzip a different version provided by Hibernate Search.
+The modules system in WildFly allows to safely run multiple versions of Hibernate ORM and
+Hibernate Search in parallel, but make sure the Hibernate Search version you choose is compatible
+with the Hibernate ORM version you choose.
 
+[[using-wildfly-provided-hibernatesearch-versions]]
 ==== Use the Hibernate Search version included in WildFly
 
 To activate the Hibernate Search modules in wildfly, you have to declare the dependency by
@@ -1427,21 +1429,67 @@ level deployment, in META-INF (or WEB-INF for web deployments).
 
 ==== Update and activate latest Hibernate Search version in WildFly
 
-*Temporarily disabled:*
+You can also download the latest Hibernate Search provided module and install it. This is often the
+best approach as you will benefit from all the latest improvements of
+Hibernate Search. Because of the modular design in WildFly, these additional modules can
+coexist with the embedded modules and won't affect any other application, unless you
+explicitly reconfigure it to use the newer module.
+
+You can download the latest pre-packaged Hibernate Search modules from
+http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist.zip/download[Sourceforge].
+As a convenience these zip files are also distributed as Maven artifacts:
+link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist:zip].
+
+Unpack the modules in your WildFly `modules` directory: this will create modules for Hibernate Search and Apache Lucene.
+The Hibernate Search modules are:
+
+* _org.hibernate.search.orm_, for users of Hibernate Search with Hibernate; this will transitively include Hibernate ORM.
+* _org.hibernate.search.engine_, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.
+* _org.hibernate.search.backend-jms_, in case you want to use the JMS backend described in <<search-architecture-jms, JMS Architecture>>.
+
+
+Using the manifest:: Add the following entry to the `MANIFEST.MF` in your archive:
+
+====
+[source]
+[subs="verbatim,attributes"]
+Dependencies: org.hibernate.search.orm:{hibernateSearchVersion} services
+====
+
+Using jboss-deployment-structure.xml:: add a resource named `jboss-deployment-structure.xml` in your top
+level deployment, in META-INF (or WEB-INF for web deployments).
+
+====
+[source, XML]
+[subs="verbatim,attributes"]
+<jboss-deployment-structure>
+    <deployment>
+        <dependencies>
+            <module
+                name="org.hibernate.search.orm"
+                slot="{hibernateSearchVersion}"
+                services="export" />
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>
+====
 
 [WARNING]
 ====
-This specific version being an early preview and requiring Hibernate ORM version 5,
-does not yet provide updated modules to run on WildFly.
-WildFly 10 will soon be updated to include these out of the box.
+This version of Hibernate Search `{hibernateSearchVersion}` requires Hibernate ORM 5.
+At the time of writing this paragraph the only version of WildFly compatible with Hibernate ORM 5 is WildFly version `10.0.0.Alpha5`;
+since this is a preview version of the application server further changes might be needed.
 
-We will again publish updated modules as usual in the near future.
+If you need an Hibernate Search version for WildFly versions 9 or earlier, you can either include
+a version of Hibernate ORM 5 in custom modules, but this requires some expertise with the modules system;
+In such a scenario it might be easier to use a previous version of Hibernate Search, or simply use the
+Hibernate Search version included in each WildFly release (see <<using-wildfly-provided-hibernatesearch-versions>>).
 ====
 
 ==== More about modules
 
 More information about the modules configuration in WildFly can be found in the
-link:https://docs.jboss.org/author/display/WFLY9/Class+Loading+in+WildFly[Class Loading in WildFly 9] wiki.
+link:https://docs.jboss.org/author/display/WFLY10/Class+Loading+in+WildFly[Class Loading in WildFly 10] wiki.
 
 [TIP]
 ====
