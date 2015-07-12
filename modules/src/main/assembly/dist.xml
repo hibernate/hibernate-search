@@ -6,7 +6,7 @@
  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
   -->
 <assembly>
-    <id>wildfly-8-dist</id>
+    <id>wildfly-10-dist</id>
     <formats>
         <format>zip</format>
         <format>dir</format> <!-- For ease of debugging only -->
