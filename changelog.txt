@@ -6,19 +6,44 @@ Version 5.4.0.CR1 (13-7-2015)
 ------------------------
 
 ** Bug
+    * [HSEARCH-1681] - Index optimisation should commit to publish the performed optimisation
+    * [HSEARCH-1868] - References to getSearchFactory in AbstractJMSHibernateSearchController documentation are outdated
+    * [HSEARCH-1896] - Documentation: duplicate <dependency> tag in example
+    * [HSEARCH-1897] - Download URLs for Hibernate 5 needs using a new pattern
+    * [HSEARCH-1913] - Integration test helper ConcertManager#saveConcerts will need a larger timeout
     * [HSEARCH-1924] - JBoss Logging upgrade needs explicit dependencies in our sub-modules
 
+** Deprecation
+    * [HSEARCH-1914] - Deprecate the @CacheFromIndex annotation and FieldCache based projections
+
 ** Improvement
+    * [HSEARCH-1474] - MassIndexer needs to avoid being timed out by the TransactionManager
+    * [HSEARCH-1812] - Documentation doesn't clearly explain how one obtains the existing SearchIntegrator
+    * [HSEARCH-1882] - Log Hibernate Search queries in a specific category
+    * [HSEARCH-1891] - Span transaction per id list in batch indexing engine
+    * [HSEARCH-1901] - Built-in TikaBridge repeatedly initializes the default parser
     * [HSEARCH-1919] - Don't use FieldCache in SortTest
-    * [HSEARCH-1922] - JMS backend should set the JMS message header  JMSXGroupID
+    * [HSEARCH-1922] - JMS backend should set the JMS message header JMSXGroupID
 
 ** New Feature
     * [HSEARCH-668] - Provide a setting to bring under the same transaction the DB operation and the JMS queue
     * [HSEARCH-1878] - Add google analytics to the HTML documentation
+    * [HSEARCH-1907] - Include the JGroups backend in the modules distribution
 
 ** Task
+    * [HSEARCH-1783] - Reproduce transaction timeouts during mass indexing
+    * [HSEARCH-1815] - Clarify the need to depend on an implementation of SerializationProvider
+    * [HSEARCH-1854] - ScheduledCommitPolicyTest fails on JDK9
+    * [HSEARCH-1875] - Upgrade to JBoss Byteman 3.0.0
     * [HSEARCH-1893] - Enable again the distribution of custom JBoss Modules
+    * [HSEARCH-1903] - Avoid starting multiple unnecessary WildFly servers to run integration tests
+    * [HSEARCH-1904] - Include the jdeps Maven plugin in the build to allow creating JRE9 profile reports
+    * [HSEARCH-1905] - Disable the WildFly integration tests when running on JDK9
     * [HSEARCH-1906] - Enable the WildFly integration tests even on Java 9
+    * [HSEARCH-1908] - Avoid the need to dynamically override the Analyzer to fieldname mapping
+    * [HSEARCH-1910] - Upgrade Spatial Query related implementations to avoid using Lucene's deprecated FieldCache
+    * [HSEARCH-1912] - Excluding superfluous dependencies from shrinkwrapped integration tests
+    * [HSEARCH-1916] - Use Path instead of File in the various test helpers
     * [HSEARCH-1920] - Document the new 'enlist_in_transaction' setting
     * [HSEARCH-1923] - Upgrade to Hibernate Commons Annotations 5.0.0.Final
     * [HSEARCH-1926] - Checkstyle not running on the OSGi test modules
