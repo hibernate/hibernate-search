@@ -1,6 +1,32 @@
 Hibernate Search Changelog
 ==========================
 
+
+Version 5.4.0.CR1 (13-7-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1924] - JBoss Logging upgrade needs explicit dependencies in our sub-modules
+
+** Improvement
+    * [HSEARCH-1919] - Don't use FieldCache in SortTest
+    * [HSEARCH-1922] - JMS backend should set the JMS message header  JMSXGroupID
+
+** New Feature
+    * [HSEARCH-668] - Provide a setting to bring under the same transaction the DB operation and the JMS queue
+    * [HSEARCH-1878] - Add google analytics to the HTML documentation
+
+** Task
+    * [HSEARCH-1893] - Enable again the distribution of custom JBoss Modules
+    * [HSEARCH-1906] - Enable the WildFly integration tests even on Java 9
+    * [HSEARCH-1920] - Document the new 'enlist_in_transaction' setting
+    * [HSEARCH-1923] - Upgrade to Hibernate Commons Annotations 5.0.0.Final
+    * [HSEARCH-1926] - Checkstyle not running on the OSGi test modules
+    * [HSEARCH-1928] - Upgrade to Hibernate ORM 5.0.0.CR2
+    * [HSEARCH-1930] - Upgrade to WildFly 9.0.0.Final and align configuration files
+    * [HSEARCH-1931] - Upgrade integration tests to WildFly 10.0.0.Alpha5 to use provided Hibernate 5 modules
+
+
 Version 5.4.0.Alpha1 (5-6-2015)
 ------------------------
 
