@@ -55,6 +55,7 @@ public class TestRunnerArquillian {
 				.addClass( TestConstants.class )
 				.addAsResource( createPersistenceXml(), "META-INF/persistence.xml" )
 				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
+				.addAsLibraries( PackagerHelper.hibernateSearchTestingLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.add( manifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( reportsOutputDirectory(), "classes/" + RUNNER_PROPERTIES );
