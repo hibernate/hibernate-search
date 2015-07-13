@@ -33,10 +33,10 @@
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
-        <!-- <module>integrationtest/wildfly</module>  -->
-        <!-- <module>integrationtest/performance</module> -->
+        <!-- <module>integrationtest/wildfly</module> Enabled by profiles: requires JDK8 -->
+        <!-- <module>integrationtest/performance</module> Requires the integrationtest/wildfly module -->
         <module>integrationtest/osgi/karaf-features</module>
-        <!-- <module>integrationtest/sandbox</module> -->
+        <module>integrationtest/sandbox</module>
     </modules>
 
     <issueManagement>
@@ -1121,6 +1121,7 @@
             </activation>
             <modules>
                 <module>integrationtest/wildfly</module>
+                <module>integrationtest/performance</module>
             </modules>
         </profile>
 
