@@ -15,7 +15,7 @@ import org.hibernate.search.spatial.impl.SpatialNumericDocValueField;
 /**
  * Hibernate Search field bridge using Range Spatial, binding a Coordinates to two numeric fields for latitude and Longitude
  *
- * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  */
 public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 

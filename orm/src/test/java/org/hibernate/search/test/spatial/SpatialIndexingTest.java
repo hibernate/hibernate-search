@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 /**
  * Hibernate Search spatial : unit tests on indexing POIs in with Grid and Grid+Distance
  *
- * @author Nicolas Helleringer &lt;nicolas.helleringer@novacodex.net&gt;
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  * @author Hardy Ferentschik
  */
 public class SpatialIndexingTest extends SearchTestBase {

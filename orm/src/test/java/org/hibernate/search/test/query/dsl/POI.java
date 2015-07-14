@@ -20,7 +20,7 @@ import org.hibernate.search.spatial.Coordinates;
 /**
  * Hibernate Search spatial : Point Of Interest test entity
  *
- * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  */
 @Entity
 @Indexed

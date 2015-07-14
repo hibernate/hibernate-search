@@ -17,7 +17,7 @@ import org.hibernate.search.spatial.impl.Point;
 /**
  * Hibernate Search spatial: helper class to compute spatial hashes indexes, ids, and optimal level for search
  *
- * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  */
 public class SpatialHashHelperTest {
 

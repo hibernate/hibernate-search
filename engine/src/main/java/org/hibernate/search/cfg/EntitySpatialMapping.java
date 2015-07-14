@@ -16,7 +16,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 
 /**
- * @author Nicolas Helleringer
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  */
 public class EntitySpatialMapping {
 

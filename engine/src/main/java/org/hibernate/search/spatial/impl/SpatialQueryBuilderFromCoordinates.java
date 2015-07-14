@@ -24,7 +24,7 @@ import java.util.List;
  * The SpatialQueryBuilder holds builder methods for Hash, Distance and Spatial (Hash+Distance) filters
  * and queries
  *
- * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  */
 public abstract class SpatialQueryBuilderFromCoordinates {
 

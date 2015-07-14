@@ -15,7 +15,7 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.bridge.FieldBridge;
 
 /**
- * @author Nicolas Helleringer
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  */
 public class PropertyLongitudeMapping {
 	private final SearchMapping mapping;

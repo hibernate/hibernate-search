@@ -9,8 +9,8 @@ package org.hibernate.search.spatial.impl;
 /**
  * Geometric constants to use in SpatialHelper calculation
  *
- * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @author Mathieu Perez <mathieu.perez@novacodex.net>
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Mathieu Perez
  * @see SpatialHelper
  */
 public interface GeometricConstants {

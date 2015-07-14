@@ -23,7 +23,7 @@ import org.hibernate.search.spatial.Coordinates;
  * Lucene Filter for filtering documents which have been indexed with Hibernate Search spatial Field bridge
  * Use double lat,long field in the index from a Coordinates field declaration
  *
- * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByHash
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
  * @see org.hibernate.search.spatial.Coordinates

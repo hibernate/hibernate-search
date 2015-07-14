@@ -21,7 +21,7 @@ import org.hibernate.search.spatial.Coordinates;
  * A Lucene distance {@code Collector} for spatial searches.
  *
  * @author Sanne Grinovero
- * @author Nicolas Helleringer
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  */
 public class DistanceCollector extends Collector {
 

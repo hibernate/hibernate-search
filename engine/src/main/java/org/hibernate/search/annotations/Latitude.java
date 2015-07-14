@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  * The property must be of type {@code Double} (or its native version).
  *
  * @hsearch.experimental Spatial support is still considered experimental
- * @author Nicolas Helleringer (nicolas.helleringer@novacodex.net)
+ * @author Nicolas Helleringer <nicolas@hibernate.org>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.FIELD, ElementType.METHOD } )
