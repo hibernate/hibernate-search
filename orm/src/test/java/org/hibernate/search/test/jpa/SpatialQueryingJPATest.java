@@ -9,12 +9,15 @@ package org.hibernate.search.test.jpa;
 import java.util.List;
 
 import org.apache.lucene.search.Sort;
+
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
+import org.hibernate.search.test.spatial.DoubleIndexedPOI;
 import org.hibernate.search.test.spatial.POI;
 import org.junit.Assert;
 import org.junit.Test;
@@ -260,8 +263,88 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		em.close();
 	}
 
+	@Test
+	public void testDoubleIndexedDistanceProjection() throws Exception {
+		DoubleIndexedPOI poi1 = new DoubleIndexedPOI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
+		DoubleIndexedPOI poi2 = new DoubleIndexedPOI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
+		DoubleIndexedPOI poi3 = new DoubleIndexedPOI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
+		DoubleIndexedPOI poi4 = new DoubleIndexedPOI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
+		DoubleIndexedPOI poi5 = new DoubleIndexedPOI( 5, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
+		DoubleIndexedPOI poi6 = new DoubleIndexedPOI( 6, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
+
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+
+		em.getTransaction().begin();
+		em.persist( poi1 );
+		em.persist( poi2 );
+		em.persist( poi3 );
+		em.getTransaction().commit();
+		em.clear();
+		em.getTransaction().begin();
+		em.persist( poi4 );
+		em.persist( poi5 );
+		em.persist( poi6 );
+		em.getTransaction().commit();
+
+		em.getTransaction().begin();
+		double centerLatitude = 24.0d;
+		double centerLongitude = 32.0d;
+
+		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( DoubleIndexedPOI.class ).get();
+
+		//Tests with FieldBridge
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )
+				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		List results = hibQuery.getResultList();
+		Object[] firstResult = (Object[]) results.get( 0 );
+		Object[] secondResult = (Object[]) results.get( 1 );
+		Object[] thirdResult = (Object[]) results.get( 2 );
+		Object[] fourthResult = (Object[]) results.get( 3 );
+		Object[] fifthResult = (Object[]) results.get( 4 );
+		Object[] sixthResult = (Object[]) results.get( 5 );
+		Assert.assertEquals( (Double) firstResult[1], 0.0, 0.0001 );
+		Assert.assertEquals( (Double) secondResult[1], 10.1582, 0.0001 );
+		Assert.assertEquals( (Double) thirdResult[1], 11.1195, 0.0001 );
+		Assert.assertEquals( (Double) fourthResult[1], 15.0636, 0.0001 );
+		Assert.assertEquals( (Double) fifthResult[1], 22.239, 0.001 );
+		Assert.assertEquals( (Double) sixthResult[1], 24.446, 0.001 );
+
+		//Tests with @Latitude+@Longitude
+		luceneQuery = builder.spatial()
+				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		hibQuery = em.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, Spatial.COORDINATES_DEFAULT_FIELD );
+		results = hibQuery.getResultList();
+		firstResult = (Object[]) results.get( 0 );
+		secondResult = (Object[]) results.get( 1 );
+		thirdResult = (Object[]) results.get( 2 );
+		fourthResult = (Object[]) results.get( 3 );
+		fifthResult = (Object[]) results.get( 4 );
+		sixthResult = (Object[]) results.get( 5 );
+		Assert.assertEquals( (Double) firstResult[1], 0.0, 0.0001 );
+		Assert.assertEquals( (Double) secondResult[1], 10.1582, 0.0001 );
+		Assert.assertEquals( (Double) thirdResult[1], 11.1195, 0.0001 );
+		Assert.assertEquals( (Double) fourthResult[1], 15.0636, 0.0001 );
+		Assert.assertEquals( (Double) fifthResult[1], 22.239, 0.001 );
+		Assert.assertEquals( (Double) sixthResult[1], 24.446, 0.001 );
+
+
+		List<?> pois = em.createQuery( "from " + DoubleIndexedPOI.class.getName() ).getResultList();
+		for ( Object entity : pois ) {
+			em.remove( entity );
+		}
+		em.getTransaction().commit();
+		em.close();
+	}
+
 	@Override
 	public Class[] getAnnotatedClasses() {
-		return new Class<?>[] { POI.class };
+		return new Class<?>[] { POI.class, DoubleIndexedPOI.class };
 	}
 }

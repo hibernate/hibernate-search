@@ -20,6 +20,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
@@ -98,6 +99,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		// GetterUser
 		fullTextSession.save( new GetterUser( 1, 24.0d, 32.0d ) );
+
+		//DoubleIndexedPOIs
+		fullTextSession.save( new DoubleIndexedPOI( 1, "Davide D'Alto", 37.780392d, -122.513898d, "Hibernate team member"));
+		fullTextSession.save( new DoubleIndexedPOI( 2, "Peter O'Tall", 40.723165d, -73.987439d, "" ));
 
 		tx.commit();
 	}
@@ -490,6 +495,43 @@ public class SpatialIndexingTest extends SearchTestBase {
 		Assert.assertEquals( 1, results2.size() );
 	}
 
+	@Test
+	public void test180MeridianCross() throws Exception {
+
+		double centerLatitude = 37.769645d;
+		double centerLongitude = -122.446428d;
+
+		final QueryBuilder builder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( DoubleIndexedPOI.class ).get();
+
+		//Tests with FieldBridge
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )
+				.within( 5000, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		List results = hibQuery.list();
+		Assert.assertEquals( 2, results.size() );
+		Object[] firstResult = (Object[]) results.get( 0 );
+		Object[] secondResult = (Object[]) results.get( 1 );
+		Assert.assertEquals( 6.0492d, (Double) firstResult[1], 0.0001 );
+		Assert.assertEquals( 4132.8166d, (Double) secondResult[1], 0.0001 );
+
+		//Tests with @Longitude+@Latitude
+		luceneQuery = builder.spatial()
+				.within( 5000, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		hibQuery = fullTextSession.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, Spatial.COORDINATES_DEFAULT_FIELD );
+		results = hibQuery.list();
+		Assert.assertEquals( 2, results.size() );
+		firstResult = (Object[]) results.get( 0 );
+		secondResult = (Object[]) results.get( 1 );
+		Assert.assertEquals( 6.0492d, (Double) firstResult[1], 0.0001 );
+		Assert.assertEquals( 4132.8166d, (Double) secondResult[1], 0.0001 );
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
@@ -504,7 +546,8 @@ public class SpatialIndexingTest extends SearchTestBase {
 				Restaurant.class,
 				NonGeoPOI.class,
 				GetterUser.class,
-				MissingSpatialPOI.class
+				MissingSpatialPOI.class,
+				DoubleIndexedPOI.class
 		};
 	}
 
