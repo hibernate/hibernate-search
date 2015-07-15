@@ -72,10 +72,6 @@ public class ChainedFilter extends Filter {
 			for ( Filter f : chainedFilters ) {
 				subSets.add( f.getDocIdSet( context, acceptDocs ) );
 			}
-			subSets = FilterOptimizationHelper.mergeByBitAnds( subSets );
-			if ( subSets.size() == 1 ) {
-				return subSets.get( 0 );
-			}
 			final LeafReader reader = context.reader();
 			return new AndDocIdSet( subSets, reader.maxDoc() );
 		}
