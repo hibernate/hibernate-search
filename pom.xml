@@ -397,22 +397,6 @@
                 <artifactId>hibernate-search-infinispan</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.infinispan</groupId>
-                <artifactId>infinispan-core</artifactId>
-                <version>${infinispanVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.infinispan</groupId>
-                <artifactId>infinispan-directory-provider</artifactId>
-                <version>${infinispanVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>hibernate-search-engine</artifactId>
-                        <groupId>org.hibernate</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
              <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-orm</artifactId>
