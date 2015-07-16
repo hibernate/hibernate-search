@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -48,11 +49,17 @@ public class ConcurrentFlushTest extends SearchTestBase {
 		public void run() {
 			Session session = sessionFactory.openSession();
 			try {
-				FlushedStuff stuff = new FlushedStuff();
-				stuff.id = jobNumber;
-				stuff.name = "Some job code #" + jobNumber;
-				session.save( stuff );
-				session.flush();
+				Transaction transaction = session.beginTransaction();
+				try {
+					FlushedStuff stuff = new FlushedStuff();
+					stuff.id = jobNumber;
+					stuff.name = "Some job code #" + jobNumber;
+					session.save( stuff );
+					session.flush();
+				}
+				finally {
+					transaction.commit();
+				}
 			}
 			catch (HibernateException e) {
 				e.printStackTrace();
