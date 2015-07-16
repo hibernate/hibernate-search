@@ -244,11 +244,17 @@ public class IndexingGeneratedCorpusTest {
 	private long countByDatabaseCriteria(Class<? extends TitleAble> type) {
 		Session session = builder.openFullTextSession();
 		try {
-			Number countAsNumber = (Number) session
-					.createCriteria( type )
-					.setProjection( Projections.rowCount() )
-					.uniqueResult();
-			return countAsNumber.longValue();
+			Transaction tx = session.beginTransaction();
+			try {
+				Number countAsNumber = (Number) session
+						.createCriteria( type )
+						.setProjection( Projections.rowCount() )
+						.uniqueResult();
+				return countAsNumber.longValue();
+			}
+			finally {
+				tx.commit();
+			}
 		}
 		finally {
 			session.close();
