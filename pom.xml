@@ -1262,6 +1262,47 @@
             </properties>
         </profile>
 
+        <!-- The PostgreSQL test environment on ci.hibernate.org (v. 9.3.9)-->
+        <profile>
+            <id>ci-postgresql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>9.3-1103-jdbc41</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <db.dialect>org.hibernate.dialect.PostgreSQL92Dialect</db.dialect>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jdbc.url>jdbc:postgresql://localhost:5432/testingdb</jdbc.url>
+                <jdbc.user>hibernate_user</jdbc.user>
+                <jdbc.pass>hibernate_password</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- The MySQL test environment test environment on ci.hibernate.org (v. 10.0.19-MariaDB)-->
+        <profile>
+            <id>ci-mariadb</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mariadb.jdbc</groupId>
+                    <artifactId>mariadb-java-client</artifactId>
+                    <version>1.1.7</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
+                <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
+                <jdbc.url>jdbc:mariadb://localhost/testingdb</jdbc.url>
+                <jdbc.user>hibernate_user</jdbc.user>
+                <jdbc.pass>hibernate_password</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
         <!--
             ###################################################################
             Then, those with commercial drivers
