@@ -28,6 +28,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -38,6 +39,7 @@ import org.hibernate.search.bridge.builtin.StringEncodingCalendarBridge;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.testing.SkipForDialect;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -172,6 +174,7 @@ public class BridgeTest extends SearchTestBase {
 	}
 
 	@Test
+	@SkipForDialect(PostgreSQL81Dialect.class)//PosgreSQL doesn't allow storing null with these column types
 	public void testDateBridge() throws Exception {
 		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
 		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
