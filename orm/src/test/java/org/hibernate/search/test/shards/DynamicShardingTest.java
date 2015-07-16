@@ -33,6 +33,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.hcore.impl.HibernateSessionFactoryService;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProviderTemplate;
 import org.hibernate.search.test.SearchTestBase;
@@ -119,10 +120,7 @@ public class DynamicShardingTest extends SearchTestBase {
 
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 
-		ExtendedSearchIntegrator integrator = getIndependentNewSearchIntegrator();
-		entityIndexBinding = integrator.getIndexBindings().get( Animal.class );
-
-		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
+		assertThat( getIndexManagersAfterReopening() ).hasSize( 2 );
 	}
 
 	@Override
@@ -169,7 +167,7 @@ public class DynamicShardingTest extends SearchTestBase {
 		}
 	}
 
-	private ExtendedSearchIntegrator getIndependentNewSearchIntegrator() {
+	private IndexManager[] getIndexManagersAfterReopening() {
 		// build a new independent SessionFactory to verify that the shards are available at restart
 		Configuration config = new Configuration();
 
@@ -185,9 +183,12 @@ public class DynamicShardingTest extends SearchTestBase {
 
 		config.addAnnotatedClass( Animal.class );
 
-		SessionFactory newSessionFactory = config.buildSessionFactory();
-		FullTextSession fullTextSession = Search.getFullTextSession( newSessionFactory.openSession() );
-		return fullTextSession.getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
+		try ( SessionFactory newSessionFactory = config.buildSessionFactory() ) {
+			try ( FullTextSession fullTextSession = Search.getFullTextSession( newSessionFactory.openSession() ) ) {
+				ExtendedSearchIntegrator integrator = fullTextSession.getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
+				return integrator.getIndexBindings().get( Animal.class ).getIndexManagers();
+			}
+		}
 	}
 
 	public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate {
