@@ -88,20 +88,6 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional/clustering/directory-infinispan</outputDirectory>
-            <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-search-infinispan</include>
-                <include>org.infinispan:infinispan-lucene-directory</include>
-            </includes>
-            <excludes>
-               <exclude>org.jboss.spec.javax.transaction:*</exclude>
-            </excludes>
-        </dependencySet>
-
-        <dependencySet>
             <outputDirectory>dist/lib/optional/clustering/backend-jgroups</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
@@ -164,6 +150,11 @@
         <file>
             <source>../copyright.txt</source>
             <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>../infinispan/moved.txt</source>
+            <!-- The following path is where we used to distribute the Infinispan integration -->
+            <outputDirectory>dist/lib/optional/clustering/directory-infinispan</outputDirectory>
         </file>
     </files>
 

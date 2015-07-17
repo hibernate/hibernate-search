@@ -1,0 +1,30 @@
+The Infinispan Directory integration which was part of the Hibernate Search distribution
+until version 5.2 is now maintained as a component of the Infinispan project.
+
+The Infinispan homepage:
+ - http://infinispan.org
+ 
+The new location for its source code:
+ - https://github.com/infinispan/infinispan
+
+The updated Maven artifact coordinates are:
+
+	<groupId>org.infinispan</groupId>
+	<artifactId>infinispan-directory-provider</artifactId>
+
+Please refer to the Infinispan documentation and build metadata to find out
+which version is compatible with each Hibernate Search version.
+
+For an Infinispan release to be updated, tested and released as compatible
+with the very latest version of Hibernate Search might need some days or weeks,
+please either help us with the process or be patient.
+
+Generally an Infinispan version compatible with Hibernate Search version Major.minor.micro
+will also be compatible with a more recent Hibernate Search version having the same micro
+version.
+As long as both projects are depending on the same version of Apache Lucene, it is very
+likely for other version combinations to work fine as well.
+
+For any questions and feedback, please get in touch
+ - http://hibernate.org/community/
+ - http://infinispan.org/community/

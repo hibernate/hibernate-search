@@ -45,10 +45,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-infinispan</artifactId>
-        </dependency>
 
         <!-- Making sure the docs get build prior to running the assembly -->
         <dependency>
@@ -109,7 +105,6 @@
                     <sourcepath>
                         ${basedir}/../engine/src/main/java;
                         ${basedir}/../orm/src/main/java;
-                        ${basedir}/../infinispan/src/main/java
                     </sourcepath>
                     <tags>
                         <tag>
@@ -126,7 +121,6 @@
                         <link>http://lucene.apache.org/core/4_10_2/core/</link>
                         <link>http://lucene.apache.org/core/4_10_2/analyzers-common/</link>
                         <link>http://lucene.apache.org/core/4_10_2/queryparser/</link>
-                        <link>https://docs.jboss.org/infinispan/7.0/apidocs/</link>
                         <link>http://jgroups.org/javadoc</link>
                     </links>
                     <packagesheader>Hibernate Search Packages</packagesheader>
@@ -136,10 +130,6 @@
                         <group>
                             <title>Hibernate Search Engine and ORM Packages</title>
                             <packages>org.hibernate.search*</packages>
-                        </group>
-                        <group>
-                            <title>Hibernate Search Infinispan</title>
-                            <packages>org.hibernate.search.infinispan</packages>
                         </group>
                     </groups>
                     <bottom>
