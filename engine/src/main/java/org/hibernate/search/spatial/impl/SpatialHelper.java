@@ -163,7 +163,7 @@ public abstract class SpatialHelper {
 					getSpatialHashCellsIds(
 							Point.fromDegreesInclusive(
 									lowerLeftLatitude,
-									GeometricConstants.LONGITUDE_DEGREE_RANGE / 2
+									-GeometricConstants.LONGITUDE_DEGREE_RANGE / 2
 								), Point.fromDegreesInclusive( upperRightLatitude, upperRightLongitude ), spatialHashLevel
 					)
 			);
