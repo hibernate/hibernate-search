@@ -16,7 +16,7 @@ public enum LogCategory {
 	/**
 	 * Category for logging executed Lucene queries.
 	 */
-	QUERY("org.hibernate.search.query"),
+	QUERY("org.hibernate.search.fulltext_query"),
 
 	/**
 	 * This is the category of the Logger used to print out the Lucene infostream.

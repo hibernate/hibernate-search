@@ -1881,5 +1881,5 @@ the case if your application accepts queries passed in by the user or e.g. dynam
 using the Hibernate Search query DSL.
 
 In order to log all Lucene queries executed by Hibernate Search, enable `DEBUG` logging for the log
-category `org.hibernate.search.query`.
+category `org.hibernate.search.fulltext_query`.
 
