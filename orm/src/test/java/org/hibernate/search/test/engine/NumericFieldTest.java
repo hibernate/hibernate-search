@@ -22,6 +22,7 @@ import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.testing.SkipForDialect;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@SkipForDialect(org.hibernate.dialect.MySQLDialect.class)
 public class NumericFieldTest extends SearchTestBase {
 
 	FullTextSession fullTextSession;
