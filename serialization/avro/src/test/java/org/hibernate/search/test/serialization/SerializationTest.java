@@ -156,6 +156,16 @@ public class SerializationTest {
 		field = new Field( "tokenstream", tokenStream, Field.TermVector.WITH_POSITIONS_OFFSETS );
 		field.setBoost( 3f );
 		doc.add( field );
+
+		field = new Field(
+				"StringF3",
+				"String field 3",
+				Store.YES,
+				Field.Index.ANALYZED,
+				Field.TermVector.YES
+		);
+		doc.add( field );
+
 		return doc;
 	}
 

@@ -420,7 +420,6 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		type.setTokenized( analyzed );
 		type.setStoreTermVectors( termVector != SerializableTermVector.NO );
 		type.setStoreTermVectorOffsets( termVector == SerializableTermVector.WITH_OFFSETS || termVector == SerializableTermVector.WITH_POSITIONS_OFFSETS );
-		type.setStoreTermVectorPayloads( termVector == SerializableTermVector.YES );
 		type.setStoreTermVectorPositions( termVector == SerializableTermVector.WITH_POSITIONS || termVector == SerializableTermVector.WITH_POSITIONS_OFFSETS );
 		type.setOmitNorms( omitNorms );
 		type.setIndexOptions( omitTermFreqAndPositions ? IndexOptions.DOCS_ONLY : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
