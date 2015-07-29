@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.jgroups.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import org.hibernate.search.exception.SearchException;
@@ -33,8 +34,8 @@ public class SerializationHelperTest {
 	}
 
 	@Test
-	public void exampleEncoding() {
-		byte[] someRandom = "Some random string to test payload".getBytes();
+	public void exampleEncoding() throws UnsupportedEncodingException {
+		byte[] someRandom = "Some random string to test payload".getBytes( "UTF-8" );
 		String indexName = "this is my favourite index";
 		byte[] buffer = MessageSerializationHelper.prependString( indexName, someRandom );
 		Assert.assertEquals( indexName, MessageSerializationHelper.extractIndexName( 0, buffer ) );
@@ -42,8 +43,8 @@ public class SerializationHelperTest {
 	}
 
 	@Test
-	public void partialBufferEncoding() {
-		byte[] someRandom = "Some random string to test payload".getBytes();
+	public void partialBufferEncoding() throws UnsupportedEncodingException {
+		byte[] someRandom = "Some random string to test payload".getBytes( "UTF-8" );
 		String indexName = "this is my favourite index";
 		byte[] buffer = MessageSerializationHelper.prependString( indexName, someRandom );
 		byte[] mixed = new byte[ buffer.length + 7 ];
