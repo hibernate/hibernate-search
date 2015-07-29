@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
@@ -268,7 +269,7 @@ public final class DirectoryProviderHelper {
 			String fsDirectoryTypeValue = properties.getProperty( FS_DIRECTORY_TYPE_PROP_NAME );
 			if ( StringHelper.isNotEmpty( fsDirectoryTypeValue ) ) {
 				try {
-					fsDirectoryType = Enum.valueOf( FSDirectoryType.class, fsDirectoryTypeValue.toUpperCase() );
+					fsDirectoryType = Enum.valueOf( FSDirectoryType.class, fsDirectoryTypeValue.toUpperCase( Locale.ROOT ) );
 				}
 				catch (IllegalArgumentException e) {
 					throw new SearchException( "Invalid option value for " + FS_DIRECTORY_TYPE_PROP_NAME + ": " + fsDirectoryTypeValue );

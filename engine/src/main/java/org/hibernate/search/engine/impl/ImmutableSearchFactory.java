@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -167,7 +168,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		}
 		else {
 			try {
-				return Enum.valueOf( ObjectLookupMethod.class, objectLookupMethod.toUpperCase() );
+				return Enum.valueOf( ObjectLookupMethod.class, objectLookupMethod.toUpperCase( Locale.ROOT ) );
 			}
 			catch (IllegalArgumentException e) {
 				throw log.invalidPropertyValue( objectLookupMethod, Environment.OBJECT_LOOKUP_METHOD );
@@ -182,7 +183,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		}
 		else {
 			try {
-				return Enum.valueOf( DatabaseRetrievalMethod.class, databaseRetrievalMethod.toUpperCase() );
+				return Enum.valueOf( DatabaseRetrievalMethod.class, databaseRetrievalMethod.toUpperCase( Locale.ROOT ) );
 			}
 			catch (IllegalArgumentException e) {
 				throw log.invalidPropertyValue( databaseRetrievalMethod, Environment.OBJECT_LOOKUP_METHOD );
