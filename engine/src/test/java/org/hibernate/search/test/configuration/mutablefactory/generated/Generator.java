@@ -8,8 +8,9 @@
 package org.hibernate.search.test.configuration.mutablefactory.generated;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 /**
  * @author Emmanuel Bernard
@@ -50,7 +51,7 @@ public final class Generator {
 		generated.append( "}\n" );
 		File f = new File( "./Generated.java" );
 		try {
-			FileWriter fw = new FileWriter( f );
+			OutputStreamWriter fw = new OutputStreamWriter( new FileOutputStream( f ), "UTF-8" );
 			fw.write( generated.toString() );
 			fw.close();
 		}
