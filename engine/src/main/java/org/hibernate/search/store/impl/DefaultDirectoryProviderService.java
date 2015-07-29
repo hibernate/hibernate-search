@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.store.impl;
 
+import java.util.Locale;
+
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.spi.BaseDirectoryProviderService;
 
@@ -23,7 +25,7 @@ public class DefaultDirectoryProviderService extends BaseDirectoryProviderServic
 
 	@Override
 	public String toFullyQualifiedClassName(String name) {
-		String maybeShortCut = name.toLowerCase();
+		String maybeShortCut = name.toLowerCase( Locale.ROOT );
 		if ( defaultProviderClasses.containsKey( maybeShortCut ) ) {
 			return defaultProviderClasses.get( maybeShortCut );
 		}
