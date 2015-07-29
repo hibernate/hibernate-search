@@ -8,6 +8,8 @@ package org.hibernate.search.bridge.builtin;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.lucene.document.Document;
 
@@ -42,6 +44,8 @@ public class StringEncodingCalendarBridge extends StringEncodingDateBridge {
 			Resolution.MILLISECOND
 	);
 
+	private static final TimeZone ENCODING_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
+
 	public StringEncodingCalendarBridge() {
 	}
 
@@ -53,7 +57,7 @@ public class StringEncodingCalendarBridge extends StringEncodingDateBridge {
 	public Object get(String name, Document document) {
 		Object value = super.get( name, document );
 		if ( value != null ) {
-			Calendar calendar = Calendar.getInstance();
+			Calendar calendar = Calendar.getInstance( ENCODING_TIME_ZONE, Locale.ROOT );
 			calendar.setTime( (Date) value );
 			value = calendar;
 		}
