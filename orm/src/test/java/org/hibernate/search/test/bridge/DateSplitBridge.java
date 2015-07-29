@@ -9,6 +9,7 @@ package org.hibernate.search.test.bridge;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.lucene.document.Document;
@@ -28,7 +29,7 @@ public class DateSplitBridge implements FieldBridge {
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		Date date = (Date) value;
-		Calendar cal = GregorianCalendar.getInstance( GMT );
+		Calendar cal = GregorianCalendar.getInstance( GMT, Locale.ROOT );
 		cal.setTime( date );
 		int year = cal.get( Calendar.YEAR );
 		int month = cal.get( Calendar.MONTH ) + 1;

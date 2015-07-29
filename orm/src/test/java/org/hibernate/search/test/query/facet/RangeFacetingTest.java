@@ -9,6 +9,7 @@ package org.hibernate.search.test.query.facet;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -287,7 +288,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	public void testDateRangeFaceting() throws Exception {
 		final String facetingName = "albumYearFaceting";
 		final String fieldName = "releaseYear";
-		final DateFormat formatter = new SimpleDateFormat( "yyyy" );
+		final DateFormat formatter = new SimpleDateFormat( "yyyy", Locale.ROOT );
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( facetingName )
 				.onField( fieldName )

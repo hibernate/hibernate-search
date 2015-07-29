@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.persistence.EntityTransaction;
 
@@ -29,6 +30,8 @@ import org.junit.Test;
  * @author Davide D'Alto <davide@hibernate.org>
  */
 public class SortUsingEntityManagerTest extends JPATestCase {
+
+	private static final TimeZone ENCODING_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
 	private static final boolean DESC = true;
 
@@ -82,7 +85,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	}
 
 	private Date date(int day, int month, int year) {
-		Calendar cal = Calendar.getInstance( Locale.US );
+		Calendar cal = Calendar.getInstance( ENCODING_TIME_ZONE, Locale.US );
 		cal.set( year, month, day, 11, 05, 30 );
 		return cal.getTime();
 	}

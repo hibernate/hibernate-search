@@ -7,7 +7,10 @@
 package org.hibernate.search.test.filter;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.Term;
@@ -214,7 +217,7 @@ public class FilterTest extends SearchTestBase {
 	public void testStraightFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
 		calendar.set( Calendar.YEAR, 2001 );
 		long from = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
 		calendar.set( Calendar.YEAR, 2005 );
@@ -243,7 +246,7 @@ public class FilterTest extends SearchTestBase {
 	public void testCachedEmptyFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
 		calendar.set( Calendar.YEAR, 2001 );
 		long from = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
 		calendar.set( Calendar.YEAR, 2005 );
@@ -295,7 +298,7 @@ public class FilterTest extends SearchTestBase {
 	private void createData() {
 		try ( Session s = openSession() ) {
 			s.getTransaction().begin();
-			Calendar cal = Calendar.getInstance();
+			Calendar cal = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
 			cal.set( 2006, 10, 11 );
 			Driver driver = new Driver();
 			driver.setDelivery( cal.getTime() );

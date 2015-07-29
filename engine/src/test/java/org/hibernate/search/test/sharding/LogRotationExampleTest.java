@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -229,7 +230,7 @@ public class LogRotationExampleTest {
 	 * @return a new GMT Calendar
 	 */
 	private static Calendar createGMTCalendar() {
-		return Calendar.getInstance( TimeZone.getTimeZone( "GMT" ) );
+		return Calendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
 	}
 
 }

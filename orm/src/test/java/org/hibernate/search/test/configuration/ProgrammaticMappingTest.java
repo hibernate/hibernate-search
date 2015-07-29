@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -253,8 +254,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		Address address = new Address();
 		address.setStreet1( "Peachtree Rd NE" );
 		address.setStreet2( "Peachtnot Rd NE" );
-		Calendar c = GregorianCalendar.getInstance();
-		c.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
+		Calendar c = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
 		c.set( 2009, Calendar.NOVEMBER, 15);
 
 		Date date = new Date( c.getTimeInMillis() );
@@ -315,8 +315,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		Address address = new Address();
 		address.setStreet1( "Peachtree Rd NE" );
 		address.setStreet2( "Peachtnot Rd NE" );
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
+		Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
 		calendar.set( 2009, Calendar.NOVEMBER, 15 );
 
 		address.setLastUpdated( calendar );
@@ -407,8 +406,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		address.setStreet1( "Peachtree Rd NE" );
 		address.setStreet2( "Peachtnot Rd NE" );
 		address.setOwner( "test" );
-		Calendar c = GregorianCalendar.getInstance();
-		c.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
+		Calendar c = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
 		c.set( 2009, Calendar.NOVEMBER, 15);
 
 		address.setLastUpdated( c );

@@ -9,6 +9,8 @@ package org.hibernate.search.test.query;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -212,7 +214,7 @@ public class SortTest extends SearchTestBase {
 	 */
 	private void createTestBooks() {
 		Transaction tx = fullTextSession.beginTransaction();
-		Calendar cal = Calendar.getInstance();
+		Calendar cal = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ROOT );
 		cal.set( 2007, Calendar.JULY, 25, 11, 20, 30 );
 		Book book = new Book( 1, "Hibernate & Lucene", "This is a test book." );
 		book.setPublicationDate( cal.getTime() );

@@ -10,9 +10,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -173,8 +173,7 @@ public class BridgeTest extends SearchTestBase {
 
 	@Test
 	public void testDateBridge() throws Exception {
-		Calendar c = GregorianCalendar.getInstance();
-		c.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
+		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
 		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
 		c.set( Calendar.MILLISECOND, 5 );
 		Date date = new Date( c.getTimeInMillis() );
@@ -259,8 +258,7 @@ public class BridgeTest extends SearchTestBase {
 	@Test
 	public void testCalendarBridge() throws Exception {
 		Cloud cloud = new Cloud();
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
+		Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
 		calendar.set( 2000, 11, 15, 3, 43, 2 );
 		calendar.set( Calendar.MILLISECOND, 5 );
 

@@ -8,7 +8,9 @@ package org.hibernate.search.test.query.dsl;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -62,7 +64,7 @@ import static org.junit.Assert.fail;
 public class DSLTest extends SearchTestBase {
 	private static final Log log = LoggerFactory.make();
 
-	private final Calendar calendar = Calendar.getInstance();
+	private final Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
 
 	private FullTextSession fullTextSession;
 	private Date february;
@@ -944,8 +946,7 @@ public class DSLTest extends SearchTestBase {
 
 	private void indexTestData() {
 		Transaction tx = fullTextSession.beginTransaction();
-		final Calendar calendar = Calendar.getInstance();
-		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		final Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ROOT );
 		calendar.set( 1900, 2, 12, 0, 0, 0 );
 		calendar.set( Calendar.MILLISECOND, 0 );
 		Date january = calendar.getTime();

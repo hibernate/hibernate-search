@@ -10,7 +10,9 @@ package org.hibernate.search.test.spatial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -100,7 +102,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 	 */
 	public int doSearch(double distance, int pageSize, boolean sortByDistance) {
 		log.debug(
-				String.format(
+				String.format( Locale.ROOT,
 						"distance %.2f pageSize %d, sortByDistance %s",
 						distance, pageSize, sortByDistance
 				)
@@ -127,7 +129,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 	private void printResults(List<GeoEntity> list) {
 		for ( GeoEntity entity : list ) {
 			log.debug(
-					String.format(
+					String.format( Locale.ROOT,
 							"%d %f %d%s",
 							idx, entity.getDistance(), entity.getId(),
 							entitiesIdsSet.containsKey( entity.getId() )

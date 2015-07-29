@@ -9,6 +9,8 @@ package org.hibernate.search.test.bridge;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
@@ -30,6 +32,9 @@ import static org.junit.Assert.fail;
  * @author Hardy Ferentschik
  */
 public class StringEncodingDateBridgeTest {
+
+	private static final TimeZone ENCODING_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
+
 	private StringEncodingDateBridge bridgeUnderTest;
 	private Date testDate;
 	private Document testDocument;
@@ -38,7 +43,7 @@ public class StringEncodingDateBridgeTest {
 	public void setUp() {
 		bridgeUnderTest = new StringEncodingDateBridge( Resolution.MILLISECOND );
 
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance( ENCODING_TIME_ZONE, Locale.ROOT );
 		testDate = calendar.getTime();
 
 		testDocument = new Document();

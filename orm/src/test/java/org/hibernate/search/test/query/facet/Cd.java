@@ -11,6 +11,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -51,7 +53,7 @@ public class Cd {
 	public Cd(String name, int price, String releaseYear) {
 		this.name = name;
 		this.price = price;
-		DateFormat formatter = new SimpleDateFormat( "yyyy" );
+		DateFormat formatter = new SimpleDateFormat( "yyyy", Locale.ROOT );
 		try {
 			this.releaseYear = formatter.parse( releaseYear );
 		}

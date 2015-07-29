@@ -9,6 +9,7 @@ package org.hibernate.search.test.spatial;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.lucene.search.Sort;
 import org.junit.Assert;
@@ -66,7 +67,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 		fullTextSession.save( new MissingSpatialPOI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" ) );
 
 		// Event
-		SimpleDateFormat dateFormat = new SimpleDateFormat( "d M yyyy" );
+		SimpleDateFormat dateFormat = new SimpleDateFormat( "d M yyyy", Locale.ROOT );
 		Date date = dateFormat.parse( "10 9 1976" );
 		fullTextSession.save( new Event( 1, "Test", 24.0d, 32.0d, date ) );
 
@@ -80,7 +81,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 		fullTextSession.save( new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d ) );
 
 		// RangeEvent
-		dateFormat = new SimpleDateFormat( "d M yyyy" );
+		dateFormat = new SimpleDateFormat( "d M yyyy", Locale.ROOT );
 		date = dateFormat.parse( "10 9 1976" );
 		fullTextSession.save( new RangeEvent( 1, "Test", 24.0d, 32.0d, date ) );
 
