@@ -834,4 +834,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 277, value = "Worker configured to be enlisted in transaction but the backend %1$s is not transactional for index %2$s")
 	SearchException backendNonTransactional(String indexName, String backend);
+
+	@Message(id = 278, value = "Can't build query for type '%1$s' which is neither indexed nor has any indexed sub-types.")
+	SearchException cantQueryUnindexedType(String canonicalEntityName);
+
 }

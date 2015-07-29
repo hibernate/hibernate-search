@@ -9,12 +9,13 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Assuming connection with the search factory
@@ -22,6 +23,9 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  * @author Emmanuel Bernard
  */
 public class ConnectedQueryContextBuilder implements QueryContextBuilder {
+
+	private static final Log log = LoggerFactory.make();
+
 	private final ExtendedSearchIntegrator factory;
 
 	public ConnectedQueryContextBuilder(ExtendedSearchIntegrator factory) {
@@ -44,9 +48,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 			Class<?> indexBoundType = getIndexBoundType( entityType, factory );
 
 			if ( indexBoundType == null ) {
-				throw new SearchException( String.format( "Can't build query for type %s which is"
-						+ " neither indexed nor has any indexed sub-types.",
-						entityType.getCanonicalName() ) );
+				throw log.cantQueryUnindexedType( entityType.getCanonicalName() );
 			}
 
 			queryAnalyzer = new ScopedAnalyzer( factory.getAnalyzer( indexBoundType ) );
