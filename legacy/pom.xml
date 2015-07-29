@@ -20,11 +20,20 @@
     <name>Hibernate Search [Deprecated Module]</name>
     <description>Hibernate Search [Deprecated Module]</description>
 
-    <dependencies>
-        <!-- For backwards compatibility: the dependency to be used is now hibernate-search-orm  -->
-        <dependency>
+    <distributionManagement>
+        <relocation>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
-        </dependency>
-    </dependencies>
+            <message>The artifact id of this module was changed to 'hibernate-search-orm', please update!</message>
+        </relocation>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
