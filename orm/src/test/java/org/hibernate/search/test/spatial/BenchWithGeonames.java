@@ -8,7 +8,8 @@ package org.hibernate.search.test.spatial;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -78,7 +79,7 @@ public final class BenchWithGeonames {
 			fullTextSession = Search.getFullTextSession( session );
 
 			File geonamesFile = new File( geonamesDataFile );
-			buffRead = new BufferedReader( new FileReader( geonamesFile ) );
+			buffRead = new BufferedReader( new InputStreamReader( new FileInputStream( geonamesFile ), "UTF-8" ) );
 			String line = null;
 
 			int line_number = 0;
