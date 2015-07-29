@@ -9,6 +9,7 @@ package org.hibernate.search.test.embedded.update;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -127,7 +128,8 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 	}
 
 	private List<ProductShootingBrief> getShootingBriefsFromIndex(FullTextSession session, String referenceCode) {
-		FullTextQuery q = session.createFullTextQuery( new WildcardQuery( new Term( "referenceCodeCollection", referenceCode.toLowerCase() + "*" ) ),
+		FullTextQuery q = session.createFullTextQuery( new WildcardQuery( new Term( "referenceCodeCollection",
+				referenceCode.toLowerCase( Locale.ROOT ) + "*" ) ),
 				ProductShootingBrief.class );
 		@SuppressWarnings("unchecked")
 		List<ProductShootingBrief> results = q.list();
