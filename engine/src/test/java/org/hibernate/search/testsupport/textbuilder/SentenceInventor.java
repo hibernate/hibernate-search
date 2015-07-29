@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.testsupport.textbuilder;
 
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -28,6 +29,7 @@ public class SentenceInventor {
 
 	private final Random r;
 	private final WordDictionary dictionary;
+	private final Locale randomlocale;
 	//array contains repeated object for probability distribution (more chance for a ",")
 	private final char[] sentenceSeparators = new char[] { ',', ',', ',' , ';', ':', ':' };
 	//same as above, but favour the "full stop" char as a more likely end for periods.
@@ -39,7 +41,17 @@ public class SentenceInventor {
 	 */
 	public SentenceInventor(long randomSeed, int dictionarySize) {
 		r = new Random( randomSeed );
+		randomlocale = randomLocale();
 		dictionary = randomDictionary( dictionarySize );
+	}
+
+	/**
+	 * @return a random Locale among the ones available on the current system
+	 */
+	private Locale randomLocale() {
+		Locale[] availableLocales = Locale.getAvailableLocales();
+		int index = r.nextInt( availableLocales.length );
+		return availableLocales[index];
 	}
 
 	/**
@@ -89,7 +101,7 @@ public class SentenceInventor {
 		String term = randomString();
 		if ( i > 10 ) {
 			//completely lowercase 189/200 cases
-			return term.toLowerCase();
+			return term.toLowerCase( randomlocale );
 		}
 		else if ( i < 2 ) {
 			//completely uppercase in 2/200 cases
@@ -97,7 +109,7 @@ public class SentenceInventor {
 		}
 		else {
 			//first letter uppercase in 9/200 cases
-			return term.substring( 0, 1 ) + term.substring( 1 ).toLowerCase();
+			return term.substring( 0, 1 ) + term.substring( 1 ).toLowerCase( randomlocale );
 		}
 	}
 
@@ -145,7 +157,7 @@ public class SentenceInventor {
 		periodLengthSentences = ( periodLengthSentences < 1 ) ? 1 : periodLengthSentences;
 		String firstsentence = nextSentence();
 		StringBuilder sb = new StringBuilder()
-			.append( firstsentence.substring( 0,1 ).toUpperCase() )
+			.append( firstsentence.substring( 0,1 ).toUpperCase( randomlocale ) )
 			.append( firstsentence.substring( 1 ) );
 		for ( int i = 1; i < periodLengthSentences; i++ ) {
 			int separatorCharIndex = r.nextInt( sentenceSeparators.length );
