@@ -9,6 +9,7 @@ package org.hibernate.search.util.logging.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.Query;
@@ -837,5 +838,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 278, value = "Can't build query for type '%1$s' which is neither indexed nor has any indexed sub-types.")
 	SearchException cantQueryUnindexedType(String canonicalEntityName);
+
+	@Message(id = 279, value = "Unable to load the UTF-8 Charset!")
+	AssertionFailure assertionNotLoadingUTF8Charset(@Cause UnsupportedEncodingException e);
 
 }

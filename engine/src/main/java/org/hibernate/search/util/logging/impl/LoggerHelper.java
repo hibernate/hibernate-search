@@ -9,6 +9,7 @@ package org.hibernate.search.util.logging.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Hardy Ferentschik
@@ -22,13 +23,18 @@ public final class LoggerHelper {
 	}
 
 	public static PrintStream getLoggingPrintStream() {
-		return new PrintStream( new CustomByteArrayOutputStream(), true );
+		try {
+			return new PrintStream( new CustomByteArrayOutputStream(), true, "UTF-8" );
+		}
+		catch (UnsupportedEncodingException e) {
+			throw log.assertionNotLoadingUTF8Charset( e );
+		}
 	}
 
 	static class CustomByteArrayOutputStream extends ByteArrayOutputStream {
 		@Override
 		public void flush() throws IOException {
-			log.debug( this.toString() );
+			log.debug( this.toString( "UTF-8" ) );
 			super.flush();
 		}
 	}
