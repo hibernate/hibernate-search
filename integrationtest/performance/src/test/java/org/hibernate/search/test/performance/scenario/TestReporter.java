@@ -18,13 +18,17 @@ import static org.hibernate.search.test.performance.scenario.TestContext.THREADS
 import static org.hibernate.search.test.performance.scenario.TestContext.VERBOSE;
 import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -47,9 +51,10 @@ public class TestReporter {
 	private TestReporter() {
 	}
 
-	public static void printReport(TestContext ctx) {
+	public static void printReport(TestContext ctx) throws UnsupportedEncodingException {
 		PrintStream outStream = createOutputStream( ctx.scenario.getClass().getSimpleName() );
-		PrintWriter outWriter = new PrintWriter( outStream );
+		PrintWriter outWriter = new PrintWriter(
+				new BufferedWriter( new OutputStreamWriter( outStream, "UTF-8" ) ), false );
 
 		outWriter.println( "==================================================================" );
 		outWriter.println( "HIBERNATE SEARCH PERFORMANCE TEST REPORT" );
@@ -63,6 +68,7 @@ public class TestReporter {
 		CheckerUncaughtExceptions.printUncaughtExceptions( ctx, outWriter );
 
 		outWriter.close();
+		outStream.close();
 	}
 
 	private static void printSummary(TestContext ctx, PrintWriter out) {
@@ -158,7 +164,7 @@ public class TestReporter {
 			File reportFile = new File( targetDir, "report-" + testScenarioName + "-" + DateFormatUtils.format( new Date(), "yyyy-MM-dd-HH'h'mm'm'" ) + ".txt" );
 
 			final OutputStream std = System.out;
-			final OutputStream file = new PrintStream( reportFile );
+			final OutputStream file = new PrintStream( new FileOutputStream( reportFile ), true, "UTF-8" );
 			final OutputStream stream = new OutputStream() {
 
 				@Override
@@ -178,10 +184,9 @@ public class TestReporter {
 					file.close();
 				}
 			};
-			PrintStream ps = new PrintStream( stream );
-			return ps;
+			return new PrintStream( stream, false, "UTF-8" );
 		}
-		catch (FileNotFoundException e) {
+		catch (FileNotFoundException|UnsupportedEncodingException e) {
 			throw new RuntimeException( e );
 		}
 	}

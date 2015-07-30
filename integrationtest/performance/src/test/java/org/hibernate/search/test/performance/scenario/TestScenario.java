@@ -12,6 +12,7 @@ import static org.hibernate.search.test.performance.task.InsertBookTask.SUMMARIE
 import static org.hibernate.search.test.performance.util.CheckerUncaughtExceptions.initUncaughtExceptionHandler;
 import static org.hibernate.search.test.performance.util.Util.log;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -190,7 +191,12 @@ public abstract class TestScenario {
 		TestContext ctx = new TestContext( this, sf );
 		scheduleTasksAndStart( ctx, measuredCyclesCount );
 
-		TestReporter.printReport( ctx );
+		try {
+			TestReporter.printReport( ctx );
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new RuntimeException( e );
+		}
 	}
 
 	protected void scheduleTasksAndStart(TestContext ctx, long cyclesCount) {
