@@ -8,6 +8,8 @@ package org.hibernate.search.store.spi;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
@@ -79,16 +81,25 @@ public class DirectoryHelper {
 	 * @param annotatedIndexName The index name declared on the @Indexed annotation
 	 * @param properties The properties may override the indexname.
 	 * @param verifyIsWritable Verify the directory is writable
-	 * @return the File representing the Index Directory
+	 * @return the Path representing the Index Directory
 	 * @throws SearchException if any.
 	 */
-	public static File getVerifiedIndexDir(String annotatedIndexName, Properties properties, boolean verifyIsWritable) {
+	public static Path getVerifiedIndexPath(String annotatedIndexName, Properties properties, boolean verifyIsWritable) {
 		String indexBase = properties.getProperty( Environment.INDEX_BASE_PROP_NAME, "." );
 		String indexName = properties.getProperty( Environment.INDEX_NAME_PROP_NAME, annotatedIndexName );
-		File baseIndexDir = new File( indexBase );
+		Path baseIndexDir = FileSystems.getDefault().getPath( indexBase );
 		DirectoryProviderHelper.makeSanityCheckedDirectory( baseIndexDir, indexName, verifyIsWritable );
-		File indexDir = new File( baseIndexDir, indexName );
+		Path indexDir = baseIndexDir.resolve( indexName );
 		DirectoryProviderHelper.makeSanityCheckedDirectory( indexDir, indexName, verifyIsWritable );
 		return indexDir;
 	}
+
+	/**
+	 * @deprecated use getVerifiedIndexPath
+	 */
+	@Deprecated
+	public static File getVerifiedIndexDir(String annotatedIndexName, Properties properties, boolean verifyIsWritable) {
+		return getVerifiedIndexPath( annotatedIndexName, properties, verifyIsWritable ).toFile();
+	}
+
 }

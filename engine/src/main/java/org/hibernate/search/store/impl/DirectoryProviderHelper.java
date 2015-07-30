@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -47,6 +50,14 @@ public final class DirectoryProviderHelper {
 	}
 
 	/**
+	 * @deprecated Use getSourceDirectoryPath
+	 */
+	@Deprecated
+	public static File getSourceDirectory(String indexName, Properties properties, boolean needWritePermissions) {
+		return getSourceDirectoryPath( indexName, properties, needWritePermissions ).toFile();
+	}
+
+	/**
 	 * Build a directory name out of a root and relative path, guessing the significant part
 	 * and checking for the file availability
 	 *
@@ -55,10 +66,10 @@ public final class DirectoryProviderHelper {
 	 * @param needWritePermissions when true the directory will be tested for read-write permissions.
 	 * @return The file representing the source directory
 	 */
-	public static File getSourceDirectory(String indexName, Properties properties, boolean needWritePermissions) {
+	public static Path getSourceDirectoryPath(String indexName, Properties properties, boolean needWritePermissions) {
 		String root = properties.getProperty( ROOT_INDEX_PROP_NAME );
 		String relative = properties.getProperty( RELATIVE_INDEX_PROP_NAME );
-		File sourceDirectory;
+		Path sourceDirectory;
 		if ( log.isTraceEnabled() ) {
 			log.trace(
 					"Guess source directory from " + ROOT_INDEX_PROP_NAME + " " +
@@ -73,16 +84,22 @@ public final class DirectoryProviderHelper {
 		}
 		if ( StringHelper.isEmpty( root ) ) {
 			log.debug( "No root directory, go with relative " + relative );
-			sourceDirectory = new File( relative );
-			if ( !sourceDirectory.isDirectory() ) { // this also tests for existence
+			sourceDirectory = FileSystems.getDefault().getPath( relative );
+			if ( Files.notExists( sourceDirectory ) ) {
+				throw new SearchException( "Source directory does not exist: " + relative );
+			}
+			else if ( ! Files.isReadable( sourceDirectory ) ) {
 				throw new SearchException( "Unable to read source directory: " + relative );
+			}
+			else if ( ! Files.isDirectory( sourceDirectory ) ) {
+				throw new SearchException( "Path does not point to a directory: " + relative );
 			}
 			//else keep source as it
 		}
 		else {
-			File rootDir = new File( root );
+			Path rootDir = FileSystems.getDefault().getPath( root );
 			makeSanityCheckedDirectory( rootDir, indexName, needWritePermissions );
-			sourceDirectory = new File( root, relative );
+			sourceDirectory = rootDir.resolve( relative );
 			makeSanityCheckedDirectory( sourceDirectory, indexName, needWritePermissions );
 			log.debug( "Got directory from root + relative" );
 		}
@@ -127,36 +144,41 @@ public final class DirectoryProviderHelper {
 	 *
 	 * @throws SearchException
 	 */
-	public static void makeSanityCheckedDirectory(File directory, String indexName, boolean verifyIsWritable) {
-		if ( !directory.exists() ) {
-			log.indexDirectoryNotFoundCreatingNewOne( directory.getAbsolutePath() );
+	public static void makeSanityCheckedDirectory(Path directory, String indexName, boolean verifyIsWritable) {
+		if ( Files.notExists( directory ) ) {
+			log.indexDirectoryNotFoundCreatingNewOne( directory.toString() );
 			//if not existing, create the full path
-			if ( !directory.mkdirs() ) {
+			try {
+				Files.createDirectories( directory );
+			}
+			catch (IOException e) {
 				throw new SearchException(
 						"Unable to create index directory: "
-								+ directory.getAbsolutePath() + " for index "
-								+ indexName
-				);
+								+ directory + " for index " + indexName );
 			}
 		}
 		else {
 			// else check it is not a file
-			if ( !directory.isDirectory() ) {
+			if ( ! Files.isDirectory( directory ) ) {
 				throw new SearchException(
 						"Unable to initialize index: "
-								+ indexName + ": "
-								+ directory.getAbsolutePath() + " is a file."
-				);
+								+ indexName + ": " + directory + " is a file." );
 			}
 		}
 		// and ensure it's writable
-		if ( verifyIsWritable && ( !directory.canWrite() ) ) {
+		if ( verifyIsWritable && ( ! Files.isWritable( directory ) ) ) {
 			throw new SearchException(
 					"Cannot write into index directory: "
-							+ directory.getAbsolutePath() + " for index "
-							+ indexName
-			);
+							+ directory + " for index " + indexName );
 		}
+	}
+
+	/**
+	 * @deprecated Use makeSanityCheckedDirectory(Path directory, String indexName, boolean verifyIsWritable)
+	 */
+	@Deprecated
+	public static void makeSanityCheckedDirectory(File directory, String indexName, boolean verifyIsWritable) {
+		makeSanityCheckedDirectory( directory.toPath(), indexName, verifyIsWritable );
 	}
 
 	/**
