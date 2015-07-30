@@ -30,6 +30,8 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- We override the version of ShrinkWrap Maven Resolver from Arquillian BOM:
+             this section must be declared before the Arquillian bom import -->
             <dependency>
                 <groupId>org.jboss.shrinkwrap.resolver</groupId>
                 <artifactId>shrinkwrap-resolver-bom</artifactId>
@@ -37,43 +39,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Imports compatible versions for each Arquillian module -->
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
                 <version>${arquillianVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <!-- Override imported versions to satisfy the dependency-convergence -->
-            <dependency>
-                <groupId>org.jboss.sasl</groupId>
-                <artifactId>jboss-sasl</artifactId>
-                <version>1.0.4.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.marshalling</groupId>
-                <artifactId>jboss-marshalling</artifactId>
-                <version>1.4.4.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.remoting</groupId>
-                <artifactId>jboss-remoting</artifactId>
-                <version>4.0.2.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.xnio</groupId>
-                <artifactId>xnio-api</artifactId>
-                <version>3.2.1.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.marshalling</groupId>
-                <artifactId>jboss-marshalling-river</artifactId>
-                <version>1.4.4.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.xnio</groupId>
-                <artifactId>xnio-nio</artifactId>
-                <version>3.2.1.Final</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -92,6 +64,8 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
+        <!-- test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -103,11 +77,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-depchain</artifactId>
             <scope>test</scope>
@@ -116,7 +85,28 @@
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <version>1.0.0.Alpha5</version>
+            <version>1.0.0.Final</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logmanager</groupId>
+                    <artifactId>jboss-logmanager</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.logmanager</groupId>
+                    <artifactId>log4j-jboss-logmanager</artifactId>
+                </exclusion>
+                <!-- This exclusion is needed to be able to setup the project in Windows:
+                     it otherwise includes transitive dependency to the JDK JConsole -->
+                <exclusion>
+                    <artifactId>wildfly-patching</artifactId>
+                    <groupId>org.wildfly</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
             <scope>test</scope>
             <exclusions>
                 <!-- This exclusion is needed to be able to setup the project in Windows:
@@ -151,14 +141,12 @@
     </dependencies>
 
     <build>
-
         <testResources>
             <testResource>
                 <filtering>true</filtering>
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -186,8 +174,8 @@
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
                                     <version>${wildflyVersion}</version>
-                                    <type>tar.gz</type>
-                                    <overWrite>false</overWrite>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
