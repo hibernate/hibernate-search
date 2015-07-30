@@ -83,8 +83,6 @@ public class TestRunnerArquillian {
 				.jtaDataSource( System.getProperty( "datasource", "java:jboss/datasources/ExampleDS" ) );
 
 		Properties properties = scenario.getHibernateProperties();
-		properties.setProperty( "hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.JtaTransactionFactory" );
-
 		for ( Entry<Object, Object> property : properties.entrySet() ) {
 			pu.getOrCreateProperties().
 					createProperty().
