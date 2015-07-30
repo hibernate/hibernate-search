@@ -177,6 +177,7 @@ public class FileHelper {
 		}
 	}
 
+	@Deprecated
 	public static void delete(File file) throws IOException {
 		delete( file.toPath() );
 	}
@@ -193,7 +194,7 @@ public class FileHelper {
 			throw new IllegalArgumentException();
 		}
 
-		if ( !Files.exists( path ) ) {
+		if ( Files.notExists( path ) ) {
 			return;
 		}
 
