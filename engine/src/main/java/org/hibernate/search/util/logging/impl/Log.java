@@ -858,4 +858,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 283, value = "Unsupported sort type for field %1$s: %2$s" )
 	SearchException sortFieldTypeUnsupported(String fieldName, SortField.Type type);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 284, value = "The configuration property '%s' no longer applies and will be ignored." )
+	void deprecatedConfigurationPropertyIsIgnored(String string);
+
 }
