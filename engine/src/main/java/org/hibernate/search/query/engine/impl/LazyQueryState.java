@@ -20,7 +20,6 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Weight;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
@@ -49,7 +48,6 @@ public final class LazyQueryState implements Closeable {
 	private final Set<Class<?>> targetedTypes;
 
 	private Query rewrittenQuery;
-	private Weight queryWeight;
 
 	public LazyQueryState(Query userQuery,
 			IndexReader reader,
@@ -182,14 +180,6 @@ public final class LazyQueryState implements Closeable {
 		else {
 			stringEncodedFieldNames.add( fieldDescriptor.getName() );
 		}
-	}
-
-	private Weight getWeight() throws IOException {
-		if ( queryWeight == null ) {
-			//FIXME don't hardcode 'boolean needsScores'
-			queryWeight = rewrittenQuery().createWeight( searcher, true );
-		}
-		return queryWeight;
 	}
 
 	private Query rewrittenQuery() throws IOException {
