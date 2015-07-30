@@ -7,8 +7,11 @@
 package org.hibernate.search.test.integration.wildfly.massindexing;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -105,9 +108,11 @@ public class MassIndexingTimeoutIT {
 
 	private void insertTestData() {
 		List<Concert> concerts = new ArrayList<>();
-
+		GregorianCalendar calendar = new GregorianCalendar( TimeZone.getTimeZone( "UTC" ), Locale.ROOT );
+		calendar.set( 2015, 0, 31 );
+		Date time = calendar.getTime();
 		for ( int i = 0; i < NUMBER_OF_ENTIIES; i++ ) {
-			concerts.add( new Concert( "Hruce Bronsby", new GregorianCalendar( 2015, 0, 31 ).getTime() ) );
+			concerts.add( new Concert( "Hruce Bronsby", time ) );
 		}
 
 		concertManager.saveConcerts( concerts );
