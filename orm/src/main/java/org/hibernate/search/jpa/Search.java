@@ -9,6 +9,8 @@ package org.hibernate.search.jpa;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.jpa.impl.ImplementationFactory;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Helper class that should be used when building a FullTextEntityManager
@@ -18,15 +20,26 @@ import org.hibernate.search.jpa.impl.ImplementationFactory;
  */
 public final class Search {
 
+	private static final Log log = LoggerFactory.make();
+
 	private Search() {
 	}
 
 	/**
 	 * Build a full text capable EntityManager
 	 * The underlying EM implementation has to be Hibernate EntityManager
+	 * The created instance depends on the passed Session: closing either of them will
+	 * close both instances. They both share the same persistence context.
+	 *
+	 * @param em the entityManager instance to use
+	 * @return a FullTextEntityManager, wrapping the passed EntityManager
+	 * @throws IllegalArgumentException if passed null
 	 */
 	public static FullTextEntityManager getFullTextEntityManager(EntityManager em) {
-		if ( em instanceof FullTextEntityManager ) {
+		if ( em == null ) {
+			throw log.getNullEntityManagerPassedToFullEntityManagerCreationException();
+		}
+		else if ( em instanceof FullTextEntityManager ) {
 			return (FullTextEntityManager) em;
 		}
 		else {

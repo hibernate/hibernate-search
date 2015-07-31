@@ -535,7 +535,7 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException getNullSessionPassedToFullTextSessionCreationException();
 
 	@Message(id = 179, value = "Unable to create a FullTextEntityManager from a null EntityManager")
-	IllegalArgumentException getNullSessionPassedToFullEntityManagerCreationException();
+	IllegalArgumentException getNullEntityManagerPassedToFullEntityManagerCreationException();
 
 	@Message(id = 180, value = "Unable to cast %s of type %s to %s")
 	ClassCastException getUnableToNarrowFieldDescriptorException(String actualDescriptorType, String type, String expectedType);

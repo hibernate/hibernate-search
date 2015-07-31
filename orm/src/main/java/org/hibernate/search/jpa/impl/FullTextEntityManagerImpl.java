@@ -48,7 +48,7 @@ final class FullTextEntityManagerImpl implements FullTextEntityManager, Serializ
 
 	public FullTextEntityManagerImpl(EntityManager em) {
 		if ( em == null ) {
-			throw log.getNullSessionPassedToFullEntityManagerCreationException();
+			throw log.getNullEntityManagerPassedToFullEntityManagerCreationException();
 		}
 		this.em = em;
 	}

@@ -9,6 +9,8 @@ package org.hibernate.search.jpa.impl;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
 /**
@@ -18,12 +20,19 @@ import org.hibernate.search.jpa.FullTextEntityManager;
  */
 public final class ImplementationFactory {
 
+	private static final Log log = LoggerFactory.make();
+
 	private ImplementationFactory() {
 		//not meant to be instantiated
 	}
 
 	public static FullTextEntityManager createFullTextEntityManager(EntityManager em) {
-		return new FullTextEntityManagerImpl( em );
+		if ( em == null ) {
+			throw log.getNullEntityManagerPassedToFullEntityManagerCreationException();
+		}
+		else {
+			return new FullTextEntityManagerImpl( em );
+		}
 	}
 
 }

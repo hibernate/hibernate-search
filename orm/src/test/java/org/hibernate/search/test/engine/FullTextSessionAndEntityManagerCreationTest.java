@@ -10,7 +10,7 @@ package org.hibernate.search.test.engine;
 import org.hibernate.search.Search;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -25,8 +25,10 @@ public class FullTextSessionAndEntityManagerCreationTest {
 			fail( "A valid session must be passed" );
 		}
 		catch (IllegalArgumentException e) {
-			assertTrue( "Unexpected error code: " + e.getMessage(),
-					e.getMessage().endsWith( "Unable to create a SessionDelegatorBaseImpl from a null sessionImplementor object" ) );
+			assertEquals(
+					"Unexpected error code: " + e.getMessage(),
+					"HSEARCH000178: Unable to create a FullTextSession from a null Session",
+					e.getMessage() );
 		}
 	}
 
@@ -37,7 +39,11 @@ public class FullTextSessionAndEntityManagerCreationTest {
 			fail( "A valid session must be passed" );
 		}
 		catch (IllegalArgumentException e) {
-			assertTrue( "Unexpected error code: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000179" ) );
+			assertEquals(
+					"Unexpected error code: " + e.getMessage(),
+					"HSEARCH000179: Unable to create a FullTextEntityManager from a null EntityManager",
+					e.getMessage() );
 		}
 	}
+
 }
