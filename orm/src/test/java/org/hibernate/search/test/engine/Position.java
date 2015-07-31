@@ -8,6 +8,7 @@ package org.hibernate.search.test.engine;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
@@ -24,6 +25,7 @@ import static org.hibernate.search.annotations.FieldCacheType.ID;
 @Entity
 @Indexed
 @CacheFromIndex({ CLASS, ID })
+@Table(name = "geopositions")
 public class Position {
 
 	@Id
