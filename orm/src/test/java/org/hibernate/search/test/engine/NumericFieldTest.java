@@ -193,7 +193,7 @@ public class NumericFieldTest extends SearchTestBase {
 	}
 
 	private int countSizeForType(Class<?> type) {
-		try ( Session session = getSession() ) {
+		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
 			SearchFactory searchFactory = fullTextSession.getSearchFactory();
 			int numDocs = -1; // to have it fail in case of errors
