@@ -8,6 +8,8 @@ package org.hibernate.search;
 
 import org.hibernate.Session;
 import org.hibernate.search.impl.ImplementationFactory;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Helper class to get a {@code FullTextSession} from a regular ORM session.
@@ -17,11 +19,25 @@ import org.hibernate.search.impl.ImplementationFactory;
  */
 public final class Search {
 
+	private static final Log log = LoggerFactory.make();
+
 	private Search() {
 	}
 
+	/**
+	 * Creates a FullTextSession from a regular Session.
+	 * The created instance depends on the passed Session: closing either of them will
+	 * close both instances. They both share the same persistence context.
+	 *
+	 * @param session
+	 * @return the new FullTextSession, based on the passed Session
+	 * @throws IllegalArgumentException if passed null
+	 */
 	public static FullTextSession getFullTextSession(Session session) {
-		if ( session instanceof FullTextSession ) {
+		if ( session == null ) {
+			throw log.getNullSessionPassedToFullTextSessionCreationException();
+		}
+		else if ( session instanceof FullTextSession ) {
 			return (FullTextSession) session;
 		}
 		else {

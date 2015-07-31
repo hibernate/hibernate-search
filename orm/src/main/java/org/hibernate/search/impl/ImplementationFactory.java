@@ -9,6 +9,8 @@ package org.hibernate.search.impl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
 /**
@@ -18,12 +20,19 @@ import org.hibernate.search.spi.SearchIntegrator;
  */
 public final class ImplementationFactory {
 
+	private static final Log log = LoggerFactory.make();
+
 	private ImplementationFactory() {
 		//not meant to be instantiated
 	}
 
 	public static FullTextSession createFullTextSession(org.hibernate.Session session) {
-		return new FullTextSessionImpl( session );
+		if ( session == null ) {
+			throw log.getNullSessionPassedToFullTextSessionCreationException();
+		}
+		else {
+			return new FullTextSessionImpl( session );
+		}
 	}
 
 	public static SearchFactory createSearchFactory(SearchIntegrator searchIntegrator) {
