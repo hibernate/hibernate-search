@@ -22,7 +22,6 @@ import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.testing.SkipForDialect;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,17 +30,12 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@SkipForDialect(org.hibernate.dialect.MySQLDialect.class)
 public class NumericFieldTest extends SearchTestBase {
-
-	FullTextSession fullTextSession;
 
 	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		Session session = openSession();
-		fullTextSession = Search.getFullTextSession( session );
 		prepareData();
 	}
 
@@ -55,69 +49,73 @@ public class NumericFieldTest extends SearchTestBase {
 
 	@Test
 	public void testIndexAndSearchNumericField() {
-		Transaction tx = fullTextSession.beginTransaction();
+		try ( Session session = openSession() ) {
+			FullTextSession fts = Search.getFullTextSession( session );
+			Transaction tx = fts.beginTransaction();
 
-		// Range Queries including lower and upper bounds
-		assertEquals( "Query id ", 3, numericQueryFor( "overriddenFieldName", 1, 3 ).size() );
-		assertEquals( "Query by double range", 3, numericQueryFor( "latitude", -10d, 10d ).size() );
-		assertEquals( "Query by short range", 3, numericQueryFor( "importance", (short) 11, (short) 13 ).size() );
-		assertEquals( "Query by Short range", 3, numericQueryFor( "fallbackImportance", Short.valueOf( "11" ), Short.valueOf( "13" ) ).size() );
-		assertEquals( "Query by byte range", 3, numericQueryFor( "popularity", (byte) 21, (byte) 23 ).size() );
-		assertEquals( "Query by Byte range", 3, numericQueryFor( "fallbackPopularity", Byte.valueOf( "21" ), Byte.valueOf( "23" ) ).size() );
-		assertEquals( "Query by integer range", 4, numericQueryFor( "ranking", 1, 2 ).size() );
-		assertEquals( "Query by long range", 3, numericQueryFor( "myCounter", 1L, 3L ).size() );
-		assertEquals( "Query by multi-fields", 2, numericQueryFor( "strMultiple", 0.7d, 0.9d ).size() );
-		assertEquals( "Query on custom bridge by range", 4, numericQueryFor( "visibleStars", -100L, 500L ).size() );
+			// Range Queries including lower and upper bounds
+			assertEquals( "Query id ", 3, numericQueryFor( fts, "overriddenFieldName", 1, 3 ).size() );
+			assertEquals( "Query by double range", 3, numericQueryFor( fts, "latitude", -10d, 10d ).size() );
+			assertEquals( "Query by short range", 3, numericQueryFor( fts, "importance", (short) 11, (short) 13 ).size() );
+			assertEquals( "Query by Short range", 3, numericQueryFor( fts, "fallbackImportance", Short.valueOf( "11" ), Short.valueOf( "13" ) ).size() );
+			assertEquals( "Query by byte range", 3, numericQueryFor( fts, "popularity", (byte) 21, (byte) 23 ).size() );
+			assertEquals( "Query by Byte range", 3, numericQueryFor( fts, "fallbackPopularity", Byte.valueOf( "21" ), Byte.valueOf( "23" ) ).size() );
+			assertEquals( "Query by integer range", 4, numericQueryFor( fts, "ranking", 1, 2 ).size() );
+			assertEquals( "Query by long range", 3, numericQueryFor( fts, "myCounter", 1L, 3L ).size() );
+			assertEquals( "Query by multi-fields", 2, numericQueryFor( fts, "strMultiple", 0.7d, 0.9d ).size() );
+			assertEquals( "Query on custom bridge by range", 4, numericQueryFor( fts, "visibleStars", -100L, 500L ).size() );
 
-		// Range Queries different bounds
-		assertEquals( "Query by id excluding upper", 2, numericQueryFor( "overriddenFieldName", 1, 3, true, false ).size() );
-		assertEquals( "Query by id excluding upper and lower", 1, numericQueryFor( "overriddenFieldName", 1, 3, false, false ).size() );
+			// Range Queries different bounds
+			assertEquals( "Query by id excluding upper", 2, numericQueryFor( fts, "overriddenFieldName", 1, 3, true, false ).size() );
+			assertEquals( "Query by id excluding upper and lower", 1, numericQueryFor( fts, "overriddenFieldName", 1, 3, false, false ).size() );
 
-		// Range Query for embedded entities
-		assertEquals( "Range Query for indexed embedded", 2, numericQueryFor( "country.idh", 0.9, 1d ).size() );
+			// Range Query for embedded entities
+			assertEquals( "Range Query for indexed embedded", 2, numericQueryFor( fts, "country.idh", 0.9, 1d ).size() );
 
-		// Range Query across entities
-		assertEquals( "Range Query across entities", 1, numericQueryFor( "pinPoints.stars", 4, 5 ).size() );
+			// Range Query across entities
+			assertEquals( "Range Query across entities", 1, numericQueryFor( fts, "pinPoints.stars", 4, 5 ).size() );
 
-		// Exact Matching Queries
-		assertEquals( "Query id exact", 1, doExactQuery( "overriddenFieldName", 1 ).getId() );
-		assertEquals( "Query double exact", 2, doExactQuery( "latitude", -10d ).getId() );
-		assertEquals( "Query short exact", 3, doExactQuery( "importance", 12 ).getId() );
-		assertEquals( "Query byte exact", 3, doExactQuery( "popularity", 22 ).getId() );
-		assertEquals( "Query integer exact", 3, doExactQuery( "longitude", -20d ).getId() );
-		assertEquals( "Query long exact", 4, doExactQuery( "myCounter", 4L ).getId() );
-		assertEquals( "Query multifield exact", 5, doExactQuery( "strMultiple", 0.1d ).getId() );
-		assertEquals( "Query on custom bridge exact", 3, doExactQuery( "visibleStars", 1000L ).getId() );
+			// Exact Matching Queries
+			assertEquals( "Query id exact", 1, doExactQuery( fts, "overriddenFieldName", 1 ).getId() );
+			assertEquals( "Query double exact", 2, doExactQuery( fts, "latitude", -10d ).getId() );
+			assertEquals( "Query short exact", 3, doExactQuery( fts, "importance", 12 ).getId() );
+			assertEquals( "Query byte exact", 3, doExactQuery( fts, "popularity", 22 ).getId() );
+			assertEquals( "Query integer exact", 3, doExactQuery( fts, "longitude", -20d ).getId() );
+			assertEquals( "Query long exact", 4, doExactQuery( fts, "myCounter", 4L ).getId() );
+			assertEquals( "Query multifield exact", 5, doExactQuery( fts, "strMultiple", 0.1d ).getId() );
+			assertEquals( "Query on custom bridge exact", 3, doExactQuery( fts, "visibleStars", 1000L ).getId() );
 
-		tx.commit();
-		fullTextSession.clear();
+			tx.commit();
+			fts.clear();
 
-		// Delete operation on Numeric Id with overriden field name:
-		tx = fullTextSession.beginTransaction();
-		List allLocations = fullTextSession.createCriteria( Location.class ).list();
-		for ( Object location : allLocations ) {
-			fullTextSession.delete( location );
+			// Delete operation on Numeric Id with overriden field name:
+			tx = fts.beginTransaction();
+			List allLocations = fts.createCriteria( Location.class ).list();
+			for ( Object location : allLocations ) {
+				fts.delete( location );
+			}
+			tx.commit();
+			fts.clear();
+			tx = fts.beginTransaction();
+
+			assertEquals( "Check for deletion on Query", 0, numericQueryFor( fts, "overriddenFieldName", 1, 6 ).size() );
+			// and now check also for the real index contents:
+			Query query = NumericFieldUtils.createNumericRangeQuery( "overriddenFieldName", 1, 6, true, true );
+			FullTextQuery fullTextQuery = fts
+					.createFullTextQuery( query, Location.class )
+					.setProjection( ProjectionConstants.DOCUMENT );
+			assertEquals( "Check for deletion on index projection", 0, fullTextQuery.list().size() );
+
+			tx.commit();
 		}
-		tx.commit();
-		fullTextSession.clear();
-		tx = fullTextSession.beginTransaction();
-
-		assertEquals( "Check for deletion on Query", 0, numericQueryFor( "overriddenFieldName", 1, 6 ).size() );
-		// and now check also for the real index contents:
-		Query query = NumericFieldUtils.createNumericRangeQuery( "overriddenFieldName", 1, 6, true, true );
-		FullTextQuery fullTextQuery = fullTextSession
-				.createFullTextQuery( query, Location.class )
-				.setProjection( ProjectionConstants.DOCUMENT );
-		assertEquals( "Check for deletion on index projection", 0, fullTextQuery.list().size() );
-
-		tx.commit();
 	}
 
 	@TestForIssue(jiraKey = "HSEARCH-1193")
 	@Test
 	public void testNumericFieldProjections() {
-		Transaction tx = fullTextSession.beginTransaction();
-		try {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Transaction tx = fullTextSession.beginTransaction();
 			Query latitudeQuery = NumericFieldUtils.createNumericRangeQuery( "latitude", -20d, -20d, true, true );
 			List list = fullTextSession.createFullTextQuery( latitudeQuery, Location.class )
 					.setProjection( "latitude" )
@@ -136,8 +134,6 @@ public class NumericFieldTest extends SearchTestBase {
 			Assert.assertEquals( 2d, secondProjection[1] );
 			Assert.assertEquals( (short) 10, secondProjection[2] );
 			Assert.assertEquals( (byte) 20, secondProjection[3] );
-		}
-		finally {
 			tx.commit();
 		}
 	}
@@ -145,16 +141,15 @@ public class NumericFieldTest extends SearchTestBase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-997")
 	public void testShortDocumentIdExplicitlyMappedAsNumericField() {
-		Transaction tx = fullTextSession.beginTransaction();
-		try {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Transaction tx = fullTextSession.beginTransaction();
 			Query query = NumericFieldUtils.createNumericRangeQuery( "myId", (short) 1, (short) 1, true, true );
 			@SuppressWarnings("unchecked")
 			List<Coordinate> list = fullTextSession.createFullTextQuery( query, Coordinate.class )
 					.list();
 			Assert.assertEquals( 1, list.size() );
 			Assert.assertEquals( (short) 1, list.iterator().next().getId() );
-		}
-		finally {
 			tx.commit();
 		}
 	}
@@ -162,16 +157,15 @@ public class NumericFieldTest extends SearchTestBase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-997")
 	public void testByteDocumentIdExplicitlyMappedAsNumericField() {
-		Transaction tx = fullTextSession.beginTransaction();
-		try {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Transaction tx = fullTextSession.beginTransaction();
 			Query query = NumericFieldUtils.createNumericRangeQuery( "myId", (byte) 1, (byte) 1, true, true );
 			@SuppressWarnings("unchecked")
 			List<PointOfInterest> list = fullTextSession.createFullTextQuery( query, PointOfInterest.class )
 					.list();
 			Assert.assertEquals( 1, list.size() );
 			Assert.assertEquals( (byte) 1, list.iterator().next().getId() );
-		}
-		finally {
 			tx.commit();
 		}
 	}
@@ -179,16 +173,15 @@ public class NumericFieldTest extends SearchTestBase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-997")
 	public void testByteDocumentIdMappedAsStringFieldByDefault() {
-		Transaction tx = fullTextSession.beginTransaction();
-		try {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Transaction tx = fullTextSession.beginTransaction();
 			Query query = TermRangeQuery.newStringRange( "id", "1", "1", true, true );
 			@SuppressWarnings("unchecked")
 			List<Position> list = fullTextSession.createFullTextQuery( query, Position.class )
 					.list();
 			Assert.assertEquals( 1, list.size() );
 			Assert.assertEquals( (byte) 1, list.iterator().next().getId() );
-		}
-		finally {
 			tx.commit();
 		}
 	}
@@ -200,16 +193,19 @@ public class NumericFieldTest extends SearchTestBase {
 	}
 
 	private int countSizeForType(Class<?> type) {
-		SearchFactory searchFactory = fullTextSession.getSearchFactory();
-		int numDocs = -1; // to have it fail in case of errors
-		IndexReader locationIndexReader = searchFactory.getIndexReaderAccessor().open( type );
-		try {
-			numDocs = locationIndexReader.numDocs();
+		try ( Session session = getSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			SearchFactory searchFactory = fullTextSession.getSearchFactory();
+			int numDocs = -1; // to have it fail in case of errors
+			IndexReader locationIndexReader = searchFactory.getIndexReaderAccessor().open( type );
+			try {
+				numDocs = locationIndexReader.numDocs();
+			}
+			finally {
+				searchFactory.getIndexReaderAccessor().close( locationIndexReader );
+			}
+			return numDocs;
 		}
-		finally {
-			searchFactory.getIndexReaderAccessor().close( locationIndexReader );
-		}
-		return numDocs;
 	}
 
 	@Override
@@ -217,56 +213,58 @@ public class NumericFieldTest extends SearchTestBase {
 		return new Class<?>[] { PinPoint.class, Location.class, Coordinate.class, PointOfInterest.class, Position.class };
 	}
 
-	private Location doExactQuery(String fieldName, Object value) {
+	private Location doExactQuery(FullTextSession fullTextSession, String fieldName, Object value) {
 		Query matchQuery = NumericFieldUtils.createExactMatchQuery( fieldName, value );
 		return (Location) fullTextSession.createFullTextQuery( matchQuery, Location.class ).list().get( 0 );
 	}
 
-	private List numericQueryFor(String fieldName, Object from, Object to) {
+	private List numericQueryFor(FullTextSession fullTextSession, String fieldName, Object from, Object to) {
 		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, from, to, true, true );
 		return fullTextSession.createFullTextQuery( query, Location.class ).list();
 	}
 
-	private List numericQueryFor(String fieldName, Object from, Object to, boolean includeLower, boolean includeUpper) {
+	private List numericQueryFor(FullTextSession fullTextSession, String fieldName, Object from, Object to, boolean includeLower, boolean includeUpper) {
 		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, from, to, includeLower, includeUpper );
 		return fullTextSession.createFullTextQuery( query, Location.class ).list();
 	}
 
 	private void prepareData() {
-		Transaction tx = fullTextSession.beginTransaction();
-		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), BigDecimal.ONE, (short) 10, (byte) 20 );
-		loc1.addPinPoints( new PinPoint( 1, 4, loc1 ), new PinPoint( 2, 5, loc1 ) );
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Transaction tx = fullTextSession.beginTransaction();
+			Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), BigDecimal.ONE, (short) 10, (byte) 20 );
+			loc1.addPinPoints( new PinPoint( 1, 4, loc1 ), new PinPoint( 2, 5, loc1 ) );
 
-		Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), BigDecimal.ONE, (short) 11, (byte) 21 );
-		loc2.addPinPoints( new PinPoint( 3, 1, loc2 ), new PinPoint( 4, 2, loc2 ) );
+			Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), BigDecimal.ONE, (short) 11, (byte) 21 );
+			loc2.addPinPoints( new PinPoint( 3, 1, loc2 ), new PinPoint( 4, 2, loc2 ) );
 
-		Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), BigDecimal.TEN, (short) 12, (byte) 22 );
-		Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), BigDecimal.ONE, (short) 13, (byte) 23 );
-		Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), BigDecimal.ONE, (short) 14, (byte) 24 );
+			Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), BigDecimal.TEN, (short) 12, (byte) 22 );
+			Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), BigDecimal.ONE, (short) 13, (byte) 23 );
+			Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), BigDecimal.ONE, (short) 14, (byte) 24 );
 
-		fullTextSession.save( loc1 );
-		fullTextSession.save( loc2 );
-		fullTextSession.save( loc3 );
-		fullTextSession.save( loc4 );
-		fullTextSession.save( loc5 );
+			fullTextSession.save( loc1 );
+			fullTextSession.save( loc2 );
+			fullTextSession.save( loc3 );
+			fullTextSession.save( loc4 );
+			fullTextSession.save( loc5 );
 
-		Coordinate coordinate1 = new Coordinate( (short) 1, -20D, 20D );
-		Coordinate coordinate2 = new Coordinate( (short) 2, -30D, 30D );
-		fullTextSession.save( coordinate1 );
-		fullTextSession.save( coordinate2 );
+			Coordinate coordinate1 = new Coordinate( (short) 1, -20D, 20D );
+			Coordinate coordinate2 = new Coordinate( (short) 2, -30D, 30D );
+			fullTextSession.save( coordinate1 );
+			fullTextSession.save( coordinate2 );
 
-		PointOfInterest poi1 = new PointOfInterest( (byte) 1, -20D, 20D );
-		PointOfInterest poi2 = new PointOfInterest( (byte) 2, -30D, 30D );
-		fullTextSession.save( poi1 );
-		fullTextSession.save( poi2 );
+			PointOfInterest poi1 = new PointOfInterest( (byte) 1, -20D, 20D );
+			PointOfInterest poi2 = new PointOfInterest( (byte) 2, -30D, 30D );
+			fullTextSession.save( poi1 );
+			fullTextSession.save( poi2 );
 
-		Position position1 = new Position( (byte) 1, -20D, 20D );
-		Position position2 = new Position( (byte) 2, -30D, 30D );
-		fullTextSession.save( position1 );
-		fullTextSession.save( position2 );
+			Position position1 = new Position( (byte) 1, -20D, 20D );
+			Position position2 = new Position( (byte) 2, -30D, 30D );
+			fullTextSession.save( position1 );
+			fullTextSession.save( position2 );
 
-		tx.commit();
-		fullTextSession.clear();
+			tx.commit();
+		}
 	}
 
 	private Country countryFor(String name, double idh) {
@@ -275,29 +273,31 @@ public class NumericFieldTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	private void cleanData() {
-		Transaction tx = fullTextSession.beginTransaction();
-		List<Location> locations = fullTextSession.createCriteria( Location.class ).list();
-		for ( Location location : locations ) {
-			fullTextSession.delete( location );
-		}
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Transaction tx = fullTextSession.beginTransaction();
+			List<Location> locations = fullTextSession.createCriteria( Location.class ).list();
+			for ( Location location : locations ) {
+				fullTextSession.delete( location );
+			}
 
-		List<Coordinate> coordinates = fullTextSession.createCriteria( Coordinate.class ).list();
-		for ( Coordinate coordinate : coordinates ) {
-			fullTextSession.delete( coordinate );
-		}
+			List<Coordinate> coordinates = fullTextSession.createCriteria( Coordinate.class ).list();
+			for ( Coordinate coordinate : coordinates ) {
+				fullTextSession.delete( coordinate );
+			}
 
-		List<PointOfInterest> pois = fullTextSession.createCriteria( PointOfInterest.class ).list();
-		for ( PointOfInterest poi : pois ) {
-			fullTextSession.delete( poi );
-		}
+			List<PointOfInterest> pois = fullTextSession.createCriteria( PointOfInterest.class ).list();
+			for ( PointOfInterest poi : pois ) {
+				fullTextSession.delete( poi );
+			}
 
-		List<Position> positions = fullTextSession.createCriteria( Position.class ).list();
-		for ( Position position : positions ) {
-			fullTextSession.delete( position );
-		}
+			List<Position> positions = fullTextSession.createCriteria( Position.class ).list();
+			for ( Position position : positions ) {
+				fullTextSession.delete( position );
+			}
 
-		tx.commit();
-		fullTextSession.close();
+			tx.commit();
+		}
 	}
 
 }
