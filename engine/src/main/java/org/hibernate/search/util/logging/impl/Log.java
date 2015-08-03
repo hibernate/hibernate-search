@@ -842,4 +842,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 279, value = "Unable to load the UTF-8 Charset!")
 	AssertionFailure assertionNotLoadingUTF8Charset(@Cause UnsupportedEncodingException e);
 
+	@Message(id = 280, value = "Source directory does not exist: '%1$s")
+	SearchException sourceDirectoryNotExisting(String directory);
+
+	@Message(id = 281, value = "Unable to read directory: '%1$s")
+	SearchException directoryIsNotReadable(String directory);
+
 }

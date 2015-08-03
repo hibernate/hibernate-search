@@ -86,13 +86,13 @@ public final class DirectoryProviderHelper {
 			log.debug( "No root directory, go with relative " + relative );
 			sourceDirectory = FileSystems.getDefault().getPath( relative );
 			if ( Files.notExists( sourceDirectory ) ) {
-				throw new SearchException( "Source directory does not exist: " + relative );
+				throw log.sourceDirectoryNotExisting( relative );
 			}
 			else if ( ! Files.isReadable( sourceDirectory ) ) {
-				throw new SearchException( "Unable to read source directory: " + relative );
+				throw log.directoryIsNotReadable( relative );
 			}
 			else if ( ! Files.isDirectory( sourceDirectory ) ) {
-				throw new SearchException( "Path does not point to a directory: " + relative );
+				throw log.fileIsADirectory( relative );
 			}
 			//else keep source as it
 		}
