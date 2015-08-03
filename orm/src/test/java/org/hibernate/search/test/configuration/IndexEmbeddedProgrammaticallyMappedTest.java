@@ -10,13 +10,17 @@ import java.lang.annotation.ElementType;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.hibernate.Transaction;
+import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.testing.SkipForDialect;
+import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,6 +30,8 @@ import static org.junit.Assert.assertEquals;
  * @author Gunnar Morling
  */
 @TestForIssue(jiraKey = "HSEARCH-1764")
+@SkipForDialect(jiraKey = "HSEARCH-1942", value = PostgreSQL81Dialect.class)
+@RunWith(CustomRunner.class)//To enable usage of @SkipForDialect
 public class IndexEmbeddedProgrammaticallyMappedTest {
 
 	@Test
