@@ -49,7 +49,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class JGroupsMasterTest extends SearchTestBase {
 
-	private final QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+	private final QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 
 	/**
 	 * Name of the JGroups channel used in test

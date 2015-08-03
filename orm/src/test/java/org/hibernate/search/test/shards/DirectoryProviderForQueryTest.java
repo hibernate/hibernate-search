@@ -58,7 +58,7 @@ public class DirectoryProviderForQueryTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 
 		FullTextQuery fullTextQuery = fts.createFullTextQuery( parser.parse( "body:message" ) );
 		List results = fullTextQuery.list();

@@ -11,6 +11,8 @@ import java.io.Serializable;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.LoggerInfoStream;
 
 /**
@@ -107,13 +109,11 @@ public enum IndexWriterSetting implements Serializable {
 			writerConfig.setRAMBufferSizeMB( value );
 		}
 	},
-	/**
-	 * @see org.apache.lucene.index.IndexWriterConfig#setTermIndexInterval(int)
-	 */
+	@Deprecated
 	TERM_INDEX_INTERVAL( "term_index_interval" ) {
 		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
-			writerConfig.setTermIndexInterval( value );
+			log.deprecatedConfigurationPropertyIsIgnored( "term_index_interval" );
 		}
 	},
 	/**
@@ -144,6 +144,8 @@ public enum IndexWriterSetting implements Serializable {
 
 	private static final Integer TRUE = 1;
 	private static final Integer FALSE = 0;
+
+	private static final Log log = LoggerFactory.make();
 
 	private final String cfgKey;
 

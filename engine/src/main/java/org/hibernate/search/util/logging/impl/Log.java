@@ -12,7 +12,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.SortField;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.backend.spi.DeletionQuery;
@@ -841,5 +844,22 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 279, value = "Unable to load the UTF-8 Charset!")
 	AssertionFailure assertionNotLoadingUTF8Charset(@Cause UnsupportedEncodingException e);
+
+	@Message(id = 280, value = "An IOException happened while opening multiple indexes" )
+	SearchException ioExceptionOnMultiReaderRefresh(@Cause IOException e);
+
+	@Message(id = 281, value = "Could not create uninverting reader for reader %s" )
+	SearchException couldNotCreateUninvertingReader(DirectoryReader reader, @Cause IOException e);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 282, value = "Could not create uninverting reader for reader of type %s; Only directory readers are supported" )
+	void readerTypeUnsupportedForInverting(@FormatWith(ClassFormatter.class) Class<? extends IndexReader> readerClass);
+
+	@Message(id = 283, value = "Unsupported sort type for field %1$s: %2$s" )
+	SearchException sortFieldTypeUnsupported(String fieldName, SortField.Type type);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 284, value = "The configuration property '%s' no longer applies and will be ignored." )
+	void deprecatedConfigurationPropertyIsIgnored(String string);
 
 }

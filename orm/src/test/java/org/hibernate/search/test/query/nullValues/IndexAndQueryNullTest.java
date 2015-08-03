@@ -221,7 +221,7 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 	}
 
 	private Query createLuceneQuery() throws ParseException {
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
 		parser.setAllowLeadingWildcard( true );
 		return parser.parse( "*" );
 	}

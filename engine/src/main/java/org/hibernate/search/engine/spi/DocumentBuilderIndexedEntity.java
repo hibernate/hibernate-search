@@ -26,7 +26,7 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetField;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -378,9 +378,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	private static FieldType createTenantIdFieldType() {
 		FieldType type = new FieldType();
 		type.setStored( false );
-		type.setIndexed( true );
 		type.setOmitNorms( true );
-		type.setIndexOptions( IndexOptions.DOCS_ONLY );
+		type.setIndexOptions( IndexOptions.DOCS );
 		type.setTokenized( false );
 		type.setStoreTermVectorOffsets( false );
 		type.setStoreTermVectorPayloads( false );

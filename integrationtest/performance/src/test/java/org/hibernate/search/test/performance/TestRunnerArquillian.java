@@ -105,7 +105,7 @@ public class TestRunnerArquillian {
 	private EntityManager em;
 
 	@Test
-	public void runPerformanceTest() {
+	public void runPerformanceTest() throws IOException {
 		SessionFactory sf = em.unwrap( Session.class ).getSessionFactory();
 		scenario.run( sf );
 	}

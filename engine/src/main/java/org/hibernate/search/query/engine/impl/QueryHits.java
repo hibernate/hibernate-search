@@ -30,15 +30,16 @@ import org.apache.lucene.facet.range.LongRangeFacetCounts;
 import org.apache.lucene.facet.sortedset.DefaultSortedSetDocValuesReaderState;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetCounts;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesReaderState;
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TimeLimitingCollector;
@@ -50,7 +51,6 @@ import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Counter;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.query.collector.impl.FacetsCollectorDecorator;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
@@ -452,13 +452,13 @@ public class QueryHits {
 	 */
 	private Set<String> findAllTermsForField(String fieldName, IndexReader reader) throws IOException {
 		Set<String> termValues = new HashSet<>();
-		for ( AtomicReaderContext leaf : reader.leaves() ) {
-			final AtomicReader atomicReader = leaf.reader();
+		for ( LeafReaderContext leaf : reader.leaves() ) {
+			final LeafReader atomicReader = leaf.reader();
 			Terms terms = atomicReader.terms( fieldName );
 			if ( terms == null ) {
 				continue;
 			}
-			final TermsEnum iterator = terms.iterator( null ); //we have no TermsEnum to reuse
+			final TermsEnum iterator = terms.iterator();
 			BytesRef byteRef;
 			while ( ( byteRef = iterator.next() ) != null ) {
 				termValues.add( byteRef.utf8ToString() );
@@ -472,16 +472,16 @@ public class QueryHits {
 			return collector;
 		}
 		facetsCollector = new FacetsCollector();
-		return new FacetsCollectorDecorator( facetsCollector, collector );
+		return MultiCollector.wrap( facetsCollector, collector );
 	}
 
 	private Collector optionallyEnableDistanceCollector(Collector collector, int maxDocs) {
 		if ( spatialFieldName == null || spatialFieldName.isEmpty() || spatialSearchCenter == null ) {
 			return collector;
 		}
-		distanceCollector = new DistanceCollector( collector, spatialSearchCenter, maxDocs, spatialFieldName );
+		distanceCollector = new DistanceCollector( spatialSearchCenter, maxDocs, spatialFieldName );
 
-		return distanceCollector;
+		return MultiCollector.wrap( distanceCollector, collector );
 	}
 
 	private boolean isImmediateTimeout() {
@@ -520,7 +520,7 @@ public class QueryHits {
 	private TopDocsCollector<?> createTopDocCollector(int maxDocs) throws IOException {
 		TopDocsCollector<?> topCollector;
 		if ( sort == null ) {
-			topCollector = TopScoreDocCollector.create( maxDocs, !searcher.scoresDocsOutOfOrder() );
+			topCollector = TopScoreDocCollector.create( maxDocs );
 		}
 		else {
 			boolean fillFields = true;
@@ -529,8 +529,7 @@ public class QueryHits {
 					maxDocs,
 					fillFields,
 					searcher.isFieldSortDoTrackScores(),
-					searcher.isFieldSortDoMaxScore(),
-					!searcher.scoresDocsOutOfOrder()
+					searcher.isFieldSortDoMaxScore()
 			);
 		}
 		return topCollector;

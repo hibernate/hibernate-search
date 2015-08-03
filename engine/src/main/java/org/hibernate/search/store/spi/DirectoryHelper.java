@@ -17,7 +17,6 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
-import org.apache.lucene.util.Version;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
@@ -46,13 +45,11 @@ public class DirectoryHelper {
 	 * @throws SearchException in case of lock acquisition timeouts, IOException, or if a corrupt index is found
 	 */
 	public static void initializeIndexIfNeeded(Directory directory) {
-		//version doesn't really matter as we won't use the Analyzer
-		Version version = Environment.DEFAULT_LUCENE_MATCH_VERSION;
-		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
+		SimpleAnalyzer analyzer = new SimpleAnalyzer();
 		try {
 			if ( ! DirectoryReader.indexExists( directory ) ) {
 				try {
-					IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE );
+					IndexWriterConfig iwriterConfig = new IndexWriterConfig( analyzer ).setOpenMode( OpenMode.CREATE );
 					//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
 					//for distributed indexes (Infinispan but probably also NFS and similar)
 					iwriterConfig.setWriteLockTimeout( 2000 );

@@ -6,18 +6,19 @@
  */
 package org.hibernate.search.spatial.impl;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.lucene.index.DocsEnum;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.BitDocIdSet;
 import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.io.IOException;
-import java.util.List;
+import org.apache.lucene.util.FixedBitSet;
 
 /**
  * Lucene Filter for filtering documents which have been indexed with Hibernate Search Spatial SpatialFieldBridge
@@ -43,14 +44,14 @@ public final class SpatialHashFilter extends Filter {
 	 * @param reader reader to the index
 	 */
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
 		if ( spatialHashCellsIds.size() == 0 ) {
 			return null;
 		}
 
-		final AtomicReader atomicReader = context.reader();
+		final LeafReader atomicReader = context.reader();
 
-		OpenBitSet matchedDocumentsIds = new OpenBitSet( atomicReader.maxDoc() );
+		BitDocIdSet matchedDocumentsIds = new BitDocIdSet( new FixedBitSet( atomicReader.maxDoc() ) );
 		Boolean found = false;
 		for ( int i = 0; i < spatialHashCellsIds.size(); i++ ) {
 			Term spatialHashCellTerm = new Term( fieldName, spatialHashCellsIds.get( i ) );
@@ -63,7 +64,7 @@ public final class SpatialHashFilter extends Filter {
 					}
 					else {
 						if ( acceptDocs == null || acceptDocs.get( docId ) ) {
-							matchedDocumentsIds.fastSet( docId );
+							matchedDocumentsIds.bits().set( docId );
 							found = true;
 						}
 					}
@@ -80,7 +81,7 @@ public final class SpatialHashFilter extends Filter {
 	}
 
 	@Override
-	public String toString() {
+	public String toString(String field) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "SpatialHashFilter" );
 		sb.append( "{spatialHashCellsIds=" ).append( spatialHashCellsIds );

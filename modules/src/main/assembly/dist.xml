@@ -21,6 +21,11 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>${module.xml.basedir}/lucene_internal/module.xml</source>
+            <outputDirectory>/org/apache/lucene/internal/${lucene.module.slot}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
             <source>${module.xml.basedir}/search/engine/module.xml</source>
             <outputDirectory>/org/hibernate/search/engine/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
@@ -114,7 +119,22 @@
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>org.apache.lucene:*</include>
+                <include>org.apache.lucene:lucene-core</include>
+                <include>org.apache.lucene:lucene-queryparser</include>
+                <include>org.apache.lucene:lucene-queries</include>
+                <include>org.apache.lucene:lucene-facet</include>
+                <include>org.apache.lucene:lucene-analyzers-common</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/apache/lucene/internal/${lucene.module.slot}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.apache.lucene:lucene-backward-codecs</include>
+                <include>org.apache.lucene:lucene-misc</include>
             </includes>
         </dependencySet>
 

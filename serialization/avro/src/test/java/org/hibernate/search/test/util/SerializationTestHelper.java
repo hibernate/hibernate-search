@@ -177,8 +177,7 @@ public final class SerializationTestHelper {
 		assertThat( copy.storeTermVectorOffsets() ).isEqualTo( original.storeTermVectorOffsets() );
 		assertThat( copy.storeTermVectorPayloads() ).isEqualTo( original.storeTermVectorPayloads() );
 		assertThat( copy.storeTermVectorOffsets() ).isEqualTo( original.storeTermVectorOffsets() );
-		assertThat( copy.docValueType() ).isEqualTo( original.docValueType() );
-		assertThat( copy.indexed() ).isEqualTo( original.indexed() );
+		assertThat( copy.docValuesType() ).isEqualTo( original.docValuesType() );
 		assertThat( copy.indexOptions() ).isEqualTo( original.indexOptions() );
 		assertThat( copy.numericPrecisionStep() ).isEqualTo( original.numericPrecisionStep() );
 		assertThat( copy.numericType() ).isEqualTo( original.numericType() );

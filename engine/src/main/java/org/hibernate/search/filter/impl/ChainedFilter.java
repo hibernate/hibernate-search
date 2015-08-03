@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
@@ -28,7 +28,6 @@ import org.hibernate.search.exception.AssertionFailure;
  * @author Hardy Ferentschik
  */
 public class ChainedFilter extends Filter {
-	private static final long serialVersionUID = -6153052295766531920L;
 
 	private final List<Filter> chainedFilters = new ArrayList<Filter>();
 
@@ -60,7 +59,7 @@ public class ChainedFilter extends Filter {
 	}
 
 	@Override
-	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
 		int size = chainedFilters.size();
 		if ( size == 0 ) {
 			throw new AssertionFailure( "No filters to chain" );
@@ -73,20 +72,25 @@ public class ChainedFilter extends Filter {
 			for ( Filter f : chainedFilters ) {
 				subSets.add( f.getDocIdSet( context, acceptDocs ) );
 			}
-			subSets = FilterOptimizationHelper.mergeByBitAnds( subSets );
-			if ( subSets.size() == 1 ) {
-				return subSets.get( 0 );
-			}
-			final AtomicReader reader = context.reader();
+			final LeafReader reader = context.reader();
 			return new AndDocIdSet( subSets, reader.maxDoc() );
 		}
 	}
 
 	@Override
-	public String toString() {
+	public String toString(String field) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( "ChainedFilter" );
-		sb.append( "{chainedFilters=" ).append( chainedFilters );
+		boolean first = true;
+		sb.append( "ChainedFilter{chainedFilters=" );
+		for ( Filter filter : chainedFilters ) {
+			if ( first ) {
+				first = false;
+			}
+			else {
+				sb.append( ", " );
+			}
+			sb.append( filter.toString( field ) );
+		}
 		sb.append( '}' );
 		return sb.toString();
 	}

@@ -11,8 +11,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -176,7 +176,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestBase {
 		IndexReaderAccessor indexReaderAccessor = getSearchFactory().getIndexReaderAccessor();
 		IndexReader indexReader = indexReaderAccessor.open( WorkingPerson.class );
 		try {
-			for ( AtomicReaderContext leave : indexReader.leaves() ) {
+			for ( LeafReaderContext leave : indexReader.leaves() ) {
 				if ( leave.reader().terms( fieldName ) != null ) {
 					return true;
 				}

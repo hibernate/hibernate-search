@@ -11,11 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -25,7 +23,6 @@ import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.RangeFacet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
 import org.junit.Test;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
@@ -122,12 +119,12 @@ public class WebShopTest extends AbstractFacetTest {
 
 	public static class SearchService {
 		public static final String colorFacetName = "color";
-		public static final String cubicCapacityFacetName = "cubicCapacity";
-		private SessionFactory factory;
+		public static final String cubicCapacityFacetName = "cubicCapacity_Numeric";
+		private final SessionFactory factory;
 		private FullTextQuery currentFullTextQuery;
 		private Map<String, List<FacetMenuItem>> menuItems;
 		private String queryString;
-		private List<Facet> selectedFacets = newArrayList();
+		private final List<Facet> selectedFacets = newArrayList();
 
 		public SearchService(SessionFactory factory) {
 			this.factory = factory;
@@ -174,7 +171,7 @@ public class WebShopTest extends AbstractFacetTest {
 			// range faceting
 			final FacetingRequest priceFacet = builder.facet()
 					.name( cubicCapacityFacetName )
-					.onField( "cubicCapacity" )
+					.onField( "cubicCapacity_Numeric" )
 					.range()
 					.below( 2500 ).excludeLimit()
 					.from( 2500 ).to( 3000 )

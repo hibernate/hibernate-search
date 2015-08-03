@@ -6,15 +6,9 @@
  */
 package org.hibernate.search.test.filter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -22,12 +16,16 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.util.DocIdBitSet;
+import org.apache.lucene.util.BitDocIdSet;
+import org.apache.lucene.util.BitSet;
 import org.apache.lucene.util.FixedBitSet;
-import org.apache.lucene.util.OpenBitSet;
-import org.apache.lucene.util.packed.EliasFanoDocIdSet;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Functionality testcase for org.hibernate.search.filter.AndDocIdSet.
@@ -117,18 +115,18 @@ public class AndDocIdSetsTest {
 	}
 
 	public void onRandomBigArraysTest(long randomSeed) {
-		List<BitSet> filtersData = makeRandomBitSetList( randomSeed, 4, 1000000, 1500000 );
-		BitSet expectedBitset = applyANDOnBitSets( filtersData );
+		List<FixedBitSet> filtersData = makeRandomBitSetList( randomSeed, 4, 1000000, 1500000 );
+		FixedBitSet expectedBitset = applyANDOnBitSets( filtersData );
 		List<DocIdSet> filters = toDocIdSetList( filtersData );
-		DocIdBitSet expectedDocIdSet = new DocIdBitSet( expectedBitset );
+		BitDocIdSet expectedDocIdSet = new BitDocIdSet( expectedBitset );
 		DocIdSet testedSet = new AndDocIdSet( filters, 1500000 );
 		assertTrue( docIdSetsEqual( expectedDocIdSet, testedSet ) );
 	}
 
-	private static List<DocIdSet> toDocIdSetList(List<BitSet> filtersData) {
-		List<DocIdSet> docIdSets = new ArrayList<DocIdSet>( filtersData.size() );
+	private static List<DocIdSet> toDocIdSetList(List<FixedBitSet> filtersData) {
+		List<DocIdSet> docIdSets = new ArrayList<>( filtersData.size() );
 		for ( BitSet bitSet : filtersData ) {
-			docIdSets.add( new DocIdBitSet( bitSet ) );
+			docIdSets.add( new BitDocIdSet( bitSet ) );
 		}
 		return docIdSets;
 	}
@@ -144,14 +142,14 @@ public class AndDocIdSetsTest {
 
 	private static void compareAndingPerformance(final int listSize,
 												final int minBitsSize, final int maxBitsSize) throws IOException {
-		List<BitSet> filtersData = makeRandomBitSetList( 13L, listSize, minBitsSize, maxBitsSize );
+		List<FixedBitSet> filtersData = makeRandomBitSetList( 13L, listSize, minBitsSize, maxBitsSize );
 		DocIdSet andedByBitsResult = null;
 		DocIdSet andedByIterationResult = null;
 		{
 			long startTime = System.nanoTime();
 			for ( int i = 0; i < 1000; i++ ) {
 				BitSet expectedBitset = applyANDOnBitSets( filtersData );
-				andedByBitsResult = new DocIdBitSet( expectedBitset );
+				andedByBitsResult = new BitDocIdSet( expectedBitset );
 				// iteration is needed to have a fair comparison with other impl:
 				iterateOnResults( andedByBitsResult );
 			}
@@ -191,23 +189,20 @@ public class AndDocIdSetsTest {
 		while ( currentDoc != DocIdSetIterator.NO_MORE_DOCS );
 	}
 
-	private static BitSet applyANDOnBitSets(final List<BitSet> filtersData) {
-		BitSet andedBitSet = null;
-		for ( BitSet bits : filtersData ) {
-			if ( andedBitSet == null ) {
-				andedBitSet = (BitSet) bits.clone();
-			}
-			else {
-				andedBitSet.and( bits );
-			}
+	private static FixedBitSet applyANDOnBitSets(final List<FixedBitSet> filtersData) {
+		//Start by cloning the first, as that's giving you the upper bound for the set ids
+		FixedBitSet first = filtersData.get( 0 );
+		FixedBitSet toreturn = first.clone();
+		for ( FixedBitSet bits : filtersData ) {
+			toreturn.and( bits );
 		}
-		return andedBitSet;
+		return toreturn;
 	}
 
-	private static List<BitSet> makeRandomBitSetList(final long randomSeed, final int listSize,
+	private static List<FixedBitSet> makeRandomBitSetList(final long randomSeed, final int listSize,
 													final int minBitsSize, final int maxBitsSize) {
 		Random r = new Random( randomSeed ); //have a fixed Seed for repeatable tests
-		List<BitSet> resultList = new ArrayList<BitSet>( listSize );
+		List<FixedBitSet> resultList = new ArrayList<>( listSize );
 		for ( int i = 0; i < listSize; i++ ) {
 			int arraySize = minBitsSize + r.nextInt( maxBitsSize - minBitsSize );
 			resultList.add( makeRandomBitSet( r, arraySize ) );
@@ -215,8 +210,8 @@ public class AndDocIdSetsTest {
 		return resultList;
 	}
 
-	private static BitSet makeRandomBitSet(final Random randomSource, final int maxSize) {
-		BitSet bitSet = new BitSet();
+	private static FixedBitSet makeRandomBitSet(final Random randomSource, final int maxSize) {
+		FixedBitSet bitSet = new FixedBitSet( maxSize );
 		for ( int datai = 0; datai < maxSize; datai++ ) {
 			// each bit has 50% change to be set:
 			if ( randomSource.nextBoolean() ) {
@@ -235,19 +230,27 @@ public class AndDocIdSetsTest {
 	 * @return a instance of {@code DocIdBitSet} filled with the integers from the specified list
 	 */
 	public DocIdSet arrayToDocIdSet(List<Integer> docIdList) {
-		BitSet bitset = new BitSet();
+		int max = -1;
+		for ( int i : docIdList ) {
+			max = Math.max( max, i );
+		}
+		FixedBitSet bitset = new FixedBitSet( max + 1 );
 		for ( int i : docIdList ) {
 			bitset.set( i );
 		}
-		return new DocIdBitSet( bitset );
+		return new BitDocIdSet( bitset );
 	}
 
 	public DocIdSet integersToDocIdSet(int... integers) {
-		BitSet bitset = new BitSet();
+		int max = -1;
+		for ( int i : integers ) {
+			max = Math.max( max, i );
+		}
+		FixedBitSet bitset = new FixedBitSet( max + 1 );
 		for ( int i : integers ) {
 			bitset.set( i );
 		}
-		return new DocIdBitSet( bitset );
+		return new BitDocIdSet( bitset );
 	}
 
 	/**
@@ -279,17 +282,6 @@ public class AndDocIdSetsTest {
 
 	// HSEARCH-610
 	@Test
-	public void testWithOpenBitSet() {
-		DocIdSet idSet1 = new OpenBitSet( new long[] { 1121 }, 1 ); // bits 0, 5, 6, 10
-		DocIdSet idSet2 = new OpenBitSet( new long[] { 64 }, 1 ); // bit 6
-		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
-
-		DocIdSet expected = integersToDocIdSet( 6 );
-		assertTrue( docIdSetsEqual( expected, actual ) );
-	}
-
-	// HSEARCH-610
-	@Test
 	public void testWithDocIdBitSet() {
 		DocIdSet idSet1 = integersToDocIdSet( 0, 5, 6, 10 );
 		DocIdSet idSet2 = integersToDocIdSet( 6 );
@@ -306,13 +298,16 @@ public class AndDocIdSetsTest {
 		idSet1.or( integersToDocIdSet( 0, 5, 6, 10 ).iterator() );
 		FixedBitSet idSet2 = new FixedBitSet( 7 );
 		idSet2.set( 6 );
-		AndDocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
+		AndDocIdSet actual = createAndDocIdSet( new BitDocIdSet( idSet1 ), new BitDocIdSet( idSet2 ) );
 
 		DocIdSet expected = integersToDocIdSet( 6 );
 		assertTrue( docIdSetsEqual( expected, actual ) );
 	}
 
 	// HSEARCH-610
+	/*
+	 * FIXME: See if there is a new BitSet implementation in Lucene 5 which
+	 * could expose the same semantics as Lucene 4's EliasFanoDocIdSet
 	@Test
 	public void testWithEliasFanoBitSet() throws IOException {
 		EliasFanoDocIdSet idSet1 = new EliasFanoDocIdSet( 4, 12 );
@@ -324,10 +319,11 @@ public class AndDocIdSetsTest {
 		DocIdSet expected = integersToDocIdSet( 6 );
 		assertTrue( docIdSetsEqual( expected, actual ) );
 	}
+	*/
 
 	@Test
 	public void testEmptyDocIdSet() throws Exception {
-		DocIdSet idSet1 = new DocIdBitSet( new BitSet() );
+		DocIdSet idSet1 = new BitDocIdSet( new FixedBitSet( 0 ) );
 		DocIdSet idSet2 = integersToDocIdSet( 0, 5, 6, 10 );
 		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
 

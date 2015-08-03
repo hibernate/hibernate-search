@@ -351,7 +351,6 @@ Other parameters which affect indexing time and memory consumption are:
 * `hibernate.search.[default|<indexname>].indexwriter.merge_max_optimize_size`
 * `hibernate.search.[default|<indexname>].indexwriter.merge_calibrate_by_deletes`
 * `hibernate.search.[default|<indexname>].indexwriter.ram_buffer_size`
-* `hibernate.search.[default|<indexname>].indexwriter.term_index_interval`
 
 Previous versions also had a `max_field_length` but this was removed from Lucene, it's possible
 to obtain a similar effect by using a `LimitTokenCountAnalyzer`.
