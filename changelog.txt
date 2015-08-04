@@ -1,6 +1,26 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.4.0.CR2 (4-8-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1708] - Using DistanceSortField does not verify the field parameter passed to the constructor
+    * [HSEARCH-1918] - Spatial Search with distance projection is not returning all results
+    * [HSEARCH-1936] - Avro Serializer does not preserve value of field's term vector when it is set to YES
+    * [HSEARCH-1941] - Passing a null to Search.getFullTextSession causes a confusing error message
+    * [HSEARCH-1945] - Resolution of index storage paths with "." creates inconsistent directory trees
+
+** Task
+    * [HSEARCH-1909] - Rename logging category for the FullText-Query category
+    * [HSEARCH-1932] - Re-enable the performance tests
+    * [HSEARCH-1934] - Replace the Infinispan integration module with a Maven Relocation
+    * [HSEARCH-1938] - Integrate build tool to verify against usage of tricky JDK methods
+    * [HSEARCH-1939] - Upgrade to Hibernate ORM 5.0.0.CR3
+    * [HSEARCH-1940] - Use Maven Relocation to deprecate the old hibernate-search artifactId
+    * [HSEARCH-1944] - Enable profiles for testing on MariaDB and PostgreSQL
+    * [HSEARCH-1948] - Missing tools.jar make the performance integration tests fail on JDK9
+
 
 Version 5.4.0.CR1 (13-7-2015)
 ------------------------

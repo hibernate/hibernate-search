@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 5.4.0.CR1*
+*Version: 5.4.0.CR2*
 
 ## Description
 
@@ -31,7 +31,7 @@ Include the following to your dependency list:
     <dependency>
        <groupId>org.hibernate</groupId>
        <artifactId>hibernate-search-orm</artifactId>
-       <version>5.4.0.CR1</version>
+       <version>5.4.0.CR2</version>
     </dependency>
 
 ### Sourceforge Bundle
