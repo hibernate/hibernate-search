@@ -11,10 +11,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.inject.Inject;
 
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
@@ -43,7 +47,7 @@ import org.junit.runner.RunWith;
 public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 
 	@Deployment
-	public static Archive<?> createTestArchive() {
+	public static Archive<?> createTestArchive() throws IllegalArgumentException, IOException {
 		JavaArchive ejb = ShrinkWrap
 				.create( JavaArchive.class, ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getSimpleName() + ".jar" )
 				.addClasses( ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class, Member.class, MemberRegistration.class, Resources.class )
@@ -55,9 +59,20 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 		EnterpriseArchive ear = ShrinkWrap
 				.create( EnterpriseArchive.class, ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getSimpleName() + ".ear" )
 				.addAsModules( ejb )
-				.addAsResource( "jboss-deployment-structure-ear.xml", "/jboss-deployment-structure.xml" )
+				.addAsResource( jbossDeploymentXml(), "/jboss-deployment-structure.xml" )
 				.setApplicationXML( new StringAsset( applicationXml ) );
 		return ear;
+	}
+
+	private static Asset jbossDeploymentXml() throws IOException {
+		String text;
+		try ( InputStream inputStream = ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getClassLoader().getResourceAsStream( "jboss-deployment-structure.xml" ) ) {
+			try ( Scanner scanner = new Scanner( inputStream, "UTF-8" ) ) {
+				text = scanner.useDelimiter( "\\A" ).next();
+			}
+		}
+		String finalXml = text.replace( (CharSequence)"${project.slot}", (CharSequence)VersionTestHelper.getModuleSlotString() );
+		return new StringAsset( finalXml );
 	}
 
 	private static Asset persistenceXml() {
