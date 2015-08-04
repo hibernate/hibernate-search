@@ -40,7 +40,8 @@ public class PackagerHelper {
 		"antlr:antlr",
 		"org.apache.geronimo.specs:geronimo-jta_1.1_spec",
 		"org.javassist:javassist",
-		"org.jboss.jdeparser:jdeparser"
+		"org.jboss.jdeparser:jdeparser",
+		"com.sun:tools" //Always exclude this as it's not available on JDK9
 	};
 
 	/**
