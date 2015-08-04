@@ -8,6 +8,8 @@ package org.hibernate.search.test.performance.reader;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -19,7 +21,6 @@ import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
@@ -78,10 +79,9 @@ public abstract class ReaderPerformance extends SearchTestBase {
 
 	private void buildBigIndex() throws InterruptedException, IOException {
 		System.out.println( "Going to create fake index..." );
+		Path detectiveIndexPath = Paths.get( getIndexBaseDir() ).resolve( Detective.class.getCanonicalName() );
+		FSDirectory directory = FSDirectory.open( detectiveIndexPath );
 
-		FSDirectory directory = FSDirectory.open(
-				new File( getIndexBaseDir(), Detective.class.getCanonicalName() )
-		);
 		SimpleAnalyzer analyzer = new SimpleAnalyzer();
 		IndexWriterConfig cfg = new IndexWriterConfig( analyzer );
 		IndexWriter iw = new IndexWriter( directory, cfg );
