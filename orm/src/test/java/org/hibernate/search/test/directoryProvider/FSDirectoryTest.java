@@ -42,73 +42,56 @@ public class FSDirectoryTest extends SearchTestBase {
 
 	@Test
 	public void testEventIntegration() throws Exception {
-		Session s = getSessionFactory().openSession();
-		s.getTransaction().begin();
-		s.persist(
-				new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" )
-		);
-		s.getTransaction().commit();
-		s.close();
+		try ( Session s = getSessionFactory().openSession() ) {
+			s.getTransaction().begin();
+			s.persist( new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" ) );
+			s.getTransaction().commit();
+		}
 
-		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
-		try {
-			IndexReader reader = DirectoryReader.open( dir );
-			try {
+		Document entity;
+
+		try ( Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() ) ) {
+			try ( IndexReader reader = DirectoryReader.open( dir ) ) {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
 				assertEquals( 1, reader.docFreq( new Term( "Abstract", "hibernate" ) ) );
 				assertEquals( 1, reader.docFreq( new Term( "title", "action" ) ) );
 				assertEquals( "1", projectSingleField( reader, "id", new Term( "title", "action" ) ) );
-
-			}
-			finally {
-				reader.close();
 			}
 
-			s = getSessionFactory().openSession();
-			s.getTransaction().begin();
-			Document entity = s.get( Document.class, Long.valueOf( 1 ) );
-			entity.setSummary( "Object/relational mapping with EJB3" );
-			s.persist( new Document( "Seam in Action", "", "blah blah blah blah" ) );
-			s.getTransaction().commit();
-			s.close();
+			try ( Session s = getSessionFactory().openSession() ) {
+				s.getTransaction().begin();
+				entity = s.get( Document.class, Long.valueOf( 1 ) );
+				entity.setSummary( "Object/relational mapping with EJB3" );
+				s.persist( new Document( "Seam in Action", "", "blah blah blah blah" ) );
+				s.getTransaction().commit();
+			}
 
-			reader = DirectoryReader.open( dir );
-			try {
+			try ( IndexReader reader = DirectoryReader.open( dir ) ) {
 				int num = reader.numDocs();
 				assertEquals( 2, num );
 				assertEquals( 1, reader.docFreq( new Term( "Abstract", "ejb" ) ) );
 			}
-			finally {
-				reader.close();
+
+			try ( Session s = getSessionFactory().openSession() ) {
+				s.getTransaction().begin();
+				s.delete( entity );
+				s.getTransaction().commit();
 			}
 
-			s = getSessionFactory().openSession();
-			s.getTransaction().begin();
-			s.delete( entity );
-			s.getTransaction().commit();
-			s.close();
-
-			reader = DirectoryReader.open( dir );
-			try {
+			try ( IndexReader reader = DirectoryReader.open( dir ) ) {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
 				assertEquals( 1, reader.docFreq( new Term( "title", "seam" ) ) );
 				assertEquals( "2", projectSingleField( reader, "id", new Term( "title", "seam" ) ) );
 			}
-			finally {
-				reader.close();
-			}
-		}
-		finally {
-			dir.close();
 		}
 
-		s = getSessionFactory().openSession();
-		s.getTransaction().begin();
-		s.delete( s.createCriteria( Document.class ).uniqueResult() );
-		s.getTransaction().commit();
-		s.close();
+		try ( Session s = getSessionFactory().openSession() ) {
+			s.getTransaction().begin();
+			s.delete( s.createCriteria( Document.class ).uniqueResult() );
+			s.getTransaction().commit();
+		}
 	}
 
 	/**
@@ -134,73 +117,68 @@ public class FSDirectoryTest extends SearchTestBase {
 
 	@Test
 	public void testBoost() throws Exception {
-		Session s = getSessionFactory().openSession();
-		s.getTransaction().begin();
-		s.persist(
-				new Document( "Hibernate in Action", "Object and Relational", "blah blah blah" )
-		);
-		s.persist(
-				new Document( "Object and Relational", "Hibernate in Action", "blah blah blah" )
-		);
-		s.getTransaction().commit();
-		s.close();
-
-		FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
-		IndexReader indexReader = DirectoryReader.open( dir );
-		IndexSearcher searcher = new IndexSearcher( indexReader );
-		try {
-			QueryParser qp = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
-			Query query = qp.parse( "title:Action OR Abstract:Action" );
-			TopDocs hits = searcher.search( query, 1000 );
-			assertEquals( 2, hits.totalHits );
-			assertTrue( hits.scoreDocs[0].score == 2 * hits.scoreDocs[1].score );
-			org.apache.lucene.document.Document doc = searcher.doc( 0 );
-			assertEquals( "Hibernate in Action", doc.get( "title" ) );
-		}
-		finally {
-			indexReader.close();
-			dir.close();
+		try ( Session s = getSessionFactory().openSession() ) {
+			s.getTransaction().begin();
+			s.persist( new Document( "Hibernate in Action", "Object and Relational", "blah blah blah" ) );
+			s.persist( new Document( "Object and Relational", "Hibernate in Action", "blah blah blah" ) );
+			s.getTransaction().commit();
 		}
 
-		s = getSessionFactory().openSession();
-		s.getTransaction().begin();
-		List list = s.createQuery( "from Document" ).list();
-		for ( Document document : (List<Document>) list ) {
-			s.delete( document );
+		try ( FSDirectory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() ) ) {
+			try ( IndexReader indexReader = DirectoryReader.open( dir ) ) {
+				IndexSearcher searcher = new IndexSearcher( indexReader );
+				QueryParser qp = new QueryParser( "id", TestConstants.standardAnalyzer );
+				Query query = qp.parse( "title:Action OR Abstract:Action" );
+				TopDocs hits = searcher.search( query, 1000 );
+				assertEquals( 2, hits.totalHits );
+				assertTrue( hits.scoreDocs[0].score == 2 * hits.scoreDocs[1].score );
+				org.apache.lucene.document.Document doc = searcher.doc( 0 );
+				assertEquals( "Hibernate in Action", doc.get( "title" ) );
+			}
 		}
-		s.getTransaction().commit();
-		s.close();
-		getSessionFactory().close(); //run the searchfactory.close() operations
+
+		try ( Session s = getSessionFactory().openSession() ) {
+			s.getTransaction().begin();
+			List list = s.createQuery( "from Document" ).list();
+			for ( Document document : (List<Document>) list ) {
+				s.delete( document );
+			}
+			s.getTransaction().commit();
+		}
 	}
 
 	@Test
 	public void testSearchOnDeletedIndex() throws Exception {
-		Session s = getSessionFactory().openSession();
-		s.getTransaction().begin();
-		s.persist( new Document( "Hibernate Search in Action", "", "" ) );
-		s.getTransaction().commit();
-		s.close();
+		try ( Session s = getSessionFactory().openSession() ) {
+			s.getTransaction().begin();
+			s.persist( new Document( "Hibernate Search in Action", "", "" ) );
+			s.getTransaction().commit();
+		}
 
-		Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() );
-		IndexReader indexReader = DirectoryReader.open( dir );
-		IndexSearcher searcher = new IndexSearcher( indexReader );
-		// deleting before search, but after IndexSearcher creation:
-		// ( fails when deleting -concurrently- to IndexSearcher initialization! )
-		FileHelper.delete( getBaseIndexDir() );
-		TermQuery query = new TermQuery( new Term( "title", "action" ) );
-		TopDocs hits = searcher.search( query, 1000 );
-		assertEquals( 1, hits.totalHits );
-		org.apache.lucene.document.Document doc = searcher.doc( 0 );
-		assertEquals( "Hibernate Search in Action", doc.get( "title" ) );
-		indexReader.close();
-		dir.close();
+		try ( Directory dir = FSDirectory.open( getBaseIndexDir().resolve( "Documents" ).toFile() ) ) {
+			try ( IndexReader indexReader = DirectoryReader.open( dir ) ) {
+				IndexSearcher searcher = new IndexSearcher( indexReader );
+				// deleting before search, but after IndexSearcher creation:
+				// ( fails when deleting -concurrently- to IndexSearcher initialization! )
+				try {
+					FileHelper.delete( getBaseIndexDir() );
+				}
+				catch (IOException ioe) {
+					// If you try deleting an in-use index on Windows, you'll get an AccessDenied
+					// So ignore that for the purposes of this test.
+				}
+				TermQuery query = new TermQuery( new Term( "title", "action" ) );
+				TopDocs hits = searcher.search( query, 1000 );
+				assertEquals( 1, hits.totalHits );
+				org.apache.lucene.document.Document doc = searcher.doc( 0 );
+				assertEquals( "Hibernate Search in Action", doc.get( "title" ) );
+			}
+		}
 	}
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] {
-				Document.class
-		};
+		return new Class[] { Document.class };
 	}
 
 	@Override
