@@ -60,9 +60,10 @@ public final class ScheduledCommitPolicy extends AbstractCommitPolicy {
 
 		@Override
 		public void run() {
-			if ( getIndexWriter() != null && getIndexWriter().hasUncommittedChanges() ) {
-				indexWriterHolder.commitIndexWriter();
-			}
+			// This is technically running in a race condition with a possible shutdown
+			// (indexwriter getting closed), which would cause an AlreadyClosedException exception,
+			// but gets swallowed as it's running in the service thread (which is also shutting down).
+			indexWriterHolder.commitIndexWriter();
 		}
 	}
 
