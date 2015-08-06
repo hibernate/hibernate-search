@@ -118,9 +118,9 @@
                     <links>
                         <link>http://download.oracle.com/javase/7/docs/api/</link>
                         <link>http://docs.jboss.org/hibernate/orm/5.0/javadocs/</link>
-                        <link>http://lucene.apache.org/core/4_10_2/core/</link>
-                        <link>http://lucene.apache.org/core/4_10_2/analyzers-common/</link>
-                        <link>http://lucene.apache.org/core/4_10_2/queryparser/</link>
+                        <link>http://lucene.apache.org/core/5_2_1/core/</link>
+                        <link>http://lucene.apache.org/core/5_2_1/analyzers-common/</link>
+                        <link>http://lucene.apache.org/core/5_2_1/queryparser/</link>
                         <link>http://jgroups.org/javadoc</link>
                     </links>
                     <packagesheader>Hibernate Search Packages</packagesheader>
