@@ -131,7 +131,7 @@ class IndexWriterHolder {
 		if ( similarity != null ) {
 			writerConfig.setSimilarity( similarity );
 		}
-		writerConfig.setOpenMode( OpenMode.APPEND ); //More efficient to open
+		writerConfig.setOpenMode( OpenMode.CREATE_OR_APPEND );
 		return writerConfig;
 	}
 
