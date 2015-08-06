@@ -119,7 +119,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 
 		s.clear();
 		Transaction tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
 		resetFieldSelector();
@@ -150,7 +150,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		Transaction tx;
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
@@ -220,7 +220,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		Transaction tx;
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
@@ -251,7 +251,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		Transaction tx;
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
@@ -364,7 +364,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		Transaction tx;
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
@@ -403,7 +403,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		Transaction tx;
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:Accounting" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
@@ -481,7 +481,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		Transaction tx;
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:Accounting" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
@@ -635,7 +635,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		tx.commit();
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Book.class );

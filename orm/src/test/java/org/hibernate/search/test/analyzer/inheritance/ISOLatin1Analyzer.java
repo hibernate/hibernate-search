@@ -6,14 +6,10 @@
  */
 package org.hibernate.search.test.analyzer.inheritance;
 
-import java.io.Reader;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-
-import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * @author Hardy Ferentschik
@@ -21,8 +17,8 @@ import org.hibernate.search.testsupport.TestConstants;
 public final class ISOLatin1Analyzer extends Analyzer {
 
 	@Override
-	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-		StandardTokenizer tokenizer = new StandardTokenizer( TestConstants.getTargetLuceneVersion(), reader );
+	protected TokenStreamComponents createComponents(String fieldName) {
+		StandardTokenizer tokenizer = new StandardTokenizer();
 		TokenStream filter = new ASCIIFoldingFilter( tokenizer );
 		return new TokenStreamComponents( tokenizer, filter );
 	}

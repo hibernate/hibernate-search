@@ -51,7 +51,7 @@ public class TestReporter {
 	private TestReporter() {
 	}
 
-	public static void printReport(TestContext ctx) throws UnsupportedEncodingException {
+	public static void printReport(TestContext ctx) throws UnsupportedEncodingException, IOException {
 		PrintStream outStream = createOutputStream( ctx.scenario.getClass().getSimpleName() );
 		PrintWriter outWriter = new PrintWriter(
 				new BufferedWriter( new OutputStreamWriter( outStream, "UTF-8" ) ), false );

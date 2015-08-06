@@ -15,11 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
@@ -64,7 +64,8 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		private final RAMDirectoryProvider dp = new RAMDirectoryProvider();
 
 		TestManipulatorPerDP(int seed) {
-			dp.initialize( String.valueOf( seed ), null, new BuildContextForTest( new SearchConfigurationForTest() ) );
+			dp.initialize( String.valueOf( seed ), new Properties(), new BuildContextForTest( new SearchConfigurationForTest() ) );
+			dp.start( null );
 		}
 
 		public void setIndexChanged() {
@@ -101,7 +102,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	}
 
 	@Override
-	protected DirectoryReader readerFactory(Directory directory) {
+	protected DirectoryReader readerFactory(Directory directory) throws IOException {
 		TestManipulatorPerDP manipulatorPerDP = manipulators.get( directory );
 		if ( !manipulatorPerDP.isReaderCreated.compareAndSet( false, true ) ) {
 			throw new IllegalStateException( "IndexReader created twice" );
@@ -130,7 +131,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	 */
 	public class MockDirectoryBasedIndexManager extends DirectoryBasedIndexManager {
 
-		private MockDirectoryProvider provider = new MockDirectoryProvider();
+		private final MockDirectoryProvider provider = new MockDirectoryProvider();
 
 		@Override
 		public DirectoryProvider getDirectoryProvider() {
@@ -165,9 +166,9 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		private final AtomicBoolean hasAlreadyBeenReOpened = new AtomicBoolean( false );
 		private final AtomicBoolean isIndexReaderCurrent;
 
-		MockIndexReader(AtomicBoolean isIndexReaderCurrent) {
+		MockIndexReader(AtomicBoolean isIndexReaderCurrent) throws IOException {
 			//make the super constructor happy as the class is "locked down"
-			super( new RAMDirectory(), new AtomicReader[0] );
+			super( new RAMDirectory(), new LeafReader[0] );
 			this.isIndexReaderCurrent = isIndexReaderCurrent;
 			if ( !isIndexReaderCurrent.compareAndSet( false, true ) ) {
 				throw new IllegalStateException( "Unnecessarily reopened" );

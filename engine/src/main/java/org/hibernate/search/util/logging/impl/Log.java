@@ -18,7 +18,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.SortField;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.backend.spi.DeletionQuery;
@@ -853,4 +856,22 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 283, value = "Sorting using '%1$s' requires an indexed field: '%2$s' is not valid")
 	SearchException sortRequiresIndexedField(@FormatWith(ClassFormatter.class) Class<?> sortFieldType, String field);
+
+	@Message(id = 284, value = "An IOException happened while opening multiple indexes" )
+	SearchException ioExceptionOnMultiReaderRefresh(@Cause IOException e);
+
+	@Message(id = 285, value = "Could not create uninverting reader for reader %s" )
+	SearchException couldNotCreateUninvertingReader(DirectoryReader reader, @Cause IOException e);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 286, value = "Could not create uninverting reader for reader of type %s; Only directory readers are supported" )
+	void readerTypeUnsupportedForInverting(@FormatWith(ClassFormatter.class) Class<? extends IndexReader> readerClass);
+
+	@Message(id = 287, value = "Unsupported sort type for field %1$s: %2$s" )
+	SearchException sortFieldTypeUnsupported(String fieldName, SortField.Type type);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 288, value = "The configuration property '%s' no longer applies and will be ignored." )
+	void deprecatedConfigurationPropertyIsIgnored(String string);
+
 }

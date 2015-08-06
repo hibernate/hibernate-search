@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<module xmlns="urn:jboss:module:1.1" name="org.apache.lucene.internal" slot="${lucene.module.slot}">
+    <resources>
+        <resource-root path="lucene-backward-codecs-${luceneVersion}.jar" />
+        <resource-root path="lucene-misc-${luceneVersion}.jar" />
+    </resources>
+    <dependencies>
+        <module name="javax.api" optional="true" />
+        <module name="org.apache.lucene" slot="${lucene.module.slot}"/>
+    </dependencies>
+</module>

@@ -13,10 +13,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.Session;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
@@ -60,7 +61,7 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 
 	private int getDocumentNbr() throws Exception {
 		// we directly access the index to verify the document count
-		IndexReader reader = IndexReader.open( getDirectory( TestEntity.class ) );
+		IndexReader reader = DirectoryReader.open( getDirectory( TestEntity.class ) );
 		try {
 			return reader.numDocs();
 		}

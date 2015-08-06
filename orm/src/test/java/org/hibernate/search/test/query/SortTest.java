@@ -18,14 +18,15 @@ import javax.persistence.Id;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.SimpleFieldComparator;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.Transaction;
@@ -45,6 +46,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -63,7 +65,6 @@ public class SortTest extends SearchTestBase {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
 		queryParser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
 				"title",
 				TestConstants.stopAnalyzer
 		);
@@ -87,7 +88,7 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testResultOrderedById() throws Exception {
+	public void testResultOrderedByIdAsString() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		Query query = queryParser.parse( "summary:lucene" );
@@ -96,12 +97,46 @@ public class SortTest extends SearchTestBase {
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertEquals( "Wrong number of test results.", 3, result.size() );
-		int id = 1;
-		for ( Book b : result ) {
-			assertEquals( "Expected another id", Integer.valueOf( id ), b.getId() );
-			id++;
-		}
+		assertThat( result ).onProperty( "id" ).containsExactly( 1, 10, 2, 3 );
+
+		tx.commit();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testResultOrderedByIdAsLong() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Query query = queryParser.parse( "summary:lucene" );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
+		Sort sort = new Sort( new SortField( "id", SortField.Type.LONG, false ) );
+		hibQuery.setSort( sort );
+		List<Book> result = hibQuery.list();
+		assertNotNull( result );
+		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
+
+		tx.commit();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testResultOrderedByIdAlteringSortStyle() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Query query = queryParser.parse( "summary:lucene" );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
+
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.LONG, false ) ) );
+		List<Book> result = hibQuery.list();
+		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
+
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
+		result = hibQuery.list();
+		assertThat( result ).onProperty( "id" ).containsExactly( 1, 10, 2, 3 );
+
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.LONG, false ) ) );
+		result = hibQuery.list();
+		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
 
 		tx.commit();
 	}
@@ -118,7 +153,7 @@ public class SortTest extends SearchTestBase {
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertEquals( "Wrong number of test results.", 4, result.size() );
+		assertEquals( "Wrong number of test results.", 5, result.size() );
 		assertEquals( "Groovy in Action", result.get( 0 ).getSummary() );
 
 		tx.commit();
@@ -136,7 +171,7 @@ public class SortTest extends SearchTestBase {
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertEquals( "Wrong number of test results.", 4, result.size() );
+		assertEquals( "Wrong number of test results.", 5, result.size() );
 		assertEquals( "Hibernate & Lucene", result.get( 0 ).getSummary() );
 
 		tx.commit();
@@ -150,14 +185,11 @@ public class SortTest extends SearchTestBase {
 		// order by date backwards
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "publicationDate", SortField.Type.LONG, true ) ); //DESC
+		Sort sort = new Sort( new SortField( "publicationDate", SortField.Type.STRING, true ) ); //DESC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
-		assertEquals( "Wrong number of test results.", 4, result.size() );
-		for ( Book book : result ) {
-			System.out.println( book.getSummary() + " : " + book.getPublicationDate() );
-		}
+		assertThat( result ).onProperty( "id" ).containsExactly( 4, 10, 3, 2, 1 );
 		assertEquals( "Groovy in Action", result.get( 0 ).getSummary() );
 
 		tx.commit();
@@ -207,6 +239,23 @@ public class SortTest extends SearchTestBase {
 		tx.commit();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testResultOrderedByDocId() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Query query = queryParser.parse( "summary:lucene" );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
+		Sort sort = new Sort( new SortField( null, SortField.Type.DOC, false ) );
+		hibQuery.setSort( sort );
+		List<Book> result = hibQuery.list();
+
+		assertNotNull( result );
+		assertThat( result ).onProperty( "id" ).containsOnly( 1, 2, 3, 10 );
+
+		tx.commit();
+	}
+
 	/**
 	 * Helper method creating three books with the same title and summary.
 	 * When searching for these books the results should be returned in the order
@@ -225,6 +274,10 @@ public class SortTest extends SearchTestBase {
 		fullTextSession.save( book );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 3, "Hibernate & Lucene", "This is a test book." );
+		book.setPublicationDate( cal.getTime() );
+		fullTextSession.save( book );
+		cal.add( Calendar.SECOND, 1 );
+		book = new Book( 10, "Hibernate & Lucene", "This is a test book." );
 		book.setPublicationDate( cal.getTime() );
 		fullTextSession.save( book );
 		cal.add( Calendar.SECOND, 1 );
@@ -337,7 +390,7 @@ public class SortTest extends SearchTestBase {
 		}
 	}
 
-	public static class SumFieldComparator extends FieldComparator<Integer> {
+	public static class SumFieldComparator extends SimpleFieldComparator<Integer> {
 		private final String field1;
 		private final String field2;
 		private final int[] field1Values;
@@ -396,11 +449,10 @@ public class SortTest extends SearchTestBase {
 		}
 
 		@Override
-		public FieldComparator<Integer> setNextReader(AtomicReaderContext context) throws IOException {
-			final AtomicReader reader = context.reader();
+		protected void doSetNextReader(LeafReaderContext context) throws IOException {
+			final LeafReader reader = context.reader();
 			currentReaderValuesField1 = reader.getNumericDocValues( field1 );
 			currentReaderValuesField2 = reader.getNumericDocValues( field2 );
-			return this;
 		}
 
 		@Override

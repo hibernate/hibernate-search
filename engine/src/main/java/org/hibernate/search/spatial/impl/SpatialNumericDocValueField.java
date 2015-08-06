@@ -8,7 +8,8 @@ package org.hibernate.search.spatial.impl;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexOptions;
 
 /**
  * This class is equivalent to {@link DoubleDocValuesField} except that we set the property indexed to false explicitly.
@@ -22,8 +23,8 @@ public class SpatialNumericDocValueField extends Field {
 
 	private static FieldType createSpatialFieldType() {
 		FieldType type = new FieldType();
-		type.setIndexed( false );
-		type.setDocValueType( FieldInfo.DocValuesType.NUMERIC );
+		type.setIndexOptions( IndexOptions.NONE );
+		type.setDocValuesType( DocValuesType.NUMERIC );
 		type.freeze();
 		return type;
 	}

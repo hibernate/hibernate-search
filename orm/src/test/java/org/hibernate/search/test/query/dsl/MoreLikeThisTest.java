@@ -6,19 +6,20 @@
  */
 package org.hibernate.search.test.query.dsl;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.fest.assertions.Condition;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -43,8 +44,9 @@ public class MoreLikeThisTest extends SearchTestBase {
 	private static final Log log = LoggerFactory.make();
 
 	private FullTextSession fullTextSession;
-	private boolean outputLogs = false;
+	private final boolean outputLogs = false;
 
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -55,7 +57,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testMoreLikeThisBasicBehavior() {
+	public void testMoreLikeThisBasicBehavior() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		try {
 			QueryBuilder qb = getCoffeeQueryBuilder();
@@ -66,15 +68,15 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.comparingAllFields()
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			List<Object[]> results = (List<Object[]>) fullTextSession
+			List<Object[]> results = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
 
 			assertThat( results ).isNotEmpty();
 
-			Set<Term> terms = new HashSet<Term>( 100 );
-			mltQuery.extractTerms( terms );
+			Set<Term> terms = extractTerms( mltQuery, Coffee.class );
+
 			assertThat( terms )
 					.describedAs( "internalDescription should be ignored" )
 					.doesNotSatisfy(
@@ -99,7 +101,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			results = (List<Object[]>) fullTextSession
+			results = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -132,6 +134,22 @@ public class MoreLikeThisTest extends SearchTestBase {
 		}
 	}
 
+	private Set<Term> extractTerms(Query query, Class<?> indexedType) throws IOException {
+		IndexReader reader = null;
+
+		try {
+			Set<Term> terms = new HashSet<Term>( 100 );
+			reader = fullTextSession.getSearchFactory().getIndexReaderAccessor().open( indexedType );
+			query.createWeight( new IndexSearcher( reader ), false ).extractTerms( terms );
+			return terms;
+		}
+		finally {
+			if ( reader != null ) {
+				reader.close();
+			}
+		}
+	}
+
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testMoreLikeThisToEntity() {
@@ -147,7 +165,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			List<Object[]> results = (List<Object[]>) fullTextSession
+			List<Object[]> results = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -159,7 +177,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntity( decaffInstance )
 					.createQuery();
-			List<Object[]> entityResults = (List<Object[]>) fullTextSession
+			List<Object[]> entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -192,7 +210,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntity( copyOfDecaffInstance )
 					.createQuery();
-			entityResults = (List<Object[]>) fullTextSession
+			entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -222,7 +240,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntity( copyOfDecaffInstance )
 					.createQuery();
-			entityResults = (List<Object[]>) fullTextSession
+			entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -261,7 +279,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			results = (List<Object[]>) fullTextSession
+			results = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -272,7 +290,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			List<Object[]> resultsWoComparingEntity = (List<Object[]>) fullTextSession
+			List<Object[]> resultsWoComparingEntity = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -305,7 +323,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.comparingField( "brand.description" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			entityResults = (List<Object[]>) fullTextSession
+			entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
@@ -344,7 +362,7 @@ public class MoreLikeThisTest extends SearchTestBase {
 					.comparingField( "brand.name" )
 					.toEntityWithId( decaffInstance.getId() )
 					.createQuery();
-			entityResults = (List<Object[]>) fullTextSession
+			entityResults = fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();

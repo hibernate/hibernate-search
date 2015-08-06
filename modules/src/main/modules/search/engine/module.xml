@@ -13,6 +13,7 @@
         <module name="javax.transaction.api" />
         <module name="org.hibernate.commons-annotations" />
         <module name="org.apache.lucene" export="true" slot="${lucene.module.slot}" />
+        <module name="org.apache.lucene.internal" slot="${lucene.module.slot}" />
         <module name="org.jboss.logging" />
 
         <!-- JMS backend support -->

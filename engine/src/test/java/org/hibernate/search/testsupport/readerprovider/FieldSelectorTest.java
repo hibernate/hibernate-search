@@ -7,6 +7,7 @@
 package org.hibernate.search.testsupport.readerprovider;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
 import org.apache.lucene.index.StoredFieldVisitor.Status;
@@ -47,7 +48,7 @@ public class FieldSelectorTest {
 	}
 
 	private void consumeField(ReusableDocumentStoredFieldVisitor fieldVisitor) throws IOException {
-		fieldVisitor.stringField( forgeFieldInfo( "anything" ), "anything" );
+		fieldVisitor.stringField( forgeFieldInfo( "anything" ), "anything".getBytes( StandardCharsets.UTF_8 ) );
 	}
 
 }

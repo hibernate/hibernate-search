@@ -11,9 +11,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.BytesRef;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
@@ -50,7 +48,7 @@ public class TermVectorTest extends SearchTestBase {
 		int x = 0; // only Document zero is tested: asserts rely on natural document order
 		Terms termVector = reader.getTermVector( x, "content" );
 		assertNotNull( termVector );
-		TermsEnum iterator = termVector.iterator( null );
+		TermsEnum iterator = termVector.iterator();
 		BytesRef next = iterator.next(); //move to first Document: we expect it to exist
 		assertNotNull( next );
 		long totalTermFreq = iterator.totalTermFreq();

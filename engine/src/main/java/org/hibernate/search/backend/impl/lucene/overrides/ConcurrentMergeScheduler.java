@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.MergePolicy;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.ThreadInterruptedException;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
@@ -36,9 +37,9 @@ public class ConcurrentMergeScheduler extends org.apache.lucene.index.Concurrent
 	}
 
 	@Override
-	protected void handleMergeException(Throwable t) {
+	protected void handleMergeException(Directory dir, Throwable t) {
 		try {
-			super.handleMergeException( t );
+			super.handleMergeException( dir, t );
 		}
 		catch (ThreadInterruptedException ie) {
 			Thread.currentThread().interrupt();
@@ -55,7 +56,6 @@ public class ConcurrentMergeScheduler extends org.apache.lucene.index.Concurrent
 	@Override
 	protected synchronized MergeThread getMergeThread(IndexWriter writer, MergePolicy.OneMerge merge) throws IOException {
 		final MergeThread thread = new MergeThread( writer, merge );
-		thread.setThreadPriority( getMergeThreadPriority() );
 		thread.setDaemon( true );
 		thread.setName( "Lucene Merge Thread #" + mergeThreadCount++ + " for index " + indexName );
 		return thread;

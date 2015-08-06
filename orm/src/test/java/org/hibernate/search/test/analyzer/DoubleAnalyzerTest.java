@@ -51,11 +51,7 @@ public class DoubleAnalyzerTest extends SearchTestBase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser(
-				TestConstants.getTargetLuceneVersion(),
-				"id",
-				TestConstants.standardAnalyzer
-		);
+		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
 		{
 			Query luceneQuery = new MatchAllDocsQuery();
 			FullTextQuery query = s.createFullTextQuery( luceneQuery );

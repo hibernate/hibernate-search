@@ -122,10 +122,7 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				FullTextSession fts = Search.getFullTextSession( s );
-				QueryParser parser = new QueryParser(
-						TestConstants.getTargetLuceneVersion(),
-						"id", TestConstants.stopAnalyzer
-				);
+				QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 				Query query;
 				try {
 					query = parser.parse( "name:Gavin" );

@@ -1056,7 +1056,7 @@ will look at the index section, then at the default section.
 ----
 hibernate.search.Animals.2.indexwriter.max_merge_docs = 10
 hibernate.search.Animals.2.indexwriter.merge_factor = 20
-hibernate.search.Animals.2.indexwriter.term_index_interval = default
+hibernate.search.Animals.2.indexwriter.max_buffered_docs = default
 hibernate.search.default.indexwriter.max_merge_docs = 100
 hibernate.search.default.indexwriter.ram_buffer_size = 64
 ----
@@ -1068,7 +1068,7 @@ applied on the second shard of the Animal index:
 * `max_merge_docs` = 10
 * `merge_factor` = 20
 * `ram_buffer_size` = 64MB
-* `term_index_interval` = Lucene default
+* `max_buffered_docs` = Lucene default
 
 All other values will use the defaults defined in Lucene.
 
@@ -1158,13 +1158,6 @@ a flush occurs for whichever event happens first.
 Generally for faster indexing performance it's best to flush by RAM usage instead of document count
 and use as large a RAM buffer as you can.
 |16 MB
-
-|hibernate.search.[default\|<indexname>].indexwriter.term_index_interval
-|Expert: Set the interval between indexed terms.
-Large values cause less memory to be used by IndexReader, but slow random-access to terms.
-Small values cause more memory to be used by an IndexReader, and speed random-access to terms.
-See Lucene documentation for more details.
-|128
 
 |hibernate.search.enable_dirty_check
 |Not all entity changes require an update of the Lucene index. If all of the updated entity

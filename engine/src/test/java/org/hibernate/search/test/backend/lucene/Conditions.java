@@ -15,15 +15,15 @@ public class Conditions {
 
 	private Conditions() { }
 
-	public static void assertConditionMet(Condition condition) throws InterruptedException {
-		int maxLoops = 500;
+	public static void assertConditionMet(final Condition condition) throws InterruptedException {
+		final int maxLoops = 2500;
+		final int sleep = 20;
 		int loop = 0;
-		int sleep = 100;
 		while ( ! condition.evaluate() ) {
-			Thread.sleep( sleep );
 			if ( ++ loop > maxLoops ) {
 				throw new AssertionFailure( "Condition not met because of a timeout" );
 			}
+			Thread.sleep( sleep );
 		}
 	}
 

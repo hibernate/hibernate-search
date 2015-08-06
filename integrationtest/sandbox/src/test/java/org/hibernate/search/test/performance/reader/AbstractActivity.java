@@ -31,7 +31,6 @@ public abstract class AbstractActivity implements Runnable {
 		@Override
 		protected QueryParser initialValue() {
 			return new MultiFieldQueryParser(
-					TestConstants.getTargetLuceneVersion(),
 					new String[] { "name", "physicalDescription", "suspectCharge" },
 					TestConstants.standardAnalyzer
 			);
