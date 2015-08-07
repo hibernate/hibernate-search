@@ -1,6 +1,19 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.5.0.Alpha1 (7-8-2015)
+------------------------
+
+** Improvement
+    * [HSEARCH-1849] - Upgrade to Apache Lucene 5.2.1
+    * [HSEARCH-1952] - ScheduledCommitPolicy might open unnecessary IndexWriter instances
+
+** Task
+    * [HSEARCH-1949] - FSDirectoryTest is leaking file handles when run on Windows
+    * [HSEARCH-1950] - Integration tests should not hardcode the module slot
+    * [HSEARCH-1953] - Javadoc should be built by linking to the one from Hibernate ORM 5.0
+
+
 Version 5.4.0.CR2 (4-8-2015)
 ------------------------
 
