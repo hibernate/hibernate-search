@@ -11,6 +11,7 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.impl.NullEncodingCapable;
 
 /**
  * Stateless field bridges for the conversion of numbers to numeric field values.
@@ -18,7 +19,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  * @author Sanne Grinovero
  * @author Gunnar Morling
  */
-public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
+public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, NullEncodingCapable {
 
 	/**
 	 * Persists byte properties in int index fields. Takes care of all the required conversion.
