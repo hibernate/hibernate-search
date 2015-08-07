@@ -874,4 +874,23 @@ public interface Log extends BasicLogger {
 	@Message(id = 288, value = "The configuration property '%s' no longer applies and will be ignored." )
 	void deprecatedConfigurationPropertyIsIgnored(String string);
 
+	@Message(id = 289, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Double Number to match the field type of the index. "
+			+ "Please change value from '%1$s' to represent a Double." )
+	SearchException nullMarkerNeedsToRepresentADoubleNumber(String proposedTokenValue, String fieldName);
+
+	@Message(id = 290, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Float Number to match the field type of the index. "
+			+ "Please change value from '%1$s' to represent a Float." )
+	SearchException nullMarkerNeedsToRepresentAFloatNumber(String proposedTokenValue, String fieldName);
+
+	@Message(id = 291, value = "The 'indexNullAs' property for field '%2$s' needs to represent an Integer Number to match the field type of the index. "
+			+ "Please change value from '%1$s' to represent an Integer." )
+	SearchException nullMarkerNeedsToRepresentAnIntegerNumber(String proposedTokenValue, String fieldName);
+
+	@Message(id = 292, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Long Number to match the field type of the index. "
+			+ "Please change value from '%1$s' to represent a Long." )
+	SearchException nullMarkerNeedsToRepresentALongNumber(String proposedTokenValue, String fieldName);
+
+	@Message(id = 293, value = "Unable to search for null token on field '%1$s' if field bridge is ignored.")
+	SearchException unableToSearchOnNullValueWithoutFieldBridge(String fieldName);
+
 }

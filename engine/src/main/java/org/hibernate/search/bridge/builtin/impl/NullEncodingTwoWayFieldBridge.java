@@ -10,8 +10,10 @@ package org.hibernate.search.bridge.builtin.impl;
 import org.apache.lucene.document.Document;
 
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.engine.impl.nullencoding.NullMarkerCodec;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -23,11 +25,11 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 	private static final Log LOG = LoggerFactory.make();
 
 	private final TwoWayFieldBridge fieldBridge;
-	private final String nullMarker;
+	private final NullMarkerCodec nullTokenCodec;
 
-	public NullEncodingTwoWayFieldBridge(TwoWayFieldBridge fieldBridge, String nullMarker) {
+	public NullEncodingTwoWayFieldBridge(TwoWayFieldBridge fieldBridge, NullMarkerCodec nullTokenCodec) {
 		this.fieldBridge = fieldBridge;
-		this.nullMarker = nullMarker;
+		this.nullTokenCodec = nullTokenCodec;
 	}
 
 	@Override
@@ -38,8 +40,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 			LOG.loadingNonExistentField( name );
 			return null;
 		}
-		String stringValue = field.stringValue();
-		if ( nullMarker.equals( stringValue ) ) {
+		if ( nullTokenCodec.representsNullValue( field ) ) {
 			return null;
 		}
 		else {
@@ -50,7 +51,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {
-			return nullMarker;
+			return nullTokenCodec.nullRepresentedAsString();
 		}
 		else {
 			return fieldBridge.objectToString( object );
@@ -64,10 +65,15 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value == null ) {
-			luceneOptions.addFieldToDocument( name, nullMarker, document );
+			nullTokenCodec.encodeNullValue( name, document, luceneOptions );
 		}
 		else {
 			fieldBridge.set( name, value, document, luceneOptions );
 		}
 	}
+
+	public Query buildNullQuery(String fieldName) {
+		return nullTokenCodec.createNullMatchingQuery( fieldName );
+	}
+
 }

@@ -74,6 +74,9 @@ import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
+import org.hibernate.search.engine.impl.nullencoding.KeywordBasedNullCodec;
+import org.hibernate.search.engine.impl.nullencoding.NullMarkerCodec;
+import org.hibernate.search.engine.impl.nullencoding.NumericNullEncodersHelper;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
@@ -958,9 +961,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				configContext.getServiceManager()
 		);
 
-		String nullToken = determineNullToken( fieldAnnotation, configContext );
-		if ( nullToken != null && fieldBridge instanceof TwoWayFieldBridge ) {
-			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullToken );
+		final NumericEncodingType numericEncodingType = determineNumericFieldEncoding( fieldBridge );
+		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldAnnotation, configContext, numericEncodingType, fieldName );
+		if ( nullTokenCodec != null && fieldBridge instanceof TwoWayFieldBridge ) {
+			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
 		}
 		Analyzer analyzer = determineAnalyzer( fieldAnnotation, member, configContext );
 
@@ -984,10 +988,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
 					.fieldBridge( fieldBridge )
 					.analyzer( analyzer )
-					.indexNullAs( nullToken )
+					.indexNullAs( nullTokenCodec )
 					.numeric()
 					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) )
-					.numericEncodingType( determineNumericFieldEncoding( fieldBridge ) );
+					.numericEncodingType( numericEncodingType );
 		}
 		else {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
@@ -998,7 +1002,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
 					.fieldBridge( fieldBridge )
 					.analyzer( analyzer )
-					.indexNullAs( nullToken );
+					.indexNullAs( nullTokenCodec );
 			if ( fieldBridge instanceof SpatialFieldBridge ) {
 				fieldMetadataBuilder.spatial();
 			}
@@ -1105,19 +1109,37 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return NumericEncodingType.UNKNOWN;
 	}
 
-	private String determineNullToken(org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context) {
+	private NullMarkerCodec determineNullMarkerCodec(org.hibernate.search.annotations.Field fieldAnnotation,
+			ConfigContext context, NumericEncodingType numericEncodingType, String fieldName) {
 		if ( fieldAnnotation == null ) {
+			// The option of null-markers is not being used
 			return null;
 		}
 
 		String indexNullAs = fieldAnnotation.indexNullAs();
 		if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL ) ) {
-			indexNullAs = null;
+			// The option is explicitly disabled
+			return null;
+		}
+		else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN )
+				&& numericEncodingType == NumericEncodingType.UNKNOWN ) {
+			// Keyword based, using the default null-token keyword
+			return new KeywordBasedNullCodec( context.getDefaultNullToken() );
+		}
+		else if ( numericEncodingType == NumericEncodingType.UNKNOWN ) {
+			// Keyword based, with a selected custom null-token keyword
+			return new KeywordBasedNullCodec( indexNullAs );
 		}
 		else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
-			indexNullAs = context.getDefaultNullToken();
+			// A Numeric Encoding, but still using the default token
+			// this will require the global default to be configured to use a numeric-encodeable value
+			return NumericNullEncodersHelper.createNumericNullMarkerCodec( numericEncodingType, context.getDefaultNullToken(), fieldName );
 		}
-		return indexNullAs;
+		else {
+			// In this last remaining case, a Numeric Encoding is being used.
+			// this will require a numeric-encodeable value for 'indexNullAs'
+			return NumericNullEncodersHelper.createNumericNullMarkerCodec( numericEncodingType, indexNullAs, fieldName );
+		}
 	}
 
 	private Analyzer determineAnalyzer(org.hibernate.search.annotations.Field fieldAnnotation,
