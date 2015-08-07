@@ -9,8 +9,7 @@ package org.hibernate.search.test.bridge.builtin;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -21,6 +20,7 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -40,7 +40,7 @@ public class NullEncodingTwoWayFieldBridgeTest {
 
 	@Rule
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class )
-		.withProperty( org.hibernate.search.cfg.Environment.DEFAULT_NULL_TOKEN, "THE MARKER" );
+		.withProperty( org.hibernate.search.cfg.Environment.DEFAULT_NULL_TOKEN, "-1" );
 
 	@Test
 	public void testIndexingWithNullEncodingFieldBridge() {
@@ -54,7 +54,7 @@ public class NullEncodingTwoWayFieldBridgeTest {
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 
-		TermQuery termQuery = new TermQuery( new Term( "deletionDate", "THE MARKER" ) );
+		Query termQuery = NumericFieldUtils.createExactMatchQuery( "deletionDate", Long.parseLong( "-1" ) );
 		int queryResultSize = searchFactory
 					.createHSQuery()
 					.targetedEntities( Arrays.asList( new Class<?>[] { Sample.class } ) )

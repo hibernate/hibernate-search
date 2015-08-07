@@ -877,4 +877,24 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.WARN)
 	@Message(id = 289, value = "Requested sort field(s) %2$s are not present in index(es) %1$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortField." )
 	void uncoveredSortsRequested(String indexNames, String uncoveredSorts);
+
+	@Message(id = 290, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Double Number to match the field type of the index. "
+			+ "Please change value from '%1$s' to represent a Double." )
+	SearchException nullMarkerNeedsToRepresentADoubleNumber(String proposedTokenValue, String fieldName);
+
+	@Message(id = 291, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Float Number to match the field type of the index. "
+			+ "Please change value from '%1$s' to represent a Float." )
+	SearchException nullMarkerNeedsToRepresentAFloatNumber(String proposedTokenValue, String fieldName);
+
+	@Message(id = 292, value = "The 'indexNullAs' property for field '%2$s' needs to represent an Integer Number to match the field type of the index. "
+			+ "Please change value from '%1$s' to represent an Integer." )
+	SearchException nullMarkerNeedsToRepresentAnIntegerNumber(String proposedTokenValue, String fieldName);
+
+	@Message(id = 293, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Long Number to match the field type of the index. "
+			+ "Please change value from '%1$s' to represent a Long." )
+	SearchException nullMarkerNeedsToRepresentALongNumber(String proposedTokenValue, String fieldName);
+
+	@Message(id = 294, value = "Unable to search for null token on field '%1$s' if field bridge is ignored.")
+	SearchException unableToSearchOnNullValueWithoutFieldBridge(String fieldName);
+
 }

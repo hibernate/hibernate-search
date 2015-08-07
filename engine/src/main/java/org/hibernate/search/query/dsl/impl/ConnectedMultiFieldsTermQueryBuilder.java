@@ -78,10 +78,10 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
 		final boolean applyTokenization;
 
+		FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
 		// Handle non-null numeric values
 		if ( value != null ) {
 			applyTokenization = fieldContext.applyAnalyzer();
-			FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
 			if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
 				fieldBridge = ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap();
 			}
@@ -91,8 +91,14 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		}
 		else {
 			applyTokenization = false;
+			if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
+				NullEncodingTwoWayFieldBridge nullEncodingBridge = (NullEncodingTwoWayFieldBridge) fieldBridge;
+				validateNullValueIsSearchable( fieldContext );
+				return nullEncodingBridge.buildNullQuery( fieldContext.getField() );
+			}
 		}
 
+		validateNullValueIsSearchable( fieldContext );
 		final String searchTerm = buildSearchTerm( fieldContext, documentBuilder, conversionContext );
 
 		if ( !applyTokenization ) {
@@ -121,14 +127,16 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
 
-	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity documentBuilder, ConversionContext conversionContext) {
+	private void validateNullValueIsSearchable(FieldContext fieldContext) {
 		if ( fieldContext.isIgnoreFieldBridge() ) {
 			if ( value == null ) {
-				throw new SearchException(
-						"Unable to search for null token on field "
-								+ fieldContext.getField() + " if field bridge is ignored."
-				);
+				throw log.unableToSearchOnNullValueWithoutFieldBridge( fieldContext.getField() );
 			}
+		}
+	}
+
+	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity documentBuilder, ConversionContext conversionContext) {
+		if ( fieldContext.isIgnoreFieldBridge() ) {
 			String stringform = value.toString();
 			if ( stringform == null ) {
 				throw new SearchException(

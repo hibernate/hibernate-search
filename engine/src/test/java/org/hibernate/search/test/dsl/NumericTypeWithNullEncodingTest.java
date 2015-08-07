@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -36,7 +35,8 @@ import org.junit.Test;
 public class NumericTypeWithNullEncodingTest {
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( SomeEntity.class );
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( SomeEntity.class )
+			.withProperty( org.hibernate.search.cfg.Environment.DEFAULT_NULL_TOKEN, "-7" );
 
 	@Before
 	public void prepareTestData() {
@@ -88,9 +88,8 @@ public class NumericTypeWithNullEncodingTest {
 					.matching( null )
 					.createQuery();
 
-		Assert.assertTrue( query instanceof TermQuery );
-		TermQuery q = (TermQuery) query;
-		Assert.assertEquals( "-1", q.toString( "nullableAge" ) );
+		Assert.assertTrue( query instanceof NumericRangeQuery );
+		Assert.assertEquals( "[-1 TO -1]", query.toString( "nullableAge" ) );
 
 		List<EntityInfo> queryEntityInfos = runProjection( query, "title" );
 
@@ -107,9 +106,8 @@ public class NumericTypeWithNullEncodingTest {
 					.matching( null )
 					.createQuery();
 
-		Assert.assertTrue( query instanceof TermQuery );
-		TermQuery q = (TermQuery) query;
-		Assert.assertEquals( "_null_", q.toString( "age" ) );
+		Assert.assertTrue( query instanceof NumericRangeQuery );
+		Assert.assertEquals( "[-7 TO -7]", query.toString( "age" ) );
 
 		List<EntityInfo> queryEntityInfos = runProjection( query, "title" );
 

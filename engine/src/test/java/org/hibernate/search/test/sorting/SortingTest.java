@@ -26,6 +26,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -100,6 +101,54 @@ public class SortingTest {
 		assertSortedResults( query, sortAsString, 3, 1, 2, 0 );
 	}
 
+	public void testSortOnNullableNumericField() throws Exception {
+		storeTestingData(
+				new Person( 1, 25, "name1" ),
+				new Person( 2, 22, null ),
+				new Person( 3, null, "name3" )
+			);
+
+		HSQuery nameQuery = queryForValueNullAndSorting( "name", SortField.Type.STRING );
+		assertEquals( nameQuery.queryEntityInfos().size(), 1 );
+
+		HSQuery ageQuery = queryForValueNullAndSorting( "ageForNullChecks", SortField.Type.INT );
+		assertEquals( ageQuery.queryEntityInfos().size(), 1 );
+	}
+
+	@Test
+	public void testSortOnNullableNumericFieldArray() throws Exception {
+		storeTestingData(
+				new Person( 1, 25, "name1", 1, 2, 3 ),
+				new Person( 2, 22, "name2", 1, null, 3 ),
+				new Person( 3, 23, "name3", null, null, null )
+			);
+
+		Query rangeQuery = queryForRangeOnFieldSorted( 0, 2, "array" );
+		Sort sortAsInt = new Sort( new SortField( "array", SortField.Type.INT ) );
+		assertNumberOfResults( 2, rangeQuery, sortAsInt );
+	}
+
+	private void assertNumberOfResults(int expectedResultsNumber, Query query, Sort sort) {
+		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
+		hsQuery.targetedEntities( Arrays.<Class<?>>asList( Person.class ) );
+		if ( sort != null ) {
+			hsQuery.sort( sort );
+		}
+		assertEquals( expectedResultsNumber, hsQuery.queryResultSize() );
+	}
+
+	private Query queryForRangeOnFieldSorted(int min, int max, String fieldName) {
+		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( Person.class ).get();
+		return queryBuilder
+				.range()
+				.onField( fieldName )
+				.from( min )
+				.to( max )
+				.createQuery();
+	}
+
 	private void storeTestingData(Person... testData) {
 		Worker worker = factoryHolder.getSearchFactory().getWorker();
 		TransactionContextForTest tc = new TransactionContextForTest();
@@ -127,6 +176,21 @@ public class SortingTest {
 		}
 	}
 
+	private HSQuery queryForValueNullAndSorting(String fieldName, SortField.Type sortType) {
+		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( Person.class ).get();
+		Query query = queryBuilder
+				.keyword()
+				.onField( fieldName )
+				.matching( null )
+				.createQuery();
+
+		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
+		Sort sort = new Sort( new SortField( fieldName, sortType ) );
+		hsQuery.targetedEntities( Arrays.<Class<?>>asList( Person.class ) ).sort( sort );
+		return hsQuery;
+	}
+
 	@Indexed
 	private class Person {
 
@@ -140,7 +204,7 @@ public class SortingTest {
 		@Fields({
 			@Field(name = "ageForStringSorting", store = Store.YES, analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class) ),
 			@Field(name = "ageForIntSorting", store = Store.YES, analyze = Analyze.NO),
-			@Field(name = "ageForNullChecks", store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+			@Field(name = "ageForNullChecks", store = Store.YES, analyze = Analyze.NO, indexNullAs = "-1")
 		})
 		final Integer age;
 
@@ -151,15 +215,23 @@ public class SortingTest {
 		@IndexedEmbedded
 		final CuddlyToy favoriteCuddlyToy;
 
-		Person(int id, Integer age, String name) {
-			this( id, age, name, null );
-		}
+		@Field
+		@IndexedEmbedded//TODO improve error message when this is missing
+		Integer[] array;
 
 		Person(int id, Integer age, String name, CuddlyToy favoriteCuddlyToy) {
 			this.id = id;
 			this.age = age;
 			this.name = name;
 			this.favoriteCuddlyToy = favoriteCuddlyToy;
+		}
+
+		Person(int id, Integer age, String name, Integer... arrayItems) {
+			this.id = id;
+			this.age = age;
+			this.name = name;
+			this.array = arrayItems;
+			this.favoriteCuddlyToy = null;
 		}
 	}
 
