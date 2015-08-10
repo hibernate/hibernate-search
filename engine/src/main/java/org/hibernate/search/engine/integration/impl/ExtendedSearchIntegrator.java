@@ -27,6 +27,7 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public interface ExtendedSearchIntegrator extends SearchIntegrator {
 
@@ -46,8 +47,24 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 
 	int getFilterCacheBitResultsSize();
 
+	/**
+	 * Given a set of target entities, return the set of indexed types following our
+	 * polymorphism rules for propagation of the {@code Indexed} annotation:
+	 * It returns an empty set if none of the target entities is indexed, nor any of their sub types.
+	 * Each of the classes of the argument is returned iff explicitly marked as indexed.
+	 * Each of the known subtypes of these classes which are explicitly marked as indexed are
+	 * added to the returned set.
+	 * The {@code Indexed} annotation is not inherited by subtypes which don't explicitly have it.
+	 * Passing {@code Object.class} among the parameters will have the returned set contain all known indexed types.
+	 *
+	 * @param classes a list of types
+	 * @return a set containing the types as in the above rules
+	 */
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
 
+	/**
+	 * @return {@code true} if JMX is enabled
+	 */
 	boolean isJMXEnabled();
 
 	/**
@@ -73,6 +90,9 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 */
 	InstanceInitializer getInstanceInitializer();
 
+	/**
+	 * @return the globally configured TimingSource, which we use to implement timeouts during query execution.
+	 */
 	TimingSource getTimingSource();
 
 	/**

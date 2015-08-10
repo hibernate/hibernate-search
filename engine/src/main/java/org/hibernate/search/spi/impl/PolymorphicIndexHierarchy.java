@@ -8,6 +8,7 @@
 package org.hibernate.search.spi.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,6 +53,9 @@ public class PolymorphicIndexHierarchy {
 	}
 
 	public Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
+		if ( classes == null ) {
+			return Collections.<Class<?>>emptySet();
+		}
 		Set<Class<?>> indexedClasses = new HashSet<Class<?>>();
 		for ( Class<?> clazz : classes ) {
 			Set<Class<?>> set = classToIndexedClass.get( clazz );
