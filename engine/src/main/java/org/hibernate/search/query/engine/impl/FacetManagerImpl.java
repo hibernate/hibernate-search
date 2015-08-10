@@ -58,9 +58,9 @@ public class FacetManagerImpl implements FacetManager {
 	/**
 	 * The query from which this manager was retrieved
 	 */
-	private final HSQueryImpl query;
+	private final LuceneHSQuery query;
 
-	FacetManagerImpl(HSQueryImpl query) {
+	FacetManagerImpl(LuceneHSQuery query) {
 		this.query = query;
 	}
 

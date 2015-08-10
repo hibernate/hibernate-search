@@ -73,7 +73,7 @@ import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResu
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class HSQueryImpl implements HSQuery, Serializable {
+public class LuceneHSQuery implements HSQuery, Serializable {
 
 	private static final Log log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
@@ -121,7 +121,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private String tenantId;
 
 
-	public HSQueryImpl(ExtendedSearchIntegrator extendedIntegrator) {
+	public LuceneHSQuery(ExtendedSearchIntegrator extendedIntegrator) {
 		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutExceptionFactory = extendedIntegrator.getDefaultTimeoutExceptionFactory();
 	}

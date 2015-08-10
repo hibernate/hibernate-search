@@ -46,7 +46,7 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
-import org.hibernate.search.query.engine.impl.HSQueryImpl;
+import org.hibernate.search.query.engine.impl.LuceneHSQuery;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
@@ -241,7 +241,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 	@Override
 	public HSQuery createHSQuery() {
-		return new HSQueryImpl( this );
+		return new LuceneHSQuery( this );
 	}
 
 	@Override
