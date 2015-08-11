@@ -21,9 +21,11 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.time.impl.JavaTimeNumericBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
@@ -76,7 +78,8 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		final Query perFieldQuery;
 		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
 		final FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
-		if ( fieldBridge instanceof NumericFieldBridge ) {
+		if ( fieldBridge instanceof NumericFieldBridge
+				|| ( jdk8Compatible() && fieldBridge instanceof JavaTimeNumericBridge ) ) {
 			return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
 		}
 
@@ -106,6 +109,10 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			}
 		}
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
+	}
+
+	private static boolean jdk8Compatible() {
+		return Version.getJavaRelease() >= 8;
 	}
 
 	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity documentBuilder, ConversionContext conversionContext) {

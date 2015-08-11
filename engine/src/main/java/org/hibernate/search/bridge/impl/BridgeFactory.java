@@ -30,6 +30,7 @@ import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
@@ -56,6 +57,10 @@ public final class BridgeFactory {
 		annotationBasedProviders.add( new NumericBridgeProvider() );
 		annotationBasedProviders.add( new SpatialBridgeProvider() );
 		annotationBasedProviders.add( new TikaBridgeProvider() );
+
+		if ( Version.getJavaRelease() >= 8 ) {
+			annotationBasedProviders.add( new JavaTimeBridgeProvider() );
+		}
 
 		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 		try {
