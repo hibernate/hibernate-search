@@ -50,7 +50,7 @@ public class ElasticSearchTest extends SearchTestBase {
 
 		ScientificArticle article2 = new ScientificArticle(
 				"Latest in ORM",
-				"Object/relational mapping with Hibernate",
+				"Object/relational mapping with Hibernate - The latest news",
 				"blah blah blah", 8
 		);
 		s.persist( article2 );
@@ -61,6 +61,20 @@ public class ElasticSearchTest extends SearchTestBase {
 				"blah blah blah", 9
 		);
 		s.persist( article3 );
+
+		ScientificArticle article4 = new ScientificArticle(
+				"High-performance ORM",
+				"Tuning persistence with Hibernate",
+				"blah blah blah", 10
+		);
+		s.persist( article4 );
+
+		ScientificArticle article5 = new ScientificArticle(
+				"ORM modelling",
+				"Modelling your domain model with Hibernate",
+				"blah blah blah", 11
+		);
+		s.persist( article5 );
 
 		ResearchPaper paper1 = new ResearchPaper(
 				"Research on Hibernate",
@@ -112,7 +126,12 @@ public class ElasticSearchTest extends SearchTestBase {
 		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
-		assertThat( result ).onProperty( "title" ).containsOnly( "Latest in ORM", "ORM for dummies" );
+		assertThat( result ).onProperty( "title" ).containsOnly(
+				"Latest in ORM",
+				"ORM for dummies",
+				"High-performance ORM",
+				"ORM modelling"
+		);
 		tx.commit();
 		s.close();
 	}
@@ -123,14 +142,13 @@ public class ElasticSearchTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'range' : { 'wordCount' : { 'gte' : 8 } } } }" );
+		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'range' : { 'wordCount' : { 'gte' : 8, 'lt' : 10 } } } }" );
 		List<?> result = session.createFullTextQuery( query ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Latest in ORM", "ORM for beginners" );
 		tx.commit();
 		s.close();
 	}
-
 
 	@Test
 	public void testEmbeddedIndexing() throws Exception {
@@ -286,6 +304,24 @@ public class ElasticSearchTest extends SearchTestBase {
 		List<?> result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Research on Hibernate" );
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testFirstResultAndMaxResults() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		List<?> result = session.createFullTextQuery( query, ScientificArticle.class )
+				.setFirstResult( 1 )
+				.setMaxResults( 2 )
+				.list();
+
+		// Order is stable due to the result scoring
+		assertThat( result ).onProperty( "title" ).containsOnly( "ORM modelling", "ORM for dummies" );
 		tx.commit();
 		s.close();
 	}

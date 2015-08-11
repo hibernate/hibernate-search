@@ -122,16 +122,6 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	@Override
-	public HSQuery firstResult(int firstResult) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
-	}
-
-	@Override
-	public HSQuery maxResults(int maxResults) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
-	}
-
-	@Override
 	public FullTextFilter enableFullTextFilter(String name) {
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
@@ -184,6 +174,9 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 		}
+
+		search.setParameter( "from", firstResult );
+		search.setParameter( "size", maxResults != null ? maxResults : Integer.MAX_VALUE );
 
 		SearchResult searchResult = executeRequest( search.build() );
 		List<EntityInfo> results = new ArrayList<>( searchResult.getTotal() );
