@@ -732,7 +732,7 @@
                     <rules>
                         <requireJavaVersion>
                             <!-- require JDK 1.7 to run the build -->
-                            <version>[1.7,)</version>
+                            <version>[1.8,)</version>
                         </requireJavaVersion>
                         <requireMavenVersion>
                             <version>3.2.3</version>

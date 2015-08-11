@@ -23,9 +23,7 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-
 import org.hibernate.annotations.common.reflection.ClassLoadingException;
-
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -69,8 +67,10 @@ import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.builtin.time.impl.JavaTimeNumericBridge;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
@@ -1058,7 +1058,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
 		// field bridge
-		return numericFieldAnnotation != null || fieldBridge instanceof NumericFieldBridge || fieldBridge instanceof NumericEncodingDateBridge;
+		return numericFieldAnnotation != null
+				|| fieldBridge instanceof NumericFieldBridge
+				|| fieldBridge instanceof NumericEncodingDateBridge
+				|| ( jdk8Compatible()
+						&& fieldBridge instanceof JavaTimeNumericBridge );
+	}
+
+	private static boolean jdk8Compatible() {
+		return Version.getJavaRelease() >= 8;
 	}
 
 	private NumericEncodingType determineNumericFieldEncoding(FieldBridge fieldBridge) {

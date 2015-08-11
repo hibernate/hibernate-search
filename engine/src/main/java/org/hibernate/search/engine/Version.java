@@ -15,7 +15,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public final class Version {
 
 	private Version() {
-		//now allowed
+		// now allowed
 	}
 
 	public static String getVersionString() {
@@ -28,4 +28,17 @@ public final class Version {
 
 	public static void touch() {
 	}
+
+	/**
+	 * Returns the Java release for the current runtime
+	 *
+	 * @return the Java release as an integer (e.g. 8 for Java 8)
+	 */
+	public static int getJavaRelease() {
+		// Will return something like 1.8
+		String[] specificationVersion = System.getProperty( "java.specification.version" ).split( "\\." );
+
+		return Integer.parseInt( specificationVersion[1] );
+	}
+
 }

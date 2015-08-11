@@ -6,11 +6,28 @@
  */
 package org.hibernate.search.bridge.util.impl;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
+import org.hibernate.search.bridge.builtin.time.impl.DurationNumericBridge;
+import org.hibernate.search.bridge.builtin.time.impl.InstantNumericBridge;
+import org.hibernate.search.bridge.builtin.time.impl.LocalDateNumericBridge;
+import org.hibernate.search.bridge.builtin.time.impl.LocalDateTimeNumericBridge;
+import org.hibernate.search.bridge.builtin.time.impl.LocalTimeNumericBridge;
+import org.hibernate.search.bridge.builtin.time.impl.MonthDayNumericBridge;
+import org.hibernate.search.bridge.builtin.time.impl.YearMonthNumericBridge;
+import org.hibernate.search.bridge.builtin.time.impl.YearNumericBridge;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -23,6 +40,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public final class NumericFieldUtils {
 
 	private static final Log log = LoggerFactory.make();
+
+	private static final Class<?>[] NUMERIC_JAVA_TIME_TYPES = { Year.class, Instant.class, LocalDate.class, LocalDateTime.class, YearMonth.class,
+			MonthDay.class, Duration.class, LocalDateTime.class };
 
 	private NumericFieldUtils() {
 		//not allowed
@@ -71,8 +91,54 @@ public final class NumericFieldUtils {
 			Long toValue = to != null ? ((Calendar) to).getTime().getTime() : null;
 			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
 		}
+		if ( jdk8Compatible() ) {
+			if ( numericClass.isAssignableFrom( LocalDate.class ) ) {
+				Long fromValue = from != null ? LocalDateNumericBridge.INSTANCE.encode( (LocalDate) from ) : null;
+				Long toValue = to != null ? LocalDateNumericBridge.INSTANCE.encode( (LocalDate) to ) : null;
+				return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+			}
+			if ( numericClass.isAssignableFrom( LocalTime.class ) ) {
+				Long fromValue = from != null ? LocalTimeNumericBridge.INSTANCE.encode( (LocalTime) from ) : null;
+				Long toValue = to != null ? LocalTimeNumericBridge.INSTANCE.encode( (LocalTime) to ) : null;
+				return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+			}
+			if ( numericClass.isAssignableFrom( LocalDateTime.class ) ) {
+				Long fromValue = from != null ? LocalDateTimeNumericBridge.INSTANCE.encode( (LocalDateTime) from ) : null;
+				Long toValue = to != null ? LocalDateTimeNumericBridge.INSTANCE.encode( (LocalDateTime) to ) : null;
+				return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+			}
+			if ( numericClass.isAssignableFrom( Year.class ) ) {
+				int fromValue = from != null ? YearNumericBridge.INSTANCE.encode( ( (Year) from ) ) : null;
+				int toValue = to != null ? YearNumericBridge.INSTANCE.encode( ( (Year) to ) ) : null;
+				return NumericRangeQuery.newIntRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+			}
+			if ( numericClass.isAssignableFrom( YearMonth.class ) ) {
+				long fromValue = from != null ? YearMonthNumericBridge.INSTANCE.encode( ( (YearMonth) from ) ) : null;
+				long toValue = to != null ? YearMonthNumericBridge.INSTANCE.encode( ( (YearMonth) to ) ) : null;
+				return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+			}
+			if ( numericClass.isAssignableFrom( MonthDay.class ) ) {
+				int fromValue = from != null ? MonthDayNumericBridge.INSTANCE.encode( ( (MonthDay) from ) ) : null;
+				int toValue = to != null ? MonthDayNumericBridge.INSTANCE.encode( ( (MonthDay) to ) ) : null;
+				return NumericRangeQuery.newIntRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+			}
+			if ( numericClass.isAssignableFrom( Duration.class ) ) {
+				long fromValue = from != null ? DurationNumericBridge.INSTANCE.encode( ( (Duration) from ) ) : null;
+				long toValue = to != null ? DurationNumericBridge.INSTANCE.encode( ( (Duration) to ) ) : null;
+				return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+			}
+			if ( numericClass.isAssignableFrom( Instant.class ) ) {
+				long fromValue = from != null ? InstantNumericBridge.INSTANCE.encode( ( (Instant) from ) ) : null;
+				long toValue = to != null ? InstantNumericBridge.INSTANCE.encode( ( (Instant) to ) ) : null;
+				return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+			}
+		}
 
 		throw log.numericRangeQueryWithNonNumericToAndFromValues( fieldName );
+	}
+
+	private static boolean jdk8Compatible() {
+		return Version.getJavaRelease() >= 8;
 	}
 
 	/**
@@ -100,10 +166,20 @@ public final class NumericFieldUtils {
 			return false;
 		}
 		final Class<?> numericClass = value.getClass();
-		return numericClass.isAssignableFrom( Double.class ) ||
-				numericClass.isAssignableFrom( Long.class ) ||
-				numericClass.isAssignableFrom( Integer.class ) ||
-				numericClass.isAssignableFrom( Float.class ) ||
-				numericClass.isAssignableFrom( Calendar.class );
+		return numericClass.isAssignableFrom( Double.class )
+				|| numericClass.isAssignableFrom( Long.class )
+				|| numericClass.isAssignableFrom( Integer.class )
+				|| numericClass.isAssignableFrom( Float.class )
+				|| numericClass.isAssignableFrom( Calendar.class )
+				|| (jdk8Compatible() && numericTemporalClass( numericClass ) );
+	}
+
+	private static boolean numericTemporalClass(Class<?> numericClass) {
+		for ( Class<?> type : NUMERIC_JAVA_TIME_TYPES ) {
+			if ( numericClass.isAssignableFrom( type ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
