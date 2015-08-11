@@ -257,17 +257,23 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
-		DocumentFieldMetadata fieldMetadata =
-				new DocumentFieldMetadata.Builder(
+
+		DocumentFieldMetadata.Builder idMetadataBuilder = new DocumentFieldMetadata.Builder(
 						path,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
 						termVector
 				)
-						.id()
-						.boost( AnnotationProcessingHelper.getBoost( member, null ) )
-						.fieldBridge( idBridge )
-						.build();
+				.id()
+				.boost( AnnotationProcessingHelper.getBoost( member, null ) )
+				.fieldBridge( idBridge );
+
+		NumericEncodingType numericEncodingType = determineNumericFieldEncoding( idBridge );
+		if ( numericEncodingType != NumericEncodingType.UNKNOWN ) {
+			idMetadataBuilder.numeric();
+			idMetadataBuilder.numericEncodingType( numericEncodingType );
+		}
+		DocumentFieldMetadata fieldMetadata = idMetadataBuilder.build();
 		PropertyMetadata idPropertyMetadata = new PropertyMetadata.Builder( member )
 				.addDocumentField( fieldMetadata )
 				.build();
