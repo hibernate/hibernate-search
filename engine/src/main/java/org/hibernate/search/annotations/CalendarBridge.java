@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * Defines the temporal resolution and encoding type of a {@code Calendar} field.
  *
  * <p>
- * </b>Note:</b> Dates are encoded in the GMT timezone.
+ * <b>Note:</b> Dates are encoded in the GMT timezone.
  * </p>
  *
  * @author Amin Mohammed-Coleman

@@ -11,7 +11,7 @@ import org.apache.lucene.document.Document;
 /**
  * Link between a java property and a Lucene Document
  * Usually a Java property will be linked to a Document Field.
- * <p/>
+ * <p>
  * All implementations need to be threadsafe.
  *
  * @author Emmanuel Bernard
@@ -20,7 +20,7 @@ public interface FieldBridge {
 
 	/**
 	 * Manipulate the document to index the given value.
-	 * <p/>
+	 * <p>
 	 * A common implementation is to add a Field with the given {@code name} to {@code document} following
 	 * the parameters {@code luceneOptions} if the {@code value} is not {@code null}.
 	 *

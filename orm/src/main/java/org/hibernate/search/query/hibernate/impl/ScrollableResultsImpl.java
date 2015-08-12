@@ -34,8 +34,7 @@ import org.hibernate.type.Type;
  * Implements scrollable and paginated resultsets.
  * Contrary to Query#iterate() or Query#list(), this implementation is
  * exposed to returned null objects (if the index is out of date).
- * <p/>
- * <p/>
+ * <p>
  * The following methods that change the value of 'current' will check
  * and set its value to either 'afterLast' or 'beforeFirst' depending
  * on direction. This is to prevent rogue values from setting it outside

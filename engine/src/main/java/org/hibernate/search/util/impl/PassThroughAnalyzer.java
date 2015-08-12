@@ -14,7 +14,7 @@ import org.apache.lucene.analysis.core.KeywordTokenizer;
 /**
  * Analyzer that applies no operation whatsoever to the flux
  * This is useful for queries operating on non tokenized fields.
- * <p/>
+ * <p>
  * TODO there is probably a way to make that much more efficient by
  * reimplementing TokenStream to take the Reader and pass through the flux as a single token
  *

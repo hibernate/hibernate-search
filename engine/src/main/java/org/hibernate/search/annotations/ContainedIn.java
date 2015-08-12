@@ -16,28 +16,29 @@ import java.lang.annotation.Documented;
  * Describe the owning entity as being part of the target entity's
  * indexed object graph.
  * <p>
- * Often used when an &#64;Indexed class is used as a &#64;IndexedEmbedded
- * target class. &#64;ContainedIn must mark the property pointing back
- * to the &#64;IndexedEmbedded owning Entity (not necessary if the class
- * is an &#64;Embeddable class).
+ * Often used when an {@code @Indexed} class is used as a {@code IndexedEmbedded}
+ * target class. {@code @ContainedIn} must mark the property pointing back
+ * to the {@code @IndexedEmbedded} owning Entity (not necessary if the class
+ * is an {@code Embeddable} class).
  * <p>
  * Also used to trigger a reindex of related entities even if no
- * &#64;IndexedEmbedded is involved, allowing to define a dependency
+ * {@code @IndexedEmbedded} is involved, allowing to define a dependency
  * graph.
- * <p>
+ * <pre>
  * <code>
- * &#64;Indexed<br>
- * public class OrderLine {<br>
- *     &#64;IndexedEmbedded<br>
- *     private Order order;<br>
- * }<br>
- *<br>
- * &#64;Indexed<br>
- * public class Order {<br>
- *     &#64;ContainedIn<br>
- *     Set<OrderLine> lines;<br>
- * }<br>
- * </code><br>
+ * {@literal @}Indexed
+ * public class OrderLine {
+ *     {@literal @}IndexedEmbedded
+ *     private Order order;
+ * }
+ *
+ * {@literal @}Indexed
+ * public class Order {
+ *     {@literal @}ContainedIn
+ *     Set{@literal <OrderLine>} lines;
+ * }
+ * </code>
+ * </pre><br>
  *
  * @see org.hibernate.search.annotations.Indexed
  * @see org.hibernate.search.annotations.IndexedEmbedded

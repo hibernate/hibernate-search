@@ -50,7 +50,7 @@ public interface IndexControlMBean {
 
 	/**
 	 * Index the specified entity using the mass indexer.
-	 * <p><b>Note:<br/>
+	 * <p><b>Note:</b><br>
 	 * This method is only available if the Hibernate {@code SessionFactory}
 	 * is available via JNDI.
 	 * </p>
@@ -64,7 +64,7 @@ public interface IndexControlMBean {
 
 	/**
 	 * Optimizes the index for the specified entity.
-	 * <p><b>Note:<br/>
+	 * <p><b>Note:</b><br>
 	 * This method is only available if the Hibernate {@code SessionFactory}
 	 * is available via JNDI.
 	 * </p>
@@ -78,7 +78,7 @@ public interface IndexControlMBean {
 
 	/**
 	 * Purge the index of the specified entity.
-	 * <p><b>Note:<br/>
+	 * <p><b>Note:</b><br>
 	 * This method is only available if the Hibernate {@code SessionFactory}
 	 * is available via JNDI.
 	 * </p>

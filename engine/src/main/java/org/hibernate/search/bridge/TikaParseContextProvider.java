@@ -15,7 +15,7 @@ public interface TikaParseContextProvider {
 
 	/**
 	 * This method is called by the Tika bridge prior to parsing the data.
-	 * <p/>
+	 * <p>
 	 * It allows to create a custom {@code ParseContext}
 	 *
 	 * @param name the field name of the property which is processed by the Tika bridge

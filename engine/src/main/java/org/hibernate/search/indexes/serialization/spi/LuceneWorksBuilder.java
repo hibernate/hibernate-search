@@ -19,7 +19,7 @@ import org.hibernate.search.bridge.spi.ConversionContext;
  * binary data. To do so, it gets passed a {@code LuceneWorksBuilder} instance which defines "template
  * methods" to assemble the work instances.
  * <p>
- * Note:<br/>
+ * Note:<br>
  * The order in which calls need to be made is not clearly defined making this API rather fragile. Refer to
  * {@code AvroDeserializer} to see how the builder is used.
  * </p>

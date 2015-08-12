@@ -19,7 +19,6 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
  * Bridge a {@code java.util.Calendar} to a {@code String}, truncated to the specified resolution.
- * <p/>
  * <ul>
  * <li>Resolution.YEAR: yyyy</li>
  * <li>Resolution.MONTH: yyyyMM</li>

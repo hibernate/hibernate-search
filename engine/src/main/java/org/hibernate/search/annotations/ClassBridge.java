@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 public @interface ClassBridge {
 	/**
 	 * @return default field name passed to your bridge implementation (see {@link org.hibernate.search.bridge.FieldBridge#set(String, Object, org.apache.lucene.document.Document, org.hibernate.search.bridge.LuceneOptions)}).
-	 * <p><b>Note:</b><br/>
+	 * <p><b>Note:</b><br>
 	 * You can ignore the passed field name in your bridge implementation and add a field or even fields with different names, however any
 	 * analyzer specified via {@link #analyzer()} will only apply for the field name specified with this parameter.
 	 */

@@ -15,7 +15,7 @@ import org.apache.lucene.document.Document;
  * Represent a unit of work to be applied against the Lucene index.
  *
  * <p>
- * Note:<br/>
+ * Note:<br>
  * Instances of this class are passed between Virtual Machines when a master/slave
  * configuration of Search is used. It is the responsibility of the {@code LuceneWorkSerializer} respectively
  * {@code SerializationProvider} to serialize and de-serialize {@code LuceneWork} instances.

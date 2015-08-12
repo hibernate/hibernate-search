@@ -34,7 +34,7 @@ public interface ProjectionConstants {
 
 	/**
 	 * Lucene Document id.
-	 * <p/>
+	 * <p>
 	 * Expert: Lucene document id can change overtime between 2 different IndexReader opening.
 	 *
 	 * @hsearch.experimental If you use this constant/feature, please speak up in the forum

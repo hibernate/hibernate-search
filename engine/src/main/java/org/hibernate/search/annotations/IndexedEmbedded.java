@@ -80,7 +80,7 @@ public @interface IndexedEmbedded {
 	 * Returns {@code true}, if the id of the embedded object should be included into the index,
 	 * {@code false} otherwise. The default is {@code false}.
 	 *
-	 * <p><b>Note</b></br>:
+	 * <p><b>Note</b><br>:
 	 * If the id property is explicitly listed via {@link #includePaths()}, then the id is included even if this value
 	 * is {@code false}.
 	 * </p>

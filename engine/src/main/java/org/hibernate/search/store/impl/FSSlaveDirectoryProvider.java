@@ -38,7 +38,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * The base directory is represented by hibernate.search.<index>.indexBase
  * The index is created in <base directory>/<index name>
  * The source (aka copy) directory is built from <sourceBase>/<index name>
- * <p/>
+ * <p>
  * A copy is triggered every refresh seconds
  *
  * @author Emmanuel Bernard

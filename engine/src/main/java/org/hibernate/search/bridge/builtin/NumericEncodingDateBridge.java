@@ -24,7 +24,6 @@ import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
  * Bridge a {@code java.util.Date} truncated to the specified resolution to a numerically indexed {@code long}.
  *
  * GMT is used as time zone.
- * <p/>
  * <ul>
  * <li>Resolution.YEAR: yyyy</li>
  * <li>Resolution.MONTH: yyyyMM</li>

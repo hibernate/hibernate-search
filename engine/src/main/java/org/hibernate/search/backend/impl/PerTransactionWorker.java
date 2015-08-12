@@ -30,7 +30,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Queue works per transaction.
  * If out of transaction, the work is executed right away
- * <p/>
+ * <p>
  * When <code>hibernate.search.worker.type</code> is set to <code>async</code>
  * the work is done in a separate thread (threads are pooled)
  *

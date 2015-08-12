@@ -17,10 +17,10 @@ import java.lang.annotation.Documented;
  * An analyzer definition defines:
  * <ul>
  * <li>one tokenizer</li>
- * </li>optionally one or more filters</li>
+ * <li>optionally one or more filters</li>
  * </ul>
  * Filters are applied in the order they are defined.
- * <p/>
+ * <p>
  * Reuses the Solr Tokenizer and Filter architecture.
  *
  * @author Emmanuel Bernard
