@@ -43,7 +43,7 @@ import org.junit.Test;
  * by careful design, so the point here is to spot the most obvious mistakes, to draw attention
  * on the problem in case of creative refactoring.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1637")
 public class SerializationInstanceNotReusedTest {

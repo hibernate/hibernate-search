@@ -12,7 +12,7 @@ package org.hibernate.search.query.engine.spi;
  * throw exceptions of an appropriate type according to a
  * specific API.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public interface TimeoutExceptionFactory {
 

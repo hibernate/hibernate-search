@@ -12,7 +12,7 @@ import java.util.Map;
  * Similar to parent class, but make sure the same functionality works fine
  * when using a FSDirectory [HSEARCH-1095].
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class FSBasedNRTFunctionalityTest extends BasicNRTFunctionalityTest {
 

@@ -11,7 +11,7 @@ import org.apache.lucene.index.FieldInfo.IndexOptions;
 
 /**
  * @author Emmanuel Bernard
- * @author Sanne Grinovero <sanne@hibernate.org>
+ * @author Sanne Grinovero
  */
 public class LuceneNumericFieldContext {
 

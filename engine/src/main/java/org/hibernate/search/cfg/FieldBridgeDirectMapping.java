@@ -17,7 +17,7 @@ import org.hibernate.search.bridge.FieldBridge;
  * this mapping can be defined directly on the property.
  * Mostly used when no Field is defined, such as on DocumentId.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class FieldBridgeDirectMapping extends PropertyMapping {
 

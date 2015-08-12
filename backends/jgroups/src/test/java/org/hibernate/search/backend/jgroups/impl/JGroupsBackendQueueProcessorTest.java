@@ -10,7 +10,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.junit.Test;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class JGroupsBackendQueueProcessorTest {
 

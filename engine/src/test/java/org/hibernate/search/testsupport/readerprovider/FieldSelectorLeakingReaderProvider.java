@@ -31,7 +31,7 @@ import org.hibernate.search.query.engine.impl.ReusableDocumentStoredFieldVisitor
 /**
  * {@code ReaderProvider} to inspect the type of {@code FieldSelector} being applied.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider implements ReaderProvider {
 

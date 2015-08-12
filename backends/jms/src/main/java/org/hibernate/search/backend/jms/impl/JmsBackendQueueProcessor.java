@@ -34,7 +34,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Yoann Gendre
  */
 public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor, BackendQueueProcessor.Transactional {

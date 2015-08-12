@@ -22,7 +22,7 @@ import org.junit.Test;
  * the JDBC Dialect. We use this approach especially as we want to make sure that using
  * {@link Integer#MIN_VALUE} is an acceptable option on MySQL as we suggest it on the documentation.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class FetchSizeConfigurationTest extends SearchTestBase {
 

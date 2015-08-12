@@ -19,7 +19,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Hibernate Search specific implementation of Lucene's {@code ResourceLoader} interface.
  *
  * @author Emmanuel Bernard
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Hardy Ferentschik
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {

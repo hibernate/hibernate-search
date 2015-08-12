@@ -21,7 +21,7 @@ import org.junit.Assert;
  * A JGroups JChannel instance can be injected in the configuration
  * directly: verify the passed instance is the one being used.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class InjectedChannelTest extends JGroupsCommonTest {
 

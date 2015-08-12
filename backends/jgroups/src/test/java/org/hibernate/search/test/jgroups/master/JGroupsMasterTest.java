@@ -45,7 +45,7 @@ import static org.junit.Assert.assertEquals;
  * <p/>
  *
  * @author Lukasz Moren
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class JGroupsMasterTest extends SearchTestBase {
 

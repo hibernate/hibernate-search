@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * Verifies the configured IndexManager implementation is used for each index .
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class IndexManagerOverrideTest {
 

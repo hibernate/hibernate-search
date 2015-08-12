@@ -19,7 +19,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Wraps a MultiReader to keep references to owning managers.
  *
  * @author Emmanuel Bernard
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class ManagedMultiReader extends MultiReader {
 

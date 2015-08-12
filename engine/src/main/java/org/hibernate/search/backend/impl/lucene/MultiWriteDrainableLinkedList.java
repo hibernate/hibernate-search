@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * a drain we'll only ever need to iterate the list sequentially, and the
  * drain needs to atomically reset the queue.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  * @since 5.0
  */
 final class MultiWriteDrainableLinkedList<T> {

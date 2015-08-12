@@ -15,7 +15,7 @@ import org.hibernate.search.exception.SearchException;
  * While we use the configured LuceneWorkSerializer to serialize the Work queue,
  * the JGroups backend needs to prefix the stream with the index name.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public final class MessageSerializationHelper {
 

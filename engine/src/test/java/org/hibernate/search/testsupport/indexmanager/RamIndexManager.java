@@ -16,7 +16,7 @@ import org.hibernate.search.testsupport.setup.WorkerBuildContextForTest;
 /**
  * At this point mainly used for tests
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class RamIndexManager extends DirectoryBasedIndexManager {
 

@@ -33,7 +33,7 @@ import org.junit.Test;
  * {@link org.hibernate.search.store.impl.DirectoryProviderHelper#getRetryInitializePeriod(java.util.Properties, String)}
  * (HSEARCH-323)
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class RetryInitializeTest {
 

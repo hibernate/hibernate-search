@@ -11,7 +11,7 @@ import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class HibernateManualConfiguration extends SearchConfigurationForTest implements SearchConfiguration {
 

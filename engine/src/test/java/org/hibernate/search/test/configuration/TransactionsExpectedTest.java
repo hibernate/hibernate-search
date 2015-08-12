@@ -23,7 +23,7 @@ import org.junit.Test;
  * Verifies org.hibernate.search.test.util.ManualConfiguration.isTransactionManagerExpected()
  * is applied correctly to the build SearchFactory [HSEARCH-1055].
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class TransactionsExpectedTest {
 

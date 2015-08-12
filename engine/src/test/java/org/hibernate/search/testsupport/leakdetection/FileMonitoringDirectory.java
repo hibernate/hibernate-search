@@ -22,7 +22,7 @@ import org.apache.lucene.store.RAMDirectory;
  * This Directory keeps track of opened IndexInput and IndexOutput
  * instances, making it possible to verify if any file was left open.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class FileMonitoringDirectory extends RAMDirectory {
 

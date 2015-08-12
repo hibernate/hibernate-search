@@ -11,7 +11,7 @@ package org.hibernate.search.backend;
  * Used to flush and commit asynchronous and other pending operations on the Indexes.
  * Generally not needed, this is mainly used at the end of mass indexing operations.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @since 4.1
  */
 public class FlushLuceneWork extends LuceneWork {

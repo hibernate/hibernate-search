@@ -23,7 +23,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * This is the default {@code IndexManager} implementation for Hibernate Search.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @author Hardy Ferentschik
  */
 public class DefaultIndexManagerFactory implements IndexManagerFactory, Startable {

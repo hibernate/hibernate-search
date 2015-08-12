@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Verify behaviour of the AvroSerializationProvider when used concurrently
  *
- * @author Sanne Grinovero &lt;sanne@hibernate.org&gt; (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1637")
 public class ConcurrentServiceTest {

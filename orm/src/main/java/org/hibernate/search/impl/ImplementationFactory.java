@@ -16,7 +16,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Creates concrete instances of FullTextSession and SearchFactory without exposing the underlying types.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  */
 public final class ImplementationFactory {
 

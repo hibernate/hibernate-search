@@ -9,7 +9,7 @@ package org.hibernate.search.indexes.spi;
 import java.util.Properties;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public interface DirectoryBasedReaderProvider extends ReaderProvider {
 

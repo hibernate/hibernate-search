@@ -33,7 +33,7 @@ import org.junit.Test;
  * Verify we don't rely on dirtyness values from Hibernate ORM on fields
  * mapped with {@link javax.persistence.Transient}.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class TransientFieldsDirtyTest extends SearchTestBase {
 

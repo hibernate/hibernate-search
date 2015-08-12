@@ -46,7 +46,7 @@ import org.junit.Test;
  * field name has different mapping rules per type, and conflicts are possible
  * when the projection handling code is not careful about this.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2015 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2015 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1786")
 public class ProjectionConversionTest {

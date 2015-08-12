@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * Test to retrieve specific IndexReader instances by index name.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class DirectorySelectionTest extends SearchTestBase {
 	private IndexReaderAccessor indexReaderAccessor;

@@ -16,7 +16,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Performs a flush of all pending changes.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @see IndexUpdateVisitor
  * @see LuceneWorkExecutor
  * @since 4.1

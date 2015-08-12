@@ -26,7 +26,7 @@ import org.junit.Test;
  * Tests to verify configuration options regarding custom OptimizerStrategy
  * implementations.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class OptimizerStrategyLoadTest {
 

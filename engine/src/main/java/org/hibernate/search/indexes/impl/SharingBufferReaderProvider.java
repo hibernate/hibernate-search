@@ -30,7 +30,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * It uses IndexReader.reopen() which should improve performance on larger indexes
  * as it shares buffers with previous IndexReader generation for the segments which didn't change.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider {
 

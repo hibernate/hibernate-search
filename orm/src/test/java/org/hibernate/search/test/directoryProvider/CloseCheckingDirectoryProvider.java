@@ -19,7 +19,7 @@ import org.hibernate.search.store.impl.RAMDirectoryProvider;
  * Verifies that a DirectoryProvider lifecycle is managed properly:
  * it's initialized and started at SearchFactory initialization and closed at shutdown.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class CloseCheckingDirectoryProvider extends RAMDirectoryProvider {
 

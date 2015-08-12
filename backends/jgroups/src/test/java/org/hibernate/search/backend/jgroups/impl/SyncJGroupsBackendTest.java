@@ -35,7 +35,7 @@ import org.junit.Assert;
  * The JGroups stack used needs to have the RSVP protocol with ack_on_delivery enabled
  * (the default configuration we use does).
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  * @since 4.3
  */
 @TestForIssue(jiraKey = "HSEARCH-1296")

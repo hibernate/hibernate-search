@@ -17,7 +17,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  * This is especially important as bridge implementations often need to
  * make assumptions about the data formats and are user provided.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @author Hardy Ferentschik
  */
 public interface ConversionContext {

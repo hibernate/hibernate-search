@@ -19,7 +19,7 @@ import org.apache.lucene.util.Bits;
  * Apparently it's legal for Lucene filters to return null
  * on {@link Filter#getDocIdSet} : make sure we can deal with it as well.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class NullReturningEmptyFilter extends Filter implements Serializable {
 

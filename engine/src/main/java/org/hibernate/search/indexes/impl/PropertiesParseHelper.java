@@ -32,7 +32,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Contains helper to parse properties which should be read by the majority
  * of IndexManager implementations.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class PropertiesParseHelper {
 

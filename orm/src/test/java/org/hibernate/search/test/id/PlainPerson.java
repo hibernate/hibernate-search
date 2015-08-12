@@ -13,7 +13,7 @@ import javax.persistence.Entity;
  * Copied from Person, but omitting the Hibernate Search annotations
  * to test programmatic mapping instead.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 @Entity
 public class PlainPerson {

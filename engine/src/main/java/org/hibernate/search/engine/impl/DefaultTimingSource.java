@@ -15,7 +15,7 @@ import org.hibernate.search.engine.spi.TimingSource;
 /**
  * Default implementation for a {@link org.hibernate.search.engine.spi.TimingSource}
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @since 4.1
  */
 public final class DefaultTimingSource implements TimingSource {

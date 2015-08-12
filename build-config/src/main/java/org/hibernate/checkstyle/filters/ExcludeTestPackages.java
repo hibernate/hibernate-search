@@ -20,7 +20,7 @@ import com.puppycrawl.tools.checkstyle.api.Filter;
  * <p>
  * A SuppressionFilter is too generic, and requires per-module configuration.
  *
- * @author Sanne Grinovero <sanne@hibernate.org>
+ * @author Sanne Grinovero
  */
 public class ExcludeTestPackages implements Filter {
 

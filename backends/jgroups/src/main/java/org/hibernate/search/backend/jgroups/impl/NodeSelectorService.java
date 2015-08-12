@@ -18,7 +18,7 @@ import org.jgroups.View;
  *
  * Implementors need to be threadsafe.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public interface NodeSelectorService extends Service {
 	NodeSelectorStrategy getMasterNodeSelector(String indexName);

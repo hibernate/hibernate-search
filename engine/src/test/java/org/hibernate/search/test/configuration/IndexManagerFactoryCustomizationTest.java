@@ -37,7 +37,7 @@ import org.junit.Test;
 /**
  * Test to verify pluggability of an alternative {@code IndexManagerFactory}
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1211")
 public class IndexManagerFactoryCustomizationTest {

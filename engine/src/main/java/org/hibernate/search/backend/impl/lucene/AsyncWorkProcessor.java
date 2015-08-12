@@ -20,7 +20,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * This is the asynchronous backend logic for the LuceneBackendQueueProcessor.
  * It merely forwards batches of indexing work to the async Executor for this indexing backend.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  * @since 5.0
  */
 final class AsyncWorkProcessor implements WorkProcessor {

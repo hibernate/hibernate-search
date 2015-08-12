@@ -21,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Responsible for sending Lucene works from slave nodes to master node
  *
  * @author Lukasz Moren
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Ales Justin
  */
 public class JGroupsBackendQueueTask {

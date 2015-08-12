@@ -20,7 +20,7 @@ import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeaki
 /**
  * ReaderProvider to inspect the type of FieldSelector being applied.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1738")
 public class FieldSelectorTest {

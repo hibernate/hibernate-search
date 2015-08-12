@@ -21,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * JGroupsReceivingMockBackend; a JGroups based BackendQueueProcessor useful to verify
  * receiver state from tests.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  * @since 4.3
  */
 public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor implements BackendQueueProcessor {

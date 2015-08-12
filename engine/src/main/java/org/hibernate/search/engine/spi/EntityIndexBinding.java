@@ -17,7 +17,7 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 /**
  * Specifies the relation and options from an indexed entity to its index(es).
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Hardy Ferentschik
  */
 public interface EntityIndexBinding {

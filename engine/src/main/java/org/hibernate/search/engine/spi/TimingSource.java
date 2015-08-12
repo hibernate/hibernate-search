@@ -12,7 +12,7 @@ package org.hibernate.search.engine.spi;
  * {@link org.apache.lucene.search.TimeLimitingCollector#TimeLimitingCollector(org.apache.lucene.search.Collector, org.apache.lucene.util.Counter, long)}
  * used by Hibernate Search when time limits are enabled on fulltext queries.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @since 4.1
  */
 public interface TimingSource {

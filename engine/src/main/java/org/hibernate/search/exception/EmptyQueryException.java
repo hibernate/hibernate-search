@@ -12,7 +12,7 @@ package org.hibernate.search.exception;
  *
  * Applications should validate user input before running such a Query;
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @see org.hibernate.search.util.AnalyzerUtils
  */
 public class EmptyQueryException extends SearchException {

@@ -17,7 +17,7 @@ import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class DirectoryLifecycleTest {
 

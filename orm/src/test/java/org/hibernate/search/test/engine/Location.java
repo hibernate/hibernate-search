@@ -30,7 +30,7 @@ import static org.hibernate.search.annotations.FieldCacheType.CLASS;
 import static org.hibernate.search.annotations.FieldCacheType.ID;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Gustavo Fernandes
  */
 @Entity

@@ -60,7 +60,7 @@ import org.junit.Test;
  * This test is intentionally not using the Hibernate ORM API as it is likely more
  * suited as a use case for the JBoss Data Grid.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  * @since 4.4
  */
 @TestForIssue(jiraKey = "HSEARCH-1429")

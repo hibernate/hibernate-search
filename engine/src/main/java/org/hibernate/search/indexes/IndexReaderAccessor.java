@@ -19,7 +19,7 @@ import org.apache.lucene.index.IndexReader;
  * <b>Note:</b> this API is intended for power users intending to extract information directly.
  * </p>
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public interface IndexReaderAccessor {
 

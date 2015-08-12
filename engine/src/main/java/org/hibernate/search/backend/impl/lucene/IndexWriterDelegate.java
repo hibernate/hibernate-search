@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  * Avoid using {@link org.hibernate.search.store.Workspace#getIndexWriter()} directly as it bypasses lifecycle
  * management of the IndexWriter such as reference counting, potentially leading to leaks.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2015 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2015 Red Hat Inc.
  */
 public final class IndexWriterDelegate {
 

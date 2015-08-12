@@ -30,7 +30,7 @@ import org.junit.Test;
  * Tests that the Slave node in a JGroups cluster can properly send messages to the channel.
  *
  * @author Lukasz Moren
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class JGroupsSlaveTest extends SearchTestBase {
 
