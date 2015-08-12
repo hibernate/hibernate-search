@@ -135,6 +135,9 @@
     </prerequisites>
 
     <properties>
+        <!-- JDK version required for the build; we still create 1.7 byte code -->
+        <minJdkVersion>1.8</minJdkVersion>
+
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
         <lucene.module.slot>5.2</lucene.module.slot>
         <jgroups.module.slot>ispn-7.2</jgroups.module.slot>
@@ -732,7 +735,7 @@
                     <rules>
                         <requireJavaVersion>
                             <!-- require JDK 1.7 to run the build -->
-                            <version>[1.7,)</version>
+                            <version>[${minJdkVersion},)</version>
                         </requireJavaVersion>
                         <requireMavenVersion>
                             <version>3.2.3</version>
