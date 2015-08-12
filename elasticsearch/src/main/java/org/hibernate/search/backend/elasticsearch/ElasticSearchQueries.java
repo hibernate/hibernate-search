@@ -11,6 +11,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
@@ -33,6 +34,28 @@ public class ElasticSearchQueries {
 		jsonQuery = new JsonParser().parse( jsonQuery ).toString();
 
 		return new ElasticSearchJsonQuery( jsonQuery );
+	}
+
+	/**
+	 * Creates an ElasticSearch query from the given Query String Query, as e.g. to be used with the "q" parameter in
+	 * the ElasticSearch API. See the <a
+	 * href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">official
+	 * documentation</a> for a description of the query syntax.
+	 */
+	public static QueryDescriptor fromQueryString(String queryStringQuery) {
+		// Payload looks like so:
+		// { "query" : { "query_string" : { "query" : "abstract:Hibernate" } } }
+
+		JsonObject query = new JsonObject();
+		query.addProperty( "query", queryStringQuery );
+
+		JsonObject queryString = new JsonObject();
+		queryString.add( "query_string", query );
+
+		JsonObject queryObject = new JsonObject();
+		queryObject.add( "query", queryString );
+
+		return new ElasticSearchJsonQuery( queryObject.toString() );
 	}
 
 	private static class ElasticSearchJsonQuery implements QueryDescriptor {
