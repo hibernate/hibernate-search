@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  * Verifies the global setting from {@link org.hibernate.search.cfg.spi.SearchConfiguration#isIndexMetadataComplete()}
  * affect the backends as expected.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class IndexMetadataCompleteConfiguredTest extends BaseConfigurationTest {
 

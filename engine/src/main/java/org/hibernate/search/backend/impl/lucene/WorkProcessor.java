@@ -16,7 +16,7 @@ import org.hibernate.search.backend.LuceneWork;
  * Defines the contract for async and synchronous processors to apply
  * batched of indexing work to the index.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  * @since 5.0
  */
 interface WorkProcessor {

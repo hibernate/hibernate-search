@@ -18,7 +18,7 @@ import org.hibernate.search.backend.spi.Work;
  * when integrating with Infinispan (as Infinispan Query) no initialization is needed.
  *
  * @see org.hibernate.search.engine.impl.SimpleInitializer
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public interface InstanceInitializer {
 

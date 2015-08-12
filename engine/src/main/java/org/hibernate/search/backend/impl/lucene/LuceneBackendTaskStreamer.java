@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * applied; this should be wrapping the invoker code, as it does for example
  * in the MassIndexer.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 final class LuceneBackendTaskStreamer {
 

@@ -70,7 +70,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * reload the underlying {@code TopDocs} if required.
  *
  * @author Hardy Ferentschik
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class QueryHits {
 	private static final Log log = LoggerFactory.make();

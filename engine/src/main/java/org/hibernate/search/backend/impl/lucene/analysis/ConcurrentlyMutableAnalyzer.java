@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  * An Analyzer implementation which can dynamically be reconfigured. We use this as temporary solution to workaround
  * LUCENE-6212, until a better solution is found.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2015 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2015 Red Hat Inc.
  */
 public final class ConcurrentlyMutableAnalyzer extends DelegatingAnalyzerWrapper {
 

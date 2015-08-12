@@ -30,7 +30,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * This is the most efficient way to update the index, but we can apply it only if the Document is uniquely identified
  * by a single term (so no index sharing across entities or Numeric ids).
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public final class UpdateExtWorkExecutor extends UpdateWorkExecutor {
 

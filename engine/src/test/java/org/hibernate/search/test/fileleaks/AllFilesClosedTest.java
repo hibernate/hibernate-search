@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * Test for HSEARCH-1090: IndexReader leaks file handles on close
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class AllFilesClosedTest {
 

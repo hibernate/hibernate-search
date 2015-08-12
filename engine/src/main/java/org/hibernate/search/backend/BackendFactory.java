@@ -25,7 +25,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Factory to instantiate the correct Search backend or to be more concrete the {@link BackendQueueProcessor} implementation.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Hardy Ferentschik
  */
 public final class BackendFactory {

@@ -30,7 +30,7 @@ import org.junit.rules.ExpectedException;
  * By overriding {@link org.hibernate.search.cfg.spi.SearchConfiguration#isIdProvidedImplicit()}
  * we allow to assume entities are annotated with ProvidedId.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class ImplicitProvidedIdTest {
 

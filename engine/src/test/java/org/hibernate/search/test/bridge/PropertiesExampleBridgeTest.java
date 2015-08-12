@@ -22,7 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  */
 public class PropertiesExampleBridgeTest {
 

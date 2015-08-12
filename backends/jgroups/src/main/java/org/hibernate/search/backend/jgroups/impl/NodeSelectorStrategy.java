@@ -21,7 +21,7 @@ import org.jgroups.View;
  *
  * A different {@literal NodeSelectorStrategy} can be chosen for each index.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public interface NodeSelectorStrategy {
 

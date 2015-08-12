@@ -19,7 +19,7 @@ import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 @Entity
 @Cacheable(true)

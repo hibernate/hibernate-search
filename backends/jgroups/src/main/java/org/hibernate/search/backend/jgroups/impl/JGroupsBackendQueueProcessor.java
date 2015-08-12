@@ -30,7 +30,7 @@ import org.jgroups.Address;
  * a JGroups channel.
  *
  * @author Lukasz Moren
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @author Ales Justin
  */
 public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {

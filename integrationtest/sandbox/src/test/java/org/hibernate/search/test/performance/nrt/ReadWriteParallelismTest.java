@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.junit.Assert;
 
 /**
- * @author <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1317")
 public class ReadWriteParallelismTest {

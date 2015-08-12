@@ -18,7 +18,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
  * Used by {@link org.hibernate.search.backend.impl.TransactionalOperationExecutor} to split a list of operations
  * according to the multiple IndexManagers it needs to be routed to.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class WorkQueuePerIndexSplitter {
 

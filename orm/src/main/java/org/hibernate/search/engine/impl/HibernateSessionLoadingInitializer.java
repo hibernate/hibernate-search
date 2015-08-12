@@ -19,7 +19,7 @@ import org.hibernate.search.spi.InstanceInitializer;
  * This EntityInitializer is relative to a specific Hibernate Session,
  * so it's able to attach detached collections to it's Session.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class HibernateSessionLoadingInitializer extends HibernateStatelessInitializer implements InstanceInitializer {
 

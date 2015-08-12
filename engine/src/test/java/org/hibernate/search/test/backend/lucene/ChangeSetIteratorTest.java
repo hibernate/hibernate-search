@@ -23,7 +23,7 @@ import org.junit.Test;
 
 /**
  * Unit tests for the iterator functionality of org.hibernate.search.backend.impl.lucene.ChangesetList
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2015 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2015 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1769")
 public class ChangeSetIteratorTest {

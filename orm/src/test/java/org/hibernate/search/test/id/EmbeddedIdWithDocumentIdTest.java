@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
  * Related to HSEARCH-1050: check we deal nicely with weird DocumentId
  * configurations.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class EmbeddedIdWithDocumentIdTest extends SearchTestBase {
 

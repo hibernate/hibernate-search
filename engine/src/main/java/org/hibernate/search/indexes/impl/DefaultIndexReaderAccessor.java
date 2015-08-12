@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Provides access to IndexReaders.
  * IndexReaders opened through this service need to be closed using this service.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 

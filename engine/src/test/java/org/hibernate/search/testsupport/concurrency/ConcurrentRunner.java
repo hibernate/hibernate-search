@@ -21,7 +21,7 @@ import org.junit.Assert;
  *
  * If any exception happens, a JUnit failure is caused.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  */
 public class ConcurrentRunner {
 

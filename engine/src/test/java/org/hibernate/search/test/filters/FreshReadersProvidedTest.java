@@ -47,7 +47,7 @@ import org.junit.Test;
  * top level (recursive) global IndexReader views: this usually should not affect
  * their usage but is relevant to how we test them.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  * @since 4.2
  */
 @TestForIssue(jiraKey = "HSEARCH-1230")

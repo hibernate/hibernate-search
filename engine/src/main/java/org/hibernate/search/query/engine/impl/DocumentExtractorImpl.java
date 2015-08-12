@@ -39,7 +39,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
  * @author Emmanuel Bernard
  * @author John Griffin
  * @author Hardy Ferentschik
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class DocumentExtractorImpl implements DocumentExtractor {
 

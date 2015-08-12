@@ -12,7 +12,7 @@ import org.hibernate.search.bridge.StringBridge;
 /**
  * Example of a StringBridge expecting to be applied on numeric objects.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class RomanNumberFieldBridge implements StringBridge {
 

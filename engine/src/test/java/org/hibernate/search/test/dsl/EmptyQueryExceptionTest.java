@@ -24,7 +24,7 @@ import org.junit.rules.ExpectedException;
 /**
  * Verifies an EmptyQueryException is thrown when appropriate.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class EmptyQueryExceptionTest {
 

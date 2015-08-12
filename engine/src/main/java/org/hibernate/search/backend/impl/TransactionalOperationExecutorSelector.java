@@ -28,7 +28,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * the need for the allocation of a parameter object with the required input data, instead a method with the required
  * parameters is exposed on said delegate.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Martin Braun
  */
 public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<Void, TransactionalOperationExecutor> {

@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
  * This test is meant to verify that HSQuery implementation is able to
  * be serialized, deserialized and then still perform the query.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 @Ignore("See HSEARCH-1478")
 public class QuerySerializationTest extends SearchTestBase {

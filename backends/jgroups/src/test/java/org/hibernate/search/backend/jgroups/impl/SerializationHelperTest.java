@@ -15,7 +15,7 @@ import org.junit.Assert;
 
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class SerializationHelperTest {
 

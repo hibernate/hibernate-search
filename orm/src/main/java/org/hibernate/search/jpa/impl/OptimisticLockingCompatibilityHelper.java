@@ -15,7 +15,7 @@ import org.hibernate.Session;
  * Helper class for {@code FullTextQueryImpl} to extract information out of an
  * Hibernate {@code OptimisticLockException} and create the JPA counterpart.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 final class OptimisticLockingCompatibilityHelper {
 

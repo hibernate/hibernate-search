@@ -17,7 +17,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 /**
  * @deprecated This interface will be moved and should be considered non-public API [HSEARCH-1915]
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 @Deprecated
 public interface Workspace {

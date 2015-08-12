@@ -41,7 +41,7 @@ import static org.junit.Assert.assertEquals;
  * modifications on an NRT IndexManager.
  * Implicitly verifies that the NRTIndexManager is setup as configured.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class BasicNRTFunctionalityTest extends SearchTestBase {
 

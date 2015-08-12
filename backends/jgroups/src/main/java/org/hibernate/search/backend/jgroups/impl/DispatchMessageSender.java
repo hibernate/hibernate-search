@@ -35,7 +35,7 @@ import org.jgroups.util.RspList;
  * being configured on the stack.
  *
  * @author Lukasz Moren
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @author Ales Justin
  * @author Hardy Ferentschik
  */

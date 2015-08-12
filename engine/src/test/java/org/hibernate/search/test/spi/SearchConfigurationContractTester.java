@@ -30,7 +30,7 @@ import org.hibernate.search.engine.service.spi.Service;
  * The current list of methods are SPI compatible with Hibernate
  * Search version 5.0.0.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class SearchConfigurationContractTester extends SearchConfigurationBase implements SearchConfiguration {
 

@@ -18,7 +18,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import static org.junit.Assert.fail;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Hardy Ferentschik
  */
 public class BytemanHelper extends Helper {

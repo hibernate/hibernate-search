@@ -14,7 +14,7 @@ import org.hibernate.search.store.impl.FSSlaveDirectoryProvider;
 /**
  * Extending FSSlaveDirectoryProvider to test it via static fields.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class FSSlaveDirectoryProviderTestingExtension extends FSSlaveDirectoryProvider {
 

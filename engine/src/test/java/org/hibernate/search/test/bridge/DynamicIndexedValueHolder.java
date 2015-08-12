@@ -18,7 +18,7 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  */
 @Indexed(index = "all")
 public class DynamicIndexedValueHolder {

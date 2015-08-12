@@ -17,7 +17,7 @@ import org.jgroups.View;
  * so that we can handle each index independently while sharing
  * the same JGroups channel.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public final class DefaultNodeSelectorService implements NodeSelectorService {
 

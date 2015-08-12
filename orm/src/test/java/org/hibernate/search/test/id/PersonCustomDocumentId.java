@@ -18,7 +18,7 @@ import org.hibernate.search.annotations.Indexed;
  * the index id with a DocumentId.
  * Renaming the doc-id field as "id" just to make it more tricky.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 @Entity
 @Indexed

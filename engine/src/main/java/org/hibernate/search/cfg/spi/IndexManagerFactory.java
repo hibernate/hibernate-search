@@ -14,7 +14,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
  * Example usage is to override {@code ClassLoader}s used to resolve implementation names,
  * define new short-hand aliases, change the default implementation.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public interface IndexManagerFactory extends Service {
 

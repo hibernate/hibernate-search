@@ -19,7 +19,7 @@ import org.hibernate.search.hcore.util.impl.HibernateHelper;
  * {@link #initializeCollection(Collection)} and {@link #initializeMap(Map)}
  * are not supported.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class HibernateStatelessInitializer implements InstanceInitializer {
 

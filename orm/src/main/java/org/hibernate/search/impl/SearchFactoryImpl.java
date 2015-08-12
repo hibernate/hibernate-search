@@ -20,7 +20,7 @@ import org.hibernate.search.stat.Statistics;
 /**
  * Implementation of the public API: a simple delegate to the actual implementor.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  * @since 5.0
  */
 final class SearchFactoryImpl implements SearchFactory {

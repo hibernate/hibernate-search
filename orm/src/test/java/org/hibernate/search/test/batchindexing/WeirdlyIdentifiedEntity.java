@@ -16,7 +16,7 @@ import org.hibernate.search.annotations.Indexed;
 /**
  * An entity having a property named "id" which is not the identifier.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 @Entity
 @Indexed

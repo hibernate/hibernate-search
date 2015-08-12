@@ -31,7 +31,7 @@ import org.hibernate.search.spi.BuildContext;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  */
 public interface ShardIdentifierProvider {
 

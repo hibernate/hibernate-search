@@ -9,7 +9,7 @@ package org.hibernate.search.test.fileleaks;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class AllFilesClosedNRTTest extends AllFilesClosedTest {
 

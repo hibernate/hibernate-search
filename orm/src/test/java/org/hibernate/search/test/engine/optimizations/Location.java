@@ -30,7 +30,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
  * via a programmatic configuration.
  *
  * @author Adam Harris
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 @Entity
 @Proxy(lazy = false)

@@ -27,7 +27,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Listen for messages from slave nodes and apply them into <code>LuceneBackendQueueProcessor</code>
  *
  * @author Lukasz Moren
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Ales Justin
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask

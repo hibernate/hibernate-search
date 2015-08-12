@@ -25,7 +25,7 @@ import org.hibernate.search.test.bridge.DateSplitBridge;
 import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 @Entity
 @Indexed(index = "Day")

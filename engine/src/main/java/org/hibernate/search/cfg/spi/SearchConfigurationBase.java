@@ -15,7 +15,7 @@ import org.hibernate.search.spi.InstanceInitializer;
  * in that case we can add default implementations here to avoid breaking
  * integration code.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public abstract class SearchConfigurationBase implements SearchConfiguration {
 

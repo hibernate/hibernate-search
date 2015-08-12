@@ -22,7 +22,7 @@ import org.junit.rules.ExpectedException;
  * Verifies we have appropriate error messages for wrong or legacy
  * configurations of the JGroups channel.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class JGroupsConfigurationTest {
 

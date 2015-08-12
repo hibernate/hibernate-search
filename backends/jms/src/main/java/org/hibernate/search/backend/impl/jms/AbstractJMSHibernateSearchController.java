@@ -25,7 +25,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * work send through JMS by the slave nodes.
  *
  * @author Emmanuel Bernard
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
 

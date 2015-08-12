@@ -28,7 +28,7 @@ import org.junit.Test;
 /**
  * Verifies the property exclusive_index_use is properly applied to the backend
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class ExclusiveIndexTest {
 
