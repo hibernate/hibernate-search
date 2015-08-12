@@ -11,7 +11,7 @@ import org.hibernate.search.spatial.Coordinates;
 /**
  * Normalized latitude,longitude holder (in [-90;90],[-180,180]) with distance and destination computations methods
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  * @author Mathieu Perez
  */
 public final class Point implements Coordinates {

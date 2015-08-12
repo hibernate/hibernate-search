@@ -19,7 +19,7 @@ import javax.persistence.Id;
 /**
  * Hibernate Search spatial: Hotel test entity with Range Spatial indexation
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 @Entity
 @Indexed

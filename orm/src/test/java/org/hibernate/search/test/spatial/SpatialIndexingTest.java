@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * Hibernate Search spatial : unit tests on indexing POIs in with Grid and Grid+Distance
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  * @author Hardy Ferentschik
  */
 public class SpatialIndexingTest extends SearchTestBase {

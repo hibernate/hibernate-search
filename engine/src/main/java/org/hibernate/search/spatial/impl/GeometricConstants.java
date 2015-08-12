@@ -9,7 +9,7 @@ package org.hibernate.search.spatial.impl;
 /**
  * Geometric constants to use in SpatialHelper calculation
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  * @author Mathieu Perez
  * @see SpatialHelper
  */

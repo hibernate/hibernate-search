@@ -14,7 +14,7 @@ import org.hibernate.search.spatial.Coordinates;
 /**
  * Spatial fields, ids generator and geometric calculation methods for use in SpatialFieldBridge
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  * @author Mathieu Perez
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByHash
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange

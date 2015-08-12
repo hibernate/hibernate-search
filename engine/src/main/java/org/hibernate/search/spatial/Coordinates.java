@@ -9,7 +9,7 @@ package org.hibernate.search.spatial;
 /**
  * Minimum interface for a field/method to be spatial hash indexable
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 public interface Coordinates {
 	/**

@@ -26,7 +26,7 @@ import javax.persistence.Id;
  * Hibernate Search spatial : Double indexed Point Of Interest test entity for
  * cheching behavior between @Latitude+@Longitude and @FieldBridge
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 @Entity
 @Indexed

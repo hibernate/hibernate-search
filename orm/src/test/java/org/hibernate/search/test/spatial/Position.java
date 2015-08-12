@@ -12,7 +12,7 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 @Embeddable
 public class Position {

@@ -23,7 +23,7 @@ import java.util.List;
  * Lucene Filter for filtering documents which have been indexed with Hibernate Search Spatial SpatialFieldBridge
  * Use denormalized spatial hash cell ids to return a sub set of documents near the center
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByHash
  * @see org.hibernate.search.spatial.Coordinates
  */

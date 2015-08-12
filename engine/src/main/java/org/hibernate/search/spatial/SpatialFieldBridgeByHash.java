@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Hibernate Search field bridge, binding a Coordinates to a spatial hash field in the index
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements ParameterizedBridge {
 

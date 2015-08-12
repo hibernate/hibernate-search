@@ -53,7 +53,7 @@ import java.lang.annotation.Target;
   * </pre>
  *
  * @hsearch.experimental Spatial support is still considered experimental
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })

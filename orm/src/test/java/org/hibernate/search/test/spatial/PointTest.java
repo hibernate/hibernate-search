@@ -14,7 +14,7 @@ import org.hibernate.search.spatial.impl.Point;
 /**
  * Unit tests for Hibernate Search Spatial point implementation
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 public class PointTest {
 	@Test
