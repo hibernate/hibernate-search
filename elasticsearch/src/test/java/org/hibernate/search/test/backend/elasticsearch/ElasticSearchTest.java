@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -400,6 +402,42 @@ public class ElasticSearchTest extends SearchTestBase {
 			position++;
 		}
 		scrollableResults.close();
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testSort() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+
+		// by title, ascending
+		List<?> result = session.createFullTextQuery( query, ScientificArticle.class )
+				.setSort( new Sort( new SortField( "title", SortField.Type.STRING, false ) ) )
+				.list();
+
+		assertThat( result ).onProperty( "title" ).containsExactly(
+				"High-performance ORM",
+				"Latest in ORM",
+				"ORM for dummies",
+				"ORM modelling"
+		);
+
+		// By id, descending
+		result = session.createFullTextQuery( query, ScientificArticle.class )
+				.setSort( new Sort( new SortField( "_uid", SortField.Type.STRING, true ) ) )
+				.list();
+
+		assertThat( result ).onProperty( "id" ).containsExactly(
+				5L,
+				4L,
+				2L,
+				1L
+		);
 
 		tx.commit();
 		s.close();

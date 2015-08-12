@@ -10,8 +10,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 
 /**
@@ -26,7 +28,10 @@ public class ScientificArticle {
 	@DocumentId
 	private Long id;
 
-	@Field
+	@Fields({
+			@Field(name = "title", analyze = Analyze.NO),
+			@Field(name = "titleAnalyzed")
+	})
 	private String title;
 
 	@Field(name = "abstract")
