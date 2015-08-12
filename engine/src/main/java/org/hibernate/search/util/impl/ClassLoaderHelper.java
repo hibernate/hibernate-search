@@ -303,7 +303,7 @@ public class ClassLoaderHelper {
 
 	/**
 	 * Perform resolution of a class name.
-	 * <p/>
+	 * <p>
 	 * Here we first check the context classloader, if one, before delegating to
 	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
 	 *

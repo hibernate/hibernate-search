@@ -43,7 +43,7 @@ public class PropertiesParseHelper {
 	}
 
 	/**
-	 * <p>isExclusiveIndexUsageEnabled.</p>
+	 * <p>isExclusiveIndexUsageEnabled.
 	 *
 	 * @param indexProps a {@link java.util.Properties} object.
 	 */
@@ -128,7 +128,7 @@ public class PropertiesParseHelper {
 	 * Creates a new <code>LuceneIndexingParameters</code> instance for the specified provider.
 	 * If there are no matching properties in the configuration default values will be applied.
 	 * <p>
-	 * NOTE:</br>
+	 * NOTE:<br>
 	 * If a non batch value is set in the configuration apply it also to the
 	 * batch mode. This covers the case where users only specify
 	 * parameters for the non batch mode. In this case the same parameters apply for

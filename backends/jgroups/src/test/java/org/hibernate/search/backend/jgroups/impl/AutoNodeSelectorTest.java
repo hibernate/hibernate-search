@@ -26,7 +26,7 @@ import org.junit.Assert;
 
 /**
  * JGroups' Auto Node Selector Test
- * <p/>
+ * <p>
  * Test if the selector choose a valid member
  *
  * @author Pedro Ruivo

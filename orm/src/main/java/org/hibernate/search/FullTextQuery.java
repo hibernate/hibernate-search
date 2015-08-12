@@ -55,7 +55,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 
 	/**
 	 * @return the number of hits for this search.
-	 *         <p/>
+	 *         <p>
 	 *         Caution:
 	 *         The number of results might be slightly different from
 	 *         <code>list().size()</code> because list() if the index is
@@ -66,11 +66,10 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	/**
 	 * Defines the Database Query used to load the Lucene results.
 	 * Useful to load a given object graph by refining the fetch modes.
-	 * <p>
 	 * <ul>
-	 * <li>No projection (criteria.setProjection() ) allowed, the root entity must be the only returned type</li>
+	 * <li>No projection ({@code criteria.setProjection()}) allowed, the root entity must be the only returned type</li>
 	 * <li>No where restriction can be defined either</li>
-	 * </p>
+	 * </ul>
 	 *
 	 * @param criteria Hibernate criteria query used to load results
 	 *
@@ -82,10 +81,10 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Defines the Lucene field names projected and returned in a query result
 	 * Each field is converted back to it's object representation, an Object[] being returned for each "row"
 	 * (similar to an HQL or a Criteria API projection).
-	 * <p/>
+	 * <p>
 	 * A projectable field must be stored in the Lucene index and use a {@link org.hibernate.search.bridge.TwoWayFieldBridge}
 	 * Unless notified in their JavaDoc, all built-in bridges are two-way. All @DocumentId fields are projectable by design.
-	 * <p/>
+	 * <p>
 	 * If the projected field is not a projectable field, null is returned in the object[]
 	 *
 	 * @param fields list of field names to project on

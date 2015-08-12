@@ -7,12 +7,12 @@
 package org.hibernate.search.bridge;
 
 /**
- * <code>StringBridge<code> allowing a translation from the string representation back to the <code>Object</code>.
- * <code>objectToString( stringToObject( string ) )</code> and <code>stringToObject( objectToString( object ) )</code>
+ * {@link StringBridge} allowing a translation from the string representation back to the {@code Object}.
+ * {@code objectToString( stringToObject( string ) )} and {@code stringToObject( objectToString( object ) )}
  * should be "idempotent". More precisely:
  * <ul>
- * <li><code>objectToString( stringToObject( string ) ).equals(string)</code>, for non <code>null</code> string.</li>
- * <li><code>stringToObject( objectToString( object ) ).equals(object)</code>, for non <code>null</code> object. </li>
+ * <li>{@code objectToString( stringToObject( string ) ).equals(string)}, for non {@code null} string.</li>
+ * <li>{@code stringToObject( objectToString( object ) ).equals(object)}, for non {@code null} object.</li>
  * </ul>
  *
  * As for all Bridges implementations must be threadsafe.

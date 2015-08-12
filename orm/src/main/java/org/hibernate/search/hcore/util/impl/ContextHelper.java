@@ -17,7 +17,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Static helper class to retrieve the instance of the current {@code Searchintegrator} / {@code ExtendedSearchintegrator}.
  *
  * <p>
- * <b>Note</b>:<br/>
+ * <b>Note</b>:<br>
  * The use of this class is discouraged. If possible should {@link org.hibernate.search.FullTextSession#getSearchFactory()}
  * be used. However, this is not always possible, for example in FullTextSessionImpl itself.
  * </p>

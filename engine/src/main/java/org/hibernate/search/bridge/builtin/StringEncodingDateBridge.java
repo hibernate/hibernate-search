@@ -26,7 +26,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Bridge a {@code java.util.Date} to a {@code String}, truncated to the specified resolution.
  * GMT is used as time zone.
- * <p/>
  * <ul>
  * <li>Resolution.YEAR: yyyy</li>
  * <li>Resolution.MONTH: yyyyMM</li>

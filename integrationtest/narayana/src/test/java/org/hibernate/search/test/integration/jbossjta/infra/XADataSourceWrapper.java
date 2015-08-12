@@ -23,7 +23,7 @@ import com.arjuna.ats.jdbc.TransactionalDriver;
 /**
  * This class provides a DataSource based approach to
  * management of transaction aware database connections.
- * <p/>
+ * <p>
  * It's a XADataSource from which they can obtain a XAResource.
  * Hence it implements both DataSource and XADataSource.
  *

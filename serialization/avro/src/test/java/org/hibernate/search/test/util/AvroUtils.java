@@ -25,7 +25,7 @@ import org.hibernate.search.exception.SearchException;
  *
  * @author Boris Lublinsky
  * @author Emmanuel Bernard
- *         <p/>
+ *         <p>
  *         //TODO convert to non static method
  */
 public class AvroUtils {

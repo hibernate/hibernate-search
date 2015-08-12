@@ -15,7 +15,7 @@ import org.hibernate.search.backend.LuceneWork;
  *
  * Needed for clustering where we need to serialize the work to remote nodes.
  * <p>
- * <b>Note</b>:<br/>
+ * <b>Note</b>:<br>
  * Implementations need to be threadsafe.
  * </p>
  *

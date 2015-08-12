@@ -13,7 +13,7 @@ import org.hibernate.search.backend.IndexingMonitor;
  * a MassIndexerProgressMonitor can be defined in the configuration
  * property hibernate.search.worker.indexing.monitor
  * implementing this interface to track indexing performance.
- * <p/>
+ * <p>
  * Implementations must:
  * <ul>
  * <li>	be threadsafe </li>

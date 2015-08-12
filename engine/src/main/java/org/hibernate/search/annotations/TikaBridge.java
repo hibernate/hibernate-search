@@ -23,7 +23,6 @@ import java.lang.annotation.Target;
  * <li>{@code byte[]}</li>
  * <li>{@code java.sql.Blob}</li>
  * </ul>
- * </p>
  *
  * @author Hardy Ferentschik
  */

@@ -36,20 +36,20 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * A {@code Workspace} implementation taking advantage of NRT Lucene features.
  * {@code IndexReader} instances are obtained directly from the {@code IndexWriter}, which is not forced
  * to flush all pending changes to the {@code Directory} structure.
- * <p/>
+ * <p>
  *
  * Lucene requires in its current version to flush delete operations, or the {@code IndexReader}s
  * retrieved via NRT will include deleted Document instances in queries; flushing delete operations
  * happens to be quite expensive so this {@code Workspace} implementation attempts to detect when such
  * a flush operation is needed.
- * <p/>
+ * <p>
  *
  * Applying write operations flags "indexReader requirements" with needs for either normal flush
  * or flush including deletes, but does not update {@code IndexReader} instances. The {@code IndexReader}s
  * are updated only if and when a fresh {@code IndexReader} is requested via {@link #openIndexReader()}.
  * This method will check if it can return the last opened {@code IndexReader} or in case of the reader being stale
  * open a fresh reader from the current {@code IndexWriter}.
- * <p/>
+ * <p>
  *
  * Generation counters are used to track need-at-least version versus last-updated-at version:
  * shared state is avoided between index writers and reader threads to avoid high complexity.
@@ -57,11 +57,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * the index to be dirty without triggering an actual {@code IndexReader} refresh, so the version counters
  * can have gaps: method {@link #refreshReaders()} will always jump to latest seen version, as it will
  * refresh the index to satisfy both kinds of flush requirements (writes and deletes).
- * <p/>
+ * <p>
  *
  * We keep a reference {@code IndexReader} in the {@link #currentReader} atomic reference as a fast path
  * for multiple read events when the index is not dirty.
- * <p/>
+ * <p>
  *
  * This class implements both {@code Workspace} and {@code ReaderProvider}.
  *

@@ -811,7 +811,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	/**
 	 * Return the id used for indexing if possible
 	 * An IllegalStateException otherwise
-	 * <p/>
+	 * <p>
 	 * If the id is provided, we can't extract it from the entity
 	 */
 	@Override

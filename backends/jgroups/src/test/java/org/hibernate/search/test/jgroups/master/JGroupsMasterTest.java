@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Tests that the Master node in a JGroups cluster can properly process messages received from channel.
- * <p/>
+ * <p>
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.

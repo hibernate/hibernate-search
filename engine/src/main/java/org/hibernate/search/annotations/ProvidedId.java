@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 /**
  * Objects whose identifier is provided externally and not part of the object state
  * should be marked with this annotation
- * <p/>
+ * <p>
  * This annotation should not be used in conjunction with {@link org.hibernate.search.annotations.DocumentId}
  *
  * @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
