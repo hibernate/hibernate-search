@@ -16,7 +16,7 @@ import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 
 /**
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public class StringSuppressorTest {
 

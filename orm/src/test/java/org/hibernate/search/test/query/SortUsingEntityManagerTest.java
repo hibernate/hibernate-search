@@ -27,7 +27,7 @@ import org.hibernate.search.test.jpa.JPATestCase;
 import org.junit.Test;
 
 /**
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public class SortUsingEntityManagerTest extends JPATestCase {
 

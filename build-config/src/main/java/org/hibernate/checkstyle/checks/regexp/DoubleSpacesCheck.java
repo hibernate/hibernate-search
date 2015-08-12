@@ -23,7 +23,7 @@ import com.puppycrawl.tools.checkstyle.api.FileContents;
  * This check considers a whitespace characters only the one generated with the space bar button.
  * All the other whitespace characters are not included ( example: \t\n\x0B\f\r).
  *
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public class DoubleSpacesCheck extends Check {
 

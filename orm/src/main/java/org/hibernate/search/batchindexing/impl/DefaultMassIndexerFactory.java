@@ -16,7 +16,7 @@ import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
 /**
  * The {@link MassIndexer} implementation used when none is specified in the configuration.
  *
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public class DefaultMassIndexerFactory implements MassIndexerFactory {
 

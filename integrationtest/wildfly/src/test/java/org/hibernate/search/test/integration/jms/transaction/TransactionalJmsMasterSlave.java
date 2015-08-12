@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNull;
  * <p>
  * Search dependencies are not added to the archives.
  *
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public abstract class TransactionalJmsMasterSlave {
 

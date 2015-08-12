@@ -15,7 +15,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 /**
  * Contains methods that can be used to create a {@link MassIndexer}.
  *
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  *
  * @since 4.3
  */
