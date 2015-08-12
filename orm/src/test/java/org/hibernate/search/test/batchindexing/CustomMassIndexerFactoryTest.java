@@ -28,7 +28,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public class CustomMassIndexerFactoryTest extends SearchTestBase {
 

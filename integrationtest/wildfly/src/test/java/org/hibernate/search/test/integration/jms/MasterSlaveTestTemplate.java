@@ -24,7 +24,7 @@ import org.junit.Test;
  * In a JMS or JGroups Master/Slave configuration, every node should be able to find
  * entities created by some other nodes after the synchronization succeed.
  *
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public abstract class MasterSlaveTestTemplate {
 
