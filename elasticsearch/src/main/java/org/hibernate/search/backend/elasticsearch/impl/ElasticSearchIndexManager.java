@@ -105,6 +105,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 				field.addProperty( "type", getFieldType( descriptor, fieldMetadata ) );
 				field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 				field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
+				field.addProperty( "boost", fieldMetadata.getBoost() );
 
 				getOrCreateProperties( payload, fieldMetadata.getName() ).add( fieldMetadata.getName().substring( fieldMetadata.getName().lastIndexOf( "." ) + 1 ), field );
 			}
