@@ -8,25 +8,20 @@ package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.logging.impl.Log;
 
 
 /**
@@ -48,8 +43,6 @@ import org.hibernate.search.util.logging.impl.Log;
  */
 public class DocumentExtractorImpl implements DocumentExtractor {
 
-	private static final Log log = LoggerFactory.make();
-
 	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final String[] projection;
 	private final QueryHits queryHits;
@@ -58,9 +51,8 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private boolean allowFieldSelection;
 	private boolean needId;
 	private final Map<String, Class> targetedClasses;
-	private int firstIndex;
-	private int maxIndex;
-	private Query query;
+	private final int firstIndex;
+	private final int maxIndex;
 	private final Class singleClassIfPossible; //null when not possible
 	private final ConversionContext exceptionWrap = new ContextualExceptionBridgeHelper();
 
@@ -70,7 +62,6 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 								Set<String> idFieldNames,
 								boolean allowFieldSelection,
 								LazyQueryState searcher,
-								Query query,
 								int firstIndex,
 								int maxIndex,
 								Set<Class<?>> classesAndSubclasses) {
@@ -95,7 +86,6 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			singleClassIfPossible = null;
 		}
 		this.searcher = searcher;
-		this.query = query;
 		this.firstIndex = firstIndex;
 		this.maxIndex = maxIndex;
 		initFieldSelection( projection, idFieldNames );
@@ -160,8 +150,8 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		// else: this.fieldSelector = null; //We need no fields at all
 	}
 
-	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex, ConversionContext exceptionWrap) throws IOException {
-		Class clazz = extractClass( docId, document, scoreDocIndex );
+	private EntityInfo extractEntityInfo(int docId, Document document, ConversionContext exceptionWrap) throws IOException {
+		Class clazz = extractClass( docId, document );
 		String idName = DocumentBuilderHelper.getDocumentIdName( extendedIntegrator, clazz );
 		Serializable id = extractId( docId, document, clazz );
 		Object[] projected = null;
@@ -182,7 +172,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 	}
 
-	private Class extractClass(int docId, Document document, int scoreDocIndex) throws IOException {
+	private Class extractClass(int docId, Document document) throws IOException {
 		//maybe we can avoid document extraction:
 		if ( singleClassIfPossible != null ) {
 			return singleClassIfPossible;
@@ -203,7 +193,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		int docId = queryHits.docId( scoreDocIndex );
 		Document document = extractDocument( scoreDocIndex );
 
-		EntityInfo entityInfo = extractEntityInfo( docId, document, scoreDocIndex, exceptionWrap );
+		EntityInfo entityInfo = extractEntityInfo( docId, document, exceptionWrap );
 		Object[] eip = entityInfo.getProjection();
 
 		if ( eip != null && eip.length > 0 ) {
@@ -271,26 +261,9 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	}
 
 	/**
-	 * In rare cases the Lucene {@code FieldCache} might fail to return a value, at this point we already extracted
-	 * the {@code Document} so we need to repeat the process to extract the missing field only.
-	 *
-	 * @param scoreDocIndex the document index
-	 *
-	 * @return the index class name stored in the {@code ProjectionConstants.OBJECT_CLASS} field.
-	 *
-	 * @throws IOException
-	 */
-	private String forceClassNameExtraction(int scoreDocIndex) throws IOException {
-		final Set<String> fields = Collections.singleton( ProjectionConstants.OBJECT_CLASS );
-		final ReusableDocumentStoredFieldVisitor classOnly = new ReusableDocumentStoredFieldVisitor( fields );
-		queryHits.visitDocument( scoreDocIndex, classOnly );
-		final Document doc = classOnly.getDocumentAndReset();
-		return doc.get( ProjectionConstants.OBJECT_CLASS );
-	}
-
-	/**
 	 * Required by Infinispan Query.
 	 */
+	@Override
 	public TopDocs getTopDocs() {
 		return queryHits.getTopDocs();
 	}

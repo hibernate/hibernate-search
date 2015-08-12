@@ -300,7 +300,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				idFieldNames,
 				allowFieldSelectionInProjection,
 				searcher,
-				luceneQuery,
 				first,
 				max,
 				classesAndSubclasses

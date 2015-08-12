@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.test.id.providedId;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +30,10 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Navin Surtani
@@ -112,7 +112,6 @@ public class ProvidedIdTest {
 				queryHits, extendedIntegrator, new String[] { "name" },
 				identifiers, false,
 				lowLevelSearcher,
-				luceneQuery,
 				0, 0, //not used in this case
 				targetedClasses
 		);
