@@ -10,6 +10,8 @@ import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
+import io.searchbox.core.search.sort.Sort;
+import io.searchbox.core.search.sort.Sort.Sorting;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,7 +27,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClientHolder;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -115,11 +117,6 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		return this;
-	}
-
-	@Override
-	public HSQuery sort(Sort sort) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override
@@ -237,6 +234,12 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			search.setParameter( "from", firstResult );
 			search.setParameter( "size", maxResults != null ? maxResults : Integer.MAX_VALUE );
 
+			// TODO: Id, embedded fields
+			if ( sort != null ) {
+				for ( SortField sortField : sort.getSort() ) {
+					search.addSort( new Sort( sortField.getField(), sortField.getReverse() ? Sorting.DESC : Sorting.ASC ) );
+				}
+			}
 			this.search = search.build();
 		}
 
