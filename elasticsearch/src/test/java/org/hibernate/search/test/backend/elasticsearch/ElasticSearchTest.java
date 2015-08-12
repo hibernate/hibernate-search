@@ -514,6 +514,39 @@ public class ElasticSearchTest extends SearchTestBase {
 		s.close();
 	}
 
+	@Test
+	public void testQueryStringQuery() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearch.queryString( "abstract:Hibernate" );
+		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
+
+		assertThat( result ).onProperty( "title" ).containsOnly(
+				"Latest in ORM",
+				"ORM for dummies",
+				"High-performance ORM",
+				"ORM modelling"
+		);
+
+		query = ElasticSearch.queryString( "abstract:important OR title:important" );
+		result = session.createFullTextQuery( query, ResearchPaper.class ).list();
+
+		assertThat( result ).onProperty( "title" ).containsExactly(
+				"Very important research on Hibernate",
+				"Some research"
+		);
+
+		query = ElasticSearch.queryString( "wordCount:[8 TO 10}" );
+		result = session.createFullTextQuery( query, ScientificArticle.class ).list();
+
+		assertThat( result ).onProperty( "title" ).containsOnly( "Latest in ORM", "ORM for beginners" );
+
+		tx.commit();
+		s.close();
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[]{
