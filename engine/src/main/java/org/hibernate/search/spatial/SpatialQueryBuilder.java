@@ -14,7 +14,7 @@ import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromCoordinates;
  * The SpatialQueryBuilder hold builder methods for Hash, Distance and Spatial (Hash+Distance) filters
  * and queries
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 public abstract class SpatialQueryBuilder {
 

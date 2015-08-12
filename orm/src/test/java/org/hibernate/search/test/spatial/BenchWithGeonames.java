@@ -48,7 +48,7 @@ import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromCoordinates;
  * To test you must download <a href="http://download.geonames.org/export/dump/FR.zip">FR GeoBames file</a>
  * and extract it at the root directory of Hibernate Search
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 public final class BenchWithGeonames {
 

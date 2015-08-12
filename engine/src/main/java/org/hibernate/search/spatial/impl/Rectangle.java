@@ -11,7 +11,7 @@ import org.hibernate.search.spatial.Coordinates;
 /**
  * Bounding box for search area on Earth
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  * @author Mathieu Perez
  */
 public final class Rectangle {

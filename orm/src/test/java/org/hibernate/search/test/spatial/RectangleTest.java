@@ -14,7 +14,7 @@ import org.hibernate.search.spatial.impl.Rectangle;
 /**
  * Unit tests for Hibernate Search spatial rectangle implementation
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 public class RectangleTest {
 	@Test

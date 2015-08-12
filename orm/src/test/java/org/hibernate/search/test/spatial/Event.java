@@ -23,7 +23,7 @@ import javax.persistence.Id;
 /**
  * Hibernate Search spatial : Event test entity
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 @Entity
 @Indexed

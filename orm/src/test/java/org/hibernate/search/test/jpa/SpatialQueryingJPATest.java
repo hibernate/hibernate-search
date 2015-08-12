@@ -27,7 +27,7 @@ import static org.hamcrest.CoreMatchers.not;
 /**
  * Hibernate Search spatial : unit tests on quering POIs
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
 public class SpatialQueryingJPATest extends JPATestCase {

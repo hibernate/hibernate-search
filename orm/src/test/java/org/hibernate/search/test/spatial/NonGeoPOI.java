@@ -17,7 +17,7 @@ import javax.persistence.Id;
 /**
  * Hibernate Search spatial : Non Geo enabled Point Of Interest test entity
  *
- * @author Nicolas Helleringer <nicolas@hibernate.org>
+ * @author Nicolas Helleringer
  */
 @Entity
 @Indexed
