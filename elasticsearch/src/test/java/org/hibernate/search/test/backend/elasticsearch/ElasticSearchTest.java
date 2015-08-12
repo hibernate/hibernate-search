@@ -86,11 +86,18 @@ public class ElasticSearchTest extends SearchTestBase {
 		s.persist( article5 );
 
 		ResearchPaper paper1 = new ResearchPaper(
-				"Research on Hibernate",
+				"Very important research on Hibernate",
 				"Latest research on Hibernate",
 				"blah blah blah", 7
 		);
 		s.persist( paper1 );
+
+		ResearchPaper paper2 = new ResearchPaper(
+				"Some research",
+				"Important Hibernate research",
+				"blah blah blah", 7
+		);
+		s.persist( paper2 );
 
 		BachelorThesis bachelorThesis = new BachelorThesis(
 				"Latest findings",
@@ -327,7 +334,7 @@ public class ElasticSearchTest extends SearchTestBase {
 		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		List<?> result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
-		assertThat( result ).onProperty( "title" ).containsOnly( "Research on Hibernate" );
+		assertThat( result ).onProperty( "title" ).containsOnly( "Very important research on Hibernate", "Some research" );
 		tx.commit();
 		s.close();
 	}
@@ -471,6 +478,36 @@ public class ElasticSearchTest extends SearchTestBase {
 				4L,
 				2L,
 				1L
+		);
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testFieldBoost() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromJson(
+				"{" +
+					"'query': {" +
+						"'bool' : {" +
+							"'should' : [" +
+								"{ 'match' : { 'abstract' : 'important' } }," +
+								"{ 'match' : { 'title' : 'important' } }" +
+							"]" +
+						"}" +
+					"}" +
+				"}"
+		);
+
+		List<?> result = session.createFullTextQuery( query, ResearchPaper.class ).list();
+
+		assertThat( result ).onProperty( "title" ).containsExactly(
+				"Very important research on Hibernate",
+				"Some research"
 		);
 
 		tx.commit();
