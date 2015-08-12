@@ -13,7 +13,7 @@ import java.lang.reflect.AnnotatedElement;
 import org.hibernate.annotations.common.reflection.XMember;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 class XMemberToAnnotatedElementAdaptor implements AnnotatedElement {
 

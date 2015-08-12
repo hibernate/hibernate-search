@@ -9,7 +9,7 @@ package org.hibernate.search.indexes.interceptor;
 /**
  * Set of possible indexing operations
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public enum IndexingOverride {
 	/**

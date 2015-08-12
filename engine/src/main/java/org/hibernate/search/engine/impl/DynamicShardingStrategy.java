@@ -21,7 +21,7 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 
 /**
  * @author Hardy Ferentschik
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 class DynamicShardingStrategy implements IndexShardingStrategy {
 	private final ShardIdentifierProvider shardIdentifierProvider;

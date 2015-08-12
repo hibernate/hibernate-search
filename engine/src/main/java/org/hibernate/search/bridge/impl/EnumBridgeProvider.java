@@ -15,7 +15,7 @@ import org.hibernate.search.bridge.spi.BridgeProvider;
 /**
  * Provide a bridge for enums.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 class EnumBridgeProvider implements BridgeProvider {
 	@Override

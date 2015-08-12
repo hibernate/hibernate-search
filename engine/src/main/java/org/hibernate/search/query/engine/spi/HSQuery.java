@@ -49,7 +49,7 @@ import org.hibernate.search.spi.SearchIntegrator;
  * }
  * </pre>
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface HSQuery extends ProjectionConstants {
 	/**

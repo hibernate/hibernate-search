@@ -38,7 +38,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 /**
  * Support all the default types of the JDK.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 class BasicJDKTypesBridgeProvider implements BridgeProvider {
 

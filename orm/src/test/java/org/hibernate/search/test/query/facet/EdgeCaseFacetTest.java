@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik <hardy@hibernate.org>
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class EdgeCaseFacetTest extends AbstractFacetTest {
 	private final String indexFieldName = "cubicCapacity";

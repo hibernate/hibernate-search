@@ -9,7 +9,7 @@ package org.hibernate.search.query.dsl;
 /**
  * Units for DSL queries
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public enum Unit {
 	/** Kilometers */

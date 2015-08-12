@@ -24,7 +24,7 @@ import org.hibernate.search.exception.SearchException;
  * Comes from http://www.infoq.com/articles/ApacheAvro
  *
  * @author Boris Lublinsky
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  *         <p/>
  *         //TODO convert to non static method
  */

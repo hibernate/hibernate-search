@@ -20,7 +20,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Check if the entity is available in the second level cache and load it if there
  * before falling back to the delegate method.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 	private static final Log log = LoggerFactory.make();

@@ -11,7 +11,7 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class SpatialQueryContext {
 	private String coordinatesField;

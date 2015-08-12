@@ -17,7 +17,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 /**
  * @IndexedEmbedded pointing to the same class with not depth defined.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 @Entity
 @Indexed

@@ -29,7 +29,7 @@ import org.hibernate.search.spi.BuildContext;
  *
  * @hsearch.experimental The exact method signatures are likely to change in future.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
  */

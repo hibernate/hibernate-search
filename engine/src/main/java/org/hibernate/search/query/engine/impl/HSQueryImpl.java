@@ -67,7 +67,7 @@ import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInst
 import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResults;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  * @author Hardy Ferentschik <hardy@hibernate.org>
  */
 public class HSQueryImpl implements HSQuery, Serializable {

@@ -18,7 +18,7 @@ import org.hibernate.search.FullTextSharedSessionBuilder;
 import org.hibernate.search.Search;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuilder {
 

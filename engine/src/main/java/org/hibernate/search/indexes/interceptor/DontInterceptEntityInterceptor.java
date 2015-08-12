@@ -10,7 +10,7 @@ package org.hibernate.search.indexes.interceptor;
  * Do not apply any interception.
  * Useful to force a subclass not to inherit its superclass interceptor.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class DontInterceptEntityInterceptor implements EntityIndexingInterceptor {
 

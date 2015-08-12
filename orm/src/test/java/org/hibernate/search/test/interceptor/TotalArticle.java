@@ -12,7 +12,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.indexes.interceptor.DontInterceptEntityInterceptor;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 @Entity
 @Indexed(interceptor = DontInterceptEntityInterceptor.class)

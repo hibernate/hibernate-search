@@ -10,7 +10,7 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org>
  */
 public class LuceneNumericFieldContext {

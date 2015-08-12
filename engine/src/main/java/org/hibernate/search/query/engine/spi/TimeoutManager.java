@@ -9,7 +9,7 @@ package org.hibernate.search.query.engine.spi;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface TimeoutManager {
 	void start();

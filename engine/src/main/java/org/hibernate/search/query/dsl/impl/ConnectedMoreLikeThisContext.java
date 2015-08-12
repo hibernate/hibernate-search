@@ -14,7 +14,7 @@ import org.hibernate.search.query.dsl.MoreLikeThisOpenedMatchingContext;
 import org.hibernate.search.query.dsl.MoreLikeThisTerminalMatchingContext;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class ConnectedMoreLikeThisContext implements MoreLikeThisContext {
 	private static final String[] ALL_FIELDS = new String[0];

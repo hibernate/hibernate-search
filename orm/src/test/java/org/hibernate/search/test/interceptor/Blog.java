@@ -14,7 +14,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 @Entity
 @Indexed(interceptor = IndexWhenPublishedInterceptor.class)

@@ -18,7 +18,7 @@ import org.hibernate.search.engine.service.spi.Service;
  * method for logging purposes.
  * </p>
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public interface SerializationProvider extends Service {

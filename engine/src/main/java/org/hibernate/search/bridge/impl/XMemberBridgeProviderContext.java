@@ -16,7 +16,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 /**
  * Offer a {@code XMember} based {@code BridgeProviderContext}.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBridgeProviderContext {
 

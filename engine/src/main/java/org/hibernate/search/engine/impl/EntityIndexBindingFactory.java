@@ -21,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Build the expected {@link org.hibernate.search.engine.spi.EntityIndexBinding} depending in the configuration.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public final class EntityIndexBindingFactory {
 

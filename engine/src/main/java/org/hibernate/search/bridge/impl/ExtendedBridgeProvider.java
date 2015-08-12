@@ -17,7 +17,7 @@ import org.hibernate.search.exception.AssertionFailure;
  * Internal contract extending {@code BridgeProvider} to handle some of the
  * specificity of Hibernate Search bridges (like annotations requirements).
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 abstract class ExtendedBridgeProvider implements BridgeProvider {
 

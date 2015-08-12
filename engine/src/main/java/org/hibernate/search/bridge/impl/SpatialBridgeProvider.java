@@ -23,7 +23,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * As built-in provider, no Service Loader file is used: the {@code BridgeFactory} does access it
  * after the custom bridge providers found.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 class SpatialBridgeProvider extends ExtendedBridgeProvider {
 

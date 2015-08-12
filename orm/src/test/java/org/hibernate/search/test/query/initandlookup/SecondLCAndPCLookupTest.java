@@ -33,7 +33,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * Test second level cache and persistence context lookup methods
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class SecondLCAndPCLookupTest extends SearchTestBase {
 
