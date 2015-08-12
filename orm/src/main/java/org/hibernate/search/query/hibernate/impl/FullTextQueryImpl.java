@@ -48,7 +48,7 @@ import org.hibernate.transform.ResultTransformer;
  * Implementation of {@link org.hibernate.search.FullTextQuery}.
  *
  * @author Emmanuel Bernard
- * @author Hardy Ferentschik <hardy@hibernate.org>
+ * @author Hardy Ferentschik
  */
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
 
