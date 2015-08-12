@@ -20,7 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Hardy Ferentschik <hardy@hibernate.org>
+ * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
 public class EdgeCaseFacetTest extends AbstractFacetTest {
