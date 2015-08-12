@@ -20,7 +20,7 @@ import java.lang.reflect.Proxy;
  *
  * @author Paolo Perrotta
  * @author Davide Marchignoli
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  *
  * @see org.hibernate.annotations.common.annotationfactory.AnnotationProxy
  */

@@ -20,7 +20,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBinding {
 

@@ -12,7 +12,7 @@ import org.hibernate.search.indexes.interceptor.IndexingOverride;
 /**
  * Only index blog when it is in published state
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor<Blog> {
 	@Override

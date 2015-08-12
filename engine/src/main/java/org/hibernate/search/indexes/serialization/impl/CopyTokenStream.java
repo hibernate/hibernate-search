@@ -26,7 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Original file released under the ASL 2.0 license
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class CopyTokenStream extends TokenStream implements Serializable {
 	private static final Log log = LoggerFactory.make();

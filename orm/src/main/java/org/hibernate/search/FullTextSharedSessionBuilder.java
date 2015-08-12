@@ -13,7 +13,7 @@ import org.hibernate.Interceptor;
 import org.hibernate.SharedSessionBuilder;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override

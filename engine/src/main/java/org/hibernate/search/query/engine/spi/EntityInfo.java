@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Wrapper class describing the loading of an element.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface EntityInfo {
 	Class<?> getClazz();

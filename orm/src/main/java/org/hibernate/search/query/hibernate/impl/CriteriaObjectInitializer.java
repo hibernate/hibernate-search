@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Initialize object using one or several criteria queries.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  * @author Gunnar Morling
  */
 public class CriteriaObjectInitializer implements ObjectInitializer {

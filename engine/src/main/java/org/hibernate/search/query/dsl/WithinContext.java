@@ -9,7 +9,7 @@ package org.hibernate.search.query.dsl;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface WithinContext {
 	/** Coordinate object representing the center of the search */

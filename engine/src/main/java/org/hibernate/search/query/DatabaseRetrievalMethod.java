@@ -9,7 +9,7 @@ package org.hibernate.search.query;
 /**
  * Defines the method used to initialize an object
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public enum DatabaseRetrievalMethod {
 	/**

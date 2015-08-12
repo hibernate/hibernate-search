@@ -7,7 +7,7 @@
 package org.hibernate.search.query.dsl;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface SpatialTermination extends Termination<SpatialTermination> {
 }

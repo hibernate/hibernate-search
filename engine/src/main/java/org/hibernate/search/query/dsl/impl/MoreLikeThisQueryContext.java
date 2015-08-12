@@ -8,7 +8,7 @@
 package org.hibernate.search.query.dsl.impl;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class MoreLikeThisQueryContext {
 	private boolean boostTerms = false;

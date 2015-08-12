@@ -12,7 +12,7 @@ import java.util.List;
 import org.apache.lucene.util.AttributeImpl;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class SerializableTokenStream implements Serializable {
 	private List<List<AttributeImpl>> stream;

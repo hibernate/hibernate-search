@@ -20,7 +20,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  * place one class name per line.
  * This follows the JDK service loader pattern.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface BridgeProvider {
 

@@ -16,7 +16,7 @@ import org.hibernate.search.bridge.FieldBridge;
 /**
  * Encapsulate the common field context state capture.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class FieldsContext implements Iterable<FieldContext> {
 

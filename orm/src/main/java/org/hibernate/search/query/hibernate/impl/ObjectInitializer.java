@@ -13,7 +13,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 /**
  * Initializes the objects specified by an array of {@code EntityInfo} instances.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public interface ObjectInitializer {

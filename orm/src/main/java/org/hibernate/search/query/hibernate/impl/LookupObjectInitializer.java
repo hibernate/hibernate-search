@@ -20,7 +20,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * Note that the second level cache is naturally first checked in this approach.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class LookupObjectInitializer implements ObjectInitializer {
 

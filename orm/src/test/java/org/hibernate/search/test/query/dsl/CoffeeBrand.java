@@ -16,7 +16,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 @Entity
 public class CoffeeBrand {

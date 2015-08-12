@@ -18,7 +18,7 @@ import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 class NumericBridgeProvider extends ExtendedBridgeProvider {
 

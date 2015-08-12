@@ -11,7 +11,7 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.WithinContext;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 	private final QueryBuildingContext queryContext;

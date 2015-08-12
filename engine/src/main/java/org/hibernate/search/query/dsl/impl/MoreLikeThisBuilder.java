@@ -64,7 +64,7 @@ import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuil
  * Apache Lucene code copyright the Apache Software Foundation released under the
  * Apache Software License 2.0.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class MoreLikeThisBuilder<T> {
 

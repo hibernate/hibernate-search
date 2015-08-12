@@ -13,7 +13,7 @@ import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public class MovieBridgeProvider implements BridgeProvider {
 	@Override

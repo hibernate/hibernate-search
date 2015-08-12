@@ -7,7 +7,7 @@
 package org.hibernate.search.indexes.serialization.spi;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public enum SerializableStore {
 	YES,

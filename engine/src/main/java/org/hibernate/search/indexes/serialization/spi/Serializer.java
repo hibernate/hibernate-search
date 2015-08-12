@@ -19,7 +19,7 @@ import org.hibernate.search.backend.spi.DeletionQuery;
  *
  * LuceneWorkSerializer controls the LuceneWork traversal flow.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface Serializer {
 

@@ -22,7 +22,7 @@ import org.apache.lucene.search.TopDocs;
  *
  * DocumentExtractor objects *must* be closed when the results are no longer traversed. See {@link #close()}
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface DocumentExtractor extends Closeable {
 

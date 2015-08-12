@@ -21,7 +21,7 @@ package org.hibernate.search.indexes.interceptor;
  * </p>
  * @hsearch.experimental {@link IndexingOverride} might be updated
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
  */
 public interface EntityIndexingInterceptor<T> {
 
