@@ -102,6 +102,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
+                    <additionalDependencies>
+                        <additionalDependency>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging-annotations</artifactId>
+                            <version>${jbossLoggingProcessorVersion}</version>
+                        </additionalDependency>
+                    </additionalDependencies>
                     <sourcepath>
                         ${basedir}/../engine/src/main/java;
                         ${basedir}/../orm/src/main/java;
