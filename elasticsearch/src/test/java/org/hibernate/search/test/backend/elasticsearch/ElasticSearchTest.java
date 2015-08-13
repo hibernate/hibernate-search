@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.backend.elasticsearch;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
+import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
@@ -32,6 +34,7 @@ import org.hibernate.search.test.embedded.Person;
 import org.hibernate.search.test.embedded.State;
 import org.hibernate.search.test.embedded.StateCandidate;
 import org.hibernate.search.test.embedded.Tower;
+import org.hibernate.search.testutil.backend.elasticsearch.JsonHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -346,10 +349,26 @@ public class ElasticSearchTest extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'active' : true } } }" );
-		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "lastName" ).containsOnly( "Hergesheimer" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+				.setProjection( ProjectionConstants.SOURCE )
+				.list();
 
-		// TODO Assert source
+		String source = (String) ( (Object[]) result.iterator().next() )[0];
+
+		JsonHelper.assertJsonEquals(
+				"{" +
+					"\"active\": true," +
+					"\"dateOfBirth\": \"1958-04-07T00:00:00Z\"," +
+					"\"driveWidth\": 285," +
+					"\"firstName\": \"Klaus\"," +
+					"\"handicap\": 3.4," +
+					"\"lastName\": \"Hergesheimer\"," +
+					"\"ranking\": {" +
+						"\"value\": \"311\"" +
+					"}" +
+				"}",
+				source
+		);
 
 		tx.commit();
 		s.close();
@@ -520,7 +539,7 @@ public class ElasticSearchTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearch.queryString( "abstract:Hibernate" );
+		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "abstract:Hibernate" );
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly(
@@ -530,7 +549,7 @@ public class ElasticSearchTest extends SearchTestBase {
 				"ORM modelling"
 		);
 
-		query = ElasticSearch.queryString( "abstract:important OR title:important" );
+		query = ElasticSearchQueries.fromQueryString( "abstract:important OR title:important" );
 		result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsExactly(
@@ -538,10 +557,57 @@ public class ElasticSearchTest extends SearchTestBase {
 				"Some research"
 		);
 
-		query = ElasticSearch.queryString( "wordCount:[8 TO 10}" );
+		query = ElasticSearchQueries.fromQueryString( "wordCount:[8 TO 10}" );
 		result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Latest in ORM", "ORM for beginners" );
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testProjection() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "lastName:Hergesheimer" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+				.setProjection(
+						ProjectionConstants.ID,
+						ProjectionConstants.OBJECT_CLASS,
+						ProjectionConstants.SCORE,
+						ProjectionConstants.THIS,
+						"firstName",
+						"lastName",
+						"active",
+						"dateOfBirth",
+						"handicap",
+						"driveWidth",
+						"ranking.value"
+				)
+				.list();
+
+		assertThat( result ).hasSize( 1 );
+
+		Calendar dob = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
+		dob.set( 1958, 3, 7, 0, 0, 0 );
+		dob.set( Calendar.MILLISECOND, 0 );
+
+		Object[] projection = (Object[]) result.iterator().next();
+		assertThat( projection[0] ).describedAs( "id" ).isEqualTo( 1L );
+		assertThat( projection[1] ).describedAs( "object class" ).isEqualTo( GolfPlayer.class );
+		assertThat( projection[2] ).describedAs( "score" ).isEqualTo( 1.0F );
+		assertThat( projection[3] ).describedAs( "this" ).isInstanceOf( GolfPlayer.class );
+		assertThat( ( (GolfPlayer) projection[3] ).getId() ).isEqualTo( 1L );
+		assertThat( projection[4] ).describedAs( "firstName" ).isEqualTo( "Klaus" );
+		assertThat( projection[5] ).describedAs( "lastName" ).isEqualTo( "Hergesheimer" );
+		assertThat( projection[6] ).describedAs( "active" ).isEqualTo( true );
+		assertThat( projection[7] ).describedAs( "dateOfBirth" ).isEqualTo( dob.getTime() );
+		assertThat( projection[8] ).describedAs( "handicap" ).isEqualTo( 3.4D );
+		assertThat( projection[9] ).describedAs( "driveWidth" ).isEqualTo( 285 );
+		assertThat( projection[10] ).describedAs( "ranking value" ).isEqualTo( BigInteger.valueOf( 311 ) );
 
 		tx.commit();
 		s.close();
