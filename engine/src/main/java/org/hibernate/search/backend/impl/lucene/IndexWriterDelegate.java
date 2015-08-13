@@ -82,6 +82,7 @@ public final class IndexWriterDelegate {
 	/**
 	 * This method should not be used: created only to avoid changes in public API.
 	 * @deprecated
+	 * @return the {@link IndexWriter}
 	 */
 	@Deprecated
 	public IndexWriter getIndexWriter() {

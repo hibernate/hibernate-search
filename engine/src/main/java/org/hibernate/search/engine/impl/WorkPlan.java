@@ -135,7 +135,10 @@ public class WorkPlan {
 	/**
 	 * Used for recursive processing of containedIn
 	 *
+	 * @param <T> the type of the entity
 	 * @param value the entity to be processed
+	 * @param depth the validator for the depth constraints
+	 * @param tenantId the tenant identifier. It can be null.
 	 */
 	public <T> void recurseContainedIn(T value, DepthValidator depth, String tenantId) {
 		Class<T> entityClass = instanceInitializer.getClass( value );

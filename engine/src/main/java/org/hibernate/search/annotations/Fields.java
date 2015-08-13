@@ -22,8 +22,9 @@ import java.lang.annotation.Documented;
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface Fields {
+
 	/**
-	 * Fields
+	 * @return the {@link Field} annotaions to use for the property
 	 */
 	Field[] value();
 

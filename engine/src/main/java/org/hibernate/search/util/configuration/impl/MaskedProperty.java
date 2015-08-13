@@ -61,14 +61,12 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * Provides a view to the provided Properties hiding
-	 * all keys not starting with some [mask.].
-	 * If no value is found then a value is returned from propsFallBack,
-	 * without masking.
+	 * Provides a view to the provided Properties hiding all keys not starting with some [mask.].
+	 * If no value is found then a value is returned from propsFallBack, without masking.
 	 *
-	 * @param propsToMask
-	 * @param mask
-	 * @param propsFallBack
+	 * @param propsToMask the properties to mask
+	 * @param mask the mask applied to the properties
+	 * @param propsFallBack a fall-back map of properties in case a value is not found in the main one
 	 */
 	public MaskedProperty(Properties propsToMask, String mask, Properties propsFallBack) {
 		if ( propsToMask == null || mask == null ) {
@@ -96,6 +94,10 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
+	 * Check if a given properties is set.
+	 *
+	 * @param key the property key
+	 * @return {@code true} if the the property is set, {@code false} otherwise
 	 * @throws IllegalArgumentException if the key is not a String instance
 	 */
 	@Override
@@ -113,7 +115,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void list(PrintStream out) {
@@ -121,7 +123,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void list(PrintWriter out) {
@@ -129,7 +131,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void load(InputStream inStream) throws IOException {
@@ -137,7 +139,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void loadFromXML(InputStream in) throws IOException {
@@ -179,7 +181,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void save(OutputStream out, String comments) {
@@ -187,7 +189,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Object setProperty(String key, String value) {
@@ -195,7 +197,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void store(OutputStream out, String comments)
@@ -204,7 +206,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void storeToXML(OutputStream os, String comment,
@@ -213,7 +215,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void storeToXML(OutputStream os, String comment)
@@ -222,7 +224,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void clear() {
@@ -230,7 +232,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Object clone() {
@@ -244,7 +246,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public boolean containsValue(Object value) {
@@ -252,7 +254,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Enumeration<Object> elements() {
@@ -261,7 +263,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Set<java.util.Map.Entry<Object, Object>> entrySet() {
@@ -269,7 +271,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Object get(Object key) {
@@ -283,7 +285,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public synchronized Enumeration<Object> keys() {
@@ -298,7 +300,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Object put(Object key, Object value) {
@@ -306,7 +308,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void putAll(Map<? extends Object, ? extends Object> t) {
@@ -314,7 +316,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	protected void rehash() {
@@ -322,16 +324,13 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Object remove(Object key) {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * @throws UnsupportedOperationException
-	 */
 	@Override
 	public synchronized int size() {
 		initPropertyNames();
@@ -350,7 +349,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Collection<Object> values() {

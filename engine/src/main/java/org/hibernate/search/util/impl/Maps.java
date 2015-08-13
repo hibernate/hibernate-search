@@ -29,6 +29,8 @@ public class Maps {
 	 * of the key allows to remove the value from the map.
 	 * Comparison on the keys is based on identity reference.
 	 *
+	 * @param <K> the key type in the map
+	 * @param <V> the value type in the map
 	 * @param initialSize for tuning of the initial size of the Map
 	 * @param concurrencyLevel the estimated number of concurrently
 	 * updating threads. The implementation performs internal sizing

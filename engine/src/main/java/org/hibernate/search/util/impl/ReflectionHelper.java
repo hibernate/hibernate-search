@@ -49,6 +49,7 @@ public abstract class ReflectionHelper {
 
 	/**
 	 * Always use this method to set accessibility regardless of the visibility.
+	 * @param member the {@link XMember} to check
 	 */
 	public static void setAccessible(XMember member) {
 		try {
@@ -65,6 +66,7 @@ public abstract class ReflectionHelper {
 
 	/**
 	 * Always use this method to set accessibility regardless of the visibility.
+	 * @param member the {@link AccessibleObject} to change
 	 */
 	public static void setAccessible(AccessibleObject member) {
 		try {

@@ -29,7 +29,7 @@ public final class Search {
 	 * The created instance depends on the passed Session: closing either of them will
 	 * close both instances. They both share the same persistence context.
 	 *
-	 * @param session
+	 * @param session the hibernate ORM session
 	 * @return the new FullTextSession, based on the passed Session
 	 * @throws IllegalArgumentException if passed null
 	 */

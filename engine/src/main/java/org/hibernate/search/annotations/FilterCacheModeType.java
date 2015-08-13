@@ -24,8 +24,7 @@ public enum FilterCacheModeType {
 	 * concurrent <code>Filter.getDocIdSet()</code> calls.
 	 * Results are not cached by Hibernate Search.
 	 *
-	 * @see org.apache.lucene.search.Filter#getDocIdSet(org.apache.lucene.index.IndexReader)
-
+	 * @see org.apache.lucene.search.Filter#getDocIdSet(org.apache.lucene.index.LeafReaderContext, org.apache.lucene.util.Bits)
 	 */
 	INSTANCE_ONLY,
 
@@ -35,7 +34,7 @@ public enum FilterCacheModeType {
 	 * concurrent <code>Filter.getDocIdSet()</code> calls.
 	 * <code>DocIdSet</code> results are cached per <code>IndexReader</code>.
 	 *
-	 * @see org.apache.lucene.search.Filter#getDocIdSet(org.apache.lucene.index.IndexReader)
+	 * @see org.apache.lucene.search.Filter#getDocIdSet(org.apache.lucene.index.LeafReaderContext, org.apache.lucene.util.Bits)
 	 */
 	INSTANCE_AND_DOCIDSETRESULTS
 

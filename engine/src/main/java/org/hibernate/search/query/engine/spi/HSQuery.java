@@ -139,7 +139,7 @@ public interface HSQuery extends ProjectionConstants {
 	List<Class<?>> getTargetedEntities();
 
 	/**
-	 * WTF does that do exactly
+	 * @return a set of indexed entities corresponding to the class hierarchy of the targeted entities
 	 */
 	Set<Class<?>> getIndexedTargetedEntities();
 
@@ -165,7 +165,7 @@ public interface HSQuery extends ProjectionConstants {
 
 	/**
 	 * Execute the Lucene query and return the list of {@code EntityInfo}s populated with
-	 * metadata and projection. {@link org.hibernate.search.engine.ProjectionConstants#THIS} if projected is <br>not</br> populated.
+	 * metadata and projection. {@link org.hibernate.search.engine.ProjectionConstants#THIS} if projected is <b>not</b> populated.
 	 * It is the responsibility of the object source integration.
 	 *
 	 * @return list of {@code EntityInfo}s populated with metadata and projection
@@ -175,9 +175,9 @@ public interface HSQuery extends ProjectionConstants {
 	/**
 	 * Execute the Lucene query and return a traversable object over the results.
 	 * Results are lazily fetched.
-	 * {@link org.hibernate.search.engine.ProjectionConstants#THIS} if projected is <br>not</br> populated. It is the responsibility
+	 * {@link org.hibernate.search.engine.ProjectionConstants#THIS} if projected is <b>not</b> populated. It is the responsibility
 	 * of the object source integration.
-	 * The returned {@code DocumentExtractor} <br>must</br> be closed by the caller to release Lucene resources.
+	 * The returned {@code DocumentExtractor} <b>must</b> be closed by the caller to release Lucene resources.
 	 *
 	 * @return the {@code DocumentExtractor} instance
 	 */

@@ -20,11 +20,13 @@ public interface WorkQueueSynchronization extends Synchronization {
 
 	/**
 	 * Add some work to the transaction queue.
+	 * @param work the work to add
 	 */
 	void add(Work work);
 
 	/**
 	 * Whether or not this queue has been consumed
+	 * @return {@code true} if the work has been consumed
 	 */
 	boolean isConsumed();
 

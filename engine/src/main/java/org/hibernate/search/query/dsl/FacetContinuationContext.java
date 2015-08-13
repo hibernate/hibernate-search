@@ -14,6 +14,7 @@ public interface FacetContinuationContext {
 	/**
 	 * Start building a range request
 	 *
+	 * @param <T> the type of the values in the range
 	 * @return a {@code FacetRangeContext} to continue building the facet request
 	 */
 	<T> FacetRangeAboveBelowContext<T> range();

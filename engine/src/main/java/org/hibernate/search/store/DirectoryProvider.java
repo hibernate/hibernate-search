@@ -22,15 +22,16 @@ import org.hibernate.search.spi.BuildContext;
  *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
+ * @param <TDirectory> a Lucene Directory provider
  */
 public interface DirectoryProvider<TDirectory extends Directory> {
 
 	/**
-	 * @param indexName
-	 * @param properties
-	 * @param context
-	 *
 	 * get the information to initialize the directory and build its hashCode/equals method
+	 *
+	 * @param indexName the name of the index (directory) to create
+	 * @param properties the configuration properties
+	 * @param context provide access to some services at initialization
 	 */
 	void initialize(String indexName, Properties properties, BuildContext context);
 
@@ -38,6 +39,7 @@ public interface DirectoryProvider<TDirectory extends Directory> {
 	 * Executed after initialize, this method set up the heavy process of starting up the DirectoryProvider
 	 * IO processing as well as background processing are expected to be set up here
 	 *
+	 * @param indexManager the index manager
 	 */
 	void start(DirectoryBasedIndexManager indexManager);
 
@@ -49,7 +51,10 @@ public interface DirectoryProvider<TDirectory extends Directory> {
 	void stop();
 
 	/**
-	 * Returns an initialized Lucene Directory. This method call <b>must</b> be threadsafe
+	 * Give access to the initialized Lucene Directory.
+	 * This method call <b>must</b> be threadsafe.
+	 *
+	 * @return an initialized Lucene Directory
 	 */
 	TDirectory getDirectory();
 }

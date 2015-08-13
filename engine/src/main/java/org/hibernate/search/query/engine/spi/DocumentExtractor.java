@@ -37,6 +37,7 @@ public interface DocumentExtractor extends Closeable {
 	/**
 	 * @hsearch.experimental We are thinking at ways to encapsulate needs for exposing TopDocs (and whether or not it makes sense)
 	 * Try to avoid it if you can
+	 * @return {@link TopDocs} instance
 	 */
 	TopDocs getTopDocs();
 

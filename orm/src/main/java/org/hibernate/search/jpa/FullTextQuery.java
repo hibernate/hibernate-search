@@ -50,7 +50,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param filter The lucene filter.
 	 *
-	 * @return this for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery setFilter(Filter filter);
 
@@ -61,6 +61,8 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * The number of results might be slightly different from
 	 * <code>getResultList().size()</code> because getResultList()
 	 * may be not in sync with the database at the time of query.
+	 *
+	 * @return the number of hits for this search
 	 */
 	int getResultSize();
 
@@ -70,6 +72,9 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * No projection (criteria.setProjection() ) allowed, the root entity must be the only returned type
 	 * No where restriction can be defined either.
+	 *
+	 * @param criteria a query defined using {@link Criteria}
+	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery setCriteriaQuery(Criteria criteria);
 
@@ -82,6 +87,9 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Unless notified in their JavaDoc, all built-in bridges are two-way. All @DocumentId fields are projectable by design.
 	 *
 	 * If the projected field is not a projectable field, null is returned in the object[]
+	 *
+	 * @param fields the fields to use for projection
+	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery setProjection(String... fields);
 
@@ -107,12 +115,17 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery setSpatialParameters(Coordinates center, String fieldName);
 
 	/**
-	 * Enable a given filter by its name. Returns a FullTextFilter object that allows filter parameter injection
+	 * Enable a given filter by its name.
+	 *
+	 * @param name the name of the filter
+	 * @return  a {@link FullTextFilter} object that allows filter parameter injection
 	 */
 	FullTextFilter enableFullTextFilter(String name);
 
 	/**
 	 * Disable a given filter by its name
+	 *
+	 * @param name the filter nane
 	 */
 	void disableFullTextFilter(String name);
 
@@ -122,7 +135,10 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FacetManager getFacetManager();
 
 	/**
-	 * defines a result transformer used during projection
+	 * Defines a result transformer used during projection
+	 *
+	 * @param transformer the {@link ResultTransformer} to use during projection
+	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
@@ -133,7 +149,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param documentId Lucene Document id to be explain. This is NOT the object id
 	 *
-	 * @return Lucene Explanation
+	 * @return Lucene {@link Explanation}
 	 */
 	Explanation explain(int documentId);
 
@@ -151,6 +167,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param timeout time out period
 	 * @param timeUnit time out unit
+	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit);
 
@@ -159,6 +176,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * When using {@link #limitExecutionTimeTo(long, java.util.concurrent.TimeUnit)} }, returns true if partial results are returned (ie if the time limit has been reached
 	 * and the result fetching process has been terminated.
+	 * @return {@code true} if partial results are returned, {@code false} otherwise
 	 */
 	boolean hasPartialResults();
 
@@ -171,6 +189,10 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * The database retrieval method defines how objects are loaded from the database. Defaults to QUERY.
 	 *
 	 * Note that Hibernate Search can deviate from these choices when it makes sense.
+	 *
+	 * @param lookupMethod lookup method
+	 * @param retrievalMethod how to initilize an object
+	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod);
 }

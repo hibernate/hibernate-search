@@ -19,21 +19,32 @@ import org.hibernate.search.store.DirectoryProvider;
  * instances, potentially making use of shortcuts for the implementation names and altering default implementations.
  *
  * @author gustavonalle
+ * @param <D> a Lucene directory provider
  */
 public interface DirectoryProviderService<D extends Directory> extends Service {
 
 	/**
 	 * Creates a DirectoryProvider for an index based on the configuration
+	 *
+	 * @param indexProperties the configuration properties
+	 * @param indexName the name of the index (directory) to create
+	 * @param context provide access to some services at initialization
+	 * @return a {@link DirectoryProvider}
 	 */
 	DirectoryProvider<D> create(Properties indexProperties, String indexName, BuildContext context);
 
 	/**
-	 * Default DirectoryProvider to be used if none is configured by the user
+	 * Default {@link DirectoryProvider} to be used if none is configured by the user
+	 *
+	 * @return the default {@link DirectoryProvider}
 	 */
 	Class<? extends DirectoryProvider<D>> getDefault();
 
 	/**
 	 * Resolve short names into implementation names
+	 *
+	 * @param shortcut the short name of the directory provider
+	 * @return the fully qualified class name of the directory provider identified by the shortcut
 	 */
 	String toFullyQualifiedClassName(String shortcut);
 

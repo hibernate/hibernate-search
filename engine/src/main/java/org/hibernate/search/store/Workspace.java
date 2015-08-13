@@ -76,6 +76,7 @@ public interface Workspace {
 	 * This allows to use delete by the identifier term which is much faster.
 	 *
 	 * This method should really be named {@code isSingleClassInIndex} but that's a public contract.
+	 * @return true if one and only one entity type is stored in the targeted index.
 	 */
 	boolean areSingleTermDeletesSafe();
 
@@ -88,6 +89,7 @@ public interface Workspace {
 	 * If unsure, we will delete taking the class field into account to avoid unwanted document deletions.
 	 *
 	 * The method should really be named {@code isDeleteByTermEnforcedOrSafe} but that's a public contract.
+	 * @return true if either the configuration guarantees that one can use delete by term on all indexes
 	 */
 	boolean isDeleteByTermEnforced();
 
@@ -106,6 +108,7 @@ public interface Workspace {
 
 	/**
 	 * Returns the name of the index this workspace is being used for.
+	 * @return the name of the index
 	 */
 	String getIndexName();
 

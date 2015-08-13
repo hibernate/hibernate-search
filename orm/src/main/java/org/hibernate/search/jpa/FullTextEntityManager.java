@@ -36,9 +36,10 @@ public interface FullTextEntityManager extends EntityManager {
 
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
-	 * Indexation is batched per transaction: if a transaction is active, the operation
+	 * Indexing is batched per transaction: if a transaction is active, the operation
 	 * will not affect the index at least until commit.
 	 *
+	 * @param <T> the type of the entity
 	 * @param entity The entity to index - must not be <code>null</code>.
 	 *
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
@@ -55,6 +56,7 @@ public interface FullTextEntityManager extends EntityManager {
 	 * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
 	 * case this method behaves like {@link #purgeAll(Class)}.
 	 *
+	 * @param <T> The type of the entity
 	 * @param entityType The type of the entity to delete.
 	 * @param id The id of the entity to delete.
 	 *
@@ -65,6 +67,7 @@ public interface FullTextEntityManager extends EntityManager {
 	/**
 	 * Remove all entities from of particular class and all its subclasses from the index.
 	 *
+	 * @param <T> the type of the entity
 	 * @param entityType The class of the entities to remove.
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.

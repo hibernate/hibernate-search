@@ -16,6 +16,7 @@ public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisCont
 
 	/**
 	 * Exclude the entity used for comparison from the results
+	 * @return {@code this} for method chaining
 	 */
 	MoreLikeThisContext excludeEntityUsedForComparison();
 
@@ -25,6 +26,8 @@ public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisCont
 	 *
 	 * Unless activated, terms are not boosted by their individual frequency.
 	 * When activated, significant terms will have their influence increased more than by default.
+	 * @param factor the factor value
+	 * @return {@code this} for method chaining
 	 */
 	MoreLikeThisContext favorSignificantTermsWithFactor(float factor);
 
@@ -35,6 +38,7 @@ public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisCont
 	 * Fields storing the id and the class type are ignored.
 	 *
 	 * We highly recommend to store the term vectors if you plan on using More Like This queries.
+	 * @return {@code this} for method chaining
 	 */
 	MoreLikeThisTerminalMatchingContext comparingAllFields();
 
@@ -44,6 +48,8 @@ public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisCont
 	 * An exception is thrown if the fields are neither storing the term vectors nor physically stored.
 	 *
 	 * We highly recommend to store the term vectors if you plan on using More Like This queries.
+	 * @param fieldNames the names of the fields to use for the comparison
+	 * @return {@code this} for method chaining
 	 */
 	MoreLikeThisOpenedMatchingContext comparingFields(String... fieldNames);
 
@@ -53,6 +59,8 @@ public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisCont
 	 * An exception is thrown if the field are neither storing the term vectors nor physically stored.
 	 *
 	 * We highly recommend to store the term vectors if you plan on using More Like This queries.
+	 * @param fieldName the name of the field to compare
+	 * @return {@code this} for method chaining
 	 */
 	MoreLikeThisOpenedMatchingContext comparingField(String fieldName);
 

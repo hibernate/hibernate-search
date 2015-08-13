@@ -21,6 +21,10 @@ public final class HibernateHelper {
 	/**
 	 * Get the real class type.
 	 * In case of Hibernate proxies, return the entity type rather than the proxy's
+	 *
+	 * @param <T> the type of the entity
+	 * @param entity an instance of the entity type
+	 * @return the real class of the type
 	 */
 	public static <T> Class<T> getClass(T entity) {
 		return Hibernate.getClass( entity );

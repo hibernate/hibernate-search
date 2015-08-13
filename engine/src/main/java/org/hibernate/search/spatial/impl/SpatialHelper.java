@@ -32,7 +32,7 @@ public abstract class SpatialHelper {
 	 * Generate a Cell Index on one axis
 	 *
 	 * @param coordinate position to compute the Index for
-	 * @param range range of the axis (-pi,pi)/(-90,90) => 2*pi/180 e.g
+	 * @param range range of the axis {@literal (-pi,pi)/(-90,90) => 2*pi/180} e.g
 	 * @param spatialHashLevel Hox many time the range has been split in two
 	 * @return the cell index on the axis
 	 */

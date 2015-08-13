@@ -23,6 +23,8 @@ public interface MoreLikeThisOpenedMatchingContext extends MoreLikeThisMatchingC
 	 * An exception is thrown if the field are neither storing the term vectors nor physically stored.
 	 *
 	 * We highly recommend to store the term vectors if you plan on using More Like This queries.
+	 * @param fieldname the name of the field
+	 * @return {@code this} for method chaining
 	 */
 	MoreLikeThisOpenedMatchingContext andField(String fieldname);
 }

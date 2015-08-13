@@ -16,6 +16,8 @@ public interface MustJunction extends BooleanJunction<MustJunction> {
 	/**
 	 * Negate the must clause.
 	 * Results of the boolean query do NOT match the subquery.
+	 *
+	 * @return a {@link BooleanJunction}
 	 */
 	BooleanJunction not();
 }

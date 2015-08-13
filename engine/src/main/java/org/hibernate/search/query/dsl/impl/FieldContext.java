@@ -34,6 +34,7 @@ public class FieldContext {
 
 	/**
 	 * Whether to analyze the given field value or not.
+	 * @return {@code true} if the field must be analyzed
 	 */
 	public boolean applyAnalyzer() {
 		return !ignoreAnalyzer && !isIdField;

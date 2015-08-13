@@ -171,6 +171,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
 	/**
+	 * @param <T> the type of the unwrapped object
 	 * @param type the type to unwrap
 	 *
 	 * @return the underlying type if possible. If not possible to unwrap to the given type an
@@ -230,6 +231,10 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * The database retrieval method defines how objects are loaded from the database. Defaults to QUERY.
 	 *
 	 * Note that Hibernate Search can deviate from these choices when it makes sense.
+	 *
+	 * @param lookupMethod the lookuip strategy
+	 * @param retrievalMethod the retrieval strategy
+	 * @return {@code this} to allow method chaining
 	 */
 	FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod);
 }

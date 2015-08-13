@@ -22,7 +22,7 @@ import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
  */
 public @interface Indexed {
 	/**
-	 * @return The filename of the index
+	 * @return The filename of the index. Default to empty string
 	 */
 	String index() default "";
 
@@ -30,6 +30,7 @@ public @interface Indexed {
 	 * Custom converter to change operations upon indexing
 	 * Useful for soft deletes and similar patterns
 	 *
+	 * @return the custom {@link EntityIndexingInterceptor} class. Default to {@link EntityIndexingInterceptor} class
 	 * @hsearch.experimental : This feature is experimental
 	 */
 	Class<? extends EntityIndexingInterceptor> interceptor() default EntityIndexingInterceptor.class;

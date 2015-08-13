@@ -219,6 +219,8 @@ public final class DocumentBuilderHelper {
 
 	/**
 	 * @deprecated we should know the projection rules from the metadata rather than guess from the field properties
+	 * @param field the field
+	 * @return the object
 	 */
 	@Deprecated
 	public static Object extractObjectFromFieldable(IndexableField field) {
@@ -234,6 +236,8 @@ public final class DocumentBuilderHelper {
 
 	/**
 	 * @deprecated we should know the projection rules from the metadata rather than guess from the field properties
+	 * @param field the field to decompress
+	 * @return the decompressed field
 	 */
 	@Deprecated
 	public static String extractStringFromFieldable(IndexableField field) {

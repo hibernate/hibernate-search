@@ -60,7 +60,7 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 	 * Obtain a direct reference to the wrapped object. This is not
 	 * recommended but may be necessary to e.g. call vendor specific methods.
 	 *
-	 * @return
+	 * @return an XA datasource
 	 */
 	public XADataSource getUnwrappedXADataSource() {
 		return _theXADataSource;

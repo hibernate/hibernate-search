@@ -14,7 +14,7 @@ public interface EntityContext {
 	EntityContext overridesForField(String field, String analyzerName);
 
 	/**
-	 * return the query builder
+	 * @return the query builder
 	 */
 	QueryBuilder get();
 }

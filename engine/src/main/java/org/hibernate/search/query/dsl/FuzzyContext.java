@@ -13,11 +13,15 @@ package org.hibernate.search.query.dsl;
 public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	/**
 	 * field / property the term query is executed on
+	 * @param field the name of the field
+	 * @return a {@link TermMatchingContext}
 	 */
 	TermMatchingContext onField(String field);
 
 	/**
 	 * fields / properties the term query is executed on
+	 * @param fields the names of the fields
+	 * @return a {@link TermMatchingContext}
 	 */
 	TermMatchingContext onFields(String... fields);
 
@@ -27,6 +31,8 @@ public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	 * Defaults to .5
 	 *
 	 * @deprecated use {@link #withEditDistanceUpTo(int)}
+	 * @param threshold the value for the threshold
+	 * @return a {@link FuzzyContext}
 	 */
 	@Deprecated
 	FuzzyContext withThreshold(float threshold);
@@ -37,6 +43,8 @@ public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	 * Can be either 1 or 2 (0 would mean no fuzziness).
 	 *
 	 * Defaults to 2.
+	 * @param maxEditDistance max value for the edit distance
+	 * @return a {@link FuzzyContext}
 	 */
 	FuzzyContext withEditDistanceUpTo(int maxEditDistance);
 
@@ -45,6 +53,8 @@ public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	 * A non zero value is recommended if the index contains a huge amount of distinct terms
 	 *
 	 * Defaults to 0
+	 * @param prefixLength the length of the prefix
+	 * @return a {@link FuzzyContext}
 	 */
 	FuzzyContext withPrefixLength(int prefixLength);
 }

@@ -39,7 +39,7 @@ public interface MassIndexerFactory {
 	 *            the {@link org.hibernate.Session} factory
 	 * @param entities
 	 *            the classes of the entities that are going to be indexed
-	 * @return a new MassIndexer
+	 * @return a new {@link MassIndexer}
 	 */
 	MassIndexer createMassIndexer(SearchIntegrator searchIntegrator, SessionFactoryImplementor sessionFactory,
 			Class<?>... entities);

@@ -99,6 +99,10 @@ public interface SearchFactory {
 	/**
 	 * Unwraps some internal Hibernate Search types.
 	 * Currently, no public type is accessible. This method should not be used by users.
+	 *
+	 * @param <T> the type of the unwrapped class
+	 * @param cls the type to unwrap
+	 * @return the unwrapped object
 	 */
 	<T> T unwrap(Class<T> cls);
 

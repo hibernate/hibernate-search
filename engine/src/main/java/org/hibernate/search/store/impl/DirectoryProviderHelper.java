@@ -51,6 +51,10 @@ public final class DirectoryProviderHelper {
 
 	/**
 	 * @deprecated Use getSourceDirectoryPath
+	 * @param indexName the name of the index (directory) to create
+	 * @param properties the configuration properties
+	 * @param needWritePermissions when true the directory will be tested for read-write permissions.
+	 * @return The file representing the source directory
 	 */
 	@Deprecated
 	public static File getSourceDirectory(String indexName, Properties properties, boolean needWritePermissions) {
@@ -112,6 +116,7 @@ public final class DirectoryProviderHelper {
 	 *
 	 * @param indexDir the directory where to write a new index
 	 * @param properties the configuration properties
+	 * @param serviceManager provides access to services
 	 * @return the created {@code FSDirectory} instance
 	 * @throws java.io.IOException if an error
 	 */
@@ -141,8 +146,7 @@ public final class DirectoryProviderHelper {
 	 * @param directory The directory to create or verify
 	 * @param indexName To label exceptions
 	 * @param verifyIsWritable Verify the directory is writable
-	 *
-	 * @throws SearchException
+	 * @throws SearchException if the index cannot be created, it's not a directory or it's not writeable
 	 */
 	public static void makeSanityCheckedDirectory(Path directory, String indexName, boolean verifyIsWritable) {
 		if ( Files.notExists( directory ) ) {
@@ -175,6 +179,10 @@ public final class DirectoryProviderHelper {
 
 	/**
 	 * @deprecated Use makeSanityCheckedDirectory(Path directory, String indexName, boolean verifyIsWritable)
+	 *
+	 * @param directory The directory to create or verify
+	 * @param indexName To label exceptions
+	 * @param verifyIsWritable Verify the directory is writable
 	 */
 	@Deprecated
 	public static void makeSanityCheckedDirectory(File directory, String indexName, boolean verifyIsWritable) {

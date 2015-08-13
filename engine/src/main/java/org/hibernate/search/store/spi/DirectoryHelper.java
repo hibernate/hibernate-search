@@ -95,7 +95,12 @@ public class DirectoryHelper {
 	}
 
 	/**
-	 * @deprecated use getVerifiedIndexPath
+	 * @deprecated use {@link #getVerifiedIndexPath}
+	 *
+	 * @param annotatedIndexName The index name declared on the @Indexed annotation
+	 * @param properties The properties may override the indexname.
+	 * @param verifyIsWritable Verify the directory is writable
+	 * @return the File representing the Index Directory
 	 */
 	@Deprecated
 	public static File getVerifiedIndexDir(String annotatedIndexName, Properties properties, boolean verifyIsWritable) {

@@ -38,9 +38,12 @@ public final class SpatialHashFilter extends Filter {
 	}
 
 	/**
-	 * Returns Doc Ids by searching the index for document having the correct spatial hash cell id at given grid level
+	 * Search the index for document having the correct spatial hash cell id at given grid level.
 	 *
-	 * @param reader reader to the index
+	 * @param context the {@link LeafReaderContext} for which to return the {@link }.
+	 * @param acceptDocs Bits that represent the allowable docs to match (typically deleted docs but possibly filtering
+	 * other documents)
+	 * @return a {@link DocIdSet} with the document ids matching
 	 */
 	@Override
 	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {

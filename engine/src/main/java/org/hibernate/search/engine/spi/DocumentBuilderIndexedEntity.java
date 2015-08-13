@@ -129,6 +129,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
 	 *
 	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>
+	 * @param typeMetadata all the metadata for the entity type
 	 * @param context Handle to default configuration settings
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
@@ -273,6 +274,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	/**
 	 * Builds the Lucene {@code Document} for a given entity instance and its id.
 	 *
+	 * @param tenantId the identifier of the tenant or null if there isn't one
 	 * @param instance The entity for which to build the matching Lucene {@code Document}
 	 * @param id the entity id.
 	 * @param fieldToAnalyzerMap this maps gets populated while generating the {@code Document}.

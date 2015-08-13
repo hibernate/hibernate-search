@@ -31,6 +31,7 @@ public interface ServiceManager {
 	/**
 	 * Gets the service in the specified service role.
 	 *
+	 * @param <S> the type of the service
 	 * @param serviceRole the service to retrieve. Cannot be {@code null}.
 	 *
 	 * @return the single service fulfilling the specified role.
@@ -44,6 +45,7 @@ public interface ServiceManager {
 	/**
 	 * Releases the service in the specified service role.
 	 *
+	 * @param <S> the type of the service
 	 * @param serviceRole the service to be released. Cannot be {@code null}.
 	 *
 	 * @throws IllegalArgumentException in case the {@code serviceRole} is {@code null}

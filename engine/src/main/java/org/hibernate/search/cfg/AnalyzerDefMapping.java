@@ -32,6 +32,9 @@ public class AnalyzerDefMapping {
 
 	/**
 	 * {@code &#064;TokenizerDef(, ... params={&#064;Parameter(name="name", value="value"), ...}) }
+	 * @param name the name of the paramater
+	 * @param value the value of the paramater
+	 * @return {@code  this} for method chaining
 	 */
 	public AnalyzerDefMapping tokenizerParam(String name, String value) {
 		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( tokenizer, "params" );
@@ -42,6 +45,8 @@ public class AnalyzerDefMapping {
 
 	/**
 	 * {@code &#064;TokenFilterDef(factory=factory) }
+	 * @param factory the {@link TokenFilterFactory}
+	 * @return a new {@link TokenFilterDefMapping}
 	 */
 	public TokenFilterDefMapping filter(Class<? extends TokenFilterFactory> factory) {
 		return new TokenFilterDefMapping( factory, analyzerDef, mapping );

@@ -46,7 +46,9 @@ public final class JMXRegistrar {
 	/**
 	 * Registers the specified object with the given name to the MBean server.
 	 *
+	 * @param <T> the type of the object interface
 	 * @param object the object to register
+	 * @param beanInterface the Management Interface exported by this MBean's implementation.
 	 * @param name the object name to register the bean under
 	 *
 	 * @return The registered object name

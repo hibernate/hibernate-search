@@ -195,7 +195,8 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	}
 
 	/**
-	 * Initialize method called by Hibernate Core when the SessionFactory starts
+	 * Initialize method called by Hibernate Core when the SessionFactory starts.
+	 * @param extendedIntegrator the {@link ExtendedSearchIntegrator}
 	 */
 	public void initialize(ExtendedSearchIntegrator extendedIntegrator) {
 		this.extendedIntegrator = extendedIntegrator;

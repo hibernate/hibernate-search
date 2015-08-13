@@ -42,7 +42,7 @@ public class ProducerConsumerQueue<T> {
 	 * Blocks until an object is available; when null
 	 * is returned the client thread should quit.
 	 * @return the next object in the queue, or null to exit
-	 * @throws InterruptedException
+	 * @throws InterruptedException if interrupted while waiting
 	 */
 	@SuppressWarnings("unchecked")
 	public T take() throws InterruptedException {
@@ -60,8 +60,8 @@ public class ProducerConsumerQueue<T> {
 	/**
 	 * Adds a new object to the queue, blocking if no space is
 	 * available.
-	 * @param obj
-	 * @throws InterruptedException
+	 * @param obj the object to add to the queue
+	 * @throws InterruptedException if interrupted while waiting
 	 */
 	public void put(T obj) throws InterruptedException {
 		queue.put( obj );

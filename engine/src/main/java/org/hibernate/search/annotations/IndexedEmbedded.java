@@ -35,6 +35,8 @@ public @interface IndexedEmbedded {
 
 	/**
 	 * Field name prefix, defaults to {@code propertyname.}.
+	 *
+	 * @return the field name prefix. Default to "."
 	 */
 	String prefix() default ".";
 
@@ -47,6 +49,8 @@ public @interface IndexedEmbedded {
 	 * When {@code includePaths} is not empty, the default value for {@code depth} is 0.</p>
 	 *
 	 * <p>Defined paths are implicitly prefixed with the {@link IndexedEmbedded#prefix()}.
+	 *
+	 * @return the paths to include. Default to empty array
 	 */
 	String[] includePaths() default { };
 
@@ -61,11 +65,14 @@ public @interface IndexedEmbedded {
 	 *
 	 * <p>Note that when defining any path to the {@code includePaths} attribute the default is zero also
 	 * when explicitly set to {@code Integer.MAX_VALUE}.</p>
+	 *
+	 * @return the depth size. Default value is {@link Integer#MAX_VALUE}
 	 */
 	int depth() default Integer.MAX_VALUE;
 
 	/**
 	 * Overrides the target type of an association, in case a collection overrides the type of the collection generics.
+	 * @return the target type of the association. Default to {@code void.class}
 	 */
 	Class<?> targetElement() default void.class;
 

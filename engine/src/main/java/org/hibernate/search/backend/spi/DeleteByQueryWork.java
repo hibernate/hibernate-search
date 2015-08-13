@@ -32,7 +32,7 @@ public class DeleteByQueryWork extends Work {
 	 *
 	 * @param tenantId the tenant identifier
 	 * @param entityType the class to operate on
-	 * @param deleteByQuery the query to delete by
+	 * @param deletionQuery the query to delete by
 	 * @throws IllegalArgumentException if a unsupported SerializableQuery is passed
 	 */
 	public DeleteByQueryWork(String tenantId, Class<?> entityType, DeletionQuery deletionQuery) {

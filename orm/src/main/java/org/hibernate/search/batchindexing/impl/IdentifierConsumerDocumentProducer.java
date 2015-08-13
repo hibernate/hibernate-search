@@ -155,7 +155,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	 *
 	 * @param listIds the list of entity identifiers (of type
 	 * @param session the session to be used
-	 * @param sessionInitializer
+	 * @param sessionInitializer the initilization strategies for entities and collections
 	 *
 	 * @throws InterruptedException
 	 */

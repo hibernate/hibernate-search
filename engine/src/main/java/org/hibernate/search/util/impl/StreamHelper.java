@@ -32,8 +32,8 @@ public class StreamHelper {
 	 * Reads the provided input stream into a string
 	 *
 	 * @param inputStream the input stream to read from
-	 *
 	 * @return the content of the input stream as string
+	 * @throws IOException if an I/O error occurs while reading the {@link InputStream}
 	 */
 	public static String readInputStream(InputStream inputStream) throws IOException {
 		Writer writer = new StringWriter();

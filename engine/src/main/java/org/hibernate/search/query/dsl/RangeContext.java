@@ -12,7 +12,8 @@ package org.hibernate.search.query.dsl;
  */
 public interface RangeContext extends QueryCustomization<RangeContext> {
 	/**
-	 * field / property the term query is executed on
+	 * @param fieldName field/property the term query is executed on
+	 * @return a {@link RangeMatchingContext}
 	 */
 	RangeMatchingContext onField(String fieldName);
 }

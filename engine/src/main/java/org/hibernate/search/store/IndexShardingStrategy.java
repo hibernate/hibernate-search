@@ -26,16 +26,24 @@ public interface IndexShardingStrategy {
 	/**
 	 * provides access to sharding properties (under the suffix sharding_strategy)
 	 * and provide access to all the IndexManager for a given index
+	 *
+	 * @param properties configuration properties
+	 * @param indexManagers array of {@link IndexManager}
 	 */
 	void initialize(Properties properties, IndexManager[] indexManagers);
 
 	/**
 	 * Ask for all shards (eg to query or optimize)
+	 * @return all the {@link IndexManager} for all shards
 	 */
 	IndexManager[] getIndexManagersForAllShards();
 
 	/**
-	 * return the IndexManager where the given entity will be indexed
+	 * @param entity the type of the entity
+	 * @param id the id in object form
+	 * @param idInString the id as transformed by the used TwoWayStringBridge
+	 * @param document the document to index
+	 * @return the IndexManager where the given entity will be indexed
 	 */
 	IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document);
 
@@ -46,6 +54,7 @@ public interface IndexShardingStrategy {
 	 * @param entity the type of the deleted entity
 	 * @param id the id in object form
 	 * @param idInString the id as transformed by the used TwoWayStringBridge
+	 * @return the {@link IndexManager}(s) where the given entity is stored
 	 */
 	IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString);
 
@@ -54,7 +63,8 @@ public interface IndexShardingStrategy {
 	 * this optional optimization allows queries to hit a subset of all shards, which may be useful for some datasets
 	 * if this optimization is not needed, return getIndexManagersForAllShards()
 	 *
-	 * fullTextFilters can be empty if no filter is applied
+	 * @param fullTextFilters can be empty if no filter is applied
+	 * @return the set of {@link IndexManager}(s) where the entities matching the filters are stored
 	 */
 	IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters);
 }

@@ -16,11 +16,17 @@ public interface TermMatchingContext extends FieldCustomization<TermMatchingCont
 	 * The value is passed to the field's:
 	 *  - field bridge
 	 *  - analyzer (unless ignoreAnalyzer is called).
+	 *
+	 * @param value the value to match
+	 * @return {@code this} for method chaining
 	 */
 	TermTermination matching(Object value);
 
 	/**
 	 * field / property the term query is executed on
+	 *
+	 * @param field another field involved in the query
+	 * @return {@code this} for method chaining
 	 */
 	TermMatchingContext andField(String field);
 }

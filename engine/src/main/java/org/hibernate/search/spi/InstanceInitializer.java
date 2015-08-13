@@ -25,6 +25,7 @@ public interface InstanceInitializer {
 	Class<?> getClassFromWork(Work work);
 
 	/**
+	 * @param <T> the type of the entity
 	 * @param entity an instance or proxy of T
 	 * @return the class from the instance, or the underlying class from a proxy.
 	 */
@@ -37,12 +38,15 @@ public interface InstanceInitializer {
 	Object unproxy(Object value);
 
 	/**
+	 * @param <T> the type of the elements in the collection
 	 * @param value the collection to initialize
 	 * @return the initialized Collection, to be used on lazily-loading collections
 	 */
 	<T> Collection<T> initializeCollection(Collection<T> value);
 
 	/**
+	 * @param <K> key
+	 * @param <V> value
 	 * @param value the map to initialize
 	 * @return the initialized Map, to be used on lazily-loading maps
 	 */

@@ -15,6 +15,8 @@ public interface TermFuzzy extends TermTermination {
 	 * Threshold above which two terms are considered similar enough.
 	 * Value between 0 and 1 (1 excluded)
 	 * Defaults to .5
+	 * @param threshold the value for the threshold
+	 * @return a {@link TermFuzzy}
 	 */
 	TermFuzzy withThreshold(float threshold);
 
@@ -23,6 +25,8 @@ public interface TermFuzzy extends TermTermination {
 	 * A non zero value is recommended if the index contains a huge amount of distinct terms
 	 *
 	 * Defaults to 0
+	 * @param prefixLength the length of the prefix
+	 * @return a {@link TermFuzzy}
 	 */
 	TermFuzzy withPrefixLength(int prefixLength);
 }

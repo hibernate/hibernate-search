@@ -152,12 +152,16 @@ public enum IndexWriterSetting implements Serializable {
 	}
 
 	/**
+	 * @param writerConfig the {@link IndexWriterConfig}
+	 * @param value the value for the configuration
 	 * @throws IllegalArgumentException when user selects an invalid value; should be wrapped.
 	 */
 	public void applySetting(IndexWriterConfig writerConfig, int value) {
 		// nothing to do unless overriden
 	}
 	/**
+	 * @param logByteSizeMergePolicy the {@link LogByteSizeMergePolicy}
+	 * @param value the value for the configuration
 	 * @throws IllegalArgumentException when user selects an invalid value; should be wrapped.
 	 */
 	public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {

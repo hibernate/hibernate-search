@@ -57,7 +57,8 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	 * @param monitor to monitor indexing progress
 	 * @param objectsLimit if not zero
 	 * @param errorHandler how to handle unexpected errors
-	 * @param tenantId
+	 * @param idFetchSize the fetch size
+	 * @param tenantId the tenant identifier
 	 */
 	public IdentifierProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,

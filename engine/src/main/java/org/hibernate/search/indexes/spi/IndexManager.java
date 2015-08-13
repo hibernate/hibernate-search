@@ -74,6 +74,7 @@ public interface IndexManager {
 	 * @param indexName the unique name of the index (manager). Can be used to retrieve a {@code IndexManager} instance
 	 * via the search factory and {@link org.hibernate.search.indexes.impl.IndexManagerHolder}.
 	 * @param properties the configuration properties
+	 * @param similarity defines the component of Lucene scoring
 	 * @param context context information needed to initialize this index manager
 	 */
 	void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context);
