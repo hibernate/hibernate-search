@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import static org.hibernate.search.backend.elasticsearch.client.impl.RequestHelper.executeRequest;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.IndicesExists;
 import io.searchbox.indices.mapping.PutMapping;
@@ -32,6 +31,8 @@ import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 import com.google.gson.JsonObject;
+
+import static org.hibernate.search.backend.elasticsearch.client.impl.RequestHelper.executeRequest;
 
 /**
  * An {@link IndexManager} applying indexing work to an ElasticSearch server.
@@ -100,7 +101,8 @@ public class ElasticSearchIndexManager implements IndexManager {
 				}
 
 				JsonObject field = new JsonObject();
-				field.addProperty( "type", fieldMetadata.isNumeric() ? "long" : "string" );
+
+				field.addProperty( "type", getFieldType( descriptor, fieldMetadata ) );
 				field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 				field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
 
@@ -125,6 +127,11 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 	@SuppressWarnings("deprecation")
 	private String getIndex(EntityIndexBinding binding, DocumentFieldMetadata fieldMetadata) {
+		// Never analyze boolean
+		if ( FieldHelper.isBoolean( binding, fieldMetadata.getName() ) ) {
+			return "not_analyzed";
+		}
+
 		switch ( fieldMetadata.getIndex() ) {
 			case ANALYZED:
 			case ANALYZED_NO_NORMS:
@@ -137,6 +144,29 @@ public class ElasticSearchIndexManager implements IndexManager {
 			default:
 				throw new IllegalArgumentException( "Unexpected index type: " + fieldMetadata.getIndex() );
 		}
+	}
+
+	private String getFieldType(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
+		String type;
+
+		if ( FieldHelper.isBoolean( descriptor, fieldMetadata.getName() ) ) {
+			type = "boolean";
+		}
+		// TODO Calendar
+		else if ( FieldHelper.isDate( descriptor, fieldMetadata.getName() ) ) {
+			type = "date";
+		}
+		// TODO Do more fine-grained split into integer/long/float/double as per
+		// https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-core-types.html;
+		// Using long for all works for now, e.g. doubles will still be handled correctly
+		else if ( fieldMetadata.isNumeric() ) {
+			type = "long";
+		}
+		else {
+			type = "string";
+		}
+
+		return type;
 	}
 
 	private JsonObject getOrCreateProperties(JsonObject mapping, String fieldName) {

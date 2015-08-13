@@ -7,8 +7,11 @@
 package org.hibernate.search.test.backend.elasticsearch;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -101,6 +104,21 @@ public class ElasticSearchTest extends SearchTestBase {
 		);
 
 		s.persist( masterThesis );
+
+		Calendar dob = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
+		dob.set( 1958, 3, 7, 0, 0, 0 );
+		dob.set( Calendar.MILLISECOND, 0 );
+
+		GolfPlayer hergesheimer = new GolfPlayer.Builder()
+			.firstName( "Klaus" )
+			.lastName( "Hergesheimer" )
+			.active( true )
+			.dateOfBirth( dob.getTime() )
+			.handicap( 3.4 )
+			.driveWidth( 285 )
+			.ranking( 311 )
+			.build();
+		s.persist( hergesheimer );
 
 		tx.commit();
 		s.close();
@@ -315,6 +333,22 @@ public class ElasticSearchTest extends SearchTestBase {
 	}
 
 	@Test
+	public void testMapping() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'active' : true } } }" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
+		assertThat( result ).onProperty( "lastName" ).containsOnly( "Hergesheimer" );
+
+		// TODO Assert source
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
 	public void testFirstResultAndMaxResults() throws Exception {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
@@ -446,7 +480,7 @@ public class ElasticSearchTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[]{
-				ScientificArticle.class, Tower.class, Address.class, Country.class, State.class, StateCandidate.class, ResearchPaper.class, BachelorThesis.class, MasterThesis.class
+				ScientificArticle.class, Tower.class, Address.class, Country.class, State.class, StateCandidate.class, ResearchPaper.class, BachelorThesis.class, MasterThesis.class, GolfPlayer.class
 		};
 	}
 
