@@ -22,6 +22,8 @@ public interface MoreLikeThisMatchingContext {
 	/**
 	 * Find other entities looking like the entity with the given id.
 	 * Only the selected fields will be used for comparison.
+	 * @param id the identifier of the entity
+	 * @return {@code this} for method chaining
 	 */
 	MoreLikeThisTermination toEntityWithId(Object id);
 

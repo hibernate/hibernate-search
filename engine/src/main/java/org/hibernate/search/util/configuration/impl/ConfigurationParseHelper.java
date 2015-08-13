@@ -133,10 +133,11 @@ public class ConfigurationParseHelper {
 	}
 
 	/**
-	 * In case value is null or an empty string the defValue is returned
-	 * @param value
-	 * @param defValue
-	 * @param errorMsgOnParseFailure
+	 * In case value is null or an empty string the defValue is returned.
+	 *
+	 * @param value the text to parse
+	 * @param defValue the value to return in case the text is null
+ 	 * @param errorMsgOnParseFailure message in case of error
 	 * @return the converted int.
 	 * @throws SearchException if value can't be parsed.
 	 */
@@ -151,9 +152,9 @@ public class ConfigurationParseHelper {
 
 	/**
 	 * In case value is null or an empty string the defValue is returned
-	 * @param value
-	 * @param defValue
-	 * @param errorMsgOnParseFailure
+	 * @param value the text to parse
+	 * @param defValue the value to return in case the text is null
+ 	 * @param errorMsgOnParseFailure message in case of error
 	 * @return the converted long.
 	 * @throws SearchException if value can't be parsed.
 	 */
@@ -171,9 +172,9 @@ public class ConfigurationParseHelper {
 	 * defValue if not found or if an empty string is found.
 	 * When the key the value is found but not in valid format
 	 * a standard error message is generated.
-	 * @param cfg
-	 * @param key
-	 * @param defValue
+	 * @param cfg the properties
+	 * @param key the property identifier
+	 * @param defValue the value to return if the property is not found or empty
 	 * @return the converted int.
 	 * @throws SearchException for invalid format.
 	 */
@@ -187,9 +188,9 @@ public class ConfigurationParseHelper {
 	 * defValue if not found or if an empty string is found.
 	 * When the key the value is found but not in valid format
 	 * a standard error message is generated.
-	 * @param cfg
-	 * @param key
-	 * @param defaultValue
+	 * @param cfg the properties
+	 * @param key the property identifier
+	 * @param defaultValue the value to return if the property is not found or empty
 	 * @return the converted long value.
 	 * @throws SearchException for invalid format.
 	 */
@@ -243,6 +244,10 @@ public class ConfigurationParseHelper {
 
 	/**
 	 * Get the string property or defaults if not present
+	 * @param cfg configuration Properties
+	 * @param key the property key
+	 * @param defaultValue the value to return if the property value is null
+	 * @return the String or default value
 	 */
 	public static final String getString(Properties cfg, String key, String defaultValue) {
 		if ( cfg == null ) {

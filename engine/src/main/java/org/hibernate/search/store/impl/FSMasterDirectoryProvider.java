@@ -29,9 +29,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * File based DirectoryProvider that takes care of index copy
- * The base directory is represented by hibernate.search.<index>.indexBase
- * The index is created in <base directory>/<index name>
- * The source (aka copy) directory is built from <sourceBase>/<index name>
+ * The base directory is represented by hibernate.search.{@literal <index>}.indexBase
+ * The index is created in {@literal <base directory>/<index name>}
+ * The source (aka copy) directory is built from {@literal <sourceBase>/<index name>}
  *
  * A copy is triggered every refresh seconds
  *

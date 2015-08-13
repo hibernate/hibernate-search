@@ -153,10 +153,10 @@ public class QueryHits {
 	 * This document loading strategy doesn't return anything as it's the responsibility
 	 * of the passed StoredFieldVisitor instance to collect the data it needs.
 	 *
-	 * @param index
-	 * @param fieldVisitor
+	 * @param index {@link ScoreDoc} index
+	 * @param fieldVisitor accessor to the stored field value in the index
 	 *
-	 * @throws IOException
+	 * @throws IOException if an error occurs accessing the index
 	 */
 	public void visitDocument(int index, StoredFieldVisitor fieldVisitor) throws IOException {
 		searcher.doc( docId( index ), fieldVisitor );

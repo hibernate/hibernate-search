@@ -13,6 +13,8 @@ package org.hibernate.search.query.dsl;
 public interface RangeMatchingContext extends FieldCustomization<RangeMatchingContext> {
 	/**
 	 * field / property the term query is executed on
+	 * @param field the name of the field
+	 * @return the {@link RangeMatchingContext}
 	 */
 	RangeMatchingContext andField(String field);
 
@@ -29,12 +31,16 @@ public interface RangeMatchingContext extends FieldCustomization<RangeMatchingCo
 	/**
 	 * The field value must be below <code>below</code>
 	 * You can exclude the value <code>below</code> by calling <code>.excludeLimit()</code>
+	 * @param below the lower limit of the range
+	 * @return a {@link RangeTerminationExcludable}
 	 */
 	RangeTerminationExcludable below(Object below);
 
 	/**
 	 * The field value must be above <code>above</code>
 	 * You can exclude the value <code>above</code> by calling <code>.excludeLimit()</code>
+	 * @param above the upper limit of the range
+	 * @return a {@link RangeTerminationExcludable}
 	 */
 	RangeTerminationExcludable above(Object above);
 

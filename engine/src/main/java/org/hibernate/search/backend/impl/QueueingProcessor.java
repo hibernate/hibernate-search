@@ -21,21 +21,26 @@ public interface QueueingProcessor {
 	/**
 	 * Add a work
 	 * TODO move that somewhere else, it does not really fit here
+	 * @param work the work to add
+	 * @param workQueue the work queue
 	 */
 	void add(Work work, WorkQueue workQueue);
 
 	/**
 	 * prepare resources for a later performWorks call
+	 * @param workQueue the work queue
 	 */
 	void prepareWorks(WorkQueue workQueue);
 
 	/**
 	 * Execute works
+	 * @param workQueue the work queue
 	 */
 	void performWorks(WorkQueue workQueue);
 
 	/**
 	 * Rollback works
+	 * @param workQueue the work queue
 	 */
 	void cancelWorks(WorkQueue workQueue);
 

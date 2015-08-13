@@ -42,9 +42,9 @@ public interface WorkerBuildContext extends BuildContext {
 	InstanceInitializer getInstanceInitializer();
 
 	/**
-	 * Should the worker and the backend enlist their work in the current transaction.
-	 * If false, the worker will still use the transaction as context but will execute
-	 * the workload when the transaction commits.
+	 * @return {@code true} if the worker and the backend enlist their work in the current transaction;
+	 * If {@code false}, the worker will still use the transaction as context but will execute the
+	 * workload when the transaction commits.
 	 */
 	boolean enlistWorkerInTransaction();
 }

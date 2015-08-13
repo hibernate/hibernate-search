@@ -37,7 +37,12 @@ public class InTransactionWorkQueueSynchronization implements WorkQueueSynchroni
 	private final Object transactionIdentifier;
 
 	/**
-	 * in transaction work
+	 * In transaction work
+	 *
+	 * @param transactionIdentifier the identifier of the transaction
+	 * @param queueingProcessor the {@link QueueingProcessor}
+	 * @param queuePerTransaction the map containing the queue for eeach transaction
+	 * @param extendedIntegrator the {@link ExtendedSearchIntegrator}
 	 */
 	public InTransactionWorkQueueSynchronization(Object transactionIdentifier, QueueingProcessor queueingProcessor,
 												ConcurrentMap<Object, WorkQueueSynchronization> queuePerTransaction,

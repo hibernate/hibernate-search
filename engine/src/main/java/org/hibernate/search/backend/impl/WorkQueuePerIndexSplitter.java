@@ -24,9 +24,6 @@ public class WorkQueuePerIndexSplitter {
 
 	private final HashMap<String,WorkPlan> queues = new HashMap<String,WorkPlan>();
 
-	/**
-	 * @param indexManager
-	 */
 	public List<LuceneWork> getIndexManagerQueue(final IndexManager indexManager) {
 		final String indexName = indexManager.getIndexName();
 		WorkPlan plan = queues.get( indexName );

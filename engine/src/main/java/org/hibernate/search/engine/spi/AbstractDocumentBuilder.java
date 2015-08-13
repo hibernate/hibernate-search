@@ -174,10 +174,11 @@ public abstract class AbstractDocumentBuilder {
 	/**
 	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities for a tenant.
 	 *
-	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, DepthValidator)
 	 * @param instance the instance to be indexed
 	 * @param workPlan the current work plan
 	 * @param currentDepth the current {@link org.hibernate.search.engine.spi.DepthValidator} object used to check the graph traversal
+	 * @param tenantIdentifier the identifier of the tenant or null, if there isn't one
+	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, DepthValidator)
 	 */
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, DepthValidator currentDepth, String tenantIdentifier) {
 		for ( ContainedInMetadata containedInMetadata : typeMetadata.getContainedInMetadata() ) {
@@ -198,7 +199,6 @@ public abstract class AbstractDocumentBuilder {
 			}
 
 			if ( member.isArray() ) {
-				@SuppressWarnings("unchecked")
 				Object[] array = (Object[]) value;
 				for ( Object arrayValue : array ) {
 					processSingleContainedInInstance( workPlan, arrayValue, depth, tenantIdentifier );

@@ -13,11 +13,15 @@ package org.hibernate.search.query.dsl;
 public interface PhraseMatchingContext extends FieldCustomization<PhraseMatchingContext> {
 	/**
 	 * field / property the term query is executed on
+	 * @param field the name of the field
+	 * @return {@code this} for method chaining
 	 */
 	PhraseMatchingContext andField(String field);
 
 	/**
 	 * Sentence to match. It will be processed by the analyzer
+	 * @param sentence the sentence to match
+	 * @return the {@link PhraseTermination} for method chaining
 	 */
 	PhraseTermination sentence(String sentence);
 }

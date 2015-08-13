@@ -31,51 +31,56 @@ public interface Statistics {
 
 	/**
 	 * Get the total search time in nanoseconds.
+	 * @return the total search time in nanoseconds.
 	 */
 	long getSearchQueryTotalTime();
 
 	/**
 	 * Get the time in nanoseconds of the slowest search.
+	 * @return the time in nanoseconds of the slowest search.
 	 */
 	long getSearchQueryExecutionMaxTime();
 
 	/**
 	 * Get the average search time in nanoseconds.
+	 * @return the average search time in nanoseconds
 	 */
 	long getSearchQueryExecutionAvgTime();
 
 	/**
 	 * Get the query string for the slowest query.
+	 * @return the query string for the slowest query.
 	 */
 	String getSearchQueryExecutionMaxTimeQueryString();
 
 	/**
-	 * Get the total object loading in nanoseconds.
+	 * @return the total object loading in nanoseconds.
 	 */
 	long getObjectLoadingTotalTime();
 
 	/**
-	 * Get the time in nanoseconds for the slowest object load.
+	 * @return the time in nanoseconds for the slowest object load.
 	 */
 	long getObjectLoadingExecutionMaxTime();
 
 	/**
-	 * Get the average object loading time in nanoseconds.
+	 * @return the average object loading time in nanoseconds.
 	 */
 	long getObjectLoadingExecutionAvgTime();
 
 	/**
-	 * Gets the total number of objects loaded
+	 * @return the total number of objects loaded
 	 */
 	long getObjectsLoadedCount();
 
 	/**
-	 * Are statistics logged
+	 * @return {@code true} if statistics are enabled, {@code false} otherwise
 	 */
 	boolean isStatisticsEnabled();
 
 	/**
 	 * Enable statistics logs (this is a dynamic parameter)
+	 * @param b if {@code true}, it enables the statistics.
 	 */
 	void setStatisticsEnabled(boolean b);
 

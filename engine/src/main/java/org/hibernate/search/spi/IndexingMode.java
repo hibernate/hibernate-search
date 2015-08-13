@@ -37,6 +37,8 @@ public enum IndexingMode {
 	/**
 	 * Returns the {@link IndexingMode} matching the given external representation as specified via
 	 * {@link org.hibernate.search.cfg.Environment#INDEXING_STRATEGY}
+	 * @param indexingMode the indexing mode external representation
+	 * @return the {@link IndexingMode}
 	 */
 	public static IndexingMode fromExternalRepresentation(String indexingMode) {
 		if ( EVENT.toExternalRepresentation().equals( indexingMode ) ) {
@@ -53,6 +55,7 @@ public enum IndexingMode {
 	/**
 	 * Returns the external representation of this indexing mode. Generally this enumeration itself should preferably be
 	 * used for comparisons etc.
+	 * @return the external representation as string
 	 */
 	public String toExternalRepresentation() {
 		return externalRepresentation;

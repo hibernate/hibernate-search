@@ -160,6 +160,7 @@ public final class Point implements Coordinates {
 	 * Compute distance between two points
 	 *
 	 * @param other a {@link org.hibernate.search.spatial.impl.Point} object.
+	 * @return the distance between points
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
 	public double getDistanceTo(Point other) {
@@ -171,6 +172,7 @@ public final class Point implements Coordinates {
 	 *
 	 * @param latitude in decimal degrees
 	 * @param longitude in decimal degrees
+	 * @return the distance between the points
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
 	public double getDistanceTo(final double latitude,final double longitude) {

@@ -65,7 +65,7 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 
 	/**
 	 * To allow extensions to create different RAMDirectory flavours:
-	 * @param lockFactory
+	 * @param lockFactory provides the locking strategy
 	 * @return the RAMDirectory this provider is going to manage
 	 */
 	protected RAMDirectory makeRAMDirectory(LockFactory lockFactory) {

@@ -17,11 +17,15 @@ public interface PhraseContext extends QueryCustomization<PhraseContext> {
 	 * like a <code>WITHIN</code> or <code>NEAR</code> operator.
 	 *
 	 * Defaults to 0
+	 * @param slop the slop value
+	 * @return a {@link PhraseContext}
 	 */
 	PhraseContext withSlop(int slop);
 
 	/**
 	 * field / property the term query is executed on
+	 * @param fieldName the name of the field
+	 * @return a {@link PhraseContext}
 	 */
 	PhraseMatchingContext onField(String fieldName);
 }

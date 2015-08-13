@@ -23,6 +23,7 @@ public @interface ClassBridges {
 	 * An array of ClassBridge annotations each of
 	 * which is to be applied to the class containing
 	 * this annotation.
+	 * @return the bridges to apply to the annotated class
 	 */
 	ClassBridge[] value() default { };
 }

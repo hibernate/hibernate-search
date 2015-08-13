@@ -43,7 +43,7 @@ public final class ConcurrentlyMutableAnalyzer extends DelegatingAnalyzerWrapper
 	 * proposed one, in which case there is no need for
 	 * replacements or locking.
 	 * Correct concurrency control requires external locking!
-	 * @param analyzer
+	 * @param analyzer the {@link ScopedAnalyzer} to use for comparison
 	 * @return true if there is no need to replace the current Analyzer
 	 */
 	public boolean isCompatibleWith(ScopedAnalyzer analyzer) {
@@ -53,7 +53,7 @@ public final class ConcurrentlyMutableAnalyzer extends DelegatingAnalyzerWrapper
 
 	/**
 	 * Correct concurrency control requires external locking!
-	 * @param analyzer
+	 * @param analyzer the {@link ScopedAnalyzer} to use for locking
 	 */
 	public void updateAnalyzer(ScopedAnalyzer analyzer) {
 		current.set( analyzer );

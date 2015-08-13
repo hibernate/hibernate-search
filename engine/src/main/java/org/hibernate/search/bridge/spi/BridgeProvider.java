@@ -25,6 +25,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 public interface BridgeProvider {
 
 	/**
+	 * @param bridgeProviderContext the {@link BridgeProviderContext}
 	 * @return a {@link org.hibernate.search.bridge.FieldBridge} instance if the provider can
 	 * build a bridge for the calling context. {@code null} otherwise.
 	 */

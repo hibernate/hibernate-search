@@ -15,6 +15,8 @@ import org.apache.lucene.search.Query;
 public interface AllContext extends QueryCustomization<AllContext>, Termination<AllContext> {
 	/**
 	 * Exclude the documents matching these queries
+	 * @param queriesMatchingExcludedDocuments the queries to use for excluding documents
+	 * @return {@code this} for method chaining
 	 */
 	AllContext except(Query... queriesMatchingExcludedDocuments);
 }

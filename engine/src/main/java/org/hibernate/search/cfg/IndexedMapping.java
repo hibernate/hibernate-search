@@ -44,6 +44,7 @@ public class IndexedMapping {
 	 * This feature will be removed, with no replacement
 	 * as caching fields is no longer effective.
 	 * @param type this argument will be ignored
+	 * @return {@code this} for method chaining
 	 * @deprecated This will be removed with no replacement.
 	 */
 	@Deprecated

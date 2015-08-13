@@ -185,7 +185,7 @@ public class FileHelper {
 	/**
 	 * Attempts to delete a file. If the file is a directory delete recursively all content.
 	 *
-	 * @param file the file or directory to be deleted
+	 * @param path the file or directory to be deleted
 	 *
 	 * @throws IOException if it wasn't possible to delete all content which is a common problem on Windows systems.
 	 */

@@ -218,7 +218,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	}
 
 	/**
-	 * Set of indexed entities corresponding to the class hierarchy of the targeted entities
+	 * @return a set of indexed entities corresponding to the class hierarchy of the targeted entities
 	 */
 	@Override
 	public Set<Class<?>> getIndexedTargetedEntities() {

@@ -39,11 +39,14 @@ public interface CommitPolicy {
 
 	/**
 	 * Obtain the IndexWriter
+	 * @return the {@link IndexWriter}
 	 */
 	IndexWriter getIndexWriter();
 
 	/**
 	 * Obtain the index writer
+	 * @param errorContextBuilder the {@link ErrorContextBuilder}
+	 * @return the {@link IndexWriter}
 	 */
 	IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder);
 

@@ -37,9 +37,6 @@ public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchro
 	private final WorkQueue queue;
 	private final Object transactionIdentifier;
 
-	/**
-	 * in transaction work
-	 */
 	public PostTransactionWorkQueueSynchronization(Object transactionIdentifier, QueueingProcessor queueingProcessor,
 			ConcurrentMap<Object, WorkQueueSynchronization> queuePerTransaction,
 			ExtendedSearchIntegrator extendedIntegrator) {

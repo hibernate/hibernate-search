@@ -33,9 +33,7 @@ public interface BatchBackend {
 	/**
 	 * Does one work in sync
 	 *
-	 * @param work
-	 *
-	 * @throws InterruptedException
+	 * @param work the lucene work to execute
 	 */
 	void doWorkInSync(LuceneWork work);
 

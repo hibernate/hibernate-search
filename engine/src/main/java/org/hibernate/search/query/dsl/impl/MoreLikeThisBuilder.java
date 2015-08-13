@@ -125,6 +125,7 @@ public class MoreLikeThisBuilder<T> {
 
 	/**
 	 * Return a query that will return docs like the passed lucene document ID.
+	 * @return a query that will return docs like the passed lucene document ID.
 	 */
 	public Query createQuery() {
 		try {

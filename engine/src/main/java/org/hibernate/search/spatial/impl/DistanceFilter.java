@@ -87,9 +87,13 @@ public final class DistanceFilter extends Filter {
 	}
 
 	/**
-	 * Returns Doc Ids by retrieving their lat,long and checking if within distance(radius) of the center of the search
+	 * Returns Doc Ids by retrieving their latitude,longitude and checking if within distance(radius) of the center of the search
 	 *
-	 * @param reader reader to the index
+	 * @param context the {@link LeafReaderContext} for which to return the {LeafReaderContext}.
+	 * @param acceptDocs Bits that represent the allowable docs to match (typically deleted docs but possibly filtering
+	 * other documents)
+	 *
+	 * @return a {@link DocIdSet} with the matching document ids
 	 */
 	@Override
 	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {

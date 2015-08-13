@@ -29,8 +29,12 @@ import org.hibernate.search.engine.service.spi.Service;
  */
 public interface IdUniquenessResolver extends Service {
 	/**
-	 * Returns {@code true} if the same identifier value cannot be shared between
+	 * Returns {@code true} if the same identifier value cannot be share between
 	 * two class instances of {@code entityInIndex} and {@code otherEntityInIndex}.
+	 * @param entityInIndex one entity class
+	 * @param otherEntityInIndex the other entity class
+	 * @return {@code true} if the same identifier value cannot be share between
+	 * two class instances of {@code entityInIndex} and {@code otherEntityInIndex}
 	 */
 	boolean areIdsUniqueForClasses(Class<?> entityInIndex, Class<?> otherEntityInIndex);
 }

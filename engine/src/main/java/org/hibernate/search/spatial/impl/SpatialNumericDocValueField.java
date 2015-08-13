@@ -12,9 +12,9 @@ import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexOptions;
 
 /**
- * This class is equivalent to {@link DoubleDocValuesField} except that we set the property indexed to false explicitly.
+ * This class is equivalent to {@code DoubleDocValuesField} except that we set the property indexed to false explicitly.
  *
- * @see DoubleDocValuesField
+ * @see org.apache.lucene.document.DoubleDocValuesField
  * @author Davide D'Alto
  */
 public class SpatialNumericDocValueField extends Field {

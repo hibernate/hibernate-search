@@ -46,6 +46,8 @@ public class PropertiesParseHelper {
 	 * <p>isExclusiveIndexUsageEnabled.
 	 *
 	 * @param indexProps a {@link java.util.Properties} object.
+	 * @return {@code true} when a lock on the index will not be released until the
+	 * SearchIntegrator (or SessionFactory) is closed. Default to {@code false}
 	 */
 	public static boolean isExclusiveIndexUsageEnabled(Properties indexProps) {
 		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.EXCLUSIVE_INDEX_USE, true );
@@ -137,6 +139,7 @@ public class PropertiesParseHelper {
 	 * </p>
 	 *
 	 * @param properties The properties extracted from the configuration.
+	 * @return a new {@link LuceneIndexingParameters} instance
 	 */
 	public static LuceneIndexingParameters extractIndexingPerformanceOptions(Properties properties) {
 		return new LuceneIndexingParameters( properties );

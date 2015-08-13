@@ -24,6 +24,8 @@ public interface MassIndexer {
 	/**
 	 * Sets the number of entity types to be indexed in parallel.
 	 * Defaults to 1.
+	 *
+	 * @param threadsToIndexObjects  number of entity types to be indexed in parallel
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer typesToIndexInParallel(int threadsToIndexObjects);
@@ -31,21 +33,21 @@ public interface MassIndexer {
 	/**
 	 * Set the number of threads to be used to load
 	 * the root entities.
-	 * @param numberOfThreads
+	 * @param numberOfThreads the number of threads
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer threadsToLoadObjects(int numberOfThreads);
 
 	/**
 	 * Sets the batch size used to load the root entities.
-	 * @param batchSize
+	 * @param batchSize the batch size
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer batchSizeToLoadObjects(int batchSize);
 
 	/**
 	 * Deprecated: value is ignored.
-	 * @param numberOfThreads
+	 * @param numberOfThreads the number of threads
 	 * @return <tt>this</tt> for method chaining
 	 * @deprecated Being ignored: this method will be removed.
 	 */
@@ -63,15 +65,14 @@ public interface MassIndexer {
 	/**
 	 * Sets the cache interaction mode for the data loading tasks.
 	 * Defaults to <tt>CacheMode.IGNORE</tt>.
+	 * @param cacheMode the cache interaction mode
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer cacheMode(CacheMode cacheMode);
 
 	/**
-	 * If index optimization has to be started at the end
-	 * of the indexing process.
-	 * Defaults to <tt>true</tt>.
-	 * @param optimize
+	 * If index optimization has to be started at the end of the indexing process. Defaults to <tt>true</tt>.
+	 * @param optimize {@code true} to enable the index optimization at the end of the indexing process
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer optimizeOnFinish(boolean optimize);
@@ -80,7 +81,7 @@ public interface MassIndexer {
 	 * If index optimization should be run before starting,
 	 * after the purgeAll. Has no effect if <tt>purgeAll</tt> is set to false.
 	 * Defaults to <tt>true</tt>.
-	 * @param optimize
+	 * @param optimize {@code true} to enable the index optimization after purge
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer optimizeAfterPurge(boolean optimize);
@@ -90,7 +91,7 @@ public interface MassIndexer {
 	 * using purgeAll. Set it to false only if you know there are no
 	 * entities in the index: otherwise search results may be duplicated.
 	 * Defaults to true.
-	 * @param purgeAll
+	 * @param purgeAll if {@code true} all entities will be removed from the index before starting the indexing
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer purgeAllOnStart(boolean purgeAll);
@@ -101,7 +102,7 @@ public interface MassIndexer {
 	 * Will stop indexing after having indexed a set amount of objects.
 	 * As a results the index will not be consistent
 	 * with the database: use only for testing on an (undefined) subset of database data.
-	 * @param maximum
+	 * @param maximum the maximum number of objects to index
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer limitIndexedObjectsTo(long maximum);
@@ -126,7 +127,7 @@ public interface MassIndexer {
 	 * if objects to be indexed. Some databases accept special values,
 	 * for example MySQL might benefit from using {@link Integer#MIN_VALUE}
 	 * otherwise it will attempt to preload everything in memory.
-	 * @param idFetchSize
+	 * @param idFetchSize the fetch size to be used when loading primary keys
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer idFetchSize(int idFetchSize);

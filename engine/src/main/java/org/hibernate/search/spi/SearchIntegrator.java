@@ -50,6 +50,7 @@ public interface SearchIntegrator extends AutoCloseable {
 	/**
 	 * Add the following classes to the SearchIntegrator. If these classes are new to the SearchIntegrator this
 	 * will trigger a reconfiguration.
+	 * @param classes the classes to add to the {@link SearchIntegrator}
 	 */
 	void addClasses(Class<?>... classes);
 
@@ -60,6 +61,8 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * - return the list of results eagerly
 	 * - return the list of results lazily
 	 * - get the number of results
+	 *
+	 * @return an Hibernate Search query object
 	 */
 	HSQuery createHSQuery();
 
@@ -159,6 +162,9 @@ public interface SearchIntegrator extends AutoCloseable {
 	/**
 	 * Unwraps some internal Hibernate Search types.
 	 * Currently, no public type is accessible. This method should not be used by users.
+	 * @param <T> the type of the unwrapped object
+	 * @param cls the class of the internal object to unwrap
+	 * @return the unwrapped object
 	 */
 	<T> T unwrap(Class<T> cls);
 
@@ -171,6 +177,7 @@ public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * The Worker is the entry point to apply writes and updates to the indexes.
+	 * @return the {@link Worker}
 	 */
 	Worker getWorker();
 
@@ -180,10 +187,15 @@ public interface SearchIntegrator extends AutoCloseable {
 	@Override
 	void close();
 
+	/**
+	 * Get an {@link IndexManager} using the name
+	 * @param indexName the name of the {@link IndexManager}
+	 * @return the selected {@link IndexManager}
+	 */
 	IndexManager getIndexManager(String indexName);
 
 	/**
-	 * Returns the current indexing strategy as specified via {@link org.hibernate.search.cfg.Environment#INDEXING_STRATEGY}.
+	 * @return the current indexing strategy as specified via {@link org.hibernate.search.cfg.Environment#INDEXING_STRATEGY}.
 	 */
 	IndexingMode getIndexingMode();
 

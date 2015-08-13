@@ -15,6 +15,7 @@ import org.apache.lucene.search.Query;
 public interface Termination<T> {
 	/**
 	 * Return the lucene query representing the operation
+	 * @return the lucene query representing the operation
 	 */
 	Query createQuery();
 }

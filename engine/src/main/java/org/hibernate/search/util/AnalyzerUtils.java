@@ -89,7 +89,7 @@ public final class AnalyzerUtils {
 	 * @param field the name of the field: might affect the Analyzer behaviour
 	 * @param text some sample input
 	 * @param printTo Human readable text will be printed to this output. Passing {@code System.out} might be a good idea.
-	 * @throws IOException
+	 * @throws IOException if an I/O error occurs
 	 */
 	public static void displayTokensWithPositions(Analyzer analyzer, String field, String text, PrintStream printTo) throws IOException {
 		Token[] tokens = tokensFromAnalysis( analyzer, field, text );

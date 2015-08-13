@@ -30,6 +30,7 @@ public interface DeletionQuery {
 	 * converts this DeletionQuery to a Lucene Query
 	 *
 	 * @param analyzerForEntity the analyzer to be used for this query
+	 * @return the deletion query as Lucene {@link Query}
 	 */
 	Query toLuceneQuery(ScopedAnalyzer analyzerForEntity);
 

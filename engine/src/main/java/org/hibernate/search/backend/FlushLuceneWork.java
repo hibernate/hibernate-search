@@ -21,6 +21,7 @@ public class FlushLuceneWork extends LuceneWork {
 	/**
 	 * Flushes all index operations for a specific entity.
 	 *
+	 * @param tenantId the tenant identifier. It might be null
 	 * @param entity the entity type for which to flush the index
 	 */
 	public FlushLuceneWork(String tenantId, Class<?> entity) {

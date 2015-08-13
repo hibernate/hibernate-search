@@ -10,7 +10,7 @@ package org.hibernate.search.indexes.interceptor;
  * This interceptor is called upon indexing operations to optionally change the indexing behavior.
  * <p>
  * The interceptor is applied to a MassIndexer operation, but is ignored when using
- * the explicit indexing control API such {@code org.hibernate.search.FullTextSession.index(T)
+ * the explicit indexing control API such {@code org.hibernate.search.FullTextSession.index(T)}
  * or {@code purge} and  {@code purgeAll}.
  * </p>
  * <p>

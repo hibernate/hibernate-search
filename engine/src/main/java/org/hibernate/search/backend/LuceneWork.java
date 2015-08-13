@@ -19,7 +19,6 @@ import org.apache.lucene.document.Document;
  * Instances of this class are passed between Virtual Machines when a master/slave
  * configuration of Search is used. It is the responsibility of the {@code LuceneWorkSerializer} respectively
  * {@code SerializationProvider} to serialize and de-serialize {@code LuceneWork} instances.
- * </p>
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -68,6 +67,8 @@ public abstract class LuceneWork {
 	/**
 	 * Accepts the given visitor by dispatching the correct visit method for the specific {@link LuceneWork} sub-type.
 	 *
+	 * @param <P> Context parameter type expected by a specific visitor
+	 * @param <R> Return type provided by a specific visitor
 	 * @param visitor the visitor to accept
 	 * @param p a visitor-specific context parameter
 	 * @return a visitor-specific return value or {@code null} if this visitor doesn't return a result

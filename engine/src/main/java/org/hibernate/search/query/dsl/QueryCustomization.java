@@ -23,17 +23,22 @@ public interface QueryCustomization<T> {
 	 *  - higher than 1 to increase the weight
 	 *
 	 * Could be negative but not unless you understand what is going on (advanced)
+	 * @param boost the value to use as boost
+	 * @return an instance of T for method chaining
 	 */
 	T boostedTo(float boost);
 
 	/**
 	 * All results matching the query have a constant score equals to the boost
 	 * FIXME is that true?
+	 * @return an instance of T for method chaining
 	 */
 	T withConstantScore();
 
 	/**
 	 * Filter the query results with the Filter instance
+	 * @param filter the filter to use
+	 * @return an instance of T for method chaining
 	 */
 	T filteredBy(Filter filter);
 

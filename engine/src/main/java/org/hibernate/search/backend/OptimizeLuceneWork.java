@@ -21,7 +21,7 @@ public class OptimizeLuceneWork extends LuceneWork {
 
 	/**
 	 * Optimizes the index(es) of a specific entity
-	 * @param entity
+	 * @param entity the entity type
 	 */
 	public OptimizeLuceneWork(Class<?> entity) {
 		super( null, null, null, entity );
