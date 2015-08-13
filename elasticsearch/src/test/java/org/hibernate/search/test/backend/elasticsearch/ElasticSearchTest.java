@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.test.backend.elasticsearch;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
@@ -30,6 +33,7 @@ import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Gunnar Morling
@@ -322,6 +326,81 @@ public class ElasticSearchTest extends SearchTestBase {
 
 		// Order is stable due to the result scoring
 		assertThat( result ).onProperty( "title" ).containsOnly( "ORM modelling", "ORM for dummies" );
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testGetResultSize() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		FullTextQuery fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class );
+
+		assertThat( fullTextQuery.getResultSize() ).isEqualTo( 4 );
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testScroll() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		FullTextQuery fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class );
+
+		ScrollableResults scrollableResults = fullTextQuery.scroll();
+
+		assertEquals( -1, scrollableResults.getRowNumber() );
+		assertTrue( scrollableResults.last() );
+		assertEquals( 3, scrollableResults.getRowNumber() );
+		scrollableResults.beforeFirst();
+
+		List<String> expectedTitles = Arrays.asList(
+				"High-performance ORM",
+				"ORM for dummies",
+				"ORM modelling",
+				"Latest in ORM"
+		);
+
+		int position = 0;
+		while ( scrollableResults.next() ) {
+			ScientificArticle article = (ScientificArticle) scrollableResults.get()[0];
+			assertThat( article.getTitle() ).isEqualTo( expectedTitles.get( position ) );
+			position++;
+		}
+		scrollableResults.close();
+
+		fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class );
+
+		scrollableResults = fullTextQuery
+				.setFirstResult( 1 )
+				.setMaxResults( 2 )
+				.scroll();
+
+		assertEquals( -1, scrollableResults.getRowNumber() );
+		assertTrue( scrollableResults.last() );
+		assertEquals( 1, scrollableResults.getRowNumber() );
+		scrollableResults.beforeFirst();
+
+		expectedTitles = Arrays.asList(
+				"ORM for dummies",
+				"ORM modelling"
+		);
+
+		position = 0;
+		while ( scrollableResults.next() ) {
+			ScientificArticle article = (ScientificArticle) scrollableResults.get()[0];
+			assertThat( article.getTitle() ).isEqualTo( expectedTitles.get( position ) );
+			position++;
+		}
+		scrollableResults.close();
+
 		tx.commit();
 		s.close();
 	}

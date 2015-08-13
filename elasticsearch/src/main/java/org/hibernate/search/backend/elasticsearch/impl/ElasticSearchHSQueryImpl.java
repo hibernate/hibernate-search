@@ -26,6 +26,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClientHolder;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -45,6 +46,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * Query implementation based on ElasticSearch.
@@ -56,6 +58,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 	private static final Log LOG = LoggerFactory.make();
 
 	private final String jsonQuery;
+
+	private Integer resultSize;
 
 	public ElasticSearchHSQueryImpl(String jsonQuery, ExtendedSearchIntegrator extendedIntegrator) {
 		super( extendedIntegrator );
@@ -79,12 +83,19 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public DocumentExtractor queryDocumentExtractor() {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		return new ElasticSearchDocumentExtractor();
 	}
 
 	@Override
 	public int queryResultSize() {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		if ( resultSize == null ) {
+			IndexSearcher searcher = new IndexSearcher();
+			SearchResult searchResult = searcher.runSearch();
+
+			resultSize = searchResult.getTotal();
+		}
+
+		return resultSize;
 	}
 
 	@Override
@@ -133,7 +144,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	protected void clearCachedResults() {
-		// Nothing to do
+		resultSize = null;
 	}
 
 	@Override
@@ -147,56 +158,22 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public List<EntityInfo> queryEntityInfos() {
-		Search.Builder search = new Search.Builder( jsonQuery );
-		Map<String, Class<?>> entityTypesByName = new HashMap<>();
+		IndexSearcher searcher = new IndexSearcher();
+		SearchResult searchResult = searcher.runSearch();
 
-		if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
-			for ( Entry<Class<?>, EntityIndexBinding> binding : extendedIntegrator.getIndexBindings().entrySet() ) {
-				entityTypesByName.put( binding.getKey().getName(), binding.getKey() );
-
-				IndexManager[] indexManagers = binding.getValue().getIndexManagers();
-				for (IndexManager indexManager : indexManagers) {
-					ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
-					search.addIndex( esIndexManager.getActualIndexName() );
-				}
-			}
-		}
-		else {
-			for ( Class<?> entityType : indexedTargetedEntities ) {
-				entityTypesByName.put( entityType.getName(), entityType );
-
-				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
-				IndexManager[] indexManagers = binding.getIndexManagers();
-
-				for (IndexManager indexManager : indexManagers) {
-					ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
-					search.addIndex( esIndexManager.getActualIndexName() );
-				}
-			}
-		}
-
-		search.setParameter( "from", firstResult );
-		search.setParameter( "size", maxResults != null ? maxResults : Integer.MAX_VALUE );
-
-		SearchResult searchResult = executeRequest( search.build() );
 		List<EntityInfo> results = new ArrayList<>( searchResult.getTotal() );
 		JsonArray hits = searchResult.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
 
-		for (JsonElement hit : hits) {
-			String type = hit.getAsJsonObject().get( "_type" ).getAsString();
-			Class<?> clazz = entityTypesByName.get( type );
-			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( clazz );
-			Object id = getId( hit, binding );
-
-			results.add( new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdentifierName(), (Serializable) id, null ) );
+		for ( JsonElement hit : hits ) {
+			results.add( searcher.convertQueryHit( hit.getAsJsonObject() ) );
 		}
 
 		return results;
 	}
 
-	private Object getId(JsonElement hit, EntityIndexBinding binding) {
+	private Object getId(JsonObject hit, EntityIndexBinding binding) {
 		Document tmp = new Document();
-		tmp.add( new StringField( "id", hit.getAsJsonObject().get( "_id" ).getAsString(), Store.NO) );
+		tmp.add( new StringField( "id", hit.get( "_id" ).getAsString(), Store.NO) );
 		Object id = binding.getDocumentBuilder().getIdBridge().get( "id", tmp );
 
 		return id;
@@ -217,6 +194,122 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		}
 		catch (IOException e) {
 			throw new SearchException( e );
+		}
+	}
+
+	/**
+	 * Determines the affected indexes and runs the given query against them.
+	 */
+	private class IndexSearcher {
+
+		private final Search search;
+		private final Map<String, Class<?>> entityTypesByName;
+
+		private IndexSearcher() {
+			Search.Builder search = new Search.Builder( jsonQuery );
+			entityTypesByName = new HashMap<>();
+
+			if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
+				for ( Entry<Class<?>, EntityIndexBinding> binding : extendedIntegrator.getIndexBindings().entrySet() ) {
+					entityTypesByName.put( binding.getKey().getName(), binding.getKey() );
+
+					IndexManager[] indexManagers = binding.getValue().getIndexManagers();
+					for ( IndexManager indexManager : indexManagers ) {
+						ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
+						search.addIndex( esIndexManager.getActualIndexName() );
+					}
+				}
+			}
+			else {
+				for ( Class<?> entityType : indexedTargetedEntities ) {
+					entityTypesByName.put( entityType.getName(), entityType );
+
+					EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
+					IndexManager[] indexManagers = binding.getIndexManagers();
+
+					for ( IndexManager indexManager : indexManagers ) {
+						ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
+						search.addIndex( esIndexManager.getActualIndexName() );
+					}
+				}
+			}
+
+			search.setParameter( "from", firstResult );
+			search.setParameter( "size", maxResults != null ? maxResults : Integer.MAX_VALUE );
+
+			this.search = search.build();
+		}
+
+		SearchResult runSearch() {
+			return executeRequest( search );
+		}
+
+		EntityInfo convertQueryHit(JsonObject hit) {
+			String type = hit.get( "_type" ).getAsString();
+			Class<?> clazz = entityTypesByName.get( type );
+
+			if ( clazz == null ) {
+				throw new SearchException( "Found unknown type in ElasticSearch index: " + type );
+			}
+
+			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( clazz );
+			Object id = getId( hit, binding );
+
+			return new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdentifierName(), (Serializable) id, null );
+		}
+	}
+
+	// TODO: Investigate scrolling API:
+	// https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
+	private class ElasticSearchDocumentExtractor implements DocumentExtractor {
+
+		private final IndexSearcher searcher;
+		private List<EntityInfo> results;
+
+		private ElasticSearchDocumentExtractor() {
+			searcher = new IndexSearcher();
+		}
+
+		@Override
+		public EntityInfo extract(int index) throws IOException {
+			if ( results == null ) {
+				runSearch();
+			}
+
+			return results.get( index );
+		}
+
+		@Override
+		public int getFirstIndex() {
+			return 0;
+		}
+
+		@Override
+		public int getMaxIndex() {
+			if ( results == null ) {
+				runSearch();
+			}
+
+			return results.size() - 1;
+		}
+
+		@Override
+		public void close() {
+		}
+
+		@Override
+		public TopDocs getTopDocs() {
+			throw new UnsupportedOperationException( "TopDocs not available with ElasticSearch backend" );
+		}
+
+		private void runSearch() {
+			SearchResult searchResult = searcher.runSearch();
+			JsonArray hits = searchResult.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+			results = new ArrayList<>( searchResult.getTotal() );
+
+			for ( JsonElement hit : hits ) {
+				results.add( searcher.convertQueryHit( hit.getAsJsonObject() ) );
+			}
 		}
 	}
 }
