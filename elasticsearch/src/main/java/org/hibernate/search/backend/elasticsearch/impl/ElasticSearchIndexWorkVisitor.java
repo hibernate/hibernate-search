@@ -10,7 +10,13 @@ import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.params.Parameters;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
@@ -22,8 +28,11 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 
 import com.google.gson.JsonObject;
@@ -117,10 +126,23 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
 					!field.name().equals( indexBinding.getDocumentBuilder().getIdentifierName() ) ) {
 
+				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
+
 				JsonObject parent = getOrCreateDocumentTree( source, field );
 				String jsonPropertyName = field.name().substring( field.name().lastIndexOf( "." ) + 1 );
 
-				if ( indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() ).isNumeric() ) {
+				if ( FieldHelper.isBoolean( indexBinding, field.name() ) ) {
+					FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
+					boolean value = (boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
+
+					parent.addProperty( jsonPropertyName, value );
+				}
+				else if ( FieldHelper.isDate( indexBinding, field.name() ) ) {
+					FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
+					Date value = (Date) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
+					parent.addProperty( jsonPropertyName, getAsString( value ) );
+				}
+				else if ( documentFieldMetadata.isNumeric() ) {
 					parent.addProperty( jsonPropertyName, field.numericValue() );
 				}
 				else {
@@ -152,5 +174,12 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		}
 
 		return parent;
+	}
+
+	// TODO Handle resolution
+	private String getAsString(Date value) {
+		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
+		c.setTime( value );
+		return DatatypeConverter.printDateTime( c );
 	}
 }
