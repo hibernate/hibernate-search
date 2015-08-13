@@ -13,6 +13,7 @@ import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
  * Helps with getting the property types for given fields.
@@ -30,6 +31,13 @@ class FieldHelper {
 
 	private FieldHelper() {
 	}
+
+	static NumericEncodingType getNumericEncodingType(DocumentFieldMetadata field) {
+		NumericEncodingType numericEncodingType = field.getNumericEncodingType();
+
+		return numericEncodingType;
+	}
+
 	static boolean isBoolean(EntityIndexBinding indexBinding, String fieldName) {
 		String propertyTypeName = getPropertyTypeName( indexBinding, fieldName );
 		return "boolean".equals( propertyTypeName ) || "java.lang.Boolean".equals( propertyTypeName );
