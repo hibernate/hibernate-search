@@ -71,8 +71,8 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		facetManager.enableFaceting( requestDesc );
 		facetManager.enableFaceting( requestAsc );
 
-		assertFacetCounts( facetManager.getFacets( descendingOrderedFacet ), new int[] { 5, 4, 4, 0 } );
-		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 4, 4, 5 } );
+		assertFacetCounts( facetManager.getFacets( descendingOrderedFacet ), new int[] { 0, 0, 0, 0 } );
+		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 0, 0, 0 } );
 
 		facetManager.disableFaceting( descendingOrderedFacet );
 		assertTrue(
@@ -80,7 +80,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 						descendingOrderedFacet
 				).isEmpty()
 		);
-		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 4, 4, 5 } );
+		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 0, 0, 0 } );
 
 		facetManager.disableFaceting( ascendingOrderedFacet );
 		assertTrue(
