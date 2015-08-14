@@ -33,8 +33,8 @@
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
-        <!-- <module>integrationtest/wildfly</module> Enabled by profiles: requires JDK8 -->
-        <!-- <module>integrationtest/performance</module> Requires the integrationtest/wildfly module -->
+        <module>integrationtest/wildfly</module>
+        <module>integrationtest/performance</module>
         <module>integrationtest/osgi/karaf-features</module>
         <module>integrationtest/sandbox</module>
     </modules>
@@ -1170,18 +1170,6 @@
             </activation>
             <modules>
                 <module>integrationtest/osgi/karaf-it</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>integration-wildfly</id>
-            <activation>
-                <!-- WildFly 10 requires JDK8 at least, works fine on JDK9  -->
-                <jdk>[1.8,1.9]</jdk>
-            </activation>
-            <modules>
-                <module>integrationtest/wildfly</module>
-                <module>integrationtest/performance</module>
             </modules>
         </profile>
 
