@@ -423,12 +423,13 @@ public class QueryHits {
 			throw log.unknownFieldNameForFaceting( facetRequest.getFacetingName(), facetRequest.getFieldName() );
 		}
 		ArrayList<Facet> facets = new ArrayList<>();
-		for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
-			Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
-			facets.add( facet );
-			termValues.remove( labelAndValue.label );
+		if ( facetResult != null ) {
+			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
+				Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
+				facets.add( facet );
+				termValues.remove( labelAndValue.label );
+			}
 		}
-
 		for ( String termValue : termValues ) {
 			Facet facet = facetRequest.createFacet( termValue, 0 );
 			facets.add( 0, facet );
