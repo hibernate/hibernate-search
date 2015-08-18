@@ -618,6 +618,41 @@ public class ElasticSearchTest extends SearchTestBase {
 		s.close();
 	}
 
+	@Test
+	public void testQueryById() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromJson(
+				"{" +
+					"'query': {" +
+						"'ids' : {" +
+							"'values' : ['1', '3']" +
+						"}" +
+					"}" +
+				"}"
+		);
+
+		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
+
+		assertThat( result ).onProperty( "title" ).containsOnly(
+				"ORM for dummies",
+				"ORM for beginners"
+		);
+
+		query = ElasticSearchQueries.fromQueryString( "_id:1 OR _id:3" );
+		result = session.createFullTextQuery( query, ScientificArticle.class ).list();
+
+		assertThat( result ).onProperty( "title" ).containsOnly(
+				"ORM for dummies",
+				"ORM for beginners"
+		);
+
+		tx.commit();
+		s.close();
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[]{
