@@ -9,6 +9,9 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
@@ -47,6 +50,20 @@ class FieldHelper {
 	static boolean isDate(EntityIndexBinding indexBinding, String fieldName) {
 		String propertyTypeName = getPropertyTypeName( indexBinding, fieldName );
 		return "java.util.Date".equals( propertyTypeName );
+	}
+
+	static boolean isNumeric(DocumentFieldMetadata field) {
+		if ( field.isNumeric() ) {
+			return true;
+		}
+
+		FieldBridge fieldBridge = field.getFieldBridge();
+
+		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
+			return ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap() instanceof NumericFieldBridge;
+		}
+
+		return false;
 	}
 
 	private static String getPropertyTypeName(EntityIndexBinding indexBinding, String fieldName) {

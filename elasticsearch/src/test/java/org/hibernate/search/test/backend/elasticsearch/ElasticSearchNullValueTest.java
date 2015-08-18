@@ -102,6 +102,7 @@ public class ElasticSearchNullValueTest extends SearchTestBase {
 					"\"driveWidth\": null," +
 					"\"firstName\": null," +
 					"\"handicap\": 0.0," + // not nullable
+					"\"puttingStrength\": \"0.0\"," + // not nullable
 					"\"lastName\": \"Kidd\"," +
 					"\"fullName\": \"Kidd\"" +
 					// ranking.value is null but indexNullAs() has not been given, so it's

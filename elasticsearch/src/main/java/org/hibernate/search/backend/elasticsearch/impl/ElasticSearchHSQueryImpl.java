@@ -40,8 +40,6 @@ import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -334,7 +332,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			else if ( fieldBridge instanceof TwoWayFieldBridge ) {
 				Document tmp = new Document();
 
-				if ( isNumeric( field ) ) {
+				if ( FieldHelper.isNumeric( field ) ) {
 					NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( field );
 
 					switch( numericEncodingType ) {
@@ -381,20 +379,6 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 					return primitive.toString();
 				}
 			}
-		}
-
-		private boolean isNumeric(DocumentFieldMetadata field) {
-			if ( field.isNumeric() ) {
-				return true;
-			}
-
-			FieldBridge fieldBridge = field.getFieldBridge();
-
-			if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
-				return ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap() instanceof NumericFieldBridge;
-			}
-
-			return false;
 		}
 
 		private JsonElement getFieldValue(JsonObject parent, String projectedField) {

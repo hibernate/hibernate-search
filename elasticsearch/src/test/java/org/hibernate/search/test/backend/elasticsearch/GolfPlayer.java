@@ -19,8 +19,10 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.bridge.builtin.DoubleBridge;
 
 /**
  * @author Gunnar Morling
@@ -28,8 +30,8 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Entity
 @Indexed(index = "golfplayer")
 @ClassBridges({
-	@ClassBridge(name = "fullName", impl = NameConcatenationBridge.class),
-	@ClassBridge(name = "age", impl = AgeBridge.class)
+		@ClassBridge(name = "fullName", impl = NameConcatenationBridge.class),
+		@ClassBridge(name = "age", impl = AgeBridge.class)
 })
 public class GolfPlayer {
 
@@ -57,6 +59,9 @@ public class GolfPlayer {
 
 	@Field
 	private double handicap;
+
+	@Field(bridge = @FieldBridge(impl = DoubleBridge.class))
+	private double puttingStrength;
 
 	@Field(indexNullAs = "-1")
 	private Integer driveWidth;
@@ -115,6 +120,14 @@ public class GolfPlayer {
 		this.handicap = handicap;
 	}
 
+	public double getPuttingStrength() {
+		return puttingStrength;
+	}
+
+	public void setPuttingStrength(double puttingStrength) {
+		this.puttingStrength = puttingStrength;
+	}
+
 	public Integer getDriveWidth() {
 		return driveWidth;
 	}
@@ -138,6 +151,7 @@ public class GolfPlayer {
 		private boolean active;
 		private Date dateOfBirth;
 		private double handicap;
+		private double puttingStrength;
 		private Integer driveWidth;
 		private Integer ranking;
 
@@ -176,6 +190,11 @@ public class GolfPlayer {
 			return this;
 		}
 
+		public Builder puttingStrength(double puttingStrength) {
+			this.puttingStrength = puttingStrength;
+			return this;
+		}
+
 		GolfPlayer build() {
 			GolfPlayer player = new GolfPlayer();
 
@@ -184,6 +203,7 @@ public class GolfPlayer {
 			player.setActive( active );
 			player.setDateOfBirth( dateOfBirth );
 			player.setHandicap( handicap );
+			player.setPuttingStrength( puttingStrength );
 			player.setDriveWidth( driveWidth );
 			if ( ranking != null ) {
 				player.setRanking( new Ranking( BigInteger.valueOf( ranking ) ) );
