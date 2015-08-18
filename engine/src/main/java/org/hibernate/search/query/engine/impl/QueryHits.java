@@ -440,8 +440,9 @@ public class QueryHits {
 		}
 
 		int maxFacetCount = facetRequest.getMaxNumberOfFacets() < 0 ? DEFAULT_FACET_RETRIEVAL_SIZE : facetRequest.getMaxNumberOfFacets();
-		FacetResult facetResult;
+		final FacetResult facetResult;
 		try {
+			// This might return null!
 			facetResult = facetCounts.getTopChildren( maxFacetCount, facetRequest.getFieldName() );
 		}
 		catch (IllegalArgumentException e) {
