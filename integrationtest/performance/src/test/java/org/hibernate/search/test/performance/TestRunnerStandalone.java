@@ -22,7 +22,6 @@ import org.junit.Test;
 /**
  * @author Tomas Hradec
  */
-@SuppressWarnings("deprecation")
 public class TestRunnerStandalone {
 
 	private final TestScenario scenario = TestScenarioFactory.create();
