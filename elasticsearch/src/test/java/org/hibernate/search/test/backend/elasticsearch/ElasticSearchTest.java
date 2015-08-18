@@ -128,6 +128,7 @@ public class ElasticSearchTest extends SearchTestBase {
 			.active( true )
 			.dateOfBirth( dob.getTime() )
 			.handicap( 3.4 )
+			.puttingStrength( 2.5 )
 			.driveWidth( 285 )
 			.ranking( 311 )
 			.build();
@@ -370,7 +371,8 @@ public class ElasticSearchTest extends SearchTestBase {
 						"\"value\": \"311\"" +
 					"}," +
 					"\"fullName\": \"Klaus Hergesheimer\"," +
-					"\"age\": 34" +
+					"\"age\": 34," +
+					"\"puttingStrength\": \"2.5\"" +
 				"}",
 				source
 		);
@@ -648,6 +650,27 @@ public class ElasticSearchTest extends SearchTestBase {
 				"ORM for dummies",
 				"ORM for beginners"
 		);
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testStringMappedNumericProperty() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'puttingStrength' : '2.5' } } }" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+				.setProjection( ProjectionConstants.ID, "puttingStrength" )
+				.list();
+
+		assertThat( result ).hasSize( 1 );
+		Object[] projection = (Object[]) result.iterator().next();
+
+		assertThat( projection[0] ).isEqualTo( 1L );
+		assertThat( projection[1] ).isEqualTo( 2.5D );
 
 		tx.commit();
 		s.close();

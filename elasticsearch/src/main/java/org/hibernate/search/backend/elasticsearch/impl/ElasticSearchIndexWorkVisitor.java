@@ -44,7 +44,6 @@ import com.google.gson.JsonObject;
 
 /**
  * @author Gunnar Morling
- *
  */
 class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
@@ -157,7 +156,9 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 					Date value = (Date) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
 					parent.addProperty( jsonPropertyName, getAsString( value ) );
 				}
-				else if ( isNumeric( field ) ) {
+				// TODO falling back for now to checking actual Field type to cover numeric fields created by custom
+				// bridges
+				else if ( FieldHelper.isNumeric( documentFieldMetadata ) || isNumeric( field ) ) {
 					// Explicitly propagate null in case value is not given and let ES handle the default token set in the meta-data
 					Number value = field.numericValue();
 

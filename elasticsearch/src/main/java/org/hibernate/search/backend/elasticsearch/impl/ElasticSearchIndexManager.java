@@ -190,7 +190,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 		else if ( FieldHelper.isDate( descriptor, fieldMetadata.getName() ) ) {
 			type = "date";
 		}
-		else if ( fieldMetadata.isNumeric() ) {
+		else if ( FieldHelper.isNumeric( fieldMetadata ) ) {
 			NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( fieldMetadata );
 
 			switch( numericEncodingType ) {
