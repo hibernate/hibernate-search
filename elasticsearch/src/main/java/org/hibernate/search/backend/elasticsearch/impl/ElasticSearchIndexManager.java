@@ -29,6 +29,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 import com.google.gson.JsonObject;
@@ -111,6 +112,11 @@ public class ElasticSearchIndexManager implements IndexManager {
 				field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
 				field.addProperty( "boost", fieldMetadata.getBoost() );
 
+				if ( fieldMetadata.indexNullAs() != null ) {
+					// TODO Validate the type; Supported types are converted transparently by ES
+					field.addProperty( "null_value", fieldMetadata.indexNullAs() );
+				}
+
 				getOrCreateProperties( payload, fieldMetadata.getName() ).add( fieldMetadata.getName().substring( fieldMetadata.getName().lastIndexOf( "." ) + 1 ), field );
 			}
 
@@ -161,11 +167,26 @@ public class ElasticSearchIndexManager implements IndexManager {
 		else if ( FieldHelper.isDate( descriptor, fieldMetadata.getName() ) ) {
 			type = "date";
 		}
-		// TODO Do more fine-grained split into integer/long/float/double as per
-		// https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-core-types.html;
-		// Using long for all works for now, e.g. doubles will still be handled correctly
 		else if ( fieldMetadata.isNumeric() ) {
-			type = "long";
+			NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( fieldMetadata );
+
+			switch( numericEncodingType ) {
+				case INTEGER:
+					type = "integer";
+					break;
+				case LONG:
+					type = "long";
+					break;
+				case FLOAT:
+					type = "float";
+					break;
+				case DOUBLE:
+					type = "double";
+					break;
+				default:
+					throw new SearchException( "Unexpected numeric field type: " + descriptor.getDocumentBuilder().getMetadata().getType() + " "
+						+ fieldMetadata.getName() );
+			}
 		}
 		else {
 			type = "string";

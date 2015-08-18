@@ -37,23 +37,23 @@ public class GolfPlayer {
 	@DocumentId
 	private Long id;
 
-	@Field
+	@Field(indexNullAs = "<NULL>")
 	private String firstName;
 
 	@Field
 	private String lastName;
 
-	@Field
+	@Field(indexNullAs = "false")
 	private Boolean active;
 
-	@Field
+	@Field(indexNullAs = "1970-01-01")
 	private Date dateOfBirth;
 
 	@Field
 	private double handicap;
 
-	@Field
-	private int driveWidth;
+	@Field(indexNullAs = "-1")
+	private Integer driveWidth;
 
 	@IndexedEmbedded
 	private Ranking ranking;
@@ -109,11 +109,11 @@ public class GolfPlayer {
 		this.handicap = handicap;
 	}
 
-	public int getDriveWidth() {
+	public Integer getDriveWidth() {
 		return driveWidth;
 	}
 
-	public void setDriveWidth(int driveWidth) {
+	public void setDriveWidth(Integer driveWidth) {
 		this.driveWidth = driveWidth;
 	}
 
@@ -132,8 +132,8 @@ public class GolfPlayer {
 		private boolean active;
 		private Date dateOfBirth;
 		private double handicap;
-		private int driveWidth;
-		private int ranking;
+		private Integer driveWidth;
+		private Integer ranking;
 
 		public Builder firstName(String firstName) {
 			this.firstName = firstName;
@@ -179,7 +179,9 @@ public class GolfPlayer {
 			player.setDateOfBirth( dateOfBirth );
 			player.setHandicap( handicap );
 			player.setDriveWidth( driveWidth );
-			player.setRanking( new Ranking( BigInteger.valueOf( ranking ) ) );
+			if ( ranking != null ) {
+				player.setRanking( new Ranking( BigInteger.valueOf( ranking ) ) );
+			}
 			return player;
 		}
 	}
