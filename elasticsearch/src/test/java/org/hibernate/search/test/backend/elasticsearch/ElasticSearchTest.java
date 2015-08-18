@@ -368,7 +368,9 @@ public class ElasticSearchTest extends SearchTestBase {
 					"\"lastName\": \"Hergesheimer\"," +
 					"\"ranking\": {" +
 						"\"value\": \"311\"" +
-					"}" +
+					"}," +
+					"\"fullName\": \"Klaus Hergesheimer\"," +
+					"\"age\": 34" +
 				"}",
 				source
 		);

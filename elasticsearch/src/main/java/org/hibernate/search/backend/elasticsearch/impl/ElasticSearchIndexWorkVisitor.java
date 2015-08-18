@@ -132,12 +132,22 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
 					!field.name().equals( indexBinding.getDocumentBuilder().getIdentifierName() ) ) {
 
-				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
-
 				JsonObject parent = getOrCreateDocumentTree( source, field );
 				String jsonPropertyName = field.name().substring( field.name().lastIndexOf( "." ) + 1 );
 
-				if ( FieldHelper.isBoolean( indexBinding, field.name() ) ) {
+				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
+
+				// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
+				if ( documentFieldMetadata == null ) {
+					String stringValue = field.stringValue();
+					if ( stringValue != null ) {
+						parent.addProperty( jsonPropertyName, stringValue );
+					}
+					else {
+						parent.addProperty( jsonPropertyName, field.numericValue() );
+					}
+				}
+				else if ( FieldHelper.isBoolean( indexBinding, field.name() ) ) {
 					FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
 					Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
 					parent.addProperty( jsonPropertyName, value );

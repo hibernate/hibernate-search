@@ -17,12 +17,10 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
-import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticSearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testutil.backend.elasticsearch.JsonHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +30,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Gunnar Morling
  */
-public class ElasticSearchNullValueTest extends SearchTestBase {
+public class ElasticSearchClassBridgeTest extends SearchTestBase {
 
 	private static final String SERVER_URI = "http://192.168.59.103:9200";
 
@@ -83,95 +81,39 @@ public class ElasticSearchNullValueTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testNullTokenMapping() {
+	public void testQueryOnClassBridgeField() {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "lastName:Kidd" );
-		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.SOURCE )
-				.list();
-
-		String source = (String) ( (Object[]) result.iterator().next() )[0];
-
-		JsonHelper.assertJsonEquals(
-				"{" +
-					"\"active\": null," +
-					"\"dateOfBirth\": null," +
-					"\"driveWidth\": null," +
-					"\"firstName\": null," +
-					"\"handicap\": 0.0," + // not nullable
-					"\"lastName\": \"Kidd\"," +
-					"\"fullName\": \"Kidd\"" +
-					// ranking.value is null but indexNullAs() has not been given, so it's
-					// not present in the index at all
-					// "\"ranking\": {" +
-					//     "\"value\": ..." +
-					// "}" +
-				"}",
-				source
-		);
-
-		tx.commit();
-		s.close();
-	}
-
-	@Test
-	public void testQueryOnNullToken() {
-		Session s = openSession();
-		FullTextSession session = Search.getFullTextSession( s );
-		Transaction tx = s.beginTransaction();
-
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "firstName:&lt;NULL&gt;" );
+		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "fullName:\"Klaus Hergesheimer\"" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded String" ).containsOnly( 2L );
+		assertThat( result ).onProperty( "id" ).describedAs( "Class-brigde provided string field" ).containsOnly( 1L );
 
-		query = ElasticSearchQueries.fromQueryString( "dateOfBirth:1970-01-01" );
+		query = ElasticSearchQueries.fromQueryString( "age:34" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Date" ).containsOnly( 2L );
-
-		query = ElasticSearchQueries.fromQueryString( "active:false" );
-		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Boolean" ).containsOnly( 2L );
-
-		query = ElasticSearchQueries.fromQueryString( "driveWidth:\\-1" );
-		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Integer" ).containsOnly( 2L );
+		assertThat( result ).onProperty( "id" ).describedAs( "Class-brigde provided numeric field" ).containsOnly( 1L );
 
 		tx.commit();
 		s.close();
 	}
 
 	@Test
-	public void testProjectionOfNullValues() {
+	public void testProjectionOfClassBridgeField() {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "lastName:Kidd" );
+		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "Hergesheimer" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection(
-						"firstName",
-						"lastName",
-						"active",
-						"dateOfBirth",
-						"handicap",
-						"driveWidth",
-						"ranking.value"
-				)
+				.setProjection( "fullName", "age" )
 				.list();
 
 		assertThat( result ).hasSize( 1 );
 
 		Object[] projection = (Object[]) result.iterator().next();
-		assertThat( projection[0] ).describedAs( "firstName" ).isNull();
-		assertThat( projection[1] ).describedAs( "lastName" ).isEqualTo( "Kidd" );
-		assertThat( projection[2] ).describedAs( "active" ).isNull();
-		assertThat( projection[3] ).describedAs( "dateOfBirth" ).isNull();
-		assertThat( projection[4] ).describedAs( "handicap" ).isEqualTo( 0.0D );
-		assertThat( projection[5] ).describedAs( "driveWidth" ).isNull();
-		assertThat( projection[6] ).describedAs( "ranking value" ).isNull();
+		assertThat( projection[0] ).describedAs( "fullName" ).isEqualTo( "Klaus Hergesheimer" );
+		assertThat( ( (Number) projection[1] ).intValue() ).describedAs( "age" ).isEqualTo( 34 );
 
 		tx.commit();
 		s.close();

@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -25,6 +27,10 @@ import org.hibernate.search.annotations.IndexedEmbedded;
  */
 @Entity
 @Indexed(index = "golfplayer")
+@ClassBridges({
+	@ClassBridge(name = "fullName", impl = NameConcatenationBridge.class),
+	@ClassBridge(name = "age", impl = AgeBridge.class)
+})
 public class GolfPlayer {
 
 	@Id
