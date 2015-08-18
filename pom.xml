@@ -715,6 +715,7 @@
                             <excludes>
                                 <exclude>**/hibernate.properties</exclude>
                                 <exclude>**/log4j.properties</exclude>
+                                <exclude>**/META-INF/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
