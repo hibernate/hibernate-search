@@ -19,6 +19,10 @@ import java.util.regex.Pattern;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleField;
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -135,8 +139,7 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 				if ( FieldHelper.isBoolean( indexBinding, field.name() ) ) {
 					FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
-					boolean value = (boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
-
+					Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
 					parent.addProperty( jsonPropertyName, value );
 				}
 				else if ( FieldHelper.isDate( indexBinding, field.name() ) ) {
@@ -144,16 +147,33 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 					Date value = (Date) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
 					parent.addProperty( jsonPropertyName, getAsString( value ) );
 				}
-				else if ( documentFieldMetadata.isNumeric() ) {
-					parent.addProperty( jsonPropertyName, field.numericValue() );
+				else if ( isNumeric( field ) ) {
+					// Explicitly propagate null in case value is not given and let ES handle the default token set in the meta-data
+					Number value = field.numericValue();
+
+					if ( value != null && value.toString().equals( documentFieldMetadata.indexNullAs() ) ) {
+						value = null;
+					}
+
+					parent.addProperty( jsonPropertyName, value );
 				}
 				else {
-					parent.addProperty( jsonPropertyName, field.stringValue() );
+					// Explicitly propagate null in case value is not given and let ES handle the default token set in the meta-data
+					String value = field.stringValue();
+					if ( value != null && value.equals( documentFieldMetadata.indexNullAs() ) ) {
+						value = null;
+					}
+
+					parent.addProperty( jsonPropertyName, value );
 				}
 			}
 		}
 
 		return source;
+	}
+
+	private boolean isNumeric(IndexableField field) {
+		return field instanceof IntField || field instanceof LongField || field instanceof FloatField || field instanceof DoubleField;
 	}
 
 	private JsonObject getOrCreateDocumentTree(JsonObject source, IndexableField field) {
@@ -180,6 +200,10 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	// TODO Handle resolution
 	private String getAsString(Date value) {
+		if ( value == null ) {
+			return null;
+		}
+
 		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
 		c.setTime( value );
 		return DatatypeConverter.printDateTime( c );
