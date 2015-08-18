@@ -100,24 +100,26 @@ public class ElasticSearchIndexManager implements IndexManager {
 			JsonObject properties = new JsonObject();
 			payload.add( "properties", properties );
 
+			// normal document fields
 			for ( DocumentFieldMetadata fieldMetadata : descriptor.getDocumentBuilder().getTypeMetadata().getAllDocumentFieldMetadata() ) {
 				if ( fieldMetadata.isId() ) {
 					continue;
 				}
 
-				JsonObject field = new JsonObject();
+				addFieldMapping( payload, descriptor, fieldMetadata );
+			}
 
-				field.addProperty( "type", getFieldType( descriptor, fieldMetadata ) );
-				field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
-				field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
-				field.addProperty( "boost", fieldMetadata.getBoost() );
-
-				if ( fieldMetadata.indexNullAs() != null ) {
-					// TODO Validate the type; Supported types are converted transparently by ES
-					field.addProperty( "null_value", fieldMetadata.indexNullAs() );
+			// fields contributed by class bridges; only a single named field per class bridge is supported atm. as we
+			// lack the meta-data on all fields potentially created by a class bridge
+			for ( DocumentFieldMetadata fieldMetadata : descriptor.getDocumentBuilder().getTypeMetadata().getClassBridgeMetadata() ) {
+				// TODO should we support dynamically added fields?
+				if ( fieldMetadata.getName() == null || fieldMetadata.getName().isEmpty() ) {
+					throw new SearchException(
+							"Unnamed class-level fields are not supported with the ElasticSearch backend: " + descriptor.getDocumentBuilder().getTypeMetadata().getType()
+					);
 				}
 
-				getOrCreateProperties( payload, fieldMetadata.getName() ).add( fieldMetadata.getName().substring( fieldMetadata.getName().lastIndexOf( "." ) + 1 ), field );
+				addFieldMapping( payload, descriptor, fieldMetadata );
 			}
 
 			PutMapping putMapping = new PutMapping.Builder(
@@ -134,6 +136,27 @@ public class ElasticSearchIndexManager implements IndexManager {
 				throw new SearchException( "Could not create mapping for entity type " + entityType.getName(), e );
 			}
 		}
+	}
+
+	/**
+	 * Adds a type mapping for the given field to the given request payload.
+	 */
+	private JsonObject addFieldMapping(JsonObject payload, EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
+		String simpleFieldName = fieldMetadata.getName().substring( fieldMetadata.getName().lastIndexOf( "." ) + 1 );
+		JsonObject field = new JsonObject();
+
+		field.addProperty( "type", getFieldType( descriptor, fieldMetadata ) );
+		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
+		field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
+		field.addProperty( "boost", fieldMetadata.getBoost() );
+
+		if ( fieldMetadata.indexNullAs() != null ) {
+			// TODO Validate the type; Supported types are converted transparently by ES
+			field.addProperty( "null_value", fieldMetadata.indexNullAs() );
+		}
+
+		getOrCreateProperties( payload, fieldMetadata.getName() ).add( simpleFieldName, field );
+		return field;
 	}
 
 	@SuppressWarnings("deprecation")

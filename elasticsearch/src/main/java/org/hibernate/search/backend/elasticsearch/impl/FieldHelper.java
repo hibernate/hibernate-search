@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -48,11 +49,12 @@ class FieldHelper {
 		return "java.util.Date".equals( propertyTypeName );
 	}
 
-	static String getPropertyTypeName(EntityIndexBinding indexBinding, String fieldName) {
-		return getPropertyMetadata( indexBinding, fieldName ).getPropertyAccessor().getType().getName();
+	private static String getPropertyTypeName(EntityIndexBinding indexBinding, String fieldName) {
+		PropertyMetadata propertyMetadata = getPropertyMetadata( indexBinding, fieldName );
+		return propertyMetadata != null ? propertyMetadata.getPropertyAccessor().getType().getName() : null;
 	}
 
-	static PropertyMetadata getPropertyMetadata(EntityIndexBinding indexBinding, String fieldName) {
+	private static PropertyMetadata getPropertyMetadata(EntityIndexBinding indexBinding, String fieldName) {
 		TypeMetadata typeMetadata;
 
 		boolean isEmbeddedField = fieldName.contains( "." );
@@ -70,7 +72,25 @@ class FieldHelper {
 			return property;
 		}
 
-		throw new IllegalArgumentException( "No property found for field: " + fieldName );
+		return null;
+	}
+
+	static DocumentFieldMetadata getFieldMetadata(EntityIndexBinding indexBinding, String fieldName) {
+		PropertyMetadata property = FieldHelper.getPropertyMetadata( indexBinding, fieldName );
+
+		if ( property != null ) {
+			return property.getFieldMetadata( fieldName );
+		}
+		else {
+			Set<DocumentFieldMetadata> classBridgeMetadata = indexBinding.getDocumentBuilder().getMetadata().getClassBridgeMetadata();
+			for ( DocumentFieldMetadata documentFieldMetadata : classBridgeMetadata ) {
+				if ( documentFieldMetadata.getFieldName().equals( fieldName ) ) {
+					return documentFieldMetadata;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private static TypeMetadata getLeafTypeMetadata(EntityIndexBinding indexBinding, String[] fieldNameParts) {

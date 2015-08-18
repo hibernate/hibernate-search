@@ -44,7 +44,6 @@ import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
-import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FullTextFilter;
@@ -64,6 +63,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * Query implementation based on ElasticSearch.
@@ -307,8 +307,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		 * field bridge. In case this bridge is not a 2-way bridge, the unconverted value will be returned.
 		 */
 		private Object getFieldValue(EntityIndexBinding binding, JsonObject hit, String projectedField) {
-			PropertyMetadata property = FieldHelper.getPropertyMetadata( binding, projectedField );
-			DocumentFieldMetadata field = property.getFieldMetadata( projectedField );
+			DocumentFieldMetadata field = FieldHelper.getFieldMetadata( binding, projectedField );
 
 			if ( field == null ) {
 				throw new IllegalArgumentException( "Unknown field " + projectedField + " for entity "
@@ -362,9 +361,25 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 				return ( (TwoWayFieldBridge) fieldBridge ).get( field.getName(), tmp );
 			}
+			// Should only be the case for custom bridges
 			else {
-				// TODO what to do in this case?
-				return value.toString();
+				JsonPrimitive primitive = value.getAsJsonPrimitive();
+
+				if ( primitive.isBoolean() ) {
+					return primitive.getAsBoolean();
+				}
+				else if ( primitive.isNumber() ) {
+					// TODO this will expose a Gson-specific Number implementation; Can we somehow return an Integer,
+					// Long... etc. instead?
+					return primitive.getAsNumber();
+				}
+				else if ( primitive.isString() ) {
+					return primitive.getAsString();
+				}
+				else {
+					// TODO Better raise an exception?
+					return primitive.toString();
+				}
 			}
 		}
 
