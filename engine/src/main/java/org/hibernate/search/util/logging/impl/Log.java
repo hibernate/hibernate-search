@@ -897,4 +897,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 294, value = "Unable to search for null token on field '%1$s' if field bridge is ignored.")
 	SearchException unableToSearchOnNullValueWithoutFieldBridge(String fieldName);
 
+	@Message(id = 295, value = "String '$1%s' cannot be parsed into a '$2%s'")
+	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);
+
 }
