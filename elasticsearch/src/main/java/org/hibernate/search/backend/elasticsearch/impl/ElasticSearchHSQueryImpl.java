@@ -14,15 +14,11 @@ import io.searchbox.core.search.sort.Sort.Sorting;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
@@ -326,9 +322,6 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			if ( FieldHelper.isBoolean( binding, field.getName() ) ) {
 				return value.getAsBoolean();
 			}
-			else if ( FieldHelper.isDate( binding, field.getName() ) ) {
-				return getAsDate( value.getAsString() );
-			}
 			else if ( fieldBridge instanceof TwoWayFieldBridge ) {
 				Document tmp = new Document();
 
@@ -400,12 +393,6 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 			return parent.getAsJsonObject().get( field );
 		}
-	}
-
-	// TODO Handle resolution
-	private Date getAsDate(String value) {
-		Calendar c = DatatypeConverter.parseDateTime( value );
-		return c.getTime();
 	}
 
 	// TODO: Investigate scrolling API:

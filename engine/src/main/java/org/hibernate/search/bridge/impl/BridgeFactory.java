@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.bridge.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,12 +47,25 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class BridgeFactory {
 
+	private static final String ELASTICSEARCH_BRIDGE_PROVIDER_CLASS = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchBridgeProvider";
+
 	private static final Log LOG = LoggerFactory.make();
 
-	private final Set<BridgeProvider> annotationBasedProviders = new HashSet<>( 5 );
+	private final List<BridgeProvider> annotationBasedProviders = new ArrayList<>( 6 );
 	private final Set<BridgeProvider> regularProviders = new HashSet<>();
 
 	public BridgeFactory(ServiceManager serviceManager) {
+		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+
+		// Register ES bridge provider if present; Add it first so it takes precedence over all others
+		try {
+			Class<? extends ExtendedBridgeProvider> esBridgeProviderType = classLoaderService.classForName( ELASTICSEARCH_BRIDGE_PROVIDER_CLASS );
+			annotationBasedProviders.add( esBridgeProviderType.newInstance() );
+		}
+		catch (Exception e) {
+			// ignore
+		}
+
 		annotationBasedProviders.add( new CalendarBridgeProvider() );
 		annotationBasedProviders.add( new DateBridgeProvider() );
 		annotationBasedProviders.add( new NumericBridgeProvider() );
@@ -61,7 +76,6 @@ public final class BridgeFactory {
 			annotationBasedProviders.add( new JavaTimeBridgeProvider() );
 		}
 
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 		try {
 			for ( BridgeProvider provider : classLoaderService.loadJavaServices( BridgeProvider.class ) ) {
 				regularProviders.add( provider );

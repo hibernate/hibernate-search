@@ -10,13 +10,7 @@ import io.searchbox.core.Delete;
 import io.searchbox.core.Index;
 import io.searchbox.params.Parameters;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
@@ -151,11 +145,6 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 					Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
 					parent.addProperty( jsonPropertyName, value );
 				}
-				else if ( FieldHelper.isDate( indexBinding, field.name() ) ) {
-					FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
-					Date value = (Date) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
-					parent.addProperty( jsonPropertyName, getAsString( value ) );
-				}
 				// TODO falling back for now to checking actual Field type to cover numeric fields created by custom
 				// bridges
 				else if ( FieldHelper.isNumeric( documentFieldMetadata ) || isNumeric( field ) ) {
@@ -207,16 +196,5 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		}
 
 		return parent;
-	}
-
-	// TODO Handle resolution
-	private String getAsString(Date value) {
-		if ( value == null ) {
-			return null;
-		}
-
-		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
-		c.setTime( value );
-		return DatatypeConverter.printDateTime( c );
 	}
 }
