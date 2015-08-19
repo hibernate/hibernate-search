@@ -900,4 +900,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 295, value = "String '$1%s' cannot be parsed into a '$2%s'")
 	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);
 
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 296, value = "%s not found on the classpath; the built-in bridge won't be available")
+	void javaTimeBridgeWontBeAdded(String string);
+
 }
