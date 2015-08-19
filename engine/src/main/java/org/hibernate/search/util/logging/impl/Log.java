@@ -874,4 +874,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 288, value = "The configuration property '%s' no longer applies and will be ignored." )
 	void deprecatedConfigurationPropertyIsIgnored(String string);
 
+	@Message(id = 289, value = "String '$1%s' cannot be parsed into a '$2%s'")
+	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);
 }
