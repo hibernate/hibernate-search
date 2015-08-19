@@ -17,11 +17,10 @@ import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
 
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -60,7 +59,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 	private boolean isTransactional;
 
 	@Override
-	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
+	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.props = props;
 		this.isTransactional = context.enlistWorkerInTransaction();
 		this.indexManager = indexManager;
