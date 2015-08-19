@@ -18,6 +18,7 @@ import org.unitils.easymock.annotation.Mock;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
 import org.hibernate.engine.config.internal.ConfigurationServiceImpl;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -33,6 +34,7 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.startsWith;
 
 /**
  * @author Sanne Grinovero
@@ -139,6 +141,10 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 		expect( mockClassLoaderService.loadJavaServices( BridgeProvider.class ) )
 			.andReturn( Collections.<BridgeProvider>emptySet() );
+
+		expect( mockClassLoaderService.classForName( startsWith( "java.time" ) ) )
+			.andThrow( new ClassLoadingException( "Called by JavaTimeBridgeProvider; we assume the classes in java.time are not on the ORM class loader" ) )
+			.anyTimes();
 
 		expect( mockMetadata.getEntityBindings() )
 			.andReturn( Collections.EMPTY_SET )
