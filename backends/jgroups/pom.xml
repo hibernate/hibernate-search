@@ -47,6 +47,15 @@
             <artifactId>hibernate-search-serialization-avro</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Test -->
+
+        <!-- For testing with the ES index manager -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>

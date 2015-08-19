@@ -19,18 +19,25 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -41,6 +48,8 @@ import com.google.gson.JsonObject;
  */
 public class ElasticSearchIndexManager implements IndexManager {
 
+	private static final Log LOG = LoggerFactory.make();
+
 	private String indexName;
 	String actualIndexName;
 	private Similarity similarity;
@@ -49,11 +58,17 @@ public class ElasticSearchIndexManager implements IndexManager {
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
 
 	private JestClientReference clientReference;
+	private BackendQueueProcessor backend;
+
+	private LuceneWorkSerializer serializer;
+	private SerializationProvider serializationProvider;
+	private ServiceManager serviceManager;
 
 	// Lifecycle
 
 	@Override
 	public void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context) {
+		this.serviceManager = context.getServiceManager();
 		this.indexName = indexName;
 
 		this.actualIndexName = indexName.toLowerCase( Locale.ENGLISH );
@@ -62,6 +77,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 		}
 
 		this.similarity = similarity;
+		this.backend = BackendFactory.createBackend( this, context, properties );
 	}
 
 	@Override
@@ -276,7 +292,21 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 	@Override
 	public LuceneWorkSerializer getSerializer() {
-		return null;
+		if ( serializer == null ) {
+			serializationProvider = requestSerializationProvider();
+			serializer = new LuceneWorkSerializerImpl( serializationProvider, searchIntegrator );
+			LOG.indexManagerUsesSerializationService( this.indexName, this.serializer.describeSerializer() );
+		}
+		return serializer;
+	}
+
+	private SerializationProvider requestSerializationProvider() {
+		try {
+			return serviceManager.requestService( SerializationProvider.class );
+		}
+		catch (SearchException se) {
+			throw LOG.serializationProviderNotFoundException( se );
+		}
 	}
 
 	public String getActualIndexName() {
@@ -287,14 +317,12 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 	@Override
 	public void performOperations(List<LuceneWork> queue, IndexingMonitor monitor) {
-		for ( LuceneWork luceneWork : queue ) {
-			luceneWork.acceptIndexWorkVisitor( new ElasticSearchIndexWorkVisitor( actualIndexName, searchIntegrator ), null );
-		}
+		backend.applyWork( queue, monitor );
 	}
 
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
-
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
