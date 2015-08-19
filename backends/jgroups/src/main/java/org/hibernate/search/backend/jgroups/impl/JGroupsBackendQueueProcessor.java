@@ -111,15 +111,20 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		log.jgroupsBlockWaitingForAck( indexName, block );
 		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, block, messageTimeout );
 
-		String backend = ConfigurationParseHelper.getString( jgroupsProperties, DELEGATE_BACKEND, "lucene" );
-		delegatedBackend = BackendFactory.createBackend( backend, indexManager, context, props );
+		if ( selectionStrategy.isIndexOwnerLocal() ) {
+			String backend = ConfigurationParseHelper.getString( jgroupsProperties, DELEGATE_BACKEND, null );
+			delegatedBackend = BackendFactory.createBackend( backend, indexManager, context, props );
+		}
 	}
 
 	@Override
 	public void close() {
 		serviceManager.releaseService( NodeSelectorService.class );
 		serviceManager.releaseService( MessageSenderService.class );
-		delegatedBackend.close();
+
+		if ( selectionStrategy.isIndexOwnerLocal() ) {
+			delegatedBackend.close();
+		}
 	}
 
 	MessageSenderService getMessageSenderService() {
