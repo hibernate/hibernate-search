@@ -9,7 +9,6 @@ package org.hibernate.search.backend.jgroups.impl;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -17,17 +16,18 @@ import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcesso
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.TimeoutException;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.Assert;
 
 
 /**
@@ -48,7 +48,6 @@ public class SyncJGroupsBackendTest {
 	public SearchFactoryHolder slaveNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", "jgroupsSlave" )
 		.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
-		.withProperty( "hibernate.search.dvds.jgroups.delegate_backend", "blackhole" )
 		.withProperty( "hibernate.search.dvds.jgroups.messages_timeout", "200" )
 		.withProperty( "hibernate.search.books.worker.execution", "async" )
 		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
@@ -58,6 +57,7 @@ public class SyncJGroupsBackendTest {
 	@Rule
 	public SearchFactoryHolder masterNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", JGroupsReceivingMockBackend.class.getName() )
+		.withProperty( "hibernate.search.dvds.jgroups.delegate_backend", "blackhole" )
 		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
 
 	@Test
@@ -124,10 +124,10 @@ public class SyncJGroupsBackendTest {
 
 	@Test
 	public void alternativeBackendConfiguration() {
-		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, "dvds" );
+		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( masterNode, "dvds" );
 		JGroupsBackendQueueProcessor jgroupsProcessor = (JGroupsBackendQueueProcessor) backendQueueProcessor;
 		BackendQueueProcessor delegatedBackend = jgroupsProcessor.getDelegatedBackend();
-		Assert.assertTrue( "dvds backend was configured with a deleage to blackhole but it's not using it", delegatedBackend instanceof BlackHoleBackendQueueProcessor );
+		Assert.assertTrue( "dvds backend was configured with a delegate to blackhole but it's not using it", delegatedBackend instanceof BlackHoleBackendQueueProcessor );
 	}
 
 	@Test
