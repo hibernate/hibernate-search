@@ -9,12 +9,13 @@ package org.hibernate.search.backend;
 import java.lang.reflect.Constructor;
 import java.util.Properties;
 
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
@@ -44,13 +45,13 @@ public final class BackendFactory {
 		//not allowed
 	}
 
-	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext buildContext, Properties properties) {
+	public static BackendQueueProcessor createBackend(IndexManager indexManager, WorkerBuildContext buildContext, Properties properties) {
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		return createBackend( backend, indexManager, buildContext, properties );
 	}
 
 	public static BackendQueueProcessor createBackend(String backend,
-			DirectoryBasedIndexManager indexManager,
+			IndexManager indexManager,
 			WorkerBuildContext buildContext,
 			Properties properties) {
 		final BackendQueueProcessor backendQueueProcessor;
