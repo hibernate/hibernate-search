@@ -16,6 +16,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -78,7 +79,6 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	protected MessageSenderService messageSender;
 	protected String indexName;
-	protected IndexManager indexManager;
 
 	private Address address;
 	private ServiceManager serviceManager;
@@ -92,7 +92,6 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
-		this.indexManager = indexManager;
 		this.indexName = indexManager.getIndexName();
 		assertLegacyOptionsNotUsed( props, indexName );
 		serviceManager = context.getServiceManager();
@@ -108,7 +107,9 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		final long messageTimeout = ConfigurationParseHelper.getLongValue( jgroupsProperties, MESSAGE_TIMEOUT_MS, DEFAULT_MESSAGE_TIMEOUT );
 
 		log.jgroupsBlockWaitingForAck( indexName, block );
-		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, block, messageTimeout );
+		LuceneWorkSerializer luceneWorkSerializer = serviceManager.requestService( LuceneWorkSerializer.class );
+
+		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, luceneWorkSerializer, block, messageTimeout );
 
 		if ( selectionStrategy.isIndexOwnerLocal() ) {
 			String backend = ConfigurationParseHelper.getString( jgroupsProperties, DELEGATE_BACKEND, null );

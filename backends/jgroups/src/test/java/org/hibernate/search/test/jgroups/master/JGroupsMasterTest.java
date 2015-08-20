@@ -18,15 +18,16 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.backend.jgroups.impl.MessageSerializationHelper;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.testsupport.TestConstants;
@@ -106,12 +107,15 @@ public class JGroupsMasterTest extends SearchTestBase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		final String indexManagerName = "org.hibernate.search.test.jgroups.master.TShirt";
-		IndexManager indexManager = getExtendedSearchIntegrator().getIndexManagerHolder().getIndexManager( indexManagerName );
+		ServiceManager serviceManager = getExtendedSearchIntegrator().getServiceManager();
+
 		//send message to all listeners
-		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
+		byte[] data = serviceManager.requestService( LuceneWorkSerializer.class ).toSerializedModel( queue );
 		data = MessageSerializationHelper.prependString( indexManagerName, data );
 		Message message = new Message( null, null, data );
 		channel.send( message );
+
+		serviceManager.releaseService( LuceneWorkSerializer.class );
 	}
 
 	/**

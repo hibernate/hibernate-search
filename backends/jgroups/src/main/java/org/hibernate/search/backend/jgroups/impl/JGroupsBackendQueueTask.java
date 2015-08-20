@@ -9,13 +9,13 @@ package org.hibernate.search.backend.jgroups.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.jgroups.logging.impl.Log;
-import org.jgroups.Message;
-
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
+import org.hibernate.search.backend.jgroups.logging.impl.Log;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.jgroups.Message;
 
 /**
  * Responsible for sending Lucene works from slave nodes to master node
@@ -30,19 +30,19 @@ public class JGroupsBackendQueueTask {
 
 	private final JGroupsBackendQueueProcessor factory;
 	private final String indexName;
-	private final IndexManager indexManager;
 	private final NodeSelectorStrategy masterNodeSelector;
+	private final LuceneWorkSerializer luceneWorkSerializer;
 	private final boolean blockForACK; //true by default if this backend is synchronous
 	private final long messageTimeout;
 
 	public JGroupsBackendQueueTask(JGroupsBackendQueueProcessor factory, IndexManager indexManager,
-			NodeSelectorService masterNodeSelector, boolean blockForACK, long messageTimeout) {
+			NodeSelectorService masterNodeSelector, LuceneWorkSerializer luceneWorkSerializer, boolean blockForACK, long messageTimeout) {
 		this.factory = factory;
-		this.indexManager = indexManager;
 		this.blockForACK = blockForACK;
 		this.messageTimeout = messageTimeout;
 		this.indexName = indexManager.getIndexName();
 		this.masterNodeSelector = masterNodeSelector.getMasterNodeSelector( indexName );
+		this.luceneWorkSerializer = luceneWorkSerializer;
 	}
 
 	public void sendLuceneWorkList(List<LuceneWork> queue) {
@@ -71,7 +71,7 @@ public class JGroupsBackendQueueTask {
 			}
 			return;
 		}
-		byte[] data = indexManager.getSerializer().toSerializedModel( filteredQueue );
+		byte[] data = luceneWorkSerializer.toSerializedModel( filteredQueue );
 		data = MessageSerializationHelper.prependString( indexName, data );
 
 		try {

@@ -15,7 +15,6 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -118,11 +117,6 @@ public interface IndexManager {
 	 * To optimize the underlying index. Some implementations might ignore the request, if it doesn't apply to them.
 	 */
 	void optimize();
-
-	/**
-	 * @return the Serializer implementation used for this IndexManager
-	 */
-	LuceneWorkSerializer getSerializer();
 
 	/**
 	 * Close the underlying index writer, releasing the index lock.

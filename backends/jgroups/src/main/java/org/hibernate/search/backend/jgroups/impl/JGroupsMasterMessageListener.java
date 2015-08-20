@@ -14,7 +14,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
@@ -39,10 +39,12 @@ public class JGroupsMasterMessageListener implements Receiver {
 
 	private final BuildContext context;
 	private final NodeSelectorService selector;
+	private final LuceneWorkSerializer luceneWorkSerializer;
 
-	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorService masterNodeSelector) {
+	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorService masterNodeSelector, LuceneWorkSerializer luceneWorkSerializer) {
 		this.context = context;
 		this.selector = masterNodeSelector;
+		this.luceneWorkSerializer = luceneWorkSerializer;
 	}
 
 	@Override
@@ -56,10 +58,9 @@ public class JGroupsMasterMessageListener implements Receiver {
 			//nodeSelector can be null if we receive the message during shutdown
 			if ( nodeSelector != null && nodeSelector.isIndexOwnerLocal() ) {
 				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( offset, bufferLength, rawBuffer );
-				final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
 				final BackendQueueProcessor backendQueueProcessor = context.getAllIndexesManager().getBackendQueueProcessor( indexName );
 				if ( backendQueueProcessor != null ) {
-					final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
+					final List<LuceneWork> queue = luceneWorkSerializer.toLuceneWorks( serializedQueue );
 					applyLuceneWorkLocally( queue, backendQueueProcessor, message );
 				}
 				else {
