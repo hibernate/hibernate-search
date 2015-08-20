@@ -14,11 +14,11 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
-
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
+import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.cfg.Environment;
@@ -52,7 +52,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private String indexName;
 	private DirectoryProvider<?> directoryProvider;
 	private Similarity similarity;
-	private BackendQueueProcessor backend;
+	private WorkspaceHolder workspaceHolder;
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters indexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
@@ -61,6 +61,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private ExtendedSearchIntegrator boundSearchIntegrator = null;
 	private DirectoryBasedReaderProvider readers = null;
 	private ServiceManager serviceManager;
+	private BackendQueueProcessor backendQueueProcessor;
 
 	@Override
 	public String getIndexName() {
@@ -75,7 +76,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void destroy() {
 		readers.stop();
-		backend.close();
+		workspaceHolder.close();
 		directoryProvider.stop();
 		if ( serializationProvider != null ) {
 			serviceManager.releaseService( SerializationProvider.class );
@@ -90,13 +91,14 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.directoryProvider = createDirectoryProvider( indexName, properties, buildContext );
 		this.indexingParameters = PropertiesParseHelper.extractIndexingPerformanceOptions( properties );
 		this.optimizer = PropertiesParseHelper.getOptimizerStrategy( this, properties, buildContext );
-		this.backend = createBackend( indexName, properties, buildContext );
+		this.workspaceHolder = createWorkspaceHolder( indexName, properties, buildContext );
+		this.backendQueueProcessor = BackendFactory.createBackend( this, buildContext, properties );
 		boolean enlistInTransaction = ConfigurationParseHelper.getBooleanValue(
 				properties,
 				Environment.WORKER_ENLIST_IN_TRANSACTION,
 				false
 		);
-		if ( enlistInTransaction && ! ( backend instanceof BackendQueueProcessor.Transactional ) ) {
+		if ( enlistInTransaction && ! ( backendQueueProcessor instanceof BackendQueueProcessor.Transactional ) ) {
 			// We are expecting to use a transactional worker but the backend is not
 			// this is war!
 			// TODO would be better to have this check in the indexManager factory but we need access to the backend
@@ -122,15 +124,15 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
 		//TODO implement async
-		backend.applyStreamWork( singleOperation, monitor );
+		workspaceHolder.applyStreamWork( singleOperation, monitor );
 	}
 
 	@Override
 	public void performOperations(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( log.isDebugEnabled() ) {
-			log.debug( "Sending work to backend of type " + backend.getClass() );
+			log.debug( "Applying work via workspace holder of type " + workspaceHolder.getClass() );
 		}
-		backend.applyWork( workList, monitor );
+		workspaceHolder.applyWork( workList, monitor );
 	}
 
 	@Override
@@ -173,7 +175,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void flushAndReleaseResources() {
-		backend.flushAndReleaseResources();
+		workspaceHolder.closeIndexWriter();
 	}
 
 	private SerializationProvider requestSerializationProvider() {
@@ -185,9 +187,14 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		}
 	}
 
-	//Not exposed on the IndexManager interface
+	@Override
 	public BackendQueueProcessor getBackendQueueProcessor() {
-		return backend;
+		return backendQueueProcessor;
+	}
+
+	//Not exposed on the IndexManager interface
+	public WorkspaceHolder getWorkspaceHolder() {
+		return workspaceHolder;
 	}
 
 	//Not exposed on the IndexManager interface
@@ -197,7 +204,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	//Not exposed on the IndexManager interface
 	public Lock getDirectoryModificationLock() {
-		return backend.getExclusiveWriteLock();
+		return workspaceHolder.getExclusiveWriteLock();
 	}
 
 	//Not exposed on the interface
@@ -217,12 +224,14 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	private void triggerWorkspaceReconfiguration() {
 		if ( boundSearchIntegrator != null ) { //otherwise it's too early
-			backend.indexMappingChanged();
+			workspaceHolder.indexMappingChanged();
 		}
 	}
 
-	protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-		return BackendFactory.createBackend( this, buildContext, cfg );
+	protected WorkspaceHolder createWorkspaceHolder(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+		WorkspaceHolder backend = new WorkspaceHolder();
+		backend.initialize( cfg, buildContext, this );
+		return backend;
 	}
 
 	protected DirectoryBasedReaderProvider createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {

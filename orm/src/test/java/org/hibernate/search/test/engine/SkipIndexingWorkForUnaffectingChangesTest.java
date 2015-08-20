@@ -14,7 +14,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,45 +39,45 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestBase {
 		getSession().persist( line1 );
 		tx.commit();
 
-		Assert.assertEquals( 1, LeakingBackendQueueProcessor.getLastProcessedQueue().size() );
-		LeakingBackendQueueProcessor.reset();
+		Assert.assertEquals( 1, LeakingLocalBackend.getLastProcessedQueue().size() );
+		LeakingLocalBackend.reset();
 		fullTextSession.clear();
 
 		// now change the BusLine in some way which does not affect the index:
 		tx = fullTextSession.beginTransaction();
-		line1 = (BusLine) fullTextSession.load( BusLine.class, line1.getId() );
+		line1 = fullTextSession.load( BusLine.class, line1.getId() );
 		line1.setBusLineCode( 2 );
 		line1.setOperating( true ); // boolean set to same value: might receive a different instance of Boolean
 		BusStop busStop = line1.getStops().iterator().next();
 		busStop.setServiceComments( "please clean the garbage after the football match" );
 		tx.commit();
 		if ( isDirtyCheckEnabled() ) {
-			Assert.assertEquals( 0, LeakingBackendQueueProcessor.getLastProcessedQueue().size() );
+			Assert.assertEquals( 0, LeakingLocalBackend.getLastProcessedQueue().size() );
 		}
 		else {
-			Assert.assertEquals( 1, LeakingBackendQueueProcessor.getLastProcessedQueue().size() );
+			Assert.assertEquals( 1, LeakingLocalBackend.getLastProcessedQueue().size() );
 		}
 
 		// now we make an indexing affecting change in the embedded object only,
 		// parent should still be updated
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
-		busStop = (BusStop) fullTextSession.load( BusStop.class, busStop.getId() );
+		busStop = fullTextSession.load( BusStop.class, busStop.getId() );
 		busStop.setRoadName( "Mill Road" );
 		tx.commit();
-		Assert.assertEquals( 1, LeakingBackendQueueProcessor.getLastProcessedQueue().size() );
+		Assert.assertEquals( 1, LeakingLocalBackend.getLastProcessedQueue().size() );
 
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
-		busStop = (BusStop) fullTextSession.load( BusStop.class, busStop.getId() );
+		busStop = fullTextSession.load( BusStop.class, busStop.getId() );
 		//verify mutable property dirty-ness:
 		busStop.getStartingDate().setTime( 0L );
 		tx.commit();
-		Assert.assertEquals( 1, LeakingBackendQueueProcessor.getLastProcessedQueue().size() );
+		Assert.assertEquals( 1, LeakingLocalBackend.getLastProcessedQueue().size() );
 
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		fullTextSession.close();
 	}
 
@@ -91,7 +91,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
-		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingLocalBackend.class.getName() );
 	}
 
 	protected boolean isDirtyCheckEnabled() {

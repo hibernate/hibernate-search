@@ -9,8 +9,8 @@ package org.hibernate.search.backend;
 import java.lang.reflect.Constructor;
 import java.util.Properties;
 
+import org.hibernate.search.backend.impl.LocalBackendQueueProcessor;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -69,7 +69,7 @@ public final class BackendFactory {
 				);
 			}
 			else {
-				backendQueueProcessor = new LuceneBackendQueueProcessor();
+				backendQueueProcessor = new LocalBackendQueueProcessor();
 			}
 		}
 		else if ( "lucene".equalsIgnoreCase( backend ) ) {
@@ -77,7 +77,7 @@ public final class BackendFactory {
 				throw new SearchException( "Cannot use Lucene backend together with Elasticsearch index manager" );
 			}
 			else {
-				backendQueueProcessor = new LuceneBackendQueueProcessor();
+				backendQueueProcessor = new LocalBackendQueueProcessor();
 			}
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
