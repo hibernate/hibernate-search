@@ -8,10 +8,9 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.NRTWorkspaceImpl;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -41,12 +40,12 @@ public class NRTIndexManager extends DirectoryBasedIndexManager {
 	private NRTWorkspaceImpl nrtWorkspace;
 
 	@Override
-	protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+	protected WorkspaceHolder createWorkspaceHolder(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		String backend = cfg.getProperty( Environment.WORKER_BACKEND );
 		if ( backend != null ) {
 			log.ignoringBackendOptionForIndex( indexName, "near-real-time" );
 		}
-		LuceneBackendQueueProcessor backendQueueProcessor = new LuceneBackendQueueProcessor();
+		WorkspaceHolder backendQueueProcessor = new WorkspaceHolder();
 		nrtWorkspace = new NRTWorkspaceImpl( this, buildContext, cfg );
 		backendQueueProcessor.setCustomWorkspace( nrtWorkspace );
 		backendQueueProcessor.initialize( cfg, buildContext, this );

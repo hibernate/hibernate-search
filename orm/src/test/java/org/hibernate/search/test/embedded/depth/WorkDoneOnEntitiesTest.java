@@ -6,6 +6,11 @@
  */
 package org.hibernate.search.test.embedded.depth;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -18,21 +23,16 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.hibernate.testing.SkipForDialect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * <pre>
@@ -247,13 +247,13 @@ public class WorkDoneOnEntitiesTest extends SearchTestBase {
 			session.save( ps[i] );
 		}
 		transaction.commit();
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 	}
 
 	@Override
 	@After
 	public void tearDown() throws Exception {
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		super.tearDown();
 	}
 
@@ -274,13 +274,13 @@ public class WorkDoneOnEntitiesTest extends SearchTestBase {
 
 	private void renamePerson(Integer id, String newName) {
 		Transaction transaction = getSession().beginTransaction();
-		WorkingPerson person = (WorkingPerson) getSession().load( WorkingPerson.class, id );
+		WorkingPerson person = getSession().load( WorkingPerson.class, id );
 		person.name = newName;
 		transaction.commit();
 	}
 
 	private int countWorksDoneOnPersonId(Integer pk) {
-		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		int count = 0;
 		for ( LuceneWork luceneWork : processedQueue ) {
 			Serializable id = luceneWork.getId();
@@ -298,7 +298,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingLocalBackend.class.getName() );
 	}
 
 }

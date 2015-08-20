@@ -7,9 +7,9 @@
 package org.hibernate.search.test.configuration;
 
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.backend.impl.LocalBackendQueueProcessor;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
@@ -26,9 +26,9 @@ public class CustomBackendTest {
 	@Test
 	public void test() {
 		verifyBackendUsage( "blackhole", BlackHoleBackendQueueProcessor.class );
-		verifyBackendUsage( "lucene", LuceneBackendQueueProcessor.class );
+		verifyBackendUsage( "lucene", LocalBackendQueueProcessor.class );
 		verifyBackendUsage( BlackHoleBackendQueueProcessor.class );
-		verifyBackendUsage( LuceneBackendQueueProcessor.class );
+		verifyBackendUsage( LocalBackendQueueProcessor.class );
 	}
 
 	private void verifyBackendUsage(String name, Class<? extends BackendQueueProcessor> backendType) {

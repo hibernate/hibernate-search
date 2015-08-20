@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import org.junit.Assert;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.Service;
@@ -101,7 +101,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	public AbstractWorkspaceImpl extractWorkspace(Class indexedType) {
 		EntityIndexBinding indexBindingForEntity = getSearchFactory().getIndexBinding( indexedType );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
-		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
+		WorkspaceHolder backend = (WorkspaceHolder) indexManager.getWorkspaceHolder();
 		return backend.getIndexResources().getWorkspace();
 	}
 

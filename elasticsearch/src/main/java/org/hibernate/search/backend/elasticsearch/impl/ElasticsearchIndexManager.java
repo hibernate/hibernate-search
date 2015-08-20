@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -19,6 +21,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
+import org.hibernate.search.backend.elasticsearch.client.impl.BulkRequestFailedException;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
@@ -33,7 +36,9 @@ import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
@@ -48,12 +53,15 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
+import io.searchbox.action.BulkableAction;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.Health.Builder;
+import io.searchbox.core.DeleteByQuery;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
+import io.searchbox.indices.Refresh;
 import io.searchbox.indices.mapping.PutMapping;
 
 /**
@@ -74,12 +82,15 @@ public class ElasticsearchIndexManager implements IndexManager {
 	ExtendedSearchIntegrator searchIntegrator;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
 
-	private ServiceReference<JestClient> clientReference;
 	private BackendQueueProcessor backend;
 
 	private LuceneWorkSerializer serializer;
 	private SerializationProvider serializationProvider;
 	private ServiceManager serviceManager;
+
+	private ElasticsearchIndexWorkVisitor visitor;
+	private ErrorHandler errorHandler;
+	private JestClient jestClient;
 
 	// Lifecycle
 
@@ -91,9 +102,15 @@ public class ElasticsearchIndexManager implements IndexManager {
 			this.indexManagementStrategy = getIndexManagementStrategy( propertiesProvider.get().getProperties() );
 			this.indexManagementWaitTimeout = getIndexManagementWaitTimeout( propertiesProvider.get().getProperties() );
 		}
+
 		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
 		this.similarity = similarity;
+
+		this.jestClient = serviceManager.requestService( JestClient.class );
 		this.backend = BackendFactory.createBackend( this, context, properties );
+
+		this.errorHandler = context.getErrorHandler();
+		this.visitor = new ElasticsearchIndexWorkVisitor( this.actualIndexName, context.getUninitializedSearchIntegrator() );
 	}
 
 	private String getIndexName(String indexName, Properties properties) {
@@ -127,14 +144,13 @@ public class ElasticsearchIndexManager implements IndexManager {
 		}
 
 		backend.close();
-		clientReference.close();
+
+		searchIntegrator.getServiceManager().releaseService( JestClient.class );
 	}
 
 	@Override
 	public void setSearchFactory(ExtendedSearchIntegrator boundSearchIntegrator) {
 		this.searchIntegrator = boundSearchIntegrator;
-		this.clientReference = searchIntegrator.getServiceManager().requestReference( JestClient.class );
-
 		initializeIndex();
 	}
 
@@ -164,7 +180,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 		CreateIndex createIndex = new CreateIndex.Builder( actualIndexName )
 				.build();
 
-		clientReference.get().executeRequest( createIndex );
+		jestClient.executeRequest( createIndex );
 
 		waitForIndexCreation();
 	}
@@ -181,7 +197,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 			}
 		};
 
-		JestResult result = clientReference.get().executeRequest( health );
+		JestResult result = jestClient.executeRequest( health );
 
 		if ( !result.isSucceeded() ) {
 			throw new SearchException( "Index " + actualIndexName + " wasn't created in time; Reason: " + result.getErrorMessage() );
@@ -189,21 +205,21 @@ public class ElasticsearchIndexManager implements IndexManager {
 	}
 
 	private void createIndexIfNotYetExisting() {
-		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 200 ) {
+		if ( jestClient.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 200 ) {
 			return;
 		}
 
-		clientReference.get().executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
+		jestClient.executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
 	}
 
 	private void deleteIndexIfExisting() {
 		// Not actually needed, but do it to avoid cluttering the ES log
-		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 404 ) {
+		if ( jestClient.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 404 ) {
 			return;
 		}
 
 		try {
-			clientReference.get().executeRequest( new DeleteIndex.Builder( actualIndexName ).build() );
+			jestClient.executeRequest( new DeleteIndex.Builder( actualIndexName ).build() );
 		}
 		catch (SearchException e) {
 			// ignoring deletion of non-existing index
@@ -256,7 +272,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 			.build();
 
 			try {
-				clientReference.get().executeRequest( putMapping );
+				jestClient.executeRequest( putMapping );
 			}
 			catch (Exception e) {
 				throw new SearchException( "Could not create mapping for entity type " + entityType.getName(), e );
@@ -580,13 +596,104 @@ public class ElasticsearchIndexManager implements IndexManager {
 	// Runtime ops
 
 	@Override
-	public void performOperations(List<LuceneWork> queue, IndexingMonitor monitor) {
-		backend.applyWork( queue, monitor );
+	public void performOperations(List<LuceneWork> workList, IndexingMonitor monitor) {
+		// Run single action, with refresh
+		if ( workList.size() == 1 ) {
+			doApplySingleWork( workList.iterator().next() );
+		}
+		// Create bulk action
+		else {
+			doApplyListOfWork( workList );
+		}
+	}
+
+	/**
+	 * Groups the given work list into executable bulks and executes them. For each bulk, the error handler - if
+	 * registered - will be invoked with the items of that bulk.
+	 */
+	private void doApplyListOfWork(List<LuceneWork> workList) {
+		BackendRequestGroup nextBulk = null;
+
+		for ( BackendRequestGroup backendRequestGroup : createRequestGroups( workList ) ) {
+			nextBulk = backendRequestGroup;
+			nextBulk.execute();
+		}
+
+		// Make sure a final refresh has been issued
+		try {
+			nextBulk.ensureRefreshed();
+		}
+		catch (BulkRequestFailedException brfe) {
+			errorHandler.handleException( "Refresh failed", brfe );
+		}
+	}
+
+	/**
+	 * Organizes the given work list into {@link BackendRequestGroup}s to be executed.
+	 */
+	private List<BackendRequestGroup> createRequestGroups(List<LuceneWork> workList) {
+		List<BackendRequestGroup> groups = new ArrayList<>();
+		List<BackendRequest<?>> currentBulk = new ArrayList<>();
+
+		for ( LuceneWork luceneWork : workList ) {
+			BackendRequest<?> request = luceneWork.acceptIndexWorkVisitor( visitor, false );
+
+			// either add to current bulk...
+			if ( request.getAction() instanceof BulkableAction ) {
+				currentBulk.add( request );
+			}
+			// ... or finish up current bulk and add single request for non-bulkable request
+			else {
+				if ( !currentBulk.isEmpty() ) {
+					groups.add( new BackendRequestBulk( currentBulk, false ) );
+					currentBulk.clear();
+				}
+				groups.add( new SingleRequest( request ) );
+			}
+		}
+
+		// finish up last bulk
+		if ( !currentBulk.isEmpty() ) {
+			groups.add( new BackendRequestBulk( currentBulk, true ) );
+		}
+
+		return groups;
+	}
+
+	private void refreshIndex() {
+		Refresh refresh = new Refresh.Builder().addIndex( actualIndexName ).build();
+		jestClient.executeRequest( refresh );
 	}
 
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
-		backend.applyStreamWork( singleOperation, monitor );
+		doApplySingleWork( singleOperation );
+	}
+
+	private void doApplySingleWork(LuceneWork work) {
+		try {
+			BackendRequest<?> request = work.acceptIndexWorkVisitor( visitor, true );
+
+			if ( request == null ) {
+				return;
+			}
+
+			jestClient.executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
+
+			// DBQ ignores the refresh parameter for some reason, so doing it explicitly
+			if ( request.getAction() instanceof DeleteByQuery ) {
+				refreshIndex();
+			}
+		}
+		catch (Exception e) {
+			ErrorContextBuilder builder = new ErrorContextBuilder();
+
+			builder.allWorkToBeDone( Collections.singleton( work ) );
+			builder.addWorkThatFailed( work );
+			builder.errorThatOccurred( e );
+
+			errorHandler.handle( builder.createErrorContext() );
+		}
 	}
 
 	@Override
@@ -595,7 +702,106 @@ public class ElasticsearchIndexManager implements IndexManager {
 	}
 
 	@Override
+	public BackendQueueProcessor getBackendQueueProcessor() {
+		return backend;
+	}
+
+	@Override
 	public String toString() {
 		return "ElasticsearchIndexManager [actualIndexName=" + actualIndexName + "]";
+	}
+
+	/**
+	 * Represents a group of backend requests, which may either be backed by an actual bulk request or by a single
+	 * request "pseudo group". Allows for uniform handling of these two cases.
+	 */
+	private interface BackendRequestGroup {
+		void execute();
+		void ensureRefreshed();
+	}
+
+	/**
+	 * A request group backed by an actual bulk request.
+	 */
+	private class BackendRequestBulk implements BackendRequestGroup {
+
+		private final List<BackendRequest<?>> requests;
+		private final boolean refresh;
+
+		public BackendRequestBulk(List<BackendRequest<?>> requests, boolean refresh) {
+			this.requests = requests;
+			this.refresh = refresh;
+		}
+
+		@Override
+		public void execute() {
+			try {
+				jestClient.executeBulkRequest( requests, refresh );
+			}
+			catch (BulkRequestFailedException brfe) {
+				ErrorContextBuilder builder = new ErrorContextBuilder();
+				List<LuceneWork> allWork = new ArrayList<>();
+
+				for ( BackendRequest<?> backendRequest : requests ) {
+					allWork.add( backendRequest.getLuceneWork() );
+					if ( !brfe.getErroneousItems().contains( backendRequest ) ) {
+						builder.workCompleted( backendRequest.getLuceneWork() );
+					}
+				}
+
+				builder.allWorkToBeDone( allWork );
+
+				for ( BackendRequest<?> failedAction : brfe.getErroneousItems() ) {
+					builder.addWorkThatFailed( failedAction.getLuceneWork() );
+				}
+
+				builder.errorThatOccurred( brfe );
+
+				errorHandler.handle( builder.createErrorContext() );
+			}
+			catch (Exception e) {
+				errorHandler.handleException( "Bulk request failed", e );
+			}
+		}
+
+		@Override
+		public void ensureRefreshed() {
+			if ( !refresh ) {
+				refreshIndex();
+			}
+		}
+	}
+
+	/**
+	 * A "group" just comprising a single, non-bulkable request.
+	 */
+	private class SingleRequest implements BackendRequestGroup {
+
+		private final BackendRequest<?> request;
+
+		public SingleRequest(BackendRequest<?> request) {
+			this.request = request;
+		}
+
+		@Override
+		public void execute() {
+			try {
+				jestClient.executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
+			}
+			catch (Exception e) {
+				ErrorContextBuilder builder = new ErrorContextBuilder();
+
+				builder.allWorkToBeDone( Collections.singletonList( request.getLuceneWork() ) );
+				builder.addWorkThatFailed( request.getLuceneWork() );
+				builder.errorThatOccurred( e );
+
+				errorHandler.handle( builder.createErrorContext() );
+			}
+		}
+
+		@Override
+		public void ensureRefreshed() {
+			refreshIndex();
+		}
 	}
 }

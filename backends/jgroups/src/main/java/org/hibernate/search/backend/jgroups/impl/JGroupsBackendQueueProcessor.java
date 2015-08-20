@@ -9,7 +9,6 @@ package org.hibernate.search.backend.jgroups.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
@@ -145,21 +144,6 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
-	public void indexMappingChanged() {
-		// no-op
-	}
-
-	@Override
-	public void closeIndexWriter() {
-		if ( selectionStrategy.isIndexOwnerLocal() ) {
-			delegatedBackend.closeIndexWriter();
-		}
-		else {
-			log.debugf( "Not owning the index '%s' so ignoring request to release IndexWriter lock", indexName );
-		}
-	}
-
-	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( selectionStrategy.isIndexOwnerLocal() ) {
 			delegatedBackend.applyWork( workList, monitor );
@@ -181,11 +165,6 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 			//TODO optimize for single operation?
 			jgroupsProcessor.sendLuceneWorkList( Collections.singletonList( singleOperation ) );
 		}
-	}
-
-	@Override
-	public Lock getExclusiveWriteLock() {
-		return delegatedBackend.getExclusiveWriteLock();
 	}
 
 	private static void assertLegacyOptionsNotUsed(Properties props, String indexName) {

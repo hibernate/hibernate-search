@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.test.configuration.norms;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +29,8 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test storing and omitting index time norms
@@ -51,7 +51,7 @@ public class StoreNormsTest extends SearchTestBase {
 		fullTextSession.save( test );
 		tx.commit();
 
-		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		assertTrue( processedQueue.size() == 1 );
 		AddLuceneWork addLuceneWork = (AddLuceneWork) processedQueue.get( 0 );
 		Document doc = addLuceneWork.getDocument();
@@ -73,7 +73,7 @@ public class StoreNormsTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingLocalBackend.class.getName() );
 	}
 
 	@Entity

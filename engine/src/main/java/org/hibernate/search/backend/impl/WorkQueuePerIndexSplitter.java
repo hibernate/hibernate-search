@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
@@ -28,7 +29,7 @@ public class WorkQueuePerIndexSplitter {
 		final String indexName = indexManager.getIndexName();
 		WorkPlan plan = queues.get( indexName );
 		if ( plan == null ) {
-			plan = new WorkPlan( indexManager );
+			plan = new WorkPlan( indexManager.getBackendQueueProcessor() );
 			queues.put( indexName, plan );
 		}
 		return plan.queue;
@@ -43,15 +44,15 @@ public class WorkQueuePerIndexSplitter {
 	public void commitOperations(IndexingMonitor monitor) {
 		// FIXME move executor here to parallel work - optionally? See HSEARCH-826
 		for ( WorkPlan plan : queues.values() ) {
-			plan.indexManager.performOperations( plan.queue, monitor );
+			plan.backendQueueProcessor.applyWork( plan.queue, monitor );
 		}
 	}
 
 	private static class WorkPlan {
-		private final IndexManager indexManager;
+		private final BackendQueueProcessor backendQueueProcessor;
 		private final LinkedList<LuceneWork> queue = new LinkedList<LuceneWork>();
-		WorkPlan(IndexManager indexManager) {
-			this.indexManager = indexManager;
+		WorkPlan(BackendQueueProcessor backendQueueProcessor) {
+			this.backendQueueProcessor = backendQueueProcessor;
 		}
 	}
 

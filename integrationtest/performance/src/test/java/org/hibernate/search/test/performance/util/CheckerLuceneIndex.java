@@ -16,7 +16,7 @@ import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -81,7 +81,7 @@ public class CheckerLuceneIndex {
 	 * might not be graceful (the shutdown is not designed to be recoverable).
 	 */
 	private static void stopBackend(DirectoryBasedIndexManager directoryBasedIndexManager) {
-		LuceneBackendQueueProcessor backendQueueProcessor = (LuceneBackendQueueProcessor) directoryBasedIndexManager.getBackendQueueProcessor();
+		WorkspaceHolder backendQueueProcessor = (WorkspaceHolder) directoryBasedIndexManager.getWorkspaceHolder();
 		backendQueueProcessor.getIndexResources().shutdown();
 	}
 
