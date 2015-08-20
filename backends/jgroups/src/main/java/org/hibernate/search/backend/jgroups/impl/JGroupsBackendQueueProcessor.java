@@ -111,7 +111,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, luceneWorkSerializer, block, messageTimeout );
 
-		String backend = ConfigurationParseHelper.getString( jgroupsProperties, DELEGATE_BACKEND, "lucene" );
+		String backend = ConfigurationParseHelper.getString( jgroupsProperties, DELEGATE_BACKEND, "local" );
 		delegatedBackend = BackendFactory.createBackend( backend, indexManager, context, props );
 	}
 

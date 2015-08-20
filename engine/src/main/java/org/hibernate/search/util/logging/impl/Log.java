@@ -874,4 +874,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 288, value = "The configuration property '%s' no longer applies and will be ignored." )
 	void deprecatedConfigurationPropertyIsIgnored(String string);
 
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 289, value = "The backend name 'lucene' is deprecated. Use 'local' instead")
+	void deprecatedBackendName();
 }

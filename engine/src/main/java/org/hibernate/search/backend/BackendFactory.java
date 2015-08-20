@@ -56,7 +56,11 @@ public final class BackendFactory {
 			Properties properties) {
 		final BackendQueueProcessor backendQueueProcessor;
 
-		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
+		if ( StringHelper.isEmpty( backend ) || "local".equalsIgnoreCase( backend ) ) {
+			backendQueueProcessor = new LocalBackendQueueProcessor();
+		}
+		else if ( "lucene".equalsIgnoreCase( backend ) ) {
+			log.deprecatedBackendName();
 			backendQueueProcessor = new LocalBackendQueueProcessor();
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
