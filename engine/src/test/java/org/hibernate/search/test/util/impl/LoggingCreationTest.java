@@ -7,7 +7,8 @@
 package org.hibernate.search.test.util.impl;
 
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -23,8 +24,20 @@ public class LoggingCreationTest {
 	@Test
 	public void verifyNullAssertionFailure() {
 		thrown.expect( AssertionFailure.class );
-		thrown.expectMessage( "HSEARCH000224: Non optional parameter named 'provider' was null" );
-		LuceneWorkSerializerImpl serializerImpl = new LuceneWorkSerializerImpl( null, null );
+		thrown.expectMessage( "HSEARCH000224: Non optional parameter named 'bar' was null" );
+
+		new Foo( null );
+	}
+
+	private static class Foo {
+
+		private static Log log = LoggerFactory.make();
+
+		Foo(String bar) {
+			if ( bar == null ) {
+				throw log.parametersShouldNotBeNull( "bar" );
+			}
+		}
 	}
 
 }

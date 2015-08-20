@@ -33,10 +33,6 @@ import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
@@ -44,17 +40,20 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.serialization.avro.impl.KnownProtocols;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
-import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.test.util.SerializationTestHelper;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * This tests backwards compatibility between Avro protocol versions.
@@ -72,16 +71,8 @@ public class ProtocolBackwardCompatibilityTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ServiceManager serviceManager = new StandardServiceManager(
-				new SearchConfigurationForTest(),
-				null
-		);
-		SerializationProvider serializationProvider = serviceManager.requestService( SerializationProvider.class );
-
-		luceneWorkSerializer = new LuceneWorkSerializerImpl(
-				serializationProvider,
-				searchFactoryHolder.getSearchFactory()
-		);
+		ServiceManager serviceManager = getTestServiceManager();
+		luceneWorkSerializer = serviceManager.requestService( LuceneWorkSerializer.class );
 
 		// check target directory -
 		// we always write out a serialized version of a work list supported by the latest protocol
@@ -91,6 +82,20 @@ public class ProtocolBackwardCompatibilityTest {
 		workList.addAll( buildV11Works() );
 		workList.addAll( buildV12Works() );
 		serializeWithAvro( workList );
+	}
+
+	private ServiceManager getTestServiceManager() {
+		SearchConfigurationForTest searchConfiguration = new SearchConfigurationForTest();
+		return new StandardServiceManager(
+				new SearchConfigurationForTest(),
+				new BuildContextForTest( searchConfiguration ) {
+
+					@Override
+					public ExtendedSearchIntegrator getUninitializedSearchIntegrator() {
+						return searchFactoryHolder.getSearchFactory();
+					};
+				}
+		);
 	}
 
 	@Test

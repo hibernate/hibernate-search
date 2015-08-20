@@ -23,9 +23,7 @@ import org.hibernate.search.cfg.spi.DirectoryProviderService;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
-import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -141,25 +139,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void optimize() {
 		performStreamOperation( OptimizeLuceneWork.INSTANCE, null, false );
-	}
-
-	@Override
-	public LuceneWorkSerializer getSerializer() {
-		if ( serializer == null ) {
-			serializationProvider = requestSerializationProvider();
-			serializer = new LuceneWorkSerializerImpl( serializationProvider, boundSearchIntegrator );
-			log.indexManagerUsesSerializationService( this.indexName, this.serializer.describeSerializer() );
-		}
-		return serializer;
-	}
-
-	private SerializationProvider requestSerializationProvider() {
-		try {
-			return serviceManager.requestService( SerializationProvider.class );
-		}
-		catch (SearchException se) {
-			throw log.serializationProviderNotFoundException( se );
-		}
 	}
 
 	//Not exposed on the IndexManager interface

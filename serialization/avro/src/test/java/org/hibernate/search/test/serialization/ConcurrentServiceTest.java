@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
-import org.junit.Rule;
-import org.junit.Test;
-
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -23,6 +20,8 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.junit.Rule;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -68,9 +67,8 @@ public class ConcurrentServiceTest {
 
 	private LuceneWorkSerializer extractSerializer() {
 		return searchFactoryHolder.getSearchFactory()
-				.getIndexManagerHolder()
-				.getIndexManager( RemoteEntity.class.getName() )
-				.getSerializer();
+				.getServiceManager()
+				.requestService( LuceneWorkSerializer.class );
 	}
 
 	private static class SerializingThread implements Runnable {

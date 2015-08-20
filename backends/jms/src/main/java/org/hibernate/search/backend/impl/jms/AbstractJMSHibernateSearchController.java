@@ -13,8 +13,9 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.logging.impl.Log;
@@ -69,8 +70,16 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 				log.messageReceivedForUndefinedIndex( indexName );
 				return;
 			}
-			queue = indexManager.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
-			indexManager.performOperations( queue, null );
+
+			LuceneWorkSerializer luceneWorkSerializer = integrator.getServiceManager().requestService( LuceneWorkSerializer.class );
+
+			try {
+				queue = luceneWorkSerializer.toLuceneWorks( (byte[]) objectMessage.getObject() );
+				indexManager.performOperations( queue, null );
+			}
+			finally {
+				integrator.getServiceManager().releaseService( LuceneWorkSerializer.class );
+			}
 		}
 		catch (JMSException e) {
 			log.unableToRetrieveObjectFromMessage( message.getClass(), e );

@@ -8,6 +8,7 @@ package org.hibernate.search.indexes.serialization.impl;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -24,6 +25,9 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
@@ -31,6 +35,7 @@ import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -44,21 +49,34 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  * @author Hardy Ferentschik
  */
-public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
+public class LuceneWorkSerializerImpl implements LuceneWorkSerializer, Startable, Stoppable {
 
 	private static Log log = LoggerFactory.make();
 
-	private final ExtendedSearchIntegrator searchIntegrator;
-	private final SerializationProvider provider;
+	private ExtendedSearchIntegrator searchIntegrator;
+	private ServiceManager serviceManager;
+	private SerializationProvider provider;
 
-	public LuceneWorkSerializerImpl(SerializationProvider provider, ExtendedSearchIntegrator searchIntegrator) {
-		this.provider = provider;
-		this.searchIntegrator = searchIntegrator;
-		if ( provider == null ) {
-			throw log.parametersShouldNotBeNull( "provider" );
+	@Override
+	public void start(Properties properties, BuildContext context) {
+		searchIntegrator = context.getUninitializedSearchIntegrator();
+		serviceManager = context.getServiceManager();
+		provider = requestSerializationProvider();
+
+		log.usingSerializationService( describeSerializer() );
+	}
+
+	@Override
+	public void stop() {
+		serviceManager.releaseService( SerializationProvider.class );
+	}
+
+	private SerializationProvider requestSerializationProvider() {
+		try {
+			return serviceManager.requestService( SerializationProvider.class );
 		}
-		if ( searchIntegrator == null ) {
-			throw log.parametersShouldNotBeNull( "searchIntegrator" );
+		catch (SearchException se) {
+			throw log.serializationProviderNotFoundException( se );
 		}
 	}
 
