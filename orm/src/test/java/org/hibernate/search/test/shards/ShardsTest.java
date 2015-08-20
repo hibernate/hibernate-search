@@ -25,7 +25,9 @@ import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Emmanuel Bernard
@@ -56,6 +58,8 @@ public class ShardsTest extends SearchTestBase {
 	}
 
 	@Test
+	// there is a mismatch of the index name as handled by IndexManagerHolder and the ES-IM: Animal.0 vs. Animal00
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testBehavior() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -100,6 +104,8 @@ public class ShardsTest extends SearchTestBase {
 	}
 
 	@Test
+	// there is a mismatch of the index name as handled by IndexManagerHolder and the ES-IM: Animal.0 vs. Animal00
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testInternalSharding() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();

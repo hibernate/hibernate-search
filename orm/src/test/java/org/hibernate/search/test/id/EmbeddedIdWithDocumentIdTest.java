@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.id;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +18,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Related to HSEARCH-1050: check we deal nicely with weird DocumentId
@@ -31,7 +31,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestBase {
 
 	@Test
 	public void testFieldBridge() throws Exception {
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 
 		PersonPK johnDoePk = new PersonPK();
 		johnDoePk.setFirstName( "John" );
@@ -47,7 +47,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestBase {
 		tx.commit();
 		s.clear();
 
-		List<LuceneWork> lastProcessedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
+		List<LuceneWork> lastProcessedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		assertEquals( 1, lastProcessedQueue.size() );
 		LuceneWork luceneWork = lastProcessedQueue.get( 0 );
 		assertEquals( "AB123", luceneWork.getIdInString() );
@@ -81,7 +81,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingLocalBackend.class.getName() );
 	}
 
 }

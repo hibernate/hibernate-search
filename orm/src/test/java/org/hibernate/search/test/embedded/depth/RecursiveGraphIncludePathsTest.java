@@ -22,10 +22,11 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.junit.Test;
 
 /**
@@ -47,7 +48,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 		verifyMatchExistsWithName( "friends.name", "Rachel", 0L, 1L, 2L, 3L, 4L, 6L );
 		verifyNoMatchExists( "friends.name", "Gunter" );
 
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		renamePerson( 5L, "Rachelita" ); // Rename Rachel, friend to anyone
 		assertEquals( 1, countWorksDoneOnPerson( 0L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
@@ -57,7 +58,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 		assertEquals( 1, countWorksDoneOnPerson( 5L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 6L ) );
 
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		renamePerson( 0L, "Rossito" ); // Rename Ross, friend to anyone but Gunter
 		assertEquals( 1, countWorksDoneOnPerson( 0L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
@@ -78,7 +79,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction transaction = fullTextSession.beginTransaction();
-			SocialPerson person = (SocialPerson) fullTextSession.load( SocialPerson.class, id );
+			SocialPerson person = fullTextSession.load( SocialPerson.class, id );
 			person.setName( newName );
 			transaction.commit();
 		}
@@ -170,7 +171,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 	}
 
 	private int countWorksDoneOnPerson(Long pk) {
-		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		int count = 0;
 		for ( LuceneWork luceneWork : processedQueue ) {
 			Serializable id = luceneWork.getId();
@@ -188,7 +189,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String, Object> cfg) {
-		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingLocalBackend.class.getName() );
 	}
 
 }

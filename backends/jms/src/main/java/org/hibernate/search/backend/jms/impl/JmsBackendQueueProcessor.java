@@ -9,8 +9,6 @@ package org.hibernate.search.backend.jms.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -109,17 +107,6 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		applyWork( Collections.singletonList( singleOperation ), monitor );
-	}
-
-	@Override
-	public Lock getExclusiveWriteLock() {
-		log.warnSuspiciousBackendDirectoryCombination( indexName );
-		return new ReentrantLock(); // keep the invoker happy, still it's useless
-	}
-
-	@Override
-	public void indexMappingChanged() {
-		// no-op
 	}
 
 	public QueueConnection getJMSConnection() {

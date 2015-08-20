@@ -6,19 +6,18 @@
  */
 package org.hibernate.search.test.configuration;
 
+import static org.junit.Assert.assertEquals;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import static org.junit.Assert.assertEquals;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.ExclusiveIndexWorkspaceImpl;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.SharedIndexWorkspaceImpl;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
@@ -60,10 +59,8 @@ public class ExclusiveIndexTest {
 
 	private void assertExclusiveIsEnabled(IndexManagerHolder allIndexesManager, String indexName, boolean expectExclusive) {
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( indexName );
-		BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
-		assertEquals( LuceneBackendQueueProcessor.class, backendQueueProcessor.getClass() );
-		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) backendQueueProcessor;
-		AbstractWorkspaceImpl workspace = backend.getIndexResources().getWorkspace();
+		WorkspaceHolder workspaceHolder = indexManager.getWorkspaceHolder();
+		AbstractWorkspaceImpl workspace = workspaceHolder.getIndexResources().getWorkspace();
 		if ( expectExclusive ) {
 			assertEquals( ExclusiveIndexWorkspaceImpl.class, workspace.getClass() );
 		}

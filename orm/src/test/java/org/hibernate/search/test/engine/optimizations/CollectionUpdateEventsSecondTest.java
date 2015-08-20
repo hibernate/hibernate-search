@@ -10,8 +10,6 @@ package org.hibernate.search.test.engine.optimizations;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Assert;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
@@ -20,9 +18,9 @@ import org.hibernate.event.spi.LoadEventListener;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -98,16 +96,16 @@ public class CollectionUpdateEventsSecondTest {
 	 * Counter is reset after invocation.
 	 */
 	private void assertOperationsPerformed(int expectedOperationCount) {
-		List<LuceneWork> lastProcessedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
+		List<LuceneWork> lastProcessedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		Assert.assertEquals( expectedOperationCount, lastProcessedQueue.size() );
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 	}
 
 	private FullTextSessionBuilder createSearchFactory() {
 		loadCountListener = new LoadCountingListener();
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 				.setProperty( "hibernate.search.default.worker.backend",
-						LeakingBackendQueueProcessor.class.getName() )
+						LeakingLocalBackend.class.getName() )
 				.addAnnotatedClass( LocationGroup.class )
 				.addAnnotatedClass( Location.class )
 				.addLoadEventListener( loadCountListener );
@@ -147,7 +145,7 @@ public class CollectionUpdateEventsSecondTest {
 	 */
 	private void addLocationToGroupCollection(FullTextSession fullTextSession) {
 		final Transaction transaction = fullTextSession.beginTransaction();
-		LocationGroup group = (LocationGroup) fullTextSession.get( LocationGroup.class, 1L );
+		LocationGroup group = fullTextSession.get( LocationGroup.class, 1L );
 
 		Location location = new Location( "New Room" );
 		fullTextSession.persist( location );
@@ -164,7 +162,7 @@ public class CollectionUpdateEventsSecondTest {
 	private void updateLocationGroupName(FullTextSession fullTextSession) {
 		final Transaction transaction = fullTextSession.beginTransaction();
 
-		LocationGroup group = (LocationGroup) fullTextSession.get( LocationGroup.class, 1L );
+		LocationGroup group = fullTextSession.get( LocationGroup.class, 1L );
 		LocationGroup locationGroup = (LocationGroup) fullTextSession.merge( group );
 		locationGroup.setName( "Airport" );
 
