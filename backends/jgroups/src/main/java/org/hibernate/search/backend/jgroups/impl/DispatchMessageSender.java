@@ -13,6 +13,7 @@ import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -104,7 +105,8 @@ public final class DispatchMessageSender implements MessageSenderService, Starta
 		channelContainer.start();
 
 		NodeSelectorService masterNodeSelector = serviceManager.requestService( NodeSelectorService.class );
-		JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener( context, masterNodeSelector );
+		LuceneWorkSerializer luceneWorkSerializer = serviceManager.requestService( LuceneWorkSerializer.class );
+		JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener( context, masterNodeSelector, luceneWorkSerializer );
 
 		JChannel channel = channelContainer.getChannel();
 
@@ -143,6 +145,7 @@ public final class DispatchMessageSender implements MessageSenderService, Starta
 	@Override
 	public void stop() {
 		serviceManager.releaseService( NodeSelectorService.class );
+		serviceManager.releaseService( LuceneWorkSerializer.class );
 		serviceManager = null;
 		dispatcher.stop();
 		try {
