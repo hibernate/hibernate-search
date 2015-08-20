@@ -13,7 +13,7 @@ import java.util.List;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 
 /**
  * Used by {@link org.hibernate.search.backend.impl.TransactionalOperationExecutor} to split a list of operations
@@ -25,11 +25,10 @@ public class WorkQueuePerIndexSplitter {
 
 	private final HashMap<String,WorkPlan> queues = new HashMap<String,WorkPlan>();
 
-	public List<LuceneWork> getIndexManagerQueue(final IndexManager indexManager) {
-		final String indexName = indexManager.getIndexName();
+	public List<LuceneWork> getIndexManagerQueue(String indexName, IndexManagerHolder indexManagerHolder) {
 		WorkPlan plan = queues.get( indexName );
 		if ( plan == null ) {
-			plan = new WorkPlan( indexManager.getBackendQueueProcessor() );
+			plan = new WorkPlan( indexManagerHolder.getBackendQueueProcessor( indexName ) );
 			queues.put( indexName, plan );
 		}
 		return plan.queue;

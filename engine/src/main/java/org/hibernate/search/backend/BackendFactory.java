@@ -18,6 +18,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -102,6 +103,20 @@ public final class BackendFactory {
 					serviceManager
 			);
 		}
+
+		boolean enlistInTransaction = ConfigurationParseHelper.getBooleanValue(
+				properties,
+				Environment.WORKER_ENLIST_IN_TRANSACTION,
+				false
+		);
+		if ( enlistInTransaction && ! ( backendQueueProcessor instanceof BackendQueueProcessor.Transactional ) ) {
+			// We are expecting to use a transactional worker but the backend is not
+			// this is war!
+			backend = StringHelper.isEmpty( backend ) ? "lucene" : backend;
+			throw log.backendNonTransactional( indexManager.getIndexName(), backend );
+
+		}
+
 		backendQueueProcessor.initialize( properties, buildContext, indexManager );
 		return backendQueueProcessor;
 	}

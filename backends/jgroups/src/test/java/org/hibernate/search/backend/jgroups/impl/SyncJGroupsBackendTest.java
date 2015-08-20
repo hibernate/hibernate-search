@@ -9,7 +9,6 @@ package org.hibernate.search.backend.jgroups.impl;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -17,18 +16,16 @@ import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcesso
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.TimeoutException;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.Assert;
-
 
 /**
  * Verifies sync / async guarantees of the JGroups backend.
@@ -151,10 +148,7 @@ public class SyncJGroupsBackendTest {
 	}
 
 	private static BackendQueueProcessor extractBackendQueue(SearchFactoryHolder node, String indexName) {
-		IndexManager indexManager = node.getSearchFactory().getIndexManagerHolder().getIndexManager( indexName );
-		Assert.assertNotNull( indexManager );
-		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;
-		return dbi.getBackendQueueProcessor();
+		return node.getSearchFactory().getIndexManagerHolder().getBackendQueueProcessor( indexName );
 	}
 
 	private void storeBook(int id, String string) {

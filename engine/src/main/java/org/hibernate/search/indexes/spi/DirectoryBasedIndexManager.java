@@ -14,14 +14,11 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.DirectoryProviderService;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -34,8 +31,6 @@ import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -61,7 +56,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private ExtendedSearchIntegrator boundSearchIntegrator = null;
 	private DirectoryBasedReaderProvider readers = null;
 	private ServiceManager serviceManager;
-	private BackendQueueProcessor backendQueueProcessor;
+//	private BackendQueueProcessor backendQueueProcessor;
 
 	@Override
 	public String getIndexName() {
@@ -92,21 +87,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.indexingParameters = PropertiesParseHelper.extractIndexingPerformanceOptions( properties );
 		this.optimizer = PropertiesParseHelper.getOptimizerStrategy( this, properties, buildContext );
 		this.workspaceHolder = createWorkspaceHolder( indexName, properties, buildContext );
-		this.backendQueueProcessor = BackendFactory.createBackend( this, buildContext, properties );
-		boolean enlistInTransaction = ConfigurationParseHelper.getBooleanValue(
-				properties,
-				Environment.WORKER_ENLIST_IN_TRANSACTION,
-				false
-		);
-		if ( enlistInTransaction && ! ( backendQueueProcessor instanceof BackendQueueProcessor.Transactional ) ) {
-			// We are expecting to use a transactional worker but the backend is not
-			// this is war!
-			// TODO would be better to have this check in the indexManager factory but we need access to the backend
-			String backend = properties.getProperty( Environment.WORKER_BACKEND );
-			backend = StringHelper.isEmpty( backend ) ? "lucene" : backend;
-			throw log.backendNonTransactional( indexName, backend );
-
-		}
 		this.directoryProvider.start( this );
 		this.readers = createIndexReader( indexName, properties, buildContext );
 	}
@@ -180,11 +160,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		catch (SearchException se) {
 			throw log.serializationProviderNotFoundException( se );
 		}
-	}
-
-	@Override
-	public BackendQueueProcessor getBackendQueueProcessor() {
-		return backendQueueProcessor;
 	}
 
 	//Not exposed on the IndexManager interface
