@@ -43,9 +43,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.ReaderProvider;
@@ -92,8 +90,6 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private ExtendedSearchIntegrator searchIntegrator;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
 
-	private LuceneWorkSerializer serializer;
-	private SerializationProvider serializationProvider;
 	private ServiceManager serviceManager;
 
 	private ElasticsearchIndexWorkVisitor visitor;
@@ -657,26 +653,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	@Override
 	public LuceneWorkSerializer getSerializer() {
-		if ( serializer == null ) {
-			serializationProvider = requestSerializationProvider();
-			serializer = new LuceneWorkSerializerImpl( serializationProvider, searchIntegrator );
-			LOG.indexManagerUsesSerializationService( this.indexName, this.serializer.describeSerializer() );
-		}
-		return serializer;
+		return null;
 	}
 
 	@Override
 	public void flushAndReleaseResources() {
 		// no-op
-	}
-
-	private SerializationProvider requestSerializationProvider() {
-		try {
-			return serviceManager.requestService( SerializationProvider.class );
-		}
-		catch (SearchException se) {
-			throw LOG.serializationProviderNotFoundException( se );
-		}
 	}
 
 	public String getActualIndexName() {

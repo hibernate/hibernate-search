@@ -19,6 +19,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -49,8 +50,6 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 	public static final String JMS_CONNECTION_LOGIN = Environment.WORKER_PREFIX + "jms.login";
 	public static final String JMS_CONNECTION_PASSWORD = Environment.WORKER_PREFIX + "jms.password";
 
-	private IndexManager indexManager;
-
 	private static final Log log = LoggerFactory.make();
 
 	private Properties props = null;
@@ -60,11 +59,11 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.props = props;
 		this.isTransactional = context.enlistWorkerInTransaction();
-		this.indexManager = indexManager;
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
 		this.integrator = context.getUninitializedSearchIntegrator();
 		this.factory = initializeJMSQueueConnectionFactory( props );
+
 		if ( ! isTransactional ) {
 			// if we are not transactional, we can eagerly initialize the queue and connection
 			this.jmsQueue = initializeJMSQueue( factory, props );
@@ -100,7 +99,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
 
-		Runnable operation = new JmsBackendQueueTask( indexName, workList, indexManager, this );
+		Runnable operation = new JmsBackendQueueTask( indexName, workList, this, integrator.getWorkSerializer() );
 		operation.run();
 	}
 
@@ -144,6 +143,8 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 
 	@Override
 	public void close() {
+		integrator.getServiceManager().releaseService( LuceneWorkSerializer.class );
+
 		try {
 			if ( connection != null ) {
 				connection.close();

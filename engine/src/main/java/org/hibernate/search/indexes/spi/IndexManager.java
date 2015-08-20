@@ -120,8 +120,10 @@ public interface IndexManager {
 	void optimize();
 
 	/**
-	 * @return the Serializer implementation used for this IndexManager
+	 * @deprecated This method is scheduled for removal. It is not invoked by Hibernate Search any more, implementations
+	 * may make this a no-op and safely return null.
 	 */
+	@Deprecated
 	LuceneWorkSerializer getSerializer();
 
 	/**

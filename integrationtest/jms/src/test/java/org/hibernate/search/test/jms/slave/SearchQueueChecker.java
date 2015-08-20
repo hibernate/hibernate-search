@@ -7,14 +7,14 @@
 package org.hibernate.search.test.jms.slave;
 
 import java.util.List;
-import javax.jms.MessageListener;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
-import javax.jms.JMSException;
 
-import org.hibernate.search.cfg.Environment;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
+
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.SearchIntegrator;
 
 /**
@@ -26,7 +26,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 public class SearchQueueChecker implements MessageListener {
 	public static int queues;
 	public static int works;
-	private SearchIntegrator searchIntegrator;
+	private final SearchIntegrator searchIntegrator;
 
 	public SearchQueueChecker(SearchIntegrator searchIntegrator) {
 		this.searchIntegrator = searchIntegrator;
@@ -38,7 +38,6 @@ public class SearchQueueChecker implements MessageListener {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void onMessage(Message message) {
 		if ( !( message instanceof ObjectMessage ) ) {
 			return;
@@ -47,15 +46,17 @@ public class SearchQueueChecker implements MessageListener {
 
 		List<LuceneWork> queue;
 		try {
-			String indexName = objectMessage.getStringProperty( Environment.INDEX_NAME_JMS_PROPERTY );
-			IndexManager indexManager = searchIntegrator.getIndexManager( indexName );
-			queue = indexManager.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
+			LuceneWorkSerializer serializer = searchIntegrator.getServiceManager().requestService( LuceneWorkSerializer.class );
+			queue = serializer.toLuceneWorks( (byte[]) objectMessage.getObject() );
 		}
 		catch (JMSException e) {
 			return;
 		}
 		catch (ClassCastException e) {
 			return;
+		}
+		finally {
+			searchIntegrator.getServiceManager().releaseService( LuceneWorkSerializer.class );
 		}
 		queues++;
 		works += queue.size();

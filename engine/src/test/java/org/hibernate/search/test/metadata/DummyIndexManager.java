@@ -95,7 +95,7 @@ class DummyIndexManager implements IndexManager {
 
 	@Override
 	public LuceneWorkSerializer getSerializer() {
-		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
+		return null;
 	}
 
 	@Override

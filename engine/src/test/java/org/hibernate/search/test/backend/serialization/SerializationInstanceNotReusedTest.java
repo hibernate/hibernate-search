@@ -19,9 +19,9 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.junit.Assert;
@@ -48,7 +48,7 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-1637")
 public class SerializationInstanceNotReusedTest {
 
-	private CountingSerializationProvider countingServiceInstance = new CountingSerializationProvider();
+	private final CountingSerializationProvider countingServiceInstance = new CountingSerializationProvider();
 
 	@Rule
 	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Book.class )
@@ -57,30 +57,32 @@ public class SerializationInstanceNotReusedTest {
 	@Test
 	public void testPropertiesIndexing() {
 		ExtendedSearchIntegrator searchFactory = factoryHolder.getSearchFactory();
-		IndexManager indexManager = searchFactory.getIndexManagerHolder().getIndexManager( "books" );
-		Assert.assertNotNull( indexManager );
+		LuceneWorkSerializer serializer = searchFactory.getServiceManager().requestService( LuceneWorkSerializer.class );
+
 		Assert.assertEquals( 0, countingServiceInstance.serializerGetCount.get() );
 		Assert.assertEquals( 0, countingServiceInstance.deserializerGetCount.get() );
 
 		//Serialize some work:
-		indexManager.getSerializer().toSerializedModel( makeSomeWork() );
+		serializer.toSerializedModel( makeSomeWork() );
 		Assert.assertEquals( 1, countingServiceInstance.serializerGetCount.get() );
 		Assert.assertEquals( 0, countingServiceInstance.deserializerGetCount.get() );
 
 		//Serialize again, note the point of the test is to request all references again:
-		indexManager.getSerializer().toSerializedModel( makeSomeWork() );
+		serializer.toSerializedModel( makeSomeWork() );
 		Assert.assertEquals( 2, countingServiceInstance.serializerGetCount.get() );
 		Assert.assertEquals( 0, countingServiceInstance.deserializerGetCount.get() );
 
 		//Now Deserialize:
-		indexManager.getSerializer().toLuceneWorks( makeSomeSerializedWork() );
+		serializer.toLuceneWorks( makeSomeSerializedWork() );
 		Assert.assertEquals( 2, countingServiceInstance.serializerGetCount.get() );
 		Assert.assertEquals( 1, countingServiceInstance.deserializerGetCount.get() );
 
 		//Now Deserialize again:
-		indexManager.getSerializer().toLuceneWorks( makeSomeSerializedWork() );
+		serializer.toLuceneWorks( makeSomeSerializedWork() );
 		Assert.assertEquals( 2, countingServiceInstance.serializerGetCount.get() );
 		Assert.assertEquals( 2, countingServiceInstance.deserializerGetCount.get() );
+
+		searchFactory.getServiceManager().releaseService( LuceneWorkSerializer.class );
 	}
 
 	private byte[] makeSomeSerializedWork() {

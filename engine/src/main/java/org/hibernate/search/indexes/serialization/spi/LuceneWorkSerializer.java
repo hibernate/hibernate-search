@@ -9,6 +9,7 @@ package org.hibernate.search.indexes.serialization.spi;
 import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.engine.service.spi.Service;
 
 /**
  * Serialize {@code LuceneWork} instances.
@@ -21,7 +22,7 @@ import org.hibernate.search.backend.LuceneWork;
  *
  * @author Sanne Grinovero &lt;sanne@hibernate.org&gt; (C) 2011 Red Hat Inc.
  */
-public interface LuceneWorkSerializer {
+public interface LuceneWorkSerializer extends Service {
 
 	/**
 	 * Convert a List of LuceneWork into a byte[].
