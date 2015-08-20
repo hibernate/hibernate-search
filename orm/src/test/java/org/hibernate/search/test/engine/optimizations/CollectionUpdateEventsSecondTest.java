@@ -20,7 +20,7 @@ import org.hibernate.event.spi.LoadEventListener;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 import org.junit.Test;
@@ -98,16 +98,16 @@ public class CollectionUpdateEventsSecondTest {
 	 * Counter is reset after invocation.
 	 */
 	private void assertOperationsPerformed(int expectedOperationCount) {
-		List<LuceneWork> lastProcessedQueue = LeakingLuceneBackend.getLastProcessedQueue();
+		List<LuceneWork> lastProcessedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		Assert.assertEquals( expectedOperationCount, lastProcessedQueue.size() );
-		LeakingLuceneBackend.reset();
+		LeakingLocalBackend.reset();
 	}
 
 	private FullTextSessionBuilder createSearchFactory() {
 		loadCountListener = new LoadCountingListener();
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 				.setProperty( "hibernate.search.default.worker.backend",
-						LeakingLuceneBackend.class.getName() )
+						LeakingLocalBackend.class.getName() )
 				.addAnnotatedClass( LocationGroup.class )
 				.addAnnotatedClass( Location.class )
 				.addLoadEventListener( loadCountListener );

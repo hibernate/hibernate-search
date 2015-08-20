@@ -11,14 +11,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.hibernate.search.backend.impl.LocalBackendQueueProcessor;
+import org.hibernate.search.backend.jms.impl.JndiJMSBackendQueueProcessor;
+import org.hibernate.search.test.integration.jms.controller.RegistrationController;
+import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.InSequence;
 import org.junit.Assert;
 import org.junit.Test;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
-import org.hibernate.search.backend.jms.impl.JndiJMSBackendQueueProcessor;
-import org.hibernate.search.test.integration.jms.controller.RegistrationController;
-import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -58,7 +58,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(0)
 	@OperateOnDeployment("master")
 	public void deleteExistingMembers() throws Exception {
-		memberRegistration.assertConfiguration( "Test Sequence 0", "master", LuceneBackendQueueProcessor.class.getName() );
+		memberRegistration.assertConfiguration( "Test Sequence 0", "master", LocalBackendQueueProcessor.class.getName() );
 		int deletedMembers = memberRegistration.deleteAllMembers();
 		assertEquals( "At the start of the test there should be no members", 0, deletedMembers );
 	}
@@ -97,7 +97,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(3)
 	@OperateOnDeployment("master")
 	public void registerNewMemberOnMaster() throws Exception {
-		memberRegistration.assertConfiguration( "Test Sequence 3", "master", LuceneBackendQueueProcessor.class.getName() );
+		memberRegistration.assertConfiguration( "Test Sequence 3", "master", LocalBackendQueueProcessor.class.getName() );
 		RegisteredMember newMember = memberRegistration.getNewMember();
 		assertNull( "A non registered member should have null ID", newMember.getId() );
 
@@ -132,7 +132,7 @@ public abstract class TransactionalJmsMasterSlave {
 	@InSequence(6)
 	@OperateOnDeployment("master")
 	public void searchNewMembersAfterSynchronizationOnMaster() throws Exception {
-		memberRegistration.assertConfiguration( "Test Sequence 6", "master", LuceneBackendQueueProcessor.class.getName() );
+		memberRegistration.assertConfiguration( "Test Sequence 6", "master", LocalBackendQueueProcessor.class.getName() );
 		assertSearchResult( "Davide D'Alto", findAtLeastOneEntity( "Davide" ) );
 		assertSearchResult( "Peter O'Tall", findAtLeastOneEntity( "Peter" ) );
 		assertSearchResult( "Richard Mayhew", findAtLeastOneEntity( "Richard" ) );

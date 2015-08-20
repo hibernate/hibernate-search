@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.impl.blackhole;
+package org.hibernate.search.backend.impl;
 
 import java.util.List;
 import java.util.Properties;
@@ -14,43 +14,32 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * This backend does not do anything: the Documents are not
- * sent to any index but are discarded.
- * Useful to identify the bottleneck in indexing performance problems,
- * fully disabling the backend system but still building the Documents
- * needed to update an index (loading data from DB).
+ * A {@link BackendQueueProcessor} which applies given index changes locally to the corresponding {@link IndexManager}.
  *
- * @author Sanne Grinovero
+ * @author Gunnar Morling
  */
-public class BlackHoleBackendQueueProcessor implements BackendQueueProcessor {
+public class LocalBackendQueueProcessor implements BackendQueueProcessor {
 
-	private static final Log log = LoggerFactory.make();
+	private IndexManager indexManager;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
-		// no-op
-		log.initializedBlackholeBackend();
+		this.indexManager = indexManager;
 	}
 
 	@Override
 	public void close() {
-		// no-op
-		log.closedBlackholeBackend();
 	}
 
 	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
-		// no-op
-		log.debug( "Discarding a list of LuceneWork" );
+		indexManager.performOperations( workList, monitor );
 	}
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-		// no-op
-		log.debug( "Discarding a single LuceneWork" );
+		indexManager.performStreamOperation( singleOperation, monitor, false );
 	}
 }

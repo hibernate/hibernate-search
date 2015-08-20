@@ -10,26 +10,27 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.jgroups.logging.impl.Log;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.Receiver;
 import org.jgroups.View;
 
-import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.jgroups.logging.impl.Log;
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-
 
 /**
- * Listen for messages from slave nodes and apply them into <code>LuceneBackendQueueProcessor</code>
+ * Listen for messages from slave nodes and apply them into {@link JGroupsBackendQueueProcessor}.
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Ales Justin
- * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
+ *
+ * @see org.hibernate.search.backend.spi.BackendQueueProcessor
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
  * @see org.jgroups.Receiver
  */
@@ -57,9 +58,10 @@ public class JGroupsMasterMessageListener implements Receiver {
 			if ( nodeSelector != null && nodeSelector.isIndexOwnerLocal() ) {
 				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( offset, bufferLength, rawBuffer );
 				final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
-				if ( indexManager != null ) {
+				final BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
+				if ( backendQueueProcessor != null ) {
 					final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
-					applyLuceneWorkLocally( queue, indexManager, message );
+					applyLuceneWorkLocally( queue, backendQueueProcessor, message );
 				}
 				else {
 					log.messageReceivedForUndefinedIndex( indexName );
@@ -77,7 +79,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 		}
 	}
 
-	private void applyLuceneWorkLocally(List<LuceneWork> queue, IndexManager indexManager, Message message) {
+	private void applyLuceneWorkLocally(List<LuceneWork> queue, BackendQueueProcessor backendQueueProcessor, Message message) {
 		if ( queue != null && !queue.isEmpty() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debugf(
@@ -86,7 +88,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 						message.getSrc()
 				);
 			}
-			indexManager.performOperations( queue, null );
+			backendQueueProcessor.applyWork( queue, null );
 		}
 		else {
 			log.receivedEmptyLuceneWorksInMessage();

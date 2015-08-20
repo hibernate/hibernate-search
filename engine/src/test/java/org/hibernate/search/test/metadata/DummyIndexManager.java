@@ -15,6 +15,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -95,6 +96,9 @@ class DummyIndexManager implements IndexManager {
 	public LuceneWorkSerializer getSerializer() {
 		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
 	}
+
+	@Override
+	public BackendQueueProcessor getBackendQueueProcessor() {
+		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
+	}
 }
-
-

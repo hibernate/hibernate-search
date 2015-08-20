@@ -9,12 +9,11 @@ package org.hibernate.search.backend;
 import java.lang.reflect.Constructor;
 import java.util.Properties;
 
+import org.hibernate.search.backend.impl.LocalBackendQueueProcessor;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -57,7 +56,7 @@ public final class BackendFactory {
 		final BackendQueueProcessor backendQueueProcessor;
 
 		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessor = new LuceneBackendQueueProcessor();
+			backendQueueProcessor = new LocalBackendQueueProcessor();
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
