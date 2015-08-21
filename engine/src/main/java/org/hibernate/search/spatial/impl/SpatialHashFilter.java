@@ -40,7 +40,7 @@ public final class SpatialHashFilter extends Filter {
 	/**
 	 * Search the index for document having the correct spatial hash cell id at given grid level.
 	 *
-	 * @param context the {@link LeafReaderContext} for which to return the {@link }.
+	 * @param context the {@link AtomicReaderContext} for which to return the {@link DocIdSet}.
 	 * @param acceptDocs Bits that represent the allowable docs to match (typically deleted docs but possibly filtering
 	 * other documents)
 	 * @return a {@link DocIdSet} with the document ids matching

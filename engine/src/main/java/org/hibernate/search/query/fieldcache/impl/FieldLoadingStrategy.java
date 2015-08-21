@@ -12,13 +12,11 @@ import java.io.IOException;
 import org.apache.lucene.index.AtomicReaderContext;
 
 /**
- * Using as composition in implementations of {@link org.hibernate.search.query.collector.impl.FieldCacheCollector},
+ * Using as composition in implementations of {@link org.hibernate.search.query.collector.impl.FacetsCollectorDecorator},
  * so that we can reuse different loading strategies in different kinds
  * of Collectors.
  *
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
- * @see org.hibernate.search.query.collector.impl.BigArrayFieldCacheCollectorImpl
- * @see org.hibernate.search.query.collector.impl.MapFieldCacheCollectorImpl
  */
 public interface FieldLoadingStrategy {
 	/**
