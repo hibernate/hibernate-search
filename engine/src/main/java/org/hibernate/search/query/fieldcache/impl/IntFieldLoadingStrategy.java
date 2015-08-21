@@ -18,7 +18,7 @@ import org.apache.lucene.search.FieldCache.Ints;
  * We need a collection of similar implementations, one per each FieldCache.DEFAULT.accessmethod
  * to be able to deal with arrays of primitive values without autoboxing all of them.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @see FieldLoadingStrategy
  */
 public final class IntFieldLoadingStrategy implements FieldLoadingStrategy {

@@ -18,7 +18,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
  * the type of field and its applied bridges. Not all cases can be covered.
  * This class contains helpers to extract the proper parameters to create such a factory.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public final class ClassLoadingStrategySelector {
 

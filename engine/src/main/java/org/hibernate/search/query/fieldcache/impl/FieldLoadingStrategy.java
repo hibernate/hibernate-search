@@ -16,7 +16,7 @@ import org.apache.lucene.index.AtomicReaderContext;
  * so that we can reuse different loading strategies in different kinds
  * of Collectors.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @see org.hibernate.search.query.collector.impl.BigArrayFieldCacheCollectorImpl
  * @see org.hibernate.search.query.collector.impl.MapFieldCacheCollectorImpl
  */

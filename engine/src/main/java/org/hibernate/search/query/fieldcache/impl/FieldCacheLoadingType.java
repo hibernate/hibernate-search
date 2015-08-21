@@ -14,7 +14,7 @@ import java.util.Map;
  * Just an indirection to different constructors, pointing to the proper
  * FieldCache extractor per type.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public enum FieldCacheLoadingType {
 	STRING_ARRAY {

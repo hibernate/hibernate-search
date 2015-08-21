@@ -20,7 +20,7 @@ import org.apache.lucene.util.BytesRef;
  * to be able to deal with arrays of primitive values without autoboxing all of them.
  * This particular implementation doesn't do any conversion.
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @see FieldLoadingStrategy
  */
 public final class StringFieldLoadingStrategy implements FieldLoadingStrategy {
