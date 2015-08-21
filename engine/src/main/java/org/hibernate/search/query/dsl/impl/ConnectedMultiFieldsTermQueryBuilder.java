@@ -21,6 +21,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
@@ -75,9 +76,16 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private Query createQuery(FieldContext fieldContext, ConversionContext conversionContext) {
 		final Query perFieldQuery;
 		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
-		final FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
-		if ( fieldBridge instanceof NumericFieldBridge ) {
-			return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
+
+		// Handle non-null numeric values
+		if ( value != null ) {
+			FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
+			if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
+				fieldBridge = ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap();
+			}
+			if ( fieldBridge instanceof NumericFieldBridge ) {
+				return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
+			}
 		}
 
 		final String searchTerm = buildSearchTerm( fieldContext, documentBuilder, conversionContext );
