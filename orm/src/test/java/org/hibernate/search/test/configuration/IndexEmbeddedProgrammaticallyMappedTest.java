@@ -48,13 +48,13 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 						.indexEmbedded()
 							.includeEmbeddedObjectId( true );
 
-			setupTestData( builder );
+			Long scotlandCountryId = setupTestData( builder );
 
 			FullTextSession s = builder.openFullTextSession();
 
 			// when
 			QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
-			org.apache.lucene.search.Query luceneQuery = parser.parse( "country.id:1" );
+			org.apache.lucene.search.Query luceneQuery = parser.parse( "country.id:" + scotlandCountryId );
 
 			Transaction tx = s.beginTransaction();
 
@@ -120,13 +120,13 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 						.property( "name", ElementType.METHOD )
 							.field();
 
-			setupTestData( builder );
+			Long scotlandCountryId = setupTestData( builder );
 
 			FullTextSession s = builder.openFullTextSession();
 
 			// when
 			QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
-			org.apache.lucene.search.Query luceneQuery = parser.parse( "country.id:1" );
+			org.apache.lucene.search.Query luceneQuery = parser.parse( "country.id:" + scotlandCountryId );
 
 			Transaction tx = s.beginTransaction();
 
@@ -155,7 +155,7 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 			.addAnnotatedClass( Country.class );
 	}
 
-	public void setupTestData(FullTextSessionBuilder builder) {
+	public Long setupTestData(FullTextSessionBuilder builder) {
 		FullTextSession s = builder.openFullTextSession();
 		Transaction tx = s.beginTransaction();
 
@@ -173,8 +173,10 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 		s.persist( bobsPlace );
 		s.persist( alicesPlace );
 		s.persist( scotland );
+		Long scotlandId = scotland.getId();
 
 		tx.commit();
 		s.close();
+		return scotlandId;
 	}
 }
