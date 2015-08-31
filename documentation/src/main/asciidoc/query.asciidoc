@@ -802,7 +802,7 @@ properties:
 ----
 org.hibernate.search.FullTextQuery query =
     s.createFullTextQuery(luceneQuery, Book.class);
-setProjection("id", "summary", "body", "mainAuthor.name");
+query.setProjection("id", "summary", "body", "mainAuthor.name");
 List results = query.list();
 Object[] firstResult = (Object[]) results.get(0);
 Integer id = firstResult[0];
