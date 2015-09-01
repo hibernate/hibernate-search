@@ -140,13 +140,12 @@
 
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
         <lucene.module.slot>5.2</lucene.module.slot>
-        <jgroups.module.slot>ispn-7.2</jgroups.module.slot>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>5.2.1</luceneVersion>
         <infinispanVersion>8.0.0.Final</infinispanVersion>
-        <jgroupsVersion>3.6.2.Final</jgroupsVersion>
+        <jgroupsVersion>3.6.4.Final</jgroupsVersion>
         <hibernateVersion>5.0.0.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>5.0.0.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
