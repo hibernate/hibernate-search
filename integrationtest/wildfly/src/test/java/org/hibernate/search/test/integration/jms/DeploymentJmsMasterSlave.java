@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.integration.jms;
 
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
+
 import java.io.File;
 
 import org.hibernate.search.cfg.Environment;
@@ -117,6 +119,10 @@ public final class DeploymentJmsMasterSlave {
 					// The deployment Scanner is disabled as the JipiJapa integration is not available because of the custom Hibernate ORM module:
 					.clazz( RegisteredMember.class.getName() )
 					.getOrCreateProperties()
+						.createProperty()
+							.name( "wildfly.jpa.hibernate.search.module" )
+							.value( getWildFlyModuleIdentifier() )
+							.up()
 						.createProperty()
 							.name( "hibernate.hbm2ddl.auto" )
 							.value( "create-drop" )
