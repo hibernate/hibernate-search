@@ -167,7 +167,7 @@
         <arquillianVersion>1.1.8.Final</arquillianVersion>
         <arquillianContainerVersion>1.0.0.Final</arquillianContainerVersion>
         <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
-        <wildflyVersion>10.0.0.Alpha6</wildflyVersion>
+        <wildflyVersion>10.0.0.Beta2</wildflyVersion>
 
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
