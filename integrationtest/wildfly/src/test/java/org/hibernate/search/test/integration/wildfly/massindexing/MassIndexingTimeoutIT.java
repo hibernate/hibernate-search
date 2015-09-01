@@ -15,7 +15,6 @@ import java.util.TimeZone;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -30,6 +29,7 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -49,7 +49,6 @@ public class MassIndexingTimeoutIT {
 				.create( WebArchive.class, MassIndexingTimeoutIT.class.getSimpleName() + ".war" )
 				.addClasses( Concert.class, ConcertManager.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsManifestResource( VersionTestHelper.moduleDependencyManifest(), "MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
 	}
@@ -67,6 +66,7 @@ public class MassIndexingTimeoutIT {
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
 					.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
 					.createProperty().name( "hibernate.jdbc.batch_size" ).value( "50" ).up()
+					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );

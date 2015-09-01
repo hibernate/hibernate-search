@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.integration.jgroups;
 
-import static org.hibernate.search.test.integration.VersionTestHelper.addDependencyToSearchModule;
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 
 import java.io.File;
 
@@ -37,13 +37,11 @@ public class JGroupsDeploymentHelper {
 
 	public static Archive<?> createMaster(String deploymentName, int refreshPeriodInSec, File tmpDir) throws Exception {
 		WebArchive master = baseArchive( deploymentName, masterPersistenceXml( deploymentName, refreshPeriodInSec, tmpDir ) );
-		addDependencyToSearchModule( master );
 		return master;
 	}
 
 	public static Archive<?> createSlave(String deploymentName, int refreshPeriodInSec, File tmpDir) throws Exception {
 		WebArchive slave = baseArchive( deploymentName, slavePersistenceXml( deploymentName, refreshPeriodInSec, tmpDir ) );
-		addDependencyToSearchModule( slave );
 		return slave;
 	}
 
@@ -88,6 +86,10 @@ public class JGroupsDeploymentHelper {
 					// The deployment Scanner is disabled as the JipiJapa integration is not available because of the custom Hibernate ORM module:
 					.clazz( RegisteredMember.class.getName() )
 					.getOrCreateProperties()
+						.createProperty()
+							.name( "wildfly.jpa.hibernate.search.module" )
+							.value( getWildFlyModuleIdentifier() )
+							.up()
 						.createProperty()
 							.name( "hibernate.search.services.jgroups.configurationFile" )
 							.value( "testing-flush-loopback.xml" )
