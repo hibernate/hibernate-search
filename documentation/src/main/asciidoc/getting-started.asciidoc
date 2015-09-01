@@ -99,12 +99,11 @@ also provides the modules to enable caching or use a connection pool.
 
 If you are creating an application to be deployed on WildFly you're lucky:
 Hibernate Search is included in the application server.
-This means that you don't need to package it along with your application but remember that you need
-to activate the module, see <<search-configuration-deploy-on-wildfly>> for details.
+This means that you don't need to package it along with your application, unless you want to use a different version
+than the one included.
+The Hibernate Search dependencies are automatically activated since WildFly 10; see <<search-configuration-deploy-on-wildfly>> for details.
 
-Due to he modular design of WildFly, you can also bundle a more recent version of
-Hibernate Search than the one included in the popular application server.
-This is also explained further in <<search-configuration-deploy-on-wildfly>>.
+Since this version of Hibernate Search requires Hibernate ORM 5.0, we will assume you're running at least WildFly 10.
 
 === Configuration
 
