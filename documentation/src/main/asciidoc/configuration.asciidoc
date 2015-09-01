@@ -1454,8 +1454,7 @@ link:https://docs.jboss.org/author/display/WFLY10/Class+Loading+in+WildFly[Class
 ====
 Modular classloading is a feature of JBoss EAP 6 as well, but if you are using JBoss EAP, you're
 reading the wrong version of the user guide! JBoss EAP subscriptions include official support for
-Hibernate Search (as part of the WFK) and come with a different edition of this guide specifically
-tailored for EAP users.
+Hibernate Search and come with a different edition of this guide specifically tailored for EAP users.
 ====
 
 ==== Using Infinispan with Hibernate Search on WildFly
