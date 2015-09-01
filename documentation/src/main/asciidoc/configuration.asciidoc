@@ -442,7 +442,7 @@ configuration.
 
 The file `jgroups-ec2.xml` used in the example above is one of the several JGroups configurations
 included in Infinispan. It is a good starting point to run on Amazon EC2 networks. For more details
-and examples see link:http://infinispan.org/docs/7.2.x/user_guide/user_guide.html#_use_one_of_the_pre_configured_jgroups_files[usage of pre-configured JGroups stacks]
+and examples see link:http://infinispan.org/docs/8.0.x/user_guide/user_guide.html#_use_one_of_the_pre_configured_jgroups_files[usage of pre-configured JGroups stacks]
 in the Infinispan configuration guide.
 
 [[configuration-worker]]

@@ -79,12 +79,8 @@ The project is split in several Maven modules:
 
 * _engine_: The engine of the project. Most of the beef is here.
 
-* _infinispan_: Backend storing indexes in [Infinispan](http://infinispan.org/).
-
 * _integrationtest_: Integration tests with various technologies like WildFly, Spring or Karaf.
 Also includes performance tests.
-
-* _legacy_: Old Maven GAV kept for backward compatibility.
 
 * _modules_: Integration with [WildFly](http://www.wildfly.org/) using JBoss Modules.
 
