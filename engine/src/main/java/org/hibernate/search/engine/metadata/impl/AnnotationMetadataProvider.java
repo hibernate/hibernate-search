@@ -959,9 +959,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 
 		String nullToken = determineNullToken( fieldAnnotation, configContext );
-		if ( nullToken != null && fieldBridge instanceof TwoWayFieldBridge ) {
-			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullToken );
-		}
+		fieldBridge = NullEncodingTwoWayFieldBridge.wrapForNullEncodingIfNeeded( fieldBridge, nullToken );
 		Analyzer analyzer = determineAnalyzer( fieldAnnotation, member, configContext );
 
 		// adjust the type analyzer

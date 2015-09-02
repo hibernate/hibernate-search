@@ -10,22 +10,33 @@ package org.hibernate.search.bridge.builtin.impl;
 import org.apache.lucene.document.Document;
 
 import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.impl.NullEncodingCapable;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
+public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge, NullEncodingCapable {
 
 	private static final Log LOG = LoggerFactory.make();
 
 	private final TwoWayFieldBridge fieldBridge;
 	private final String nullMarker;
 
-	public NullEncodingTwoWayFieldBridge(TwoWayFieldBridge fieldBridge, String nullMarker) {
+	public static FieldBridge wrapForNullEncodingIfNeeded(FieldBridge fieldBridge, String nullMarker) {
+		if ( nullMarker != null && fieldBridge instanceof TwoWayFieldBridge && ! ( fieldBridge instanceof NullEncodingCapable ) ) {
+			return new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullMarker );
+		}
+		else {
+			return fieldBridge;
+		}
+	}
+
+	private NullEncodingTwoWayFieldBridge(TwoWayFieldBridge fieldBridge, String nullMarker) {
 		this.fieldBridge = fieldBridge;
 		this.nullMarker = nullMarker;
 	}
