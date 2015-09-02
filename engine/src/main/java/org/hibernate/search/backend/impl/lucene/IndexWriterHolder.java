@@ -19,7 +19,6 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.similarities.Similarity;
-import org.apache.lucene.store.Directory;
 import org.hibernate.search.backend.impl.lucene.analysis.ConcurrentlyMutableAnalyzer;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
@@ -184,18 +183,10 @@ class IndexWriterHolder {
 		log.forcingReleaseIndexWriterLock();
 		writerInitializationLock.lock();
 		try {
-			try {
-				IndexWriter indexWriter = writer.getAndSet( null );
-				if ( indexWriter != null ) {
-					indexWriter.close();
-					log.trace( "IndexWriter closed" );
-				}
-			}
-			finally {
-				final Directory directory = directoryProvider.getDirectory();
-				if ( IndexWriter.isLocked( directory ) ) {
-					directory.makeLock( IndexWriter.WRITE_LOCK_NAME ).close();
-				}
+			IndexWriter indexWriter = writer.getAndSet( null );
+			if ( indexWriter != null ) {
+				indexWriter.close();
+				log.trace( "IndexWriter closed" );
 			}
 		}
 		catch (IOException ioe) {
