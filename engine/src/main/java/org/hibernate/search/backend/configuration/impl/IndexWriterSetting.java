@@ -116,13 +116,11 @@ public enum IndexWriterSetting implements Serializable {
 			log.deprecatedConfigurationPropertyIsIgnored( "term_index_interval" );
 		}
 	},
-	/**
-	 * @see org.apache.lucene.index.IndexWriterConfig#setMaxThreadStates(int)
-	 */
+	@Deprecated
 	MAX_THREAD_STATES( "max_thread_states" ) {
 		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
-			writerConfig.setMaxThreadStates( value );
+			log.deprecatedConfigurationPropertyIsIgnored( "max_thread_states" );
 		}
 	},
 	/**
