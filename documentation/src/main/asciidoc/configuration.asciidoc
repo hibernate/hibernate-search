@@ -1378,8 +1378,8 @@ configuration.
 Hibernate Search is included in the WildFly application server, and since WildFly 10 the module
 is automatically activated (added to the classpath of your deployment) if you have any indexed entities.
 
-Alternatively you can opt to use a different version of the module, by downloading and unzipping a different
-moduleset and setting the `wildfly.jpa.hibernate.search.module` in your `persistence.xml`.
+Alternatively you can opt to use a different version of the module by downloading and unzipping a different
+moduleset and setting the `wildfly.jpa.hibernate.search.module` property in your `persistence.xml`.
 
 The modules system in WildFly allows to safely run multiple versions of Hibernate ORM and
 Hibernate Search in parallel, but if you download an alternative version make sure the Hibernate Search version you choose
