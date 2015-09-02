@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -39,9 +40,9 @@ public class NumericTypeWithNullEncodingTest {
 
 	@Before
 	public void prepareTestData() {
-		storeData( "title-one", 1 );
-		storeData( "title-two", 2 );
-		storeData( "title-three", 3 );
+		storeData( "title-one", 1, 1 );
+		storeData( "title-two", 2, null );
+		storeData( "title-three", 3, 3 );
 	}
 
 	@Test
@@ -62,7 +63,6 @@ public class NumericTypeWithNullEncodingTest {
 		Assert.assertEquals( "title-two", entityInfo.getProjection()[0] );
 	}
 
-
 	@Test
 	public void verifyExplicitKeywordQuery() {
 		Query query = getQueryBuilder()
@@ -78,6 +78,42 @@ public class NumericTypeWithNullEncodingTest {
 		Assert.assertEquals( 1, queryEntityInfos.size() );
 		EntityInfo entityInfo = queryEntityInfos.get( 0 );
 		Assert.assertEquals( "title-two", entityInfo.getProjection()[0] );
+	}
+
+	@Test
+	public void verifyCustomNullEncoding() {
+		Query query = getQueryBuilder()
+					.keyword()
+					.onField( "nullableAge" )
+					.matching( null )
+					.createQuery();
+
+		Assert.assertTrue( query instanceof TermQuery );
+		TermQuery q = (TermQuery) query;
+		Assert.assertEquals( "-1", q.toString( "nullableAge" ) );
+
+		List<EntityInfo> queryEntityInfos = runProjection( query, "title" );
+
+		Assert.assertEquals( 1, queryEntityInfos.size() );
+		EntityInfo entityInfo = queryEntityInfos.get( 0 );
+		Assert.assertEquals( "title-two", entityInfo.getProjection()[0] );
+	}
+
+	@Test
+	public void verifyNullEncoding() {
+		Query query = getQueryBuilder()
+					.keyword()
+					.onField( "age" )
+					.matching( null )
+					.createQuery();
+
+		Assert.assertTrue( query instanceof TermQuery );
+		TermQuery q = (TermQuery) query;
+		Assert.assertEquals( "_null_", q.toString( "age" ) );
+
+		List<EntityInfo> queryEntityInfos = runProjection( query, "title" );
+
+		Assert.assertEquals( 0, queryEntityInfos.size() );
 	}
 
 	private List<EntityInfo> runProjection(Query query, String fieldName) {
@@ -97,10 +133,11 @@ public class NumericTypeWithNullEncodingTest {
 				.get();
 	}
 
-	private void storeData(String title, int value) {
+	private void storeData(String title, int value, Integer nullableAge) {
 		SomeEntity entry = new SomeEntity();
 		entry.title = title;
 		entry.age = value;
+		entry.nullableAge = nullableAge;
 
 		Work work = new Work( entry, entry.title, WorkType.ADD, false );
 		TransactionContextForTest tc = new TransactionContextForTest();
@@ -115,7 +152,9 @@ public class NumericTypeWithNullEncodingTest {
 
 		@Field(indexNullAs = Field.DEFAULT_NULL_TOKEN)
 		int age;
-	}
 
+		@Field(indexNullAs = "-1")
+		Integer nullableAge;
+	}
 
 }
