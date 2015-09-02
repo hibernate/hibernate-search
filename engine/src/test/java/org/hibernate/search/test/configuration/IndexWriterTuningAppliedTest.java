@@ -39,18 +39,6 @@ public class IndexWriterTuningAppliedTest {
 		.withProperty( "hibernate.search.index2.indexwriter.infostream", "true" );
 
 	@Test
-	public void testIndexWriterTuningApplied() throws IOException {
-		AbstractWorkspaceImpl dvdsWorkspace = sfHolder.extractWorkspace( Dvd.class );
-		IndexWriter dvdsIndexWriter = dvdsWorkspace.getIndexWriter();
-		try {
-			Assert.assertEquals( 23, dvdsIndexWriter.getConfig().getMaxThreadStates() );
-		}
-		finally {
-			dvdsIndexWriter.close();
-		}
-	}
-
-	@Test
 	public void testInfoStream() throws IOException {
 		//Enable trace level on the magic category:
 		Logger.getLogger( LogCategory.INFOSTREAM_LOGGER_CATEGORY.getName() ).setLevel( Level.TRACE );
@@ -65,18 +53,6 @@ public class IndexWriterTuningAppliedTest {
 		finally {
 			booksIndexWriter.close();
 			dvdsIndexWriter.close();
-		}
-	}
-
-	@Test
-	public void testIndexWriterTuningAppliedOnDefault() throws IOException {
-		AbstractWorkspaceImpl booksWorkspace = sfHolder.extractWorkspace( Book.class );
-		IndexWriter booksIndexWriter = booksWorkspace.getIndexWriter();
-		try {
-			Assert.assertEquals( 7, booksIndexWriter.getConfig().getMaxThreadStates() );
-		}
-		finally {
-			booksIndexWriter.close();
 		}
 	}
 
