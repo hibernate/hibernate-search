@@ -1055,6 +1055,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( fieldBridge instanceof ContainerBridge ) {
 			fieldBridge = ( (ContainerBridge) fieldBridge ).getElementBridge();
 		}
+		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
+			fieldBridge = ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap();
+		}
 
 		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
 		// field bridge
