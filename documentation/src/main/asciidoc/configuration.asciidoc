@@ -1168,13 +1168,6 @@ This optimization will not be applied on classes using a `@ClassBridge` or a `@D
 Boolean parameter, use "true" or "false".
 |true
 
-|hibernate.search.[default\|<indexname>].indexwriter.max_thread_states
-|Lucene's `IndexWriter` can apply writes in parallel, but this property controls the limit of
-parallelism. If you have many cores and contention on the internal structures of the `IndexWriter`
-becomes a bottleneck you should configure an higher value, at the cost of slightly higher memory
-consumption.
-|8
-
 |hibernate.search.[default\|<indexname>].indexwriter.infostream
 |Enable low level trace information about Lucene's internal components.
 Will cause significant performance degradation: should only be used for troubleshooting purposes.
