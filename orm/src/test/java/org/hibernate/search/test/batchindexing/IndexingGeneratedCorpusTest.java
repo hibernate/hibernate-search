@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.Lock;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
@@ -175,8 +175,7 @@ public class IndexingGeneratedCorpusTest {
 		SearchIntegrator searchIntegrator = builder.getSearchFactory().unwrap( SearchIntegrator.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchIntegrator.getIndexBinding( type ).getIndexManagers()[0];
 		Directory directory = indexManager.getDirectoryProvider().getDirectory();
-		Lock writeLock = directory.makeLock( "write.lock" );
-		Assert.assertEquals( isLocked, writeLock.isLocked() );
+		Assert.assertEquals( isLocked, IndexWriter.isLocked( directory ) );
 	}
 
 	@SuppressWarnings("unchecked")

@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+
 /**
  * @author Sanne Grinovero
  */
@@ -62,13 +64,13 @@ public class CustomLockProviderTest {
 	}
 
 	@Test
-	public void testUseOfNativeLockingFactory() {
+	public void testUseOfNativeLockingFactory() throws IOException {
 		testUseOfSelectedLockingFactory( null, NATIVE_LOCK_FQN, false );
 		testUseOfSelectedLockingFactory( "native", NATIVE_LOCK_FQN, false );
 	}
 
 	@Test
-	public void testUseOfSingleLockingFactory() {
+	public void testUseOfSingleLockingFactory() throws IOException {
 		testUseOfSelectedLockingFactory( "single", SINGLE_INSTANCE_LOCK_FQN, false );
 		testUseOfSelectedLockingFactory( "single", SINGLE_INSTANCE_LOCK_FQN, true );
 		//default for RAMDirectory:
@@ -76,11 +78,11 @@ public class CustomLockProviderTest {
 	}
 
 	@Test
-	public void testUseOfSimpleLockingFactory() {
+	public void testUseOfSimpleLockingFactory() throws IOException {
 		testUseOfSelectedLockingFactory( "simple", SIMPLE_LOCK_FQN, false );
 	}
 
-	private void testUseOfSelectedLockingFactory(String optionName, String expectedLockTypeName, boolean useRamDirectory) {
+	private void testUseOfSelectedLockingFactory(String optionName, String expectedLockTypeName, boolean useRamDirectory) throws IOException {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		FullTextSessionBuilder fullTextSessionBuilder = builder.addAnnotatedClass( SnowStorm.class );
 		if ( optionName != null ) {
@@ -96,8 +98,9 @@ public class CustomLockProviderTest {
 			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
 			DirectoryProvider<?> directoryProvider = indexManager.getDirectoryProvider();
 			Directory directory = directoryProvider.getDirectory();
-			Lock lock = directory.makeLock( "my-lock" );
-			assertEquals( expectedLockTypeName, lock.getClass().getName() );
+			try ( Lock lock = directory.obtainLock( "my-lock" ) ) {
+				assertEquals( expectedLockTypeName, lock.getClass().getName() );
+			}
 		}
 		finally {
 			builder.close();
