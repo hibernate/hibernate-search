@@ -139,11 +139,11 @@
         <minJdkVersion>1.8</minJdkVersion>
 
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
-        <lucene.module.slot>5.2</lucene.module.slot>
+        <lucene.module.slot>5.3</lucene.module.slot>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>5.2.1</luceneVersion>
+        <luceneVersion>5.3.0</luceneVersion>
         <infinispanVersion>8.0.0.Final</infinispanVersion>
         <jgroupsVersion>3.6.4.Final</jgroupsVersion>
         <hibernateVersion>5.0.0.Final</hibernateVersion>
