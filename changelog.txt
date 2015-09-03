@@ -1,6 +1,28 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.4.0.Final (3-9-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1960] - TypeMetadata and QueryValidator fail to recognize an Id being encoded as Numeric
+    * [HSEARCH-1968] - NPE on Faceting queries which represent and empty result
+    * [HSEARCH-1973] - ConnectedMultiFieldsTermQueryBuilder must unwrap a NullEncodingTwoWayFieldBridge before checking for NumericFieldBridge
+    * [HSEARCH-1981] - QueryBuilder should not tokenize the null-token when searching for null
+
+** Task
+    * [HSEARCH-1949] - FSDirectoryTest is leaking file handles when run on Windows
+    * [HSEARCH-1950] - Integration tests should not hardcode the module slot
+    * [HSEARCH-1953] - Javadoc should be built by linking to the one from Hibernate ORM 5.0
+    * [HSEARCH-1972] - Upgrade to Hibernate ORM 5.0.0.Final
+    * [HSEARCH-1978] - Fix example in projection documentation
+    * [HSEARCH-1979] - Upgrade to WildFly 10.0.0.Beta2
+    * [HSEARCH-1980] - Upgrade to JGroups 3.6.4.Final
+
+** Improvement
+    * [HSEARCH-1952] - ScheduledCommitPolicy might open unnecessary IndexWriter instances
+
+
 Version 5.4.0.CR2 (4-8-2015)
 ------------------------
 
