@@ -16,8 +16,6 @@ Version 5.4.0.Final (3-9-2015)
     * [HSEARCH-1953] - Javadoc should be built by linking to the one from Hibernate ORM 5.0
     * [HSEARCH-1972] - Upgrade to Hibernate ORM 5.0.0.Final
     * [HSEARCH-1978] - Fix example in projection documentation
-    * [HSEARCH-1979] - Upgrade to WildFly 10.0.0.Beta2
-    * [HSEARCH-1980] - Upgrade to JGroups 3.6.4.Final
 
 ** Improvement
     * [HSEARCH-1952] - ScheduledCommitPolicy might open unnecessary IndexWriter instances
