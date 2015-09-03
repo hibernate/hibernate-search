@@ -86,6 +86,7 @@ public abstract class TestScenario {
 		Properties properties = new Properties();
 		properties.setProperty( "hibernate.hbm2ddl.auto", "create" );
 		properties.setProperty( "hibernate.search.default.lucene_version", "LUCENE_CURRENT" );
+		properties.setProperty( "wildfly.jpa.hibernate.search.module", "none" );
 		return properties;
 	}
 
