@@ -67,7 +67,7 @@ class JavaTimeBridgeProvider implements BridgeProvider {
 	private static Map<String, FieldBridge> populateBridgeMap(ClassLoaderService classLoaderService) {
 		Map<String, FieldBridge> bridges = new HashMap<String, FieldBridge>( 12 );
 		if ( classExists( classLoaderService, "java.time.Year" ) ) {
-			bridges.put( Year.class.getName(), new TwoWayString2FieldBridgeAdaptor( YearBridge.INSTANCE ) );
+			bridges.put( Year.class.getName(), YearBridge.INSTANCE );
 		}
 		if ( classExists( classLoaderService, "java.time.YearMonth" ) ) {
 			bridges.put( YearMonth.class.getName(), new TwoWayString2FieldBridgeAdaptor( YearMonthBridge.INSTANCE ) );
@@ -103,7 +103,7 @@ class JavaTimeBridgeProvider implements BridgeProvider {
 			bridges.put( Period.class.getName(), new TwoWayString2FieldBridgeAdaptor( PeriodBridge.INSTANCE ) );
 		}
 		if ( classExists( classLoaderService, "java.time.Duration" ) ) {
-			bridges.put( Duration.class.getName(), new TwoWayString2FieldBridgeAdaptor( DurationBridge.INSTANCE ) );
+			bridges.put( Duration.class.getName(), DurationBridge.INSTANCE );
 		}
 		if ( classExists( classLoaderService, "java.time.Instant" ) ) {
 			bridges.put( Instant.class.getName(), new TwoWayString2FieldBridgeAdaptor( InstantBridge.INSTANCE ) );

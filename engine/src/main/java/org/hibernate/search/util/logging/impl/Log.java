@@ -904,4 +904,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 296, value = "%s not found on the classpath; the built-in bridge won't be available")
 	void javaTimeBridgeWontBeAdded(String string);
 
+	@Message(id = 297, value = " Value of '%2$s' for type '%1$s' is too big for the conversion")
+	SearchException valueTooLargeForConvertionException(@FormatWith(ClassFormatter.class) Class<?> type, Object duration, @Cause Exception ae);
+
 }
