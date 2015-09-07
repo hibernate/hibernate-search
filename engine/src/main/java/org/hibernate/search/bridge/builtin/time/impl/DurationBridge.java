@@ -7,26 +7,24 @@
 package org.hibernate.search.bridge.builtin.time.impl;
 
 import java.time.Duration;
-import java.util.Locale;
 
-import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.apache.lucene.document.Document;
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Converts a {@link Duration} to a {@link String}.
+ * Converts a {@link Duration} to a {@link Long} expressing the duration in nanoseconds.
  * <p>
- * The string is obtained concatenating the number of seconds with the nano of seconds.
- * The values are padded with 0 to allow field sorting.
+ * If the duration cannot be expressed using a long, a {@link org.hibernate.search.exception.SearchException} get thrown.
  *
  * @author Davide D'Alto
  */
-public class DurationBridge implements TwoWayStringBridge {
+public class DurationBridge implements TwoWayFieldBridge, NumericTimeBridge {
 
 	private static final Log log = LoggerFactory.make();
-	private static final int SECONDS_PADDING = 20;
-	private static final int NANOS_PADDING = 9;
-	private static final String FORMAT = "%+0" + SECONDS_PADDING + "d%0" + NANOS_PADDING + "d";
 
 	public static final DurationBridge INSTANCE = new DurationBridge();
 
@@ -39,25 +37,36 @@ public class DurationBridge implements TwoWayStringBridge {
 			return null;
 		}
 
-		Duration duration = (Duration) object;
-		long seconds = duration.getSeconds();
-		int nano = duration.getNano();
-		return String.format( Locale.ROOT, FORMAT, seconds, nano );
+		return String.valueOf( toNanos( (Duration) object ) );
 	}
 
 	@Override
-	public Object stringToObject(String stringValue) {
-		if ( stringValue == null ) {
-			return null;
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+		if ( value != null ) {
+			Long nanos = toNanos( (Duration) value );
+			luceneOptions.addNumericFieldToDocument( name, nanos, document );
 		}
+	}
 
+	private Long toNanos(Duration value) {
 		try {
-			long seconds = Long.parseLong( stringValue.substring( 0, SECONDS_PADDING ) );
-			int nano = Integer.parseInt( stringValue.substring( SECONDS_PADDING ) );
-			return Duration.ofSeconds( seconds, nano );
+			Long nanos = value.toNanos();
+			return nanos;
 		}
-		catch (NumberFormatException e) {
-			throw log.parseException( stringValue, Duration.class, e );
+		catch (ArithmeticException ae) {
+			throw log.valueTooLargeForConvertionException( Duration.class, value, ae );
 		}
+	}
+
+	@Override
+	public Object get(String name, Document document) {
+		String nanosFromIndex = document.get( name );
+		Long nanos = Long.valueOf( nanosFromIndex );
+		return Duration.ofNanos( nanos );
+	}
+
+	@Override
+	public NumericEncodingType getEncodingType() {
+		return NumericEncodingType.LONG;
 	}
 }

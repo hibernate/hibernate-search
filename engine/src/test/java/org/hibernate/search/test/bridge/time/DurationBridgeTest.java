@@ -11,62 +11,62 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.time.Duration;
 
 import org.hibernate.search.bridge.builtin.time.impl.DurationBridge;
+import org.hibernate.search.exception.SearchException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Davide D'Alto
  */
 public class DurationBridgeTest {
 
+	private static final long NANOS_PER_SECOND = 1000_000_000L;
+
 	private static final DurationBridge BRIDGE = DurationBridge.INSTANCE;
 
-	private static final Duration MAX_DURATION = Duration.ofSeconds( Long.MAX_VALUE, 999_999_999 );
-	private static final Duration MIN_DURATION = Duration.ofSeconds( Long.MIN_VALUE, 0 );
-	private static final Duration CUSTOM_DURATION = Duration.ofSeconds( -5807L, 10 );
+	private static final Duration MAX_DURATION = Duration.ofNanos( Long.MAX_VALUE );
+	private static final Duration MIN_DURATION = Duration.ofSeconds( Long.MIN_VALUE / NANOS_PER_SECOND, 999_999_999 );
+	private static final Duration CUSTOM_DURATION = Duration.ofSeconds( -5808L, 10 );
 	private static final Duration ZERO_DURATION = Duration.ZERO;
+	private static final Duration OUT_OF_RANGE_DURATION = Duration.ofSeconds( Long.MAX_VALUE, 999_999_999L );
 
-	private static final String MAX = "+9223372036854775807" + "999999999";
-	private static final String MIN = "-9223372036854775808" + "000000000";
-	private static final String CST = "-0000000000000005807" + "000000010";
-	private static final String ZER = "+0000000000000000000" + "000000000";
+	@Rule
+	public final ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void testMaxObjectToString() throws Exception {
-		assertThat( BRIDGE.objectToString( MAX_DURATION ) ).isEqualTo( MAX );
+		assertThat( BRIDGE.objectToString( MAX_DURATION ) ).isEqualTo( String.valueOf( MAX_DURATION.toNanos() ) );
 	}
 
 	@Test
 	public void testMinObjectToString() throws Exception {
-		assertThat( BRIDGE.objectToString( MIN_DURATION ) ).isEqualTo( MIN );
+		assertThat( BRIDGE.objectToString( MIN_DURATION ) ).isEqualTo( String.valueOf( MIN_DURATION.toNanos() ) );
 	}
 
 	@Test
 	public void testPaddingObjectToString() throws Exception {
-		assertThat( BRIDGE.objectToString( CUSTOM_DURATION ) ).isEqualTo( CST );
+		assertThat( BRIDGE.objectToString( CUSTOM_DURATION ) ).isEqualTo( String.valueOf( CUSTOM_DURATION.toNanos() ) );
 	}
 
 	@Test
 	public void testZeroObjectToString() throws Exception {
-		assertThat( BRIDGE.objectToString( ZERO_DURATION ) ).isEqualTo( ZER );
+		assertThat( BRIDGE.objectToString( ZERO_DURATION ) ).isEqualTo( "0" );
 	}
 
 	@Test
-	public void testMaxStringToObject() throws Exception {
-		assertThat( BRIDGE.stringToObject( MAX ) ).isEqualTo( MAX_DURATION );
+	public void testExceptionValueTooSmall() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000291" );
+
+		BRIDGE.objectToString( Duration.ofSeconds( Long.MIN_VALUE / NANOS_PER_SECOND - 1, 999_999_999 ) );
 	}
 
 	@Test
-	public void testMinStringToObject() throws Exception {
-		assertThat( BRIDGE.stringToObject( MIN ) ).isEqualTo( MIN_DURATION );
-	}
+	public void testExceptionValueTooBig() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000291" );
 
-	@Test
-	public void testPaddingStringToObject() throws Exception {
-		assertThat( BRIDGE.stringToObject( CST ) ).isEqualTo( CUSTOM_DURATION );
-	}
-
-	@Test
-	public void testZeroStringToObject() throws Exception {
-		assertThat( BRIDGE.stringToObject( ZER ) ).isEqualTo( ZERO_DURATION );
+		BRIDGE.objectToString( OUT_OF_RANGE_DURATION );
 	}
 }

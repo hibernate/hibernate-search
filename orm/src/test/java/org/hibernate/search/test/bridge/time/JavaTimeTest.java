@@ -103,7 +103,7 @@ public class JavaTimeTest extends SearchTestBase {
 
 	@Test
 	public void testDuration() throws Exception {
-		Duration value = Duration.ZERO;
+		Duration value = Duration.ofNanos( Long.MAX_VALUE );
 
 		Sample sample = new Sample( 1L, "Duration example" );
 		sample.duration = value;
