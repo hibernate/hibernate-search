@@ -7,8 +7,6 @@
 
 package org.hibernate.search.engine.metadata.impl;
 
-import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,9 +21,7 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-
 import org.hibernate.annotations.common.reflection.ClassLoadingException;
-
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -84,6 +80,8 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
 
 /**
  * A metadata provider which extracts the required information from annotations.
@@ -155,6 +153,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private void checkDocumentId(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
 			boolean isRoot,
 			String prefix,
 			ConfigContext configContext,
@@ -179,7 +178,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( path ) ) {
-				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, configContext, path );
+				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, configContext, path );
 			}
 		}
 
@@ -188,7 +187,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, ConfigContext configContext, String fieldName) {
+	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, PropertyMetadata.Builder propertyMetadataBuilder, ConfigContext configContext, String fieldName) {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
@@ -205,12 +204,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						.idInEmbedded()
 						.build();
 
-		PropertyMetadata propertyMetadata = new PropertyMetadata.Builder( member )
-				.addDocumentField( fieldMetadata )
-				.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) )
-				.build();
-
-		typeMetadataBuilder.addProperty( propertyMetadata );
+		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
 		// property > entity analyzer (no field analyzer)
 		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer(
@@ -601,6 +595,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			String prefix,
 			XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
 			ParseContext parseContext) {
 
 		if ( parseContext.isSpatialNameUsed( spatialAnnotation.name() ) ) {
@@ -625,11 +620,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				.spatial()
 				.build();
 
-		PropertyMetadata propertyMetadata = new PropertyMetadata.Builder( member )
-				.addDocumentField( fieldMetadata )
-				.build();
+		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
-		typeMetadataBuilder.addProperty( propertyMetadata );
 		if ( member.isCollection() ) {
 			parseContext.collectUnqualifiedCollectionRole( member.getName() );
 		}
@@ -757,13 +749,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ConfigContext configContext,
 			PathsContext pathsContext,
 			ParseContext parseContext) {
+
+		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
+		.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
+
 		if ( !isProvidedId ) {
-			checkDocumentId( member, typeMetadataBuilder, isRoot, prefix, configContext, pathsContext, parseContext );
+			checkDocumentId( member, typeMetadataBuilder, propertyMetadataBuilder, isRoot, prefix, configContext, pathsContext, parseContext );
 		}
-		checkForField( member, typeMetadataBuilder, prefix, configContext, pathsContext, parseContext );
-		checkForFields( member, typeMetadataBuilder, prefix, configContext, pathsContext, parseContext );
-		checkForSpatial( member, typeMetadataBuilder, prefix, pathsContext, parseContext );
-		checkForSpatialsAnnotation( member, typeMetadataBuilder, prefix, pathsContext, parseContext );
+
+		checkForField( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, configContext, pathsContext, parseContext );
+		checkForFields( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, configContext, pathsContext, parseContext );
+		checkForSpatial( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, pathsContext, parseContext );
+		checkForSpatialsAnnotation( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, pathsContext, parseContext );
 		checkForAnalyzerDefs( member, configContext );
 		checkForAnalyzerDiscriminator( member, typeMetadataBuilder, configContext );
 		checkForIndexedEmbedded(
@@ -777,6 +774,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		checkForContainedIn( member, typeMetadataBuilder, parseContext );
 
+		PropertyMetadata property = propertyMetadataBuilder.build();
+		if ( !property.getFieldMetadata().isEmpty() ) {
+			typeMetadataBuilder.addProperty( propertyMetadataBuilder.build() );
+		}
 	}
 
 	private void checkForContainedIn(XProperty member, TypeMetadata.Builder typeMetadataBuilder, ParseContext parseContext) {
@@ -861,6 +862,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private void checkForField(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
 			String prefix,
 			ConfigContext configContext,
 			PathsContext pathsContext,
@@ -879,8 +881,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		if ( fieldAnnotation != null ) {
 			if ( isFieldInPath( fieldAnnotation, member, pathsContext, prefix ) || !parseContext.isMaxLevelReached() ) {
-				PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
-						.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
 				Set<Facet> facetAnnotations = findMatchingFacetAnnotations( member, fieldAnnotation.name() );
 				bindFieldAnnotation(
@@ -893,8 +893,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						configContext,
 						parseContext
 				);
-
-				typeMetadataBuilder.addProperty( propertyMetadataBuilder.build() );
 			}
 		}
 	}
@@ -1165,6 +1163,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private void checkForSpatialsAnnotation(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
 			String prefix,
 			PathsContext pathsContext,
 			ParseContext parseContext) {
@@ -1182,6 +1181,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 							prefix,
 							member,
 							typeMetadataBuilder,
+							propertyMetadataBuilder,
 							parseContext
 					);
 				}
@@ -1191,6 +1191,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private void checkForSpatial(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
 			String prefix,
 			PathsContext pathsContext,
 			ParseContext parseContext) {
@@ -1202,7 +1203,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					pathsContext,
 					prefix
 			) || !parseContext.isMaxLevelReached() ) {
-				bindSpatialAnnotation( spatialAnnotation, prefix, member, typeMetadataBuilder, parseContext );
+				bindSpatialAnnotation( spatialAnnotation, prefix, member, typeMetadataBuilder, propertyMetadataBuilder, parseContext );
 			}
 		}
 	}
@@ -1256,6 +1257,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private void checkForFields(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
 			String prefix,
 			ConfigContext configContext,
 			PathsContext pathsContext,
@@ -1270,8 +1272,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						pathsContext,
 						prefix
 				) || !parseContext.isMaxLevelReached() ) {
-					PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
-							.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 					Set<Facet> facetAnnotations = findMatchingFacetAnnotations( member, fieldAnnotation.name() );
 					bindFieldAnnotation(
 							prefix,
@@ -1283,8 +1283,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 							configContext,
 							parseContext
 					);
-
-					typeMetadataBuilder.addProperty( propertyMetadataBuilder.build() );
 				}
 			}
 		}
