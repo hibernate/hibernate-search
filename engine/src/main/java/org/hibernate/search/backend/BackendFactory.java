@@ -9,15 +9,16 @@ package org.hibernate.search.backend;
 import java.lang.reflect.Constructor;
 import java.util.Properties;
 
-import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.backend.impl.LocalBackendQueueProcessor;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -44,19 +45,23 @@ public final class BackendFactory {
 		//not allowed
 	}
 
-	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext buildContext, Properties properties) {
+	public static BackendQueueProcessor createBackend(IndexManager indexManager, WorkerBuildContext buildContext, Properties properties) {
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		return createBackend( backend, indexManager, buildContext, properties );
 	}
 
 	public static BackendQueueProcessor createBackend(String backend,
-			DirectoryBasedIndexManager indexManager,
+			IndexManager indexManager,
 			WorkerBuildContext buildContext,
 			Properties properties) {
 		final BackendQueueProcessor backendQueueProcessor;
 
-		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessor = new LuceneBackendQueueProcessor();
+		if ( StringHelper.isEmpty( backend ) || "local".equalsIgnoreCase( backend ) ) {
+			backendQueueProcessor = new LocalBackendQueueProcessor();
+		}
+		else if ( "lucene".equalsIgnoreCase( backend ) ) {
+			log.deprecatedBackendName();
+			backendQueueProcessor = new LocalBackendQueueProcessor();
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
@@ -102,6 +107,20 @@ public final class BackendFactory {
 					serviceManager
 			);
 		}
+
+		boolean enlistInTransaction = ConfigurationParseHelper.getBooleanValue(
+				properties,
+				Environment.WORKER_ENLIST_IN_TRANSACTION,
+				false
+		);
+		if ( enlistInTransaction && ! ( backendQueueProcessor instanceof BackendQueueProcessor.Transactional ) ) {
+			// We are expecting to use a transactional worker but the backend is not
+			// this is war!
+			backend = StringHelper.isEmpty( backend ) ? "lucene" : backend;
+			throw log.backendNonTransactional( indexManager.getIndexName(), backend );
+
+		}
+
 		backendQueueProcessor.initialize( properties, buildContext, indexManager );
 		return backendQueueProcessor;
 	}

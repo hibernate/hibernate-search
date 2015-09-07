@@ -9,7 +9,7 @@ package org.hibernate.search.test.backend;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -39,7 +39,7 @@ public class WorkQueueLengthConfiguredTest extends SearchTestBase {
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
-		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
+		WorkspaceHolder backend = (WorkspaceHolder) indexManager.getWorkspaceHolder();
 		assertEquals( 5, backend.getIndexResources().getMaxQueueLength() );
 	}
 

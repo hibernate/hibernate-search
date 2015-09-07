@@ -212,7 +212,8 @@ public class SearchIntegratorBuilder {
 
 		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor(
 				documentBuildersIndexedEntities,
-				cfg.getProperties()
+				cfg.getProperties(),
+				buildContext.getAllIndexesManager()
 		);
 		// build worker and back end components
 		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor ) );

@@ -25,7 +25,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
+import org.hibernate.search.backend.impl.LocalBackendQueueProcessor;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Assert;
@@ -46,6 +46,7 @@ public class ConcurrentFlushTest extends SearchTestBase {
 			this.jobNumber = jobNumber;
 		}
 
+		@Override
 		public void run() {
 			Session session = sessionFactory.openSession();
 			try {
@@ -100,7 +101,7 @@ public class ConcurrentFlushTest extends SearchTestBase {
 
 	}
 
-	public static class SlowCountingBackend extends LuceneBackendQueueProcessor {
+	public static class SlowCountingBackend extends LocalBackendQueueProcessor {
 		@Override
 		public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 			// Increment counter
