@@ -36,9 +36,9 @@ import org.hibernate.search.annotations.Store;
 public class MapBridgeTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
-	static final String NULL_NUMERIC_TOKEN = "NULL_NUMERIC_MARKER";
+	static final String NULL_NUMERIC_TOKEN = "-1";
 	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
-	static final String NULL_EMBEDDED_NUMERIC = "EMBEDDED_NUMERIC_NULL";
+	static final String NULL_EMBEDDED_NUMERIC = "-1";
 
 	private Long id;
 	private String name;
