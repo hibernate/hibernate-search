@@ -304,7 +304,7 @@ public class Essay {
 specification. The `grade` field is annotated as Numeric with a slightly larger precisionStep than
 the default.
 
-[[facets-annotation]]
+[[fields-annotation]]
 ==== Mapping properties multiple times
 
 Sometimes one has to map a property multiple times per index, with slightly different indexing
