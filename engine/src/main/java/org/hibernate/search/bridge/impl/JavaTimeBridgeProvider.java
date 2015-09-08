@@ -106,7 +106,7 @@ class JavaTimeBridgeProvider implements BridgeProvider {
 			bridges.put( Duration.class.getName(), DurationBridge.INSTANCE );
 		}
 		if ( classExists( classLoaderService, "java.time.Instant" ) ) {
-			bridges.put( Instant.class.getName(), new TwoWayString2FieldBridgeAdaptor( InstantBridge.INSTANCE ) );
+			bridges.put( Instant.class.getName(), InstantBridge.INSTANCE );
 		}
 		if ( bridges.isEmpty() ) {
 			bridges = Collections.emptyMap();

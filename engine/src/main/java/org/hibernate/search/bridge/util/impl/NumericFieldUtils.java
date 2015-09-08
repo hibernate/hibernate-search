@@ -7,6 +7,7 @@
 package org.hibernate.search.bridge.util.impl;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.Year;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,6 +27,7 @@ public final class NumericFieldUtils {
 
 	private static final String JAVA_TIME_DURATION = "java.time.Duration";
 	private static final String JAVA_TIME_YEAR = "java.time.Year";
+	private static final String JAVA_TIME_INSTANT = "java.time.Instant";
 
 	private static final Log log = LoggerFactory.make();
 
@@ -86,6 +88,11 @@ public final class NumericFieldUtils {
 			Integer toValue = to != null ? ( (Year) to ).getValue() : null;
 			return NumericRangeQuery.newIntRange( fieldName, fromValue, toValue, includeLower, includeUpper );
 		}
+		if ( isAssignableFrom( numericClass, JAVA_TIME_INSTANT ) ) {
+			Long fromValue = from != null ? ( (Instant) from ).toEpochMilli() : null;
+			Long toValue = to != null ? ( (Instant) to ).toEpochMilli() : null;
+			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
 
 		throw log.numericRangeQueryWithNonNumericToAndFromValues( fieldName );
 	}
@@ -130,6 +137,7 @@ public final class NumericFieldUtils {
 				numericClass.isAssignableFrom( Integer.class ) ||
 				numericClass.isAssignableFrom( Float.class ) ||
 				numericClass.isAssignableFrom( Calendar.class ) ||
+				isAssignableFrom( numericClass, JAVA_TIME_INSTANT ) ||
 				isAssignableFrom( numericClass, JAVA_TIME_YEAR ) ||
 				isAssignableFrom( numericClass, JAVA_TIME_DURATION );
 	}
