@@ -237,7 +237,7 @@ use of the property as numeric value explicit.
 ----
 @Entity
 @Indexed
-public static class Item {
+public class Item {
     @Id
     @GeneratedValue
     private int id;
@@ -261,6 +261,50 @@ public static class Item {
 }
 ----
 ====
+
+[[sortablefield-annotation]]
+===== @SortableField
+
+As of Lucene 5 (and thus Hibernate Search 5.5) it is highly recommended to create a so-called "doc value field"
+for each field to sort on. Hibernate Search provides the `@SortableField` annotation for that purpose.
+This is an extension annotation to `@Field` and marks a field as sortable (internally, the required doc value
+field will be added to the index).
+
+[[example-useof-sortablefield]]
+.Use of `@SortableField`
+====
+[source, JAVA]
+----
+@Entity
+@Indexed
+public class Book {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    @Field(name="Abstract", analyze=Analyze.NO)
+    @SortableField
+    private String summary;
+
+    // ...
+}
+----
+====
+
+If there is a single `@Field` declared for a given property, `@SortableField` implicitly applies to this field.
+In case several fields exist for a single property, the `@Field` to be marked as sortable can be specified
+via `@SortField#forField()`. Several sortable fields can be defined with help of the `@SortableFields` annotation.
+
+The field to be marked as sortable must not be analyzed.
+
+Note that sorting also works if a property is not explicitly marked with `@SortField`. This has negative runtime
+performance and memory consumption implications, though. Therefore it is highly recommended to explicitly mark each
+field to be used for sorting.
+
+Should you want to make a property sortable but not searchable, still an `@Field` needs to be declared (so its field
+bridge configuration can be inherited). It can be marked with `store = Store.NO` and `index = Index.NO`, causing
+only the doc value field required for sorting to be added, but not a regular index field.
 
 [[id-annotation]]
 ===== @Id
@@ -323,7 +367,8 @@ public class Book {
     @Fields( {
             @Field,
             @Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
-            } )
+    } )
+    @SortableField(forField = "summary_forSort")
     public String getSummary() {
         return summary;
     }
