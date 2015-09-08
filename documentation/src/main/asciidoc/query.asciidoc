@@ -1574,7 +1574,7 @@ annotation. Also, the field itself cannot be analyzed.
 
 `@Facet` contains a `name` and `forField` parameter. The `name` is arbitrary and used to identify
 the facet. Per default it matches the field name it belongs to. `forField` is relevant in case the
-property is mapped to multiple fields using `@Fields` (see also <<facets-annotation>>). In this case
+property is mapped to multiple fields using `@Fields` (see also <<fields-annotation>>). In this case
 `forField` can be used to identify the index field to which it applies. Mirroring `@Fields` there
 also exists a `@Facets` annotation in case multiple fields need to be targeted by faceting.
 
