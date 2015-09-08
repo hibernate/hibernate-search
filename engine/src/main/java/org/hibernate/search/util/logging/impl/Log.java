@@ -874,4 +874,13 @@ public interface Log extends BasicLogger {
 	@Message(id = 288, value = "The configuration property '%s' no longer applies and will be ignored." )
 	void deprecatedConfigurationPropertyIsIgnored(String string);
 
+	@Message(id = 289, value = "String '$1%s' cannot be parsed into a '$2%s'")
+	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 290, value = "%s not found on the classpath; the built-in bridge won't be available")
+	void javaTimeBridgeWontBeAdded(String string);
+
+	@Message(id = 291, value = " Value of '%2$s' for type '%1$s' is too big for the conversion")
+	SearchException valueTooLargeForConvertionException(@FormatWith(ClassFormatter.class) Class<?> type, Object duration, @Cause Exception ae);
 }

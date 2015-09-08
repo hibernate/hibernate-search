@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.bridge.util.impl;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.Year;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -21,6 +24,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class NumericFieldUtils {
+
+	private static final String JAVA_TIME_DURATION = "java.time.Duration";
+	private static final String JAVA_TIME_YEAR = "java.time.Year";
+	private static final String JAVA_TIME_INSTANT = "java.time.Instant";
 
 	private static final Log log = LoggerFactory.make();
 
@@ -71,8 +78,33 @@ public final class NumericFieldUtils {
 			Long toValue = to != null ? ((Calendar) to).getTime().getTime() : null;
 			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
 		}
+		if ( isAssignableFrom( numericClass, JAVA_TIME_DURATION ) ) {
+			Long fromValue = from != null ? ( (Duration) from ).toNanos() : null;
+			Long toValue = to != null ? ( (Duration) to ).toNanos() : null;
+			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
+		if ( isAssignableFrom( numericClass, JAVA_TIME_YEAR ) ) {
+			Integer fromValue = from != null ? ( (Year) from ).getValue() : null;
+			Integer toValue = to != null ? ( (Year) to ).getValue() : null;
+			return NumericRangeQuery.newIntRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
+		if ( isAssignableFrom( numericClass, JAVA_TIME_INSTANT ) ) {
+			Long fromValue = from != null ? ( (Instant) from ).toEpochMilli() : null;
+			Long toValue = to != null ? ( (Instant) to ).toEpochMilli() : null;
+			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
 
 		throw log.numericRangeQueryWithNonNumericToAndFromValues( fieldName );
+	}
+
+	private static boolean isAssignableFrom(Class<?> numericClass, String className) {
+		try {
+			Class<?> clazz = Class.forName( className );
+			return numericClass.isAssignableFrom( clazz );
+		}
+		catch (ClassNotFoundException e) {
+			return false;
+		}
 	}
 
 	/**
@@ -104,6 +136,9 @@ public final class NumericFieldUtils {
 				numericClass.isAssignableFrom( Long.class ) ||
 				numericClass.isAssignableFrom( Integer.class ) ||
 				numericClass.isAssignableFrom( Float.class ) ||
-				numericClass.isAssignableFrom( Calendar.class );
+				numericClass.isAssignableFrom( Calendar.class ) ||
+				isAssignableFrom( numericClass, JAVA_TIME_INSTANT ) ||
+				isAssignableFrom( numericClass, JAVA_TIME_YEAR ) ||
+				isAssignableFrom( numericClass, JAVA_TIME_DURATION );
 	}
 }
