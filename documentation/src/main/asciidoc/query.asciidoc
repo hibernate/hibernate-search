@@ -748,7 +748,8 @@ List results = query.list();
 
 [TIP]
 ====
-Be aware that fields used for sorting must not be tokenized (see <<field-annotation>>).
+Be aware that fields used for sorting must not be tokenized (see <<field-annotation>>). Also they should
+be marked as sortable field using the `@SortableField` annotation (see <<sortablefield-annotation>>).
 ====
 
 ===== Fetching strategy
