@@ -16,6 +16,7 @@ import org.apache.lucene.document.Field;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.engine.impl.nullencoding.NotEncodingCodec;
 import org.hibernate.search.engine.impl.nullencoding.NullMarkerCodec;
 
 import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
@@ -98,7 +99,7 @@ public class DocumentFieldMetadata {
 	}
 
 	public String indexNullAs() {
-		return nullMarkerCodec == null ? null : nullMarkerCodec.nullRepresentedAsString();
+		return nullMarkerCodec.nullRepresentedAsString();
 	}
 
 	public boolean isNumeric() {
@@ -141,7 +142,7 @@ public class DocumentFieldMetadata {
 				", analyzer=" + analyzer +
 				", isId=" + isId +
 				", isIdInEmbedded=" + isIdInEmbedded +
-				", nullToken='" + nullMarkerCodec == null ? null : nullMarkerCodec.nullRepresentedAsString() + '\'' +
+				", nullToken='" + nullMarkerCodec.nullRepresentedAsString() + '\'' +
 				", isNumeric=" + isNumeric +
 				", isSpatial=" + isSpatial +
 				", precisionStep=" + precisionStep +
@@ -168,7 +169,7 @@ public class DocumentFieldMetadata {
 		private int precisionStep = NumericField.PRECISION_STEP_DEFAULT;
 		private NumericEncodingType numericEncodingType;
 		private Set<FacetMetadata> facetMetadata;
-		private NullMarkerCodec nullMarkerCodec;
+		private NullMarkerCodec nullMarkerCodec = NotEncodingCodec.SINGLETON;
 
 		public Builder(String fieldName,
 				Store store,
