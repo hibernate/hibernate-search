@@ -256,6 +256,22 @@ public class SortTest extends SearchTestBase {
 		tx.commit();
 	}
 
+	@Test
+	public void testResultOrderedByEmbeddedAuthorNameAscending() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		// order by summary
+		Query query = queryParser.parse( "summary:lucene OR summary:action" );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
+		Sort sort = new Sort( new SortField( "mainAuthor.name", SortField.Type.STRING ) ); //ASC
+		hibQuery.setSort( sort );
+		List<Book> result = hibQuery.list();
+		assertNotNull( result );
+		assertThat( result ).onProperty( "id" ).containsExactly( 2, 1, 3, 4, 10 );
+
+		tx.commit();
+	}
+
 	/**
 	 * Helper method creating three books with the same title and summary.
 	 * When searching for these books the results should be returned in the order
@@ -265,25 +281,46 @@ public class SortTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 		Calendar cal = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ROOT );
 		cal.set( 2007, Calendar.JULY, 25, 11, 20, 30 );
+
+		Author author = new Author( "Bob" );
+		fullTextSession.save( author );
 		Book book = new Book( 1, "Hibernate & Lucene", "This is a test book." );
 		book.setPublicationDate( cal.getTime() );
+		book.setMainAuthor( author );
 		fullTextSession.save( book );
+
+		author = new Author( "Anthony" );
+		fullTextSession.save( author );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 2, "Hibernate & Lucene", "This is a test book." );
+		book.setMainAuthor( author );
 		book.setPublicationDate( cal.getTime() );
 		fullTextSession.save( book );
+
+		author = new Author( "Calvin" );
+		fullTextSession.save( author );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 3, "Hibernate & Lucene", "This is a test book." );
+		book.setMainAuthor( author );
 		book.setPublicationDate( cal.getTime() );
 		fullTextSession.save( book );
+
+		author = new Author( "Ernst" );
+		fullTextSession.save( author );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 10, "Hibernate & Lucene", "This is a test book." );
+		book.setMainAuthor( author );
 		book.setPublicationDate( cal.getTime() );
 		fullTextSession.save( book );
+
+		author = new Author( "Dennis" );
+		fullTextSession.save( author );
 		cal.add( Calendar.SECOND, 1 );
 		book = new Book( 4, "Groovy in Action", "The bible of Groovy" );
+		book.setMainAuthor( author );
 		book.setPublicationDate( cal.getTime() );
 		fullTextSession.save( book );
+
 		tx.commit();
 		fullTextSession.clear();
 	}

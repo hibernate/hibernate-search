@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.SortField;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -27,6 +28,13 @@ public class Author {
 	private Integer id;
 	private String name;
 
+	Author() {
+	}
+
+	public Author(String name) {
+		this.name = name;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -35,6 +43,7 @@ public class Author {
 		this.id = id;
 	}
 
+	@SortField
 	@Field(store = Store.YES)
 	public String getName() {
 		return name;

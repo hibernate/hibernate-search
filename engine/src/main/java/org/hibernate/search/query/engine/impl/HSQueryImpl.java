@@ -30,6 +30,10 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
+import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.SortFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
@@ -536,6 +540,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 		Similarity searcherSimilarity = null;
+		List<SortFieldMetadata> configuredSortFields = new ArrayList<>();
 
 		//TODO check if caching this work for the last n list of indexedTargetedEntities makes a perf boost
 		if ( indexedTargetedEntities.size() == 0 ) {
@@ -555,6 +560,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 				populateIndexManagers( targetedIndexes, entityIndexBinding.getSelectionStrategy() );
+				collectSortFields( configuredSortFields, entityIndexBinding.getDocumentBuilder().getTypeMetadata() );
 			}
 			classesAndSubclasses = null;
 		}
@@ -580,6 +586,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
+
+				collectSortFields( configuredSortFields, builder.getTypeMetadata() );
 				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
 				populateIndexManagers( targetedIndexes, entityIndexBinding.getSelectionStrategy() );
 			}
@@ -615,7 +623,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		final IndexManager[] indexManagers = targetedIndexes.toArray(
 				new IndexManager[targetedIndexes.size()]
 		);
-		final IndexReader compoundReader = MultiReaderFactory.openReader( sort, indexManagers );
+
+		final IndexReader compoundReader = MultiReaderFactory.openReader( configuredSortFields, sort, indexManagers );
 
 		final Query filteredQuery = filterQueryByTenantId( filterQueryByClasses( luceneQuery ) );
 
@@ -675,6 +684,32 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				false,
 				false
 		);
+	}
+
+	/**
+	 * Collects all sort fields declared on the properties of the given type or the properties of all the types it
+	 * embeds into the given list.
+	 */
+	private void collectSortFields(List<SortFieldMetadata> configuredSortFields, TypeMetadata typeMetadata) {
+		configuredSortFields.addAll( typeMetadata.getIdPropertyMetadata().getSortFieldMetadata() );
+
+		for ( PropertyMetadata property : typeMetadata.getAllPropertyMetadata() ) {
+			configuredSortFields.addAll( property.getSortFieldMetadata() );
+		}
+
+		for ( EmbeddedTypeMetadata embeddedType : typeMetadata.getEmbeddedTypeMetadata() ) {
+			collectSortFields( configuredSortFields, embeddedType );
+		}
+	}
+
+	private void collectSortFields(List<SortFieldMetadata> configuredSortFields, EmbeddedTypeMetadata embeddedTypeMetadata) {
+		for ( PropertyMetadata property : embeddedTypeMetadata.getAllPropertyMetadata() ) {
+			configuredSortFields.addAll( property.getSortFieldMetadata() );
+		}
+
+		for ( EmbeddedTypeMetadata embeddedType : embeddedTypeMetadata.getEmbeddedTypeMetadata() ) {
+			collectSortFields( configuredSortFields, embeddedType );
+		}
 	}
 
 	private void validateSortFields(ExtendedSearchIntegrator extendedIntegrator) {

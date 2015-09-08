@@ -11,12 +11,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.uninverting.UninvertingReader;
 import org.apache.lucene.uninverting.UninvertingReader.Type;
+import org.hibernate.search.engine.metadata.impl.SortFieldMetadata;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -48,47 +50,84 @@ public class ManagedMultiReader extends MultiReader {
 		assert readersForClosing.length == managers.length;
 	}
 
-	public static ManagedMultiReader createInstance(IndexReader[] subReaders, ReaderProvider[] managers, Sort sort) throws IOException {
-		IndexReader[] effectiveReaders = getEffectiveReaders( subReaders, sort );
+	public static ManagedMultiReader createInstance(IndexReader[] subReaders, ReaderProvider[] managers, Iterable<SortFieldMetadata> configuredSortFields, Sort sort) throws IOException {
+		IndexReader[] effectiveReaders = getEffectiveReaders( subReaders, configuredSortFields, sort );
 		return new ManagedMultiReader( effectiveReaders, subReaders, managers );
 	}
 
 	/**
-	 * Gets the readers to be effectively used. Will be the given readers, if there is no sort involved. Otherwise each
-	 * directory reader will be wrapped in a {@link UninvertingReader} configured in a way to satisfy the requested
-	 * sorts.
+	 * Gets the readers to be effectively used. Will be the given readers, if:
+	 * <ul>
+	 * <li>there is no sort involved.</li>
+	 * <li>A doc value field is contained in the index for each requested sort field</li>
+	 * </ul>
+	 * Otherwise each directory reader will be wrapped in a {@link UninvertingReader} configured in a way to satisfy the
+	 * requested sorts.
 	 */
-	private static IndexReader[] getEffectiveReaders(IndexReader[] subReaders, Sort sort) {
+	private static IndexReader[] getEffectiveReaders(IndexReader[] subReaders, Iterable<SortFieldMetadata> configuredSortFields, Sort sort) {
 		if ( sort == null || sort.getSort().length == 0 ) {
 			return subReaders;
 		}
-		// TODO HSEARCH-1984: Validate incoming sorts against defined sort fields and apply uninverting reader if not
-		// all sorts are covered by doc value fields
 
 		IndexReader[] uninvertingReaders = new IndexReader[subReaders.length];
-		Map<String, Type> mappings = getMappings( sort );
+		boolean isSortCoveredByDocValueFields = isSortCoveredByDocValueFields( configuredSortFields, sort );
 
-		int i = 0;
-		for ( IndexReader reader : subReaders ) {
-//			if ( reader instanceof DirectoryReader ) {
-//				DirectoryReader directoryReader = (DirectoryReader) reader;
-//
-//				try {
-//					uninvertingReaders[i] = UninvertingReader.wrap( directoryReader, mappings );
-//				}
-//				catch (IOException e) {
-//					throw log.couldNotCreateUninvertingReader( directoryReader, e );
-//				}
-//			}
-//			else {
-//				log.readerTypeUnsupportedForInverting( reader.getClass() );
-				uninvertingReaders[i] = reader;
-//			}
+		if ( isSortCoveredByDocValueFields ) {
+			return subReaders;
+		}
+		else {
+			// TODO HSEARCH-1984 Log hint to create required sort fields
 
-			i++;
+			Map<String, Type> mappings = getMappings( sort );
+
+			int i = 0;
+			for ( IndexReader reader : subReaders ) {
+				if ( reader instanceof DirectoryReader ) {
+					DirectoryReader directoryReader = (DirectoryReader) reader;
+
+					try {
+						uninvertingReaders[i] = UninvertingReader.wrap( directoryReader, mappings );
+					}
+					catch (IOException e) {
+						throw log.couldNotCreateUninvertingReader( directoryReader, e );
+					}
+				}
+				else {
+					log.readerTypeUnsupportedForInverting( reader.getClass() );
+					uninvertingReaders[i] = reader;
+				}
+
+				i++;
+			}
+
+			return uninvertingReaders;
+		}
+	}
+
+	/**
+	 * Whether the requested sort can be satisfied by the existing sort fields (doc value fields) in the index or not.
+	 */
+	private static boolean isSortCoveredByDocValueFields(Iterable<SortFieldMetadata> configuredSortFields, Sort sort) {
+		for ( SortField sortField : sort.getSort() ) {
+			// no doc value field needed for these
+			if ( sortField.getType() == SortField.Type.DOC && sortField.getType() == SortField.Type.SCORE ) {
+				continue;
+			}
+
+			boolean isConfigured = false;
+			for ( SortFieldMetadata sortFieldMetadata : configuredSortFields ) {
+				if ( sortFieldMetadata.getFieldName().equals( sortField.getField() ) ) {
+					isConfigured = true;
+					break;
+				}
+			}
+
+			if ( !isConfigured ) {
+				return false;
+			}
 		}
 
-		return uninvertingReaders;
+		return true;
 	}
 
 	/**
