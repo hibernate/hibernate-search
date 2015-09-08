@@ -147,6 +147,9 @@ should not be indexed. You can set this value to `DEFAULT_NULL_TOKEN` to indicat
 token should be used. This default null token can be specified in the configuration using
 `hibernate.search.default_null_token`. If this property is not set the string "_null_" will
 be used as default.
+When the field is of a Numeric Type (see <<numeric-field-annotation>>), the token will be encoded as the
+respective numeric type: the `indexNullAs` value needs to be set to a value which can be parsed into
+a number of the matching type, for example "-1".
 +
 [NOTE]
 ====
