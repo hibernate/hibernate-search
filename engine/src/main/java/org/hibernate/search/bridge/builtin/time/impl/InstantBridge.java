@@ -64,7 +64,7 @@ public class InstantBridge implements TwoWayFieldBridge, NumericTimeBridge {
 			return millis;
 		}
 		catch (ArithmeticException ae) {
-			throw log.valueTooLargeForConvertionException( Instant.class, value, ae );
+			throw log.valueTooLargeForConversionException( Instant.class, value, ae );
 		}
 	}
 }

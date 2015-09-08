@@ -54,7 +54,7 @@ public class DurationBridge implements TwoWayFieldBridge, NumericTimeBridge {
 			return nanos;
 		}
 		catch (ArithmeticException ae) {
-			throw log.valueTooLargeForConvertionException( Duration.class, value, ae );
+			throw log.valueTooLargeForConversionException( Duration.class, value, ae );
 		}
 	}
 
