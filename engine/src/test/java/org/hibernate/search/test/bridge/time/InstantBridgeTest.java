@@ -42,7 +42,7 @@ public class InstantBridgeTest {
 	@Test
 	public void testTooLargeValueException() {
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000291" );
+		thrown.expectMessage( "HSEARCH000297" );
 
 		BRIDGE.objectToString( Instant.MAX );
 	}

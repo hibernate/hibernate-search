@@ -57,7 +57,7 @@ public class DurationBridgeTest {
 	@Test
 	public void testExceptionValueTooSmall() throws Exception {
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000291" );
+		thrown.expectMessage( "HSEARCH000297" );
 
 		BRIDGE.objectToString( Duration.ofSeconds( Long.MIN_VALUE / NANOS_PER_SECOND - 1, 999_999_999 ) );
 	}
@@ -65,7 +65,7 @@ public class DurationBridgeTest {
 	@Test
 	public void testExceptionValueTooBig() throws Exception {
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000291" );
+		thrown.expectMessage( "HSEARCH000297" );
 
 		BRIDGE.objectToString( OUT_OF_RANGE_DURATION );
 	}
