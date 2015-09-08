@@ -51,6 +51,8 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.ProvidedId;
+import org.hibernate.search.annotations.SortField;
+import org.hibernate.search.annotations.SortFields;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.Store;
@@ -269,9 +271,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			idMetadataBuilder.numericEncodingType( numericEncodingType );
 		}
 		DocumentFieldMetadata fieldMetadata = idMetadataBuilder.build();
-		PropertyMetadata idPropertyMetadata = new PropertyMetadata.Builder( member )
-				.addDocumentField( fieldMetadata )
+		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member );
+		propertyMetadataBuilder.addDocumentField( fieldMetadata );
+		checkForSortField( member, typeMetadataBuilder, propertyMetadataBuilder, "", true, null, parseContext );
+		checkForSortFields( member, typeMetadataBuilder, propertyMetadataBuilder, "", true, null, parseContext );
+
+		PropertyMetadata idPropertyMetadata = propertyMetadataBuilder
 				.build();
+
 		typeMetadataBuilder.idProperty( idPropertyMetadata );
 	}
 
@@ -740,6 +747,52 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return spatialBridge;
 	}
 
+	private void bindSortFieldAnnotation(SortField sortFieldAnnotation,
+			String prefix,
+			XProperty member,
+			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
+			boolean isIdProperty,
+			ParseContext parseContext) {
+
+		String sortedFieldName = prefix + ReflectionHelper.getAttributeName( member, sortFieldAnnotation.forField() );
+		String idFieldName;
+
+		// Make sure a sort on the id field is only added to the idPropertyMetadata
+		if ( isIdProperty ) {
+			idFieldName = propertyMetadataBuilder.getFieldMetadata().iterator().next().getFieldName();
+			if ( !sortedFieldName.equals( idFieldName ) ) {
+				return;
+			}
+		}
+		else {
+			idFieldName = typeMetadataBuilder.getIdPropertyMetadata().getFieldMetadata().iterator().next().getFieldName();
+			if ( sortedFieldName.equals( idFieldName ) ) {
+				return;
+			}
+		}
+
+		if ( !sortedFieldName.equals( idFieldName ) && !containsField( propertyMetadataBuilder, sortedFieldName ) ) {
+			throw new SearchException( "SortField declared on " + typeMetadataBuilder.getIndexedType().getName() + "#" + propertyMetadataBuilder.getPropertyAccessor().getName() + " references undeclared field '" + sortedFieldName + "'" );
+		}
+
+		SortFieldMetadata fieldMetadata = new SortFieldMetadata.Builder()
+			.fieldName( sortedFieldName )
+			.build();
+
+		propertyMetadataBuilder.addSortField( fieldMetadata );
+	}
+
+	private boolean containsField(PropertyMetadata.Builder propertyMetadataBuilder, String fieldName) {
+		for ( DocumentFieldMetadata field : propertyMetadataBuilder.getFieldMetadata() ) {
+			if ( field.getName().equals( fieldName ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private void initializeMemberLevelAnnotations(String prefix,
 			XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
@@ -751,7 +804,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ParseContext parseContext) {
 
 		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
-		.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
+			.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
 		if ( !isProvidedId ) {
 			checkDocumentId( member, typeMetadataBuilder, propertyMetadataBuilder, isRoot, prefix, configContext, pathsContext, parseContext );
@@ -761,6 +814,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		checkForFields( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, configContext, pathsContext, parseContext );
 		checkForSpatial( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, pathsContext, parseContext );
 		checkForSpatialsAnnotation( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, pathsContext, parseContext );
+		checkForSortField( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, false, pathsContext, parseContext );
+		checkForSortFields( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, false, pathsContext, parseContext );
 		checkForAnalyzerDefs( member, configContext );
 		checkForAnalyzerDiscriminator( member, typeMetadataBuilder, configContext );
 		checkForIndexedEmbedded(
@@ -1204,6 +1259,56 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					prefix
 			) || !parseContext.isMaxLevelReached() ) {
 				bindSpatialAnnotation( spatialAnnotation, prefix, member, typeMetadataBuilder, propertyMetadataBuilder, parseContext );
+			}
+		}
+	}
+
+	private void checkForSortField(XProperty member,
+			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
+			String prefix,
+			boolean isIdProperty,
+			PathsContext pathsContext,
+			ParseContext parseContext) {
+		SortField sortFieldAnnotation = member.getAnnotation( SortField.class );
+		if ( sortFieldAnnotation != null ) {
+			if ( isFieldInPath(
+					sortFieldAnnotation,
+					member,
+					pathsContext,
+					prefix
+			) || !parseContext.isMaxLevelReached() ) {
+				bindSortFieldAnnotation( sortFieldAnnotation, prefix, member, typeMetadataBuilder, propertyMetadataBuilder, isIdProperty, parseContext );
+			}
+		}
+	}
+
+	private void checkForSortFields(XProperty member,
+			TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder,
+			String prefix,
+			boolean isIdProperty,
+			PathsContext pathsContext,
+			ParseContext parseContext) {
+		SortFields sortFieldsAnnotation = member.getAnnotation( SortFields.class );
+		if ( sortFieldsAnnotation != null ) {
+			for ( SortField sortFieldAnnotation : sortFieldsAnnotation.value() ) {
+				if ( isFieldInPath(
+						sortFieldAnnotation,
+						member,
+						pathsContext,
+						prefix
+				) || !parseContext.isMaxLevelReached() ) {
+					bindSortFieldAnnotation(
+							sortFieldAnnotation,
+							prefix,
+							member,
+							typeMetadataBuilder,
+							propertyMetadataBuilder,
+							isIdProperty,
+							parseContext
+					);
+				}
 			}
 		}
 	}

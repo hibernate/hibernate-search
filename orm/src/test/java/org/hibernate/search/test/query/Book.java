@@ -9,21 +9,29 @@ package org.hibernate.search.test.query;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import org.apache.lucene.document.Document;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.SortField;
+import org.hibernate.search.annotations.SortFields;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.TwoWayStringBridge;
 
 /**
  * @author Emmanuel Bernard
@@ -78,6 +86,17 @@ public class Book {
 
 	@Id
 	@DocumentId
+	@Field(
+		name = "id_forIntegerSort",
+		store = Store.NO,
+		index = Index.NO,
+		// TODO explicit bridge is used as workaround for HSEARCH-1987
+		bridge = @org.hibernate.search.annotations.FieldBridge(impl = MyIntegerBridge.class)
+	)
+	@SortFields({
+			@SortField(forField = "id"),
+			@SortField(forField = "id_forIntegerSort")
+	})
 	public Integer getId() {
 		return id;
 	}
@@ -86,6 +105,7 @@ public class Book {
 		this.id = id;
 	}
 
+	@SortField(forField = "summary_forSort")
 	@Fields({
 			@Field(store = Store.YES),
 			@Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
@@ -98,6 +118,7 @@ public class Book {
 		this.summary = summary;
 	}
 
+	@SortField
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	@DateBridge(resolution = Resolution.SECOND, encoding = EncodingType.STRING)
 	public Date getPublicationDate() {
@@ -106,5 +127,23 @@ public class Book {
 
 	public void setPublicationDate(Date publicationDate) {
 		this.publicationDate = publicationDate;
+	}
+
+	public static class MyIntegerBridge implements FieldBridge, TwoWayStringBridge {
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			luceneOptions.addNumericFieldToDocument( name, value, document );
+		}
+
+		@Override
+		public String objectToString(Object object) {
+			return object.toString();
+		}
+
+		@Override
+		public Object stringToObject(String stringValue) {
+			return Integer.valueOf( stringValue );
+		}
 	}
 }

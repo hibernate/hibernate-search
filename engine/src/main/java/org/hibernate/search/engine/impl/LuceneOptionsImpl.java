@@ -68,6 +68,17 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		this.indexNullAs = fieldMetadata.indexNullAs();
 	}
 
+	public LuceneOptionsImpl(Index indexMode, TermVector termVector, Store store, String indexNullAs, float fieldLevelBoost, float inheritedBoost) {
+		this.inheritedBoost = inheritedBoost;
+		this.indexMode = indexMode;
+		this.termVector = termVector;
+		this.fieldLevelBoost = fieldLevelBoost;
+		this.storeType = store;
+		this.storeCompressed = this.storeType.equals( Store.COMPRESS );
+		this.storeUncompressed = this.storeType.equals( Store.YES );
+		this.indexNullAs = indexNullAs;
+	}
+
 	@Override
 	public void addFieldToDocument(String name, String indexedString, Document document) {
 		//Do not add fields on empty strings, seems a sensible default in most situations
@@ -82,12 +93,22 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	}
 
 	private void standardFieldAdd(String name, String indexedString, Document document) {
+		// Non-stored, non-indexed field may be declared for sorting purposes; don't add it to the document
+		if ( storeType == Store.NO && indexMode == Index.NO ) {
+			return;
+		}
+
 		Field field = new Field( name, indexedString, storeUncompressed ? Field.Store.YES : Field.Store.NO, indexMode, termVector );
 		setBoost( field );
 		document.add( field );
 	}
 
 	private void compressedFieldAdd(String name, String indexedString, Document document) {
+		// Non-stored, non-indexed field may be declared for sorting purposes; don't add it to the document
+		if ( storeType == Store.NO && indexMode == Index.NO ) {
+			return;
+		}
+
 		byte[] compressedString = CompressionTools.compressString( indexedString );
 		// indexed is implicitly set to false when using byte[]
 		Field field = new Field( name, compressedString, TYPE_COMPRESSED );

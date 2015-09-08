@@ -109,7 +109,7 @@ public class SortTest extends SearchTestBase {
 
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "id", SortField.Type.LONG, false ) );
+		Sort sort = new Sort( new SortField( "id_forIntegerSort", SortField.Type.LONG, false ) );
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -126,17 +126,17 @@ public class SortTest extends SearchTestBase {
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
 
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.LONG, false ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
 		List<Book> result = hibQuery.list();
+		assertThat( result ).onProperty( "id" ).containsExactly( 1, 10, 2, 3 );
+
+		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, false ) ) );
+		result = hibQuery.list();
 		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
 
 		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
 		result = hibQuery.list();
 		assertThat( result ).onProperty( "id" ).containsExactly( 1, 10, 2, 3 );
-
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.LONG, false ) ) );
-		result = hibQuery.list();
-		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
 
 		tx.commit();
 	}
