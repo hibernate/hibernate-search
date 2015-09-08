@@ -7,12 +7,6 @@
 
 package org.hibernate.search.util.logging.impl;
 
-import static org.jboss.logging.Logger.Level.DEBUG;
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.TRACE;
-import static org.jboss.logging.Logger.Level.WARN;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -39,6 +33,12 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.TRACE;
+import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -874,4 +874,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 288, value = "The configuration property '%s' no longer applies and will be ignored." )
 	void deprecatedConfigurationPropertyIsIgnored(String string);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 289, value = "Requested sort field(s) %2$s are not present in index(es) %1$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortField." )
+	void uncoveredSortsRequested(String indexNames, String uncoveredSorts);
 }

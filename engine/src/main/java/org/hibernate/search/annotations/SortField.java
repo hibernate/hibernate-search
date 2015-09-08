@@ -15,9 +15,12 @@ import java.lang.annotation.Target;
 /**
  * Makes a property sortable.
  * <p>
- * A document field for that property must exist from which the field bridge configuration will be inherited. In the
- * rare case that a property should be sortable but not searchable, declare a field which is not indexed nor stored.
- * Then only the sort field will be added to the document, but no standard index field.
+ * A field for that property must be declared via the {@link Field} annotation from which the field bridge configuration
+ * will be inherited. In the rare case that a property should be sortable but not searchable, declare a field which is
+ * not indexed nor stored. Then only the sort field will be added to the document, but no standard index field.
+ * <p>
+ * Sorting on a field without a declared sort field will still work, but it will be slower and cause a higher memory
+ * consumption. Therefore it's strongly recommended to declare each required sort field.
  *
  * @author Gunnar Morling
  */
@@ -27,8 +30,8 @@ import java.lang.annotation.Target;
 public @interface SortField {
 
 	/**
-	 * Name of the document field whose field bridge to apply to obtain the value of this sort field. Can be omitted in
-	 * case only a single field exists for the annotated property.
+	 * Name of the field whose field bridge to apply to obtain the value of this sort field. Can be omitted in case only
+	 * a single field exists for the annotated property.
 	 */
 	String forField() default "";
 }

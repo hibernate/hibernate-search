@@ -7,8 +7,10 @@
 package org.hibernate.search.reader.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.index.DirectoryReader;
@@ -19,7 +21,9 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.uninverting.UninvertingReader;
 import org.apache.lucene.uninverting.UninvertingReader.Type;
 import org.hibernate.search.engine.metadata.impl.SortFieldMetadata;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -39,20 +43,32 @@ public class ManagedMultiReader extends MultiReader {
 	 * them to super.
 	 */
 	final IndexReader[] readersForClosing;
-	final ReaderProvider[] managers;
+	final ReaderProvider[] readerProviders;
 
-	private ManagedMultiReader(IndexReader[] subReaders, IndexReader[] readersForClosing, ReaderProvider[] managers) throws IOException {
+
+	private ManagedMultiReader(IndexReader[] subReaders, IndexReader[] readersForClosing, ReaderProvider[] readerProviders) throws IOException {
 		// If this flag isn't set to true, the MultiReader will increase the usage counter!
 		super( subReaders, true );
+		assert readersForClosing.length == readerProviders.length;
 
 		this.readersForClosing = readersForClosing;
-		this.managers = managers;
-		assert readersForClosing.length == managers.length;
+		this.readerProviders = readerProviders;
 	}
 
-	public static ManagedMultiReader createInstance(IndexReader[] subReaders, ReaderProvider[] managers, Iterable<SortFieldMetadata> configuredSortFields, Sort sort) throws IOException {
-		IndexReader[] effectiveReaders = getEffectiveReaders( subReaders, configuredSortFields, sort );
-		return new ManagedMultiReader( effectiveReaders, subReaders, managers );
+	static ManagedMultiReader createInstance(IndexManager[] indexManagers, Iterable<SortFieldMetadata> configuredSortFields, Sort sort) throws IOException {
+		final int length = indexManagers.length;
+
+		IndexReader[] subReaders = new IndexReader[length];
+		ReaderProvider[] readerProviders = new ReaderProvider[length];
+		for ( int index = 0; index < length; index++ ) {
+			ReaderProvider indexReaderManager = indexManagers[index].getReaderProvider();
+			IndexReader openIndexReader = indexReaderManager.openIndexReader();
+			subReaders[index] = openIndexReader;
+			readerProviders[index] = indexReaderManager;
+		}
+
+		IndexReader[] effectiveReaders = getEffectiveReaders( indexManagers, subReaders, configuredSortFields, sort );
+		return new ManagedMultiReader( effectiveReaders, subReaders, readerProviders );
 	}
 
 	/**
@@ -64,19 +80,24 @@ public class ManagedMultiReader extends MultiReader {
 	 * Otherwise each directory reader will be wrapped in a {@link UninvertingReader} configured in a way to satisfy the
 	 * requested sorts.
 	 */
-	private static IndexReader[] getEffectiveReaders(IndexReader[] subReaders, Iterable<SortFieldMetadata> configuredSortFields, Sort sort) {
+	private static IndexReader[] getEffectiveReaders(IndexManager[] indexManagers, IndexReader[] subReaders, Iterable<SortFieldMetadata> configuredSortFields, Sort sort) {
 		if ( sort == null || sort.getSort().length == 0 ) {
 			return subReaders;
 		}
 
 		IndexReader[] uninvertingReaders = new IndexReader[subReaders.length];
-		boolean isSortCoveredByDocValueFields = isSortCoveredByDocValueFields( configuredSortFields, sort );
+		List<String> uncoveredSorts = getUncoveredSorts( configuredSortFields, sort );
 
-		if ( isSortCoveredByDocValueFields ) {
+		if ( uncoveredSorts.isEmpty() ) {
 			return subReaders;
 		}
 		else {
-			// TODO HSEARCH-1984 Log hint to create required sort fields
+			List<String> indexNames = new ArrayList<>();
+			for ( IndexManager indexManager : indexManagers ) {
+				indexNames.add( indexManager.getIndexName() );
+			}
+
+			log.uncoveredSortsRequested( StringHelper.join( indexNames, ", " ), StringHelper.join( uncoveredSorts, ", " ) );
 
 			Map<String, Type> mappings = getMappings( sort );
 
@@ -105,9 +126,13 @@ public class ManagedMultiReader extends MultiReader {
 	}
 
 	/**
-	 * Whether the requested sort can be satisfied by the existing sort fields (doc value fields) in the index or not.
+	 * Returns all those sorts requested that cannot be satisfied by the existing sort fields (doc value fields) in the
+	 * index.
 	 */
-	private static boolean isSortCoveredByDocValueFields(Iterable<SortFieldMetadata> configuredSortFields, Sort sort) {
+	// TODO HSEARCH-1992 Need to consider that per entity actually
+	private static List<String> getUncoveredSorts(Iterable<SortFieldMetadata> configuredSortFields, Sort sort) {
+		List<String> uncoveredSorts = new ArrayList<>();
+
 		for ( SortField sortField : sort.getSort() ) {
 			// no doc value field needed for these
 			if ( sortField.getType() == SortField.Type.DOC && sortField.getType() == SortField.Type.SCORE ) {
@@ -123,11 +148,11 @@ public class ManagedMultiReader extends MultiReader {
 			}
 
 			if ( !isConfigured ) {
-				return false;
+				uncoveredSorts.add( sortField.getField() );
 			}
 		}
 
-		return true;
+		return uncoveredSorts;
 	}
 
 	/**
@@ -174,7 +199,7 @@ public class ManagedMultiReader extends MultiReader {
 			log.debugf( "Closing MultiReader: %s", this );
 		}
 		for ( int i = 0; i < readersForClosing.length; i++ ) {
-			ReaderProvider container = managers[i];
+			ReaderProvider container = readerProviders[i];
 			container.closeIndexReader( readersForClosing[i] ); // might be virtual
 		}
 		if ( debugEnabled ) {
@@ -184,6 +209,6 @@ public class ManagedMultiReader extends MultiReader {
 
 	@Override
 	public String toString() {
-		return ManagedMultiReader.class.getSimpleName() + " [readersForClosing=" + Arrays.toString( readersForClosing ) + ", managers=" + Arrays.toString( managers ) + "]";
+		return ManagedMultiReader.class.getSimpleName() + " [readersForClosing=" + Arrays.toString( readersForClosing ) + ", readerProviders=" + Arrays.toString( readerProviders ) + "]";
 	}
 }
