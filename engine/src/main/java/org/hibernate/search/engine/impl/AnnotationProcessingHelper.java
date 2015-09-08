@@ -19,7 +19,7 @@ import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
-import org.hibernate.search.annotations.SortField;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.engine.BoostStrategy;
@@ -166,8 +166,8 @@ public final class AnnotationProcessingHelper {
 		else if ( fieldAnn instanceof Spatial ) {
 			fieldName = ( (Spatial) fieldAnn ).name();
 		}
-		else if ( fieldAnn instanceof SortField ) {
-			fieldName = ( (SortField) fieldAnn ).forField();
+		else if ( fieldAnn instanceof SortableField ) {
+			fieldName = ( (SortableField) fieldAnn ).forField();
 		}
 		else {
 			return raiseAssertionOnIncorrectAnnotation( fieldAnn );
@@ -176,6 +176,6 @@ public final class AnnotationProcessingHelper {
 	}
 
 	private static String raiseAssertionOnIncorrectAnnotation(Annotation fieldAnn) {
-		throw new AssertionFailure( "Cannot process instances other than @Field, @Spatial and @SortField. Found: " + fieldAnn.getClass() );
+		throw new AssertionFailure( "Cannot process instances other than @Field, @Spatial and @SortableField. Found: " + fieldAnn.getClass() );
 	}
 }

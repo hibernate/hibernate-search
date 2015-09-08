@@ -30,7 +30,7 @@ public class PropertyMetadata {
 	private final XProperty propertyAccessor;
 	private final Map<String, DocumentFieldMetadata> documentFieldMetadataMap;
 	private final Set<DocumentFieldMetadata> documentFieldMetadataList;
-	private final Set<SortFieldMetadata> sortFieldMetadata;
+	private final Set<SortableFieldMetadata> sortableFieldMetadata;
 	private final BoostStrategy dynamicBoostStrategy;
 	private final String propertyAccessorName;
 
@@ -38,7 +38,7 @@ public class PropertyMetadata {
 		this.propertyAccessor = builder.propertyAccessor;
 		this.documentFieldMetadataList = Collections.unmodifiableSet( builder.fieldMetadataSet );
 		this.documentFieldMetadataMap = createDocumentFieldMetadataMap( builder.fieldMetadataSet );
-		this.sortFieldMetadata = Collections.unmodifiableSet( builder.sortFieldMetadata );
+		this.sortableFieldMetadata = Collections.unmodifiableSet( builder.sortableFieldMetadata );
 		this.propertyAccessorName = propertyAccessor == null ? null : propertyAccessor.getName();
 		if ( builder.dynamicBoostStrategy != null ) {
 			this.dynamicBoostStrategy = builder.dynamicBoostStrategy;
@@ -74,10 +74,10 @@ public class PropertyMetadata {
 	}
 
 	/**
-	 * Returns the sort fields defined for this property.
+	 * Returns the sortable fields defined for this property.
 	 */
-	public Set<SortFieldMetadata> getSortFieldMetadata() {
-		return sortFieldMetadata;
+	public Set<SortableFieldMetadata> getSortableFieldMetadata() {
+		return sortableFieldMetadata;
 	}
 
 	public BoostStrategy getDynamicBoostStrategy() {
@@ -88,7 +88,7 @@ public class PropertyMetadata {
 		// required parameters
 		private final XProperty propertyAccessor;
 		private final Set<DocumentFieldMetadata> fieldMetadataSet;
-		private final Set<SortFieldMetadata> sortFieldMetadata;
+		private final Set<SortableFieldMetadata> sortableFieldMetadata;
 
 		// optional parameters
 		private BoostStrategy dynamicBoostStrategy;
@@ -99,7 +99,7 @@ public class PropertyMetadata {
 			}
 			this.propertyAccessor = propertyAccessor;
 			this.fieldMetadataSet = new HashSet<>();
-			this.sortFieldMetadata = new HashSet<>();
+			this.sortableFieldMetadata = new HashSet<>();
 		}
 
 		public Builder dynamicBoostStrategy(BoostStrategy boostStrategy) {
@@ -112,8 +112,8 @@ public class PropertyMetadata {
 			return this;
 		}
 
-		public Builder addSortField(SortFieldMetadata sortField) {
-			this.sortFieldMetadata.add( sortField );
+		public Builder addSortableField(SortableFieldMetadata sortableField) {
+			this.sortableFieldMetadata.add( sortableField );
 			return this;
 		}
 
@@ -138,5 +138,3 @@ public class PropertyMetadata {
 				+ ", dynamicBoostStrategy=" + dynamicBoostStrategy + '}';
 	}
 }
-
-

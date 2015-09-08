@@ -11,11 +11,11 @@ package org.hibernate.search.engine.metadata.impl;
  *
  * @author Gunnar Morling
  */
-public class SortFieldMetadata {
+public class SortableFieldMetadata {
 
 	private final String fieldName;
 
-	private SortFieldMetadata(String fieldName) {
+	private SortableFieldMetadata(String fieldName) {
 		this.fieldName = fieldName;
 	}
 
@@ -28,7 +28,7 @@ public class SortFieldMetadata {
 
 	@Override
 	public String toString() {
-		return "SortFieldMetadata [fieldName=" + fieldName + "]";
+		return "SortableFieldMetadata [fieldName=" + fieldName + "]";
 	}
 
 	public static class Builder {
@@ -40,8 +40,8 @@ public class SortFieldMetadata {
 			return this;
 		}
 
-		SortFieldMetadata build() {
-			return new SortFieldMetadata( fieldName );
+		SortableFieldMetadata build() {
+			return new SortableFieldMetadata( fieldName );
 		}
 	}
 }
