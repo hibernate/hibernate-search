@@ -9,7 +9,7 @@ package org.hibernate.checkstyle.checks.regexp;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 
 /**
- * {@link com.puppycrawl.tools.checkstyle.checks.regexp.MatchSuppressor} used to suppress a violation if it happens inside a {@link String}.
+ * A MatchSuppressor used to suppress a violation if it happens inside a {@link String}.
  *
  * @author Davide D'Alto
  */
