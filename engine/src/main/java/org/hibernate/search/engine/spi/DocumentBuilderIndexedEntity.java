@@ -60,7 +60,7 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
-import org.hibernate.search.engine.metadata.impl.SortFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
@@ -694,7 +694,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 * doc field value will be added.
 	 */
 	private void addSortFieldDocValues(Document document, PropertyMetadata propertyMetadata, float documentBoost, Object propertyValue) {
-		for ( SortFieldMetadata sortField : propertyMetadata.getSortFieldMetadata() ) {
+		for ( SortableFieldMetadata sortField : propertyMetadata.getSortableFieldMetadata() ) {
 			DocumentFieldMetadata fieldMetaData = propertyMetadata.getFieldMetadata( sortField.getFieldName() );
 			IndexableField field;
 

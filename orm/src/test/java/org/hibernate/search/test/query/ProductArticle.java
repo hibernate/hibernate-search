@@ -19,7 +19,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.annotations.SortField;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Store;
@@ -45,7 +45,7 @@ public class ProductArticle implements Coordinates {
 	@Column(name = "longitude")
 	private Double longitude;
 
-	@SortField
+	@SortableField
 	@Column(name = "creation_date")
 	@Field(analyze = Analyze.NO)
 	@DateBridge(resolution = Resolution.DAY)

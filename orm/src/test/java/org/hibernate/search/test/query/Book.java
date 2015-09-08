@@ -26,8 +26,8 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.annotations.SortField;
-import org.hibernate.search.annotations.SortFields;
+import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -93,9 +93,9 @@ public class Book {
 		// TODO explicit bridge is used as workaround for HSEARCH-1987
 		bridge = @org.hibernate.search.annotations.FieldBridge(impl = MyIntegerBridge.class)
 	)
-	@SortFields({
-			@SortField(forField = "id"),
-			@SortField(forField = "id_forIntegerSort")
+	@SortableFields({
+			@SortableField(forField = "id"),
+			@SortableField(forField = "id_forIntegerSort")
 	})
 	public Integer getId() {
 		return id;
@@ -117,7 +117,7 @@ public class Book {
 		this.summary = summary;
 	}
 
-	@SortField
+	@SortableField
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	@DateBridge(resolution = Resolution.SECOND, encoding = EncodingType.STRING)
 	public Date getPublicationDate() {

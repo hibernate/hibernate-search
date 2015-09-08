@@ -19,7 +19,7 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.SortFields;
+import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
@@ -133,9 +133,9 @@ public class SortingTest {
 		@DocumentId
 		final int id;
 
-		@SortFields({
-				@org.hibernate.search.annotations.SortField(forField = "ageForStringSorting"),
-				@org.hibernate.search.annotations.SortField(forField = "ageForIntSorting")
+		@SortableFields({
+				@org.hibernate.search.annotations.SortableField(forField = "ageForStringSorting"),
+				@org.hibernate.search.annotations.SortableField(forField = "ageForIntSorting")
 		})
 		@Fields({
 			@Field(name = "ageForStringSorting", store = Store.YES, analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class) ),
@@ -144,7 +144,7 @@ public class SortingTest {
 		})
 		final Integer age;
 
-		@org.hibernate.search.annotations.SortField
+		@org.hibernate.search.annotations.SortableField
 		@Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 		final String name;
 
@@ -165,7 +165,7 @@ public class SortingTest {
 
 	private class CuddlyToy {
 
-		@org.hibernate.search.annotations.SortField
+		@org.hibernate.search.annotations.SortableField
 		@Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 		String type;
 

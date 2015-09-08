@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Sort;
-import org.hibernate.search.engine.metadata.impl.SortFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -32,14 +32,14 @@ public final class MultiReaderFactory {
 		return openReader( null, null, indexManagers );
 	}
 
-	public static IndexReader openReader(Iterable<SortFieldMetadata> configuredSortFields, Sort sort, IndexManager[] indexManagers) {
+	public static IndexReader openReader(Iterable<SortableFieldMetadata> configuredSortableFields, Sort sort, IndexManager[] indexManagers) {
 		if ( indexManagers.length == 0 ) {
 			return null;
 		}
 		else {
 			//everything should be the same so wrap in an MultiReader
 			try {
-				return ManagedMultiReader.createInstance( indexManagers, configuredSortFields, sort );
+				return ManagedMultiReader.createInstance( indexManagers, configuredSortableFields, sort );
 			}
 			catch (IOException e) {
 				throw log.ioExceptionOnMultiReaderRefresh( e );

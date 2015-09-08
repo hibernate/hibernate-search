@@ -20,7 +20,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.uninverting.UninvertingReader;
 import org.apache.lucene.uninverting.UninvertingReader.Type;
-import org.hibernate.search.engine.metadata.impl.SortFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.util.StringHelper;
@@ -55,7 +55,7 @@ public class ManagedMultiReader extends MultiReader {
 		this.readerProviders = readerProviders;
 	}
 
-	static ManagedMultiReader createInstance(IndexManager[] indexManagers, Iterable<SortFieldMetadata> configuredSortFields, Sort sort) throws IOException {
+	static ManagedMultiReader createInstance(IndexManager[] indexManagers, Iterable<SortableFieldMetadata> configuredSortableFields, Sort sort) throws IOException {
 		final int length = indexManagers.length;
 
 		IndexReader[] subReaders = new IndexReader[length];
@@ -67,7 +67,7 @@ public class ManagedMultiReader extends MultiReader {
 			readerProviders[index] = indexReaderManager;
 		}
 
-		IndexReader[] effectiveReaders = getEffectiveReaders( indexManagers, subReaders, configuredSortFields, sort );
+		IndexReader[] effectiveReaders = getEffectiveReaders( indexManagers, subReaders, configuredSortableFields, sort );
 		return new ManagedMultiReader( effectiveReaders, subReaders, readerProviders );
 	}
 
@@ -80,7 +80,7 @@ public class ManagedMultiReader extends MultiReader {
 	 * Otherwise each directory reader will be wrapped in a {@link UninvertingReader} configured in a way to satisfy the
 	 * requested sorts.
 	 */
-	private static IndexReader[] getEffectiveReaders(IndexManager[] indexManagers, IndexReader[] subReaders, Iterable<SortFieldMetadata> configuredSortFields, Sort sort) {
+	private static IndexReader[] getEffectiveReaders(IndexManager[] indexManagers, IndexReader[] subReaders, Iterable<SortableFieldMetadata> configuredSortFields, Sort sort) {
 		if ( sort == null || sort.getSort().length == 0 ) {
 			return subReaders;
 		}
@@ -130,7 +130,7 @@ public class ManagedMultiReader extends MultiReader {
 	 * index.
 	 */
 	// TODO HSEARCH-1992 Need to consider that per entity actually
-	private static List<String> getUncoveredSorts(Iterable<SortFieldMetadata> configuredSortFields, Sort sort) {
+	private static List<String> getUncoveredSorts(Iterable<SortableFieldMetadata> configuredSortFields, Sort sort) {
 		List<String> uncoveredSorts = new ArrayList<>();
 
 		for ( SortField sortField : sort.getSort() ) {
@@ -140,7 +140,7 @@ public class ManagedMultiReader extends MultiReader {
 			}
 
 			boolean isConfigured = false;
-			for ( SortFieldMetadata sortFieldMetadata : configuredSortFields ) {
+			for ( SortableFieldMetadata sortFieldMetadata : configuredSortFields ) {
 				if ( sortFieldMetadata.getFieldName().equals( sortField.getField() ) ) {
 					isConfigured = true;
 					break;

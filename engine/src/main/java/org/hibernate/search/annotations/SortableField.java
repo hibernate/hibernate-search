@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
-public @interface SortField {
+public @interface SortableField {
 
 	/**
 	 * Name of the field whose field bridge to apply to obtain the value of this sort field. Can be omitted in case only
