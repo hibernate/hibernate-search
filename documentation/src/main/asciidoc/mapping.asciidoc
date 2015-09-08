@@ -1344,6 +1344,21 @@ internal format. It is important, however, to query a numerically indexed date v
 Usually, storing the date up to the millisecond is not necessary. `@DateBridge` defines the
 appropriate resolution you are willing to store in the index.
 +
+
+`java.time.Year`:: converts the year to the integer representation.
+`java.time.Duration`:: converts the duration to the total length in nanoseconds.
+`java.time.Instant`:: converts the instant to the number of milliseconds from Epoch.
+Note that these values are indexed with a precision to the millisecond.
+
+[IMPORTANT]
+====
+Note that it must be possible to convert the `Instant` or the `Duration` to a `Long`.
+If these values are too big or too small an exception is thrown.
+====
+
+`LocalDate`, `LocalTime`, `LocalDateTime`, `LocalTime`, `MonthDay`, `OffsetDateTime`, `OffsetTime`, `Period`, `YearMonth`, `ZoneDateTime`, `ZoneId`, `ZoneOffset`:: the bridges
+for these classes in the `java.time` package store the values as string padded with 0 when required to allow sorting.
+
 ====
 [source, JAVA]
 ----
@@ -1356,21 +1371,20 @@ public class Meeting {
     // ...
 ----
 ====
-+
+
 You can also choose to encode the date as string using the `encoding=EncodingType.STRING` of
 `DateBridge`. In this case the dates are stored in the format _yyyyMMddHHmmssSSS_ (using GMT time).
-+
+
 [IMPORTANT]
 ====
 A Date whose resolution is lower than `MILLISECOND` cannot be a `@DocumentId`
 ====
-+
+
 [IMPORTANT]
 ====
 The default date bridge uses Lucene's `DateTools` to convert from `Date` or `Calendar` to its indexed
 value. This means that all dates are expressed in GMT time. If your requirements are to store dates
-in a fixed time zone you have to implement a custom date bridge. Make sure you understand the
-requirements of your applications regarding to date indexing and searching.
+in a fixed time zone you have to implement a custom date bridge.
 ====
 
 `java.net.URI`, `java.net.URL`:: `URI` and `URL` are converted to their string representation
