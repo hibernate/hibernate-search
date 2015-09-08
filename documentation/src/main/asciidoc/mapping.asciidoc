@@ -1296,6 +1296,20 @@ internal format. It is important, however, to query a numerically indexed date v
 Usually, storing the date up to the millisecond is not necessary. `@DateBridge` defines the
 appropriate resolution you are willing to store in the index.
 +
+
+`java.time.Year`:: converts the year to the integer representation.
+`java.time.Duration`:: converts the duration to the total length in nanoseconds.
+`java.time.Instant`:: converts the instant to the number of milliseconds from Epoch.
+Note that this values is converted with a precision to the millisecond.
++
+Note that it must be possible to convert the `Instant` or the `Duration` to a `Long`.
+If this values are too big or too small an exception is thrown.
++
+
+`LocalDate`, `LocalTime`, `LocalDateTime`, `LocalTime`, `MonthDay`,`OffsetDateTime`, `OffsetTime`,
+`Period`, `YearMonth`, `ZoneDateTime`, `ZoneId`, `ZoneOffset`:: the bridges for this classes in
+the `java.time` package store the values as string padded with 0 when required to allow sorting. 
+
 ====
 [source, JAVA]
 ----
