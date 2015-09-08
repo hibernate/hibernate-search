@@ -756,7 +756,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ParseContext parseContext) {
 
 		String sortedFieldName = prefix + ReflectionHelper.getAttributeName( member, sortFieldAnnotation.forField() );
-		String idFieldName;
+		String idFieldName = null;
 
 		// Make sure a sort on the id field is only added to the idPropertyMetadata
 		if ( isIdProperty ) {
@@ -766,7 +766,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			}
 		}
 		else {
-			idFieldName = typeMetadataBuilder.getIdPropertyMetadata().getFieldMetadata().iterator().next().getFieldName();
+			if ( typeMetadataBuilder.getIdPropertyMetadata() != null ) {
+				idFieldName = typeMetadataBuilder.getIdPropertyMetadata().getFieldMetadata().iterator().next().getFieldName();
+			}
 			if ( sortedFieldName.equals( idFieldName ) ) {
 				return;
 			}
