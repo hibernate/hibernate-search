@@ -603,7 +603,11 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					}
 				}
 
-				addSortFieldDocValues( document, propertyMetadata, documentBoost, currentFieldValue );
+				// add the doc value fields required for sorting, but only if this property is not part of an embedded
+				// to-many assoc, in which case sorting on these fields would not make sense
+				if ( !multiValuedFacet ) {
+					addSortFieldDocValues( document, propertyMetadata, documentBoost, currentFieldValue );
+				}
 			}
 			finally {
 				conversionContext.popProperty();

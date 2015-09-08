@@ -105,7 +105,6 @@ public class Book {
 		this.id = id;
 	}
 
-	@SortField(forField = "summary_forSort")
 	@Fields({
 			@Field(store = Store.YES),
 			@Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
