@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.test.sorting;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,9 +15,10 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.SortFields;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
@@ -33,6 +31,9 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test to verify we apply the right sorting strategy for non-trivial mapped entities
@@ -65,6 +66,22 @@ public class SortingTest {
 		// Sorting Age as Int (numeric):
 		Sort sortAsInt = new Sort( new SortField( "ageForIntSorting", SortField.Type.INT ) );
 		assertSortedResults( query, sortAsInt, 0, 3, 2, 1 );
+	}
+
+	@Test
+	public void testSortingOnString() {
+		// Index all testData:
+		storeTestingData(
+				new Person( 0, 3, "Three" ),
+				new Person( 1, 10, "Ten" ),
+				new Person( 2, 9, "Nine" ),
+				new Person( 3, 5, "Five" )
+			);
+
+		// Sorting Name
+		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
+		Sort sortAsString = new Sort( new SortField( "name", SortField.Type.STRING ) );
+		assertSortedResults( query, sortAsString, 3, 2, 1, 0 );
 	}
 
 	private void storeTestingData(Person... testData) {
@@ -100,6 +117,10 @@ public class SortingTest {
 		@DocumentId
 		final int id;
 
+		@SortFields({
+				@org.hibernate.search.annotations.SortField(forField = "ageForStringSorting"),
+				@org.hibernate.search.annotations.SortField(forField = "ageForIntSorting")
+		})
 		@Fields({
 			@Field(name = "ageForStringSorting", store = Store.YES, analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class) ),
 			@Field(name = "ageForIntSorting", store = Store.YES, analyze = Analyze.NO),
@@ -107,6 +128,7 @@ public class SortingTest {
 		})
 		final Integer age;
 
+		@org.hibernate.search.annotations.SortField
 		@Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 		final String name;
 

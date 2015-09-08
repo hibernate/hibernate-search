@@ -535,6 +535,10 @@ public class TypeMetadata {
 			return indexedType;
 		}
 
+		public PropertyMetadata getIdPropertyMetadata() {
+			return idPropertyMetadata;
+		}
+
 		public TypeMetadata build() {
 			return new TypeMetadata( this );
 		}

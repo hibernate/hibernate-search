@@ -19,6 +19,7 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.SortField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
@@ -56,6 +57,7 @@ public class Employee {
 	@Id
 	@DocumentId
 	@FieldBridge(impl = PaddedIntegerBridge.class) // test needs to sort on the id
+	@SortField
 	public Integer getId() {
 		return id;
 	}
@@ -67,6 +69,7 @@ public class Employee {
 	// TODO HSEARCH-1849 This used to work with index = NO; But the implicit uninverting used for sorting requires the
 	// field to be indexed
 	@Field(index = Index.YES, store = Store.YES)
+	@SortField
 	public String getLastname() {
 		return lastname;
 	}

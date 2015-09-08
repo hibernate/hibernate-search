@@ -22,13 +22,15 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetField;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableField;
-
+import org.apache.lucene.util.BytesRef;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -57,6 +59,7 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.SortFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
@@ -336,6 +339,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 			try {
 				contextualizedBridge.set( idFieldMetaData.getName(), id, doc, luceneOptions );
+				addSortFieldDocValues( doc, idPropertyMetadata, documentLevelBoost, id );
 			}
 			finally {
 				conversionContext.popProperty();
@@ -598,6 +602,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						}
 					}
 				}
+
+				addSortFieldDocValues( document, propertyMetadata, documentBoost, currentFieldValue );
 			}
 			finally {
 				conversionContext.popProperty();
@@ -675,6 +681,65 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 
 		document.add( facetField );
+	}
+
+	/**
+	 * Adds the doc field values to the document required to map the configured sort fields. The value from the
+	 * underlying field will be obtained from the document (it has been written at this point already) and an equivalent
+	 * doc field value will be added.
+	 */
+	private void addSortFieldDocValues(Document document, PropertyMetadata propertyMetadata, float documentBoost, Object propertyValue) {
+		for ( SortFieldMetadata sortField : propertyMetadata.getSortFieldMetadata() ) {
+			DocumentFieldMetadata fieldMetaData = propertyMetadata.getFieldMetadata( sortField.getFieldName() );
+			IndexableField field;
+
+			// A non-stored, non-indexed field will not be added to the actual document; in that case retrieve
+			// its value via a dummy document, adjusting the options to index the field
+			if ( fieldMetaData.getIndex() == Index.NO && fieldMetaData.getStore() == Store.NO ) {
+				FieldBridge fieldBridge = fieldMetaData.getFieldBridge();
+
+				LuceneOptionsImpl luceneOptions = new LuceneOptionsImpl(
+						Index.NOT_ANALYZED,
+						fieldMetaData.getTermVector(),
+						fieldMetaData.getStore(),
+						fieldMetaData.indexNullAs(),
+						fieldMetaData.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( propertyValue ),
+						documentBoost
+				);
+
+				Document dummy = new Document();
+				fieldBridge.set(
+						"dummy",
+						propertyValue,
+						dummy,
+						luceneOptions
+				);
+
+				field = dummy.getField( "dummy" );
+			}
+			else {
+				field = document.getField( sortField.getFieldName() );
+			}
+
+			if ( field != null ) {
+				Number numericValue = field.numericValue();
+
+				if ( numericValue != null ) {
+					if ( numericValue instanceof Double ) {
+						document.add( new DoubleDocValuesField( sortField.getFieldName(), (double) numericValue ) );
+					}
+					else if ( numericValue instanceof Float ) {
+						document.add( new DoubleDocValuesField( sortField.getFieldName(), (float) numericValue ) );
+					}
+					else {
+						document.add( new NumericDocValuesField( sortField.getFieldName(), numericValue.longValue() ) );
+					}
+				}
+				else {
+					document.add( new SortedDocValuesField( sortField.getFieldName(), new BytesRef( field.stringValue() ) ) );
+				}
+			}
+		}
 	}
 
 	private void buildDocumentFieldForClassBridges(Document doc,

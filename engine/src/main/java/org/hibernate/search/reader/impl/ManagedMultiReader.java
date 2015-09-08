@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.Sort;
@@ -63,26 +62,28 @@ public class ManagedMultiReader extends MultiReader {
 		if ( sort == null || sort.getSort().length == 0 ) {
 			return subReaders;
 		}
+		// TODO HSEARCH-1984: Validate incoming sorts against defined sort fields and apply uninverting reader if not
+		// all sorts are covered by doc value fields
 
 		IndexReader[] uninvertingReaders = new IndexReader[subReaders.length];
 		Map<String, Type> mappings = getMappings( sort );
 
 		int i = 0;
 		for ( IndexReader reader : subReaders ) {
-			if ( reader instanceof DirectoryReader ) {
-				DirectoryReader directoryReader = (DirectoryReader) reader;
-
-				try {
-					uninvertingReaders[i] = UninvertingReader.wrap( directoryReader, mappings );
-				}
-				catch (IOException e) {
-					throw log.couldNotCreateUninvertingReader( directoryReader, e );
-				}
-			}
-			else {
-				log.readerTypeUnsupportedForInverting( reader.getClass() );
+//			if ( reader instanceof DirectoryReader ) {
+//				DirectoryReader directoryReader = (DirectoryReader) reader;
+//
+//				try {
+//					uninvertingReaders[i] = UninvertingReader.wrap( directoryReader, mappings );
+//				}
+//				catch (IOException e) {
+//					throw log.couldNotCreateUninvertingReader( directoryReader, e );
+//				}
+//			}
+//			else {
+//				log.readerTypeUnsupportedForInverting( reader.getClass() );
 				uninvertingReaders[i] = reader;
-			}
+//			}
 
 			i++;
 		}
