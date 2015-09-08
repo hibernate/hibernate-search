@@ -1,6 +1,39 @@
 Hibernate Search Changelog
 ==========================
 
+
+Version 5.5.0.CR1 (8-9-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1956] - Exception on sorting on NumericField and indexNullAs
+    * [HSEARCH-1960] - TypeMetadata and QueryValidator fail to recognize an Id being encoded as Numeric
+    * [HSEARCH-1968] - NPE on Faceting queries which represent and empty result
+    * [HSEARCH-1973] - ConnectedMultiFieldsTermQueryBuilder must unwrap a NullEncodingTwoWayFieldBridge before checking for NumericFieldBridge
+    * [HSEARCH-1981] - QueryBuilder should not tokenize the null-token when searching for null
+
+** New Feature
+    * [HSEARCH-1491] - Support queries on Numeric fields by value "null"
+    * [HSEARCH-1947] - Create custom bridges for Java 8 Date and Time classes
+    * [HSEARCH-1984] - Provide means of configuring fields to sort on
+
+** Task
+    * [HSEARCH-1946] - Make sure the performance tests do cleanup the filesystem indexes
+    * [HSEARCH-1954] - Require JDK 8 for building
+    * [HSEARCH-1959] - Add JavaDoc to ExtendedSearchIntegrator#getIndexedTypesPolymorphic()
+    * [HSEARCH-1962] - Verify if the indexwriter.max_thread_states configuration property still applies
+    * [HSEARCH-1963] - Make sure we point users to an Infinispan version for integration which supports Lucene 5
+    * [HSEARCH-1965] - Remove dead code from DocumentExtractorImpl
+    * [HSEARCH-1972] - Upgrade to Hibernate ORM 5.0.0.Final
+    * [HSEARCH-1978] - Fix example in projection documentation
+    * [HSEARCH-1979] - Upgrade to WildFly 10.0.0.Beta2
+    * [HSEARCH-1980] - Upgrade to JGroups 3.6.4.Final
+    * [HSEARCH-1998] - Upgrade to Hibernate ORM 5.0.1.Final
+
+** Improvement
+    * [HSEARCH-1989] - Let maven build support maven-color
+
+
 Version 5.5.0.Alpha1 (7-8-2015)
 ------------------------
 
