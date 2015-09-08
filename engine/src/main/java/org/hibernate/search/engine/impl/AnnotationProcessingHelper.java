@@ -7,25 +7,26 @@
 
 package org.hibernate.search.engine.impl;
 
+import java.lang.annotation.Annotation;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.SortField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-
-import java.lang.annotation.Annotation;
 
 /**
  * A helper classes dealing with the processing of annotation. It is there to share some annotation processing
@@ -165,6 +166,9 @@ public final class AnnotationProcessingHelper {
 		else if ( fieldAnn instanceof Spatial ) {
 			fieldName = ( (Spatial) fieldAnn ).name();
 		}
+		else if ( fieldAnn instanceof SortField ) {
+			fieldName = ( (SortField) fieldAnn ).forField();
+		}
 		else {
 			return raiseAssertionOnIncorrectAnnotation( fieldAnn );
 		}
@@ -172,8 +176,6 @@ public final class AnnotationProcessingHelper {
 	}
 
 	private static String raiseAssertionOnIncorrectAnnotation(Annotation fieldAnn) {
-		throw new AssertionFailure( "Cannot instances other than @Field and @Spatial. Found: " + fieldAnn.getClass() );
+		throw new AssertionFailure( "Cannot process instances other than @Field, @Spatial and @SortField. Found: " + fieldAnn.getClass() );
 	}
 }
-
-

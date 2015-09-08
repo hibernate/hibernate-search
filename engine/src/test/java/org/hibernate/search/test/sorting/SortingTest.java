@@ -18,6 +18,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortFields;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.spi.Work;
@@ -84,6 +85,21 @@ public class SortingTest {
 		assertSortedResults( query, sortAsString, 3, 2, 1, 0 );
 	}
 
+	@Test
+	public void testSortingOnEmbeddedString() {
+		// Index all testData:
+		storeTestingData(
+				new Person( 0, 3, "Three", new CuddlyToy( "Hippo" ) ),
+				new Person( 1, 10, "Ten", new CuddlyToy( "Giraffe" ) ),
+				new Person( 2, 9, "Nine", new CuddlyToy( "Gorilla" ) ),
+				new Person( 3, 5, "Five" , new CuddlyToy( "Alligator" ) )
+			);
+
+		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
+		Sort sortAsString = new Sort( new SortField( "favoriteCuddlyToy.type", SortField.Type.STRING ) );
+		assertSortedResults( query, sortAsString, 3, 1, 2, 0 );
+	}
+
 	private void storeTestingData(Person... testData) {
 		Worker worker = factoryHolder.getSearchFactory().getWorker();
 		TransactionContextForTest tc = new TransactionContextForTest();
@@ -132,12 +148,29 @@ public class SortingTest {
 		@Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 		final String name;
 
+		@IndexedEmbedded
+		final CuddlyToy favoriteCuddlyToy;
+
 		Person(int id, Integer age, String name) {
+			this( id, age, name, null );
+		}
+
+		Person(int id, Integer age, String name, CuddlyToy favoriteCuddlyToy) {
 			this.id = id;
 			this.age = age;
 			this.name = name;
+			this.favoriteCuddlyToy = favoriteCuddlyToy;
 		}
-
 	}
 
+	private class CuddlyToy {
+
+		@org.hibernate.search.annotations.SortField
+		@Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+		String type;
+
+		public CuddlyToy(String type) {
+			this.type = type;
+		}
+	}
 }
