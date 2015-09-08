@@ -999,6 +999,22 @@
                             <artifactId>hibernate-search-build-config</artifactId>
                             <version>${project.version}</version>
                         </dependency>
+                        <!--
+                             force SLF4J dependency to align
+                             Maven internals and CheckStyle's
+                             see https://github.com/jcgay/maven-color/wiki/Problems
+                             If that causes problem, that can be removed
+                             but maven-color won't work -->
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>jcl-over-slf4j</artifactId>
+                            <version>1.7.5</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-jdk14</artifactId>
+                            <version>1.7.5</version>
+                        </dependency>
                     </dependencies>
                     <configuration>
                         <!-- Location is relative to the classpath -->
