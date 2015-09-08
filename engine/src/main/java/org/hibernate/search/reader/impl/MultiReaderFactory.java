@@ -12,7 +12,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.metadata.impl.SortFieldMetadata;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -34,23 +33,13 @@ public final class MultiReaderFactory {
 	}
 
 	public static IndexReader openReader(Iterable<SortFieldMetadata> configuredSortFields, Sort sort, IndexManager[] indexManagers) {
-		final int length = indexManagers.length;
-		IndexReader[] readers = new IndexReader[length];
-		ReaderProvider[] managers = new ReaderProvider[length];
-		for ( int index = 0; index < length; index++ ) {
-			ReaderProvider indexReaderManager = indexManagers[index].getReaderProvider();
-			IndexReader openIndexReader = indexReaderManager.openIndexReader();
-			readers[index] = openIndexReader;
-			managers[index] = indexReaderManager;
-		}
-
-		if ( length == 0 ) {
+		if ( indexManagers.length == 0 ) {
 			return null;
 		}
 		else {
 			//everything should be the same so wrap in an MultiReader
 			try {
-				return ManagedMultiReader.createInstance( readers, managers, configuredSortFields, sort );
+				return ManagedMultiReader.createInstance( indexManagers, configuredSortFields, sort );
 			}
 			catch (IOException e) {
 				throw log.ioExceptionOnMultiReaderRefresh( e );

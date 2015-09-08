@@ -13,11 +13,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Defines several sort fields.
+ *
  * @author Gunnar Morling
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface SortFields {
+
+	/**
+	 * The sort fields of the annotated property
+	 */
 	SortField[] value();
 }

@@ -24,6 +24,7 @@ import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.FloatDocValuesField;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.facet.FacetsConfig;
@@ -733,7 +734,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						document.add( new DoubleDocValuesField( sortField.getFieldName(), (double) numericValue ) );
 					}
 					else if ( numericValue instanceof Float ) {
-						document.add( new DoubleDocValuesField( sortField.getFieldName(), (float) numericValue ) );
+						document.add( new FloatDocValuesField( sortField.getFieldName(), (float) numericValue ) );
 					}
 					else {
 						document.add( new NumericDocValuesField( sortField.getFieldName(), numericValue.longValue() ) );

@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.annotations;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Documented;
 
 /**
  * Mark a property as indexable into different fields
@@ -24,7 +24,7 @@ import java.lang.annotation.Documented;
 public @interface Fields {
 
 	/**
-	 * @return the {@link Field} annotaions to use for the property
+	 * @return the {@link Field} annotations to use for the property
 	 */
 	Field[] value();
 
