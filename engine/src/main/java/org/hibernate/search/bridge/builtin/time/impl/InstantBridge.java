@@ -6,42 +6,65 @@
  */
 package org.hibernate.search.bridge.builtin.time.impl;
 
-import static java.time.temporal.ChronoField.INSTANT_SECONDS;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
-import java.time.format.SignStyle;
+
+import org.apache.lucene.document.Document;
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Converts a {@link Instant} to a {@link String}.
+ * Store a {@link Instant} in a numeric field representing it as the number of milliseconds form Epoch.
+ * Note that the instant is truncated to the milliseconds.
  * <p>
- * The string is obtained concatenating the number of seconds from Epoch with the nano of seconds.
- * The values are padded with 0 to allow field sorting.
+ * If the instant cannot be expressed using a long, a {@link org.hibernate.search.exception.SearchException} get thrown.
  *
+ * @see Instant#toEpochMilli()
  * @author Davide D'Alto
  */
-public class InstantBridge extends TemporalAccessorStringBridge<Instant> {
+public class InstantBridge implements TwoWayFieldBridge, NumericTimeBridge {
 
-	private static final int SECONDS_PADDING = 17;
-
-	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.appendValue( INSTANT_SECONDS, SECONDS_PADDING, SECONDS_PADDING, SignStyle.ALWAYS )
-			.appendValue( NANO_OF_SECOND, 9 )
-			.toFormatter();
+	private static final Log log = LoggerFactory.make();
 
 	public static final InstantBridge INSTANCE = new InstantBridge();
 
-	private InstantBridge() {
-		super( FORMATTER, Instant.class );
+	@Override
+	public NumericEncodingType getEncodingType() {
+		return NumericEncodingType.LONG;
 	}
 
 	@Override
-	Instant parse(String stringValue) throws DateTimeParseException {
-		long seconds = Long.parseLong( stringValue.substring( 0, SECONDS_PADDING + 1 ) );
-		long nanos = Integer.parseInt( stringValue.substring( SECONDS_PADDING + 1 ) );
-		return Instant.ofEpochSecond( seconds, nanos );
+	public Object get(String name, Document document) {
+		String millisFromEpoch = document.get( name );
+		return Instant.ofEpochMilli( Long.valueOf( millisFromEpoch ) );
+	}
+
+	@Override
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+		if ( value != null ) {
+			Long nanos = toEpochMillis( (Instant) value );
+			luceneOptions.addNumericFieldToDocument( name, nanos, document );
+		}
+	}
+
+	@Override
+	public String objectToString(Object object) {
+		if ( object == null ) {
+			return null;
+		}
+		Instant instant = (Instant) object;
+		return String.valueOf( toEpochMillis( instant ) );
+	}
+
+	private Long toEpochMillis(Instant value) {
+		try {
+			Long millis = value.toEpochMilli();
+			return millis;
+		}
+		catch (ArithmeticException ae) {
+			throw log.valueTooLargeForConvertionException( Instant.class, value, ae );
+		}
 	}
 }
