@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.lucene.search.Query;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 
@@ -41,6 +42,10 @@ public class MemberRegistration {
 	public void register(Member member) throws Exception {
 		em.persist( member );
 		initNewMember();
+	}
+
+	public String getHibernateSearchVersionString() {
+		return Version.getVersionString();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 
 import org.hibernate.search.test.integration.VersionTestHelper;
@@ -31,6 +32,7 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.application6.ApplicationDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
@@ -46,22 +48,46 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 
+	private static final String EXPECTED_SEARCH_VERSION_RESOURCE = "expectedHibernateSearchVersion";
+
 	@Deployment
 	public static Archive<?> createTestArchive() throws IllegalArgumentException, IOException {
+		WebArchive war = ShrinkWrap
+				.create( WebArchive.class, ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getSimpleName() + ".war" )
+				.addAsWebInfResource( webXml(), "web.xml" );
+
 		JavaArchive ejb = ShrinkWrap
 				.create( JavaArchive.class, ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getSimpleName() + ".jar" )
 				.addClasses( ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class, Member.class, MemberRegistration.class, Resources.class )
 				.addAsManifestResource( persistenceXml(), "persistence.xml" )
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 
-		String applicationXml = Descriptors.create( ApplicationDescriptor.class ).createModule().ejb( ejb.getName() ).up().exportAsString();
+		String applicationXml = Descriptors.create( ApplicationDescriptor.class )
+				.createModule()
+					.ejb( ejb.getName() ).up()
+				.createModule()
+					.getOrCreateWeb()
+						.webUri( war.getName() ).up().up()
+				.exportAsString();
 
 		EnterpriseArchive ear = ShrinkWrap
 				.create( EnterpriseArchive.class, ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getSimpleName() + ".ear" )
 				.addAsModules( ejb )
+				.addAsModule( war )
 				.addAsResource( jbossDeploymentXml(), "/jboss-deployment-structure.xml" )
 				.setApplicationXML( new StringAsset( applicationXml ) );
 		return ear;
+	}
+
+	private static Asset webXml() {
+		String webXml = Descriptors.create( org.jboss.shrinkwrap.descriptor.api.webapp31.WebAppDescriptor.class )
+			.createEnvEntry()
+				.envEntryName( EXPECTED_SEARCH_VERSION_RESOURCE )
+				.envEntryValue( VersionTestHelper.getDependencyVersionHibernateSearch() )
+				.envEntryType( "java.lang.String" )
+				.up()
+			.exportAsString();
+		return new StringAsset( webXml );
 	}
 
 	private static Asset jbossDeploymentXml() throws IOException {
@@ -87,13 +113,22 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
+					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( "none" ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );
 	}
 
+	@Resource(name = EXPECTED_SEARCH_VERSION_RESOURCE)
+	String expectedSearchVersion;
+
 	@Inject
 	MemberRegistration memberRegistration;
+
+	@Test
+	public void HibernateSearchVersion() throws Exception {
+		assertEquals( expectedSearchVersion, memberRegistration.getHibernateSearchVersionString() );
+	}
 
 	@Test
 	public void testRegister() throws Exception {

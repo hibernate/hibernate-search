@@ -14,8 +14,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
@@ -41,13 +43,27 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class ModuleMemberRegistrationIT {
 
+	private static final String EXPECTED_SEARCH_VERSION_RESOURCE = "expectedHibernateSearchVersion";
+
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
 				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
+				.addAsWebInfResource( webXml(), "web.xml" );
+	}
+
+	private static Asset webXml() {
+		String webXml = Descriptors.create( org.jboss.shrinkwrap.descriptor.api.webapp31.WebAppDescriptor.class )
+			.createEnvEntry()
+				.envEntryName( EXPECTED_SEARCH_VERSION_RESOURCE )
+				.envEntryValue( VersionTestHelper.getDependencyVersionHibernateSearch() )
+				.envEntryType( "java.lang.String" )
+				.up()
+			.exportAsString();
+		return new StringAsset( webXml );
 	}
 
 	private static Asset persistenceXml() {
@@ -70,6 +86,14 @@ public class ModuleMemberRegistrationIT {
 
 	@Inject
 	MemberRegistration memberRegistration;
+
+	@Resource(name = EXPECTED_SEARCH_VERSION_RESOURCE)
+	String expectedSearchVersion;
+
+	@Test
+	public void HibernateSearchVersion() throws Exception {
+		assertEquals( expectedSearchVersion, memberRegistration.getHibernateSearchVersionString() );
+	}
 
 	@Test
 	public void testRegister() throws Exception {
