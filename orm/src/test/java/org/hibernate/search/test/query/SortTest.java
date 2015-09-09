@@ -41,6 +41,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.query.sorting.BrickLayer;
+import org.hibernate.search.test.query.sorting.Plumber;
+import org.hibernate.search.test.query.sorting.Thatcher;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.After;
 import org.junit.Before;
@@ -50,6 +53,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -71,6 +75,7 @@ public class SortTest extends SearchTestBase {
 
 		createTestBooks();
 		createTestNumbers();
+		createTestContractors();
 	}
 
 	@Override
@@ -81,6 +86,7 @@ public class SortTest extends SearchTestBase {
 		if ( fullTextSession.getTransaction().getStatus() != TransactionStatus.ACTIVE ) {
 			deleteTestBooks();
 			deleteTestNumbers();
+			deleteTestContractors();
 			fullTextSession.close();
 		}
 		super.tearDown();
@@ -272,6 +278,67 @@ public class SortTest extends SearchTestBase {
 		tx.commit();
 	}
 
+	@Test
+	public void testCombinedQueryOnIndexWithSortFieldAndIndexToBeUninverted() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Query query = queryParser.parse( "name:Bill" );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Plumber.class, BrickLayer.class );
+		Sort sort = new Sort( new SortField( "sortName", SortField.Type.STRING ) ); //ASC
+		hibQuery.setSort( sort );
+
+		@SuppressWarnings("unchecked")
+		List<Book> result = hibQuery.list();
+		assertNotNull( result );
+		assertThat( result ).onProperty( "name" )
+			.describedAs( "Expecting results from index with sort field and uninverted index in the correct sort order" )
+			.containsExactly( "Bill the brick layer", "Bill the plumber" );
+
+		tx.commit();
+	}
+
+	@Test
+	public void testQueryOnIndexSharedByEntityWithRequiredSortFieldAndEntityWithoutRaisesException() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Query query = queryParser.parse( "name:Bill" );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Thatcher.class, BrickLayer.class );
+		Sort sort = new Sort( new SortField( "sortName", SortField.Type.STRING ) ); //ASC
+		hibQuery.setSort( sort );
+
+		try {
+			hibQuery.list();
+			fail( "Expected exception was not raised" );
+		}
+		catch (Exception e) {
+			assertThat( e.getMessage() ).contains( "HSEARCH000298" );
+		}
+
+		tx.commit();
+	}
+
+	@Test
+	public void testSortingByMultipleFields() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Query query = queryParser.parse( "name:Bill OR name:Barny OR name:Bart" );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, BrickLayer.class );
+		Sort sort = new Sort( new SortField( "sortLastName", SortField.Type.STRING ), new SortField( "sortName", SortField.Type.STRING ) );
+		hibQuery.setSort( sort );
+
+
+		@SuppressWarnings("unchecked")
+		List<Book> result = hibQuery.list();
+		assertNotNull( result );
+		assertThat( result ).onProperty( "lastName" )
+			.containsExactly( "Higgins", "Higgins", "Johnson", "Johnson" );
+
+		assertThat( result ).onProperty( "name" )
+			.containsExactly( "Barny the brick layer", "Bart the brick layer", "Barny the brick layer", "Bill the brick layer" );
+
+		tx.commit();
+	}
+
 	/**
 	 * Helper method creating three books with the same title and summary.
 	 * When searching for these books the results should be returned in the order
@@ -342,6 +409,20 @@ public class SortTest extends SearchTestBase {
 		fullTextSession.clear();
 	}
 
+	private void createTestContractors() {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		fullTextSession.save( new Plumber( 1, "Bill the plumber" ) );
+		fullTextSession.save( new BrickLayer( 2, "Bill the brick layer", "Johnson" ) );
+		fullTextSession.save( new BrickLayer( 4, "Barny the brick layer", "Johnson" ) );
+		fullTextSession.save( new BrickLayer( 5, "Bart the brick layer", "Higgins" ) );
+		fullTextSession.save( new BrickLayer( 6, "Barny the brick layer", "Higgins" ) );
+		fullTextSession.save( new Thatcher( 3, "Bill the thatcher" ) );
+
+		tx.commit();
+		fullTextSession.clear();
+	}
+
 	private void deleteTestBooks() {
 		Transaction tx = fullTextSession.beginTransaction();
 		fullTextSession.createQuery( "delete " + Book.class.getName() ).executeUpdate();
@@ -356,12 +437,24 @@ public class SortTest extends SearchTestBase {
 		fullTextSession.clear();
 	}
 
+	private void deleteTestContractors() {
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.createQuery( "delete " + Plumber.class.getName() ).executeUpdate();
+		fullTextSession.createQuery( "delete " + BrickLayer.class.getName() ).executeUpdate();
+		fullTextSession.createQuery( "delete " + Thatcher.class.getName() ).executeUpdate();
+		tx.commit();
+		fullTextSession.clear();
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
 				Author.class,
-				NumberHolder.class
+				NumberHolder.class,
+				Plumber.class,
+				BrickLayer.class,
+				Thatcher.class
 		};
 	}
 

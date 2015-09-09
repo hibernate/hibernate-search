@@ -7,11 +7,13 @@
 package org.hibernate.search.reader.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -20,9 +22,10 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.uninverting.UninvertingReader;
 import org.apache.lucene.uninverting.UninvertingReader.Type;
-import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
+import org.hibernate.search.query.engine.impl.SortConfigurations;
+import org.hibernate.search.query.engine.impl.SortConfigurations.SortConfiguration;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -55,7 +58,7 @@ public class ManagedMultiReader extends MultiReader {
 		this.readerProviders = readerProviders;
 	}
 
-	static ManagedMultiReader createInstance(IndexManager[] indexManagers, Iterable<SortableFieldMetadata> configuredSortableFields, Sort sort) throws IOException {
+	static ManagedMultiReader createInstance(IndexManager[] indexManagers, SortConfigurations configuredSorts, Sort sort) throws IOException {
 		final int length = indexManagers.length;
 
 		IndexReader[] subReaders = new IndexReader[length];
@@ -67,47 +70,42 @@ public class ManagedMultiReader extends MultiReader {
 			readerProviders[index] = indexReaderManager;
 		}
 
-		IndexReader[] effectiveReaders = getEffectiveReaders( indexManagers, subReaders, configuredSortableFields, sort );
+		IndexReader[] effectiveReaders = getEffectiveReaders( indexManagers, subReaders, configuredSorts, sort );
 		return new ManagedMultiReader( effectiveReaders, subReaders, readerProviders );
 	}
 
 	/**
-	 * Gets the readers to be effectively used. Will be the given readers, if:
+	 * Gets the readers to be effectively used. A given reader will be returned itself if:
 	 * <ul>
 	 * <li>there is no sort involved.</li>
-	 * <li>A doc value field is contained in the index for each requested sort field</li>
+	 * <li>doc value fields for all requested sort fields are contained in the index, for each entity type mapped to the
+	 * index</li>
 	 * </ul>
-	 * Otherwise each directory reader will be wrapped in a {@link UninvertingReader} configured in a way to satisfy the
+	 * Otherwise the directory reader will be wrapped in a {@link UninvertingReader} configured in a way to satisfy the
 	 * requested sorts.
 	 */
-	private static IndexReader[] getEffectiveReaders(IndexManager[] indexManagers, IndexReader[] subReaders, Iterable<SortableFieldMetadata> configuredSortFields, Sort sort) {
+	private static IndexReader[] getEffectiveReaders(IndexManager[] indexManagers, IndexReader[] subReaders, SortConfigurations configuredSorts, Sort sort) {
 		if ( sort == null || sort.getSort().length == 0 ) {
 			return subReaders;
 		}
 
-		IndexReader[] uninvertingReaders = new IndexReader[subReaders.length];
-		List<String> uncoveredSorts = getUncoveredSorts( configuredSortFields, sort );
+		Set<String> indexesToBeUninverted = getIndexesToBeUninverted( configuredSorts, sort );
+		Map<String, Type> mappings = indexesToBeUninverted.isEmpty() ? Collections.<String, Type>emptyMap() : getMappings( sort );
+		IndexReader[] effectiveReaders = new IndexReader[subReaders.length];
 
-		if ( uncoveredSorts.isEmpty() ) {
-			return subReaders;
-		}
-		else {
-			List<String> indexNames = new ArrayList<>();
-			for ( IndexManager indexManager : indexManagers ) {
-				indexNames.add( indexManager.getIndexName() );
+		int i = 0;
+		for ( IndexReader reader : subReaders ) {
+			// take incoming reader as is
+			if ( !indexesToBeUninverted.contains( indexManagers[i].getIndexName() ) ) {
+				effectiveReaders[i] = reader;
 			}
-
-			log.uncoveredSortsRequested( StringHelper.join( indexNames, ", " ), StringHelper.join( uncoveredSorts, ", " ) );
-
-			Map<String, Type> mappings = getMappings( sort );
-
-			int i = 0;
-			for ( IndexReader reader : subReaders ) {
+			// wrap with uninverting reader
+			else {
 				if ( reader instanceof DirectoryReader ) {
 					DirectoryReader directoryReader = (DirectoryReader) reader;
 
 					try {
-						uninvertingReaders[i] = UninvertingReader.wrap( directoryReader, mappings );
+						effectiveReaders[i] = UninvertingReader.wrap( directoryReader, mappings );
 					}
 					catch (IOException e) {
 						throw log.couldNotCreateUninvertingReader( directoryReader, e );
@@ -115,44 +113,46 @@ public class ManagedMultiReader extends MultiReader {
 				}
 				else {
 					log.readerTypeUnsupportedForInverting( reader.getClass() );
-					uninvertingReaders[i] = reader;
+					effectiveReaders[i] = reader;
 				}
-
-				i++;
 			}
 
-			return uninvertingReaders;
+			i++;
 		}
+
+		return effectiveReaders;
 	}
 
 	/**
-	 * Returns all those sorts requested that cannot be satisfied by the existing sort fields (doc value fields) in the
-	 * index.
+	 * Checks for each involved entity type whether it maps all the required sortable fields; If not, it marks the index
+	 * for uninverting.
 	 */
-	// TODO HSEARCH-1992 Need to consider that per entity actually
-	private static List<String> getUncoveredSorts(Iterable<SortableFieldMetadata> configuredSortFields, Sort sort) {
-		List<String> uncoveredSorts = new ArrayList<>();
+	private static Set<String> getIndexesToBeUninverted(SortConfigurations configuredSorts, Sort sort) {
+		Set<String> indexesToBeUninverted = new HashSet<>();
 
-		for ( SortField sortField : sort.getSort() ) {
-			// no doc value field needed for these
-			if ( sortField.getType() == SortField.Type.DOC && sortField.getType() == SortField.Type.SCORE ) {
-				continue;
-			}
+		for ( SortConfiguration sortConfiguration : configuredSorts ) {
+			boolean foundEntityWithAllRequiredSorts = false;
+			boolean foundEntityWithMissingSorts = false;
 
-			boolean isConfigured = false;
-			for ( SortableFieldMetadata sortFieldMetadata : configuredSortFields ) {
-				if ( sortFieldMetadata.getFieldName().equals( sortField.getField() ) ) {
-					isConfigured = true;
-					break;
+			for ( Class<?> entityType : sortConfiguration.getEntityTypes() ) {
+				List<String> uncoveredSorts = sortConfiguration.getUncoveredSorts( entityType, sort );
+
+				if ( !uncoveredSorts.isEmpty() ) {
+					indexesToBeUninverted.add( sortConfiguration.getIndexName() );
+					log.uncoveredSortsRequested( entityType, sortConfiguration.getIndexName(), StringHelper.join( uncoveredSorts, ", " ) );
+					foundEntityWithMissingSorts = true;
+				}
+				else {
+					foundEntityWithAllRequiredSorts = true;
 				}
 			}
 
-			if ( !isConfigured ) {
-				uncoveredSorts.add( sortField.getField() );
+			if ( foundEntityWithAllRequiredSorts && foundEntityWithMissingSorts ) {
+				throw log.inconsistentSortableFieldConfigurationForSharedIndex( sortConfiguration.getIndexName(), StringHelper.join( sort.getSort(), ", " ) );
 			}
 		}
 
-		return uncoveredSorts;
+		return indexesToBeUninverted;
 	}
 
 	/**
