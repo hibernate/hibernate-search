@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +33,6 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
-import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -60,7 +60,6 @@ import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -537,10 +536,11 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 */
 	private LazyQueryState buildSearcher(ExtendedSearchIntegrator extendedIntegrator, Boolean forceScoring) {
 		Map<Class<?>, EntityIndexBinding> indexBindings = extendedIntegrator.getIndexBindings();
-		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
+		Set<IndexManager> targetedIndexes = new HashSet<>();
 		Set<String> idFieldNames = new HashSet<String>();
 		Similarity searcherSimilarity = null;
-		List<SortableFieldMetadata> configuredSortableFields = new ArrayList<>();
+
+		SortConfigurations.Builder sortConfigurations = new SortConfigurations.Builder();
 
 		//TODO check if caching this work for the last n list of indexedTargetedEntities makes a perf boost
 		if ( indexedTargetedEntities.size() == 0 ) {
@@ -559,8 +559,10 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
-				populateIndexManagers( targetedIndexes, entityIndexBinding.getSelectionStrategy() );
-				collectSortableFields( configuredSortableFields, entityIndexBinding.getDocumentBuilder().getTypeMetadata() );
+
+				List<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
+				targetedIndexes.addAll( indexManagers );
+				collectSortableFields( sortConfigurations, indexManagers, entityIndexBinding.getDocumentBuilder().getTypeMetadata() );
 			}
 			classesAndSubclasses = null;
 		}
@@ -587,9 +589,10 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 
-				collectSortableFields( configuredSortableFields, builder.getTypeMetadata() );
+				List<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
+				targetedIndexes.addAll( indexManagers );
+				collectSortableFields( sortConfigurations, indexManagers, builder.getTypeMetadata() );
 				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
-				populateIndexManagers( targetedIndexes, entityIndexBinding.getSelectionStrategy() );
 			}
 			this.classesAndSubclasses = involvedClasses;
 		}
@@ -624,7 +627,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				new IndexManager[targetedIndexes.size()]
 		);
 
-		final IndexReader compoundReader = MultiReaderFactory.openReader( configuredSortableFields, sort, indexManagers );
+		final IndexReader compoundReader = MultiReaderFactory.openReader( sortConfigurations.build(), sort, indexManagers );
 
 		final Query filteredQuery = filterQueryByTenantId( filterQueryByClasses( luceneQuery ) );
 
@@ -690,25 +693,30 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * Collects all sort fields declared on the properties of the given type or the properties of all the types it
 	 * embeds into the given list.
 	 */
-	private void collectSortableFields(List<SortableFieldMetadata> configuredSortableFields, TypeMetadata typeMetadata) {
-		configuredSortableFields.addAll( typeMetadata.getIdPropertyMetadata().getSortableFieldMetadata() );
+	private void collectSortableFields(SortConfigurations.Builder sortConfigurations, Iterable<IndexManager> indexManagers, TypeMetadata typeMetadata) {
+		for ( IndexManager indexManager : indexManagers ) {
+			sortConfigurations.setIndex( indexManager.getIndexName() );
+			sortConfigurations.setEntityType( typeMetadata.getType() );
 
-		for ( PropertyMetadata property : typeMetadata.getAllPropertyMetadata() ) {
-			configuredSortableFields.addAll( property.getSortableFieldMetadata() );
-		}
+			sortConfigurations.addSortableFields( typeMetadata.getIdPropertyMetadata().getSortableFieldMetadata() );
 
-		for ( EmbeddedTypeMetadata embeddedType : typeMetadata.getEmbeddedTypeMetadata() ) {
-			collectSortableFields( configuredSortableFields, embeddedType );
+			for ( PropertyMetadata property : typeMetadata.getAllPropertyMetadata() ) {
+				sortConfigurations.addSortableFields( property.getSortableFieldMetadata() );
+			}
+
+			for ( EmbeddedTypeMetadata embeddedType : typeMetadata.getEmbeddedTypeMetadata() ) {
+				collectSortableFields( sortConfigurations, embeddedType );
+			}
 		}
 	}
 
-	private void collectSortableFields(List<SortableFieldMetadata> configuredSortableFields, EmbeddedTypeMetadata embeddedTypeMetadata) {
+	private void collectSortableFields(SortConfigurations.Builder sortConfigurations, EmbeddedTypeMetadata embeddedTypeMetadata) {
 		for ( PropertyMetadata property : embeddedTypeMetadata.getAllPropertyMetadata() ) {
-			configuredSortableFields.addAll( property.getSortableFieldMetadata() );
+			sortConfigurations.addSortableFields( property.getSortableFieldMetadata() );
 		}
 
 		for ( EmbeddedTypeMetadata embeddedType : embeddedTypeMetadata.getEmbeddedTypeMetadata() ) {
-			collectSortableFields( configuredSortableFields, embeddedType );
+			collectSortableFields( sortConfigurations, embeddedType );
 		}
 	}
 
@@ -756,23 +764,22 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return similarity;
 	}
 
-	private void populateIndexManagers(List<IndexManager> indexManagersTarget, final IndexShardingStrategy indexShardingStrategy) {
-		final IndexManager[] indexManagersForQuery;
+	private List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
+		FullTextFilterImplementor[] fullTextFilters = getFullTextFilters();
+		return Arrays.asList( binding.getSelectionStrategy().getIndexManagersForQuery( fullTextFilters ) );
+	}
+
+	private FullTextFilterImplementor[] getFullTextFilters() {
+		FullTextFilterImplementor[] fullTextFilters;
+
 		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
-			indexManagersForQuery = indexShardingStrategy.getIndexManagersForQuery(
-					filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] )
-			);
+			fullTextFilters = filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] );
 		}
 		else {
-			//no filter get all shards
-			indexManagersForQuery = indexShardingStrategy.getIndexManagersForQuery( EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR );
+			// no filter get all shards
+			fullTextFilters = EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR;
 		}
-
-		for ( IndexManager indexManager : indexManagersForQuery ) {
-			if ( !indexManagersTarget.contains( indexManager ) ) {
-				indexManagersTarget.add( indexManager );
-			}
-		}
+		return fullTextFilters;
 	}
 
 	private void buildFilters() {
