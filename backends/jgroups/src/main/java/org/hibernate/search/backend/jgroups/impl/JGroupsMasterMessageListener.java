@@ -22,16 +22,13 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-
 /**
- * Listen for messages from slave nodes and apply them into <code>LuceneBackendQueueProcessor</code>
+ * A {@link Receiver} that listens for messages from slave nodes and apply them.
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Ales Justin
- * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
- * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
- * @see org.jgroups.Receiver
+ *
  */
 public class JGroupsMasterMessageListener implements Receiver {
 

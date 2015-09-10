@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 public @interface SortableField {
 
 	/**
-	 * Name of the field whose field bridge to apply to obtain the value of this sort field. Can be omitted in case only
+	 * @return the name of the field whose field bridge to apply to obtain the value of this sort field. Can be omitted in case only
 	 * a single field exists for the annotated property.
 	 */
 	String forField() default "";

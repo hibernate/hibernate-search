@@ -74,7 +74,9 @@ public class PropertyMetadata {
 	}
 
 	/**
-	 * Returns the sortable fields defined for this property.
+	 * Accessor to the metadata of the sortable fields.
+	 *
+	 * @return the sortable fields defined for this property.
 	 */
 	public Set<SortableFieldMetadata> getSortableFieldMetadata() {
 		return sortableFieldMetadata;

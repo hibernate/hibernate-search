@@ -31,7 +31,7 @@ public class AutoNodeSelector implements NodeSelectorStrategy {
 	private volatile Address masterAddress;
 
 	/**
-	 * @param indexName
+	 * @param indexName the name of the index
 	 */
 	public AutoNodeSelector(String indexName) {
 		this.indexName = indexName;

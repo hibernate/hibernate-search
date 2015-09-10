@@ -17,7 +17,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * <p>
  * Parsing code inspired by http://www.infoq.com/articles/ApacheAvro
  * from Boris Lublinsky
- * </p>
  * <p>
  * Before the actual serialized flux, two bytes are reserved:
  * <ul>
@@ -27,15 +26,14 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * A major version increase implies an incompatible protocol change.
  * Messages of a {@code majorVersion > current version} should be refused.
- *
+ * <p>
  * A minor version increase implies a compatible protocol change.
  * Messages of a {@code minorVersion > current version} are parsed, but new
  * operation will be ignored or rejected.
- *
+ * <p>
  * If message's {@code major version is < current version}, then the
  * implementation is strongly encouraged to parse and process them.
  * It is mandatory if only message's {@code code minor version is < current version}.
- * </p>
  *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  * @author Hardy Ferentschik

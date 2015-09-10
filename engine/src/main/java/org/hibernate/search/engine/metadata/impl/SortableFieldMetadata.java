@@ -20,7 +20,7 @@ public class SortableFieldMetadata {
 	}
 
 	/**
-	 * The name of the field whose field bridge will be used to determine the value for the doc value field.
+	 * @return the name of the field whose field bridge will be used to determine the value for the doc value field.
 	 */
 	public String getFieldName() {
 		return fieldName;

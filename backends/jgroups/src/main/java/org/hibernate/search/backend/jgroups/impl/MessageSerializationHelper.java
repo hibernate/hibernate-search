@@ -59,7 +59,7 @@ public final class MessageSerializationHelper {
 	}
 
 	/**
-	 * Inverse operation of {@link #prependString(String, byte[]): extracts
+	 * Inverse operation of {@link #prependString(String, byte[])}: extracts
 	 * the original buffer discarding the prefixed string.
 	 * The buffer is not altered.
 	 *

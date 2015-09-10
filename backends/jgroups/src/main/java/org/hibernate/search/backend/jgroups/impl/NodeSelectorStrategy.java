@@ -28,6 +28,8 @@ public interface NodeSelectorStrategy {
 	/**
 	 * Specifies if the current (local) node should apply
 	 * changes to the index.
+	 *
+	 * @return true if the local node is the owner
 	 */
 	boolean isIndexOwnerLocal();
 
