@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 public @interface SortableFields {
 
 	/**
-	 * The sortable fields of the annotated property
+	 * @return the sortable fields of the annotated property
 	 */
 	SortableField[] value();
 }

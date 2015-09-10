@@ -41,9 +41,6 @@ import java.lang.ref.SoftReference;
  * <strong>Note:</strong> This class is serializable, however all entries are
  * discarded on serialization.
  *
- * @see org.hibernate.cfg.Environment#QUERY_PLAN_CACHE_MAX_STRONG_REFERENCES
- * @see org.hibernate.cfg.Environment#QUERY_PLAN_CACHE_MAX_SOFT_REFERENCES
- *
  * @author Steve Ebersole
  * @author Manuel Dominguez Sarmiento
  *

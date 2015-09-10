@@ -37,8 +37,8 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	 * Provides an optional extension point for the case you have to
 	 * do some cleanup after the Message was processed.
 	 *
-	 * This is invoked once by {@see #onMessage(Message)} after processing
-	 * each Message, provided the type of the Message is {@see ObjectMessage}
+	 * This is invoked once by {@link #onMessage(Message)} after processing
+	 * each Message, provided the type of the Message is {@link ObjectMessage}
 	 * as expected.
 	 */
 	protected void afterMessage() {

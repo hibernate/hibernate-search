@@ -26,6 +26,7 @@ public interface NullMarkerCodec {
 	/**
 	 * This is mostly a requirement for integration with other old-style
 	 * contracts which expect a strongly String based strategy.
+	 *
 	 * @return a string representation of the null-marker, or null if no marker is used.
 	 */
 	String nullRepresentedAsString();
@@ -33,21 +34,25 @@ public interface NullMarkerCodec {
 	/**
 	 * Store the null marker in the Document.
 	 * Some implementations might not do anything
-	 * @param fieldName the
-	 * @param document
-	 * @param luceneOptions
+	 *
+	 * @param fieldName the name of the field
+	 * @param document the document where to store the null marker
+	 * @param luceneOptions indexing options
 	 */
 	void encodeNullValue(String fieldName, Document document, LuceneOptions luceneOptions);
 
 	/**
 	 * Create a Query to find all documents which have a 'null' value encoded in the specified field
+	 *
 	 * @param fieldName the field to target with the Query
 	 * @return a new Lucene Query
 	 */
 	Query createNullMatchingQuery(String fieldName);
 
 	/**
-	 * @param field
+	 * Check if the field represents the encoding for a null element
+	 *
+	 * @param field the fields to check
 	 * @return true if the field argument is representing the encoding for a null element.
 	 */
 	boolean representsNullValue(IndexableField field);

@@ -29,7 +29,7 @@ import org.hibernate.search.stat.Statistics;
  * This contract gives access to lower level APIs of Hibernate Search for
  * frameworks integrating with it.
  * Frameworks should not expose this as public API though, but expose a simplified view; for
- * example the Hibernate Search ORM module expose the {@link org.hibernate.search.SearchFactory} contract to
+ * example the Hibernate Search ORM module expose the {@code org.hibernate.search.SearchFactory} contract to
  * its clients.
  *
  * @author Emmanuel Bernard
