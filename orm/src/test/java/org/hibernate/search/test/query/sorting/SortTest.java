@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.query;
+package org.hibernate.search.test.query.sorting;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -41,9 +41,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.query.sorting.BrickLayer;
-import org.hibernate.search.test.query.sorting.Plumber;
-import org.hibernate.search.test.query.sorting.Thatcher;
+import org.hibernate.search.test.query.Author;
+import org.hibernate.search.test.query.Book;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.After;
 import org.junit.Before;
