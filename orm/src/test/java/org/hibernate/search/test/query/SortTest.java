@@ -297,6 +297,11 @@ public class SortTest extends SearchTestBase {
 		tx.commit();
 	}
 
+	/**
+	 * The index is shared by two entities. One declares the required sorts, the other does not. As this would require
+	 * uninverting the index for one entity but not the other, that situation is considered inconsistent and an
+	 * exception is expected.
+	 */
 	@Test
 	public void testQueryOnIndexSharedByEntityWithRequiredSortFieldAndEntityWithoutRaisesException() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
