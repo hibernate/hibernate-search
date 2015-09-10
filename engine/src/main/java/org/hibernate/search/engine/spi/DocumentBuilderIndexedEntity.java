@@ -353,13 +353,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				instance,
 				doc,
 				facetConfig,
-				false,
 				getMetadata(),
 				fieldToAnalyzerMap,
 				processedFieldNames,
 				conversionContext,
 				objectInitializer,
-				documentLevelBoost
+				documentLevelBoost,
+				false
 		);
 
 
@@ -404,13 +404,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	private void buildDocumentFields(Object instance,
 			Document doc,
 			FacetsConfig facetConfig,
-			boolean multiValuedFacets,
 			TypeMetadata typeMetadata,
 			Map<String, String> fieldToAnalyzerMap,
 			Set<String> processedFieldNames,
 			ConversionContext conversionContext,
 			InstanceInitializer objectInitializer,
-			final float inheritedBoost) {
+			final float inheritedBoost,
+			boolean multiValued) {
 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
@@ -419,12 +419,12 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		buildDocumentFieldsForProperties(
 				doc,
 				facetConfig,
-				multiValuedFacets,
 				typeMetadata,
 				conversionContext,
 				objectInitializer,
 				inheritedBoost,
-				unproxiedInstance
+				unproxiedInstance,
+				multiValued
 		);
 
 		// allow analyzer override for the fields added by the class and field bridges
@@ -441,7 +441,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				conversionContext,
 				objectInitializer,
 				inheritedBoost,
-				unproxiedInstance
+				unproxiedInstance,
+				multiValued
 		);
 	}
 
@@ -453,7 +454,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			ConversionContext conversionContext,
 			InstanceInitializer objectInitializer,
 			float inheritedBoost,
-			Object unproxiedInstance) {
+			Object unproxiedInstance,
+			boolean multiValued) {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
 			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
@@ -473,13 +475,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									arrayValue,
 									doc,
 									facetsConfig,
-									true,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
 									conversionContext,
 									objectInitializer,
-									embeddedBoost
+									embeddedBoost,
+									true
 							);
 						}
 						break;
@@ -490,13 +492,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									collectionValue,
 									doc,
 									facetsConfig,
-									true,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
 									conversionContext,
 									objectInitializer,
-									embeddedBoost
+									embeddedBoost,
+									true
 							);
 						}
 						break;
@@ -507,13 +509,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									collectionValue,
 									doc,
 									facetsConfig,
-									true,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
 									conversionContext,
 									objectInitializer,
-									embeddedBoost
+									embeddedBoost,
+									true
 							);
 						}
 						break;
@@ -522,13 +524,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 								value,
 								doc,
 								facetsConfig,
-								false,
 								embeddedTypeMetadata,
 								fieldToAnalyzerMap,
 								processedFieldNames,
 								conversionContext,
 								objectInitializer,
-								embeddedBoost
+								embeddedBoost,
+								multiValued
 						);
 						break;
 					default:
@@ -544,14 +546,19 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 	}
 
+	/**
+	 * @param multiValued Whether the type whose properties should be added may appear more than once (within the same
+	 * role) in a document or not. That's the case if the type is (directly or indirectly) contained within an embedded
+	 * to-many association.
+	 */
 	private void buildDocumentFieldsForProperties(Document document,
 			FacetsConfig facetsConfig,
-			boolean multiValuedFacet,
 			TypeMetadata typeMetadata,
 			ConversionContext conversionContext,
 			InstanceInitializer objectInitializer,
 			float documentBoost,
-			Object unproxiedInstance) {
+			Object unproxiedInstance,
+			boolean multiValued) {
 		XMember previousMember = null;
 		Object currentFieldValue = null;
 
@@ -596,7 +603,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					// handle faceting fields
 					if ( fieldMetadata.hasFacets() ) {
 						for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
-							if ( multiValuedFacet ) {
+							if ( multiValued ) {
 								facetsConfig.setMultiValued( facetMetadata.getFacetName(), true );
 							}
 							addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
@@ -606,7 +613,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 				// add the doc value fields required for sorting, but only if this property is not part of an embedded
 				// to-many assoc, in which case sorting on these fields would not make sense
-				if ( !multiValuedFacet ) {
+				if ( !multiValued ) {
 					addSortFieldDocValues( document, propertyMetadata, documentBoost, currentFieldValue );
 				}
 			}
