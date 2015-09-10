@@ -63,13 +63,13 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	 */
 	private static final String GEOCHRON_TID = "geochron";
 
-	private static Clock[] METAMEC_MODELS = {
+	private static Object[] METAMEC_MODELS = {
 		new Clock( 1, "Metamec - Model A850"),
 		new Clock( 2, "Metamec - Model 4562"),
 		new Clock( 5, "Metamec - Model 792")
 		};
 
-	private static Clock[] GEOCHRON_MODELS = {
+	private static Object[] GEOCHRON_MODELS = {
 		new Clock( 1, "Geochron - Model The Original Kilburg" ),
 		new Clock( 2, "Geochron - Model The Boardroom" ),
 		new Clock( 9, "Geochron - Model Designer Series")
@@ -223,9 +223,9 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		return getSessionFactory().withOptions().tenantIdentifier( tenantId ).openSession();
 	}
 
-	private void persist(Session session, Clock... clocks) {
+	private void persist(Session session, Object... clocks) {
 		session.beginTransaction();
-		for ( Clock clock : clocks ) {
+		for ( Object clock : clocks ) {
 			session.persist( clock );
 		}
 		session.getTransaction().commit();
