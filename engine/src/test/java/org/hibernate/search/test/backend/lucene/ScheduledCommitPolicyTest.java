@@ -44,7 +44,7 @@ public class ScheduledCommitPolicyTest {
 
 	@Rule
 	public SearchFactoryHolder sfAsyncExclusiveIndex = new SearchFactoryHolder( Quote.class )
-			.withProperty( "hibernate.search.default.index_flush_interval", "100" )
+			.withProperty( "hibernate.search.default.index_flush_interval", "1" )
 			.withProperty( "hibernate.search.default.worker.execution", "async" )
 			.withProperty( "hibernate.search.default.exclusive_index_use", "true" )
 			.withProperty( "hibernate.search.error_handler", CountingErrorHandler.class.getName() );
@@ -68,13 +68,33 @@ public class ScheduledCommitPolicyTest {
 			targetMethod = "commit",
 			action = "throw new IOException(\"File not found!\")",
 			name = "commitError")
-	public void testErrorHandling() throws Exception {
+	public void testErrorHandlingDuringCommit() throws Exception {
 		writeData( sfAsyncExclusiveIndex, 2 );
 		final CountingErrorHandler errorHandler = (CountingErrorHandler) sfAsyncExclusiveIndex.getSearchFactory().getErrorHandler();
 		assertConditionMet( new Condition() {
 			@Override
 			public boolean evaluate() {
 				return errorHandler.getCountFor( IOException.class ) >= 2;
+			}
+		} );
+	}
+
+	@Test
+	@BMRule(targetClass = "org.hibernate.search.backend.impl.lucene.IndexWriterHolder",
+			targetMethod = "commitIndexWriter()",
+			action = "throw new NullPointerException(\"Fake internal error\")",
+			name = "timerDisruptingError")
+	public void testErrorHandlingOnBackgroundThread() throws Exception {
+		writeData( sfAsyncExclusiveIndex, 2 );
+		final CountingErrorHandler errorHandler = (CountingErrorHandler) sfAsyncExclusiveIndex.getSearchFactory().getErrorHandler();
+		assertConditionMet( new Condition() {
+			@Override
+			public boolean evaluate() {
+				// It's going to commit once each millisecond, and produce a failure each time.
+				// So "4" is just a random number higher than 0, but high enough to
+				// verify that the scheduled task is not being killed at the first failure,
+				// and will keep trying.
+				return errorHandler.getCountFor( NullPointerException.class ) >= 4;
 			}
 		} );
 	}
