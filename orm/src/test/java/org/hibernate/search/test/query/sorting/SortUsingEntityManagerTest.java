@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.query;
+package org.hibernate.search.test.query.sorting;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -24,6 +24,7 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.jpa.JPATestCase;
+import org.hibernate.search.test.query.ProductArticle;
 import org.junit.Test;
 
 /**
