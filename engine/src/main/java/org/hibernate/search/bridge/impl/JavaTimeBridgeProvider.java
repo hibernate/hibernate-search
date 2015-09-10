@@ -42,93 +42,63 @@ import org.hibernate.search.bridge.builtin.time.impl.ZoneIdBridge;
 import org.hibernate.search.bridge.builtin.time.impl.ZoneOffsetBridge;
 import org.hibernate.search.bridge.builtin.time.impl.ZonedDateTimeBridge;
 import org.hibernate.search.bridge.spi.BridgeProvider;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * {@link BridgeProvider} for the classes in java.time.*
  * <p>
- * The bridge for a specific type is created only if the type get found using a {@link ClassLoaderService}.
+ * Note that the bridges are created only if the specific the package java.time exists on the classpath
  *
  * @author Davide D'Alto
  */
-class JavaTimeBridgeProvider implements BridgeProvider {
+public class JavaTimeBridgeProvider implements BridgeProvider {
 
 	private static final Log LOG = LoggerFactory.make();
 
+	private static final boolean ACTIVATED = JavaTimeBridgeProvider.javaTimePackageExists();
+
 	private final Map<String, FieldBridge> builtInBridges;
 
-	JavaTimeBridgeProvider(ClassLoaderService classLoaderService) {
-		Map<String, FieldBridge> bridges = populateBridgeMap( classLoaderService );
-		this.builtInBridges = bridges;
+	JavaTimeBridgeProvider() {
+		if ( isActive() ) {
+			this.builtInBridges = populateBridgeMap();
+		}
+		else {
+			this.builtInBridges = Collections.emptyMap();
+		}
 	}
 
-	private static Map<String, FieldBridge> populateBridgeMap(ClassLoaderService classLoaderService) {
+	private static Map<String, FieldBridge> populateBridgeMap() {
 		Map<String, FieldBridge> bridges = new HashMap<String, FieldBridge>( 12 );
-		if ( classExists( classLoaderService, "java.time.Year" ) ) {
-			bridges.put( Year.class.getName(), YearBridge.INSTANCE );
-		}
-		if ( classExists( classLoaderService, "java.time.YearMonth" ) ) {
-			bridges.put( YearMonth.class.getName(), new TwoWayString2FieldBridgeAdaptor( YearMonthBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.MonthDay" ) ) {
-			bridges.put( MonthDay.class.getName(), new TwoWayString2FieldBridgeAdaptor( MonthDayBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.LocalDateTime" ) ) {
-			bridges.put( LocalDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalDateTimeBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.LocalDate" ) ) {
-			bridges.put( LocalDate.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalDateBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.LocalTime" ) ) {
-			bridges.put( LocalTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalTimeBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.OffsetDateTime" ) ) {
-			bridges.put( OffsetDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( OffsetDateTimeBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.OffsetTime" ) ) {
-			bridges.put( OffsetTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( OffsetTimeBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.ZonedDateTime" ) ) {
-			bridges.put( ZonedDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZonedDateTimeBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.ZoneOffset" ) ) {
-			bridges.put( ZoneOffset.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZoneOffsetBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.ZoneId" ) ) {
-			bridges.put( ZoneId.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZoneIdBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.Period" ) ) {
-			bridges.put( Period.class.getName(), new TwoWayString2FieldBridgeAdaptor( PeriodBridge.INSTANCE ) );
-		}
-		if ( classExists( classLoaderService, "java.time.Duration" ) ) {
-			bridges.put( Duration.class.getName(), DurationBridge.INSTANCE );
-		}
-		if ( classExists( classLoaderService, "java.time.Instant" ) ) {
-			bridges.put( Instant.class.getName(), InstantBridge.INSTANCE );
-		}
-		if ( bridges.isEmpty() ) {
-			bridges = Collections.emptyMap();
-		}
+		bridges.put( Year.class.getName(), YearBridge.INSTANCE );
+		bridges.put( YearMonth.class.getName(), new TwoWayString2FieldBridgeAdaptor( YearMonthBridge.INSTANCE ) );
+		bridges.put( MonthDay.class.getName(), new TwoWayString2FieldBridgeAdaptor( MonthDayBridge.INSTANCE ) );
+		bridges.put( LocalDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalDateTimeBridge.INSTANCE ) );
+		bridges.put( LocalDate.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalDateBridge.INSTANCE ) );
+		bridges.put( LocalTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalTimeBridge.INSTANCE ) );
+		bridges.put( OffsetDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( OffsetDateTimeBridge.INSTANCE ) );
+		bridges.put( OffsetTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( OffsetTimeBridge.INSTANCE ) );
+		bridges.put( ZonedDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZonedDateTimeBridge.INSTANCE ) );
+		bridges.put( ZoneOffset.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZoneOffsetBridge.INSTANCE ) );
+		bridges.put( ZoneId.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZoneIdBridge.INSTANCE ) );
+		bridges.put( Period.class.getName(), new TwoWayString2FieldBridgeAdaptor( PeriodBridge.INSTANCE ) );
+		bridges.put( Duration.class.getName(), DurationBridge.INSTANCE );
+		bridges.put( Instant.class.getName(), InstantBridge.INSTANCE );
 		return bridges;
 	}
 
-	/**
-	 * @return {@code true} if at least one of the supported classes in the package java.time exists on the classpath,
-	 * {@code false} otherwise.
-	 */
-	public boolean hasFoundSomeJavaTimeTypes() {
-		return !builtInBridges.isEmpty();
+	public static boolean isActive() {
+		return ACTIVATED;
 	}
 
-	private static boolean classExists(ClassLoaderService classLoaderService, String className) {
+	private static boolean javaTimePackageExists() {
 		try {
-			classLoaderService.classForName( className );
+			Class.forName( "java.time.LocalDate" );
 			return true;
 		}
-		catch (org.hibernate.search.engine.service.classloading.spi.ClassLoadingException e) {
-			LOG.javaTimeBridgeWontBeAdded( className );
+		catch (ClassNotFoundException e) {
+			LOG.javaTimeBridgeWontBeAdded( e );
 			return false;
 		}
 	}
