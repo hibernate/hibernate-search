@@ -780,7 +780,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		if ( !sortedFieldName.equals( idFieldName ) && !containsField( propertyMetadataBuilder, sortedFieldName ) ) {
-			throw new SearchException( "@SortableField declared on " + typeMetadataBuilder.getIndexedType().getName() + "#" + propertyMetadataBuilder.getPropertyAccessor().getName() + " references undeclared field '" + sortedFieldName + "'" );
+			throw log.sortableFieldRefersToUndefinedField( typeMetadataBuilder.getIndexedType(), propertyMetadataBuilder.getPropertyAccessor().getName(), sortedFieldName );
 		}
 
 		SortableFieldMetadata fieldMetadata = new SortableFieldMetadata.Builder()

@@ -875,8 +875,8 @@ public interface Log extends BasicLogger {
 	void deprecatedConfigurationPropertyIsIgnored(String string);
 
 	@LogMessage(level = Level.WARN)
-	@Message(id = 289, value = "Requested sort field(s) %2$s are not present in index(es) %1$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortField." )
-	void uncoveredSortsRequested(String indexNames, String uncoveredSorts);
+	@Message(id = 289, value = "Requested sort field(s) %3$s are not configured for entity type %1$s mapped to index %2$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortField." )
+	void uncoveredSortsRequested(@FormatWith(ClassFormatter.class) Class<?> entityType, String indexName, String uncoveredSorts);
 
 	@Message(id = 290, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Double Number to match the field type of the index. "
 			+ "Please change value from '%1$s' to represent a Double." )
@@ -907,4 +907,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 297, value = " Value of '%2$s' for type '%1$s' is too big for the conversion")
 	SearchException valueTooLargeForConversionException(@FormatWith(ClassFormatter.class) Class<?> type, Object duration, @Cause Exception ae);
 
+	@Message(id = 298, value = "Inconsisent configuration of sort fields %2$s for index '%1$s'. Make sure they are configured using @SortableField for all entities mapped to this index.")
+	SearchException inconsistentSortableFieldConfigurationForSharedIndex(String indexName, String requestedSortFields);
+
+	@Message(id = 299, value = "@SortableField declared on %s#%s references to undeclared field '%s'" )
+	SearchException sortableFieldRefersToUndefinedField(@FormatWith(ClassFormatter.class) Class<?> entityType, String property, String sortedFieldName);
 }

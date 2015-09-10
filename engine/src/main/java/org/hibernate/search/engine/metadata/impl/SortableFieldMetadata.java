@@ -40,7 +40,7 @@ public class SortableFieldMetadata {
 			return this;
 		}
 
-		SortableFieldMetadata build() {
+		public SortableFieldMetadata build() {
 			return new SortableFieldMetadata( fieldName );
 		}
 	}

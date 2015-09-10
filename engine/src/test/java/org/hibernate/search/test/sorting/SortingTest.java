@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.sorting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
@@ -99,6 +101,40 @@ public class SortingTest {
 		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
 		Sort sortAsString = new Sort( new SortField( "favoriteCuddlyToy.type", SortField.Type.STRING ) );
 		assertSortedResults( query, sortAsString, 3, 1, 2, 0 );
+	}
+
+	/**
+	 * Sortable fields within an embedded to-many association should be ignored. They should not prevent other sort
+	 * fields from working, though.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2000")
+	public void testSortingForTypeWithSortableFieldWithinEmbeddedToManyAssociation() {
+		// Index all testData:
+		storeTestingData(
+				new Person(
+						0,
+						3,
+						"Three",
+						Arrays.asList(
+								new Friend( new CuddlyToy( "Hippo" ) ),
+								new Friend( new CuddlyToy( "Giraffe" ) )
+						)
+				),
+				new Person(
+						1,
+						10,
+						"Ten",
+						Arrays.asList(
+								new Friend( new CuddlyToy( "Gorilla" ) ),
+								new Friend( new CuddlyToy( "Alligator" ) )
+						)
+				)
+			);
+
+		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
+		Sort sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING ) );
+		assertSortedResults( query, sortAsString, 1, 0 );
 	}
 
 	public void testSortOnNullableNumericField() throws Exception {
@@ -215,6 +251,9 @@ public class SortingTest {
 		@IndexedEmbedded
 		final CuddlyToy favoriteCuddlyToy;
 
+		@IndexedEmbedded
+		final List<Friend> friends;
+
 		@Field
 		@IndexedEmbedded//TODO improve error message when this is missing
 		Integer[] array;
@@ -224,6 +263,15 @@ public class SortingTest {
 			this.age = age;
 			this.name = name;
 			this.favoriteCuddlyToy = favoriteCuddlyToy;
+			this.friends = new ArrayList<Friend>();
+		}
+
+		Person(int id, Integer age, String name, List<Friend> friends) {
+			this.id = id;
+			this.age = age;
+			this.name = name;
+			this.favoriteCuddlyToy = null;
+			this.friends = friends;
 		}
 
 		Person(int id, Integer age, String name, Integer... arrayItems) {
@@ -232,6 +280,17 @@ public class SortingTest {
 			this.name = name;
 			this.array = arrayItems;
 			this.favoriteCuddlyToy = null;
+			this.friends = new ArrayList<Friend>();
+		}
+	}
+
+	private static class Friend {
+
+		@IndexedEmbedded
+		final CuddlyToy favoriteCuddlyToy;
+
+		public Friend(CuddlyToy favoriteCuddlyToy) {
+			this.favoriteCuddlyToy = favoriteCuddlyToy;
 		}
 	}
 
