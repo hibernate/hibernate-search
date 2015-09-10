@@ -34,7 +34,7 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 
 	private final List<SortConfiguration> configurations;
 
-	public SortConfigurations(List<SortConfiguration> configurations) {
+	private SortConfigurations(List<SortConfiguration> configurations) {
 		this.configurations = Collections.unmodifiableList( configurations );
 	}
 
@@ -112,26 +112,31 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 		private Map<Class<?>, List<SortableFieldMetadata>> currentIndexBucket;
 		private List<SortableFieldMetadata> currentEntityTypeBucket;
 
-		public void setIndex(String indexName) {
+		public Builder setIndex(String indexName) {
 			currentIndexBucket = builtConfigurations.get( indexName );
 
 			if ( currentIndexBucket == null ) {
 				currentIndexBucket = new HashMap<>();
 				builtConfigurations.put( indexName, currentIndexBucket );
 			}
+
+			return this;
 		}
 
-		public void setEntityType(Class<?> entityType) {
+		public Builder setEntityType(Class<?> entityType) {
 			currentEntityTypeBucket = currentIndexBucket.get( entityType );
 
 			if ( currentEntityTypeBucket == null ) {
 				currentEntityTypeBucket = new ArrayList<>();
 				currentIndexBucket.put( entityType, currentEntityTypeBucket );
 			}
+
+			return this;
 		}
 
-		public void addSortableFields(Collection<SortableFieldMetadata> sortableFieldMetadata) {
+		public Builder addSortableFields(Collection<SortableFieldMetadata> sortableFieldMetadata) {
 			currentEntityTypeBucket.addAll( sortableFieldMetadata );
+			return this;
 		}
 
 		public SortConfigurations build() {

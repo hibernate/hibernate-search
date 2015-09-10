@@ -909,4 +909,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 298, value = "Inconsisent configuration of sort fields %2$s for index '%1$s'. Make sure they are configured using @SortableField for all entities mapped to this index.")
 	SearchException inconsistentSortableFieldConfigurationForSharedIndex(String indexName, String requestedSortFields);
+
+	@Message(id = 299, value = "@SortableField declared on %s#%s references to undeclared field '%s'" )
+	SearchException sortableFieldRefersToUndefinedField(@FormatWith(ClassFormatter.class) Class<?> entityType, String property, String sortedFieldName);
 }

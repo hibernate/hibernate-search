@@ -7,18 +7,30 @@
 
 package org.hibernate.search.test.configuration;
 
+import java.util.Set;
+
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.annotations.SortableFields;
+import org.hibernate.search.bridge.builtin.IntegerBridge;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -53,6 +65,17 @@ public class TypeMetadataTest {
 		}
 	}
 
+	@Test
+	public void testRetrievalOfSortableFieldMetadata() {
+		TypeMetadata metadata = metadataProvider.getTypeMetadataFor( Bar.class );
+
+		Set<SortableFieldMetadata> fieldMetadata = metadata.getPropertyMetadataForProperty( "name" ).getSortableFieldMetadata();
+		assertThat( fieldMetadata ).onProperty( "fieldName" ).containsOnly( "name" );
+
+		fieldMetadata = metadata.getPropertyMetadataForProperty( "age" ).getSortableFieldMetadata();
+		assertThat( fieldMetadata ).onProperty( "fieldName" ).containsOnly( "ageForStringSorting", "ageForIntSorting" );
+	}
+
 	@Indexed
 	public class Foo {
 		@DocumentId
@@ -77,6 +100,25 @@ public class TypeMetadataTest {
 			this.name = name;
 		}
 	}
+
+	@Indexed
+	public class Bar {
+		@DocumentId
+		private Integer id;
+
+		@Field
+		@SortableField
+		private String name;
+
+		@SortableFields({
+			@SortableField(forField = "ageForStringSorting"),
+			@SortableField(forField = "ageForIntSorting")
+		})
+
+		@Fields({
+			@Field(name = "ageForStringSorting", analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class) ),
+			@Field(name = "ageForIntSorting", analyze = Analyze.NO),
+		})
+		private long age;
+	}
 }
-
-

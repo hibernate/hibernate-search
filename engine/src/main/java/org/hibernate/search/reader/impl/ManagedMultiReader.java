@@ -207,6 +207,11 @@ public class ManagedMultiReader extends MultiReader {
 		}
 	}
 
+	// Exposed only for testing
+	public List<? extends IndexReader> getSubReaders() {
+		return getSequentialSubReaders();
+	}
+
 	@Override
 	public String toString() {
 		return ManagedMultiReader.class.getSimpleName() + " [readersForClosing=" + Arrays.toString( readersForClosing ) + ", readerProviders=" + Arrays.toString( readerProviders ) + "]";
