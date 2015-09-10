@@ -57,9 +57,12 @@ public final class BridgeFactory {
 		annotationBasedProviders.add( new SpatialBridgeProvider() );
 		annotationBasedProviders.add( new TikaBridgeProvider() );
 
+		if ( JavaTimeBridgeProvider.isActive() ) {
+			annotationBasedProviders.add( new JavaTimeBridgeProvider() );
+		}
+
 		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 		try {
-			provideJavaTimeBridges( classLoaderService );
 			for ( BridgeProvider provider : classLoaderService.loadJavaServices( BridgeProvider.class ) ) {
 				regularProviders.add( provider );
 			}
@@ -69,13 +72,6 @@ public final class BridgeFactory {
 		}
 		regularProviders.add( new EnumBridgeProvider() );
 		regularProviders.add( new BasicJDKTypesBridgeProvider( serviceManager ) );
-	}
-
-	private void provideJavaTimeBridges(ClassLoaderService classLoaderService) {
-		JavaTimeBridgeProvider javaTimeBridgeProvider = new JavaTimeBridgeProvider( classLoaderService );
-		if ( javaTimeBridgeProvider.hasFoundSomeJavaTimeTypes() ) {
-			annotationBasedProviders.add( javaTimeBridgeProvider );
-		}
 	}
 
 	/**

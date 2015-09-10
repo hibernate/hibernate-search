@@ -901,8 +901,8 @@ public interface Log extends BasicLogger {
 	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 296, value = "%s not found on the classpath; the built-in bridge won't be available")
-	void javaTimeBridgeWontBeAdded(String string);
+	@Message(id = 296, value = "Package java.time not found on the classpath; the built-in bridge won't be available")
+	void javaTimeBridgeWontBeAdded(@Cause Exception e);
 
 	@Message(id = 297, value = " Value of '%2$s' for type '%1$s' is too big for the conversion")
 	SearchException valueTooLargeForConversionException(@FormatWith(ClassFormatter.class) Class<?> type, Object duration, @Cause Exception ae);
