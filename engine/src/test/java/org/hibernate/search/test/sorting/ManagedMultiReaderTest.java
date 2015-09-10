@@ -64,10 +64,11 @@ public class ManagedMultiReaderTest {
 			.build();
 
 
-		ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagers );
-		List<? extends IndexReader> actualReaders = reader.getSubReaders();
-		assertThat( actualReaders ).hasSize( 1 );
-		assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "StandardDirectoryReader" );
+		try ( ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagers ) ) {
+			List<? extends IndexReader> actualReaders = reader.getSubReaders();
+			assertThat( actualReaders ).hasSize( 1 );
+			assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "StandardDirectoryReader" );
+		}
 	}
 
 	@Test
@@ -92,10 +93,11 @@ public class ManagedMultiReaderTest {
 			)
 			.build();
 
-		ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagers );
-		List<? extends IndexReader> actualReaders = reader.getSubReaders();
-		assertThat( actualReaders ).hasSize( 1 );
-		assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "UninvertingDirectoryReader" );
+		try ( ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagers ) ) {
+			List<? extends IndexReader> actualReaders = reader.getSubReaders();
+			assertThat( actualReaders ).hasSize( 1 );
+			assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "UninvertingDirectoryReader" );
+		}
 	}
 
 	@Test
@@ -129,11 +131,12 @@ public class ManagedMultiReaderTest {
 					)
 			.build();
 
-		ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagers.toArray( new IndexManager[indexManagers.size()] ) );
-		List<? extends IndexReader> actualReaders = reader.getSubReaders();
-		assertThat( actualReaders ).hasSize( 2 );
-		assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "UninvertingDirectoryReader" );
-		assertThat( actualReaders.get( 1 ).getClass().getSimpleName() ).isEqualTo( "StandardDirectoryReader" );
+		try ( ManagedMultiReader reader = (ManagedMultiReader) MultiReaderFactory.openReader( configuredSorts, sort, indexManagers.toArray( new IndexManager[indexManagers.size()] ) ) ) {
+			List<? extends IndexReader> actualReaders = reader.getSubReaders();
+			assertThat( actualReaders ).hasSize( 2 );
+			assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "UninvertingDirectoryReader" );
+			assertThat( actualReaders.get( 1 ).getClass().getSimpleName() ).isEqualTo( "StandardDirectoryReader" );
+		}
 	}
 
 	@Indexed(index = "person")
