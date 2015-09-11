@@ -52,5 +52,11 @@ abstract class ExtendedBridgeProvider implements BridgeProvider {
 		 * @return {@code true} if the indexed type is the document id, {@code false} otherwise.
 		 */
 		boolean isId();
+
+		/**
+		 * Whether the field in question is marked as numeric field by means of the {code NumericField} annotation or
+		 * not.
+		 */
+		boolean isExplicitlyMarkedAsNumeric();
 	}
 }

@@ -790,7 +790,7 @@ public interface Log extends BasicLogger {
 	SearchException unknownDeletionQueryKeySpecified(int queryKey);
 
 	@Message(id = 262, value = "@NumericField annotation is used on %1$s#%2$s without a matching @Field annotation")
-	SearchException numericFieldAnnotationWithoutMatchingField(String className, String memberName);
+	SearchException numericFieldAnnotationWithoutMatchingField(@FormatWith(ClassFormatter.class) Class<?> entityClass, String memberName);
 
 	@Message(id = 263, value = "@Facet annotation is used on %1$s#%2$s without a matching @Field annotation")
 	SearchException facetAnnotationWithoutMatchingField(String className, String memberName);
@@ -912,4 +912,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 299, value = "@SortableField declared on %s#%s references to undeclared field '%s'" )
 	SearchException sortableFieldRefersToUndefinedField(@FormatWith(ClassFormatter.class) Class<?> entityType, String property, String sortedFieldName);
+
+	@Message(id = 300, value = "Several @NumericField annotations used on %1$s#%2$s refer to the same field")
+	SearchException severalNumericFieldAnnotationsForSameField(@FormatWith(ClassFormatter.class) Class<?> entityClass, String memberName);
 }

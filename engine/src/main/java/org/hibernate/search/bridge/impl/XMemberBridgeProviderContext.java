@@ -25,9 +25,11 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 	private final String memberName;
 	private final ServiceManager serviceManager;
 	private final boolean isId;
+	private final boolean isExplicitlyMarkedAsNumeric;
 
 	public XMemberBridgeProviderContext(XMember member,
 			boolean isId,
+			boolean isExplicitlyMarkedAsNumeric,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager) {
 		this.annotatedElement = new XMemberToAnnotatedElementAdaptor( member );
@@ -36,6 +38,7 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 		this.memberName = member.getName();
 		this.serviceManager = serviceManager;
 		this.isId = isId;
+		this.isExplicitlyMarkedAsNumeric = isExplicitlyMarkedAsNumeric;
 	}
 
 	@Override
@@ -61,5 +64,10 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 	@Override
 	public boolean isId() {
 		return isId;
+	}
+
+	@Override
+	public boolean isExplicitlyMarkedAsNumeric() {
+		return isExplicitlyMarkedAsNumeric;
 	}
 }
