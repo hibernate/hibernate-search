@@ -91,8 +91,8 @@ public final class NumericFieldUtils {
 		}
 
 		throw log.numericRangeQueryWithNonNumericToAndFromValues( fieldName );
-	}
 
+	}
 	/**
 	 * Will create a {@code RangeQuery} matching exactly the provided value: lower
 	 * and upper value match, and bounds are included. This should perform
