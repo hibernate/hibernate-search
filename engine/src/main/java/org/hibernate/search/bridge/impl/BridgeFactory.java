@@ -162,15 +162,17 @@ public final class BridgeFactory {
 
 	public FieldBridge buildFieldBridge(XMember member,
 			boolean isId,
+			boolean isExplicitlyMarkedAsNumeric,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
-		return buildFieldBridge( null, member, isId, reflectionManager, serviceManager );
+		return buildFieldBridge( null, member, isId, isExplicitlyMarkedAsNumeric, reflectionManager, serviceManager );
 	}
 
 	public FieldBridge buildFieldBridge(Field field,
 			XMember member,
 			boolean isId,
+			boolean isExplicitlyMarkedAsNumeric,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
@@ -180,7 +182,7 @@ public final class BridgeFactory {
 		}
 
 		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext(
-				member, isId, reflectionManager, serviceManager
+				member, isId, isExplicitlyMarkedAsNumeric, reflectionManager, serviceManager
 		);
 		ContainerType containerType = getContainerType( member, reflectionManager );
 
