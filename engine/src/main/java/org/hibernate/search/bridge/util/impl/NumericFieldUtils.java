@@ -43,30 +43,30 @@ public final class NumericFieldUtils {
 			throw log.rangeQueryWithNullToAndFromValue( fieldName );
 		}
 
-		if ( numericClass.isAssignableFrom( Double.class ) ) {
+		if ( Double.class.isAssignableFrom( numericClass ) ) {
 			return NumericRangeQuery.newDoubleRange( fieldName, (Double) from, (Double) to, includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Byte.class ) ) {
+		if ( Byte.class.isAssignableFrom( numericClass ) ) {
 			return NumericRangeQuery.newIntRange( fieldName, ( (Byte) from ).intValue(), ( (Byte) to ).intValue(), includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Short.class ) ) {
+		if ( Short.class.isAssignableFrom( numericClass ) ) {
 			return NumericRangeQuery.newIntRange( fieldName, ( (Short) from ).intValue(), ( (Short) to ).intValue(), includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Long.class ) ) {
+		if ( Long.class.isAssignableFrom( numericClass ) ) {
 			return NumericRangeQuery.newLongRange( fieldName, (Long) from, (Long) to, includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Integer.class ) ) {
+		if ( Integer.class.isAssignableFrom( numericClass ) ) {
 			return NumericRangeQuery.newIntRange( fieldName, (Integer) from, (Integer) to, includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Float.class ) ) {
+		if ( Float.class.isAssignableFrom( numericClass ) ) {
 			return NumericRangeQuery.newFloatRange( fieldName, (Float) from, (Float) to, includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Date.class ) ) {
+		if ( Date.class.isAssignableFrom( numericClass ) ) {
 			Long fromValue = from != null ? ((Date) from).getTime() : null;
 			Long toValue = to != null ? ((Date) to).getTime() : null;
 			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Calendar.class ) ) {
+		if ( Calendar.class.isAssignableFrom( numericClass ) ) {
 			Long fromValue = from != null ? ((Calendar) from).getTime().getTime() : null;
 			Long toValue = to != null ? ((Calendar) to).getTime().getTime() : null;
 			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
@@ -100,10 +100,10 @@ public final class NumericFieldUtils {
 			return false;
 		}
 		final Class<?> numericClass = value.getClass();
-		return numericClass.isAssignableFrom( Double.class ) ||
-				numericClass.isAssignableFrom( Long.class ) ||
-				numericClass.isAssignableFrom( Integer.class ) ||
-				numericClass.isAssignableFrom( Float.class ) ||
-				numericClass.isAssignableFrom( Calendar.class );
+		return Double.class.isAssignableFrom( numericClass ) ||
+				Long.class.isAssignableFrom( numericClass ) ||
+				Integer.class.isAssignableFrom( numericClass ) ||
+				Float.class.isAssignableFrom( numericClass ) ||
+				Calendar.class.isAssignableFrom( numericClass );
 	}
 }
