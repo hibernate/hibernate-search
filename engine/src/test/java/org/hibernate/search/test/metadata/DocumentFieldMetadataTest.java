@@ -11,9 +11,6 @@ import java.net.URI;
 import java.util.Date;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
@@ -23,6 +20,8 @@ import org.hibernate.search.annotations.Facets;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
@@ -33,6 +32,10 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -43,6 +46,9 @@ import static org.junit.Assert.fail;
  */
 @TestForIssue(jiraKey = "HSEARCH-809")
 public class DocumentFieldMetadataTest {
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	private AnnotationMetadataProvider metadataProvider;
 
@@ -107,7 +113,7 @@ public class DocumentFieldMetadataTest {
 	}
 
 	@Test
-	public void testAddingFacetToUnalyzedFieldThrowsException() {
+	public void testAddingFacetToUnanalyzedFieldThrowsException() {
 		try {
 			metadataProvider.getTypeMetadataFor( Snafu.class );
 			fail( "Field targeted for faceting cannot be analyzed" );
@@ -115,6 +121,30 @@ public class DocumentFieldMetadataTest {
 		catch (SearchException e) {
 			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000273" ) );
 		}
+	}
+
+	@Test
+	public void testNumericFieldReferencingNonExistingFieldThrowsException() {
+		expectedException.expect( SearchException.class );
+		expectedException.expectMessage( "HSEARCH000262" );
+
+		metadataProvider.getTypeMetadataFor( TypeWithNumericFieldReferringToNonExistantField.class );
+	}
+
+	@Test
+	public void testNumericFieldWithoutFieldThrowsException() {
+		expectedException.expect( SearchException.class );
+		expectedException.expectMessage( "HSEARCH000262" );
+
+		metadataProvider.getTypeMetadataFor( TypeWithNumericFieldWithoutField.class );
+	}
+
+	@Test
+	public void testSeveralNumericFieldsReferringToSameFieldThrowException() {
+		expectedException.expect( SearchException.class );
+		expectedException.expectMessage( "HSEARCH000300" );
+
+		metadataProvider.getTypeMetadataFor( TypeWithSeveralNumericFieldsReferringToSameField.class );
 	}
 
 	private FacetMetadata getSingleFacetMetadata(Class<?> type, String fieldName) {
@@ -207,6 +237,39 @@ public class DocumentFieldMetadataTest {
 		@Facet
 		private String name;
 	}
+
+	@Indexed
+	public class TypeWithNumericFieldReferringToNonExistantField {
+
+		@DocumentId
+		private Integer id;
+
+		@NumericField(forField = "nonExistant")
+		@Field
+		private short name;
+	}
+
+	@Indexed
+	public class TypeWithNumericFieldWithoutField {
+
+		@DocumentId
+		private Integer id;
+
+		@NumericField
+		private short name;
+	}
+
+	@Indexed
+	public class TypeWithSeveralNumericFieldsReferringToSameField {
+
+		@DocumentId
+		private Integer id;
+
+		@NumericFields({
+				@NumericField(forField = "name"),
+				@NumericField(forField = "name")
+		})
+		@Field(name = "name")
+		private short name;
+	}
 }
-
-
