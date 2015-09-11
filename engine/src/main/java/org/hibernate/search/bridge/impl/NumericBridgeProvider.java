@@ -7,12 +7,10 @@
 
 package org.hibernate.search.bridge.impl;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.util.impl.CollectionHelper;
@@ -25,7 +23,7 @@ class NumericBridgeProvider extends ExtendedBridgeProvider {
 	private static final Map<String, NumericFieldBridge> numericBridges;
 
 	/**
-	 * Those numeric types for which a String field will be used by default; Only if explicitly marked via {@link NumericField}
+	 * Those numeric types for which a String field will be used by default; Only if explicitly marked via {@code NumericField}
 	 * they will be encoded numerically.
 	 */
 	// TODO HSEARCH-1779 Remove and use numeric fields for all number types by default
@@ -50,16 +48,12 @@ class NumericBridgeProvider extends ExtendedBridgeProvider {
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext bridgeContext) {
 		// For id and short/byte use numeric fields only if explicitly requested via @NumericField
-		if ( !isMarkedAsNumericField( bridgeContext.getAnnotatedElement() ) &&
+		if ( !bridgeContext.isExplicitlyMarkedAsNumeric() &&
 				( bridgeContext.isId() || encodeWithStringFieldByDefault( bridgeContext.getReturnType() ) ) ) {
 			return null;
 		}
 
 		return numericBridges.get( bridgeContext.getReturnType().getName() );
-	}
-
-	private boolean isMarkedAsNumericField(AnnotatedElement annotatedElement) {
-		return annotatedElement.isAnnotationPresent( NumericField.class );
 	}
 
 	private boolean encodeWithStringFieldByDefault(Class<?> clazz) {

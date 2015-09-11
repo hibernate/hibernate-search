@@ -41,6 +41,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.FacetEncodingType;
 import org.hibernate.search.annotations.Facets;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Index;
@@ -49,7 +50,6 @@ import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
-import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.SortableFields;
@@ -161,6 +161,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void checkDocumentId(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
 			PropertyMetadata.Builder propertyMetadataBuilder,
+			NumericFieldsConfiguration numericFields,
 			boolean isRoot,
 			String prefix,
 			ConfigContext configContext,
@@ -177,6 +178,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			createIdPropertyMetadata(
 					member,
 					typeMetadataBuilder,
+					numericFields,
 					configContext,
 					parseContext,
 					idAnnotation,
@@ -185,7 +187,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( path ) ) {
-				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, configContext, path );
+				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, configContext, path );
 			}
 		}
 
@@ -194,12 +196,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, PropertyMetadata.Builder propertyMetadataBuilder, ConfigContext configContext, String fieldName) {
+	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, PropertyMetadata.Builder propertyMetadataBuilder, NumericFieldsConfiguration numericFields, ConfigContext configContext, String fieldName) {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
+
 		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				member,
 				true,
+				numericFields.isNumericField( fieldName ),
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -229,6 +233,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private void createIdPropertyMetadata(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
+			NumericFieldsConfiguration numericFields,
 			ConfigContext configContext,
 			ParseContext parseContext,
 			Annotation idAnnotation,
@@ -246,9 +251,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			parseContext.setExplicitDocumentId( true );
 		}
 
+		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( path );
+
+		// Don't apply @NumericField if it is given with the default name and there is another custom @Field
+		if ( numericFieldAnnotation != null && numericFieldAnnotation.forField().isEmpty()
+				&& ( member.isAnnotationPresent( org.hibernate.search.annotations.Field.class ) || member.isAnnotationPresent( Fields.class ) ) ) {
+			numericFieldAnnotation = null;
+		}
+
 		FieldBridge idBridge = bridgeFactory.buildFieldBridge(
 				member,
 				true,
+				numericFieldAnnotation != null,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -622,6 +636,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				member,
 				false,
+				false,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -813,12 +828,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
 			.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
+		NumericFieldsConfiguration numericFields = new NumericFieldsConfiguration( typeMetadataBuilder.getIndexedType(), member );
+
 		if ( !isProvidedId ) {
-			checkDocumentId( member, typeMetadataBuilder, propertyMetadataBuilder, isRoot, prefix, configContext, pathsContext, parseContext );
+			checkDocumentId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, isRoot, prefix, configContext, pathsContext, parseContext );
 		}
 
-		checkForField( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, configContext, pathsContext, parseContext );
-		checkForFields( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, configContext, pathsContext, parseContext );
+		checkForField( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, prefix, configContext, pathsContext, parseContext );
+		checkForFields( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, prefix, configContext, pathsContext, parseContext );
 		checkForSpatial( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, pathsContext, parseContext );
 		checkForSpatialsAnnotation( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, pathsContext, parseContext );
 		checkForSortableField( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, false, pathsContext, parseContext );
@@ -836,9 +853,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		checkForContainedIn( member, typeMetadataBuilder, parseContext );
 
+		numericFields.validate();
+
 		PropertyMetadata property = propertyMetadataBuilder.build();
 		if ( !property.getFieldMetadata().isEmpty() ) {
-			typeMetadataBuilder.addProperty( propertyMetadataBuilder.build() );
+			typeMetadataBuilder.addProperty( property );
 		}
 	}
 
@@ -925,6 +944,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void checkForField(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
 			PropertyMetadata.Builder propertyMetadataBuilder,
+			NumericFieldsConfiguration numericFields,
 			String prefix,
 			ConfigContext configContext,
 			PathsContext pathsContext,
@@ -932,14 +952,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		org.hibernate.search.annotations.Field fieldAnnotation =
 				member.getAnnotation( org.hibernate.search.annotations.Field.class );
-		DocumentId idAnn = member.getAnnotation( DocumentId.class );
-
-		NumericField numericFieldAnnotation = member.getAnnotation( NumericField.class );
-		if ( ( fieldAnnotation == null && idAnn == null ) && numericFieldAnnotation != null ) {
-			String className = member.getDeclaringClass().getName();
-			String memberName = member.getName();
-			throw log.numericFieldAnnotationWithoutMatchingField( className, memberName);
-		}
 
 		if ( fieldAnnotation != null ) {
 			if ( isFieldInPath( fieldAnnotation, member, pathsContext, prefix ) || !parseContext.isMaxLevelReached() ) {
@@ -948,7 +960,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				bindFieldAnnotation(
 						prefix,
 						fieldAnnotation,
-						numericFieldAnnotation,
+						numericFields,
 						facetAnnotations,
 						typeMetadataBuilder,
 						propertyMetadataBuilder,
@@ -986,7 +998,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void bindFieldAnnotation(
 			String prefix,
 			org.hibernate.search.annotations.Field fieldAnnotation,
-			NumericField numericFieldAnnotation,
+			NumericFieldsConfiguration numericFields,
 			Set<Facet> facetAnnotations,
 			TypeMetadata.Builder typeMetadataBuilder,
 			PropertyMetadata.Builder propertyMetadataBuilder,
@@ -1010,10 +1022,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( fieldAnnotation.termVector() );
 
+		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( fieldName );
+
 		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				fieldAnnotation,
 				member,
 				false,
+				numericFieldAnnotation != null,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -1396,13 +1411,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void checkForFields(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
 			PropertyMetadata.Builder propertyMetadataBuilder,
+			NumericFieldsConfiguration numericFields,
 			String prefix,
 			ConfigContext configContext,
 			PathsContext pathsContext,
 			ParseContext parseContext) {
-		org.hibernate.search.annotations.Fields fieldsAnnotation = member.getAnnotation( org.hibernate.search.annotations.Fields.class );
-		NumericFields numericFieldsAnnotations = member.getAnnotation( NumericFields.class );
-		if ( fieldsAnnotation != null ) {
+		Fields fieldsAnnotation = member.getAnnotation( Fields.class );
+		if ( fieldsAnnotation != null && fieldsAnnotation.value().length > 0 ) {
 			for ( org.hibernate.search.annotations.Field fieldAnnotation : fieldsAnnotation.value() ) {
 				if ( isFieldInPath(
 						fieldAnnotation,
@@ -1414,7 +1429,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					bindFieldAnnotation(
 							prefix,
 							fieldAnnotation,
-							getNumericExtension( fieldAnnotation, numericFieldsAnnotations ),
+							numericFields,
 							facetAnnotations,
 							typeMetadataBuilder,
 							propertyMetadataBuilder,
@@ -1424,18 +1439,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				}
 			}
 		}
-	}
-
-	private NumericField getNumericExtension(org.hibernate.search.annotations.Field fieldAnnotation, NumericFields numericFields) {
-		if ( numericFields == null ) {
-			return null;
-		}
-		for ( NumericField numericField : numericFields.value() ) {
-			if ( numericField.forField().equals( fieldAnnotation.name() ) ) {
-				return numericField;
-			}
-		}
-		return null;
 	}
 
 	private boolean isFieldInPath(Annotation fieldAnnotation,

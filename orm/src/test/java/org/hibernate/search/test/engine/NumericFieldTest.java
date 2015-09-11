@@ -8,8 +8,11 @@ package org.hibernate.search.test.engine;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.Session;
@@ -20,6 +23,10 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.metadata.FieldDescriptor;
+import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
+import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
@@ -27,6 +34,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -186,6 +194,65 @@ public class NumericFieldTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1987")
+	public void testOneOfSeveralFieldsIsNumeric() {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Transaction tx = fullTextSession.beginTransaction();
+
+			QueryContextBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder();
+			Query query = queryBuilder.forEntity( TouristAttraction.class ).get().all().createQuery();
+
+			@SuppressWarnings("unchecked")
+			List<Object[]> list = fullTextSession.createFullTextQuery( query, TouristAttraction.class )
+					.setProjection( ProjectionConstants.DOCUMENT )
+					.list();
+
+			assertEquals( 1, list.size() );
+			Document document = (Document) list.iterator().next()[0];
+
+			IndexableField scoreNumeric = document.getField( "scoreNumeric" );
+			assertThat( scoreNumeric.numericValue() ).isEqualTo( 23 );
+
+			IndexableField scoreString = document.getField( "scoreString" );
+			assertThat( scoreString.numericValue() ).isNull();
+			assertThat( scoreString.stringValue() ).isEqualTo( "23" );
+
+			tx.commit();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1987")
+	public void testSomeOfSeveralFieldsAreNumeric() {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+
+			Set<FieldDescriptor> fields = fullTextSession.getSearchFactory()
+					.getIndexedTypeDescriptor( TouristAttraction.class )
+					.getProperty( "rating" )
+					.getIndexedFields();
+
+			assertThat( fields ).onProperty( "name" )
+					.containsOnly( "rating", "ratingNumericPrecision1", "ratingNumericPrecision2");
+
+			for ( FieldDescriptor field : fields ) {
+				if ( "ratingNumericPrecision1".equals( field.getName() ) ) {
+					assertThat( field.getType() ).isEqualTo( Type.NUMERIC );
+					assertThat( field.as( NumericFieldSettingsDescriptor.class ).precisionStep() ).isEqualTo( 1 );
+				}
+				else if ( "ratingNumericPrecision2".equals( field.getName() ) ) {
+					assertThat( field.getType() ).isEqualTo( Type.NUMERIC );
+					assertThat( field.as( NumericFieldSettingsDescriptor.class ).precisionStep() ).isEqualTo( 2 );
+				}
+				else {
+					assertThat( field.getType() ).isEqualTo( Type.BASIC );
+				}
+			}
+		}
+	}
+
 	private boolean indexIsEmpty() {
 		int numDocsLocation = countSizeForType( Location.class );
 		int numDocsPinPoint = countSizeForType( PinPoint.class );
@@ -210,7 +277,7 @@ public class NumericFieldTest extends SearchTestBase {
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { PinPoint.class, Location.class, Coordinate.class, PointOfInterest.class, Position.class };
+		return new Class<?>[]{ PinPoint.class, Location.class, Coordinate.class, PointOfInterest.class, Position.class, TouristAttraction.class };
 	}
 
 	private Location doExactQuery(FullTextSession fullTextSession, String fieldName, Object value) {
@@ -262,6 +329,9 @@ public class NumericFieldTest extends SearchTestBase {
 			Position position2 = new Position( (byte) 2, -30D, 30D );
 			fullTextSession.save( position1 );
 			fullTextSession.save( position2 );
+
+			TouristAttraction attraction = new TouristAttraction( 1, (short) 23, (short) 46L );
+			fullTextSession.save( attraction );
 
 			tx.commit();
 		}
