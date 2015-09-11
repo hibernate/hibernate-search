@@ -67,7 +67,7 @@ public final class NumericFieldUtils {
 			Long toValue = to != null ? ((Date) to).getTime() : null;
 			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Calendar.class ) ) {
+		if ( Calendar.class.isAssignableFrom( numericClass ) ) {
 			Long fromValue = from != null ? ((Calendar) from).getTime().getTime() : null;
 			Long toValue = to != null ? ((Calendar) to).getTime().getTime() : null;
 			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );

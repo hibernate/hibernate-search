@@ -20,6 +20,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.time.impl.NumericTimeBridge;
@@ -86,7 +87,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
 				fieldBridge = ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap();
 			}
-			if ( fieldBridge instanceof NumericFieldBridge || fieldBridge instanceof NumericTimeBridge ) {
+			if ( isNumericBridge( fieldBridge ) ) {
 				return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
 			}
 		}
@@ -126,6 +127,12 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			}
 		}
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
+	}
+
+	private static boolean isNumericBridge(FieldBridge fieldBridge) {
+		return fieldBridge instanceof NumericFieldBridge
+				|| fieldBridge instanceof NumericTimeBridge
+				|| fieldBridge instanceof NumericEncodingDateBridge;
 	}
 
 	private void validateNullValueIsSearchable(FieldContext fieldContext) {
