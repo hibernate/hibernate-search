@@ -56,12 +56,10 @@ class NumericFieldsConfiguration {
 	 * Gets the {@code @NumericField} annotation matching the given field, if any. As a side-effect, the given field
 	 * is collected for later validation of configured numeric fields against actually present fields.
 	 */
-	NumericField getNumericFieldAnnotation(String fieldName) {
-		fieldName = unqualify( fieldName );
+	NumericField getNumericFieldAnnotation(final String unprefixedFieldName) {
+		fieldsOfProperty.add( unprefixedFieldName );
 
-		fieldsOfProperty.add( fieldName );
-
-		NumericField numericFieldAnnotation = fieldsMarkedAsNumeric.get( fieldName );
+		NumericField numericFieldAnnotation = fieldsMarkedAsNumeric.get( unprefixedFieldName );
 
 		if ( numericFieldAnnotation == null ) {
 			numericFieldAnnotation = fieldsMarkedAsNumeric.get( "" );
@@ -89,12 +87,4 @@ class NumericFieldsConfiguration {
 		}
 	}
 
-	private String unqualify(String fieldName) {
-		int separatorIdx = fieldName.lastIndexOf( '.' );
-		if ( separatorIdx != -1 ) {
-			fieldName = fieldName.substring( separatorIdx + 1 );
-		}
-
-		return fieldName;
-	}
 }

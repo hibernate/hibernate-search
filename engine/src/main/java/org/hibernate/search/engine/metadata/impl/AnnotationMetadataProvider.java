@@ -172,8 +172,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
-		String attributeName = getIdAttributeName( member, idAnnotation );
-		String path = prefix + attributeName;
+		final String unprefixedAttributeName = getIdAttributeName( member, idAnnotation );
+		final String path = prefix + unprefixedAttributeName;
 		if ( isRoot ) {
 			createIdPropertyMetadata(
 					member,
@@ -182,7 +182,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					configContext,
 					parseContext,
 					idAnnotation,
-					path
+					path,
+					unprefixedAttributeName
 			);
 		}
 		else {
@@ -237,7 +238,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ConfigContext configContext,
 			ParseContext parseContext,
 			Annotation idAnnotation,
-			String path) {
+			String path,
+			String unprefixedAttributeName) {
 		if ( parseContext.isExplicitDocumentId() ) {
 			if ( idAnnotation instanceof DocumentId ) {
 				throw log.duplicateDocumentIdFound( typeMetadataBuilder.getIndexedType().getName() );
@@ -251,7 +253,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			parseContext.setExplicitDocumentId( true );
 		}
 
-		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( path );
+		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( unprefixedAttributeName );
 
 		// Don't apply @NumericField if it is given with the default name and there is another custom @Field
 		if ( numericFieldAnnotation != null && numericFieldAnnotation.forField().isEmpty()
@@ -1013,7 +1015,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			typeMetadataBuilder.disableStateInspectionOptimization();
 		}
 
-		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnnotation.name() );
+		final String unPrefixedFieldName = ReflectionHelper.getAttributeName( member, fieldAnnotation.name() );
+		final String fieldName = prefix + unPrefixedFieldName;
 		Store store = fieldAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex(
 				fieldAnnotation.index(),
@@ -1022,7 +1025,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( fieldAnnotation.termVector() );
 
-		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( fieldName );
+		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( unPrefixedFieldName );
 
 		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				fieldAnnotation,
