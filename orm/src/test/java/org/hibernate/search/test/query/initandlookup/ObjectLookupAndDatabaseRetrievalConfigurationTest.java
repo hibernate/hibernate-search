@@ -49,8 +49,10 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( null, null ) ) {
 			indexTestData( builder );
 			FullTextSession fullTextSession = builder.openFullTextSession();
+			Transaction tx = fullTextSession.beginTransaction();
 			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
 			query.list();
+			tx.commit();
 			fullTextSession.close();
 
 			Assert.assertEquals(
@@ -71,8 +73,10 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( "PERSISTENCE_CONTEXT", null ) ) {
 			indexTestData( builder );
 			FullTextSession fullTextSession = builder.openFullTextSession();
+			Transaction tx = fullTextSession.beginTransaction();
 			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
 			query.list();
+			tx.commit();
 			fullTextSession.close();
 
 			Assert.assertEquals(
@@ -93,8 +97,10 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( "persistence_context", null ) ) {
 			indexTestData( builder );
 			FullTextSession fullTextSession = builder.openFullTextSession();
+			Transaction tx = fullTextSession.beginTransaction();
 			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
 			query.list();
+			tx.commit();
 			fullTextSession.close();
 
 			Assert.assertEquals(
@@ -115,8 +121,10 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( null, "FIND_BY_ID" ) ) {
 			indexTestData( builder );
 			FullTextSession fullTextSession = builder.openFullTextSession();
+			Transaction tx = fullTextSession.beginTransaction();
 			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
 			query.list();
+			tx.commit();
 			fullTextSession.close();
 
 			Assert.assertEquals(
@@ -137,8 +145,10 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( null, "find_by_id" ) ) {
 			indexTestData( builder );
 			FullTextSession fullTextSession = builder.openFullTextSession();
+			Transaction tx = fullTextSession.beginTransaction();
 			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
 			query.list();
+			tx.commit();
 			fullTextSession.close();
 
 			Assert.assertEquals(

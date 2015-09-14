@@ -372,9 +372,11 @@ public class EmbeddedTest extends SearchTestBase {
 		tx.commit();
 		s.clear();
 
+		tx = s.beginTransaction();
 		query = parser.parse( "features.name:featureB" );
 		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
 		assertEquals( "Feature B should be indexed now as well", 1, result.size() );
+		tx.commit();
 
 		s.close();
 	}

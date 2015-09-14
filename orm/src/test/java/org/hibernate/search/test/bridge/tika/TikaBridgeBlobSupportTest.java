@@ -69,6 +69,7 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 	@SuppressWarnings("unchecked")
 	private void searchBook(Session session) throws ParseException {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		Transaction transaction = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser(
 				"content",
 				TestConstants.standardAnalyzer
@@ -91,6 +92,8 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 
 		result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
 		assertEquals( "there should be match", 2, result.size() );
+		transaction.commit();
+		fullTextSession.clear();
 	}
 
 	private void persistBook(Session session, Blob data) throws IOException {

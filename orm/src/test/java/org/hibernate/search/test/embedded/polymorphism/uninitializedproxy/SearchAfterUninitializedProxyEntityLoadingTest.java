@@ -108,9 +108,12 @@ public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBa
 	private static <T> List<T> doSearch(Session session, Class<T> clazz, Integer entityId) {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
+		Transaction tx = fullTextSession.beginTransaction();
 		FullTextQuery query = fullTextSession.createFullTextQuery(
 				new TermQuery( new Term( "id", entityId.toString() ) ), clazz );
 
-		return query.list();
+		List<T> result = query.list();
+		tx.commit();
+		return result;
 	}
 }

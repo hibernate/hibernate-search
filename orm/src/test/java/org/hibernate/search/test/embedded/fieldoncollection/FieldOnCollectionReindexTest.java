@@ -96,12 +96,15 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 		hibernateSession.update( indexedEntity );
 		tx.commit();
 
+		tx = hibernateSession.beginTransaction();
+
 		// The collection hasn't been indexed correctly
 		// The following tests fail
 		searchResult = searchIndexedEntity( hibernateSession, "itemsWithFieldAnnotation", item3 );
 		assertEquals( 1, searchResult.size() );
 		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
 
+		tx.commit();
 		hibernateSession.close();
 	}
 
@@ -175,12 +178,15 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 		hibernateSession.update( indexedEntity );
 		tx.commit();
 
+		tx = hibernateSession.beginTransaction();
+
 		// The collection hasn't been indexed correctly
 		// The following tests fail
 		searchResult = searchIndexedEntity( hibernateSession, IndexedEntity.FIELD1_FIELD_NAME, item3 );
 		assertEquals( 1, searchResult.size() );
 		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
 
+		tx.commit();
 		hibernateSession.close();
 	}
 
@@ -236,11 +242,13 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 		hibernateSession.update( indexedEntity );
 		tx.commit();
 
+		tx = hibernateSession.beginTransaction();
 		// The collection hasn't been indexed correctly
 		// The following tests fail
 		searchResult = searchIndexedEntity( hibernateSession, "keywords", "test5" );
 		assertEquals( 1, searchResult.size() );
 		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+		tx.commit();
 
 		hibernateSession.close();
 	}
