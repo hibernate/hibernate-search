@@ -23,6 +23,7 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -238,6 +239,7 @@ public class JavaTimeTest extends SearchTestBase {
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private LocalDate localDate;
 
+		@Column(name = "LOCAL_TIME") // localTime is a special keywork for some db
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private LocalTime localTime;
 
