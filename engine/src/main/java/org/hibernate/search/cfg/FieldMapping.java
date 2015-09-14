@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.util.TokenizerFactory;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
@@ -101,6 +100,14 @@ public class FieldMapping {
 
 	public NumericFieldMapping numericField() {
 		return new NumericFieldMapping( property, entity, mapping );
+	}
+
+	public SortableFieldMapping sortableField() {
+		String forField = (String) field.get( "name" );
+		if ( forField == null ) {
+			forField = "";
+		}
+		return new SortableFieldMapping( forField, property, entity, mapping );
 	}
 
 	public PropertyMapping property(String name, ElementType type) {

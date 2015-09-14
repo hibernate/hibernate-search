@@ -25,18 +25,19 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.junit.Test;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
@@ -46,7 +47,9 @@ import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -113,7 +116,44 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		s.delete( query.list().get( 0 ) );
 		tx.commit();
 		s.close();
+	}
 
+	@Test
+	public void testSortableField() throws Exception {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+
+		Item item1 = new Item();
+		item1.setPrice( 34.54d );
+		s.persist( item1 );
+
+		Item item2 = new Item();
+		item2.setPrice( 33.54d );
+		s.persist( item2 );
+
+		Item item3 = new Item();
+		item3.setPrice( 35.54d );
+		s.persist( item3 );
+
+		tx.commit();
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		Query q = s.getSearchFactory().buildQueryBuilder().forEntity( Item.class ).get().all().createQuery();
+		FullTextQuery query = s.createFullTextQuery( q, Item.class );
+		query.setSort( new Sort( new SortField( "price", SortField.Type.DOUBLE ) ) );
+
+		List<?> results = query.list();
+		assertThat( results ).onProperty( "price" )
+			.describedAs( "Sortable field via programmatic config" )
+			.containsExactly( 33.54d, 34.54d, 35.54d );
+
+		s.delete( results.get( 0 ) );
+		s.delete( results.get( 1 ) );
+		s.delete( results.get( 2 ) );
+		tx.commit();
+		s.close();
 	}
 
 	@Test
@@ -504,7 +544,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 
-		Item loaded = (Item) s.get( Item.class, item.getId() );
+		Item loaded = s.get( Item.class, item.getId() );
 		loaded.setDescription( "Ferrari" );
 
 		s.update( loaded );

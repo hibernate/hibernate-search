@@ -17,8 +17,9 @@ import java.util.Map;
  */
 public class PropertyDescriptor {
 
-	private Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-	private Collection<Map<String, Object>> numericFields = new ArrayList<Map<String, Object>>();
+	private final Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
+	private final Collection<Map<String, Object>> numericFields = new ArrayList<Map<String, Object>>();
+	private final Collection<Map<String, Object>> sortableFields = new ArrayList<Map<String, Object>>();
 	private Map<String, Object> dateBridge = new HashMap<String, Object>();
 	private Map<String, Object> calendarBridge = new HashMap<String, Object>();
 	private Map<String,Object> indexEmbedded;
@@ -47,6 +48,11 @@ public class PropertyDescriptor {
 		numericFields.add( numericField );
 	}
 
+
+	public void addSortableField(Map<String, Object> sortableField) {
+		sortableFields.add( sortableField );
+	}
+
 	public void setDateBridge(Map<String,Object> dateBridge) {
 		this.dateBridge = dateBridge;
 	}
@@ -60,6 +66,10 @@ public class PropertyDescriptor {
 
 	public Collection<Map<String, Object>> getNumericFields() {
 		return numericFields;
+	}
+
+	public Collection<Map<String, Object>> getSortableFields() {
+		return sortableFields;
 	}
 
 	public Map<String, Object> getDocumentId() {

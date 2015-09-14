@@ -49,6 +49,8 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.ProvidedId;
+import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.TokenFilterDef;
@@ -393,8 +395,11 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final Map<String, Object> latitude = property.getLatitude();
 			final Map<String, Object> longitude = property.getLongitude();
 			final Collection<Map<String, Object>> numericFields = property.getNumericFields();
+			final Collection<Map<String, Object>> sortableFields = property.getSortableFields();
+
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
+
 			List<NumericField> numericFieldAnnotations = new ArrayList<NumericField>( numericFields.size() );
 			for ( Map<String, Object> numericField : numericFields ) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( NumericField.class );
@@ -403,6 +408,16 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 				numericFieldAnnotations.add( (NumericField) createAnnotation( fieldAnnotation ) );
 			}
+
+			List<SortableField> sortableFieldAnnotations = new ArrayList<SortableField>( sortableFields.size() );
+			for ( Map<String, Object> sortableField : sortableFields ) {
+				AnnotationDescriptor sortableFieldAnnotation = new AnnotationDescriptor( SortableField.class );
+				for ( Map.Entry<String, Object> entry : sortableField.entrySet() ) {
+					sortableFieldAnnotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				sortableFieldAnnotations.add( (SortableField) createAnnotation( sortableFieldAnnotation ) );
+			}
+
 			for ( Map<String, Object> field : fields ) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
 				for ( Map.Entry<String, Object> entry : field.entrySet() ) {
@@ -476,6 +491,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 			AnnotationDescriptor fieldsAnnotation = new AnnotationDescriptor( Fields.class );
 			AnnotationDescriptor numericFieldsAnnotation = new AnnotationDescriptor( NumericFields.class );
+			AnnotationDescriptor sortableFieldsAnnotation = new AnnotationDescriptor( SortableFields.class );
 
 			final org.hibernate.search.annotations.Field[] fieldArray =
 					new org.hibernate.search.annotations.Field[fieldAnnotations.size()];
@@ -485,6 +501,12 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final NumericField[] numericFieldAsArray = numericFieldAnnotations.toArray( numericFieldArray );
 			numericFieldsAnnotation.setValue( "value", numericFieldAsArray );
 			annotations.put( NumericFields.class, createAnnotation( numericFieldsAnnotation ) );
+
+			final SortableField[] sortableFieldArray = new SortableField[sortableFieldAnnotations.size()];
+			final SortableField[] sortableFieldAsArray = sortableFieldAnnotations.toArray( sortableFieldArray );
+			sortableFieldsAnnotation.setValue( "value", sortableFieldAsArray );
+			annotations.put( SortableFields.class, createAnnotation( sortableFieldsAnnotation ) );
+
 			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, createAnnotation( fieldsAnnotation ) );
 			createDateBridge( property );

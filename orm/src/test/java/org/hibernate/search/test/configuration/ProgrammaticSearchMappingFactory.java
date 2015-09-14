@@ -8,8 +8,8 @@ package org.hibernate.search.test.configuration;
 
 import java.lang.annotation.ElementType;
 
-import org.apache.lucene.analysis.de.GermanStemFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.de.GermanStemFilterFactory;
 import org.apache.lucene.analysis.ngram.NGramFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
@@ -90,6 +90,7 @@ public class ProgrammaticSearchMappingFactory {
 					.property( "price", ElementType.FIELD )
 						.field()
 						.numericField().precisionStep( 10 )
+						.sortableField()
 				.entity( DynamicBoostedDescLibrary.class )
 					.dynamicBoost( CustomBoostStrategy.class )
 					.indexed()
