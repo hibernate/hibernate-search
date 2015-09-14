@@ -53,8 +53,11 @@ class NumericFieldsConfiguration {
 	}
 
 	/**
-	 * Gets the {@code @NumericField} annotation matching the given field, if any. As a side-effect, the given field
-	 * is collected for later validation of configured numeric fields against actually present fields.
+	 * Gets the {@code @NumericField} annotation matching the given field, if any. As a side-effect, the given field is
+	 * collected for later validation of configured numeric fields against actually present fields.
+	 *
+	 * @param unprefixedFieldName The name of the field of interest, without any prefixes it may inherited from the
+	 * parent in case it's part of an embedded entity
 	 */
 	NumericField getNumericFieldAnnotation(final String unprefixedFieldName) {
 		fieldsOfProperty.add( unprefixedFieldName );
@@ -68,8 +71,8 @@ class NumericFieldsConfiguration {
 		return numericFieldAnnotation;
 	}
 
-	boolean isNumericField(String fieldName) {
-		return getNumericFieldAnnotation( fieldName ) != null;
+	boolean isNumericField(String unprefixedFieldName) {
+		return getNumericFieldAnnotation( unprefixedFieldName ) != null;
 	}
 
 	/**

@@ -188,7 +188,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( path ) ) {
-				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, configContext, path );
+				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, configContext, unprefixedAttributeName, path );
 			}
 		}
 
@@ -197,14 +197,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, PropertyMetadata.Builder propertyMetadataBuilder, NumericFieldsConfiguration numericFields, ConfigContext configContext, String fieldName) {
+	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, PropertyMetadata.Builder propertyMetadataBuilder, NumericFieldsConfiguration numericFields, ConfigContext configContext, String unprefixedFieldName, String fieldName) {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 
 		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				member,
 				true,
-				numericFields.isNumericField( fieldName ),
+				numericFields.isNumericField( unprefixedFieldName ),
 				reflectionManager,
 				configContext.getServiceManager()
 		);

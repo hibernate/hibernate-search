@@ -108,7 +108,7 @@ public class NumericFieldTest extends SearchTestBase {
 
 			// Delete operation on Numeric Id with overriden field name:
 			tx = fts.beginTransaction();
-			List allLocations = fts.createCriteria( Location.class ).list();
+			List<?> allLocations = fts.createCriteria( Location.class ).list();
 			for ( Object location : allLocations ) {
 				fts.delete( location );
 			}
@@ -135,14 +135,14 @@ public class NumericFieldTest extends SearchTestBase {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
 			Transaction tx = fullTextSession.beginTransaction();
 			Query latitudeQuery = NumericFieldUtils.createNumericRangeQuery( "latitude", -20d, -20d, true, true );
-			List list = fullTextSession.createFullTextQuery( latitudeQuery, Location.class )
+			List<?> list = fullTextSession.createFullTextQuery( latitudeQuery, Location.class )
 					.setProjection( "latitude" )
 					.list();
 			Assert.assertEquals( 1, list.size() );
 			Object[] firstProjection = (Object[]) list.get( 0 );
 			Assert.assertEquals( 1, firstProjection.length );
 			Assert.assertEquals( -20d, firstProjection[0] );
-			List listAgain = fullTextSession.createFullTextQuery( latitudeQuery, Location.class )
+			List<?> listAgain = fullTextSession.createFullTextQuery( latitudeQuery, Location.class )
 					.setProjection( "coordinatePair_x", "coordinatePair_y", "importance", "popularity" )
 					.list();
 			Assert.assertEquals( 1, listAgain.size() );
@@ -275,16 +275,19 @@ public class NumericFieldTest extends SearchTestBase {
 
 			@SuppressWarnings("unchecked")
 			List<Object[]> list = fullTextSession.createFullTextQuery( query, ScoreBoard.class )
-					.setProjection( "score_alpha", "score_beta" )
+					.setProjection( ProjectionConstants.DOCUMENT )
 					.list();
 
 			assertEquals( 1, list.size() );
-			Object[] result = (Object[]) list.get( 0 );
-			assertThat( result[0] ).isEqualTo( 1 );
-			assertThat( result[1] ).isEqualTo( 100 );
+			Document document = (Document) list.iterator().next()[0];
+
+			IndexableField scoreNumeric = document.getField( "score_id" );
+			assertThat( scoreNumeric.numericValue() ).isEqualTo( 1 );
+
+			IndexableField beta = document.getField( "score_beta" );
+			assertThat( beta.numericValue() ).isEqualTo( 100 );
 
 			tx.commit();
-
 		}
 	}
 
@@ -321,12 +324,12 @@ public class NumericFieldTest extends SearchTestBase {
 		return (Location) fullTextSession.createFullTextQuery( matchQuery, Location.class ).list().get( 0 );
 	}
 
-	private List numericQueryFor(FullTextSession fullTextSession, String fieldName, Object from, Object to) {
+	private List<?> numericQueryFor(FullTextSession fullTextSession, String fieldName, Object from, Object to) {
 		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, from, to, true, true );
 		return fullTextSession.createFullTextQuery( query, Location.class ).list();
 	}
 
-	private List numericQueryFor(FullTextSession fullTextSession, String fieldName, Object from, Object to, boolean includeLower, boolean includeUpper) {
+	private List<?> numericQueryFor(FullTextSession fullTextSession, String fieldName, Object from, Object to, boolean includeLower, boolean includeUpper) {
 		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, from, to, includeLower, includeUpper );
 		return fullTextSession.createFullTextQuery( query, Location.class ).list();
 	}
@@ -443,14 +446,11 @@ public class NumericFieldTest extends SearchTestBase {
 	@Indexed @Entity
 	static class Score {
 
-		@Field(name = "alpha", store = Store.YES)
-		@NumericField(forField = "alpha")
 		@Id
+		@NumericField
 		Integer id;
 
 		@Field(name = "beta", store = Store.YES)
 		Integer subscore;
-
 	}
-
 }
