@@ -101,6 +101,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	@Test
 	public void testNumeric() throws Exception {
 		Item item = new Item();
+		item.setId( 1 );
 		item.setPrice( (short) 3454 );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -142,14 +143,17 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		Item item1 = new Item();
+		item1.setId( 3 );
 		item1.setPrice( (short) 3454 );
 		s.persist( item1 );
 
 		Item item2 = new Item();
+		item2.setId( 2 );
 		item2.setPrice( (short) 3354 );
 		s.persist( item2 );
 
 		Item item3 = new Item();
+		item3.setId( 1 );
 		item3.setPrice( (short) 3554 );
 		s.persist( item3 );
 
@@ -166,6 +170,13 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		assertThat( results ).onProperty( "price" )
 			.describedAs( "Sortable field via programmatic config" )
 			.containsExactly( (short) 3354, (short) 3454, (short) 3554 );
+
+		query.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
+
+		results = query.list();
+		assertThat( results ).onProperty( "id" )
+			.describedAs( "Sortable field via programmatic config" )
+			.containsExactly( 1, 2, 3 );
 
 		s.delete( results.get( 0 ) );
 		s.delete( results.get( 1 ) );
@@ -507,6 +518,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		ProductCatalog productCatalog = new ProductCatalog();
 		productCatalog.setName( "Cars" );
 		Item item = new Item();
+		item.setId( 1 );
 		item.setDescription( "Ferrari" );
 		item.setProductCatalog( productCatalog );
 		productCatalog.addItem( item );
@@ -542,6 +554,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		ProductCatalog productCatalog = new ProductCatalog();
 		productCatalog.setName( "Cars" );
 		Item item = new Item();
+		item.setId( 1 );
 		item.setDescription( "test" );
 		item.setProductCatalog( productCatalog );
 		productCatalog.addItem( item );
