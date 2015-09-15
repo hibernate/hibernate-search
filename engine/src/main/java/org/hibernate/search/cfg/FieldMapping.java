@@ -99,13 +99,18 @@ public class FieldMapping {
 	}
 
 	public NumericFieldMapping numericField() {
-		return new NumericFieldMapping( property, entity, mapping );
+		String forField = (String) field.get( "name" );
+		if ( forField == null ) {
+			forField = property.getName();
+		}
+
+		return new NumericFieldMapping( forField, property, entity, mapping );
 	}
 
 	public SortableFieldMapping sortableField() {
 		String forField = (String) field.get( "name" );
 		if ( forField == null ) {
-			forField = "";
+			forField = property.getName();
 		}
 		return new SortableFieldMapping( forField, property, entity, mapping );
 	}

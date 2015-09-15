@@ -16,7 +16,9 @@ import java.util.TimeZone;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.DateTools;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -99,7 +101,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	@Test
 	public void testNumeric() throws Exception {
 		Item item = new Item();
-		item.setPrice( 34.54d );
+		item.setPrice( (short) 3454 );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -109,11 +111,27 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 
-		NumericRangeQuery<Double> q = NumericRangeQuery.newDoubleRange( "price", 34.5d, 34.6d, true, true );
+		Query q = s.getSearchFactory().buildQueryBuilder().forEntity( Item.class ).get().all().createQuery();
 		FullTextQuery query = s.createFullTextQuery( q, Item.class );
+
+		@SuppressWarnings("unchecked")
+		List<Object[]> result = query.setProjection( ProjectionConstants.DOCUMENT, ProjectionConstants.THIS )
+				.list();
+
 		assertEquals( "Numeric field via programmatic config", 1, query.getResultSize() );
 
-		s.delete( query.list().get( 0 ) );
+		Object[] row = result.iterator().next();
+		Document document = (Document) row[0];
+
+		IndexableField priceNumeric = document.getField( "price" );
+		assertThat( priceNumeric.numericValue() ).isEqualTo( 3454 );
+
+		IndexableField priceString = document.getField( "price_string" );
+		assertThat( priceString.numericValue() ).isNull();
+		assertThat( priceString.stringValue() ).isEqualTo( "3454" );
+
+		s.delete( row[1] );
+
 		tx.commit();
 		s.close();
 	}
@@ -124,15 +142,15 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		Item item1 = new Item();
-		item1.setPrice( 34.54d );
+		item1.setPrice( (short) 3454 );
 		s.persist( item1 );
 
 		Item item2 = new Item();
-		item2.setPrice( 33.54d );
+		item2.setPrice( (short) 3354 );
 		s.persist( item2 );
 
 		Item item3 = new Item();
-		item3.setPrice( 35.54d );
+		item3.setPrice( (short) 3554 );
 		s.persist( item3 );
 
 		tx.commit();
@@ -147,7 +165,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		List<?> results = query.list();
 		assertThat( results ).onProperty( "price" )
 			.describedAs( "Sortable field via programmatic config" )
-			.containsExactly( 33.54d, 34.54d, 35.54d );
+			.containsExactly( (short) 3354, (short) 3454, (short) 3554 );
 
 		s.delete( results.get( 0 ) );
 		s.delete( results.get( 1 ) );

@@ -17,6 +17,7 @@ import java.util.Map;
  */
 public class PropertyDescriptor {
 
+	private final String name;
 	private final Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
 	private final Collection<Map<String, Object>> numericFields = new ArrayList<Map<String, Object>>();
 	private final Collection<Map<String, Object>> sortableFields = new ArrayList<Map<String, Object>>();
@@ -34,6 +35,7 @@ public class PropertyDescriptor {
 	private Map<String, Object> longitude;
 
 	public PropertyDescriptor(String name, ElementType type) {
+		this.name = name;
 	}
 
 	public void setDocumentId(Map<String, Object> documentId) {
@@ -48,7 +50,6 @@ public class PropertyDescriptor {
 		numericFields.add( numericField );
 	}
 
-
 	public void addSortableField(Map<String, Object> sortableField) {
 		sortableFields.add( sortableField );
 	}
@@ -58,6 +59,10 @@ public class PropertyDescriptor {
 	}
 	public void setCalendarBridge(Map<String,Object> calendarBridge) {
 		this.calendarBridge = calendarBridge;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public Collection<Map<String, Object>> getFields() {
