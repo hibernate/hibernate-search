@@ -31,8 +31,12 @@ public class ContainedInMapping {
 		return new FieldMapping(property, entity, mapping);
 	}
 
+	/**
+	 * @deprecated Invoke {@code field().numericField()} instead.
+	 */
+	@Deprecated
 	public NumericFieldMapping numericField() {
-		return new NumericFieldMapping(property, entity, mapping);
+		return new NumericFieldMapping( property.getName(), property, entity, mapping );
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
