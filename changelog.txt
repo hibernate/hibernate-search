@@ -1,6 +1,34 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.5.0.Final (15-9-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1870] - The DSL should support keyword queries on numerically indexed Date fields
+    * [HSEARCH-1955] - ScheduledCommitPolicy helper threads not handling exceptions
+    * [HSEARCH-1987] - @NumericField doesn't work as expected when several fields are present
+    * [HSEARCH-1992] - Validation of valid sorting options to skip index uninverting needs to ensure consistent mapping across all entities of each involved index
+    * [HSEARCH-1999] - AbstractDocumentBuilder.isDirty() returns false for indexed fields if Hibernate property name does not correspond to the Java field name
+    * [HSEARCH-2000] - Ignore sortable fields when contained indirectly within embedded to-many association
+    * [HSEARCH-2002] - Have the Infinispan Directory maven redirect point to the right version
+    * [HSEARCH-2003] - numericField() in the DSL should take field name into account
+    * [HSEARCH-2004] - Queries in unit tests should be inside a transaction
+
+** New Feature
+    * [HSEARCH-1993] - Allow to define sortable fields through configuration DSL
+
+** Task
+    * [HSEARCH-1933] - Review javadoc warnings
+    * [HSEARCH-1966] - Some javadoc mistakes are causing background build errors
+    * [HSEARCH-1983] - Have the integration tests verify which Hibernate Search version they are using
+
+** Improvement
+    * [HSEARCH-1997] - NumericFieldUtils to avoid checking for Java8 time classes multiple times
+
+** Deprecation
+    * [HSEARCH-2005] - Deprecate ContainedInMapping#numericField()
+
 
 Version 5.5.0.CR1 (8-9-2015)
 ------------------------
