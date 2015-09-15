@@ -16,6 +16,14 @@ public class NumericFieldMapping extends FieldMapping {
 
 	private final Map<String, Object> numericField = new HashMap<String, Object>( 2 );
 
+	/**
+	 * @deprecated Use {@link #NumericFieldMapping(String, PropertyDescriptor, EntityDescriptor, SearchMapping)} instead.
+	 */
+	@Deprecated
+	public NumericFieldMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
+		this( property.getName(), property, entity, mapping );
+	}
+
 	public NumericFieldMapping(String fieldName, PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		super( property, entity, mapping );
 		numericField.put( "forField", fieldName );
