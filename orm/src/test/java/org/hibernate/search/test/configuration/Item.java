@@ -8,14 +8,13 @@ package org.hibernate.search.test.configuration;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Item {
 
-	@Id @GeneratedValue
+	@Id
 	private Integer id;
 	private String description;
 	private Short price;
