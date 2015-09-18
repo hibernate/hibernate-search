@@ -875,7 +875,7 @@ public interface Log extends BasicLogger {
 	void deprecatedConfigurationPropertyIsIgnored(String string);
 
 	@LogMessage(level = Level.WARN)
-	@Message(id = 289, value = "Requested sort field(s) %3$s are not configured for entity type %1$s mapped to index %2$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortField." )
+	@Message(id = 289, value = "Requested sort field(s) %3$s are not configured for entity type %1$s mapped to index %2$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortableField." )
 	void uncoveredSortsRequested(@FormatWith(ClassFormatter.class) Class<?> entityType, String indexName, String uncoveredSorts);
 
 	@Message(id = 290, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Double Number to match the field type of the index. "
