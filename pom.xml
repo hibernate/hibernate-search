@@ -152,7 +152,7 @@
         <bytemanVersion>3.0.0</bytemanVersion>
         <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>2.0.0.Final</jbossLoggingProcessorVersion>
-        <narayanaVersion>5.0.0.Final</narayanaVersion>
+        <narayanaVersion>5.2.5.Final</narayanaVersion>
         <avroVersion>1.7.6</avroVersion>
         <jacksonAslVersion>1.9.13</jacksonAslVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
