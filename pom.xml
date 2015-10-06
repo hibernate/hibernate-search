@@ -749,7 +749,6 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <goals>deploy</goals>
-                    <releaseProfiles>docbook,dist</releaseProfiles>
                     <arguments>-DskipTests</arguments>
                     <pushChanges>false</pushChanges>
                     <localCheckout>true</localCheckout>
@@ -899,9 +898,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.9.1</version>
-                    <configuration>
-                        <additionalparam>-Xdoclint:none</additionalparam>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1165,6 +1161,11 @@
     <profiles>
         <profile>
             <id>dist</id>
+
+            <properties>
+                <failOnJavaDocError>true</failOnJavaDocError>
+            </properties>
+
             <modules>
                 <module>distribution</module>
             </modules>
