@@ -749,7 +749,6 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <goals>deploy</goals>
-                    <releaseProfiles>docbook,dist</releaseProfiles>
                     <arguments>-DskipTests</arguments>
                     <pushChanges>false</pushChanges>
                     <localCheckout>true</localCheckout>
@@ -900,7 +899,22 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.9.1</version>
                     <configuration>
-                        <additionalparam>-Xdoclint:none</additionalparam>
+                        <!-- Fail on error alternative -->
+                        <!-- <additionalparam>-Xdoclint:none</additionalparam> -->
+                        <additionalDependencies>
+                            <additionalDependency>
+                                <groupId>org.jboss.logging</groupId>
+                                <artifactId>jboss-logging-annotations</artifactId>
+                                <version>${jbossLoggingProcessorVersion}</version>
+                            </additionalDependency>
+                        </additionalDependencies>
+                        <tags>
+                            <tag>
+                                <name>hsearch.experimental</name>
+                                <placement>a</placement>
+                                <head>Experimental</head>
+                            </tag>
+                        </tags>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1165,6 +1179,11 @@
     <profiles>
         <profile>
             <id>dist</id>
+
+            <properties>
+                <failOnJavaDocError>true</failOnJavaDocError>
+            </properties>
+
             <modules>
                 <module>distribution</module>
             </modules>

@@ -102,25 +102,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                    <additionalDependencies>
-                        <additionalDependency>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging-annotations</artifactId>
-                            <version>${jbossLoggingProcessorVersion}</version>
-                        </additionalDependency>
-                    </additionalDependencies>
+                    <verbose>false</verbose>
+                    <failOnError>${failOnJavaDocError}</failOnError>
                     <sourcepath>
                         ${basedir}/../engine/src/main/java;
                         ${basedir}/../orm/src/main/java;
+                        ${basedir}/../serialization/avro/src/main/java;
+                        ${basedir}/../backends/jgroups/src/main/java;
+                        ${basedir}/../backends/jms/src/main/java;
                     </sourcepath>
-                    <tags>
-                        <tag>
-                            <name>hsearch.experimental</name>
-                            <placement>a</placement>
-                            <head>Experimental</head>
-                        </tag>
-                    </tags>
                     <docfilessubdirs>true</docfilessubdirs>
                     <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
                     <links>
