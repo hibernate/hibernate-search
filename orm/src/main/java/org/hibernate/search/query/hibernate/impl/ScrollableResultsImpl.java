@@ -110,6 +110,15 @@ public class ScrollableResultsImpl implements ScrollableResults {
 				}
 			}
 		}
+		
+		//cleanup cached items not in window
+		for(int i=0;i<windowStart;i++){
+			resultsContext[i]=null;
+		}
+		for(int i=windowStop;i<max;i++){
+			resultsContext[i]=null;
+		}
+
 		//preload efficiently by batches:
 		if ( sizeToLoad > 1 ) {
 			loader.load( entityInfosToLoad.toArray( new EntityInfo[sizeToLoad] ) );
