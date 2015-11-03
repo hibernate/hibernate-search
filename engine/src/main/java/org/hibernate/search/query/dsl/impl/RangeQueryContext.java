@@ -13,7 +13,9 @@ package org.hibernate.search.query.dsl.impl;
 public class RangeQueryContext {
 	//RANGE
 	private Object from;
+	private boolean hasFrom;
 	private Object to;
+	private boolean hasTo;
 	private boolean excludeFrom;
 	private boolean excludeTo;
 
@@ -23,6 +25,11 @@ public class RangeQueryContext {
 
 	public void setFrom(Object from) {
 		this.from = from;
+		this.hasFrom = true;
+	}
+
+	public boolean hasFrom() {
+		return hasFrom;
 	}
 
 	public Object getTo() {
@@ -31,6 +38,11 @@ public class RangeQueryContext {
 
 	public void setTo(Object to) {
 		this.to = to;
+		this.hasTo = true;
+	}
+
+	public boolean hasTo() {
+		return hasTo;
 	}
 
 	public boolean isExcludeFrom() {
