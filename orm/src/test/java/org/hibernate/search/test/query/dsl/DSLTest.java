@@ -490,6 +490,36 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2030")
+	public void testRangeQueryWithNullToken() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb
+				.range()
+					.onField( "keyForOrdering" )
+					.below( "-mar" )
+					.createQuery();
+
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "March", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		query = monthQb
+				.range()
+					.onField( "keyForOrdering" )
+					.below( null )
+					.createQuery();
+
+		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "March", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		transaction.commit();
+	}
+
+	@Test
 	public void testRangeQueryAbove() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -957,7 +987,8 @@ public class DSLTest extends SearchTestBase {
 						"Month of colder and whitening",
 						"Historically colder than any other month in the northern hemisphere",
 						january,
-						0.231d
+						0.231d,
+						"jan"
 				)
 		);
 		calendar.set( 100 + 1900, 2, 12, 0, 0, 0 );
@@ -969,7 +1000,8 @@ public class DSLTest extends SearchTestBase {
 						"Month of snowboarding",
 						"Historically, the month where we make babies while watching the whitening landscape",
 						february,
-						0.435d
+						0.435d,
+						"feb"
 				)
 		);
 		calendar.set( 1800, 2, 12, 0, 0, 0 );
@@ -981,7 +1013,8 @@ public class DSLTest extends SearchTestBase {
 						"Month of fake spring",
 						"Historically, the month in which we actually find time to go snowboarding.",
 						march,
-						0.435d
+						0.435d,
+						"-mar"
 				)
 		);
 
