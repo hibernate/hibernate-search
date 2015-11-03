@@ -17,6 +17,7 @@ import java.util.Set;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.SearchMapping;
@@ -89,15 +90,13 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	@Override
 	public ReflectionManager getReflectionManager() {
 		if ( reflectionManager == null ) {
-			try {
-				//TODO introduce a ReflectionManagerHolder interface to avoid reflection
-				//I want to avoid hard link between HAN and Search for such a simple need
-				//reuse the existing reflectionManager one when possible
-				reflectionManager =
-						(ReflectionManager) configurationService.getClass().getMethod( "getReflectionManager" ).invoke( configurationService );
-
+			if ( metadata instanceof MetadataImplementor ) {
+				reflectionManager = ((MetadataImplementor) metadata).getMetadataBuildingOptions().getReflectionManager();
 			}
-			catch (Exception e) {
+			if ( reflectionManager == null ) {
+				// Fall back to our own instance of JavaReflectionManager
+				// when metadata is not a MetadataImplementor or
+				// the reflection manager were not created by Hibernate yet.
 				reflectionManager = new JavaReflectionManager();
 			}
 		}
