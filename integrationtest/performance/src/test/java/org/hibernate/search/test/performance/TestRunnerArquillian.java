@@ -17,10 +17,10 @@ import javax.persistence.PersistenceContext;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.integration.wildfly.PackagerHelper;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;
+import org.hibernate.search.testsupport.TestConstants;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -54,6 +54,7 @@ public class TestRunnerArquillian {
 				.addPackages( true, TestRunnerArquillian.class.getPackage() )
 				.addClass( TestConstants.class )
 				.addAsResource( createPersistenceXml(), "META-INF/persistence.xml" )
+				.addAsWebInfResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
 				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
 				.addAsLibraries( PackagerHelper.hibernateSearchTestingLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )

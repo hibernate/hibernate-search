@@ -31,6 +31,7 @@ public class PackagerHelper {
 	 */
 	private static String[] exclusions = new String[] {
 		"org.hibernate:hibernate-core",
+		"org.hibernate.common:hibernate-commons-annotations",
 		"org.hibernate.javax.persistence:hibernate-jpa-2.1-api",
 		"org.jboss.logging:jboss-logging",
 		"org.jboss.logging:jboss-logging-processor",
