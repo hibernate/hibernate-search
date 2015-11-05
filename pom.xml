@@ -146,8 +146,14 @@
         <luceneVersion>5.3.1</luceneVersion>
         <infinispanVersion>8.0.1.Final</infinispanVersion>
         <jgroupsVersion>3.6.6.Final</jgroupsVersion>
+
+        <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
         <hibernateVersion>5.0.3.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>5.0.0.Final</hibernateCommonsAnnotationVersion>
+        <jandexVersion>2.0.0.CR1</jandexVersion>
+        <classMateVersion>0.8.0</classMateVersion>
+        <javassistVersion>3.18.1-GA</javassistVersion>
+
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>3.0.2</bytemanVersion>
         <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
@@ -160,7 +166,6 @@
         <jbossTransactionApiVersion>1.0.0.Final</jbossTransactionApiVersion>
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <activeMQVersion>5.8.0</activeMQVersion>
-        <commonsIoVersion>2.1</commonsIoVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
 
         <!-- Integration tests -->
