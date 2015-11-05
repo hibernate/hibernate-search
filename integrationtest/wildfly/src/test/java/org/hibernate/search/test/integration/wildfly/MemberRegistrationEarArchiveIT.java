@@ -55,6 +55,7 @@ public class MemberRegistrationEarArchiveIT {
 		EnterpriseArchive ear = ShrinkWrap
 				.create( EnterpriseArchive.class, MemberRegistrationEarArchiveIT.class.getSimpleName() + ".ear" )
 				.addAsModules( ejb )
+				.addAsManifestResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
 				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
 				.setApplicationXML( new StringAsset( applicationXml ) );
 		return ear;
