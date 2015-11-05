@@ -41,11 +41,12 @@ import org.junit.runner.RunWith;
 public class MemberRegistrationIT {
 
 	@Deployment
-	public static Archive<?> createTestArchive() {
+	public static Archive<?> createTestArchive() throws Exception {
 		WebArchive archive = ShrinkWrap
 				.create( WebArchive.class, MemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
+				.addAsWebInfResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
 				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
