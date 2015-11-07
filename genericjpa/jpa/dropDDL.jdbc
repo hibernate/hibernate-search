@@ -1,0 +1,7 @@
+ALTER TABLE Place_Sorcerer DROP FOREIGN KEY FK_Place_Sorcerer_place_ID
+ALTER TABLE Place_Sorcerer DROP FOREIGN KEY FK_Place_Sorcerer_Sorcerer_ID
+DROP TABLE SORCERER
+DROP TABLE PLACE
+DROP TABLE CustomUpdatedEntity
+DROP TABLE MultipleColumnsIdEntity
+DROP TABLE Place_Sorcerer
