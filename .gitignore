@@ -34,3 +34,6 @@ atlassian-ide-plugin.xml
 *.sh
 .clover
 .DS_Store
+
+createDDL.jdbc
+dropDDL.jdbc

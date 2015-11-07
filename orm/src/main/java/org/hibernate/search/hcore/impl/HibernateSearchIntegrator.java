@@ -77,6 +77,10 @@ public class HibernateSearchIntegrator implements Integrator {
 		listenerRegistry.appendListeners( EventType.POST_COLLECTION_REMOVE, eventListener );
 		listenerRegistry.appendListeners( EventType.POST_COLLECTION_UPDATE, eventListener );
 		listenerRegistry.appendListeners( EventType.FLUSH, eventListener );
+
+		//TODO: register async mechanism here. is this the correct place?
+		//maybe we should give support for async mechanisms with a plugin
+		//and just disable the native event listeners?
 	}
 
 	public static class DuplicationStrategyImpl implements DuplicationStrategy {

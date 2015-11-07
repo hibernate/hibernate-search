@@ -203,6 +203,13 @@
     </module>
 
     <module name="SuppressionCommentFilter" />
+    
+    <module name="RegexpSingleline">
+        <!-- not using an "illegal import" rule as it might be needed for API reasons -->
+        <property name="format" value="\s+LOGGER = Logger.getLogger\("/>
+        <property name="message"
+                  value="Avoid using standard Java logging"/>
+    </module>
 
     <module name="SuppressionFilter">
         <property name="file" value="/suppressions.xml" />

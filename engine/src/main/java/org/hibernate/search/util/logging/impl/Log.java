@@ -934,4 +934,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 305, value = "Analyzer reference with name '%2$s' not initialized for field '%1$s' ")
 	SearchException analyzerReferenceNotInitialized(String fieldName, String name);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 3022, value = "unknown eventType-id found during index updating: %d")
+	void unknownEventTypeFoundDuringIndexUpdating(int eventType);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 306, value = "class '%1$s' not found in any index during index updating")
+	void entityClassNotFoundInAnyIndexIndexUpdating( Class<?> entityClass );
 }

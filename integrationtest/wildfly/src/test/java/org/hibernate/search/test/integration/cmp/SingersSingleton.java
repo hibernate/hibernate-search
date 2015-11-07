@@ -6,16 +6,15 @@
  */
 package org.hibernate.search.test.integration.cmp;
 
-import java.util.List;
 import javax.ejb.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.List;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.CacheMode;
-
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
