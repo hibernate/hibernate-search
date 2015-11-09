@@ -6,42 +6,19 @@
  */
 package org.hibernate.search.test.filter;
 
-import java.io.IOException;
-
-import org.apache.lucene.index.DocsEnum;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.util.BitDocIdSet;
-import org.apache.lucene.util.Bits;
-import org.apache.lucene.util.FixedBitSet;
+import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.TermQuery;
 
 /**
- * @author Emmanuel Bernard
+ * This filter is used verbatim in our documentation as an example.
+ * Please keep the code simple and readable, formatted narrowly, and in sync with
+ * the reference documentation.
  */
-public class BestDriversFilter extends Filter {
+public class BestDriversFilter extends QueryWrapperFilter {
 
-	@Override
-	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
-		LeafReader reader = context.reader();
-		FixedBitSet bits = new FixedBitSet( reader.maxDoc() );
-		DocsEnum termDocsEnum = reader.termDocsEnum( new Term( "score", "5" ) );
-		if ( termDocsEnum == null ) {
-			return new BitDocIdSet( bits ); // All bits already correctly set
-		}
-		while ( termDocsEnum.nextDoc() != DocsEnum.NO_MORE_DOCS ) {
-			final int docID = termDocsEnum.docID();
-			if ( acceptDocs == null || acceptDocs.get( docID ) ) {
-				bits.set( docID );
-			}
-		}
-		return new BitDocIdSet( bits );
+	public BestDriversFilter() {
+		super( new TermQuery( new Term( "score", "5" ) ) );
 	}
 
-	@Override
-	public String toString(String field) {
-		return "";
-	}
 }
