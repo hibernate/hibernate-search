@@ -37,6 +37,7 @@
         <module>integrationtest/performance</module>
         <module>integrationtest/osgi/karaf-features</module>
         <module>integrationtest/sandbox</module>
+        <module>integrationtest/engine-performance</module>
     </modules>
 
     <issueManagement>
@@ -173,6 +174,7 @@
         <arquillianContainerVersion>1.0.0.Final</arquillianContainerVersion>
         <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
         <wildflyVersion>10.0.0.CR4</wildflyVersion>
+        <jmhVersion>1.11.2</jmhVersion>
 
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1093,6 +1095,7 @@
                                         <versionRange>[2.1,)</versionRange>
                                         <goals>
                                             <goal>unpack</goal>
+                                            <goal>build-classpath</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
