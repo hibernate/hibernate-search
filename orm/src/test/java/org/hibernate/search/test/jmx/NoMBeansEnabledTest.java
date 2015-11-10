@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.test.jmx;
 
-import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import javax.management.MBeanServer;
@@ -49,13 +51,20 @@ public class NoMBeansEnabledTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		File targetDir = TestConstants.getTargetDir( NoMBeansEnabledTest.class );
-		File simpleJndiDir = new File( targetDir, "simpleJndi" );
-		simpleJndiDir.mkdir();
+		Path targetDir = TestConstants.getTargetDir( NoMBeansEnabledTest.class );
+		Path simpleJndiDir = targetDir.resolve( "simpleJndi" );
+		if ( ! Files.exists( simpleJndiDir) ) {
+			try {
+				Files.createDirectory( simpleJndiDir );
+			}
+			catch (IOException e) {
+				throw new RuntimeException( e );
+			}
+		}
 
 		cfg.put( "hibernate.session_factory_name", "java:comp/SessionFactory" );
 		cfg.put( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
-		cfg.put( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() );
+		cfg.put( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.toAbsolutePath().toString() );
 		cfg.put( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
 		// not setting the property is effectively the same as setting is explicitly to false
 		// cfg.setProperty( Environment.JMX_ENABLED, "false" );

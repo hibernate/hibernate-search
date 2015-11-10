@@ -19,7 +19,6 @@ import static org.hibernate.search.test.performance.scenario.TestContext.VERBOSE
 import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +28,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -160,11 +161,12 @@ public class TestReporter {
 
 	private static PrintStream createOutputStream(String testScenarioName) {
 		try {
-			File targetDir = getTargetDir();
-			File reportFile = new File( targetDir, "report-" + testScenarioName + "-" + DateFormatUtils.format( new Date(), "yyyy-MM-dd-HH'h'mm'm'" ) + ".txt" );
+			Path targetDir = getTargetDir();
+			String reportFileName = "report-" + testScenarioName + "-" + DateFormatUtils.format( new Date(), "yyyy-MM-dd-HH'h'mm'm'" ) + ".txt";
+			Path reportFile = targetDir.resolve( reportFileName );
 
 			final OutputStream std = System.out;
-			final OutputStream file = new PrintStream( new FileOutputStream( reportFile ), true, "UTF-8" );
+			final OutputStream file = new PrintStream( new FileOutputStream( reportFile.toFile() ), true, "UTF-8" );
 			final OutputStream stream = new OutputStream() {
 
 				@Override
@@ -191,7 +193,7 @@ public class TestReporter {
 		}
 	}
 
-	private static File getTargetDir() {
+	private static Path getTargetDir() {
 		InputStream runnerPropertiesStream = TestReporter.class.getResourceAsStream( "/" + RUNNER_PROPERTIES );
 		if ( runnerPropertiesStream != null ) {
 			Properties runnerProperties = new Properties();
@@ -201,7 +203,7 @@ public class TestReporter {
 			catch (IOException e) {
 				throw new RuntimeException( e );
 			}
-			return new File( runnerProperties.getProperty( TARGET_DIR_KEY ) );
+			return Paths.get( runnerProperties.getProperty( TARGET_DIR_KEY ) );
 		}
 		else {
 			return TestConstants.getTargetDir( TestReporter.class );

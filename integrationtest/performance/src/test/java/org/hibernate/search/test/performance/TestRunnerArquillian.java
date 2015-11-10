@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.test.performance;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -64,8 +64,8 @@ public class TestRunnerArquillian {
 	}
 
 	private static StringAsset reportsOutputDirectory() throws IOException {
-		File path = TestConstants.getTargetDir( TestRunnerArquillian.class );
-		String absolutePath = path.getAbsolutePath();
+		Path path = TestConstants.getTargetDir( TestRunnerArquillian.class );
+		String absolutePath = path.toAbsolutePath().toString();
 		//Use Properties to make sure we encode the output correctly,
 		//especially tricky to deal with escaping of paths:
 		Properties runnerProperties = new Properties();

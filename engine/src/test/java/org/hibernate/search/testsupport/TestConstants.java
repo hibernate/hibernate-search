@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.testsupport;
 
-import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
@@ -47,7 +49,7 @@ public final class TestConstants {
 	 * @param testClass the test class for which the target directory is requested.
 	 * @return the target directory of the build
 	 */
-	public static File getTargetDir(Class<?> testClass) {
+	public static Path getTargetDir(Class<?> testClass) {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 		// get a URL reference to something we now is part of the classpath (our own classes)
 		String currentTestClass = testClass.getName();
@@ -55,10 +57,16 @@ public final class TestConstants {
 		int hopsToTargetDirectory = hopsToCompileDirectory + 1;
 		URL classURL = contextClassLoader.getResource( currentTestClass.replace( '.', '/' ) + ".class" );
 		// navigate back to '/target'
-		File targetDir = new File( classURL.getFile() );
+		Path targetDir;
+		try {
+			targetDir = Paths.get( classURL.toURI() );
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException( e );
+		}
 		// navigate back to '/target'
 		for ( int i = 0; i < hopsToTargetDirectory; i++ ) {
-			targetDir = targetDir.getParentFile();
+			targetDir = targetDir.getParent();
 		}
 		return targetDir;
 	}
@@ -71,10 +79,11 @@ public final class TestConstants {
 	 * @return Return the root directory to store test indexes
 	 */
 	public static String getIndexDirectory(Class<?> testClass) {
-		File targetDir = getTargetDir( testClass );
-		String indexDirPath = targetDir.getAbsolutePath() + File.separator + "indextemp";
-		log.debugf( "Using %s as index directory.", indexDirPath );
-		return indexDirPath;
+		Path targetDir = getTargetDir( testClass );
+		Path indexDirPath = targetDir.resolve( "indextemp" );
+		String indexDir = indexDirPath.toAbsolutePath().toString();
+		log.debugf( "Using %s as index directory.", indexDir );
+		return indexDir;
 	}
 
 	public static boolean arePerformanceTestsEnabled() {
