@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.integration.jbossjta;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,8 +29,6 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;
-import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.FileHelper;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -46,15 +43,12 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImpl
 public class JBossTSIT {
 
 	private static EntityManagerFactory factory;
-	public static File tempDirectory = new File( TestConstants.getTargetDir( JBossTSIT.class ) + "/h2" );
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		FileHelper.delete( tempDirectory );
-		tempDirectory.mkdir();
 
 		//DataSource configuration
-		final String url = "jdbc:h2:file:" + tempDirectory.getAbsolutePath() + "/h2db";
+		final String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
 		final String user = "sa";
 		final String password = "";
 
@@ -101,7 +95,6 @@ public class JBossTSIT {
 		if ( factory != null ) {
 			factory.close();
 		}
-		FileHelper.delete( tempDirectory );
 	}
 
 	@Test
