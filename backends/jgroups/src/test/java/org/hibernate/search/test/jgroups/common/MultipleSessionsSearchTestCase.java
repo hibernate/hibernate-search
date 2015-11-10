@@ -94,7 +94,7 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 		HashMap<String, Object> slaveConfiguration = new HashMap<String,Object>();
 		configureSlave( slaveConfiguration );
 		TestConfiguration slaveTestConfiguration = new ImmutableTestConfiguration( slaveConfiguration, getAnnotatedClasses() );
-		slaveResources = new DefaultTestResourceManager( slaveTestConfiguration );
+		slaveResources = new DefaultTestResourceManager( slaveTestConfiguration, this.getClass() );
 		slaveResources.openSessionFactory();
 	}
 

@@ -111,7 +111,7 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 	// synchronized due to lazy initialization
 	private synchronized DefaultTestResourceManager getTestResourceManager() {
 		if ( testResourceManager == null ) {
-			testResourceManager = new DefaultTestResourceManager( this );
+			testResourceManager = new DefaultTestResourceManager( this, this.getClass() );
 		}
 		return testResourceManager;
 	}

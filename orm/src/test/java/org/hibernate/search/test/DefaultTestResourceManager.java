@@ -65,9 +65,9 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private SearchFactory searchFactory;
 	private Map<String,Object> configurationSettings;
 
-	public DefaultTestResourceManager(TestConfiguration test) {
+	public DefaultTestResourceManager(TestConfiguration test, Class currentTestModuleClass) {
 		this.test = test;
-		this.baseIndexDir = createBaseIndexDir();
+		this.baseIndexDir = createBaseIndexDir( currentTestModuleClass );
 	}
 
 	@Override
@@ -217,13 +217,13 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		searchFactory = null;
 	}
 
-	private Path createBaseIndexDir() {
+	private Path createBaseIndexDir(Class currentTestModuleClass) {
 		// Make sure no directory is ever reused across the test suite as Windows might not be able
 		// to delete the files after usage. See also
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
-		String shortTestName = this.getClass().getSimpleName() + "-" + UUID.randomUUID().toString().substring( 0, 8 );
+		String shortTestName = currentTestModuleClass.getSimpleName() + "-" + UUID.randomUUID().toString().substring( 0, 8 );
 
-		return Paths.get( TestConstants.getIndexDirectory( this.getClass() ), shortTestName );
+		return Paths.get( TestConstants.getIndexDirectory( currentTestModuleClass ), shortTestName );
 	}
 
 	private static class RollbackWork implements Work {
