@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.test.jmx;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
@@ -23,14 +25,21 @@ public class MutableSearchFactoryAndJMXTest {
 
 	@Test
 	public void testRebuildFactory() {
-		File targetDir = TestConstants.getTargetDir( MutableSearchFactoryAndJMXTest.class );
-		File simpleJndiDir = new File( targetDir, "simpleJndi" );
-		simpleJndiDir.mkdir();
+		Path targetDir = TestConstants.getTargetDir( MutableSearchFactoryAndJMXTest.class );
+		Path simpleJndiDir = targetDir.resolve( "simpleJndi" );
+		if ( ! Files.exists( simpleJndiDir) ) {
+			try {
+				Files.createDirectory( simpleJndiDir );
+			}
+			catch (IOException e) {
+				throw new RuntimeException( e );
+			}
+		}
 
 		SearchConfigurationForTest configuration = new HibernateManualConfiguration()
 				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
 				.addProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" )
-				.addProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() )
+				.addProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.toAbsolutePath().toString() )
 				.addProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" )
 				.addProperty( Environment.JMX_ENABLED, "true" );
 

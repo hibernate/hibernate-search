@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.serialization;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -219,11 +218,9 @@ public class ProtocolBackwardCompatibilityTest {
 	}
 
 	private void storeSerializedForm(byte[] out, int major, int minor) throws IOException {
-		File file = new File(
-				TestConstants.getTargetDir( ProtocolBackwardCompatibilityTest.class ),
-				RESOURCE_BASE_NAME + major + "." + minor
-		);
-		try (OutputStream outputStream = new FileOutputStream( file )) {
+		Path targetDir = TestConstants.getTargetDir( ProtocolBackwardCompatibilityTest.class );
+		Path outputFilePath = targetDir.resolve( RESOURCE_BASE_NAME + major + "." + minor );
+		try (OutputStream outputStream = new FileOutputStream( outputFilePath.toFile() )) {
 			outputStream.write( out );
 			outputStream.flush();
 		}

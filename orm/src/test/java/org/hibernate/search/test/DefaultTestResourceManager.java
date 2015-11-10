@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private static final Log log = LoggerFactory.make();
 
 	private final TestConfiguration test;
-	private final File baseIndexDir;
+	private final Path baseIndexDir;
 
 	/* Each of the following fields needs to be cleaned up on close */
 	private SessionFactoryImplementor sessionFactory;
@@ -193,7 +193,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public Path getBaseIndexDir() {
-		return baseIndexDir.toPath();
+		return baseIndexDir;
 	}
 
 	public void defaultTearDown() throws Exception {
@@ -217,16 +217,13 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		searchFactory = null;
 	}
 
-	private File createBaseIndexDir() {
+	private Path createBaseIndexDir() {
 		// Make sure no directory is ever reused across the test suite as Windows might not be able
 		// to delete the files after usage. See also
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
 		String shortTestName = this.getClass().getSimpleName() + "-" + UUID.randomUUID().toString().substring( 0, 8 );
 
-		// the constructor File(File, String) is broken too, see :
-		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5066567
-		// So make sure to use File(String, String) in this case as TestConstants works with absolute paths!
-		return new File( TestConstants.getIndexDirectory( this.getClass() ), shortTestName );
+		return Paths.get( TestConstants.getIndexDirectory( this.getClass() ), shortTestName );
 	}
 
 	private static class RollbackWork implements Work {
