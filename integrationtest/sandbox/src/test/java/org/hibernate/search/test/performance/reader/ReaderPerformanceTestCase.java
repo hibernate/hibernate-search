@@ -64,7 +64,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		String indexBase = TestConstants.getIndexDirectory( SearchTestBase.class );
+		String indexBase = TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class );
 		File indexDir = new File(indexBase);
 		FileHelper.delete( indexDir );
 	}
