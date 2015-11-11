@@ -26,7 +26,6 @@ import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 
 import static org.junit.Assert.assertEquals;
@@ -43,14 +42,7 @@ public class MultipleStatisticsMBeanTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Path targetDir = TestConstants.getTargetDir( MultipleStatisticsMBeanTest.class );
-		simpleJndiDir = targetDir.resolve( "simpleJndi" );
-		try {
-			Files.createDirectory( simpleJndiDir );
-		}
-		catch (IOException e) {
-			throw new RuntimeException( e );
-		}
+		simpleJndiDir = SimpleJNDIHelper.makeTestingJndiDirectory( MultipleStatisticsMBeanTest.class );
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
 	}
 
@@ -114,7 +106,6 @@ public class MultipleStatisticsMBeanTest {
 		String objectName = JMXRegistrar.buildMBeanName( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME, suffix );
 		ObjectName statisticsBeanObjectName = new ObjectName( objectName );
 
-
 		ObjectInstance mBean = null;
 		try {
 			mBean = mbeanServer.getObjectInstance( statisticsBeanObjectName );
@@ -127,11 +118,9 @@ public class MultipleStatisticsMBeanTest {
 
 	private SearchIntegrator createSearchIntegratorUsingJndiPrefix(String suffix) {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
-				.addProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" )
-				.addProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.toAbsolutePath().toString() )
-				.addProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" )
-				.addProperty( Environment.JMX_ENABLED, "true" );
+				.addProperty( Environment.JMX_ENABLED, "true" )
+				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" );
+		SimpleJNDIHelper.enableSimpleJndi( configuration, simpleJndiDir );
 
 		if ( suffix != null ) {
 			configuration.addProperty( Environment.JMX_BEAN_SUFFIX, suffix );
