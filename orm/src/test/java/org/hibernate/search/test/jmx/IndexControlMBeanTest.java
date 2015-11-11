@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.test.jmx;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -34,7 +32,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,23 +133,10 @@ public class IndexControlMBeanTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		Path targetDir = TestConstants.getTargetDir( IndexControlMBeanTest.class );
-		Path simpleJndiDir = targetDir.resolve( "simpleJndi" );
-		if ( ! Files.exists( simpleJndiDir) ) {
-			try {
-				Files.createDirectory( simpleJndiDir );
-			}
-			catch (IOException e) {
-				throw new RuntimeException( e );
-			}
-		}
-
+		Path simpleJndiDir = SimpleJNDIHelper.makeTestingJndiDirectory( IndexControlMBeanTest.class );
+		SimpleJNDIHelper.enableSimpleJndi( cfg, simpleJndiDir );
 		cfg.put( "hibernate.session_factory_name", "java:comp/SessionFactory" );
-		cfg.put( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
 		cfg.put( "hibernate.jndi.org.osjava.sj.factory", "org.hibernate.search.test.jmx.IndexControlMBeanTest$CustomContextFactory" );
-		cfg.put( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.toAbsolutePath().toString() );
-		cfg.put( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
-
 		cfg.put( "hibernate.search.indexing_strategy", "manual" );
 		cfg.put( Environment.JMX_ENABLED, "true" );
 	}
