@@ -34,7 +34,7 @@ public class JestClientService implements Service, Startable, Stoppable {
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
-		JestClientFactory factory = new ConnectionTimeoutAwareJestClientFactory();
+		JestClientFactory factory = new JestClientFactory();
 
 		String serverUri = ConfigurationParseHelper.getString(
 				properties, ElasticSearchEnvironment.SERVER_URI, "http://localhost:9200"
