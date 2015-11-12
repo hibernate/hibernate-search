@@ -417,6 +417,33 @@ public class DSLTest extends SearchTestBase {
 		transaction.commit();
 	}
 
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testBooleanWithoutNegationQueries() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		//must + disable scoring
+		Query query = monthQb
+				.bool()
+				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+					.not() //expectation: exclude January
+				.must( monthQb.keyword().onField( "mythology" ).matching( "snowboarding" ).createQuery() )
+					.not() //expectation: exclude February
+				.createQuery();
+
+		List<Month> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 1, results.size() );
+		assertEquals( "March", results.get( 0 ).getName() );
+		assertTrue( query instanceof BooleanQuery );
+		BooleanQuery bq = (BooleanQuery) query;
+		BooleanClause firstBooleanClause = bq.clauses().get( 0 );
+		assertFalse( firstBooleanClause.isScoring() );
+
+		transaction.commit();
+	}
+
 	@Test(expected = SearchException.class)
 	public void testIllegalBooleanJunction() {
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
