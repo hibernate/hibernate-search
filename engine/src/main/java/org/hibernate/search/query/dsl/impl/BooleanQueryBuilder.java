@@ -95,23 +95,19 @@ class BooleanQueryBuilder implements MustJunction {
 		if ( nbrOfClauses == 0 ) {
 			throw log.booleanQueryWithoutClauses();
 		}
-		else if ( nbrOfClauses == 1 ) {
-			final BooleanClause uniqueClause = clauses.get( 0 );
-			final Occur occur = uniqueClause.getOccur();
-			if ( occur == Occur.FILTER || occur == Occur.MUST_NOT ) {
-				//In the case it's a FILTER or MUST_NOT clause,
-				//and it's a unique clause, we need to pair it up with a match-all query
-				should( new MatchAllDocsQuery() );
-			}
-			else {
-				//optimize
-				return queryCustomizer.setWrappedQuery( uniqueClause.getQuery() ).createQuery();
-			}
-		}
 
 		Builder builder = new org.apache.lucene.search.BooleanQuery.Builder();
+		boolean allClausesAreMustNot = true;
 		for ( BooleanClause clause : clauses ) {
+			if ( clause.getOccur() != Occur.MUST_NOT ) {
+				allClausesAreMustNot = false;
+			}
 			builder.add( clause );
+		}
+		if ( allClausesAreMustNot ) {
+			//It is illegal to have only must-not queries,
+			//in this case we need to add a positive clause to match everything else.
+			builder.add( new MatchAllDocsQuery(), Occur.FILTER );
 		}
 		return queryCustomizer.setWrappedQuery( builder.build() ).createQuery();
 	}
