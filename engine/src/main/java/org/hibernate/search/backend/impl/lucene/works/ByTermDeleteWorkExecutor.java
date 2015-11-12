@@ -65,14 +65,14 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 	private void deleteWithTenant(LuceneWork work, IndexWriterDelegate delegate, final String tenantId, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
 		BooleanQuery termDeleteQuery = new BooleanQuery();
 		TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
-		termDeleteQuery.add( tenantTermQuery, Occur.MUST );
+		termDeleteQuery.add( tenantTermQuery, Occur.FILTER );
 		if ( isIdNumeric( builder ) ) {
 			Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
-			termDeleteQuery.add( exactMatchQuery, Occur.MUST );
+			termDeleteQuery.add( exactMatchQuery, Occur.FILTER );
 		}
 		else {
 			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
-			termDeleteQuery.add( new TermQuery( idTerm ), Occur.MUST );
+			termDeleteQuery.add( new TermQuery( idTerm ), Occur.FILTER );
 		}
 		delegate.deleteDocuments( termDeleteQuery );
 	}

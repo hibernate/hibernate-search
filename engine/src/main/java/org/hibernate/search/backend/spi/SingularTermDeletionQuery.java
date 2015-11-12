@@ -94,7 +94,7 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 					BooleanQuery booleanQuery = new BooleanQuery();
 					while ( tokenStream.incrementToken() ) {
 						String value = tokenStream.getAttribute( CharTermAttribute.class ).toString();
-						booleanQuery.add( new TermQuery( new Term( this.getFieldName(), value ) ), Occur.MUST );
+						booleanQuery.add( new TermQuery( new Term( this.getFieldName(), value ) ), Occur.FILTER );
 					}
 					return booleanQuery;
 				}
