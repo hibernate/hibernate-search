@@ -8,11 +8,9 @@ package org.hibernate.search.query.engine.impl;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Counter;
-
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.spi.TimingSource;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 
@@ -24,14 +22,14 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	private Long timeout;
 	private long start;
 	boolean timedOut = false;
-	private final Query luceneQuery;
+	private final Object query;
 	private Type type;
 	private boolean partialResults;
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 	private final TimingSource timingSource;
 
-	public TimeoutManagerImpl(Query query, TimeoutExceptionFactory timeoutExceptionFactory, TimingSource timingSource) {
-		this.luceneQuery = query;
+	public TimeoutManagerImpl(Object query, TimeoutExceptionFactory timeoutExceptionFactory, TimingSource timingSource) {
+		this.query = query;
 		this.timeoutExceptionFactory = timeoutExceptionFactory;
 		this.timingSource = timingSource;
 	}
@@ -108,7 +106,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 			if ( this.type != Type.LIMIT && timedOut ) {
 				throw timeoutExceptionFactory.createTimeoutException(
 						"Full-text query took longer than expected (in microsecond): " + TimeUnit.NANOSECONDS.toMicros( elapsedTime ),
-						String.valueOf( luceneQuery )
+						String.valueOf( query )
 				);
 			}
 			return timedOut;
@@ -166,7 +164,8 @@ public class TimeoutManagerImpl implements TimeoutManager {
 			if ( e == null ) {
 				e = timeoutExceptionFactory.createTimeoutException(
 						"Timeout period exceeded",
-						String.valueOf( luceneQuery ) );
+						String.valueOf( query )
+				);
 			}
 			throw e;
 		}
