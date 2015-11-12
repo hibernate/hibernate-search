@@ -574,15 +574,63 @@ adjust this weapon. Make sure to continuously test the results against your data
 
 ===== Combining queries
 
-Finally, you can aggregate (combine) queries to create more complex queries. The following
-aggregation operators are available:
+You can combine queries to create more complex queries.
+The following aggregation operators are available:
 
-* `SHOULD`: the query query should contain the matching elements of the subquery
+* `SHOULD`: the query should contain the matching elements of the subquery
 * `MUST`: the query must contain the matching elements of the subquery
 * `MUST NOT`: the query must not contain the matching elements of the subquery
 
-The sub-queries can be any Lucene query including a boolean query itself. Let's look at a few examples:
+These aggregations have a similar effect as the classic boolean operators `AND`, `OR` and `NOT`,
+but have different names to emphasise that they will have an impact on scoring.
 
+For example the `SHOULD` operator between two queries will have an effect similar to the boolean `OR`:
+if either of the two combined queries matches the entry, the entry will be included in the match;
+though the entries which match both queries will have an higher score than those which only match one of them.
+
+
+The sub-queries can be any Lucene query including a boolean query itself.
+
+.Structure of a boolean `AND` query: the `must` method.
+====
+[source, JAVA]
+----
+Query combinedQuery = querybuilder
+    .bool()
+        .must( queryA )
+        .must( queryB )
+    .createQuery();
+----
+====
+
+.Structure of boolean `OR` query: the `should` method.
+====
+[source, JAVA]
+----
+Query combinedQuery = querybuilder
+    .bool()
+        .should( queryA )
+        .should( queryB )
+    .createQuery();
+----
+====
+
+.Structure of a negation query: apply a `not` modifier to a `must`.
+====
+[source, JAVA]
+----
+Query combinedQuery = querybuilder
+    .bool()
+        .must( queryA )
+        .must( queryB ).not()
+    .createQuery();
+----
+====
+
+Let's look at a few more practical examples; note how the querybuilder usage can be nested
+and how 'should', 'must', and 'not' can be combined in many ways:
+
+.Full example of combining fulltext queries
 ====
 [source, JAVA]
 ----
