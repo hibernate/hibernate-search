@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -109,11 +109,11 @@ class BooleanQueryBuilder implements MustJunction {
 			}
 		}
 
-		BooleanQuery query = new BooleanQuery();
+		Builder builder = new org.apache.lucene.search.BooleanQuery.Builder();
 		for ( BooleanClause clause : clauses ) {
-			query.add( clause );
+			builder.add( clause );
 		}
-		return queryCustomizer.setWrappedQuery( query ).createQuery();
+		return queryCustomizer.setWrappedQuery( builder.build() ).createQuery();
 	}
 
 	@Override
