@@ -24,7 +24,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.similarities.Similarity;
@@ -39,7 +38,6 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterKey;
-import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
@@ -54,18 +52,12 @@ import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
-import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
-import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
-import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInstance;
 import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResults;
 
@@ -73,75 +65,34 @@ import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResu
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class LuceneHSQuery implements HSQuery, Serializable {
+public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializable {
 
-	private static final Log log = LoggerFactory.make();
+	static final Log log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
-	private transient ExtendedSearchIntegrator extendedIntegrator;
 	private Query luceneQuery;
-	private List<Class<?>> targetedEntities;
-	private transient TimeoutManagerImpl timeoutManager;
-	private Set<Class<?>> indexedTargetedEntities;
-	private boolean allowFieldSelectionInProjection = true;
 
-	/**
-	 * The  map of currently active/enabled filters.
-	 */
-	private final Map<String, FullTextFilterImpl> filterDefinitions = newHashMap();
+	private boolean allowFieldSelectionInProjection = true;
 
 	/**
 	 * Combined chained filter to be applied to the query.
 	 */
 	private Filter filter;
 
-	/**
-	 * User specified filters. Will be combined into a single chained filter {@link #filter}.
-	 */
-	private Filter userFilter;
-	private Sort sort;
-	private String[] projectedFields;
-	private int firstResult;
-	private int maxResults;
-	private boolean definedMaxResults = false;
 	private transient Set<Class<?>> classesAndSubclasses;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
 	private transient FacetManagerImpl facetManager;
-	private transient TimeoutExceptionFactory timeoutExceptionFactory;
-	private Coordinates spatialSearchCenter = null;
-	private String spatialFieldName = null;
 
 	/**
 	 * The number of results for this query. This field gets populated once {@link #queryResultSize}, {@link #queryEntityInfos}
 	 * or {@link #queryDocumentExtractor} is called.
 	 */
 	private Integer resultSize;
-	private String tenantId;
-
 
 	public LuceneHSQuery(ExtendedSearchIntegrator extendedIntegrator) {
-		this.extendedIntegrator = extendedIntegrator;
-		this.timeoutExceptionFactory = extendedIntegrator.getDefaultTimeoutExceptionFactory();
-	}
-
-	@Override
-	public void afterDeserialise(SearchIntegrator extendedIntegrator) {
-		this.extendedIntegrator = extendedIntegrator.unwrap( ExtendedSearchIntegrator.class );
-	}
-
-	@Override
-	public HSQuery setSpatialParameters(Coordinates center, String fieldName) {
-		spatialSearchCenter = center;
-		spatialFieldName = fieldName;
-		return this;
-	}
-
-	@Override
-	public HSQuery tenantIdentifier(String tenantId) {
-		this.tenantId = tenantId;
-		return this;
+		super( extendedIntegrator );
 	}
 
 	@Override
@@ -152,100 +103,14 @@ public class LuceneHSQuery implements HSQuery, Serializable {
 	}
 
 	@Override
-	public HSQuery targetedEntities(List<Class<?>> classes) {
-		clearCachedResults();
-		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>( classes );
-		final Class<?>[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
-		this.indexedTargetedEntities = extendedIntegrator.getIndexedTypesPolymorphic( classesAsArray );
-		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
-			throw log.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ));
+	protected TimeoutManagerImpl buildTimeoutManager() {
+		if ( luceneQuery == null ) {
+			throw new AssertionFailure( "Requesting TimeoutManager before setting luceneQuery()" );
 		}
-		return this;
-	}
 
-	@Override
-	public HSQuery sort(Sort sort) {
-		this.sort = sort;
-		return this;
-	}
-
-	@Override
-	public HSQuery filter(Filter filter) {
-		clearCachedResults();
-		this.userFilter = filter;
-		return this;
-	}
-
-	@Override
-	public HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory) {
-		this.timeoutExceptionFactory = exceptionFactory;
-		return this;
-	}
-
-	@Override
-	public HSQuery projection(String... fields) {
-		if ( fields == null || fields.length == 0 ) {
-			this.projectedFields = null;
-		}
-		else {
-			this.projectedFields = fields;
-		}
-		return this;
-	}
-
-	@Override
-	public HSQuery firstResult(int firstResult) {
-		if ( firstResult < 0 ) {
-			throw new IllegalArgumentException( "'first' pagination parameter less than 0" );
-		}
-		this.firstResult = firstResult;
-		return this;
-	}
-
-	@Override
-	public HSQuery maxResults(int maxResults) {
-		if ( maxResults < 0 ) {
-			throw new IllegalArgumentException( "'max' pagination parameter less than 0" );
-		}
-		this.maxResults = maxResults;
-		this.definedMaxResults = true;
-		return this;
-	}
-
-	/**
-	 * List of targeted entities as described by the user
-	 */
-	@Override
-	public List<Class<?>> getTargetedEntities() {
-		return targetedEntities;
-	}
-
-	/**
-	 * @return a set of indexed entities corresponding to the class hierarchy of the targeted entities
-	 */
-	@Override
-	public Set<Class<?>> getIndexedTargetedEntities() {
-		return indexedTargetedEntities;
-	}
-
-	@Override
-	public String[] getProjectedFields() {
-		return projectedFields;
-	}
-
-	private TimeoutManagerImpl getTimeoutManagerImpl() {
-		if ( timeoutManager == null ) {
-			if ( luceneQuery == null ) {
-				throw new AssertionFailure( "Requesting TimeoutManager before setting luceneQuery()" );
-			}
-			timeoutManager = new TimeoutManagerImpl( luceneQuery, timeoutExceptionFactory, this.extendedIntegrator.getTimingSource() );
-		}
-		return timeoutManager;
-	}
-
-	@Override
-	public TimeoutManager getTimeoutManager() {
-		return getTimeoutManagerImpl();
+		return new TimeoutManagerImpl(
+				luceneQuery, timeoutExceptionFactory, this.extendedIntegrator.getTimingSource()
+		);
 	}
 
 	@Override
@@ -386,30 +251,6 @@ public class LuceneHSQuery implements HSQuery, Serializable {
 		return explanation;
 	}
 
-	@Override
-	public FullTextFilter enableFullTextFilter(String name) {
-		clearCachedResults();
-		FullTextFilterImpl filterDefinition = filterDefinitions.get( name );
-		if ( filterDefinition != null ) {
-			return filterDefinition;
-		}
-
-		filterDefinition = new FullTextFilterImpl();
-		filterDefinition.setName( name );
-		FilterDef filterDef = extendedIntegrator.getFilterDefinition( name );
-		if ( filterDef == null ) {
-			throw log.unknownFullTextFilter( name );
-		}
-		filterDefinitions.put( name, filterDefinition );
-		return filterDefinition;
-	}
-
-	@Override
-	public void disableFullTextFilter(String name) {
-		clearCachedResults();
-		filterDefinitions.remove( name );
-	}
-
 	private void closeSearcher(LazyQueryState searcherWithPayload) {
 		if ( searcherWithPayload == null ) {
 			return;
@@ -421,7 +262,8 @@ public class LuceneHSQuery implements HSQuery, Serializable {
 	 * This class caches some of the query results and we need to reset the state in case something in the query
 	 * changes (eg a new filter is set).
 	 */
-	void clearCachedResults() {
+	@Override
+	protected void clearCachedResults() {
 		resultSize = null;
 	}
 
@@ -450,7 +292,7 @@ public class LuceneHSQuery implements HSQuery, Serializable {
 					searcher,
 					filter,
 					sort,
-					getTimeoutManagerImpl(),
+					getTimeoutManager(),
 					facetManager.getFacetRequests(),
 					this.timeoutExceptionFactory,
 					spatialSearchCenter,
@@ -463,7 +305,7 @@ public class LuceneHSQuery implements HSQuery, Serializable {
 					filter,
 					null,
 					0,
-					getTimeoutManagerImpl(),
+					getTimeoutManager(),
 					null,
 					this.timeoutExceptionFactory,
 					spatialSearchCenter,
@@ -476,7 +318,7 @@ public class LuceneHSQuery implements HSQuery, Serializable {
 					filter,
 					sort,
 					n,
-					getTimeoutManagerImpl(),
+					getTimeoutManager(),
 					facetManager.getFacetRequests(),
 					this.timeoutExceptionFactory,
 					spatialSearchCenter,
@@ -1009,10 +851,4 @@ public class LuceneHSQuery implements HSQuery, Serializable {
 					totalHits - 1;
 		}
 	}
-
-	@Override
-	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
-		return extendedIntegrator;
-	}
-
 }
