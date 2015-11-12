@@ -807,19 +807,18 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializa
 		}
 		else {
 			//A query filter is more practical than a manual class filtering post query (esp on scrollable resultsets)
-			//it also probably minimise the memory footprint
-			BooleanQuery classFilter = new BooleanQuery();
-			//annihilate the scoring impact of DocumentBuilderIndexedEntity.CLASS_FIELDNAME
-			classFilter.setBoost( 0 );
+			//it also probably minimises the memory footprint
+			BooleanQuery.Builder classFilterBuilder = new BooleanQuery.Builder();
 			for ( Class clazz : classesAndSubclasses ) {
 				Term t = new Term( ProjectionConstants.OBJECT_CLASS, clazz.getName() );
 				TermQuery termQuery = new TermQuery( t );
-				classFilter.add( termQuery, BooleanClause.Occur.SHOULD );
+				classFilterBuilder.add( termQuery, BooleanClause.Occur.SHOULD );
 			}
-			BooleanQuery filteredQuery = new BooleanQuery();
-			filteredQuery.add( luceneQuery, BooleanClause.Occur.MUST );
-			filteredQuery.add( classFilter, BooleanClause.Occur.MUST );
-			return filteredQuery;
+			BooleanQuery classFilter = classFilterBuilder.build();
+			BooleanQuery.Builder combinedQueryBuilder = new BooleanQuery.Builder();
+			combinedQueryBuilder.add( luceneQuery, BooleanClause.Occur.MUST );
+			combinedQueryBuilder.add( classFilter, BooleanClause.Occur.FILTER );
+			return combinedQueryBuilder.build();
 		}
 	}
 
@@ -828,16 +827,14 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializa
 			return luceneQuery;
 		}
 		else {
-			// A query filter is more practical than a manual class filtering post query (esp on scrollable resultsets)
-			// it also probably minimise the memory footprint
 			TermQuery tenantIdFilter = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 			// annihilate the scoring impact of TENANT_ID
 			tenantIdFilter.setBoost( 0 );
 
-			BooleanQuery filteredQuery = new BooleanQuery();
-			filteredQuery.add( luceneQuery, BooleanClause.Occur.MUST );
-			filteredQuery.add( tenantIdFilter, BooleanClause.Occur.MUST );
-			return filteredQuery;
+			BooleanQuery.Builder combinedQueryBuilder = new BooleanQuery.Builder();
+			combinedQueryBuilder.add( luceneQuery, BooleanClause.Occur.MUST );
+			combinedQueryBuilder.add( tenantIdFilter, BooleanClause.Occur.FILTER );
+			return combinedQueryBuilder.build();
 		}
 	}
 
