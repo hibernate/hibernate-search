@@ -180,8 +180,8 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 		}
 
 		BooleanQuery boxQuery = new BooleanQuery();
-		boxQuery.add( latQuery, BooleanClause.Occur.MUST );
-		boxQuery.add( longQuery, BooleanClause.Occur.MUST );
+		boxQuery.add( latQuery, BooleanClause.Occur.FILTER );
+		boxQuery.add( longQuery, BooleanClause.Occur.FILTER );
 
 		return new FilteredQuery(
 				new MatchAllDocsQuery(),
