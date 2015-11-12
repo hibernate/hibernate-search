@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
@@ -34,6 +33,7 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -51,7 +51,6 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -66,7 +65,7 @@ import com.google.gson.JsonPrimitive;
  */
 public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( Log.class );
 	private static final Pattern DOT = Pattern.compile( "\\." );
 
 	private final String jsonQuery;
@@ -193,28 +192,22 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			Search.Builder search = new Search.Builder( jsonQuery );
 			entityTypesByName = new HashMap<>();
 
-			if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
-				for ( Entry<Class<?>, EntityIndexBinding> binding : extendedIntegrator.getIndexBindings().entrySet() ) {
-					entityTypesByName.put( binding.getKey().getName(), binding.getKey() );
+			for ( Class<?> queriedEntityType : getQueriedEntityTypes() ) {
+				entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
 
-					IndexManager[] indexManagers = binding.getValue().getIndexManagers();
-					for ( IndexManager indexManager : indexManagers ) {
-						ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
-						search.addIndex( esIndexManager.getActualIndexName() );
+				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
+				IndexManager[] indexManagers = binding.getIndexManagers();
+
+				for ( IndexManager indexManager : indexManagers ) {
+					if ( !( indexManager instanceof ElasticSearchIndexManager ) ) {
+						throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
+							queriedEntityType,
+							jsonQuery
+						);
 					}
-				}
-			}
-			else {
-				for ( Class<?> entityType : indexedTargetedEntities ) {
-					entityTypesByName.put( entityType.getName(), entityType );
 
-					EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
-					IndexManager[] indexManagers = binding.getIndexManagers();
-
-					for ( IndexManager indexManager : indexManagers ) {
-						ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
-						search.addIndex( esIndexManager.getActualIndexName() );
-					}
+					ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
+					search.addIndex( esIndexManager.getActualIndexName() );
 				}
 			}
 
@@ -228,6 +221,15 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 			this.search = search.build();
+		}
+
+		private Iterable<Class<?>> getQueriedEntityTypes() {
+			if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
+				return extendedIntegrator.getIndexBindings().keySet();
+			}
+			else {
+				return indexedTargetedEntities;
+			}
 		}
 
 		SearchResult runSearch() {

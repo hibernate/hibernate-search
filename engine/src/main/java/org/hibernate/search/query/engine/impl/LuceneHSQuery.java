@@ -45,6 +45,7 @@ import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.ChainedFilter;
 import org.hibernate.search.filter.impl.DefaultFilterKey;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
@@ -614,7 +615,18 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializa
 
 	private List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
 		FullTextFilterImplementor[] fullTextFilters = getFullTextFilters();
-		return Arrays.asList( binding.getSelectionStrategy().getIndexManagersForQuery( fullTextFilters ) );
+		List<IndexManager> indexManagers = Arrays.asList( binding.getSelectionStrategy().getIndexManagersForQuery( fullTextFilters ) );
+
+		for ( IndexManager indexManager : indexManagers ) {
+			if ( !( indexManager instanceof DirectoryBasedIndexManager ) ) {
+				throw log.cannotRunLuceneQueryTargetingEntityIndexedWithNonDirectoryBasedIndexManager(
+						binding.getDocumentBuilder().getBeanClass(),
+						luceneQuery.toString()
+				);
+			}
+		}
+
+		return indexManagers;
 	}
 
 	private FullTextFilterImplementor[] getFullTextFilters() {

@@ -51,6 +51,7 @@ public interface Log extends BasicLogger {
 
 	int JGROUPS_BACKEND_MESSAGES_START_ID = 200000;
 	int AVRO_SERIALIZATION_MESSAGES_START_ID = 300000;
+	int ES_BACKEND_MESSAGES_START_ID = 400000;
 
 	@LogMessage(level = WARN)
 	@Message(id = 1, value = "initialized \"blackhole\" backend. Index changes will be prepared but discarded!")
@@ -918,4 +919,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 301, value = "Requested sort field(s) %3$s are not configured for entity type %1$s mapped to index %2$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortableField." )
 	SearchException uncoveredSortsRequestedWithUninvertingNotAllowed(@FormatWith(ClassFormatter.class) Class<?> entityType, String indexName, String uncoveredSorts);
+
+	@Message(id = 302, value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is indexed through a non directory-based backend")
+	SearchException cannotRunLuceneQueryTargetingEntityIndexedWithNonDirectoryBasedIndexManager(@FormatWith(ClassFormatter.class) Class<?> entityType, String query);
 }
