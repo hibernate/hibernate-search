@@ -211,9 +211,9 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			BooleanQuery boolQuery = new BooleanQuery();
-			boolQuery.add( new MatchAllDocsQuery(), BooleanClause.Occur.MUST );
+			boolQuery.add( new MatchAllDocsQuery(), BooleanClause.Occur.FILTER );
 			boolQuery.add(
-					new TermQuery( new Term( ProjectionConstants.OBJECT_CLASS, entity ) ), BooleanClause.Occur.MUST
+					new TermQuery( new Term( ProjectionConstants.OBJECT_CLASS, entity ) ), BooleanClause.Occur.FILTER
 			);
 			try {
 				TopDocs topdocs = searcher.search( boolQuery, 1 );
