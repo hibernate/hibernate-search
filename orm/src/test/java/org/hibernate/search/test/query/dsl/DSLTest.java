@@ -21,6 +21,8 @@ import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.document.DateTools;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -53,6 +55,7 @@ import org.junit.Test;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 /**
@@ -386,6 +389,30 @@ public class DSLTest extends SearchTestBase {
 		assertEquals( "February", results.get( 0 ).getName() );
 		assertEquals( "March", results.get( 1 ).getName() );
 
+		transaction.commit();
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testBooleanWithoutScoring() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		//must + disable scoring
+		Query query = monthQb
+				.bool()
+				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+				.disableScoring()
+				.createQuery();
+
+		List<Month> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 1, results.size() );
+		assertEquals( "January", results.get( 0 ).getName() );
+		assertTrue( query instanceof BooleanQuery );
+		BooleanQuery bq = (BooleanQuery) query;
+		BooleanClause firstBooleanClause = bq.clauses().get( 0 );
+		assertFalse( firstBooleanClause.isScoring() );
 
 		transaction.commit();
 	}
