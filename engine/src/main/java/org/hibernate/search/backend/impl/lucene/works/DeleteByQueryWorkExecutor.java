@@ -59,12 +59,12 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 			ScopedAnalyzer analyzer = this.workspace.getDocumentBuilder( entityType ).getAnalyzer();
 			Query queryToDelete = query.toLuceneQuery( analyzer );
 
-			entityDeletionQuery.add( queryToDelete, BooleanClause.Occur.MUST );
+			entityDeletionQuery.add( queryToDelete, BooleanClause.Occur.FILTER );
 		}
 
 		Term classNameQueryTerm = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
-		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.MUST );
+		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.FILTER );
 
 		addTenantQueryTerm( work.getTenantId(), entityDeletionQuery );
 
@@ -81,7 +81,7 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {
 		if ( tenantId != null ) {
 			Term tenantTerm = new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
-			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.MUST );
+			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.FILTER );
 		}
 	}
 }
