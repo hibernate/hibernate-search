@@ -62,10 +62,10 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 				);
 				Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
 				BooleanQuery deleteDocumentsQuery = new BooleanQuery();
-				deleteDocumentsQuery.add( exactMatchQuery, Occur.MUST );
+				deleteDocumentsQuery.add( exactMatchQuery, Occur.FILTER );
 				if ( tenantId != null ) {
 					TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
-					deleteDocumentsQuery.add( tenantTermQuery, Occur.MUST );
+					deleteDocumentsQuery.add( tenantTermQuery, Occur.FILTER );
 				}
 				delegate.deleteDocuments( deleteDocumentsQuery );
 				// no need to log the Add operation as we'll log in the delegate
