@@ -54,8 +54,8 @@ import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -393,6 +393,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2034")
 	@SuppressWarnings("unchecked")
 	public void testBooleanWithoutScoring() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -418,8 +419,9 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2037")
 	@SuppressWarnings("unchecked")
-	public void testBooleanWithoutNegationQueries() throws Exception {
+	public void testBooleanWithOnlyNegationQueries() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
