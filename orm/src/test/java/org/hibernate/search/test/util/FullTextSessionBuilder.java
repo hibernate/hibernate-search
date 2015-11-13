@@ -92,7 +92,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 	 * @return the same builder (this).
 	 */
 	public FullTextSessionBuilder useFileSystemDirectoryProvider(Class<?> testClass) {
-		indexRootDirectory = new File( TestConstants.getIndexDirectory( testClass ) );
+		indexRootDirectory = new File( TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir() ) );
 		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.getAbsolutePath() );

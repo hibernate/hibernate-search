@@ -8,6 +8,10 @@ package org.hibernate.search.test.configuration.sharding;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,13 +19,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.apache.lucene.document.Document;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -32,12 +35,13 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.store.impl.NotShardedStrategy;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.BytemanHelper;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -232,7 +236,7 @@ public class ShardingConfigurationTest {
 		);
 
 		shardingProperties.put( "hibernate.search.foo.snafu.directory_provider", "filesystem" );
-		File indexDir = new File( TestConstants.getIndexDirectory( ShardingConfigurationTest.class ) );
+		File indexDir = new File( TestConstants.getIndexDirectory( getTargetDir() ) );
 		shardingProperties.put( "hibernate.search.foo.snafu.indexBase", indexDir.getAbsolutePath() );
 
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
@@ -260,6 +264,21 @@ public class ShardingConfigurationTest {
 		return (MutableSearchFactory) new SearchIntegratorBuilder().configuration(
 				configuration
 		).buildSearchIntegrator();
+	}
+
+	private static Path getTargetDir() {
+		URI classesDirUri;
+		try {
+			classesDirUri = ShardingConfigurationTest.class.getProtectionDomain()
+					.getCodeSource()
+					.getLocation()
+					.toURI();
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException( e );
+		}
+
+		return Paths.get( classesDirUri ).getParent();
 	}
 
 	@Indexed(index = "foo")
@@ -299,7 +318,7 @@ public class ShardingConfigurationTest {
 	}
 
 	public static class DummyShardIdentifierProvider implements ShardIdentifierProvider {
-		private Set<String> shards = new HashSet<String>();
+		private final Set<String> shards = new HashSet<String>();
 
 		@Override
 		public void initialize(Properties properties, BuildContext buildContext) {

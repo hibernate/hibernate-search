@@ -6,18 +6,6 @@
  */
 package org.hibernate.search.test.performance.scenario;
 
-import static org.apache.commons.lang.StringUtils.leftPad;
-import static org.apache.commons.lang.StringUtils.rightPad;
-import static org.hibernate.search.test.performance.TestRunnerArquillian.RUNNER_PROPERTIES;
-import static org.hibernate.search.test.performance.TestRunnerArquillian.TARGET_DIR_KEY;
-import static org.hibernate.search.test.performance.scenario.TestContext.ASSERT_QUERY_RESULTS;
-import static org.hibernate.search.test.performance.scenario.TestContext.CHECK_INDEX_STATE;
-import static org.hibernate.search.test.performance.scenario.TestContext.MEASURE_MEMORY;
-import static org.hibernate.search.test.performance.scenario.TestContext.MEASURE_TASK_TIME;
-import static org.hibernate.search.test.performance.scenario.TestContext.THREADS_COUNT;
-import static org.hibernate.search.test.performance.scenario.TestContext.VERBOSE;
-import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
-
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -38,11 +26,24 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.test.performance.task.AbstractTask;
 import org.hibernate.search.test.performance.util.CheckerLuceneIndex;
 import org.hibernate.search.test.performance.util.CheckerUncaughtExceptions;
-import org.hibernate.search.engine.Version;
+import org.hibernate.search.test.performance.util.TargetDirHelper;
+import org.hibernate.search.testsupport.TestConstants;
+
+import static org.apache.commons.lang.StringUtils.leftPad;
+import static org.apache.commons.lang.StringUtils.rightPad;
+import static org.hibernate.search.test.performance.TestRunnerArquillian.RUNNER_PROPERTIES;
+import static org.hibernate.search.test.performance.TestRunnerArquillian.TARGET_DIR_KEY;
+import static org.hibernate.search.test.performance.scenario.TestContext.ASSERT_QUERY_RESULTS;
+import static org.hibernate.search.test.performance.scenario.TestContext.CHECK_INDEX_STATE;
+import static org.hibernate.search.test.performance.scenario.TestContext.MEASURE_MEMORY;
+import static org.hibernate.search.test.performance.scenario.TestContext.MEASURE_TASK_TIME;
+import static org.hibernate.search.test.performance.scenario.TestContext.THREADS_COUNT;
+import static org.hibernate.search.test.performance.scenario.TestContext.VERBOSE;
+import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
 
 /**
  * @author Tomas Hradec
@@ -206,7 +207,7 @@ public class TestReporter {
 			return Paths.get( runnerProperties.getProperty( TARGET_DIR_KEY ) );
 		}
 		else {
-			return TestConstants.getTargetDir( TestReporter.class );
+			return TargetDirHelper.getTargetDir();
 		}
 	}
 

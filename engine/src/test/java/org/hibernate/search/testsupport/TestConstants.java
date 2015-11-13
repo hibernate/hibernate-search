@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.testsupport;
 
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
@@ -17,7 +16,6 @@ import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
-
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -44,43 +42,32 @@ public final class TestConstants {
 	}
 
 	/**
-	 * Returns the target directory of the build.
-	 *
-	 * @param testClass the test class for which the target directory is requested.
-	 * @return the target directory of the build
+	 * Returns a temporary directory for storing test data such as indexes etc. Specific tests should store their data
+	 * in sub-directories. The returned directory will be deleted on graceful shut-down. The returned directory will be
+	 * named like {@code $TEMP/hsearch-tests-<random>}.
 	 */
-	public static Path getTargetDir(Class<?> testClass) {
-		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-		// get a URL reference to something we now is part of the classpath (our own classes)
-		String currentTestClass = testClass.getName();
-		int hopsToCompileDirectory = currentTestClass.split( "\\." ).length;
-		int hopsToTargetDirectory = hopsToCompileDirectory + 1;
-		URL classURL = contextClassLoader.getResource( currentTestClass.replace( '.', '/' ) + ".class" );
-		// navigate back to '/target'
-		Path targetDir;
+	public static Path getTempTestDataDir() {
 		try {
-			targetDir = Paths.get( classURL.toURI() );
+			Path tempTestDataDir = Files.createTempDirectory( "hsearch-tests-" );
+			tempTestDataDir.toFile().deleteOnExit();
+
+			return tempTestDataDir;
 		}
-		catch (URISyntaxException e) {
-			throw new RuntimeException( e );
+		catch (IOException e) {
+			throw new RuntimeException( "Could not create temporary directory for tests", e );
 		}
-		// navigate back to '/target'
-		for ( int i = 0; i < hopsToTargetDirectory; i++ ) {
-			targetDir = targetDir.getParent();
-		}
-		return targetDir;
 	}
 
 	/**
 	 * Return the root directory to store test indexes in. Tests should never use or delete this directly
 	 * but rather nest sub directories in it to avoid interferences across tests.
 	 *
-	 * @param testClass the test class for which the index directory is requested.
 	 * @return Return the root directory to store test indexes
 	 */
-	public static String getIndexDirectory(Class<?> testClass) {
-		Path targetDir = getTargetDir( testClass );
-		Path indexDirPath = targetDir.resolve( "indextemp" );
+	public static String getIndexDirectory(Path parent) {
+		Path indexDirPath = parent.resolve( "indextemp" );
+		indexDirPath.toFile().deleteOnExit();
+
 		String indexDir = indexDirPath.toAbsolutePath().toString();
 		log.debugf( "Using %s as index directory.", indexDir );
 		return indexDir;

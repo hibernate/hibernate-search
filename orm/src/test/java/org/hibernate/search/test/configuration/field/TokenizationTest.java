@@ -10,19 +10,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.jboss.byteman.contrib.bmunit.BMRule;
-import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.BytemanHelper;
+import org.hibernate.search.testsupport.TestConstants;
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
@@ -48,7 +47,6 @@ public class TokenizationTest {
 
 		config.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
 		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		config.setProperty( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( TokenizationTest.class ) );
 
 		config.buildSessionFactory();
 

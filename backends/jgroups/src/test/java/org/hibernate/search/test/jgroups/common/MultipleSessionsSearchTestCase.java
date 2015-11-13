@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.test.jgroups.common;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,11 +47,11 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 		//master
 		cfg.put(
 				"hibernate.search.default.sourceBase",
-				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterCopy
+				TestConstants.getIndexDirectory( getTargetDir() ) + masterCopy
 		);
 		cfg.put(
 				"hibernate.search.default.indexBase",
-				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterMain
+				TestConstants.getIndexDirectory( getTargetDir() ) + masterMain
 		);
 		cfg.put( "hibernate.search.default.refresh", "1" );
 		cfg.put(
@@ -59,11 +63,11 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 		//slave(s)
 		cfg.put(
 				"hibernate.search.default.sourceBase",
-				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterCopy
+				TestConstants.getIndexDirectory( getTargetDir() ) + masterCopy
 		);
 		cfg.put(
 				"hibernate.search.default.indexBase",
-				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + slave
+				TestConstants.getIndexDirectory( getTargetDir() ) + slave
 		);
 		cfg.put( "hibernate.search.default.refresh", "1" );
 		cfg.put(
@@ -106,4 +110,19 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 		return slaveResources.getSessionFactory();
 	}
 
+	private Path getTargetDir() {
+		URI classesDirUri;
+
+		try {
+			classesDirUri = getClass().getProtectionDomain()
+					.getCodeSource()
+					.getLocation()
+					.toURI();
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException( e );
+		}
+
+		return Paths.get( classesDirUri ).getParent();
+	}
 }

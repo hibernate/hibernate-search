@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.performance.reader;
 
+import org.hibernate.search.test.util.TargetDirHelper;
 import org.hibernate.search.testsupport.TestConstants;
 
 /**
@@ -20,7 +21,7 @@ public class NotSharedReaderPerformanceTest extends ReaderPerformance {
 
 	@Override
 	protected String getIndexBaseDir() {
-		return TestConstants.getIndexDirectory( NotSharedReaderPerformanceTest.class ) + "NotSharedReaderPerformanceTest";
+		return TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ) + "NotSharedReaderPerformanceTest";
 	}
 
 }
