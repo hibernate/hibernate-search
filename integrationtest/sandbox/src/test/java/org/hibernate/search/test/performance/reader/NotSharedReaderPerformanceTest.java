@@ -21,7 +21,7 @@ public class NotSharedReaderPerformanceTest extends ReaderPerformance {
 
 	@Override
 	protected String getIndexBaseDir() {
-		return TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ) + "NotSharedReaderPerformanceTest";
+		return TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
 	}
 
 }

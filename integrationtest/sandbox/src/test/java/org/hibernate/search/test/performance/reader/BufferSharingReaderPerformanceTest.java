@@ -21,6 +21,6 @@ public class BufferSharingReaderPerformanceTest extends ReaderPerformance {
 
 	@Override
 	protected String getIndexBaseDir() {
-		return TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ) + "BufferSharingReaderPerformanceTest";
+		return TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
 	}
 }
