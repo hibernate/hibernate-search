@@ -32,6 +32,7 @@ public final class TestConstants {
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static final Log log = LoggerFactory.make();
+	private static final CallerProvider callerProvider = new CallerProvider();
 
 	private TestConstants() {
 		//not allowed
@@ -59,13 +60,21 @@ public final class TestConstants {
 	}
 
 	/**
-	 * Return the root directory to store test indexes in. Tests should never use or delete this directly
-	 * but rather nest sub directories in it to avoid interferences across tests.
-	 *
-	 * @return Return the root directory to store test indexes
+	 * Doing the same as {@link #getIndexDirectory(Path, Class)}, using the immediate caller class as requester.
 	 */
 	public static String getIndexDirectory(Path parent) {
-		Path indexDirPath = parent.resolve( "indextemp" );
+		return getIndexDirectory( parent, callerProvider.getCallerClass() );
+	}
+
+	/**
+	 * Return the root directory to store test indexes in. Tests should never use or delete this directly but rather
+	 * nest sub directories in it to avoid interferences across tests.
+	 *
+	 * @param requester The test class requesting the index directory, its name will be part of the returned directory
+	 * @return Return the root directory to store test indexes
+	 */
+	public static String getIndexDirectory(Path parent, Class<?> requester) {
+		Path indexDirPath = parent.resolve( "indextemp-" + requester.getSimpleName() );
 		indexDirPath.toFile().deleteOnExit();
 
 		String indexDir = indexDirPath.toAbsolutePath().toString();
@@ -75,5 +84,12 @@ public final class TestConstants {
 
 	public static boolean arePerformanceTestsEnabled() {
 		return Boolean.getBoolean( "org.hibernate.search.enable_performance_tests" );
+	}
+
+	private static class CallerProvider extends SecurityManager {
+
+		public Class<?> getCallerClass() {
+			return getClassContext()[2];
+		}
 	}
 }

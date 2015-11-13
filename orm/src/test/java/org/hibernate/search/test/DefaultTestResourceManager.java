@@ -218,12 +218,13 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	}
 
 	private Path createBaseIndexDir(Class<?> currentTestModuleClass) {
-		// Make sure no directory is ever reused across the test suite as Windows might not be able
-		// to delete the files after usage. See also
+		// Appending UUID to be extra-sure no directory is ever reused across the test suite as Windows might not be
+		// able to delete the files after usage. See also
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
-		String shortTestName = currentTestModuleClass.getSimpleName() + "-" + UUID.randomUUID().toString().substring( 0, 8 );
-
-		return Paths.get( TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir() ), shortTestName );
+		return Paths.get(
+				TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir(), currentTestModuleClass ),
+				UUID.randomUUID().toString().substring( 0, 8 )
+		);
 	}
 
 	private static class RollbackWork implements Work {
