@@ -443,8 +443,10 @@ distribution.
 
 In the example below a `StandardTokenizerFactory` is used followed by two filter factories,
 `LowerCaseFilterFactory` and `SnowballPorterFilterFactory`. The standard tokenizer splits words at
-punctuation characters and hyphens while keeping email addresses and internet hostnames intact. It
-is a good general purpose tokenizer.
+punctuation characters and hyphens.
+It is a good general purpose tokenizer.
+For indexing email addresses or internet hostnames it is not the best fit as it would split them up.
+You may either make use of Lucene's `ClassicTokenizerFactory` in such cases or implement a custom tokenizer and factory.
 The lowercase filter converts to lowercase the letters in each token
 whereas the snowball filter finally applies language specific stemming.
 
