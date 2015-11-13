@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,10 +33,6 @@ import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
@@ -51,9 +48,11 @@ import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.test.util.SerializationTestHelper;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * This tests backwards compatibility between Avro protocol versions.
@@ -218,7 +217,7 @@ public class ProtocolBackwardCompatibilityTest {
 	}
 
 	private void storeSerializedForm(byte[] out, int major, int minor) throws IOException {
-		Path targetDir = TestConstants.getTargetDir( ProtocolBackwardCompatibilityTest.class );
+		Path targetDir = getTargetDir();
 		Path outputFilePath = targetDir.resolve( RESOURCE_BASE_NAME + major + "." + minor );
 		try (OutputStream outputStream = new FileOutputStream( outputFilePath.toFile() )) {
 			outputStream.write( out );
@@ -231,5 +230,21 @@ public class ProtocolBackwardCompatibilityTest {
 		URI uri = url.toURI();
 		Path path = Paths.get( uri );
 		return Files.readAllBytes( path );
+	}
+
+	private Path getTargetDir() {
+		URI classesDirUri;
+
+		try {
+			classesDirUri = getClass().getProtectionDomain()
+					.getCodeSource()
+					.getLocation()
+					.toURI();
+		}
+		catch (URISyntaxException e) {
+			throw new RuntimeException( e );
+		}
+
+		return Paths.get( classesDirUri ).getParent();
 	}
 }

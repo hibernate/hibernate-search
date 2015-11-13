@@ -157,7 +157,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 	static File prepareDirectories(String testId) throws IOException {
 
-		String superRootPath = TestConstants.getIndexDirectory( FSSlaveAndMasterDPTest.class );
+		String superRootPath = TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir() );
 		File root = new File( superRootPath, testId );
 
 		if ( root.exists() ) {

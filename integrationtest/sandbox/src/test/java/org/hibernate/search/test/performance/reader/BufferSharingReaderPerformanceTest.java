@@ -7,6 +7,7 @@
 package org.hibernate.search.test.performance.reader;
 
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
+import org.hibernate.search.test.util.TargetDirHelper;
 import org.hibernate.search.testsupport.TestConstants;
 
 /**
@@ -20,6 +21,6 @@ public class BufferSharingReaderPerformanceTest extends ReaderPerformance {
 
 	@Override
 	protected String getIndexBaseDir() {
-		return TestConstants.getIndexDirectory( BufferSharingReaderPerformanceTest.class ) + "BufferSharingReaderPerformanceTest";
+		return TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ) + "BufferSharingReaderPerformanceTest";
 	}
 }

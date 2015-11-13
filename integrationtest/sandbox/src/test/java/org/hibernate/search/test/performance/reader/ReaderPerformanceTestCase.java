@@ -28,6 +28,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.util.TargetDirHelper;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -48,7 +49,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@Override
 	@Before
 	public void setUp() throws Exception {
-		String indexBase = TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class );
+		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
 		File indexDir = new File(indexBase);
 		indexDir.mkdir();
 		File[] files = indexDir.listFiles();
@@ -64,7 +65,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		String indexBase = TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class );
+		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
 		File indexDir = new File(indexBase);
 		FileHelper.delete( indexDir );
 	}
@@ -126,8 +127,8 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	}
 
 	protected class Work implements Runnable {
-		private Random random = new Random();
-		private SessionFactory sf;
+		private final Random random = new Random();
+		private final SessionFactory sf;
 //		public volatile int count = 0;
 		public AtomicInteger count = new AtomicInteger( 0 );
 
@@ -219,8 +220,8 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	}
 
 	protected static class ReverseWork implements Runnable {
-		private SessionFactory sf;
-		private Random random = new Random();
+		private final SessionFactory sf;
+		private final Random random = new Random();
 
 		public ReverseWork(SessionFactory sf) {
 			this.sf = sf;
@@ -274,7 +275,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class ) );
+		cfg.put( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() ) );
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}

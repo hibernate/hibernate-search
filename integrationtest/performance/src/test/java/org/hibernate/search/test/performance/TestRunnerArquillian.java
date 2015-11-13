@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.test.integration.wildfly.PackagerHelper;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;
+import org.hibernate.search.test.performance.util.TargetDirHelper;
 import org.hibernate.search.testsupport.TestConstants;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -48,7 +49,7 @@ public class TestRunnerArquillian {
 	public static final String TARGET_DIR_KEY = "target";
 
 	@Deployment
-	public static Archive<?> createTestArchive() throws IOException {
+	public static Archive<?> createTestArchive() throws Exception {
 		WebArchive archive = ShrinkWrap
 				.create( WebArchive.class, TestRunnerArquillian.class.getSimpleName() + ".war" )
 				.addPackages( true, TestRunnerArquillian.class.getPackage() )
@@ -63,8 +64,8 @@ public class TestRunnerArquillian {
 		return archive;
 	}
 
-	private static StringAsset reportsOutputDirectory() throws IOException {
-		Path path = TestConstants.getTargetDir( TestRunnerArquillian.class );
+	private static StringAsset reportsOutputDirectory() throws Exception {
+		Path path = TargetDirHelper.getTargetDir();
 		String absolutePath = path.toAbsolutePath().toString();
 		//Use Properties to make sure we encode the output correctly,
 		//especially tricky to deal with escaping of paths:
