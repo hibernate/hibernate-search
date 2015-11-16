@@ -1,0 +1,137 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.test.query.sorting;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.hibernate.Transaction;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.query.Book;
+import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Tests for sortable fields contributed through custom field bridges. Those bridges must expose the required sortable
+ * field meta-data so they can be used for sorting without falling back to index uninverting.
+ *
+ * @author Gunnar Morling
+ */
+@TestForIssue(jiraKey = "HSEARCH-2021")
+public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
+
+	@Before
+	public void insertTestData() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		fullTextSession.save( new Explorer( 1, 23, "Sam", "1st", "Seaman" ) );
+		fullTextSession.save( new Explorer( 2, 22, "Sam", "2nd", "Traveller" ) );
+		fullTextSession.save( new Explorer( 3, 22, "Collin", "1st", "Conqueror" ) );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@After
+	public void deleteTestData() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		fullTextSession.delete( new Explorer( 1 ) );
+		fullTextSession.delete( new Explorer( 2 ) );
+		fullTextSession.delete( new Explorer( 3 ) );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testSortableFieldConfiguredThroughClassLevelBridge() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		@SuppressWarnings("unchecked")
+		List<Book> result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Explorer.class )
+			.setSort(
+					new Sort(
+							new SortField( "firstName", SortField.Type.STRING ),
+							new SortField( "middleName", SortField.Type.STRING )
+					)
+			)
+			.list();
+
+		assertNotNull( result );
+		assertThat( result ).onProperty( "id" ).containsExactly( 3, 1, 2 );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testSortableFieldConfiguredThroughCustomFieldLevelBridge() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		@SuppressWarnings("unchecked")
+		List<Book> result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Explorer.class )
+			.setSort( new Sort( new SortField( "lastName", SortField.Type.STRING ) ) )
+			.list();
+
+		assertNotNull( result );
+		assertThat( result ).onProperty( "id" ).containsExactly( 3, 1, 2 );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+
+	@Test
+	public void testTwoSortableFieldsConfiguredThroughAnnotationAndCustomFieldLevelBridge() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		@SuppressWarnings("unchecked")
+		List<Book> result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Explorer.class )
+			.setSort(
+					new Sort(
+							new SortField( "exploredCountries", SortField.Type.INT ),
+							new SortField( "lastName", SortField.Type.STRING )
+					)
+			)
+			.list();
+
+		assertNotNull( result );
+		assertThat( result ).onProperty( "id" ).containsExactly( 3, 2, 1 );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Override
+	public Class<?>[] getAnnotatedClasses() {
+		return new Class[] { Explorer.class };
+	}
+
+	@Override
+	public void configure(Map<String, Object> settings) {
+		// explicitly disallowing transparent uninverting, so the test would fail if the sort fields contributed through
+		// field bridges are not present
+		settings.put( Environment.INDEX_UNINVERTING_ALLOWED, "false" );
+	}
+}

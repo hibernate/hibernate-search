@@ -703,6 +703,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			sortConfigurations.setIndex( indexManager.getIndexName() );
 			sortConfigurations.setEntityType( typeMetadata.getType() );
 
+			sortConfigurations.addSortableFields( typeMetadata.getClassBridgeSortableFieldMetadata() );
 			sortConfigurations.addSortableFields( typeMetadata.getIdPropertyMetadata().getSortableFieldMetadata() );
 
 			for ( PropertyMetadata property : typeMetadata.getAllPropertyMetadata() ) {
