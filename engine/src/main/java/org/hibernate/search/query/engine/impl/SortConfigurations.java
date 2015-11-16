@@ -67,7 +67,7 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 
 			for ( SortField sortField : sort.getSort() ) {
 				// no doc value field needed for these
-				if ( sortField.getType() == SortField.Type.DOC && sortField.getType() == SortField.Type.SCORE ) {
+				if ( sortField.getType() == SortField.Type.DOC || sortField.getType() == SortField.Type.SCORE ) {
 					continue;
 				}
 
