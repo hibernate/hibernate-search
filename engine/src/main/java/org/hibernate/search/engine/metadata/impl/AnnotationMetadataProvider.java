@@ -59,6 +59,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
@@ -615,6 +616,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		typeMetadataBuilder.addClassBridgeField( fieldMetadata );
 
+		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
+			typeMetadataBuilder.addClassBridgeSortableFields( ( (MetadataProvidingFieldBridge) fieldBridge).getSortableFieldNames() );
+		}
 		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer( classBridgeAnnotation.analyzer(), configContext );
 		typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
 	}
@@ -1035,6 +1039,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				reflectionManager,
 				configContext.getServiceManager()
 		);
+
+		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
+			for ( String sortableField : ( (MetadataProvidingFieldBridge) fieldBridge).getSortableFieldNames() ) {
+				SortableFieldMetadata sortableFieldMetadata = new SortableFieldMetadata.Builder()
+					.fieldName( sortableField )
+					.build();
+				propertyMetadataBuilder.addSortableField( sortableFieldMetadata );
+			}
+		}
 
 		final NumericEncodingType numericEncodingType = determineNumericFieldEncoding( fieldBridge );
 		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldAnnotation, configContext, numericEncodingType, fieldName );

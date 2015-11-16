@@ -136,6 +136,8 @@ public class TypeMetadata {
 	// TODO - would be nice to not need this in TypeMetadata (HF)
 	private final Set<XClass> optimizationBlackList;
 
+	private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata;
+
 	protected TypeMetadata(Builder builder) {
 		this.indexedType = builder.indexedType;
 		this.boost = builder.boost;
@@ -156,6 +158,7 @@ public class TypeMetadata {
 		this.propertyGetterNameToPropertyMetadata = keyPropertyMetadata( builder.propertyMetadataSet );
 		this.documentFieldNameToFieldMetadata = keyFieldMetadata( builder.propertyMetadataSet );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
+		this.classBridgeSortableFieldMetadata = Collections.unmodifiableSet( builder.classBridgeSortableFieldMetadata );
 	}
 
 	public Class<?> getType() {
@@ -176,6 +179,10 @@ public class TypeMetadata {
 
 	public Set<DocumentFieldMetadata> getClassBridgeMetadata() {
 		return classBridgeFields;
+	}
+
+	public Set<SortableFieldMetadata> getClassBridgeSortableFieldMetadata() {
+		return classBridgeSortableFieldMetadata;
 	}
 
 	public DocumentFieldMetadata getDocumentFieldMetadataFor(String fieldName) {
@@ -403,6 +410,7 @@ public class TypeMetadata {
 		private final Set<String> collectionRoles = new TreeSet<String>();
 		private PropertyMetadata idPropertyMetadata;
 		private XProperty jpaProperty;
+		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new HashSet<>();
 
 		public Builder(Class<?> indexedType, ConfigContext configContext) {
 			this( indexedType, new ScopedAnalyzer( configContext.getDefaultAnalyzer() ) );
@@ -546,6 +554,12 @@ public class TypeMetadata {
 		@Override
 		public String toString() {
 			return "TypeMetadata.Builder{indexedType=" + indexedType + "}";
+		}
+
+		public void addClassBridgeSortableFields(Iterable<String> sortableFieldNames) {
+			for ( String sortableFieldName : sortableFieldNames ) {
+				classBridgeSortableFieldMetadata.add( new SortableFieldMetadata.Builder().fieldName( sortableFieldName ).build() );
+			}
 		}
 	}
 }

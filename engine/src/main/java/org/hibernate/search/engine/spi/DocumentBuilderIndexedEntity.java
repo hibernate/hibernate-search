@@ -703,6 +703,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	private void addSortFieldDocValues(Document document, PropertyMetadata propertyMetadata, float documentBoost, Object propertyValue) {
 		for ( SortableFieldMetadata sortField : propertyMetadata.getSortableFieldMetadata() ) {
 			DocumentFieldMetadata fieldMetaData = propertyMetadata.getFieldMetadata( sortField.getFieldName() );
+
+			// field marked as sortable by custom bridge to allow sort field validation pass, but that bridge itself is
+			// in charge of adding the required field
+			if ( fieldMetaData == null ) {
+				continue;
+			}
+
 			IndexableField field;
 
 			// A non-stored, non-indexed field will not be added to the actual document; in that case retrieve
