@@ -8,8 +8,10 @@ package org.hibernate.search.test.query.sorting;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.persistence.Entity;
@@ -38,8 +40,8 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
@@ -52,7 +54,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -262,6 +263,7 @@ public class SortTest extends SearchTestBase {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testResultOrderedByEmbeddedAuthorNameAscending() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -273,50 +275,6 @@ public class SortTest extends SearchTestBase {
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
 		assertThat( result ).onProperty( "id" ).containsExactly( 2, 1, 3, 4, 10 );
-
-		tx.commit();
-	}
-
-	@Test
-	public void testCombinedQueryOnIndexWithSortFieldAndIndexToBeUninverted() throws Exception {
-		Transaction tx = fullTextSession.beginTransaction();
-
-		Query query = queryParser.parse( "name:Bill" );
-		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Plumber.class, BrickLayer.class );
-		Sort sort = new Sort( new SortField( "sortName", SortField.Type.STRING ) ); //ASC
-		hibQuery.setSort( sort );
-
-		@SuppressWarnings("unchecked")
-		List<Book> result = hibQuery.list();
-		assertNotNull( result );
-		assertThat( result ).onProperty( "name" )
-			.describedAs( "Expecting results from index with sort field and uninverted index in the correct sort order" )
-			.containsExactly( "Bill the brick layer", "Bill the plumber" );
-
-		tx.commit();
-	}
-
-	/**
-	 * The index is shared by two entities. One declares the required sorts, the other does not. As this would require
-	 * uninverting the index for one entity but not the other, that situation is considered inconsistent and an
-	 * exception is expected.
-	 */
-	@Test
-	public void testQueryOnIndexSharedByEntityWithRequiredSortFieldAndEntityWithoutRaisesException() throws Exception {
-		Transaction tx = fullTextSession.beginTransaction();
-
-		Query query = queryParser.parse( "name:Bill" );
-		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Thatcher.class, BrickLayer.class );
-		Sort sort = new Sort( new SortField( "sortName", SortField.Type.STRING ) ); //ASC
-		hibQuery.setSort( sort );
-
-		try {
-			hibQuery.list();
-			fail( "Expected exception was not raised" );
-		}
-		catch (Exception e) {
-			assertThat( e.getMessage() ).contains( "HSEARCH000298" );
-		}
 
 		tx.commit();
 	}
@@ -416,12 +374,10 @@ public class SortTest extends SearchTestBase {
 	private void createTestContractors() {
 		Transaction tx = fullTextSession.beginTransaction();
 
-		fullTextSession.save( new Plumber( 1, "Bill the plumber" ) );
 		fullTextSession.save( new BrickLayer( 2, "Bill the brick layer", "Johnson" ) );
 		fullTextSession.save( new BrickLayer( 4, "Barny the brick layer", "Johnson" ) );
 		fullTextSession.save( new BrickLayer( 5, "Bart the brick layer", "Higgins" ) );
 		fullTextSession.save( new BrickLayer( 6, "Barny the brick layer", "Higgins" ) );
-		fullTextSession.save( new Thatcher( 3, "Bill the thatcher" ) );
 
 		tx.commit();
 		fullTextSession.clear();
@@ -443,9 +399,7 @@ public class SortTest extends SearchTestBase {
 
 	private void deleteTestContractors() {
 		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.createQuery( "delete " + Plumber.class.getName() ).executeUpdate();
 		fullTextSession.createQuery( "delete " + BrickLayer.class.getName() ).executeUpdate();
-		fullTextSession.createQuery( "delete " + Thatcher.class.getName() ).executeUpdate();
 		tx.commit();
 		fullTextSession.clear();
 	}
@@ -456,9 +410,7 @@ public class SortTest extends SearchTestBase {
 				Book.class,
 				Author.class,
 				NumberHolder.class,
-				Plumber.class,
-				BrickLayer.class,
-				Thatcher.class
+				BrickLayer.class
 		};
 	}
 
@@ -505,7 +457,7 @@ public class SortTest extends SearchTestBase {
 	 *
 	 * @author Gunnar Morling
 	 */
-	public static class SortFieldCreatingClassBridge implements FieldBridge {
+	public static class SortFieldCreatingClassBridge implements MetadataProvidingFieldBridge {
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
@@ -513,6 +465,11 @@ public class SortTest extends SearchTestBase {
 
 			document.add( new NumericDocValuesField( "num1", numberHolder.num1 ) );
 			document.add( new NumericDocValuesField( "num2", numberHolder.num2 ) );
+		}
+
+		@Override
+		public Set<String> getSortableFieldNames() {
+			return Collections.singleton( "sum" );
 		}
 	}
 
