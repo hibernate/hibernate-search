@@ -29,7 +29,10 @@ import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 
 @Entity
 @Indexed
-@ClassBridge(impl = Explorer.FirstAndMiddleNamesFieldBridge.class)
+@ClassBridge(
+		name = "fn",
+		impl = Explorer.FirstAndMiddleNamesFieldBridge.class
+)
 public class Explorer {
 
 	@Id
@@ -81,19 +84,19 @@ public class Explorer {
 			Explorer explorer = (Explorer) value;
 
 			String firstName = explorer.getNameParts().get( "firstName" );
-			luceneOptions.addFieldToDocument( "firstName", firstName, document );
-			document.add( new SortedDocValuesField( "firstName", new BytesRef( firstName ) ) );
+			luceneOptions.addFieldToDocument( name + "_firstName", firstName, document );
+			document.add( new SortedDocValuesField( name + "_firstName", new BytesRef( firstName ) ) );
 
 			String middleName = explorer.getNameParts().get( "middleName" );
-			luceneOptions.addFieldToDocument( "middleName", middleName, document );
-			document.add( new SortedDocValuesField( "middleName", new BytesRef( middleName ) ) );
+			luceneOptions.addFieldToDocument( name + "_middleName", middleName, document );
+			document.add( new SortedDocValuesField( name + "_middleName", new BytesRef( middleName ) ) );
 		}
 
 		@Override
-		public Set<String> getSortableFieldNames() {
+		public Set<String> getSortableFieldNames(String fieldName) {
 			Set<String> sortableFields = new HashSet<>();
-			sortableFields.add( "firstName" );
-			sortableFields.add( "middleName" );
+			sortableFields.add( fieldName + "_firstName" );
+			sortableFields.add( fieldName + "_middleName" );
 
 			return sortableFields;
 		}
@@ -110,13 +113,13 @@ public class Explorer {
 			Map<String, String> nameParts = (Map<String, String>) value;
 			String lastName = nameParts.get( "lastName" );
 
-			luceneOptions.addFieldToDocument( "lastName", lastName, document );
-			document.add( new SortedDocValuesField( "lastName", new BytesRef( lastName ) ) );
+			luceneOptions.addFieldToDocument( name + "_lastName", lastName, document );
+			document.add( new SortedDocValuesField( name + "_lastName", new BytesRef( lastName ) ) );
 		}
 
 		@Override
-		public Set<String> getSortableFieldNames() {
-			return Collections.singleton( "lastName" );
+		public Set<String> getSortableFieldNames(String fieldName) {
+			return Collections.singleton( fieldName + "_lastName" );
 		}
 	}
 }

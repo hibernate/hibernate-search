@@ -468,7 +468,7 @@ public class SortTest extends SearchTestBase {
 		}
 
 		@Override
-		public Set<String> getSortableFieldNames() {
+		public Set<String> getSortableFieldNames(String fieldName) {
 			return Collections.singleton( "sum" );
 		}
 	}
