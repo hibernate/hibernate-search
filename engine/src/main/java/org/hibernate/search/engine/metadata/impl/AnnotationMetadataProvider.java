@@ -617,7 +617,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		typeMetadataBuilder.addClassBridgeField( fieldMetadata );
 
 		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
-			typeMetadataBuilder.addClassBridgeSortableFields( ( (MetadataProvidingFieldBridge) fieldBridge).getSortableFieldNames() );
+			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
+			typeMetadataBuilder.addClassBridgeSortableFields( metadataProvidingFieldBridge.getSortableFieldNames( fieldName ) );
 		}
 		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer( classBridgeAnnotation.analyzer(), configContext );
 		typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
@@ -1041,7 +1042,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 
 		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
-			for ( String sortableField : ( (MetadataProvidingFieldBridge) fieldBridge).getSortableFieldNames() ) {
+			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
+
+			for ( String sortableField : metadataProvidingFieldBridge.getSortableFieldNames( fieldName ) ) {
 				SortableFieldMetadata sortableFieldMetadata = new SortableFieldMetadata.Builder()
 					.fieldName( sortableField )
 					.build();

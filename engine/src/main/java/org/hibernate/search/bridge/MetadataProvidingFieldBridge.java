@@ -20,6 +20,10 @@ public interface MetadataProvidingFieldBridge extends FieldBridge {
 
 	/**
 	 * Returns the names of the sortable fields created by this field bridge.
+	 *
+	 * @param name The default field name; Should be used consistently with
+	 * {@link FieldBridge#set(String, Object, org.apache.lucene.document.Document, LuceneOptions)}.
+	 * @return The names of the sortable fields created by this field bridge. Never {@code null}.
 	 */
-	Set<String> getSortableFieldNames();
+	Set<String> getSortableFieldNames(String name);
 }
