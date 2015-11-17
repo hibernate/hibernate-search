@@ -627,7 +627,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				new IndexManager[targetedIndexes.size()]
 		);
 
-		final IndexReader compoundReader = MultiReaderFactory.openReader( sortConfigurations.build(), sort, indexManagers );
+		final IndexReader compoundReader = MultiReaderFactory.openReader(
+				sortConfigurations.build(),
+				sort,
+				indexManagers,
+				extendedIntegrator.isIndexUninvertingAllowed()
+		);
 
 		final Query filteredQuery = filterQueryByTenantId( filterQueryByClasses( luceneQuery ) );
 
