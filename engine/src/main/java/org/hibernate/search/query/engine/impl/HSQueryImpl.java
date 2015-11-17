@@ -720,6 +720,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	}
 
 	private void collectSortableFields(SortConfigurations.Builder sortConfigurations, EmbeddedTypeMetadata embeddedTypeMetadata) {
+		sortConfigurations.addSortableFields( embeddedTypeMetadata.getClassBridgeSortableFieldMetadata() );
+
 		for ( PropertyMetadata property : embeddedTypeMetadata.getAllPropertyMetadata() ) {
 			sortConfigurations.addSortableFields( property.getSortableFieldMetadata() );
 		}

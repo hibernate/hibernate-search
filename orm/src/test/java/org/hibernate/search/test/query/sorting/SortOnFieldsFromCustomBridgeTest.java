@@ -40,9 +40,16 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 
-		fullTextSession.save( new Explorer( 1, 23, "Sam", "1st", "Seaman" ) );
-		fullTextSession.save( new Explorer( 2, 22, "Sam", "2nd", "Traveller" ) );
-		fullTextSession.save( new Explorer( 3, 22, "Collin", "1st", "Conqueror" ) );
+		Territory novaScotia = new Territory( 1, "Nova Scotia" );
+		fullTextSession.save( novaScotia );
+		Territory alaska = new Territory( 2, "Alaska" );
+		fullTextSession.save( alaska );
+		Territory tierraDelFuego = new Territory( 3, "Tierra del Fuego" );
+		fullTextSession.save( tierraDelFuego );
+
+		fullTextSession.save( new Explorer( 1, 23, novaScotia, "Sam", "1st", "Seaman" ) );
+		fullTextSession.save( new Explorer( 2, 22, alaska, "Sam", "2nd", "Traveller" ) );
+		fullTextSession.save( new Explorer( 3, 22, tierraDelFuego, "Collin", "1st", "Conqueror" ) );
 
 		tx.commit();
 		fullTextSession.close();
@@ -56,6 +63,10 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 		fullTextSession.delete( new Explorer( 1 ) );
 		fullTextSession.delete( new Explorer( 2 ) );
 		fullTextSession.delete( new Explorer( 3 ) );
+
+		fullTextSession.delete( new Territory( 1 ) );
+		fullTextSession.delete( new Territory( 2 ) );
+		fullTextSession.delete( new Territory( 3 ) );
 
 		tx.commit();
 		fullTextSession.close();
@@ -100,7 +111,6 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 		fullTextSession.close();
 	}
 
-
 	@Test
 	public void testTwoSortableFieldsConfiguredThroughAnnotationAndCustomFieldLevelBridge() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -123,9 +133,26 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 		fullTextSession.close();
 	}
 
+	@Test
+	public void testSortableFieldConfiguredThroughClassLevelBridgeOnEmbeddedEntity() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		@SuppressWarnings("unchecked")
+		List<Book> result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Explorer.class )
+			.setSort( new Sort( new SortField( "territoryName", SortField.Type.STRING ) ) )
+			.list();
+
+		assertNotNull( result );
+		assertThat( result ).onProperty( "id" ).containsExactly( 2, 1, 3 );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] { Explorer.class };
+		return new Class[] { Explorer.class, Territory.class };
 	}
 
 	@Override
