@@ -309,6 +309,47 @@ Should you want to make a property sortable but not searchable, still an `@Field
 bridge configuration can be inherited). It can be marked with `store = Store.NO` and `index = Index.NO`, causing
 only the doc value field required for sorting to be added, but not a regular index field.
 
+Fields added through class-level bridges or custom field-level bridges (when not using the default field name) cannot
+be marked as sortable by means of the `@SortableField` annotation. Instead the field bridge itself has to add the
+required doc value fields, in addition to the document fields it adds. Furthermore such bridge needs to implement the
+`MetadataProvidingFieldBridge` interface which defines a method `getSortableFieldNames()` for returning the names of
+the sortable fields created by this bridge:
+
+[[example-adding-docvaluefield]]
+.Adding a sortable field via a custom field bridge
+====
+[source, JAVA]
+----
+public class MyClassBridge implements MetadataProvidingFieldBridge {
+
+    @Override
+    public void set(
+            String name, Object value, Document document, LuceneOptions luceneOptions) {
+
+        // add other document field(s)
+        // ...
+
+        // add doc value field
+        document.add( new NumericDocValuesField( "myField", 311 );
+    }
+
+    Set<String> getSortableFieldNames(String name) {
+        return Collections.singleton( "myField" );
+    }
+}
+----
+====
+
+The names returned from `getSortableFieldNames()` will be used for sort validation upon query execution. The name
+passed to the method is the default field name also passed to `set()`. It needs to be used consistently with `set()`,
+e.g. as a prefix for all custom fields added.
+
+[NOTE]
+====
+The `MetadataProvidingFieldBridge` contract is under active development and considered experimental at this time. It
+may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
+====
+
 [[id-annotation]]
 ===== @Id
 
