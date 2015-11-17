@@ -350,6 +350,26 @@ The `MetadataProvidingFieldBridge` contract is under active development and cons
 may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
 ====
 
+[[flagging-uncovered-sorts]]
+====== Flagging uncovered sorts
+By default Hibernate Search will transparently create an uninverting index reader when running a query with sorts not
+covered by the sortable fields configured as described above. While this allows to execute the query, relying on index
+uninverting negatively impacts performance.
+
+You thus can optionally advice Hibernate Search to raise an exception when detecting uncovered sorts. To do so, specify
+the following option:
+
+.Disabling automatic index uninverting for uncovered sorts
+====
+[source]
+----
+hibernate.search.index_uninverting_allowed = false
+----
+====
+
+You e.g. may set this to "false" during testing to identify the sortable fields required for your queries and set it to
+"true" in production environments to fall back to index uninverting for uncovered sorts accidentally left over.
+
 [[id-annotation]]
 ===== @Id
 
