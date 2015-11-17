@@ -110,6 +110,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final ObjectLookupMethod defaultObjectLookupMethod;
 	private final DatabaseRetrievalMethod defaultDatabaseRetrievalMethod;
 	private final boolean enlistWorkerInTransaction;
+	private final boolean indexUninvertingAllowed;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -158,6 +159,10 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.defaultDatabaseRetrievalMethod = determineDefaultDatabaseRetrievalMethod();
 		this.enlistWorkerInTransaction = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.WORKER_ENLIST_IN_TRANSACTION, false
+		);
+
+		this.indexUninvertingAllowed = ConfigurationParseHelper.getBooleanValue(
+				configurationProperties, Environment.INDEX_UNINVERTING_ALLOWED, true
 		);
 	}
 
@@ -531,6 +536,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public IndexManager getIndexManager(String indexName) {
 		return getIndexManagerHolder().getIndexManager( indexName );
+	}
+
+	@Override
+	public boolean isIndexUninvertingAllowed() {
+		return indexUninvertingAllowed;
 	}
 
 	@SuppressWarnings("unchecked")

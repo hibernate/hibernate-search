@@ -333,6 +333,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
+	public boolean isIndexUninvertingAllowed() {
+		return delegate.isIndexUninvertingAllowed();
+	}
+
+	@Override
 	public <T> T unwrap(Class<T> cls) {
 		if ( SearchIntegrator.class.equals( cls ) || ExtendedSearchIntegrator.class.equals( cls ) || MutableSearchFactory.class.equals( cls ) ) {
 			return (T) this;

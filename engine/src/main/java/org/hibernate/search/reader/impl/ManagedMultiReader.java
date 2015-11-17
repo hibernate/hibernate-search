@@ -58,7 +58,7 @@ public class ManagedMultiReader extends MultiReader {
 		this.readerProviders = readerProviders;
 	}
 
-	static ManagedMultiReader createInstance(IndexManager[] indexManagers, SortConfigurations configuredSorts, Sort sort) throws IOException {
+	static ManagedMultiReader createInstance(IndexManager[] indexManagers, SortConfigurations configuredSorts, Sort sort, boolean indexUninvertingAllowed) throws IOException {
 		final int length = indexManagers.length;
 
 		IndexReader[] subReaders = new IndexReader[length];
@@ -70,7 +70,7 @@ public class ManagedMultiReader extends MultiReader {
 			readerProviders[index] = indexReaderManager;
 		}
 
-		IndexReader[] effectiveReaders = getEffectiveReaders( indexManagers, subReaders, configuredSorts, sort );
+		IndexReader[] effectiveReaders = getEffectiveReaders( indexManagers, subReaders, configuredSorts, sort, indexUninvertingAllowed );
 		return new ManagedMultiReader( effectiveReaders, subReaders, readerProviders );
 	}
 
@@ -84,12 +84,12 @@ public class ManagedMultiReader extends MultiReader {
 	 * Otherwise the directory reader will be wrapped in a {@link UninvertingReader} configured in a way to satisfy the
 	 * requested sorts.
 	 */
-	private static IndexReader[] getEffectiveReaders(IndexManager[] indexManagers, IndexReader[] subReaders, SortConfigurations configuredSorts, Sort sort) {
+	private static IndexReader[] getEffectiveReaders(IndexManager[] indexManagers, IndexReader[] subReaders, SortConfigurations configuredSorts, Sort sort, boolean indexUninvertingAllowed) {
 		if ( sort == null || sort.getSort().length == 0 ) {
 			return subReaders;
 		}
 
-		Set<String> indexesToBeUninverted = getIndexesToBeUninverted( configuredSorts, sort );
+		Set<String> indexesToBeUninverted = getIndexesToBeUninverted( configuredSorts, sort, indexUninvertingAllowed );
 		Map<String, Type> mappings = indexesToBeUninverted.isEmpty() ? Collections.<String, Type>emptyMap() : getMappings( sort );
 		IndexReader[] effectiveReaders = new IndexReader[subReaders.length];
 
@@ -127,7 +127,7 @@ public class ManagedMultiReader extends MultiReader {
 	 * Checks for each involved entity type whether it maps all the required sortable fields; If not, it marks the index
 	 * for uninverting.
 	 */
-	private static Set<String> getIndexesToBeUninverted(SortConfigurations configuredSorts, Sort sort) {
+	private static Set<String> getIndexesToBeUninverted(SortConfigurations configuredSorts, Sort sort, boolean indexUninvertingAllowed) {
 		Set<String> indexesToBeUninverted = new HashSet<>();
 
 		for ( SortConfiguration sortConfiguration : configuredSorts ) {
@@ -139,7 +139,18 @@ public class ManagedMultiReader extends MultiReader {
 
 				if ( !uncoveredSorts.isEmpty() ) {
 					indexesToBeUninverted.add( sortConfiguration.getIndexName() );
-					log.uncoveredSortsRequested( entityType, sortConfiguration.getIndexName(), StringHelper.join( uncoveredSorts, ", " ) );
+
+					if ( indexUninvertingAllowed ) {
+						log.uncoveredSortsRequested( entityType, sortConfiguration.getIndexName(), StringHelper.join( uncoveredSorts, ", " ) );
+					}
+					else {
+						throw log.uncoveredSortsRequestedWithUninvertingNotAllowed(
+								entityType,
+								sortConfiguration.getIndexName(),
+								StringHelper.join( uncoveredSorts, ", " )
+						);
+					}
+
 					foundEntityWithMissingSorts = true;
 				}
 				else {

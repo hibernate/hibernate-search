@@ -260,6 +260,17 @@ public final class Environment {
 	 */
 	public static final String INDEX_NAME_PROP_NAME = "indexName";
 
+	/**
+	 * Option for allowing or disallowing index uninverting when sorting on fields not covered by doc value fields. If
+	 * disallowed and and uncovered sort is detected, an exception will be raised, otherwise only a warning will be
+	 * logged.
+	 * <p>
+	 * Allowed values are "true" and "false". Defaults to "true".
+	 *
+	 * @see org.hibernate.search.annotations.SortableField
+	 */
+	public static final String INDEX_UNINVERTING_ALLOWED = "hibernate.search.index_uninverting_allowed";
+
 	public static final Map<Class<? extends Service>, String> DEFAULT_SERVICES_MAP;
 	// TODO for now we hard code the default services. This could/should be made configurable (HF)
 	static

@@ -29,17 +29,17 @@ public final class MultiReaderFactory {
 	}
 
 	public static IndexReader openReader(IndexManager... indexManagers) {
-		return openReader( null, null, indexManagers );
+		return openReader( null, null, indexManagers, true );
 	}
 
-	public static IndexReader openReader(SortConfigurations configuredSorts, Sort sort, IndexManager[] indexManagers) {
+	public static IndexReader openReader(SortConfigurations configuredSorts, Sort sort, IndexManager[] indexManagers, boolean indexUninvertingAllowed) {
 		if ( indexManagers.length == 0 ) {
 			return null;
 		}
 		else {
 			//everything should be the same so wrap in an MultiReader
 			try {
-				return ManagedMultiReader.createInstance( indexManagers, configuredSorts, sort );
+				return ManagedMultiReader.createInstance( indexManagers, configuredSorts, sort, indexUninvertingAllowed );
 			}
 			catch (IOException e) {
 				throw log.ioExceptionOnMultiReaderRefresh( e );

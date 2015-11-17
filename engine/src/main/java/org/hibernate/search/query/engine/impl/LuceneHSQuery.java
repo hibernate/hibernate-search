@@ -469,7 +469,12 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializa
 				new IndexManager[targetedIndexes.size()]
 		);
 
-		final IndexReader compoundReader = MultiReaderFactory.openReader( sortConfigurations.build(), sort, indexManagers );
+		final IndexReader compoundReader = MultiReaderFactory.openReader(
+				sortConfigurations.build(),
+				sort,
+				indexManagers,
+				extendedIntegrator.isIndexUninvertingAllowed()
+		);
 
 		final Query filteredQuery = filterQueryByTenantId( filterQueryByClasses( luceneQuery ) );
 
