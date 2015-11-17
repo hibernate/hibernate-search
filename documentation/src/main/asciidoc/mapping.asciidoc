@@ -309,6 +309,29 @@ Should you want to make a property sortable but not searchable, still an `@Field
 bridge configuration can be inherited). It can be marked with `store = Store.NO` and `index = Index.NO`, causing
 only the doc value field required for sorting to be added, but not a regular index field.
 
+Fields added through class-level bridges or custom field bridges cannot be marked as sortable by means of the
+`@SortableField` annotation. If you need to sort on such fields, you therefore should add the required doc value fields
+yourself from within the bridge implementation, in addition to the document fields it adds:
+
+[[example-adding-docvaluefield]]
+.Adding a doc value field
+====
+[source, JAVA]
+----
+public class MyClassBridge implements FieldBridge {
+
+    @Override
+    public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+        // add other document fields
+        // ...
+
+        // add doc value field
+        document.add( new NumericDocValuesField( "myField", 311 );
+    }
+}
+----
+====
+
 [[id-annotation]]
 ===== @Id
 
