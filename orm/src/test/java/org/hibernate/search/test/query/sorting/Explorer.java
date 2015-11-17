@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.SortedDocValuesField;
@@ -23,6 +24,7 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
@@ -46,6 +48,10 @@ public class Explorer {
 	@ElementCollection
 	private final Map<String, String> nameParts = new HashMap<>();
 
+	@ManyToOne
+	@IndexedEmbedded
+	private Territory favoriteTerritory;
+
 	public Explorer() {
 	}
 
@@ -53,10 +59,12 @@ public class Explorer {
 		this.id = id;
 	}
 
-	public Explorer(int id, int exploredCountries, String firstName, String middleName, String lastName) {
+	public Explorer(int id, int exploredCountries, Territory favoriteTerritory, String firstName, String middleName, String lastName) {
 		this.id = id;
 
 		this.exploredCountries = exploredCountries;
+		this.favoriteTerritory = favoriteTerritory;
+
 		nameParts.put( "firstName", firstName );
 		nameParts.put( "middleName", middleName );
 		nameParts.put( "lastName", lastName );
@@ -72,6 +80,10 @@ public class Explorer {
 
 	public Map<String, String> getNameParts() {
 		return nameParts;
+	}
+
+	public Territory getFavoriteTerritory() {
+		return favoriteTerritory;
 	}
 
 	/**

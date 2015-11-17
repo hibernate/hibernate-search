@@ -562,6 +562,8 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializa
 	}
 
 	private void collectSortableFields(SortConfigurations.Builder sortConfigurations, EmbeddedTypeMetadata embeddedTypeMetadata) {
+		sortConfigurations.addSortableFields( embeddedTypeMetadata.getClassBridgeSortableFieldMetadata() );
+
 		for ( PropertyMetadata property : embeddedTypeMetadata.getAllPropertyMetadata() ) {
 			sortConfigurations.addSortableFields( property.getSortableFieldMetadata() );
 		}
