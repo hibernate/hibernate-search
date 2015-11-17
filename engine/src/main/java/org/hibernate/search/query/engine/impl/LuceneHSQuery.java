@@ -464,6 +464,10 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializa
 			this.classesAndSubclasses = extendedIntegrator.getIndexedTypes();
 		}
 
+		if ( this.sort != null ) {
+			validateSortFields( extendedIntegrator );
+		}
+
 		//set up the searcher
 		final IndexManager[] indexManagers = targetedIndexes.toArray(
 				new IndexManager[targetedIndexes.size()]
@@ -502,7 +506,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializa
 			);
 		}
 		else if ( this.sort != null ) {
-			validateSortFields( extendedIntegrator );
 			if ( projection != null ) {
 				boolean activate = false;
 				for ( String field : projection ) {

@@ -105,6 +105,7 @@ public class Book {
 			@Field(store = Store.YES),
 			@Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
 	})
+	@SortableField(forField = "summary_forSort")
 	public String getSummary() {
 		return summary;
 	}
