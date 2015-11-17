@@ -30,7 +30,6 @@ import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
@@ -204,12 +203,6 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 		return new Class<?>[] {
 				GeoEntity.class
 		};
-	}
-
-	@Override
-	public void configure(Map<String, Object> settings) {
-		// TODO HSEARCH-2044 Atm. sorting on spatial fields is only possible w/ index uninverting
-		settings.put( Environment.INDEX_UNINVERTING_ALLOWED, "true" );
 	}
 
 	@Entity

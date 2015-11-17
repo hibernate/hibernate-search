@@ -11,16 +11,18 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.apache.lucene.document.Document;
+import java.util.Collections;
+import java.util.Set;
 
-import org.hibernate.search.bridge.FieldBridge;
+import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static java.util.Locale.ENGLISH;
 
-public abstract class SpatialFieldBridge implements FieldBridge {
+public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -43,6 +45,11 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 				throw LOG.cannotExtractCoordinateFromObject( value.getClass().getName() );
 			}
 		}
+	}
+
+	@Override
+	public Set<String> getSortableFieldNames(String name) {
+		return Collections.singleton( name );
 	}
 
 	private Double getCoordinateFromField(String coordinateField, Object value) {

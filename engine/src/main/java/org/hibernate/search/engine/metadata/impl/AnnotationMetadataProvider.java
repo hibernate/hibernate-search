@@ -691,6 +691,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		typeMetadataBuilder.addClassBridgeField( fieldMetadata );
 
+		if ( spatialBridge instanceof MetadataProvidingFieldBridge ) {
+			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) spatialBridge;
+			typeMetadataBuilder.addClassBridgeSortableFields( metadataProvidingFieldBridge.getSortableFieldNames( fieldName ) );
+		}
+
 		Analyzer analyzer = typeMetadataBuilder.getAnalyzer();
 		if ( analyzer == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
