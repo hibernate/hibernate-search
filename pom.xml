@@ -26,6 +26,7 @@
         <module>serialization/avro</module>
         <module>backends/jgroups</module>
         <module>backends/jms</module>
+        <module>elasticsearch</module>
         <module>orm</module>
         <module>testing</module>
         <module>infinispan</module>

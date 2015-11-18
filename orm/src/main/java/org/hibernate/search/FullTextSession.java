@@ -9,6 +9,7 @@ package org.hibernate.search;
 import java.io.Serializable;
 
 import org.hibernate.Session;
+import org.hibernate.search.query.engine.spi.QueryDescriptor;
 
 /**
  * Extends the Hibernate {@link Session} with fulltext search and indexing capabilities.
@@ -30,6 +31,11 @@ public interface FullTextSession extends Session {
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
 	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
+
+	/**
+	 * Creates a fulltext query from the given query descriptor.
+	 */
+	FullTextQuery createFullTextQuery(QueryDescriptor descriptor, Class<?>... entities);
 
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
