@@ -21,6 +21,7 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -31,8 +32,6 @@ import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 import com.google.gson.JsonObject;
-
-import static org.hibernate.search.backend.elasticsearch.client.impl.RequestHelper.executeRequest;
 
 /**
  * An {@link IndexManager} applying indexing work to an ElasticSearch server.
@@ -47,6 +46,8 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 	ExtendedSearchIntegrator searchIntegrator;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
+
+	private JestClientReference clientReference;
 
 	// Lifecycle
 
@@ -64,11 +65,14 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 	@Override
 	public void destroy() {
+		clientReference.close();
 	}
 
 	@Override
 	public void setSearchFactory(ExtendedSearchIntegrator boundSearchIntegrator) {
 		this.searchIntegrator = boundSearchIntegrator;
+		this.clientReference = new JestClientReference( searchIntegrator.getServiceManager() );
+
 		createIndexIfNotYetExisting();
 		createIndexMappings();
 	}
@@ -79,11 +83,11 @@ public class ElasticSearchIndexManager implements IndexManager {
 	}
 
 	private void createIndexIfNotYetExisting() {
-		if ( Boolean.TRUE.equals( executeRequest( new IndicesExists.Builder( actualIndexName ).build(), false ).getValue( "found" ) ) ) {
+		if ( Boolean.TRUE.equals( clientReference.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), false ).getValue( "found" ) ) ) {
 			return;
 		}
 
-		executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
+		clientReference.executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
 	}
 
 	private void createIndexMappings() {
@@ -118,7 +122,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 			.build();
 
 			try {
-				executeRequest( putMapping );
+				clientReference.executeRequest( putMapping );
 			}
 			catch (Exception e) {
 				throw new SearchException( "Could not create mapping for entity type " + entityType.getName(), e );
@@ -198,7 +202,6 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 		return parentProperties;
 	}
-
 
 	// Getters
 

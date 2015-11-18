@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
@@ -39,7 +37,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClientHolder;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -187,24 +185,6 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		return id;
 	}
 
-	private <T extends JestResult > T executeRequest(Action<T> request) {
-		T result;
-		try {
-			result = JestClientHolder.getClient().execute( request );
-
-			System.out.println( result.getJsonString() );
-
-			if ( !result.isSucceeded() ) {
-				throw new SearchException( result.getErrorMessage() );
-			}
-
-			return result;
-		}
-		catch (IOException e) {
-			throw new SearchException( e );
-		}
-	}
-
 	/**
 	 * Determines the affected indexes and runs the given query against them.
 	 */
@@ -255,7 +235,9 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		SearchResult runSearch() {
-			return executeRequest( search );
+			try ( JestClientReference clientReference = new JestClientReference( extendedIntegrator.getServiceManager() ) ) {
+				return clientReference.executeRequest( search );
+			}
 		}
 
 		EntityInfo convertQueryHit(JsonObject hit) {
