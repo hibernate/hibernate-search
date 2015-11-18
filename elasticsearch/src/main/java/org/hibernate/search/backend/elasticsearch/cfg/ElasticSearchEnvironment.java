@@ -13,7 +13,7 @@ package org.hibernate.search.backend.elasticsearch.cfg;
  */
 public final class ElasticSearchEnvironment {
 
-	public static final String SERVER_URI = "org.hibernate.search.elasticsearch.host";
+	public static final String SERVER_URI = "hibernate.search.elasticsearch.host";
 
 	private ElasticSearchEnvironment() {
 	}

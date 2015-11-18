@@ -15,7 +15,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticSearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.cfg.Environment;
@@ -32,9 +31,7 @@ import org.junit.Test;
  * @author Lukasz Moren
  * @author Sanne Grinovero
  */
-public class JGroupsElasticSearchTest extends MultipleSessionsSearchTestCase {
-
-	private static final String SERVER_URI = "http://192.168.59.103:9200";
+public class JGroupsElasticSearchIT extends MultipleSessionsSearchTestCase {
 
 	public static final String TESTING_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
 	public static final long NETWORK_WAIT_MILLISECONDS = 100;
@@ -171,7 +168,6 @@ public class JGroupsElasticSearchTest extends MultipleSessionsSearchTestCase {
 	 */
 	protected void applyCommonJGroupsChannelConfiguration(Map<String,Object> cfg) {
 		cfg.put( "hibernate.search.default.indexmanager", ElasticSearchIndexManager.class.getName() );
-		cfg.put( ElasticSearchEnvironment.SERVER_URI, SERVER_URI );
 		cfg.put( "hibernate.search.default." + DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
 		cfg.put( DispatchMessageSender.CONFIGURATION_FILE, TESTING_JGROUPS_CONFIGURATION_FILE );
 	}

@@ -9,7 +9,6 @@ package org.hibernate.search.test.backend.elasticsearch;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.hibernate.Session;
@@ -18,8 +17,6 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticSearchEnvironment;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testutil.backend.elasticsearch.JsonHelper;
@@ -32,9 +29,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Gunnar Morling
  */
-public class ElasticSearchNullValueTest extends SearchTestBase {
-
-	private static final String SERVER_URI = "http://192.168.59.103:9200";
+public class ElasticSearchNullValueIT extends SearchTestBase {
 
 	@Before
 	public void setupTestData() {
@@ -181,11 +176,5 @@ public class ElasticSearchNullValueTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[]{ GolfPlayer.class };
-	}
-
-	@Override
-	public void configure(Map<String, Object> settings) {
-		settings.put( "hibernate.search.default.indexmanager", ElasticSearchIndexManager.class.getName() );
-		settings.put( ElasticSearchEnvironment.SERVER_URI, SERVER_URI );
 	}
 }
