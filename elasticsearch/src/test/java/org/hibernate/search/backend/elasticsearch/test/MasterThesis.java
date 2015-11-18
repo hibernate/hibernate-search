@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.backend.elasticsearch;
+package org.hibernate.search.backend.elasticsearch.test;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,7 +19,7 @@ import org.hibernate.search.annotations.Indexed;
  */
 @Entity
 @Indexed(index = "studentwork")
-public class BachelorThesis {
+public class MasterThesis {
 
 	@Id
 	@GeneratedValue
@@ -32,10 +32,10 @@ public class BachelorThesis {
 	@Field
 	private String text;
 
-	BachelorThesis() {
+	MasterThesis() {
 	}
 
-	public BachelorThesis(String title, String text) {
+	public MasterThesis(String title, String text) {
 		this.text = text;
 		this.title = title;
 	}
