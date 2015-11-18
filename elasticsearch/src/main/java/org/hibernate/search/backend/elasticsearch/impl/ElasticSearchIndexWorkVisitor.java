@@ -27,6 +27,7 @@ import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -36,8 +37,6 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 
 import com.google.gson.JsonObject;
-
-import static org.hibernate.search.backend.elasticsearch.client.impl.RequestHelper.executeRequest;
 
 /**
  * @author Gunnar Morling
@@ -70,7 +69,9 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			.setParameter( Parameters.REFRESH, true )
 			.build();
 
-		executeRequest( delete );
+		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
+			clientReference.executeRequest( delete );
+		}
 
 		return null;
 	}
@@ -102,7 +103,6 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
-
 	private void indexDocument(String id, Document document, Class<?> entityType) {
 		JsonObject source = convertToJson( document, entityType );
 		String type = entityType.getName();
@@ -115,7 +115,9 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			.setParameter( Parameters.REFRESH, true )
 			.build();
 
-		executeRequest( index );
+		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
+			clientReference.executeRequest( index );
+		}
 	}
 
 	private JsonObject convertToJson(Document document, Class<?> entityType) {
