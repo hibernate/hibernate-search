@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.genericjpa.test.jpa.mysql;
+package org.hibernate.search.genericjpa.test.jpa.hsqldb;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.genericjpa.Constants;
 import org.hibernate.search.genericjpa.Setup;
 import org.hibernate.search.genericjpa.db.events.UpdateConsumer;
-import org.hibernate.search.genericjpa.db.events.triggers.MySQLTriggerSQLStringSource;
+import org.hibernate.search.genericjpa.db.events.triggers.HSQLDBTriggerSQLStringSource;
 import org.hibernate.search.genericjpa.impl.JPASearchFactoryAdapter;
 import org.hibernate.search.genericjpa.test.jpa.AutomaticUpdatesIntegrationTest;
 import org.hibernate.search.genericjpa.test.jpa.entities.ID;
@@ -33,16 +33,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by Martin on 27.07.2015.
+ * Created by Martin on 28.07.2015.
  */
-public class MySQLNativeEclipseLinkAutomaticUpdatesIntegrationTest extends AutomaticUpdatesIntegrationTest {
+public class HSQLDBNativeHibernateAutomaticUpdatesIntegrationTest extends AutomaticUpdatesIntegrationTest {
 
 	@Before
 	public void setup() {
-		this.setup( "eclipselink", "EclipseLink_MySQL", MySQLTriggerSQLStringSource.class );
+		this.setup( "hibernate", "Hibernate_HSQLDB", HSQLDBTriggerSQLStringSource.class );
 	}
 
 	//TODO: test this for object hierarchies
+
 	@Test
 	public void testNativeEvents() {
 		if ( "sql".equals( this.searchFactoryType ) ) {
@@ -285,7 +286,6 @@ public class MySQLNativeEclipseLinkAutomaticUpdatesIntegrationTest extends Autom
 						).getResultSize()
 				);
 			}
-
 			assertTrue( receivedEvent[0] );
 		}
 		finally {

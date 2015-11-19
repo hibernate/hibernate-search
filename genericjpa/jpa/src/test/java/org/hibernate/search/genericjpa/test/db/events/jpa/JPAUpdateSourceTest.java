@@ -46,7 +46,7 @@ public class JPAUpdateSourceTest {
 		EventModelParser parser = new AnnotationEventModelParser();
 		JPAUpdateSource updateSource = new JPAUpdateSource(
 				parser.parse( new HashSet<>( Arrays.asList( Place.class, Sorcerer.class ) ) ),
-				new JPAEntityManagerFactoryWrapper( emf, null ), 1, TimeUnit.SECONDS, 2, 2, "`"
+				new JPAEntityManagerFactoryWrapper( emf, null ), 1, TimeUnit.SECONDS, 2, 2, "\""
 		);
 		return JPAUpdateSource.query( updateSource, new JPAEntityManagerWrapper( em, null ) );
 	}
