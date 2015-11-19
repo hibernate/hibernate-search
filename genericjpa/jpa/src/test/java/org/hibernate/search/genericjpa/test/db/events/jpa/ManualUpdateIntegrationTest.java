@@ -26,7 +26,7 @@ import org.hibernate.search.genericjpa.db.events.impl.EventModelInfo;
 import org.hibernate.search.genericjpa.db.events.impl.EventModelParser;
 import org.hibernate.search.genericjpa.db.events.index.impl.IndexUpdater;
 import org.hibernate.search.genericjpa.db.events.jpa.impl.JPAUpdateSource;
-import org.hibernate.search.genericjpa.db.events.triggers.MySQLTriggerSQLStringSource;
+import org.hibernate.search.genericjpa.db.events.triggers.HSQLDBTriggerSQLStringSource;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
 import org.hibernate.search.genericjpa.entity.impl.JPAReusableEntityProvider;
 import org.hibernate.search.genericjpa.factory.StandaloneSearchConfiguration;
@@ -67,14 +67,14 @@ public class ManualUpdateIntegrationTest extends DatabaseIntegrationTest {
 			rehashedTypeMetadataPerIndexRoot.put( indexRootType, rehashed );
 		}
 		this.containedInIndexOf = MetadataUtil.calculateInIndexOf( rehashedTypeMetadatas );
-		this.setup( "EclipseLink_MySQL", new MySQLTriggerSQLStringSource() );
+		this.setup( "EclipseLink_HSQLDB", new HSQLDBTriggerSQLStringSource() );
 		this.metaModelParser = new MetaModelParser();
 		this.metaModelParser.parse( this.emf.getMetamodel() );
 	}
 
 	@Test
 	public void test() throws SQLException, InterruptedException {
-		this.setupTriggers( new MySQLTriggerSQLStringSource() );
+		this.setupTriggers( new HSQLDBTriggerSQLStringSource() );
 		try {
 			if ( this.exceptionString != null ) {
 				fail( exceptionString );
@@ -115,7 +115,7 @@ public class ManualUpdateIntegrationTest extends DatabaseIntegrationTest {
 						new JPAEntityManagerFactoryWrapper( this.emf, null ),
 						100,
 						TimeUnit.MILLISECONDS,
-						10, new MySQLTriggerSQLStringSource().getDelimitedIdentifierToken()
+						10, new HSQLDBTriggerSQLStringSource().getDelimitedIdentifierToken()
 				);
 				updateSource.setUpdateConsumers( Arrays.asList( indexUpdater::updateEvent ) );
 				updateSource.start();

@@ -47,6 +47,8 @@
 		<module>genericjpa/async-updates</module>
         <module>genericjpa/jpa</module>
         <module>genericjpa/ejb</module>
+        <module>genericjpa/integrationtest/mysql</module>
+        <module>genericjpa/integrationtest/postgres</module>
         <module>genericjpa/integrationtest/glassfish</module>
 
         <module>orm-async</module>

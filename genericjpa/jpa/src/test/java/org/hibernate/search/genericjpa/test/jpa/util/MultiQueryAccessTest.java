@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.hibernate.search.genericjpa.db.EventType;
-import org.hibernate.search.genericjpa.db.events.triggers.MySQLTriggerSQLStringSource;
+import org.hibernate.search.genericjpa.db.events.triggers.HSQLDBTriggerSQLStringSource;
 import org.hibernate.search.genericjpa.jpa.util.impl.MultiQueryAccess;
 import org.hibernate.search.genericjpa.test.db.events.jpa.DatabaseIntegrationTest;
 import org.hibernate.search.genericjpa.test.db.events.jpa.JPAUpdateSourceTest;
@@ -36,8 +36,8 @@ public class MultiQueryAccessTest extends DatabaseIntegrationTest {
 
 	@Before
 	public void setup() throws NoSuchFieldException, SQLException {
-		this.setup( "EclipseLink_MySQL", new MySQLTriggerSQLStringSource() );
-		this.setupTriggers( new MySQLTriggerSQLStringSource() );
+		this.setup( "EclipseLink_HSQLDB", new HSQLDBTriggerSQLStringSource() );
+		this.setupTriggers( new HSQLDBTriggerSQLStringSource() );
 
 		EntityManager em = null;
 		try {
@@ -66,7 +66,7 @@ public class MultiQueryAccessTest extends DatabaseIntegrationTest {
 				em.createNativeQuery(
 						String.format(
 								(Locale) null,
-								"INSERT INTO PlaceSorcererUpdatesHsearch(updateid, eventCase, placefk, sorcererfk) VALUES (1, %s, 123123, 123)",
+								"INSERT INTO \"PlaceSorcererUpdatesHsearch\"(\"updateid\", \"eventCase\", \"placefk\", \"sorcererfk\") VALUES (1, %s, 123123, 123)",
 								String.valueOf( EventType.INSERT )
 						)
 				).executeUpdate();
@@ -77,7 +77,7 @@ public class MultiQueryAccessTest extends DatabaseIntegrationTest {
 				em.createNativeQuery(
 						String.format(
 								(Locale) null,
-								"INSERT INTO PlaceSorcererUpdatesHsearch(updateid, eventCase, placefk, sorcererfk) VALUES (5, %s, 123123, 123)",
+								"INSERT INTO \"PlaceSorcererUpdatesHsearch\"(\"updateid\", \"eventCase\", \"placefk\", \"sorcererfk\") VALUES (5, %s, 123123, 123)",
 								String.valueOf( EventType.INSERT )
 						)
 				).executeUpdate();
@@ -88,7 +88,7 @@ public class MultiQueryAccessTest extends DatabaseIntegrationTest {
 				em.createNativeQuery(
 						String.format(
 								(Locale) null,
-								"INSERT INTO PlaceSorcererUpdatesHsearch(updateid, eventCase, placefk, sorcererfk) VALUES (4, %s, 123123, 123)",
+								"INSERT INTO \"PlaceSorcererUpdatesHsearch\"(\"updateid\", \"eventCase\", \"placefk\", \"sorcererfk\")VALUES (4, %s, 123123, 123)",
 								String.valueOf( EventType.UPDATE )
 						)
 				).executeUpdate();
@@ -99,7 +99,7 @@ public class MultiQueryAccessTest extends DatabaseIntegrationTest {
 				em.createNativeQuery(
 						String.format(
 								(Locale) null,
-								"INSERT INTO PlaceUpdatesHsearch(updateid, eventCase, placefk) VALUES (3, %s, 233)",
+								"INSERT INTO \"PlaceUpdatesHsearch\"(\"updateid\", \"eventCase\", \"placefk\") VALUES (3, %s, 233)",
 								String.valueOf( EventType.UPDATE )
 						)
 				).executeUpdate();
@@ -110,7 +110,7 @@ public class MultiQueryAccessTest extends DatabaseIntegrationTest {
 				em.createNativeQuery(
 						String.format(
 								(Locale) null,
-								"INSERT INTO PlaceUpdatesHsearch(updateid, eventCase, placefk) VALUES (2, %s, 233)",
+								"INSERT INTO \"PlaceUpdatesHsearch\"(\"updateid\", \"eventCase\", \"placefk\") VALUES (2, %s, 233)",
 								String.valueOf( EventType.DELETE )
 						)
 				).executeUpdate();

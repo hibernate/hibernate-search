@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.genericjpa.db.events.triggers.MySQLTriggerSQLStringSource;
+import org.hibernate.search.genericjpa.db.events.triggers.HSQLDBTriggerSQLStringSource;
 import org.hibernate.search.genericjpa.entity.impl.BasicEntityProvider;
 import org.hibernate.search.genericjpa.test.db.events.jpa.DatabaseIntegrationTest;
 import org.hibernate.search.genericjpa.test.db.events.jpa.MetaModelParser;
@@ -33,7 +33,7 @@ public class EntityManagerEntityProviderTest extends DatabaseIntegrationTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void test() throws SQLException, IOException {
-		this.setup( "EclipseLink_MySQL", new MySQLTriggerSQLStringSource() );
+		this.setup( "EclipseLink_HSQLDB", new HSQLDBTriggerSQLStringSource() );
 		EntityManager em = this.emf.createEntityManager();
 		MetaModelParser metaModelParser = new MetaModelParser();
 		metaModelParser.parse( this.emf.getMetamodel() );

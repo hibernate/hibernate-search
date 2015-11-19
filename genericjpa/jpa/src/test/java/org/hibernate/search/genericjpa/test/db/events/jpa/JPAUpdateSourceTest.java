@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.genericjpa.db.EventType;
 import org.hibernate.search.genericjpa.db.events.UpdateConsumer;
 import org.hibernate.search.genericjpa.db.events.impl.AnnotationEventModelParser;
 import org.hibernate.search.genericjpa.db.events.impl.EventModelInfo;
 import org.hibernate.search.genericjpa.db.events.impl.EventModelParser;
-import org.hibernate.search.genericjpa.db.EventType;
 import org.hibernate.search.genericjpa.db.events.jpa.impl.JPAUpdateSource;
-import org.hibernate.search.genericjpa.db.events.triggers.MySQLTriggerSQLStringSource;
-import org.hibernate.search.genericjpa.jpa.util.impl.MultiQueryAccess;
+import org.hibernate.search.genericjpa.db.events.triggers.HSQLDBTriggerSQLStringSource;
 import org.hibernate.search.genericjpa.jpa.util.impl.JPAEntityManagerFactoryWrapper;
 import org.hibernate.search.genericjpa.jpa.util.impl.JPAEntityManagerWrapper;
+import org.hibernate.search.genericjpa.jpa.util.impl.MultiQueryAccess;
 import org.hibernate.search.genericjpa.test.jpa.entities.Place;
 import org.hibernate.search.genericjpa.test.jpa.entities.Sorcerer;
 import org.hibernate.search.genericjpa.util.Sleep;
@@ -53,10 +53,10 @@ public class JPAUpdateSourceTest {
 
 	@Test
 	public void test() throws InterruptedException {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory( "EclipseLink_MySQL" );
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory( "EclipseLink_HSQLDB" );
 		try {
 			EventModelParser parser = new AnnotationEventModelParser();
-			MySQLTriggerSQLStringSource triggerSource = new MySQLTriggerSQLStringSource();
+			HSQLDBTriggerSQLStringSource triggerSource = new HSQLDBTriggerSQLStringSource();
 			{
 				EntityManager em = null;
 				JPAUpdateSource updateSource;
@@ -98,7 +98,7 @@ public class JPAUpdateSourceTest {
 					em.createNativeQuery(
 							String.format(
 									(Locale) null,
-									"DELETE FROM PlaceSorcererUpdatesHsearch",
+									"DELETE FROM \"PlaceSorcererUpdatesHsearch\"",
 									String.valueOf( EventType.INSERT )
 							)
 					).executeUpdate();
@@ -108,7 +108,7 @@ public class JPAUpdateSourceTest {
 					em.createNativeQuery(
 							String.format(
 									(Locale) null,
-									"INSERT INTO PlaceSorcererUpdatesHsearch(updateid, eventCase, placefk, sorcererfk) VALUES (1, %s, 2, 3)",
+									"INSERT INTO \"PlaceSorcererUpdatesHsearch\"(\"updateid\", \"eventCase\", \"placefk\", \"sorcererfk\") VALUES (1, %s, 2, 3)",
 									String.valueOf( EventType.INSERT )
 							)
 					).executeUpdate();
@@ -165,7 +165,7 @@ public class JPAUpdateSourceTest {
 				assertEquals(
 						"AsyncUpdateSource should delete all things after it has processed the updates but didn't do so",
 						0,
-						em.createNativeQuery( "SELECT * FROM PlaceSorcererUpdatesHsearch" ).getResultList().size()
+						em.createNativeQuery( "SELECT * FROM \"PlaceSorcererUpdatesHsearch\"" ).getResultList().size()
 				);
 				tx.commit();
 			}

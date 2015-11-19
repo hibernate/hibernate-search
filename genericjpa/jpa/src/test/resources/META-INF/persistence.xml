@@ -64,7 +64,7 @@
         </properties>
     </persistence-unit>
 
-    <persistence-unit name="EclipseLink_PostgreSQL"
+    <persistence-unit name="EclipseLink_PostgresSQL"
                       transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>org.hibernate.search.genericjpa.test.jpa.entities.Sorcerer</class>

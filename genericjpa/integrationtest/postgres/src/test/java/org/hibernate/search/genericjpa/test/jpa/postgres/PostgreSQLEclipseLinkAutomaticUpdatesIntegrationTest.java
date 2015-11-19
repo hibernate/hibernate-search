@@ -4,21 +4,25 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.genericjpa.test.jpa.postgresql;
+package org.hibernate.search.genericjpa.test.jpa.postgres;
 
 import org.hibernate.search.genericjpa.db.events.triggers.PostgreSQLTriggerSQLStringSource;
-import org.hibernate.search.genericjpa.test.jpa.ManualUpdatesIntegrationTest;
+import org.hibernate.search.genericjpa.test.jpa.AutomaticUpdatesIntegrationTest;
 
 import org.junit.Before;
 
 /**
- * Created by Martin on 02.07.2015.
+ * Created by Martin on 22.07.2015.
  */
-public class PostgreSQLEclipseLinkManualIntegrationTest extends ManualUpdatesIntegrationTest {
+public class PostgreSQLEclipseLinkAutomaticUpdatesIntegrationTest extends AutomaticUpdatesIntegrationTest {
 
 	@Before
 	public void setup() {
-		this.setup( "EclipseLink_PostgreSQL", PostgreSQLTriggerSQLStringSource.class );
+		this.setup(
+				"sql",
+				"EclipseLink_PostgresSQL",
+				PostgreSQLTriggerSQLStringSource.class
+		);
 	}
 
 }

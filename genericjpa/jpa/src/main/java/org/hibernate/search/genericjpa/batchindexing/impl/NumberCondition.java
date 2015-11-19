@@ -79,7 +79,7 @@ public class NumberCondition {
 	public void check() throws InterruptedException {
 		this.lock.lock();
 		try {
-			while ( (!this.initialSetupDone || this.count > this.lockCount) && !this.disable && !Thread.currentThread()
+			while ( !this.initialSetupDone || (this.count > this.lockCount) && !this.disable && !Thread.currentThread()
 					.isInterrupted() ) {
 				this.condition.await();
 			}

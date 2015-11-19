@@ -11,7 +11,7 @@ import org.hibernate.search.genericjpa.Constants;
 import org.hibernate.search.genericjpa.Setup;
 import org.hibernate.search.genericjpa.batchindexing.MassIndexer;
 import org.hibernate.search.genericjpa.batchindexing.impl.MassIndexerImpl;
-import org.hibernate.search.genericjpa.db.events.triggers.MySQLTriggerSQLStringSource;
+import org.hibernate.search.genericjpa.db.events.triggers.HSQLDBTriggerSQLStringSource;
 import org.hibernate.search.genericjpa.impl.JPASearchFactoryAdapter;
 import org.hibernate.search.genericjpa.test.jpa.entities.Place;
 
@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class MassIndexerTestWithoutEntities {
 
-	private EntityManagerFactory emf;
+	/*private EntityManagerFactory emf;
 	private EntityManager em;
 	private JPASearchFactoryAdapter searchFactory;
 	private MassIndexer massIndexer;
@@ -33,10 +33,10 @@ public class MassIndexerTestWithoutEntities {
 
 	@Before
 	public void setup() {
-		this.emf = Persistence.createEntityManagerFactory( "EclipseLink_MySQL" );
+		this.emf = Persistence.createEntityManagerFactory( "EclipseLink_HSQLDB" );
 		Properties properties = new Properties();
 		properties.setProperty( Constants.SEARCH_FACTORY_NAME_KEY, "testCustomUpdatedEntity" );
-		properties.setProperty( Constants.TRIGGER_SOURCE_KEY, MySQLTriggerSQLStringSource.class.getName() );
+		properties.setProperty( Constants.TRIGGER_SOURCE_KEY, HSQLDBTriggerSQLStringSource.class.getName() );
 		properties.setProperty( Constants.SEARCH_FACTORY_TYPE_KEY, "manual-updates" );
 		properties.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		properties.setProperty( "hibernate.search.default.indexBase", "target/indexes" );
@@ -96,6 +96,6 @@ public class MassIndexerTestWithoutEntities {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 
 }

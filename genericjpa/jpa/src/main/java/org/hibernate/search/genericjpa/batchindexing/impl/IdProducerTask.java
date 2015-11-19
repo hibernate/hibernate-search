@@ -133,6 +133,10 @@ public class IdProducerTask implements Runnable {
 			if ( this.finishConsumer != null ) {
 				this.finishConsumer.run();
 			}
+			if(this.numberCondition != null) {
+				//make sure this is definitely called
+				this.numberCondition.initialSetup();
+			}
 		}
 	}
 

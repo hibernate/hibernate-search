@@ -375,8 +375,11 @@ public class MassIndexerImpl implements MassIndexer {
 
 					//we also have to finish up
 					MassIndexerImpl.this.closeExecutorServices();
+					MassIndexerImpl.this.waitForShutdownExecutors();
+
 					MassIndexerImpl.this.closeAllOpenEntityManagers();
 					MassIndexerImpl.this.cleanUpLatch.countDown();
+					LOGGER.info( "MassIndexer cleaning thread shutting down" );
 				}
 			}
 
@@ -388,17 +391,22 @@ public class MassIndexerImpl implements MassIndexer {
 
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
+				LOGGER.info( "cancelling MassIndexer" );
 				boolean ret = false;
 
 				ret |= MassIndexerImpl.this.cancelIdProducers( mayInterruptIfRunning );
+				LOGGER.info( "cancelled id producers" );
 
 				MassIndexerImpl.this.setCancelled();
-
-				// FIXME: wait for all the running threads to finish up.
-				// add this logic here, but don't add it in the onException method
-				// or this will result in a deadlock
+				LOGGER.info( "set cancelled" );
 
 				MassIndexerImpl.this.disableFinishConditions();
+
+				LOGGER.info( "disabled finish conditions" );
+
+				MassIndexerImpl.this.waitForShutdownExecutors();
+
+				LOGGER.info( "finished waiting for pending threads to finish" );
 
 				// but we have to wait for the cleanup thread to finish up
 				try {
@@ -407,8 +415,8 @@ public class MassIndexerImpl implements MassIndexer {
 				catch (InterruptedException e) {
 					throw new SearchException( "couldn't wait for optimizeOnFinish", e );
 				}
+				LOGGER.info( "successfully cancelled MassIndexer" );
 				return ret;
-
 			}
 
 			@Override
@@ -518,7 +526,8 @@ public class MassIndexerImpl implements MassIndexer {
 				this.entityProviders.add( emProvider );
 			}
 			return emProvider;
-		} else {
+		}
+		else {
 			return this.userSpecifiedEntityProvider;
 		}
 	}
@@ -578,6 +587,16 @@ public class MassIndexerImpl implements MassIndexer {
 	private void closeExecutorServices() {
 		this.executorServiceForIds.shutdown();
 		this.executorServiceForObjects.shutdown();
+	}
+
+	private void waitForShutdownExecutors() {
+		try {
+			this.executorServiceForIds.awaitTermination( Long.MAX_VALUE, TimeUnit.DAYS );
+			this.executorServiceForObjects.awaitTermination( Long.MAX_VALUE, TimeUnit.DAYS );
+		}
+		catch (InterruptedException e) {
+			LOGGER.log( Level.WARNING, "interrupted while awaiting termination of ExecutorServices" );
+		}
 	}
 
 	private void closeAllOpenEntityManagers() {

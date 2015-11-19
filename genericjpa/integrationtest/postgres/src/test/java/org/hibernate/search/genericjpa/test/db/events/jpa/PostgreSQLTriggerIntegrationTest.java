@@ -20,7 +20,7 @@ public class PostgreSQLTriggerIntegrationTest extends DatabaseIntegrationTest {
 
 	@Before
 	public void setup() throws SQLException {
-		this.setup( "EclipseLink_PostgreSQL", new PostgreSQLTriggerSQLStringSource() );
+		this.setup( "EclipseLink_PostgresSQL", new PostgreSQLTriggerSQLStringSource() );
 		this.setupTriggers( new PostgreSQLTriggerSQLStringSource() );
 	}
 
