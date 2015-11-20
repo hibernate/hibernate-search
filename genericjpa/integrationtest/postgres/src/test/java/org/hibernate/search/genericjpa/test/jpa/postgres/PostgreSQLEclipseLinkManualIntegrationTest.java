@@ -18,7 +18,7 @@ public class PostgreSQLEclipseLinkManualIntegrationTest extends ManualUpdatesInt
 
 	@Before
 	public void setup() {
-		this.setup( "EclipseLink_PostgresSQL", PostgreSQLTriggerSQLStringSource.class );
+		this.setup( "EclipseLink_PostgreSQL", PostgreSQLTriggerSQLStringSource.class );
 	}
 
 }
