@@ -7,6 +7,7 @@
 package org.hibernate.search.test.bridge;
 
 import java.util.Date;
+
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -36,7 +37,8 @@ public class ArrayBridgeTestEntity {
 	static final String NULL_TOKEN = "NULL_MARKER";
 	static final String NULL_NUMERIC_TOKEN = "-1";
 	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
-	static final String NULL_EMBEDDED_NUMERIC = "-1	";
+
+	static final String NULL_EMBEDDED_NUMERIC = "-1";
 
 	private Long id;
 	private String name;
