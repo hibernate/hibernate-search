@@ -23,7 +23,6 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
-import org.hibernate.search.backend.elasticsearch.testutil.JsonHelper;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.embedded.Address;
@@ -337,41 +336,6 @@ public class ElasticSearchIT extends SearchTestBase {
 		List<?> result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Very important research on Hibernate", "Some research" );
-		tx.commit();
-		s.close();
-	}
-
-	@Test
-	public void testMapping() throws Exception {
-		Session s = openSession();
-		FullTextSession session = Search.getFullTextSession( s );
-		Transaction tx = s.beginTransaction();
-
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'active' : true } } }" );
-		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.SOURCE )
-				.list();
-
-		String source = (String) ( (Object[]) result.iterator().next() )[0];
-
-		JsonHelper.assertJsonEquals(
-				"{" +
-					"\"active\": true," +
-					"\"dateOfBirth\": \"1958-04-07T00:00:00Z\"," +
-					"\"driveWidth\": 285," +
-					"\"firstName\": \"Klaus\"," +
-					"\"handicap\": 3.4," +
-					"\"lastName\": \"Hergesheimer\"," +
-					"\"ranking\": {" +
-						"\"value\": \"311\"" +
-					"}," +
-					"\"fullName\": \"Klaus Hergesheimer\"," +
-					"\"age\": 34," +
-					"\"puttingStrength\": \"2.5\"" +
-				"}",
-				source
-		);
-
 		tx.commit();
 		s.close();
 	}
