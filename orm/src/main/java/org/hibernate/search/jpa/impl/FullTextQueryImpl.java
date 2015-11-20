@@ -51,12 +51,13 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.jpa.TwoWayTransformerAdapter;
 import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.jpa.ResultTransformer;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.transform.ResultTransformer;
 
 /**
  * Implements JPA 2 query interface and delegate the call to
@@ -143,7 +144,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 
 	@Override
 	public FullTextQuery setResultTransformer(ResultTransformer transformer) {
-		query.setResultTransformer( transformer );
+		query.setResultTransformer( new TwoWayTransformerAdapter( transformer ) );
 		return this;
 	}
 

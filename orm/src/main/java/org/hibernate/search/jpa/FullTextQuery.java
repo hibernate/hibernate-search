@@ -20,7 +20,6 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.transform.ResultTransformer;
 
 /**
  * The base interface for lucene powered searches.
