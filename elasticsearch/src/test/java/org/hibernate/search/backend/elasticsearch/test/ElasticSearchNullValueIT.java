@@ -16,8 +16,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
-import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
-import org.hibernate.search.backend.elasticsearch.testutil.JsonHelper;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
@@ -78,41 +76,7 @@ public class ElasticSearchNullValueIT extends SearchTestBase {
 		s.close();
 	}
 
-	@Test
-	public void testNullTokenMapping() {
-		Session s = openSession();
-		FullTextSession session = Search.getFullTextSession( s );
-		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "lastName:Kidd" );
-		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.SOURCE )
-				.list();
-
-		String source = (String) ( (Object[]) result.iterator().next() )[0];
-
-		JsonHelper.assertJsonEquals(
-				"{" +
-					"\"active\": null," +
-					"\"dateOfBirth\": null," +
-					"\"driveWidth\": null," +
-					"\"firstName\": null," +
-					"\"handicap\": 0.0," + // not nullable
-					"\"puttingStrength\": \"0.0\"," + // not nullable
-					"\"lastName\": \"Kidd\"," +
-					"\"fullName\": \"Kidd\"" +
-					// ranking.value is null but indexNullAs() has not been given, so it's
-					// not present in the index at all
-					// "\"ranking\": {" +
-					//     "\"value\": ..." +
-					// "}" +
-				"}",
-				source
-		);
-
-		tx.commit();
-		s.close();
-	}
 
 	@Test
 	public void testQueryOnNullToken() {
