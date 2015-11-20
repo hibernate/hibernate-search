@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.spi;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collection;
@@ -27,7 +26,6 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FloatDocValuesField;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.SortedDocValuesField;
-import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetField;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableField;
@@ -55,6 +53,7 @@ import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.ConfigContext;
+import org.hibernate.search.engine.impl.FacetHandling;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
@@ -310,7 +309,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 
 		Document doc = new Document();
-		FacetsConfig facetConfig = new FacetsConfig();
+		FacetHandling faceting = new FacetHandling();
 		Class<?> entityType = objectInitializer.getClass( instance );
 		float documentLevelBoost = getMetadata().getClassBoost( instance );
 
@@ -352,7 +351,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		buildDocumentFields(
 				instance,
 				doc,
-				facetConfig,
+				faceting,
 				getMetadata(),
 				fieldToAnalyzerMap,
 				processedFieldNames,
@@ -363,12 +362,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		);
 
 
-		try {
-			doc = facetConfig.build( doc );
-		}
-		catch (IOException e) {
-			throw log.errorDuringFacetingIndexing( e );
-		}
+		doc = faceting.build( doc );
 		return doc;
 	}
 
@@ -403,7 +397,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 */
 	private void buildDocumentFields(Object instance,
 			Document doc,
-			FacetsConfig facetConfig,
+			FacetHandling faceting,
 			TypeMetadata typeMetadata,
 			Map<String, String> fieldToAnalyzerMap,
 			Set<String> processedFieldNames,
@@ -418,7 +412,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		buildDocumentFieldForClassBridges( doc, typeMetadata, conversionContext, inheritedBoost, unproxiedInstance );
 		buildDocumentFieldsForProperties(
 				doc,
-				facetConfig,
+				faceting,
 				typeMetadata,
 				conversionContext,
 				objectInitializer,
@@ -434,7 +428,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 		buildDocumentFieldsForEmbeddedObjects(
 				doc,
-				facetConfig,
+				faceting,
 				typeMetadata,
 				fieldToAnalyzerMap,
 				processedFieldNames,
@@ -447,7 +441,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	private void buildDocumentFieldsForEmbeddedObjects(Document doc,
-			FacetsConfig facetsConfig,
+			FacetHandling faceting,
 			TypeMetadata typeMetadata,
 			Map<String, String> fieldToAnalyzerMap,
 			Set<String> processedFieldNames,
@@ -474,7 +468,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 							buildDocumentFields(
 									arrayValue,
 									doc,
-									facetsConfig,
+									faceting,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
@@ -491,7 +485,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 							buildDocumentFields(
 									collectionValue,
 									doc,
-									facetsConfig,
+									faceting,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
@@ -508,7 +502,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 							buildDocumentFields(
 									collectionValue,
 									doc,
-									facetsConfig,
+									faceting,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
@@ -523,7 +517,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						buildDocumentFields(
 								value,
 								doc,
-								facetsConfig,
+								faceting,
 								embeddedTypeMetadata,
 								fieldToAnalyzerMap,
 								processedFieldNames,
@@ -552,7 +546,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 * to-many association.
 	 */
 	private void buildDocumentFieldsForProperties(Document document,
-			FacetsConfig facetsConfig,
+			FacetHandling faceting,
 			TypeMetadata typeMetadata,
 			ConversionContext conversionContext,
 			InstanceInitializer objectInitializer,
@@ -602,9 +596,10 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 					// handle faceting fields
 					if ( fieldMetadata.hasFacets() ) {
+						faceting.enableFacetProcessing();
 						for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
 							if ( multiValued ) {
-								facetsConfig.setMultiValued( facetMetadata.getFacetName(), true );
+								faceting.setMultiValued( facetMetadata.getFacetName() );
 							}
 							addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
 						}
