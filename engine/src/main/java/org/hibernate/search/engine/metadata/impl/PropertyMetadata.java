@@ -64,9 +64,16 @@ public class PropertyMetadata {
 		return propertyAccessorName;
 	}
 
-	// TODO HSEARCH-1867 change return type to set
+	/**
+	 * @deprecated use getFieldMetadataSet() instead
+	 */
+	@Deprecated
 	public List<DocumentFieldMetadata> getFieldMetadata() {
 		return new ArrayList<DocumentFieldMetadata>( documentFieldMetadataList );
+	}
+
+	public Set<DocumentFieldMetadata> getFieldMetadataSet() {
+		return documentFieldMetadataList;
 	}
 
 	public DocumentFieldMetadata getFieldMetadata(String fieldName) {

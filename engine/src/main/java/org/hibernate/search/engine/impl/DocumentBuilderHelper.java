@@ -161,7 +161,7 @@ public final class DocumentBuilderHelper {
 	private static void processMetadataRecursivelyForProjections(TypeMetadata typeMetadata, String[] fields, Object[] result, Document document, ConversionContext contextualBridge) {
 		//process base fields
 		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
-			for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+			for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 				final String fieldName = fieldMetadata.getName();
 				int matchingPosition = getFieldPosition( fields, fieldName );
 				if ( matchingPosition != -1 && result[matchingPosition] == NOT_SET ) {

@@ -799,7 +799,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			if ( typeMetadataBuilder.getIdPropertyMetadata() != null ) {
-				idFieldName = typeMetadataBuilder.getIdPropertyMetadata().getFieldMetadata().iterator().next().getFieldName();
+				idFieldName = typeMetadataBuilder.getIdPropertyMetadata().getFieldMetadataSet().iterator().next().getFieldName();
 			}
 			if ( sortedFieldName.equals( idFieldName ) ) {
 				return;
@@ -868,7 +868,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		numericFields.validate();
 
 		PropertyMetadata property = propertyMetadataBuilder.build();
-		if ( !property.getFieldMetadata().isEmpty() ) {
+		if ( !property.getFieldMetadataSet().isEmpty() ) {
 			typeMetadataBuilder.addProperty( property );
 		}
 	}
