@@ -32,10 +32,10 @@ public class IntegrationTestUtil {
 				.resolve()
 				.withTransitivity()
 				.asFile();
-		return ShrinkWrap.create( WebArchive.class, "eclipselink-mysql.war" ).setWebXML( "WEB-INF/web.xml" ).addPackage(
+		return ShrinkWrap.create( WebArchive.class, "eclipselink-hsqldb.war" ).setWebXML( "WEB-INF/web.xml" ).addPackage(
 				Game.class.getPackage()
 		)
-				.addAsResource( "META-INF/eclipselink-mysql-persistence.xml", "META-INF/persistence.xml" )
+				.addAsResource( "META-INF/eclipselink-hsqldb-persistence.xml", "META-INF/persistence.xml" )
 				.addAsResource( "META-INF/hsearch.properties", "META-INF/hsearch.properties" ).addAsLibraries( libs )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
