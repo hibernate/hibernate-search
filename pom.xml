@@ -198,6 +198,8 @@
         <!-- Eclipse plugin options -->
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
+        <hibernate.search.genericjpa.integrationtest.skip>true</hibernate.search.genericjpa.integrationtest.skip>
+
     </properties>
 
     <dependencyManagement>
@@ -1289,6 +1291,14 @@
         </profile>
 
         <profile>
+            <id>genericjpa</id>
+            <!-- enable the integration tests for this build -->
+            <properties>
+                <hibernate.search.genericjpa.integrationtest.skip>false</hibernate.search.genericjpa.integrationtest.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>docs</id>
             <activation>
                 <!-- asciidoctor won't work on JDK9  -->
@@ -1631,16 +1641,5 @@
             </properties>
         </profile>
 
-        <profile>
-            <id>genericjpa</id>
-            <modules>
-                <module>genericjpa/util</module>
-                <module>genericjpa/standalone</module>
-                <module>genericjpa/db</module>
-                <module>genericjpa/jpa</module>
-                <module>genericjpa/ejb</module>
-                <module>genericjpa/integrationtest/glassfish</module>
-            </modules>
-        </profile>
     </profiles>
 </project>

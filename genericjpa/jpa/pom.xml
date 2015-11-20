@@ -12,6 +12,8 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
+	<inceptionYear>2015</inceptionYear>
+
 	<build>
 		<plugins>
 			<plugin>
