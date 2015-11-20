@@ -186,7 +186,7 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 		}
 
 		boolean id = false;
-		for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
+		for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 			if ( documentFieldMetadata.isId() ) {
 				id = true;
 			}

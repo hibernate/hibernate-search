@@ -156,7 +156,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			throw log.noDocumentIdFoundException( clazz.getName() );
 		}
 
-		idFieldName = idPropertyMetadata.getFieldMetadata().iterator().next().getName();
+		idFieldName = idPropertyMetadata.getFieldMetadataSet().iterator().next().getName();
 
 		checkAllowFieldSelection();
 		if ( log.isDebugEnabled() ) {
@@ -583,7 +583,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			try {
 				conversionContext.pushProperty( propertyMetadata.getPropertyAccessorName() );
 
-				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 					final FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
 					final String fieldName = fieldMetadata.getName();
 					final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext(
@@ -1005,7 +1005,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			return;
 		}
 		for ( PropertyMetadata propertyMetadata : getMetadata().getAllPropertyMetadata() ) {
-			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
+			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 				FieldBridge bridge = documentFieldMetadata.getFieldBridge();
 				if ( fieldBridgeProhibitsFieldSelectionInProjection( bridge ) ) {
 					allowFieldSelectionInProjection = false;

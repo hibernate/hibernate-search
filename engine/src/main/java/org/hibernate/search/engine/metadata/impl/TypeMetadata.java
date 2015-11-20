@@ -352,7 +352,7 @@ public class TypeMetadata {
 	private Map<String, DocumentFieldMetadata> keyFieldMetadata(Set<PropertyMetadata> propertyMetadataSet) {
 		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
 		for ( PropertyMetadata propertyMetadata : propertyMetadataSet ) {
-			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
+			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 				DocumentFieldMetadata oldFieldMetadata = tmpMap.put(
 						documentFieldMetadata.getName(),
 						documentFieldMetadata
@@ -372,7 +372,7 @@ public class TypeMetadata {
 		}
 
 		if ( idPropertyMetadata != null ) {
-			for ( DocumentFieldMetadata documentFieldMetadata : idPropertyMetadata.getFieldMetadata() ) {
+			for ( DocumentFieldMetadata documentFieldMetadata : idPropertyMetadata.getFieldMetadataSet() ) {
 				tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
 			}
 		}
@@ -463,8 +463,8 @@ public class TypeMetadata {
 		public Builder addProperty(PropertyMetadata propertyMetadata) {
 			if ( idPropertyMetadata != null && idPropertyMetadata.getPropertyAccessorName() != null ) {
 				// the id property is always a single field
-				String idFieldName = idPropertyMetadata.getFieldMetadata().iterator().next().getName();
-				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+				String idFieldName = idPropertyMetadata.getFieldMetadataSet().iterator().next().getName();
+				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 					if ( idFieldName.equals( fieldMetadata.getName() ) ) {
 						throw log.fieldTriesToOverrideIdFieldSettings(
 								propertyMetadata.getPropertyAccessor().getDeclaringClass().getName(),
