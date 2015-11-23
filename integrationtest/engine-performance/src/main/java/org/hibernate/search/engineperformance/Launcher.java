@@ -19,39 +19,22 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  * Refer to the <a href="http://openjdk.java.net/projects/code-tools/jmh/">JMH documentation</a> to learn more about the
  * Java Micro-benchmark Harness in general.
  *
+ * Typically you'll want to run this from a commandline; this Launcher is not meant
+ * to take measurements but rather to simplify debugging and developing.
+ *
  * @author Gunnar Morling
  */
 public class Launcher {
 
-	/**
-	 * Property used to specify VM arguments to be passed to the benchmark runner, e.g. like so:
-	 * <pre>
-	 * {@code
-	 * java Launcher -DbenchmarkVmArgs="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder"
-	 * java Launcher -DbenchmarkVmArgs="-Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y"
-	 * }
-	 * </pre>
-	 */
-	private static final String BENCHMARK_VM_ARGS_KEY = "benchmarkVmArgs";
-
 	public static void main(String... args) throws Exception {
-		String benchmarkArgsString = System.getProperty( BENCHMARK_VM_ARGS_KEY );
-		String[] benchMarkArgs;
-
-		if ( benchmarkArgsString != null ) {
-			benchMarkArgs = benchmarkArgsString.split( "\\s+" );
-		}
-		else {
-			benchMarkArgs = new String[0];
-		}
-
 		Options opts = new OptionsBuilder()
 			.include( ".*" )
-			.warmupIterations( 20 )
-			.measurementIterations( 20 )
-			.jvmArgs( "-server" )
-			.jvmArgsAppend( benchMarkArgs )
-			.forks( 1 )
+			.warmupIterations( 10 )
+			.measurementIterations( 20000 )
+			.param( "queryBackend", "fs" )
+			.param( "indexSize", "5000000" )
+			.exclude( "simple" )
+			.forks( 0 ) //To simplify debugging; Remember this implies JVM parameters via @Fork won't be applied.
 			.build();
 
 		new Runner( opts ).run();

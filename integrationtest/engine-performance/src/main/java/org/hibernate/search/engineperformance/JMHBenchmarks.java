@@ -6,10 +6,19 @@
  */
 package org.hibernate.search.engineperformance;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engineperformance.model.BookEntity;
+import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -20,7 +29,7 @@ public class JMHBenchmarks {
 
 	@Benchmark
 	@Threads(20)
-	public void simpleIndexing(EngineHolder eh) {
+	public void simpleIndexing(IndexingEngineHolder eh) {
 		Worker worker = eh.si.getWorker();
 		BookEntity book = new BookEntity();
 		book.setId( 1l );
@@ -31,6 +40,33 @@ public class JMHBenchmarks {
 		TransactionContextForTest tc = new TransactionContextForTest();
 		worker.performWork( work, tc );
 		tc.end();
+	}
+
+	@Benchmark
+	@Threads(20)
+	public void queryBooksByBestRating(QueryEngineHolder eh) {
+		SearchIntegrator searchIntegrator = eh.si;
+		Query luceneQuery = searchIntegrator.buildQueryBuilder()
+				.forEntity( BookEntity.class )
+				.get()
+				.all()
+				.createQuery();
+
+		long expectedIndexSize = eh.getExpectedIndexSize();
+		int maxResults = eh.getMaxResults();
+
+		HSQuery hsQuery = searchIntegrator.createHSQuery().luceneQuery( luceneQuery );
+		hsQuery.targetedEntities( Arrays.<Class<?>>asList( BookEntity.class ) );
+		hsQuery.sort( new Sort( new SortField( "rating", SortField.Type.FLOAT, true ) ) );
+		hsQuery.maxResults( maxResults );
+		int queryResultSize = hsQuery.queryResultSize();
+		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();
+		if ( queryResultSize != expectedIndexSize ) {
+			throw new RuntimeException( "Unexpected index size" );
+		}
+		if ( maxResults != queryEntityInfos.size() ) {
+			throw new RuntimeException( "Unexpected resultset size" );
+		}
 	}
 
 }
