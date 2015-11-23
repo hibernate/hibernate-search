@@ -29,6 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public abstract class ReflectionHelper {
 	private static final Log LOG = LoggerFactory.make();
+	private static final Object[] EMPTY_ARRAY = new Object[0];
 
 	private ReflectionHelper() {
 	}
@@ -84,7 +85,9 @@ public abstract class ReflectionHelper {
 	public static Object getMemberValue(Object bean, XMember getter) {
 		Object value;
 		try {
-			value = getter.invoke( bean );
+			//EMPTY_ARRAY used to avoid excessive allocations of empty arrays as
+			//the invoke method accepts varargs
+			value = getter.invoke( bean, EMPTY_ARRAY );
 		}
 		catch (Exception e) {
 			throw new IllegalStateException( "Could not get property value", e );
