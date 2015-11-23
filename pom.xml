@@ -149,7 +149,7 @@
         <jgroupsVersion>3.6.6.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
-        <hibernateVersion>5.0.3.Final</hibernateVersion>
+        <hibernateVersion>5.0.4.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>5.0.0.Final</hibernateCommonsAnnotationVersion>
         <jandexVersion>2.0.0.CR1</jandexVersion>
         <classMateVersion>0.8.0</classMateVersion>
@@ -485,6 +485,10 @@
                     <exclusion>
                         <groupId>com.experlog</groupId>
                         <artifactId>xapool</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                      <artifactId>geronimo-jta_1.1_spec</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
