@@ -11,6 +11,7 @@ import java.util.Properties;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.spi.Service;
 
 /**
  * Created by Martin on 14.11.2015.
@@ -20,7 +21,7 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
  * Does not implement Startable and Stoppable as its lifecycle needs to be controlled
  * explicitly
  */
-public interface TriggerAsyncBackendService {
+public interface TriggerAsyncBackendService extends Service {
 
 	void start(
 			SessionFactory sessionFactory,

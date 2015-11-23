@@ -18,14 +18,12 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.IndexControl;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -78,7 +76,14 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			HibernateSessionFactoryService sessionService = new DefaultHibernateSessionFactoryService( factory );
 			if ( extendedIntegrator == null ) {
 				SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
-						.configuration( new SearchConfigurationFromHibernateCore( metadata, configurationService, classLoaderService, sessionService ) )
+						.configuration(
+								new SearchConfigurationFromHibernateCore(
+										metadata,
+										configurationService,
+										classLoaderService,
+										sessionService
+								)
+						)
 						.buildSearchIntegrator();
 				extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
 			}
@@ -90,40 +95,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			}
 			listener.initialize( extendedIntegrator );
 			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
-			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedIntegrator );
+			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize(
+					extendedIntegrator
+			);
 
-			this.triggerAsyncBackendService = null;
-			//FIXME: do this with the hibernate.search.indexing_strategy property
-			//FIXME: hack, how do I do this correctly?
-			try {
-				Boolean triggerBackendEnabled = Boolean.parseBoolean( (String) extendedIntegrator.getConfigurationProperties()
-						.getOrDefault( TriggerServiceConstants.TRIGGER_BASED_BACKEND_KEY,
-									TriggerServiceConstants.TRIGGER_BASED_BACKEND_DEFAULT_VALUE ) );
-				if ( triggerBackendEnabled.booleanValue() ) {
-					Class<?> clazz = this.classLoaderService.classForName( "org.hibernate.search.backend.triggers.impl.TriggerAsyncBackendServiceImpl" );
-					this.triggerAsyncBackendService = (TriggerAsyncBackendService) clazz.newInstance();
-				}
-			}
-			catch (ClassLoadingException e) {
-				// hack, do nothing
-			}
-			catch (InstantiationException e) {
-				// hack, do nothing
-			}
-			catch (IllegalAccessException e) {
-				throw new AssertionFailure( "could not instantiate TriggerAsyncBackendServiceImpl" );
-			}
-
-			if ( this.triggerAsyncBackendService != null ) {
-				this.triggerAsyncBackendService.start(
-						factory,
-						extendedIntegrator,
-						extendedIntegrator.getServiceManager().requestService(
-								org.hibernate.search.engine.service.classloading.spi.ClassLoaderService.class
-						),
-						extendedIntegrator.getConfigurationProperties()
-				);
-			}
+			this.startTriggerAsyncBackendService( factory );
 
 			failedBoot = false;
 		}
@@ -131,6 +107,34 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			if ( failedBoot ) {
 				factory.close();
 			}
+		}
+	}
+
+	private void startTriggerAsyncBackendService(SessionFactory factory) {
+		Boolean triggerBackendEnabled = Boolean.parseBoolean(
+				(String) extendedIntegrator.getConfigurationProperties()
+						.getOrDefault(
+								TriggerServiceConstants.TRIGGER_BASED_BACKEND_KEY,
+								TriggerServiceConstants.TRIGGER_BASED_BACKEND_DEFAULT_VALUE
+						)
+		);
+		if ( triggerBackendEnabled.booleanValue() ) {
+			this.triggerAsyncBackendService = extendedIntegrator.getServiceManager().requestService(
+					TriggerAsyncBackendService.class
+			);
+		}
+		if ( this.triggerAsyncBackendService != null ) {
+			// we do manual life-cycle management here.
+			// as we need a reference to the searchFactory
+			// in the trigger backend
+			this.triggerAsyncBackendService.start(
+					factory,
+					extendedIntegrator,
+					extendedIntegrator.getServiceManager().requestService(
+							org.hibernate.search.engine.service.classloading.spi.ClassLoaderService.class
+					),
+					extendedIntegrator.getConfigurationProperties()
+			);
 		}
 	}
 
@@ -147,10 +151,14 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		}
 	}
 
-	private static String enableIndexControlBean(ConfigurationService configurationService, ExtendedSearchIntegrator extendedIntegrator) {
+	private static String enableIndexControlBean(
+			ConfigurationService configurationService,
+			ExtendedSearchIntegrator extendedIntegrator) {
 		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
 		if ( StringHelper.isEmpty( configurationService.getSetting( "hibernate.session_factory_name", STRING ) ) ) {
-			log.debug( "In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI" );
+			log.debug(
+					"In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI"
+			);
 			return null;
 		}
 

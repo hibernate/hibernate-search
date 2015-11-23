@@ -32,6 +32,7 @@ import org.hibernate.search.genericjpa.jpa.util.impl.ORMEntityManagerFactoryWrap
 import org.hibernate.search.genericjpa.metadata.impl.MetadataRehasher;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataUtil;
 import org.hibernate.search.genericjpa.metadata.impl.RehashedTypeMetadata;
+import org.hibernate.search.spi.BuildContext;
 
 import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_DEFAULT_VALUE;
 import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_KEY;
