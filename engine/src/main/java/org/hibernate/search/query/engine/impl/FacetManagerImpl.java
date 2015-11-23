@@ -34,12 +34,12 @@ public class FacetManagerImpl implements FacetManager {
 	/**
 	 * The map of currently active/enabled facet requests.
 	 */
-	private final Map<String, FacetingRequest> facetRequests = newHashMap();
+	private Map<String, FacetingRequest> facetRequests;
 
 	/**
 	 * Keep track of the current facet selection groups.
 	 */
-	private final Map<String, FacetSelectionImpl> facetSelection = newHashMap();
+	private Map<String, FacetSelectionImpl> facetSelection;
 
 	/**
 	 * Keeps track of faceting results. This map gets populated once the query gets executed and needs to be
@@ -63,6 +63,9 @@ public class FacetManagerImpl implements FacetManager {
 
 	@Override
 	public FacetManager enableFaceting(FacetingRequest facetingRequest) {
+		if ( facetRequests == null ) {
+			facetRequests = newHashMap();
+		}
 		facetRequests.put( facetingRequest.getFacetingName(), (FacetingRequestImpl) facetingRequest );
 		queryHasChanged();
 		return this;
@@ -70,7 +73,9 @@ public class FacetManagerImpl implements FacetManager {
 
 	@Override
 	public void disableFaceting(String facetingName) {
-		facetRequests.remove( facetingName );
+		if ( facetRequests != null ) {
+			facetRequests.remove( facetingName );
+		}
 		if ( facetResults != null ) {
 			facetResults.remove( facetingName );
 		}
@@ -80,7 +85,7 @@ public class FacetManagerImpl implements FacetManager {
 	@Override
 	public List<Facet> getFacets(String facetingName) {
 		// if there are no facet requests we don't have to do anything
-		if ( facetRequests.isEmpty() || !facetRequests.containsKey( facetingName ) ) {
+		if ( facetRequests == null || facetRequests.isEmpty() || !facetRequests.containsKey( facetingName ) ) {
 			return Collections.emptyList();
 		}
 
@@ -110,6 +115,9 @@ public class FacetManagerImpl implements FacetManager {
 		if ( groupName == null ) {
 			throw new IllegalArgumentException( "null is not a valid facet selection group name" );
 		}
+		if ( facetSelection == null ) {
+			facetSelection = newHashMap();
+		}
 		FacetSelectionImpl selection = facetSelection.get( groupName );
 		if ( selection == null ) {
 			selection = new FacetSelectionImpl();
@@ -119,7 +127,7 @@ public class FacetManagerImpl implements FacetManager {
 	}
 
 	public Map<String, FacetingRequest> getFacetRequests() {
-		return facetRequests;
+		return facetRequests != null ? facetRequests : Collections.<String, FacetingRequest>emptyMap();
 	}
 
 	public void setFacetResults(Map<String, List<Facet>> facetResults) {
@@ -134,7 +142,7 @@ public class FacetManagerImpl implements FacetManager {
 
 	public QueryFilters getFacetFilters() {
 		if ( facetFilterset == null ) {
-			int size = facetSelection.values().size();
+			int size = facetSelection == null ? 0 : facetSelection.values().size();
 			if ( size != 0 ) {
 				List<Query> filterQueries = new ArrayList<>( size );
 				for ( FacetSelectionImpl selection : facetSelection.values() ) {
