@@ -7,15 +7,31 @@
 package org.hibernate.search.engineperformance.model;
 
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 
 @Indexed
+@AnalyzerDef(name = "textAnalyzer", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class) , filters = {
+		@TokenFilterDef(factory = LowerCaseFilterFactory.class),
+		@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+				@Parameter(name = "language", value = "English") }) })
 public class BookEntity {
 
 	private Long id;
 	private String title;
 	private String text;
+	private Float rating;
 
 	@DocumentId
 	public Long getId() {
@@ -42,6 +58,17 @@ public class BookEntity {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	@Field(analyze = Analyze.NO, store = Store.YES)
+	@NumericField
+	@SortableField
+	public Float getRating() {
+		return rating;
+	}
+
+	public void setRating(Float rating) {
+		this.rating = rating;
 	}
 
 }

@@ -47,6 +47,35 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+                <!-- Redefine the ForbiddenApis configuration as some rules need
+                                 to be relaxed in this CLI tool;
+                                 e.g. we use System.out.println() instead of enforcing a logger -->
+                <executions>
+                    <execution>
+                        <id>verify-forbidden-apis</id>
+                        <configuration>
+                             <bundledSignatures combine.self="override">
+                                 <!-- This will automatically choose the right signatures based on 'targetVersion': -->
+                                 <bundledSignature>jdk-unsafe</bundledSignature>
+                                 <bundledSignature>jdk-deprecated</bundledSignature>
+                             </bundledSignatures>
+                         </configuration>
+                     </execution>
+                     <execution>
+                         <id>verify-forbidden-test-apis</id>
+                         <configuration>
+                             <bundledSignatures combine.self="override">
+                                 <!-- This will automatically choose the right signatures based on 'targetVersion': -->
+                                 <bundledSignature>jdk-unsafe</bundledSignature>
+                                 <bundledSignature>jdk-deprecated</bundledSignature>
+                             </bundledSignatures>
+                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <configuration>
