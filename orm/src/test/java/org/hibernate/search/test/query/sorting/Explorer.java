@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.test.query.sorting;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -28,6 +25,8 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 @Entity
 @Indexed
@@ -105,12 +104,12 @@ public class Explorer {
 		}
 
 		@Override
-		public Set<String> getSortableFieldNames(String fieldName) {
-			Set<String> sortableFields = new HashSet<>();
-			sortableFields.add( fieldName + "_firstName" );
-			sortableFields.add( fieldName + "_middleName" );
-
-			return sortableFields;
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder
+				.field( name + "_firstName", FieldType.STRING )
+					.sortable( true )
+				.field( name + "_middleName", FieldType.STRING )
+					.sortable( true );
 		}
 	}
 
@@ -130,8 +129,10 @@ public class Explorer {
 		}
 
 		@Override
-		public Set<String> getSortableFieldNames(String fieldName) {
-			return Collections.singleton( fieldName + "_lastName" );
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder
+				.field( name + "_lastName", FieldType.STRING )
+					.sortable( true );
 		}
 	}
 }

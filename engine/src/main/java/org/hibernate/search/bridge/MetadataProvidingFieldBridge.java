@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.bridge;
 
-import java.util.Set;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 
 /**
  * Optional contract to be implemented by {@link FieldBridge} implementations wishing to expose meta-data related to the
@@ -19,11 +19,11 @@ import java.util.Set;
 public interface MetadataProvidingFieldBridge extends FieldBridge {
 
 	/**
-	 * Returns the names of the sortable fields created by this field bridge.
+	 * Allows this bridge to expose meta-data about the fields it creates.
 	 *
 	 * @param name The default field name; Should be used consistently with
 	 * {@link FieldBridge#set(String, Object, org.apache.lucene.document.Document, LuceneOptions)}.
-	 * @return The names of the sortable fields created by this field bridge. Never {@code null}.
+	 * @param builder Builder for exposing field-related meta-data
 	 */
-	Set<String> getSortableFieldNames(String name);
+	void configureFieldMetadata(String name, FieldMetadataBuilder builder);
 }

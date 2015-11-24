@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.test.query.sorting;
 
-import java.util.Collections;
-import java.util.Set;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -19,6 +16,8 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * @author Gunnar Morling
@@ -73,8 +72,10 @@ public class Territory {
 		}
 
 		@Override
-		public Set<String> getSortableFieldNames(String fieldName) {
-			return Collections.singleton( "territoryName" );
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder
+				.field( "territoryName", FieldType.STRING )
+					.sortable( true );
 		}
 	}
 }
