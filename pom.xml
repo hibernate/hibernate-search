@@ -150,7 +150,7 @@
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
         <hibernateVersion>5.0.4.Final</hibernateVersion>
-        <hibernateCommonsAnnotationVersion>5.0.0.Final</hibernateCommonsAnnotationVersion>
+        <hibernateCommonsAnnotationVersion>5.0.1.Final</hibernateCommonsAnnotationVersion>
         <jandexVersion>2.0.0.CR1</jandexVersion>
         <classMateVersion>0.8.0</classMateVersion>
         <javassistVersion>3.18.1-GA</javassistVersion>
