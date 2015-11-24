@@ -8,10 +8,8 @@ package org.hibernate.search.test.query.sorting;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 
 import javax.persistence.Entity;
@@ -42,6 +40,8 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
@@ -468,8 +468,9 @@ public class SortTest extends SearchTestBase {
 		}
 
 		@Override
-		public Set<String> getSortableFieldNames(String fieldName) {
-			return Collections.singleton( "sum" );
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( "sum", FieldType.INTEGER )
+				.sortable( true );
 		}
 	}
 

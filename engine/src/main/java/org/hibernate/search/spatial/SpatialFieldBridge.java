@@ -11,12 +11,12 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -48,8 +48,9 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 	}
 
 	@Override
-	public Set<String> getSortableFieldNames(String name) {
-		return Collections.singleton( name );
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name, FieldType.DOUBLE )
+			.sortable( true );
 	}
 
 	private Double getCoordinateFromField(String coordinateField, Object value) {

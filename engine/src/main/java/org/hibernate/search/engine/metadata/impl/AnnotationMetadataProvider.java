@@ -618,7 +618,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
 			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
-			typeMetadataBuilder.addClassBridgeSortableFields( metadataProvidingFieldBridge.getSortableFieldNames( fieldName ) );
+			typeMetadataBuilder.addClassBridgeSortableFields( getSortableFieldNames( fieldName, metadataProvidingFieldBridge ) );
 		}
 		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer( classBridgeAnnotation.analyzer(), configContext );
 		typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
@@ -693,7 +693,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		if ( spatialBridge instanceof MetadataProvidingFieldBridge ) {
 			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) spatialBridge;
-			typeMetadataBuilder.addClassBridgeSortableFields( metadataProvidingFieldBridge.getSortableFieldNames( fieldName ) );
+			typeMetadataBuilder.addClassBridgeSortableFields( getSortableFieldNames( fieldName, metadataProvidingFieldBridge ) );
 		}
 
 		Analyzer analyzer = typeMetadataBuilder.getAnalyzer();
@@ -1049,7 +1049,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
 			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
 
-			for ( String sortableField : metadataProvidingFieldBridge.getSortableFieldNames( fieldName ) ) {
+			for ( String sortableField : getSortableFieldNames( fieldName, metadataProvidingFieldBridge ) ) {
 				SortableFieldMetadata sortableFieldMetadata = new SortableFieldMetadata.Builder()
 					.fieldName( sortableField )
 					.build();
@@ -1744,5 +1744,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return false; // as with class bridge: might be affected by any field
 		}
 		return true;
+	}
+
+	private Set<String> getSortableFieldNames(String fieldName, MetadataProvidingFieldBridge metadataProvidingFieldBridge) {
+		FieldMetadataBuilderImpl builder = new FieldMetadataBuilderImpl();
+		metadataProvidingFieldBridge.configureFieldMetadata( fieldName, builder );
+		return builder.getSortableFields();
 	}
 }
