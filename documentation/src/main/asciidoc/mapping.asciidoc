@@ -312,11 +312,11 @@ only the doc value field required for sorting to be added, but not a regular ind
 Fields added through class-level bridges or custom field-level bridges (when not using the default field name) cannot
 be marked as sortable by means of the `@SortableField` annotation. Instead the field bridge itself has to add the
 required doc value fields, in addition to the document fields it adds. Furthermore such bridge needs to implement the
-`MetadataProvidingFieldBridge` interface which defines a method `getSortableFieldNames()` for returning the names of
-the sortable fields created by this bridge:
+`MetadataProvidingFieldBridge` interface which defines a method `configureFieldMetadata()` for marking the fields
+created by this bridge as sortable:
 
 [[example-adding-docvaluefield]]
-.Adding sortable fields via a custom field bridge
+.Marking fields as sortable via a custom field bridge
 ====
 [source, JAVA]
 ----
@@ -344,20 +344,20 @@ public class MyClassBridge implements MetadataProvidingFieldBridge {
         document.add( new SortedDocValuesField( name + "_lastName", new BytesRef( lastName ) ) );
     }
 
-    public Set<String> getSortableFieldNames(String name) {
-        Set<String> sortableFields = new HashSet<>();
-        sortableFields.add( name + "_firstName" );
-        sortableFields.add( name + "_lastName" );
-
-        return sortableFields;
+    public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+        builder
+            .field( name + "_firstName", FieldType.STRING )
+                .sortable( true )
+            .field( name + "_lastName", FieldType.STRING )
+                .sortable( true );
     }
 }
 ----
 ====
 
-The names returned from `getSortableFieldNames()` will be used for sort validation upon query execution. The name
-passed to the method is the default field name also passed to `set()`. It needs to be used consistently with `set()`,
-e.g. as a prefix for all custom fields added.
+The meta-data configured through `configureFieldMetadata()` will be used for sort validation upon query execution. The
+name passed to the method is the default field name also passed to `set()`. It needs to be used consistently with
+`set()`, e.g. as a prefix for all custom fields added.
 
 [NOTE]
 ====

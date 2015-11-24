@@ -19,7 +19,9 @@ public interface FieldMetadataCreationContext {
 	 * Adds a field to the list of all meta-data.
 	 *
 	 * @param name The name of the field
-	 * @param type The type of the field
+	 * @param type The type of the field; The type of the field created in
+	 * {@link org.hibernate.search.bridge.FieldBridge#set(String, Object, org.apache.lucene.document.Document, org.hibernate.search.bridge.LuceneOptions)}
+	 * must match the type declared for the field here.
 	 * @return a context object for fluent API invocations
 	 */
 	FieldMetadataCreationContext field(String name, FieldType type);

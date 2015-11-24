@@ -11,6 +11,11 @@ import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 /**
  * Optional contract to be implemented by {@link FieldBridge} implementations wishing to expose meta-data related to the
  * fields they create.
+ * <p>
+ * Field bridges should implement this contract if they create field(s) with custom names and wish them to mark as
+ * sortable. The required doc value fields will be added by the Hibernate Search engine in that case. Otherwise users
+ * may not (efficiently) sort on such custom fields.
+ * <p>
  *
  * @author Gunnar Morling
  * @hsearch.experimental This contract is currently under active development and may be altered in future releases,
