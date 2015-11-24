@@ -23,12 +23,12 @@ public enum FieldType {
 	/**
 	 * A boolean field, mapped to the String "true" or "false" in Lucene.
 	 */
-	STRING_MAPPED_BOOLEAN,
+	BOOLEAN,
 
 	/**
-	 * A date, mapped to a String in Lucene.
+	 * A date, mapped to a formatted String in Lucene.
 	 */
-	STRING_MAPPED_DATE,
+	DATE,
 
 	/**
 	 * An integer field.
