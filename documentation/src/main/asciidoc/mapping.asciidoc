@@ -321,36 +321,39 @@ created by this bridge as sortable:
 [source, JAVA]
 ----
 /***
-  * Custom field bridge for a Map property which creates sortable fields with the values
-  * of two keys from the map.
+  * Custom field bridge for a Map property which creates sortable fields
+  * with the values of two keys from the map.
   */
 public class MyClassBridge implements MetadataProvidingFieldBridge {
 
-    @Override
-    public void set(
-            String name, Object value, Document document, LuceneOptions luceneOptions) {
+  @Override
+  public void set(String name, Object value,
+          Document document, LuceneOptions luceneOps) {
 
-        Map<String, String> map = (Map<String, String>) value;
+      Map<String, String> map = (Map<String, String>) value;
 
-        String firstName = map.get( "firstName" );
-        String lastName = map.get( "lastName" );
+      String firstName = map.get( "firstName" );
+      String lastName = map.get( "lastName" );
 
-        // add regular document fields
-        luceneOptions.addFieldToDocument( name + "_firstName", lastName, document );
-        luceneOptions.addFieldToDocument( name + "_lastName", lastName, document );
+      // add regular document fields
+      luceneOps.addFieldToDocument( name + "_firstName", lastName, document );
+      luceneOps.addFieldToDocument( name + "_lastName", lastName, document );
 
-        // add doc value fields to allow for sorting
-        document.add( new SortedDocValuesField( name + "_firstName", new BytesRef( firstName ) ) );
-        document.add( new SortedDocValuesField( name + "_lastName", new BytesRef( lastName ) ) );
-    }
+      // add doc value fields to allow for sorting
+      document.add( new SortedDocValuesField(
+                        name + "_firstName", new BytesRef( firstName ) ) );
+      document.add( new SortedDocValuesField(
+                        name + "_lastName", new BytesRef( lastName ) ) );
+  }
 
-    public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
-        builder
-            .field( name + "_firstName", FieldType.STRING )
-                .sortable( true )
-            .field( name + "_lastName", FieldType.STRING )
-                .sortable( true );
-    }
+  @Override
+  public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+      builder
+          .field( name + "_firstName", FieldType.STRING )
+              .sortable( true )
+          .field( name + "_lastName", FieldType.STRING )
+              .sortable( true );
+  }
 }
 ----
 ====
