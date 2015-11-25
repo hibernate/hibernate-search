@@ -15,6 +15,7 @@ import org.hibernate.search.genericjpa.transaction.TransactionContext;
 
 /**
  * @author Martin Braun
+ * @hsearch.experimental
  */
 public interface UpdateConsumer {
 

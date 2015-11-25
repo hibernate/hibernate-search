@@ -11,7 +11,8 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * @author Martin
+ * @author Martin Braun
+ * @hsearch.experimental
  */
 @Retention(RUNTIME)
 public @interface Hint {

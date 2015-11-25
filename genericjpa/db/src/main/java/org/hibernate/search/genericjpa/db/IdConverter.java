@@ -7,7 +7,8 @@
 package org.hibernate.search.genericjpa.db;
 
 /**
- * Created by Martin on 20.07.2015.
+ * @author Martin Braun
+ * @hsearch.experimental
  */
 public interface IdConverter {
 

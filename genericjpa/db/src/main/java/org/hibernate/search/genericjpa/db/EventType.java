@@ -12,6 +12,7 @@ import org.hibernate.search.genericjpa.exception.AssertionFailure;
  * Contains constants that describe the different Database-Events that are relevant to the index
  *
  * @author Martin Braun
+ * @hsearch.experimental
  */
 public final class EventType {
 

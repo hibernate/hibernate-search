@@ -10,7 +10,8 @@ import org.hibernate.search.genericjpa.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.exception.SearchException;
 
 /**
- * Created by Martin on 21.07.2015.
+ * @author Martin Braun
+ * @hsearch.experimental
  */
 public enum ColumnType implements IdConverter {
 	STRING {

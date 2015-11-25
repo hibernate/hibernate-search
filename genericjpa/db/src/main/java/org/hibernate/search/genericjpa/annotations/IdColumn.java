@@ -13,7 +13,8 @@ import org.hibernate.search.genericjpa.db.ColumnType;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Created by Martin on 21.07.2015.
+ * @author Martin Braun
+ * @hsearch.experimental
  */
 @Retention(RUNTIME)
 public @interface IdColumn {

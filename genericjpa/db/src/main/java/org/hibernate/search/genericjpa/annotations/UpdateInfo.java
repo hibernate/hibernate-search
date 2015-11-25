@@ -16,7 +16,8 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Created by Martin on 20.07.2015.
+ * @author Martin Braun
+ * @hsearch.experimental
  */
 @Target({FIELD, METHOD, TYPE})
 @Retention(RUNTIME)
