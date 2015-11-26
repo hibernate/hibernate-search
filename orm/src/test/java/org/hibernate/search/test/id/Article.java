@@ -22,8 +22,10 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Indexed
 public class Article {
+
 	@Id
 	@GeneratedValue
+	@Field
 	long articleId;
 
 	@DocumentId

@@ -167,9 +167,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			String prefix,
 			ConfigContext configContext,
 			PathsContext pathsContext,
-			ParseContext parseContext) {
+			ParseContext parseContext,
+			boolean hasExplicitDocumentId) {
 		Annotation idAnnotation = getIdAnnotation( member, typeMetadataBuilder, configContext );
 		if ( idAnnotation == null ) {
+			return;
+		}
+
+		// Ignore JPA @Id/@DocumentId if @DocumentId is present at another property
+		if ( hasExplicitDocumentId && idAnnotation.annotationType() != DocumentId.class ) {
 			return;
 		}
 
@@ -447,6 +453,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		// iterate again for the properties and fields
 		for ( XClass currentClass : hierarchy ) {
 			parseContext.setCurrentClass( currentClass );
+			boolean hasExplicitDocumentId = hasExplicitDocumentId( currentClass );
+
 			// rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
 			// so indexing a non property does not make sense
 			List<XProperty> methods = currentClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
@@ -460,7 +468,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						isProvidedId,
 						configContext,
 						pathsContext,
-						parseContext
+						parseContext,
+						hasExplicitDocumentId
 				);
 			}
 
@@ -475,7 +484,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						isProvidedId,
 						configContext,
 						pathsContext,
-						parseContext
+						parseContext,
+						hasExplicitDocumentId
 				);
 			}
 
@@ -835,7 +845,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			boolean isProvidedId,
 			ConfigContext configContext,
 			PathsContext pathsContext,
-			ParseContext parseContext) {
+			ParseContext parseContext,
+			boolean hasExplicitDocumentId) {
 
 		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
 			.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
@@ -843,7 +854,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		NumericFieldsConfiguration numericFields = new NumericFieldsConfiguration( typeMetadataBuilder.getIndexedType(), member );
 
 		if ( !isProvidedId ) {
-			checkDocumentId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, isRoot, prefix, configContext, pathsContext, parseContext );
+			checkDocumentId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, isRoot, prefix, configContext, pathsContext, parseContext, hasExplicitDocumentId );
 		}
 
 		checkForField( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, prefix, configContext, pathsContext, parseContext );
@@ -1750,5 +1761,23 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		FieldMetadataBuilderImpl builder = new FieldMetadataBuilderImpl();
 		metadataProvidingFieldBridge.configureFieldMetadata( fieldName, builder );
 		return builder.getSortableFields();
+	}
+
+	private boolean hasExplicitDocumentId(XClass type) {
+		List<XProperty> methods = type.getDeclaredProperties( XClass.ACCESS_PROPERTY );
+		for ( XProperty method : methods ) {
+			if ( method.getAnnotation( DocumentId.class ) != null ) {
+				return true;
+			}
+		}
+
+		List<XProperty> fields = type.getDeclaredProperties( XClass.ACCESS_FIELD );
+		for ( XProperty field : fields ) {
+			if ( field.getAnnotation( DocumentId.class ) != null ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

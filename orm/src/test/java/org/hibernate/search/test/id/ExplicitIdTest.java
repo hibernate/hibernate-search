@@ -9,14 +9,14 @@ package org.hibernate.search.test.id;
 import java.util.List;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -120,6 +120,32 @@ public class ExplicitIdTest extends SearchTestBase {
 					e.getMessage()
 			);
 		}
+		tx.commit();
+		s.close();
+	}
+
+	/**
+	 * Tests that one can query on the default-named field of the JPA {@code @Id} property also if there is another
+	 * property marked with {@code @DocumentId}.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2056")
+	public void testQueryOnIdPropertyWithExplicitDocumentIdPresent() throws Exception {
+		Article hello = new Article();
+		hello.setDocumentId( 1 );
+		hello.setText( "Hello World" );
+
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.save( hello );
+		tx.commit();
+		s.clear();
+
+		tx = s.beginTransaction();
+		List results = Search.getFullTextSession( s ).createFullTextQuery(
+				NumericRangeQuery.newLongRange( "articleId", hello.getArticleId(), hello.getArticleId(), true, true )
+		).list();
+		assertEquals( 1, results.size() );
 		tx.commit();
 		s.close();
 	}
