@@ -11,10 +11,6 @@ import java.util.HashMap;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.easymock.EasyMockUnitils;
-import org.unitils.easymock.annotation.Mock;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
@@ -30,6 +26,10 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
 import org.hibernate.search.hcore.impl.SearchFactoryReference;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.easymock.EasyMockUnitils;
+import org.unitils.easymock.annotation.Mock;
 
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -137,7 +137,12 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 		// returning object.class is fair enough for testing purposes
 		expect( mockClassLoaderService.classForName( "javax.persistence.Id" ) )
-			.andReturn( Object.class );
+			.andReturn( Object.class )
+			.anyTimes();
+
+		expect( mockClassLoaderService.classForName( "javax.persistence.EmbeddedId" ) )
+			.andReturn( Object.class )
+			.anyTimes();
 
 		expect( mockClassLoaderService.loadJavaServices( BridgeProvider.class ) )
 			.andReturn( Collections.<BridgeProvider>emptySet() );

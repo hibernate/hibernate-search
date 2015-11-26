@@ -107,10 +107,33 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private final ConfigContext configContext;
 	private final BridgeFactory bridgeFactory;
 
+	private final Class<? extends Annotation> jpaIdClass;
+	private final Class<? extends Annotation> jpaEmbeddedIdClass;
+
 	public AnnotationMetadataProvider(ReflectionManager reflectionManager, ConfigContext configContext) {
 		this.reflectionManager = reflectionManager;
 		this.configContext = configContext;
 		this.bridgeFactory = new BridgeFactory( configContext.getServiceManager() );
+
+		if ( configContext.isJpaPresent() ) {
+			this.jpaIdClass = loadAnnotationClass( "javax.persistence.Id", configContext );
+			this.jpaEmbeddedIdClass = loadAnnotationClass( "javax.persistence.EmbeddedId", configContext );
+		}
+		else {
+			this.jpaIdClass = null;
+			this.jpaEmbeddedIdClass = null;
+		}
+	}
+
+	private Class<? extends Annotation> loadAnnotationClass(String className, ConfigContext configContext) {
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends Annotation> idClass = ClassLoaderHelper.classForName( className, configContext.getServiceManager() );
+			return idClass;
+		}
+		catch (ClassLoadingException e) {
+			throw new SearchException( "Unable to load class " + className + " even though it should be present?!" );
+		}
 	}
 
 	@Override
@@ -252,7 +275,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				throw log.duplicateDocumentIdFound( typeMetadataBuilder.getIndexedType().getName() );
 			}
 			else {
-				// If it's not a DocumentId it's a JPA @Id: ignore it as we already have a @DocumentId
+				// If it's not a DocumentId it's a JPA @Id/@EmbeddedId: ignore it as we already have a @DocumentId
 				return;
 			}
 		}
@@ -311,15 +334,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	/**
-	 * Checks whether the specified property contains an annotation used as document id.
-	 * This can either be an explicit <code>@DocumentId</code> or if no <code>@DocumentId</code> is specified a
-	 * JPA <code>@Id</code> annotation. The check for the JPA annotation is indirectly to avoid a hard dependency
-	 * to Hibernate Annotations.
+	 * Checks whether the specified property contains an annotation used as document id. This can either be an explicit
+	 * {@code @DocumentId} or if no {@code @DocumentId} is specified a JPA {@code @Id} / {@code @EmbeddedId} annotation.
+	 * The check for the JPA annotations is indirectly to avoid a hard dependency to Hibernate Annotations.
 	 *
 	 * @param member the property to check for the id annotation.
 	 * @param context Handle to default configuration settings.
-	 *
-	 * @return the annotation used as document id or <code>null</code> if id annotation is specified on the property.
+	 * @return the annotation used as document id or {@code null} if no id annotation is specified on the property.
 	 */
 	private Annotation getIdAnnotation(XProperty member, TypeMetadata.Builder typeMetadataBuilder, ConfigContext context) {
 		Annotation idAnnotation = null;
@@ -329,26 +350,24 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( documentIdAnnotation != null ) {
 			idAnnotation = documentIdAnnotation;
 		}
-		// check for JPA @Id
+		// check for JPA @Id/@EmbeddedId
 		if ( context.isJpaPresent() ) {
-			Annotation jpaId;
-			try {
-				@SuppressWarnings("unchecked")
-				Class<? extends Annotation> jpaIdClass =
-						ClassLoaderHelper.classForName( "javax.persistence.Id", configContext.getServiceManager() );
-				jpaId = member.getAnnotation( jpaIdClass );
+			Annotation jpaId = member.getAnnotation( jpaIdClass );
+
+			if ( jpaId == null ) {
+				jpaId = member.getAnnotation( jpaEmbeddedIdClass );
 			}
-			catch (ClassLoadingException e) {
-				throw new SearchException( "Unable to load @Id.class even though it should be present ?!" );
-			}
+
 			if ( jpaId != null ) {
 				typeMetadataBuilder.jpaProperty( member );
-				if ( documentIdAnnotation == null ) {
+
+				if ( idAnnotation == null ) {
 					log.debug( "Found JPA id and using it as document id" );
 					idAnnotation = jpaId;
 				}
 			}
 		}
+
 		return idAnnotation;
 	}
 
@@ -392,13 +411,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	 */
 	private String getIdAttributeName(XProperty member, Annotation idAnnotation) {
 		String name = null;
-		try {
-			Method m = idAnnotation.getClass().getMethod( "name" );
-			name = (String) m.invoke( idAnnotation );
+
+		if ( idAnnotation.annotationType() == DocumentId.class ) {
+			name = ( (DocumentId) idAnnotation ).name();
 		}
-		catch (Exception e) {
-			// ignore
-		}
+
 		return ReflectionHelper.getAttributeName( member, name );
 	}
 

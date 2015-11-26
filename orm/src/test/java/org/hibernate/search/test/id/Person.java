@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.test.id;
 
-import javax.persistence.Entity;
 import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
 
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 
 /**
@@ -20,9 +19,9 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Indexed
 public class Person {
+
 	@EmbeddedId
 	@FieldBridge(impl = PersonPKBridge.class)
-	@DocumentId
 	private PersonPK id;
 	private String favoriteColor;
 
