@@ -139,7 +139,12 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 		// returning object.class is fair enough for testing purposes
 		expect( mockClassLoaderService.classForName( "javax.persistence.Id" ) )
-			.andReturn( Object.class );
+			.andReturn( Object.class )
+			.anyTimes();
+
+		expect( mockClassLoaderService.classForName( "javax.persistence.EmbeddedId" ) )
+			.andReturn( Object.class )
+			.anyTimes();
 
 		expect( mockClassLoaderService.loadJavaServices( BridgeProvider.class ) )
 			.andReturn( Collections.<BridgeProvider>emptySet() );
