@@ -51,8 +51,10 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.jpa.TwoWayTransformerAdapter;
+import org.hibernate.search.jpa.EntityProvider;
 import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.jpa.HibernateFullTextQuery;
+import org.hibernate.search.jpa.TwoWayTransformerAdapter;
 import org.hibernate.search.jpa.ResultTransformer;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
@@ -61,12 +63,12 @@ import org.hibernate.search.spatial.Coordinates;
 
 /**
  * Implements JPA 2 query interface and delegate the call to
- * a Hibernate Core FullTextQuery.
+ * a Hibernate Core HibernateFullTextQuery.
  * This has the consequence of "duplicating" the JPA 2 query logic in some areas.
  *
  * @author Emmanuel Bernard
  */
-final class FullTextQueryImpl implements FullTextQuery {
+final class FullTextQueryImpl implements HibernateFullTextQuery {
 
 	private final org.hibernate.search.FullTextQuery query;
 	private final Session session;
@@ -82,13 +84,13 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public FullTextQuery setSort(Sort sort) {
+	public HibernateFullTextQuery setSort(Sort sort) {
 		query.setSort( sort );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setFilter(Filter filter) {
+	public HibernateFullTextQuery setFilter(Filter filter) {
 		query.setFilter( filter );
 		return this;
 	}
@@ -109,25 +111,25 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public FullTextQuery setCriteriaQuery(Criteria criteria) {
+	public HibernateFullTextQuery setCriteriaQuery(Criteria criteria) {
 		query.setCriteriaQuery( criteria );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setProjection(String... fields) {
+	public HibernateFullTextQuery setProjection(String... fields) {
 		query.setProjection( fields );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setSpatialParameters(double latitude, double longitude, String fieldName) {
+	public HibernateFullTextQuery setSpatialParameters(double latitude, double longitude, String fieldName) {
 		query.setSpatialParameters( latitude, longitude, fieldName );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setSpatialParameters(Coordinates center, String fieldName) {
+	public HibernateFullTextQuery setSpatialParameters(Coordinates center, String fieldName) {
 		query.setSpatialParameters( center, fieldName );
 		return this;
 	}
@@ -143,7 +145,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public FullTextQuery setResultTransformer(ResultTransformer transformer) {
+	public HibernateFullTextQuery setResultTransformer(ResultTransformer transformer) {
 		query.setResultTransformer( new TwoWayTransformerAdapter( transformer ) );
 		return this;
 	}
@@ -362,7 +364,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
+	public HibernateFullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
 		query.limitExecutionTimeTo( timeout, timeUnit );
 		return this;
 	}
@@ -373,9 +375,15 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
+	public HibernateFullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
 		query.initializeObjectsWith( lookupMethod, retrievalMethod );
 		return this;
+	}
+
+	@Override
+	public FullTextQuery entityProvider(EntityProvider entityProvider) {
+		//FIXME: implement this
+		return null;
 	}
 
 	@Override
@@ -537,7 +545,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 
 	@Override
 	public <T> T unwrap(Class<T> type) {
-		//I've purposely decided not to return the underlying Hibernate FullTextQuery
+		//I've purposely decided not to return the underlying Hibernate HibernateFullTextQuery
 		//as I see this as an implementation detail that should not be exposed.
 		return query.unwrap( type );
 	}

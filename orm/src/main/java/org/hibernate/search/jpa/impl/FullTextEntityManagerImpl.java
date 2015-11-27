@@ -26,12 +26,12 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.FullTextQuery;
-import org.hibernate.search.MassIndexer;
+import org.hibernate.search.jpa.HibernateFullTextQuery;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.jpa.MassIndexer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.Session;
@@ -91,7 +91,7 @@ final class FullTextEntityManagerImpl implements FullTextEntityManager, Serializ
 	}
 
 	@Override
-	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
+	public HibernateFullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
 		FullTextSession ftSession = getFullTextSession();
 		return new FullTextQueryImpl( ftSession.createFullTextQuery( luceneQuery, entities ), ftSession );
 	}
@@ -330,7 +330,7 @@ final class FullTextEntityManagerImpl implements FullTextEntityManager, Serializ
 
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
-		return getFullTextSession().createIndexer( types );
+		return new ORMMassIndexerAdapter( getFullTextSession().createIndexer( types ) );
 	}
 
 	@Override

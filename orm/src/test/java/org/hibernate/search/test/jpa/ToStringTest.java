@@ -19,6 +19,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -59,7 +60,7 @@ public class ToStringTest extends JPATestCase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1173")
 	public void testToStringContainsQueryInformationForJPAUseCase() throws Exception {
-		org.hibernate.search.jpa.FullTextQuery fullTextQuery = entityManager.createFullTextQuery(
+		FullTextQuery fullTextQuery = entityManager.createFullTextQuery(
 				luceneQuery, Foo.class
 		);
 		assertToStringContainsLuceneQueryInformation( fullTextQuery.toString() );

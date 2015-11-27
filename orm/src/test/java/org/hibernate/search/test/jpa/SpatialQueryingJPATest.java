@@ -13,6 +13,7 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.jpa.HibernateFullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
@@ -65,7 +66,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setProjection( HibernateFullTextQuery.THIS, HibernateFullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.getResultList();
 		Object[] firstResult = (Object[]) results.get( 0 );
@@ -123,7 +124,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
 		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
 		hibQuery.setSort( distanceSort );
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setProjection( HibernateFullTextQuery.THIS, HibernateFullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.getResultList();
 		Object[] firstResult = (Object[]) results.get( 0 );
@@ -188,7 +189,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
 		hibQuery.setSort( distanceSort );
 		hibQuery.setMaxResults( 1000 );
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setProjection( HibernateFullTextQuery.THIS, HibernateFullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = hibQuery.getResultList();
@@ -243,7 +244,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
 		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
 		hibQuery.setSort( distanceSort );
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setProjection( HibernateFullTextQuery.THIS, HibernateFullTextQuery.SPATIAL_DISTANCE );
 		// Set max results to 3 when 6 documents are stored:
 		hibQuery.setMaxResults( 3 );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
@@ -297,7 +298,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setProjection( HibernateFullTextQuery.THIS, HibernateFullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.getResultList();
 		Object[] firstResult = (Object[]) results.get( 0 );
@@ -318,7 +319,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		hibQuery = em.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setProjection( HibernateFullTextQuery.THIS, HibernateFullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, Spatial.COORDINATES_DEFAULT_FIELD );
 		results = hibQuery.getResultList();
 		firstResult = (Object[]) results.get( 0 );

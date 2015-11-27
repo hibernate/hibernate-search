@@ -16,9 +16,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.apache.lucene.search.Query;
+
 import org.hibernate.CacheMode;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.jpa.impl.ORMMassIndexerAdapter;
+
 import org.jboss.ejb3.annotation.TransactionTimeout;
 
 /**
@@ -62,8 +65,8 @@ public class ConcertManager {
 	@TransactionAttribute(TransactionAttributeType.NEVER)
 	public void indexConcerts() {
 		try {
-			Search.getFullTextEntityManager( entityManager )
-				.createIndexer()
+			((ORMMassIndexerAdapter) Search.getFullTextEntityManager( entityManager )
+					.createIndexer())
 				.batchSizeToLoadObjects( 1 )
 				.threadsToLoadObjects( 1 )
 				.transactionTimeout( 10 )

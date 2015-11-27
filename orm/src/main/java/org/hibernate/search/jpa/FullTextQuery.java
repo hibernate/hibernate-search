@@ -6,16 +6,15 @@
  */
 package org.hibernate.search.jpa;
 
-import java.util.concurrent.TimeUnit;
 import javax.persistence.Query;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 
-import org.hibernate.Criteria;
-import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
@@ -27,8 +26,8 @@ import org.hibernate.search.spatial.Coordinates;
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
+ * @author Martin Braun
  */
-//TODO return FullTextQuery rather than Query in useful chain methods
 public interface FullTextQuery extends Query, ProjectionConstants {
 
 	/**
@@ -65,17 +64,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 */
 	int getResultSize();
 
-	/**
-	 * Defines the Database Query used to load the Lucene results.
-	 * Useful to load a given object graph by refining the fetch modes
-	 *
-	 * No projection (criteria.setProjection() ) allowed, the root entity must be the only returned type
-	 * No where restriction can be defined either.
-	 *
-	 * @param criteria a query defined using {@link Criteria}
-	 * @return {@code this} for method chaining
-	 */
-	FullTextQuery setCriteriaQuery(Criteria criteria);
+
 
 	/**
 	 * Defines the Lucene field names projected and returned in a query result
@@ -194,4 +183,8 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod);
+
+	//
+
+	FullTextQuery entityProvider(EntityProvider entityProvider);
 }
