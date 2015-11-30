@@ -126,7 +126,6 @@ public final class LuceneBackendResources {
 		}
 		catch (InterruptedException e) {
 			log.interruptedWhileWaitingForIndexActivity( e );
-			Thread.currentThread().interrupt();
 		}
 		if ( ! asyncIndexingExecutor.isTerminated() ) {
 			log.unableToShutdownAsynchronousIndexingByTimeout( indexName );
