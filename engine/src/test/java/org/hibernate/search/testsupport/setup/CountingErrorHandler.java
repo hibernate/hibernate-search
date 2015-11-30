@@ -36,6 +36,14 @@ public class CountingErrorHandler implements ErrorHandler {
 		return count == null ? 0 : count;
 	}
 
+	public int getTotalCount() {
+		int total = 0;
+		for ( Integer i : stats.values() ) {
+			total += i;
+		}
+		return total;
+	}
+
 	private synchronized void register(Throwable exception) {
 		Integer count = stats.get( exception.getClass() );
 		if ( count == null ) {
