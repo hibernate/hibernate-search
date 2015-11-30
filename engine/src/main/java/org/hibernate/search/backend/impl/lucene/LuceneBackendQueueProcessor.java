@@ -65,8 +65,9 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void close() {
-		resources.shutdown();
+		//The order is important! The work processor uses the resources.
 		workProcessor.shutdown();
+		resources.shutdown();
 	}
 
 	@Override
