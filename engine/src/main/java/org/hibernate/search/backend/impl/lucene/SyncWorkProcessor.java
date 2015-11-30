@@ -14,6 +14,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -37,6 +39,10 @@ final class SyncWorkProcessor implements WorkProcessor {
 	private final MultiWriteDrainableLinkedList<Changeset> transferQueue = new MultiWriteDrainableLinkedList<>();
 
 	private volatile LuceneBackendResources resources;
+
+	//To allow others to wait on actual shutdown of the internal threads
+	private final CountDownLatch shutdownLatch = new CountDownLatch( 1 );
+
 	private final String indexName;
 	private volatile boolean stop = false;
 	final Thread consumerThread;
@@ -107,6 +113,12 @@ final class SyncWorkProcessor implements WorkProcessor {
 	public void shutdown() {
 		stop = true;
 		LockSupport.unpark( consumerThread );
+		try {
+			shutdownLatch.await( Long.MAX_VALUE, TimeUnit.SECONDS );
+		}
+		catch (InterruptedException e) {
+			log.timedOutWaitingShutdown( indexName );
+		}
 	}
 
 	/**
@@ -136,6 +148,7 @@ final class SyncWorkProcessor implements WorkProcessor {
 				}
 			}
 			log.stoppingSyncConsumerThread( indexName );
+			shutdownLatch.countDown();
 		}
 
 		private void applyChangesets(Iterable<Changeset> changesets) {

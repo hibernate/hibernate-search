@@ -918,4 +918,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 301, value = "Requested sort field(s) %3$s are not configured for entity type %1$s mapped to index %2$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortableField." )
 	SearchException uncoveredSortsRequestedWithUninvertingNotAllowed(@FormatWith(ClassFormatter.class) Class<?> entityType, String indexName, String uncoveredSorts);
+
+	@Message(id = 302, value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is indexed through a non directory-based backend")
+	SearchException cannotRunLuceneQueryTargetingEntityIndexedWithNonDirectoryBasedIndexManager(@FormatWith(ClassFormatter.class) Class<?> entityType, String query);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 303, value = "Timeout while waiting for indexing resources to properly flush and close on shut down of"
+			+ "indexing backend for index '%s'. Some pending index writes might have been lost.")
+	void timedOutWaitingShutdown(String indexName);
+
 }
