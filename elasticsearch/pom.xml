@@ -221,7 +221,6 @@
                                 <exclude>**/CompressionTest.java</exclude>
                                 <exclude>**/ConcurrentFlushTest.java</exclude>
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
-                                <exclude>**/ManualIndexingStrategyTest.java</exclude>
                                 <exclude>**/LuceneIndexingParametersTest.java</exclude>
                                 <exclude>**/StoreNormsTest.java</exclude>
                                 <exclude>**/ProgrammaticMappingTest.java</exclude>
@@ -236,13 +235,10 @@
                                 <exclude>**/CollectionUpdateEventsSecondTest.java</exclude>
                                 <exclude>**/CollectionUpdateEventTest.java</exclude>
                                 <exclude>**/DeleteByTermTest.java</exclude>
-                                <exclude>**/IndexReaderSeeOptimizedIndexTest.java</exclude>
                                 <exclude>**/UpdateOperationsTest.java</exclude>
                                 <exclude>**/SkipIndexingWorkForUnaffectingChangesTest.java</exclude>
                                 <exclude>**/TransactionTest.java</exclude>
                                 <exclude>**/UsingIdentifierRollbackTest.java</exclude>
-                                <exclude>**/WorkDuplicationTest.java</exclude>
-                                <exclude>**/WorkSequencesTest.java</exclude>
                                 <exclude>**/SearchAndEnversIntegrationTest.java</exclude>
                                 <exclude>**/EventBasedEmbeddableCollectionUpdateTest.java</exclude>
                                 <exclude>**/FilterTest.java</exclude>
@@ -290,8 +286,6 @@
                                 <exclude>**/JPATimeoutTest.java</exclude>
                                 <exclude>**/DirectoryProviderForQueryTest.java</exclude>
                                 <exclude>**/DirectorySelectionTest.java</exclude>
-                                <exclude>**/DynamicShardingTest.java</exclude>
-                                <exclude>**/ShardsTest.java</exclude>
                                 <exclude>**/SpatialIndexingTest.java</exclude>
                                 <exclude>**/SpatialSearchSortByDistanceAndPagingTest.java</exclude>
                                 <exclude>**/AnalyzerTest.java</exclude>
@@ -346,6 +340,7 @@
                                 <exclude>**/DirectoryLifecycleTest.java</exclude>
                                 <exclude>**/ScheduledCommitPolicyTest.java</exclude>
                                 <exclude>**/FSSlaveAndMasterDPTest.java</exclude>
+                                <exclude>**/IndexReaderSeeOptimizedIndexTest.java</exclude>
                             </excludes>
                         </configuration>
                     </execution>

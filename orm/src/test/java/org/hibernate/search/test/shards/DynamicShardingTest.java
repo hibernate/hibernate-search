@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.test.shards;
 
-import java.io.IOException;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -16,10 +18,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.store.FSDirectory;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -40,9 +39,6 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
@@ -88,8 +84,8 @@ public class DynamicShardingTest extends SearchTestBase {
 		insertAnimals( bear );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 
-		assertNumberOfEntitiesInIndex( "Animal.Mammal", 2 );
-		assertNumberOfEntitiesInIndex( "Animal.Insect", 1 );
+		assertEquals( 2, getNumberOfDocumentsInIndex( "Animal.Mammal" ) );
+		assertEquals( 1, getNumberOfDocumentsInIndex( "Animal.Insect" ) );
 	}
 
 	@Test
@@ -147,23 +143,6 @@ public class DynamicShardingTest extends SearchTestBase {
 		return new Class<?>[] {
 				Animal.class
 		};
-	}
-
-	private void assertNumberOfEntitiesInIndex(String indexName, int expectedCount) throws IOException {
-		FSDirectory fsDirectory = FSDirectory.open( getBaseIndexDir().resolve( indexName ) );
-		try {
-			IndexReader reader = DirectoryReader.open( fsDirectory );
-			try {
-				int actualCount = reader.numDocs();
-				assertEquals( "Unexpected document count", expectedCount, actualCount );
-			}
-			finally {
-				reader.close();
-			}
-		}
-		finally {
-			fsDirectory.close();
-		}
 	}
 
 	private void insertAnimals(Animal... animals) {

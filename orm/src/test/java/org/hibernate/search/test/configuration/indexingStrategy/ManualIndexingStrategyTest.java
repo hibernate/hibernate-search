@@ -13,8 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.hibernate.Session;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.Environment;
@@ -35,7 +33,7 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 		assertEquals(
 				"Due to manual indexing being enabled no automatic indexing should have occurred",
 				0,
-				getDocumentNbr()
+				getNumberOfDocumentsInIndex( TestEntity.class )
 		);
 	}
 
@@ -57,17 +55,6 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 
 		session.getTransaction().commit();
 		session.close();
-	}
-
-	private int getDocumentNbr() throws Exception {
-		// we directly access the index to verify the document count
-		IndexReader reader = DirectoryReader.open( getDirectory( TestEntity.class ) );
-		try {
-			return reader.numDocs();
-		}
-		finally {
-			reader.close();
-		}
 	}
 
 	@Indexed
