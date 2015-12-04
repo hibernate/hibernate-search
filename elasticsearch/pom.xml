@@ -251,7 +251,6 @@
                                 <exclude>**/SpatialQueryingJPATest.java</exclude>
                                 <exclude>**/ToStringTest.java</exclude>
                                 <exclude>**/DynamicBoostingTest.java</exclude>
-                                <exclude>**/FieldBoostTest.java</exclude>
                                 <exclude>**/ResultSizeOnCriteriaTest.java</exclude>
                                 <exclude>**/DSLTest.java</exclude>
                                 <exclude>**/MoreLikeThisTest.java</exclude>
