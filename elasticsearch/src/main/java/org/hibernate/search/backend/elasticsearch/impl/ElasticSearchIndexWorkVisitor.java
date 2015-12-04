@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import io.searchbox.core.Delete;
-import io.searchbox.core.Index;
-import io.searchbox.params.Parameters;
-
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
@@ -35,6 +31,10 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 
 import com.google.gson.JsonObject;
+
+import io.searchbox.core.Delete;
+import io.searchbox.core.Index;
+import io.searchbox.params.Parameters;
 
 /**
  * @author Gunnar Morling
@@ -75,11 +75,13 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	@Override
 	public Void visitOptimizeWork(OptimizeLuceneWork work, Void p) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
 	public Void visitPurgeAllWork(PurgeAllLuceneWork work, Void p) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
@@ -91,12 +93,14 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	@Override
 	public Void visitFlushWork(FlushLuceneWork work, Void p) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
 	public Void visitDeleteByQueryWork(
 			DeleteByQueryLuceneWork work, Void p) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 

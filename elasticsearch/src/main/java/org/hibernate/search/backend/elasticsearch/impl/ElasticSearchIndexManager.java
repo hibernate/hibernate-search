@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.IndicesExists;
-import io.searchbox.indices.mapping.PutMapping;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +36,10 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
+
+import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.IndicesExists;
+import io.searchbox.indices.mapping.PutMapping;
 
 /**
  * An {@link IndexManager} applying indexing work to an ElasticSearch server.
@@ -107,6 +107,9 @@ public class ElasticSearchIndexManager implements IndexManager {
 		clientReference.executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
 	}
 
+	// TODO
+	// What happens if mappings already exist? We need an option similar to hbm2ddl
+	// What happens if several nodes in a cluster try to create the mappings?
 	private void createIndexMappings() {
 		for ( Class<?> entityType : containedEntityTypes ) {
 			EntityIndexBinding descriptor = searchIntegrator.getIndexBinding( entityType );
@@ -322,10 +325,12 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
 	public void optimize() {
+		// TODO Is there such thing for ES?
 	}
 }
