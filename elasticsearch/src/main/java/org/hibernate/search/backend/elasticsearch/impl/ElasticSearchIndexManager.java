@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
@@ -20,6 +19,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -70,17 +70,15 @@ public class ElasticSearchIndexManager implements IndexManager {
 	@Override
 	public void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context) {
 		this.serviceManager = context.getServiceManager();
-		this.indexName = indexName;
-
-		this.actualIndexName = indexName.toLowerCase( Locale.ENGLISH );
-		if ( !actualIndexName.equals( indexName ) ) {
-			// TODO LOG
-			// TODO: if index lowercasing introduces a possible ambiguity in the ES case, maybe we should validate for this
-			// at the root of all IndexManagers during bootstrap?
-		}
-
+		this.indexName = getIndexName( indexName, properties );
+		this.actualIndexName = IndexNameNormalizer.getElasticSearchIndexName( this.indexName );
 		this.similarity = similarity;
 		this.backend = BackendFactory.createBackend( this, context, properties );
+	}
+
+	private String getIndexName(String indexName, Properties properties) {
+		String name = properties.getProperty( Environment.INDEX_NAME_PROP_NAME );
+		return name != null ? name : indexName;
 	}
 
 	@Override
