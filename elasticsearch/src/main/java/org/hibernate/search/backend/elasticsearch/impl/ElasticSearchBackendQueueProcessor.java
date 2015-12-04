@@ -49,16 +49,19 @@ public class ElasticSearchBackendQueueProcessor implements BackendQueueProcessor
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
 	public Lock getExclusiveWriteLock() {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
 	public void indexMappingChanged() {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }

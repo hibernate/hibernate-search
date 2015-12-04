@@ -6,11 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
-import io.searchbox.core.search.sort.Sort;
-import io.searchbox.core.search.sort.Sort.Sorting;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -58,6 +53,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
+import io.searchbox.core.search.sort.Sort;
+import io.searchbox.core.search.sort.Sort.Sorting;
+
 /**
  * Query implementation based on ElasticSearch.
  *
@@ -84,6 +84,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public FacetManager getFacetManager() {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
@@ -111,16 +112,19 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public Explanation explain(int documentId) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override
 	public HSQuery setSpatialParameters(Coordinates center, String fieldName) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override
 	public HSQuery tenantIdentifier(String tenantId) {
+		// TODO implement
 		if ( tenantId != null ) {
 			LOG.warnf( "Multi-tenancy not yet implemented for ElasticSearch backend" );
 		}
@@ -130,16 +134,19 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public HSQuery filter(Filter filter) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override
 	public FullTextFilter enableFullTextFilter(String name) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override
 	public void disableFullTextFilter(String name) {
+		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
