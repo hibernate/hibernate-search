@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import io.searchbox.core.DocumentResult;
+import io.searchbox.core.Explain;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
@@ -74,6 +77,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 	private final String jsonQuery;
 
 	private Integer resultSize;
+	private IndexSearcher searcher;
+	private SearchResult searchResult;
 
 	public ElasticSearchHSQueryImpl(String jsonQuery, ExtendedSearchIntegrator extendedIntegrator) {
 		super( extendedIntegrator );
@@ -103,11 +108,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public int queryResultSize() {
-		if ( resultSize == null ) {
-			IndexSearcher searcher = new IndexSearcher();
-			SearchResult searchResult = searcher.runSearch();
-
-			resultSize = searchResult.getTotal();
+		if ( searchResult == null ) {
+			execute();
 		}
 
 		return resultSize;
@@ -115,8 +117,54 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public Explanation explain(int documentId) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		if ( searchResult == null ) {
+			execute();
+		}
+
+		JsonObject hit = searchResult.getJsonObject()
+				.get( "hits" )
+				.getAsJsonObject()
+				.get( "hits" )
+				.getAsJsonArray()
+				// TODO Is it right to use the document id that way? I am not quite clear about its semantics
+				.get( documentId )
+				.getAsJsonObject();
+
+		try ( JestClientReference client = new JestClientReference( getExtendedSearchIntegrator().getServiceManager() ) ) {
+			Explain request = new Explain.Builder(
+					hit.get( "_index" ).getAsString(),
+					hit.get( "_type" ).getAsString(),
+					hit.get( "_id" ).getAsString(),
+					searcher.executedQuery
+				)
+				.build();
+
+			DocumentResult response = client.executeRequest( request );
+			JsonObject explanation = response.getJsonObject().get( "explanation" ).getAsJsonObject();
+
+			return convertExplanation( explanation );
+		}
+	}
+
+	private Explanation convertExplanation(JsonObject explanation) {
+		float value = explanation.get( "value" ).getAsFloat();
+		String description = explanation.get( "description" ).getAsString();
+		JsonElement explanationDetails = explanation.get( "details" );
+
+		List<Explanation> details;
+
+		if ( explanationDetails != null ) {
+			details = new ArrayList<>( explanationDetails.getAsJsonArray().size() );
+
+			for ( JsonElement detail : explanationDetails.getAsJsonArray() ) {
+				details.add( convertExplanation( detail.getAsJsonObject() ) );
+			}
+		}
+		else {
+			details = Collections.emptyList();
+		}
+
+		return Explanation.match( value, description, details );
 	}
 
 	@Override
@@ -159,8 +207,9 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public List<EntityInfo> queryEntityInfos() {
-		IndexSearcher searcher = new IndexSearcher();
-		SearchResult searchResult = searcher.runSearch();
+		if ( searchResult == null ) {
+			execute();
+		}
 
 		List<EntityInfo> results = new ArrayList<>( searchResult.getTotal() );
 		JsonArray hits = searchResult.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
@@ -173,6 +222,13 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		return results;
+	}
+
+	private void execute() {
+		searcher = new IndexSearcher();
+
+		searchResult = searcher.runSearch();
+		resultSize = searchResult.getTotal();
 	}
 
 	private Object getId(JsonObject hit, EntityIndexBinding binding) {
@@ -190,6 +246,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 		private final Search search;
 		private final Map<String, Class<?>> entityTypesByName;
+		private final String executedQuery;
 
 		private IndexSearcher() {
 			entityTypesByName = new HashMap<>();
@@ -219,7 +276,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			JsonObject effectiveFilter = getEffectiveFilter();
 
 			// TODO can we avoid the forth and back between GSON and String?
-			String executedQuery = "{ \"query\" : { \"filtered\" : { " + jsonQuery.substring( 1, jsonQuery.length() - 1 ) + ", \"filter\" : " + effectiveFilter.toString() + " } } }";
+			executedQuery = "{ \"query\" : { \"filtered\" : { " + jsonQuery.substring( 1, jsonQuery.length() - 1 ) + ", \"filter\" : " + effectiveFilter.toString() + " } } }";
 
 			Search.Builder search = new Search.Builder( executedQuery );
 			search.addIndex( indexNames );
