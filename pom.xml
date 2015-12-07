@@ -145,21 +145,21 @@
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>5.3.1</luceneVersion>
-        <infinispanVersion>8.0.1.Final</infinispanVersion>
+        <infinispanVersion>8.0.2.Final</infinispanVersion>
         <jgroupsVersion>3.6.6.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
-        <hibernateVersion>5.0.4.Final</hibernateVersion>
+        <hibernateVersion>5.0.5.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>5.0.1.Final</hibernateCommonsAnnotationVersion>
-        <jandexVersion>2.0.0.CR1</jandexVersion>
-        <classMateVersion>0.8.0</classMateVersion>
+        <jandexVersion>2.0.0.Final</jandexVersion>
+        <classMateVersion>1.1.0</classMateVersion>
         <javassistVersion>3.18.1-GA</javassistVersion>
 
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>3.0.2</bytemanVersion>
         <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>2.0.0.Final</jbossLoggingProcessorVersion>
-        <narayanaVersion>5.2.5.Final</narayanaVersion>
+        <narayanaVersion>5.2.8.Final</narayanaVersion>
         <avroVersion>1.7.6</avroVersion>
         <jacksonAslVersion>1.9.13</jacksonAslVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
