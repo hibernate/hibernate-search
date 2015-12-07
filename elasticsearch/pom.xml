@@ -222,7 +222,6 @@
                                 <exclude>**/ConcurrentFlushTest.java</exclude>
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
                                 <exclude>**/LuceneIndexingParametersTest.java</exclude>
-                                <exclude>**/StoreNormsTest.java</exclude>
                                 <exclude>**/ProgrammaticMappingTest.java</exclude>
                                 <exclude>**/ShardsConfigurationTest.java</exclude>
                                 <exclude>**/DocumentIdContainedInTest.java</exclude>
@@ -236,9 +235,7 @@
                                 <exclude>**/CollectionUpdateEventTest.java</exclude>
                                 <exclude>**/DeleteByTermTest.java</exclude>
                                 <exclude>**/UpdateOperationsTest.java</exclude>
-                                <exclude>**/SkipIndexingWorkForUnaffectingChangesTest.java</exclude>
                                 <exclude>**/TransactionTest.java</exclude>
-                                <exclude>**/UsingIdentifierRollbackTest.java</exclude>
                                 <exclude>**/SearchAndEnversIntegrationTest.java</exclude>
                                 <exclude>**/EventBasedEmbeddableCollectionUpdateTest.java</exclude>
                                 <exclude>**/FilterTest.java</exclude>
@@ -272,7 +269,6 @@
                                 <exclude>**/WebShopTest.java</exclude>
 
                                 <exclude>**/SecondLCAndPCLookupTest.java</exclude>
-                                <exclude>**/StrictSecondLCAndPCLookupTest.java</exclude>
                                 <exclude>**/LuceneQueryTest.java</exclude>
                                 <exclude>**/IndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>

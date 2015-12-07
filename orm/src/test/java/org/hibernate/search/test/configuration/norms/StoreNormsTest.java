@@ -26,7 +26,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -51,7 +51,7 @@ public class StoreNormsTest extends SearchTestBase {
 		fullTextSession.save( test );
 		tx.commit();
 
-		List<LuceneWork> processedQueue = LeakingLuceneBackend.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
 		assertTrue( processedQueue.size() == 1 );
 		AddLuceneWork addLuceneWork = (AddLuceneWork) processedQueue.get( 0 );
 		Document doc = addLuceneWork.getDocument();
@@ -73,7 +73,7 @@ public class StoreNormsTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
 	}
 
 	@Entity
