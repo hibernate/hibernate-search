@@ -23,7 +23,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
-import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
@@ -50,17 +50,17 @@ public class RecursiveGraphTest extends SearchTestBase {
 		verifyMatchExistsWithName( 2L, "parents.parents.name", "Fulk V of Anjou" );
 		verifyNoMatchExists( "parents.parents.parents.name", "Fulk V of Anjou" );
 
-		LeakingLuceneBackend.reset();
+		LeakingBackendQueueProcessor.reset();
 		renamePerson( 1L, "John Lackland" );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
 		assertEquals( 0, countWorksDoneOnPerson( 2L ) );
 
-		LeakingLuceneBackend.reset();
+		LeakingBackendQueueProcessor.reset();
 		renamePerson( 2L, "Henry II of New England" );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 2L ) );
 
-		LeakingLuceneBackend.reset();
+		LeakingBackendQueueProcessor.reset();
 		renamePerson( 16L, "Fulk 4th of Anjou" );
 		assertEquals( 1, countWorksDoneOnPerson( 16L ) );
 		assertEquals( 0, countWorksDoneOnPerson( 17L ) );
@@ -179,7 +179,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 	}
 
 	private int countWorksDoneOnPerson(Long pk) {
-		List<LuceneWork> processedQueue = LeakingLuceneBackend.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
 		int count = 0;
 		for ( LuceneWork luceneWork : processedQueue ) {
 			Serializable id = luceneWork.getId();
@@ -197,7 +197,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
 	}
 
 }

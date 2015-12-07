@@ -14,7 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
 
 /**
  * @author Sanne Grinovero
@@ -33,7 +33,7 @@ public class DocumentIdContainedInTest extends RecursiveGraphTest {
 		finally {
 			session.close();
 		}
-		List<LuceneWork> processedQueue = LeakingLuceneBackend.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
 		// as they resolve to the same Lucene id only one instance will make it to the backend.
 		// (which one is undefined, nobody should use a constant as id)
 		Assert.assertEquals( 1, processedQueue.size() );
