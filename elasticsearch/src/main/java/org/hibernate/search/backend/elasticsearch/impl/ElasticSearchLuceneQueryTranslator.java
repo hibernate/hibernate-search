@@ -168,11 +168,25 @@ public class ElasticSearchLuceneQueryTranslator implements LuceneQueryTranslator
 	}
 
 	private JsonObject convertTermQuery(TermQuery termQuery) {
+		String field = termQuery.getTerm().field();
+
 		JsonObject term = new JsonObject();
-		term.addProperty( termQuery.getTerm().field(), termQuery.getTerm().text() );
+		term.addProperty( field, termQuery.getTerm().text() );
 
 		JsonObject matchQuery = new JsonObject();
 		matchQuery.add( "match", term );
+
+		// prepare query on nested property
+		if ( field.contains( "." ) ) {
+			String path = field.substring( 0, field.lastIndexOf( "." ) );
+
+			JsonObject nested = new JsonObject();
+			nested.addProperty( "path", path );
+			nested.add( "query", matchQuery );
+
+			matchQuery = new JsonObject();
+			matchQuery.add( "nested", nested );
+		}
 
 		return matchQuery;
 	}

@@ -295,7 +295,6 @@
                                 <exclude>**/FieldOnCollectionReindexTest.java</exclude>
                                 <exclude>**/LazyM2OContainedInTest.java</exclude>
                                 <exclude>**/NestedContainedInTest.java</exclude>
-                                <exclude>**/NestedEmbeddedTest.java</exclude>
                                 <exclude>**/DefaultDepthPathCaseEmbeddedTest.java</exclude>
                                 <exclude>**/PathRespectDepthCaseEmbeddedTest.java</exclude>
                                 <exclude>**/IdIncludedInPathCaseEmbeddedTest.java</exclude>
