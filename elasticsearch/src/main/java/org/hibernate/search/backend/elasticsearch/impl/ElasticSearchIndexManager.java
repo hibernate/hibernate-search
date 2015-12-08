@@ -74,6 +74,8 @@ public class ElasticSearchIndexManager implements IndexManager {
 		this.actualIndexName = indexName.toLowerCase( Locale.ENGLISH );
 		if ( !actualIndexName.equals( indexName ) ) {
 			// TODO LOG
+			// TODO: if index lowercasing introduces a possible ambiguity in the ES case, maybe we should validate for this
+			// at the root of all IndexManagers during bootstrap?
 		}
 
 		this.similarity = similarity;

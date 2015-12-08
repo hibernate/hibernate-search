@@ -123,6 +123,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		serviceManager.releaseService( MessageSenderService.class );
 
 		if ( selectionStrategy.isIndexOwnerLocal() ) {
+			//TODO verify all delegates have been closed when ownership was lost before [HSEARCH-2060]
 			delegatedBackend.close();
 		}
 	}
