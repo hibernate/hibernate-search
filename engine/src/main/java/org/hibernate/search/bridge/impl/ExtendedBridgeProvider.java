@@ -19,7 +19,7 @@ import org.hibernate.search.exception.AssertionFailure;
  *
  * @author Emmanuel Bernard
  */
-abstract class ExtendedBridgeProvider implements BridgeProvider {
+public abstract class ExtendedBridgeProvider implements BridgeProvider {
 
 	/**
 	 * Same as {@link org.hibernate.search.bridge.spi.BridgeProvider#provideFieldBridge(org.hibernate.search.bridge.spi.BridgeProvider.BridgeProviderContext)}
@@ -36,7 +36,7 @@ abstract class ExtendedBridgeProvider implements BridgeProvider {
 		return provideFieldBridge( (ExtendedBridgeProviderContext) bridgeProviderContext );
 	}
 
-	interface ExtendedBridgeProviderContext extends BridgeProviderContext {
+	public interface ExtendedBridgeProviderContext extends BridgeProviderContext {
 
 		/**
 		 * Offers access to the annotations hosted on the member seeking a bridge.

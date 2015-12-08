@@ -36,6 +36,7 @@ import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.spatial.Coordinates;
@@ -62,15 +63,16 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private int fetchSize = 1;
 	private final HSQuery hSearchQuery;
 
+
 	/**
 	 * Constructs a  <code>FullTextQueryImpl</code> instance.
 	 *
-	 * @param query The Lucene query.
+	 * @param query The query.
 	 * @param classes Array of classes (must be immutable) used to filter the results to the given class types.
 	 * @param session Access to the Hibernate session.
 	 * @param parameterMetadata Additional query metadata.
 	 */
-	public FullTextQueryImpl(org.apache.lucene.search.Query query,
+	public FullTextQueryImpl(QueryDescriptor query,
 			Class<?>[] classes,
 			SessionImplementor session,
 			ParameterMetadata parameterMetadata) {
@@ -81,9 +83,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		this.objectLookupMethod = extendedIntegrator.getDefaultObjectLookupMethod();
 		this.databaseRetrievalMethod = extendedIntegrator.getDefaultDatabaseRetrievalMethod();
 
-		hSearchQuery = getExtendedSearchIntegrator().createHSQuery();
+		hSearchQuery = query.createHSQuery( extendedIntegrator );
 		hSearchQuery
-				.luceneQuery( query )
 				.timeoutExceptionFactory( exceptionFactory )
 				.tenantIdentifier( session.getTenantIdentifier() )
 				.targetedEntities( Arrays.asList( classes ) );

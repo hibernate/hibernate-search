@@ -9,12 +9,13 @@ package org.hibernate.search.backend;
 import java.lang.reflect.Constructor;
 import java.util.Properties;
 
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
@@ -40,23 +41,44 @@ public final class BackendFactory {
 	private static final String JGROUPS_AUTO_SELECTOR = "org.hibernate.search.backend.jgroups.impl.AutoNodeSelector";
 	private static final String JGROUPS_SELECTOR_BASE_TYPE = "org.hibernate.search.backend.jgroups.impl.NodeSelectorStrategy";
 
+	private static final String ES_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchBackendQueueProcessor";
+	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager";
+
 	private BackendFactory() {
 		//not allowed
 	}
 
-	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext buildContext, Properties properties) {
+	public static BackendQueueProcessor createBackend(IndexManager indexManager, WorkerBuildContext buildContext, Properties properties) {
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		return createBackend( backend, indexManager, buildContext, properties );
 	}
 
 	public static BackendQueueProcessor createBackend(String backend,
-			DirectoryBasedIndexManager indexManager,
+			IndexManager indexManager,
 			WorkerBuildContext buildContext,
 			Properties properties) {
 		final BackendQueueProcessor backendQueueProcessor;
 
-		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessor = new LuceneBackendQueueProcessor();
+		if ( StringHelper.isEmpty( backend ) ) {
+			if ( indexManager.getClass().getName().equals( ES_INDEX_MANAGER ) ) {
+				backendQueueProcessor = ClassLoaderHelper.instanceFromName(
+						BackendQueueProcessor.class,
+						ES_BACKEND_QUEUE_PROCESSOR,
+						"ElasticSearch backend",
+						buildContext.getServiceManager()
+				);
+			}
+			else {
+				backendQueueProcessor = new LuceneBackendQueueProcessor();
+			}
+		}
+		else if ( "lucene".equalsIgnoreCase( backend ) ) {
+			if ( indexManager.getClass().getName().equals( ES_INDEX_MANAGER ) ) {
+				throw new SearchException( "Cannot use Lucene backend together with ElasticSearch index manager" );
+			}
+			else {
+				backendQueueProcessor = new LuceneBackendQueueProcessor();
+			}
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(

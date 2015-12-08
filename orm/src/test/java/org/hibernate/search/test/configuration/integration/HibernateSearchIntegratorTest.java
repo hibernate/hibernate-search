@@ -11,10 +11,6 @@ import java.util.HashMap;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.easymock.EasyMockUnitils;
-import org.unitils.easymock.annotation.Mock;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
@@ -30,6 +26,10 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
 import org.hibernate.search.hcore.impl.SearchFactoryReference;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.easymock.EasyMockUnitils;
+import org.unitils.easymock.annotation.Mock;
 
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -41,6 +41,8 @@ import static org.easymock.EasyMock.startsWith;
  * @author Hardy Ferentschik
  */
 public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
+
+	private static final String ELASTICSEARCH_BRIDGE_PROVIDER_CLASS = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchBridgeProvider";
 
 	private static final Boolean SEARCH_DISABLED = Boolean.FALSE;
 	private static final Boolean SEARCH_ENABLED = Boolean.TRUE;
@@ -145,6 +147,9 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 		expect( mockClassLoaderService.classForName( startsWith( "java.time" ) ) )
 			.andThrow( new ClassLoadingException( "Called by JavaTimeBridgeProvider; we assume the classes in java.time are not on the ORM class loader" ) )
 			.anyTimes();
+
+		expect( mockClassLoaderService.classForName( ELASTICSEARCH_BRIDGE_PROVIDER_CLASS ) )
+			.andReturn( null );
 
 		expect( mockMetadata.getEntityBindings() )
 			.andReturn( Collections.EMPTY_SET )

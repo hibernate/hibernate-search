@@ -26,6 +26,7 @@
         <module>serialization/avro</module>
         <module>backends/jgroups</module>
         <module>backends/jms</module>
+        <module>elasticsearch</module>
         <module>orm</module>
         <module>testing</module>
         <module>infinispan</module>
@@ -447,6 +448,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-documentation</artifactId>
                 <type>pom</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1162,6 +1168,18 @@
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.alexcojocaru</groupId>
+                    <artifactId>elasticsearch-maven-plugin</artifactId>
+                    <version>2.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-api</artifactId>
+                            <version>${slf4jVersion}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
