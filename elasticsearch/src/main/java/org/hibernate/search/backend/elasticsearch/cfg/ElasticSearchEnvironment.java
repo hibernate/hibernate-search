@@ -14,6 +14,7 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 public final class ElasticSearchEnvironment {
 
 	public static final String SERVER_URI = "hibernate.search.elasticsearch.host";
+	public static final String INDEX_MANAGEMENT_STRATEGY = "hibernate.search.elasticsearch.index_management_strategy";
 
 	private ElasticSearchEnvironment() {
 	}
