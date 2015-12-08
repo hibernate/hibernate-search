@@ -17,8 +17,8 @@
 
     <artifactId>hibernate-search-backend-elasticsearch</artifactId>
 
-    <name>Hibernate Search ElasticSearch Backend</name>
-    <description>Hibernate Search JGroup based backend</description>
+    <name>Hibernate Search Elasticsearch Backend</name>
+    <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>
 
     <dependencies>
         <dependency>
