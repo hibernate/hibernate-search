@@ -196,7 +196,6 @@
                                 <exclude>**/MassIndexerCancellingTest.java</exclude>
                                 <exclude>**/IndexingGeneratedCorpusTest.java</exclude>
                                 <exclude>**/MassIndexerErrorReportingTest.java</exclude>
-                                <exclude>**/MassIndexerIndexedEmbeddedProxyTest.java</exclude>
 
                                 <!-- Analyzers -->
                                 <exclude>**/CustomAnalyzerInClassBridgeTest.java</exclude>
@@ -259,7 +258,6 @@
                                 <exclude>**/StringFacetingTest.java</exclude>
                                 <exclude>**/WebShopTest.java</exclude>
 
-                                <exclude>**/LuceneQueryTest.java</exclude>
                                 <exclude>**/IndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProjectionQueryTest.java</exclude>

@@ -98,6 +98,13 @@ class FieldHelper {
 	}
 
 	static DocumentFieldMetadata getFieldMetadata(EntityIndexBinding indexBinding, String fieldName) {
+		if ( indexBinding.getDocumentBuilder().getIdentifierName().equals( fieldName ) ) {
+			return indexBinding.getDocumentBuilder()
+					.getTypeMetadata()
+					.getIdPropertyMetadata()
+					.getFieldMetadata( fieldName );
+		}
+
 		PropertyMetadata property = FieldHelper.getPropertyMetadata( indexBinding, fieldName );
 
 		if ( property != null ) {

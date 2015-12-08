@@ -72,7 +72,13 @@ import io.searchbox.core.search.sort.Sort.Sorting;
 public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
 	private static final Pattern DOT = Pattern.compile( "\\." );
+
+	/**
+	 * ES default limit for (firstResult + maxResult)
+	 */
+	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
 
 	private final String jsonQuery;
 
@@ -250,6 +256,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 		private IndexSearcher() {
 			entityTypesByName = new HashMap<>();
+			String idFieldName = null;
+			JsonArray typeFilters = new JsonArray();
 			Set<String> indexNames = new HashSet<>();
 
 			for ( Class<?> queriedEntityType : getQueriedEntityTypes() ) {
@@ -266,14 +274,19 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 						);
 					}
 
+					// TODO will this be a problem when querying multiple entity types, with one using a field as id
+					// field and the other not; is that possible?
+					idFieldName = binding.getDocumentBuilder().getIdentifierName();
 					ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
 					indexNames.add( esIndexManager.getActualIndexName() );
 				}
+
+				typeFilters.add( getEntityTypeFilter( queriedEntityType ) );
 			}
 
 			// Query filters; always a type filter, possibly a tenant id filter;
 			// TODO feed in user-provided filters
-			JsonObject effectiveFilter = getEffectiveFilter();
+			JsonObject effectiveFilter = getEffectiveFilter( typeFilters );
 
 			// TODO can we avoid the forth and back between GSON and String?
 			executedQuery = "{ \"query\" : { \"filtered\" : { " + jsonQuery.substring( 1, jsonQuery.length() - 1 ) + ", \"filter\" : " + effectiveFilter.toString() + " } } }";
@@ -281,24 +294,41 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			Search.Builder search = new Search.Builder( executedQuery );
 			search.addIndex( indexNames );
 			search.setParameter( "from", firstResult );
-			search.setParameter( "size", maxResults != null ? maxResults : Integer.MAX_VALUE );
 
-			// TODO: Id, embedded fields
+			// If the user has given a value, take it as is, let ES itself complain if it's too high; if no value is
+			// given, I take as much as possible, as by default only 10 rows would be returned
+			search.setParameter( "size", maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult );
+
+			// TODO: embedded fields
 			if ( sort != null ) {
 				for ( SortField sortField : sort.getSort() ) {
-					search.addSort( new Sort( sortField.getField(), sortField.getReverse() ? Sorting.DESC : Sorting.ASC ) );
+					String sortFieldName = sortField.getField().equals( idFieldName ) ? "_uid" : sortField.getField();
+					search.addSort( new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC ) );
 				}
 			}
 			this.search = search.build();
 		}
 
-		private JsonObject getEffectiveFilter() {
+		private JsonObject getEffectiveFilter(JsonArray typeFilters) {
 			JsonArray filters = new JsonArray();
 
 			JsonObject tenantFilter = getTenantIdFilter();
 			if ( tenantFilter != null ) {
 				filters.add( tenantFilter );
 			}
+
+			// wrap type filters into should if there is more than one
+			JsonObject effectiveTypeFilter = new JsonObject();
+			if ( typeFilters.size() == 1 ) {
+				effectiveTypeFilter = typeFilters.get( 0 ).getAsJsonObject();
+			}
+			else {
+				JsonObject should = new JsonObject();
+				should.add( "should", typeFilters );
+				effectiveTypeFilter = new JsonObject();
+				effectiveTypeFilter.add( "bool", should );
+			}
+			filters.add( effectiveTypeFilter );
 
 			// wrap filters into must if there is more than one
 			JsonObject effectiveFilter = new JsonObject();
@@ -313,6 +343,16 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			}
 
 			return effectiveFilter;
+		}
+
+		private JsonObject getEntityTypeFilter(Class<?> queriedEntityType) {
+			JsonObject value = new JsonObject();
+			value.addProperty( "value", queriedEntityType.getName() );
+
+			JsonObject type = new JsonObject();
+			type.add( "type", value );
+
+			return type;
 		}
 
 		private JsonObject getTenantIdFilter() {
@@ -417,7 +457,15 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 						+ binding.getDocumentBuilder().getMetadata().getType().getName() );
 			}
 
-			JsonElement value = getFieldValue( hit.get( "_source" ).getAsJsonObject(), projectedField );
+			JsonElement value;
+
+			if ( field.isId() ) {
+				value = hit.get( "_id" );
+			}
+			else {
+				value = getFieldValue( hit.get( "_source" ).getAsJsonObject(), projectedField );
+			}
+
 			if ( value == null || value.isJsonNull() ) {
 				return null;
 			}
@@ -553,7 +601,10 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			results = new ArrayList<>( searchResult.getTotal() );
 
 			for ( JsonElement hit : hits ) {
-				results.add( searcher.convertQueryHit( hit.getAsJsonObject() ) );
+				EntityInfo converted = searcher.convertQueryHit( hit.getAsJsonObject() );
+				if ( converted != null ) {
+					results.add( converted );
+				}
 			}
 		}
 	}
