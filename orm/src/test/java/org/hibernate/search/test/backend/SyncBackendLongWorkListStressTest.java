@@ -12,9 +12,9 @@ import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,6 +27,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 	@Test
 	public void testWorkLongerThanMaxQueueSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
+
 		for ( int i = 0; i < NUM_SAVED_ENTITIES; i++ ) {
 			Transaction tx = s.beginTransaction();
 			Clock clock = new Clock( i, "brand num° " + i );
@@ -53,6 +54,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		int fullTextCount = s.createFullTextQuery( new MatchAllDocsQuery(), Clock.class ).getResultSize();
 		Assert.assertEquals( NUM_SAVED_ENTITIES, fullTextCount );
+		s.purgeAll( Clock.class );
 		tx.commit();
 		s.close();
 	}
@@ -68,6 +70,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.put( "hibernate.search.default.max_queue_length", "5" );
 		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+		cfg.put( "hibernate.search.elasticsearch.index_management_strategy", "MERGE" );
 	}
 
 }
