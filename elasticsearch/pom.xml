@@ -55,6 +55,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
@@ -232,8 +237,6 @@
                                 <exclude>**/ProgrammaticEmbeddedItTest.java</exclude>
                                 <exclude>**/IndexingActionInterceptorTest.java</exclude>
                                 <exclude>**/IndexControlMBeanTest.java</exclude>
-                                <exclude>**/EntityManagerSerializationTest.java</exclude>
-                                <exclude>**/EntityManagerTest.java</exclude>
                                 <exclude>**/SpatialQueryingJPATest.java</exclude>
                                 <exclude>**/ToStringTest.java</exclude>
                                 <exclude>**/DynamicBoostingTest.java</exclude>
