@@ -187,7 +187,6 @@
                             <excludes>
                                 <!-- Mass indexer -->
                                 <exclude>**/MassIndexerCancellingTest.java</exclude>
-                                <exclude>**/MassIndexTest.java</exclude>
                                 <exclude>**/IndexingGeneratedCorpusTest.java</exclude>
                                 <exclude>**/MassIndexerErrorReportingTest.java</exclude>
                                 <exclude>**/MassIndexerIndexedEmbeddedProxyTest.java</exclude>
@@ -211,7 +210,6 @@
                                 <exclude>**/OptimizationTriggerTest.java</exclude>
                                 <exclude>**/WorkQueueLengthConfiguredTest.java</exclude>
                                 <exclude>**/CollectionInitializeTest.java</exclude>
-                                <exclude>**/DatabaseMultitenancyTest.java</exclude>
                                 <exclude>**/CompressionTest.java</exclude>
                                 <exclude>**/ConcurrentFlushTest.java</exclude>
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
@@ -221,7 +219,6 @@
                                 <exclude>**/RecursiveGraphTest.java</exclude>
                                 <exclude>**/WorkDoneOnEntitiesTest.java</exclude>
                                 <exclude>**/NullEmbeddedTest.java</exclude>
-                                <exclude>**/ContainedInWithoutIndexedEmbeddedReindexPropagationTest.java</exclude>
                                 <exclude>**/NumericFieldTest.java</exclude>
                                 <exclude>**/CollectionUpdateEventTest.java</exclude>
                                 <exclude>**/DeleteByTermTest.java</exclude>
@@ -240,7 +237,6 @@
                                 <exclude>**/SpatialQueryingJPATest.java</exclude>
                                 <exclude>**/ToStringTest.java</exclude>
                                 <exclude>**/DynamicBoostingTest.java</exclude>
-                                <exclude>**/ResultSizeOnCriteriaTest.java</exclude>
                                 <exclude>**/DSLTest.java</exclude>
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>

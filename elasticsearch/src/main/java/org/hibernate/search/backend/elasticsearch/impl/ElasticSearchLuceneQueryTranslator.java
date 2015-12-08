@@ -16,6 +16,7 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
+import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -74,6 +75,9 @@ public class ElasticSearchLuceneQueryTranslator implements LuceneQueryTranslator
 		}
 		else if ( query instanceof NumericRangeQuery ) {
 			return convertNumericRangeQuery( (NumericRangeQuery<?>) query );
+		}
+		else if ( query instanceof WildcardQuery ) {
+			return convertWildcardQuery( (WildcardQuery) query );
 		}
 
 		throw LOG.cannotTransformLuceneQueryIntoEsQuery( query );
@@ -189,6 +193,30 @@ public class ElasticSearchLuceneQueryTranslator implements LuceneQueryTranslator
 		}
 
 		return matchQuery;
+	}
+
+	private JsonObject convertWildcardQuery(WildcardQuery query) {
+		String field = query.getTerm().field();
+
+		JsonObject term = new JsonObject();
+		term.addProperty( field, query.getTerm().text() );
+
+		JsonObject wildcardQuery = new JsonObject();
+		wildcardQuery.add( "wildcard", term );
+
+		// prepare query on nested property
+		if ( field.contains( "." ) ) {
+			String path = field.substring( 0, field.lastIndexOf( "." ) );
+
+			JsonObject nested = new JsonObject();
+			nested.addProperty( "path", path );
+			nested.add( "query", wildcardQuery );
+
+			wildcardQuery = new JsonObject();
+			wildcardQuery.add( "nested", nested );
+		}
+
+		return wildcardQuery;
 	}
 
 	private JsonObject convertTermRangeQuery(TermRangeQuery query) {
