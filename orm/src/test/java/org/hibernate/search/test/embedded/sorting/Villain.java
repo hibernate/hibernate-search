@@ -16,9 +16,12 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 
+/**
+ * @author Davide D'Alto
+ */
 @Entity
 @Indexed
-class Level2SortableId {
+class Villain {
 
 	@Id
 	@SortableField
@@ -27,10 +30,19 @@ class Level2SortableId {
 
 	@OneToOne
 	@ContainedIn
-	private Level1 level1Parent;
+	private Hero hero;
 
 	@Field
 	private String name;
+
+	public Villain() {
+	}
+
+	public Villain(Integer id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
 
 	public Integer getId() {
 		return id;
@@ -40,12 +52,12 @@ class Level2SortableId {
 		this.id = id;
 	}
 
-	public Level1 getLevel1Parent() {
-		return level1Parent;
+	public Hero getHero() {
+		return hero;
 	}
 
-	public void setLevel1Parent(Level1 level1Parent) {
-		this.level1Parent = level1Parent;
+	public void setHero(Hero hero) {
+		this.hero = hero;
 	}
 
 	public String getName() {

@@ -7,25 +7,32 @@
 package org.hibernate.search.test.embedded.sorting;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
+/**
+ * @author Davide D'Alto
+ */
 @Entity
 @Indexed
-class Level1 {
+class Hero {
 
 	@Id
-	@GeneratedValue
 	private Integer id;
 
-	@OneToOne(mappedBy = "level1Parent")
+	@OneToOne(mappedBy = "hero")
 	@IndexedEmbedded(includePaths = "name")
-	private Level2SortableId level2Child;
+	private Villain villain;
+
+	public Hero() {
+	}
+
+	public Hero(Integer id) {
+		this.id = id;
+	}
 
 	public Integer getId() {
 		return id;
@@ -35,12 +42,12 @@ class Level1 {
 		this.id = id;
 	}
 
-	public Level2SortableId getLevel2Child() {
-		return level2Child;
+	public Villain getVillain() {
+		return villain;
 	}
 
-	public void setLevel2Child(Level2SortableId level2Child) {
-		this.level2Child = level2Child;
+	public void setVillain(Villain villain) {
+		this.villain = villain;
 	}
 
 }
