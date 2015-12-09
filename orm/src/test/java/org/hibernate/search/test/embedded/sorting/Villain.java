@@ -11,21 +11,38 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.SortableField;
 
+/**
+ * @author Davide D'Alto
+ */
 @Entity
 @Indexed
-class Level1 {
+class Villain {
 
 	@Id
+	@SortableField
 	@GeneratedValue
 	private Integer id;
 
-	@OneToOne(mappedBy = "level1Parent")
-	@IndexedEmbedded(includePaths = "name")
-	private Level2SortableId level2Child;
+	@OneToOne
+	@ContainedIn
+	private Hero hero;
+
+	@Field
+	private String name;
+
+	public Villain() {
+	}
+
+	public Villain(Integer id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
 
 	public Integer getId() {
 		return id;
@@ -35,12 +52,20 @@ class Level1 {
 		this.id = id;
 	}
 
-	public Level2SortableId getLevel2Child() {
-		return level2Child;
+	public Hero getHero() {
+		return hero;
 	}
 
-	public void setLevel2Child(Level2SortableId level2Child) {
-		this.level2Child = level2Child;
+	public void setHero(Hero hero) {
+		this.hero = hero;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }
