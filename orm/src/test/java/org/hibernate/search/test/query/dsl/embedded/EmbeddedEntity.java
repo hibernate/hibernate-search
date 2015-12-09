@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.query.dsl.embedded;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -30,6 +32,10 @@ public class EmbeddedEntity {
 	@Column(name = "num")
 	private Integer number;
 
+	@Field(name = "date", analyze = Analyze.NO)
+	@Column(name = "date")
+	private Date date;
+
 	public String getEmbeddedField() {
 		return embeddedField;
 	}
@@ -44,6 +50,14 @@ public class EmbeddedEntity {
 
 	public void setNumber(Integer number) {
 		this.number = number;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 }
