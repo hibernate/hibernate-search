@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.search.annotations.ContainedIn;
-import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
@@ -22,7 +21,6 @@ import org.hibernate.search.annotations.SortableField;
 class Level2SortableId {
 
 	@Id
-	@DocumentId
 	@SortableField
 	@GeneratedValue
 	private Integer id;

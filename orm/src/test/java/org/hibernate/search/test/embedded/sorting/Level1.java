@@ -20,7 +20,6 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 class Level1 {
 
 	@Id
-	@DocumentId
 	@GeneratedValue
 	private Integer id;
 
