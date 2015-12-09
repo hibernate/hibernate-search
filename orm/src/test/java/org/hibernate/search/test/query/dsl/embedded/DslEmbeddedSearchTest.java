@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.test.query.dsl.embedded;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
@@ -18,6 +22,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +36,17 @@ public class DslEmbeddedSearchTest extends SearchTestBase {
 
 	private Session s = null;
 
+	private static Calendar initCalendar(int year, int month, int day) {
+		Calendar instance = createCalendar();
+		instance = DateUtils.truncate(instance, Calendar.DATE);
+		instance.set( year, month, day );
+		return instance;
+	}
+
+	private static Calendar createCalendar() {
+		return Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ITALY );
+	}
+
 	@Override
 	@Before
 	public void setUp() throws Exception {
@@ -39,6 +55,7 @@ public class DslEmbeddedSearchTest extends SearchTestBase {
 		EmbeddedEntity ee = new EmbeddedEntity();
 		ee.setEmbeddedField( "embedded" );
 		ee.setNumber( 7 );
+		ee.setDate(initCalendar(2007, Calendar.JANUARY, 14).getTime());
 
 		ContainerEntity pe = new ContainerEntity();
 		pe.setEmbeddedEntity( ee );
@@ -47,6 +64,19 @@ public class DslEmbeddedSearchTest extends SearchTestBase {
 		s = openSession();
 		s.getTransaction().begin();
 		s.persist( pe );
+		s.getTransaction().commit();
+
+		EmbeddedEntity ee2 = new EmbeddedEntity();
+		ee2.setEmbeddedField( "otherembedded" );
+		ee2.setNumber( 3 );
+		ee2.setDate(initCalendar(2007, Calendar.JANUARY, 12).getTime());
+
+		ContainerEntity pe2 = new ContainerEntity();
+		pe2.setEmbeddedEntity( ee2 );
+		pe2.setParentStringValue( "theotherparentvalue" );
+
+		s.getTransaction().begin();
+		s.persist( pe2 );
 		s.getTransaction().commit();
 	}
 
@@ -82,6 +112,21 @@ public class DslEmbeddedSearchTest extends SearchTestBase {
 
 		assertEquals( "DSL didn't find the embedded numeric field", 1, results.size() );
 		assertEquals( Integer.valueOf( 7 ), results.get( 0 ).getEmbeddedEntity().getNumber() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2070")
+	public void testSearchDateWithoutFieldBridge() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( s );
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder()
+				.forEntity( ContainerEntity.class ).get();
+		Query q = qb.range().onField( "emb.date" )
+				.above(initCalendar(2007, Calendar.JANUARY, 14).getTime())
+				.createQuery();
+		List<ContainerEntity> results = execute( fullTextSession, q );
+
+		assertEquals( "DSL didn't find the embedded date field.", 1, results.size() );
+		assertEquals( initCalendar(2007, Calendar.JANUARY, 14).getTime(), results.get( 0 ).getEmbeddedEntity().getDate() );
 	}
 
 	@SuppressWarnings("unchecked")

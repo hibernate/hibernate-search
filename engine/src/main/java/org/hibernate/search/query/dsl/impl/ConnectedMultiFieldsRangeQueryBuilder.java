@@ -18,8 +18,8 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**
@@ -79,9 +79,10 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		final Query perFieldQuery;
 		final String fieldName = fieldContext.getField();
 
-		FieldDescriptor fieldDescriptor = queryContext.getFactory().getIndexedTypeDescriptor( queryContext.getEntityType() ).getIndexedField( fieldName );
-		if ( fieldDescriptor != null ) {
-			if ( FieldDescriptor.Type.NUMERIC.equals( fieldDescriptor.getType() ) ) {
+		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
+		DocumentFieldMetadata fieldMetadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( fieldName );
+		if ( fieldMetadata != null ) {
+			if ( fieldMetadata.isNumeric() ) {
 				perFieldQuery = createNumericRangeQuery( fieldName, rangeContext );
 			}
 			else {
