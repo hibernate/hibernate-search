@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
@@ -22,7 +21,6 @@ class Level1 {
 
 	@Id
 	@DocumentId
-	@Field
 	@GeneratedValue
 	private Integer id;
 
