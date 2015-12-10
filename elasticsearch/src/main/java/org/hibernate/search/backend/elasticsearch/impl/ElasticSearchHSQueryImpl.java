@@ -483,7 +483,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 				Document tmp = new Document();
 
 				if ( FieldHelper.isNumeric( field ) ) {
-					NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( field );
+					NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( binding, field );
 
 					switch( numericEncodingType ) {
 						case INTEGER:

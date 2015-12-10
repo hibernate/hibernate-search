@@ -8,15 +8,17 @@ package org.hibernate.search.test.engine;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
-
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * Assumes values are strings containing integer pairs in the form "12;34"
  * (strongly assumes valid format)
  */
-public class CoordinatesPairFieldBridge implements TwoWayFieldBridge {
+public class CoordinatesPairFieldBridge implements MetadataProvidingFieldBridge, TwoWayFieldBridge {
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
@@ -60,4 +62,9 @@ public class CoordinatesPairFieldBridge implements TwoWayFieldBridge {
 		return name + "_x";
 	}
 
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( getXFieldName( name ), FieldType.DOUBLE )
+			.field( getYFieldName( name ), FieldType.DOUBLE );
+	}
 }

@@ -9,11 +9,13 @@ package org.hibernate.search.test.engine;
 import java.math.BigDecimal;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
-public class BigDecimalNumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
+public class BigDecimalNumericFieldBridge implements MetadataProvidingFieldBridge, TwoWayFieldBridge {
 
 	private static final BigDecimal storeFactor = BigDecimal.valueOf( 100 );
 
@@ -38,4 +40,8 @@ public class BigDecimalNumericFieldBridge implements FieldBridge, TwoWayFieldBri
 		return object.toString();
 	}
 
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name, FieldType.LONG );
+	}
 }
