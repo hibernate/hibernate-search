@@ -24,7 +24,7 @@ import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -33,6 +33,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.util.logging.impl.Log;
@@ -80,8 +81,8 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			.setParameter( Parameters.REFRESH, true )
 			.build();
 
-		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
-			clientReference.executeRequest( delete, false );
+		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+			client.get().executeRequest( delete, false );
 		}
 
 		return null;
@@ -113,11 +114,11 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		DeleteByQuery delete = builder.build();
 		Refresh refresh = new Refresh.Builder().addIndex( indexName ).build();
 
-		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
-			clientReference.executeRequest( delete );
+		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+			client.get().executeRequest( delete );
 
 			// TODO Refresh not needed on ES 1.x; Make it configurable?
-			clientReference.executeRequest( refresh );
+			client.get().executeRequest( refresh );
 		}
 
 		return null;
@@ -154,8 +155,8 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			.setParameter( Parameters.REFRESH, true )
 			.build();
 
-		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
-			clientReference.executeRequest( index );
+		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+			client.get().executeRequest( index );
 		}
 	}
 

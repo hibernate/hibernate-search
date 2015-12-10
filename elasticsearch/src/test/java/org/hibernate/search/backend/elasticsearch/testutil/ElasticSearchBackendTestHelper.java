@@ -9,10 +9,11 @@ package org.hibernate.search.backend.elasticsearch.testutil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.impl.IndexNameNormalizer;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.TestResourceManager;
 import org.hibernate.search.test.util.BackendTestHelper;
@@ -47,13 +48,13 @@ public class ElasticSearchBackendTestHelper extends BackendTestHelper {
 			indexNames.add( ( (ElasticSearchIndexManager)indexManager ).getActualIndexName() );
 		}
 
-		try (JestClientReference client = new JestClientReference( serviceManager ) ) {
+		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
 			Count request = new Count.Builder()
 					.addIndex( indexNames )
 					.addType( entityType.getName() )
 					.build();
 
-			CountResult response = client.executeRequest( request );
+			CountResult response = client.get().executeRequest( request );
 
 			return response.getCount().intValue();
 		}
@@ -63,12 +64,12 @@ public class ElasticSearchBackendTestHelper extends BackendTestHelper {
 	public int getNumberOfDocumentsInIndex(String indexName) {
 		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
 
-		try (JestClientReference client = new JestClientReference( serviceManager ) ) {
+		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
 			Count request = new Count.Builder()
 					.addIndex( IndexNameNormalizer.getElasticSearchIndexName( indexName ) )
 					.build();
 
-			CountResult response = client.executeRequest( request );
+			CountResult response = client.get().executeRequest( request );
 
 			return response.getCount().intValue();
 		}
@@ -79,13 +80,13 @@ public class ElasticSearchBackendTestHelper extends BackendTestHelper {
 		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
 		String query = value.contains( "*" ) ? "wildcard" : "term";
 
-		try (JestClientReference client = new JestClientReference( serviceManager ) ) {
+		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
 			Count request = new Count.Builder()
 					.addIndex( IndexNameNormalizer.getElasticSearchIndexName( indexName ) )
 					.query( "{ \"query\" : { \"" + query + "\" : { \"" + fieldName + "\" : \"" + value + "\" } } }" )
 					.build();
 
-			CountResult response = client.executeRequest( request );
+			CountResult response = client.get().executeRequest( request );
 
 			return response.getCount().intValue();
 		}
