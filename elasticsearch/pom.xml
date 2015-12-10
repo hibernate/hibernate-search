@@ -184,7 +184,170 @@
                             </dependenciesToScan>
                             <includes>
                                 <include>**/*IT.java</include>
+                                <include>**/*.java</include>
                             </includes>
+                            <excludes>
+                                <!-- Mass indexer -->
+                                <exclude>**/MassIndexerCancellingTest.java</exclude>
+                                <exclude>**/MassIndexTest.java</exclude>
+                                <exclude>**/IndexingGeneratedCorpusTest.java</exclude>
+                                <exclude>**/MassIndexerErrorReportingTest.java</exclude>
+                                <exclude>**/MassIndexerIndexedEmbeddedProxyTest.java</exclude>
+                                <exclude>**/AvoidDuplicatesTest.java</exclude>
+                                <exclude>**/FieldBridgeOnLazyFieldReindexTest.java</exclude>
+                                <exclude>**/LazyIndirectCollectionBridgeReindexTest.java</exclude>
+                                <exclude>**/InterceptedMassIndexerTest.java</exclude>
+
+                                <!-- Analyzers -->
+                                <exclude>**/CustomAnalyzerInClassBridgeTest.java</exclude>
+                                <exclude>**/SolrAnalyzerTest.java</exclude>
+
+                                <!-- Bridges -->
+                                <exclude>**/ArrayBridgeTest.java</exclude>
+                                <exclude>**/NumericBigDecimalBridgeTest.java</exclude>
+                                <exclude>**/BridgeTest.java</exclude>
+                                <exclude>**/ClassBridgeTest.java</exclude>
+                                <exclude>**/IterableBridgeTest.java</exclude>
+                                <exclude>**/MapBridgeTest.java</exclude>
+                                <exclude>**/BridgeProviderTest.java</exclude>
+                                <exclude>**/TikaBridgeBlobSupportTest.java</exclude>
+                                <exclude>**/TikaBridgeTest.java</exclude>
+
+                                <exclude>**/HibernateSearchIntegratorTest.java</exclude>
+                                <exclude>**/OptimizationTriggerTest.java</exclude>
+                                <exclude>**/WorkQueueLengthConfiguredTest.java</exclude>
+                                <exclude>**/CollectionInitializeTest.java</exclude>
+                                <exclude>**/DatabaseMultitenancyTest.java</exclude>
+                                <exclude>**/CompressionTest.java</exclude>
+                                <exclude>**/ConcurrentFlushTest.java</exclude>
+                                <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
+                                <exclude>**/ManualIndexingStrategyTest.java</exclude>
+                                <exclude>**/LuceneIndexingParametersTest.java</exclude>
+                                <exclude>**/StoreNormsTest.java</exclude>
+                                <exclude>**/ProgrammaticMappingTest.java</exclude>
+                                <exclude>**/ShardsConfigurationTest.java</exclude>
+                                <exclude>**/DocumentIdContainedInTest.java</exclude>
+                                <exclude>**/RecursiveGraphTest.java</exclude>
+                                <exclude>**/WorkDoneOnEntitiesTest.java</exclude>
+                                <exclude>**/NullEmbeddedTest.java</exclude>
+                                <exclude>**/ContainedInWithoutIndexedEmbeddedReindexPropagationTest.java</exclude>
+                                <exclude>**/DirtyChecksDisabledTest.java</exclude>
+                                <exclude>**/PurgeTest.java</exclude>
+                                <exclude>**/NumericFieldTest.java</exclude>
+                                <exclude>**/CollectionUpdateEventsSecondTest.java</exclude>
+                                <exclude>**/CollectionUpdateEventTest.java</exclude>
+                                <exclude>**/DeleteByTermTest.java</exclude>
+                                <exclude>**/IndexReaderSeeOptimizedIndexTest.java</exclude>
+                                <exclude>**/UpdateOperationsTest.java</exclude>
+                                <exclude>**/SkipIndexingWorkForUnaffectingChangesTest.java</exclude>
+                                <exclude>**/TransactionTest.java</exclude>
+                                <exclude>**/UsingIdentifierRollbackTest.java</exclude>
+                                <exclude>**/WorkDuplicationTest.java</exclude>
+                                <exclude>**/WorkSequencesTest.java</exclude>
+                                <exclude>**/SearchAndEnversIntegrationTest.java</exclude>
+                                <exclude>**/EventBasedEmbeddableCollectionUpdateTest.java</exclude>
+                                <exclude>**/FilterTest.java</exclude>
+                                <exclude>**/EmbeddedIdTest.java</exclude>
+                                <exclude>**/EmbeddedIdWithDocumentIdTest.java</exclude>
+                                <exclude>**/ProgrammaticEmbeddedItTest.java</exclude>
+                                <exclude>**/InheritanceTest.java</exclude>
+                                <exclude>**/IndexingActionInterceptorTest.java</exclude>
+                                <exclude>**/IndexControlMBeanTest.java</exclude>
+                                <exclude>**/EntityManagerSerializationTest.java</exclude>
+                                <exclude>**/EntityManagerTest.java</exclude>
+                                <exclude>**/SpatialQueryingJPATest.java</exclude>
+                                <exclude>**/ToStringTest.java</exclude>
+                                <exclude>**/DynamicBoostingTest.java</exclude>
+                                <exclude>**/FieldBoostTest.java</exclude>
+                                <exclude>**/ResultSizeOnCriteriaTest.java</exclude>
+                                <exclude>**/DSLTest.java</exclude>
+                                <exclude>**/MoreLikeThisTest.java</exclude>
+                                <exclude>**/NumericEncodingQueriesTest.java</exclude>
+                                <exclude>**/ExplanationTest.java</exclude>
+
+                                <!-- Faceting -->
+                                <exclude>**/CollectionFacetingTest.java</exclude>
+                                <exclude>**/EdgeCaseFacetTest.java</exclude>
+                                <exclude>**/FacetFilteringTest.java</exclude>
+                                <exclude>**/ManyToOneFacetingTest.java</exclude>
+                                <exclude>**/NoQueryResultsFacetingTest.java</exclude>
+                                <exclude>**/NumberFacetingTest.java</exclude>
+                                <exclude>**/RangeFacetingTest.java</exclude>
+                                <exclude>**/SimpleFacetingTest.java</exclude>
+                                <exclude>**/StringFacetingTest.java</exclude>
+                                <exclude>**/WebShopTest.java</exclude>
+
+                                <exclude>**/SecondLCAndPCLookupTest.java</exclude>
+                                <exclude>**/StrictSecondLCAndPCLookupTest.java</exclude>
+                                <exclude>**/LuceneQueryTest.java</exclude>
+                                <exclude>**/IndexAndQueryNullTest.java</exclude>
+                                <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>
+                                <exclude>**/ProjectionQueryTest.java</exclude>
+                                <exclude>**/ScrollableResultsTest.java</exclude>
+                                <exclude>**/SortTest.java</exclude>
+                                <exclude>**/SortUsingEntityManagerTest.java</exclude>
+                                <exclude>**/SortUsingEntityManagerTest.java</exclude>
+                                <exclude>**/TermVectorTest.java</exclude>
+                                <exclude>**/JPATimeoutTest.java</exclude>
+                                <exclude>**/DirectoryProviderForQueryTest.java</exclude>
+                                <exclude>**/DirectorySelectionTest.java</exclude>
+                                <exclude>**/DynamicShardingTest.java</exclude>
+                                <exclude>**/ShardsTest.java</exclude>
+                                <exclude>**/SpatialIndexingTest.java</exclude>
+                                <exclude>**/SpatialSearchSortByDistanceAndPagingTest.java</exclude>
+                                <exclude>**/AnalyzerTest.java</exclude>
+                                <exclude>**/DoubleAnalyzerTest.java</exclude>
+                                <exclude>**/AnalyzerInheritanceTest.java</exclude>
+                                <exclude>**/FetchSizeConfigurationTest.java</exclude>
+                                <exclude>**/ProgressMonitorTest.java</exclude>
+                                <exclude>**/SearchIndexerTest.java</exclude>
+                                <exclude>**/HibernateSearchSessionFactoryObserverTest.java</exclude>
+                                <exclude>**/RetryInitializeTest.java</exclude>
+                                <exclude>**/EmbeddedTest.java</exclude>
+                                <exclude>**/FieldOnCollectionReindexTest.java</exclude>
+                                <exclude>**/LazyM2OContainedInTest.java</exclude>
+                                <exclude>**/NestedContainedInTest.java</exclude>
+                                <exclude>**/NestedEmbeddedTest.java</exclude>
+                                <exclude>**/DefaultDepthPathCaseEmbeddedTest.java</exclude>
+                                <exclude>**/PathRespectDepthCaseEmbeddedTest.java</exclude>
+                                <exclude>**/IdIncludedInPathCaseEmbeddedTest.java</exclude>
+                                <exclude>**/MultiplePathCaseEmbeddedTest.java</exclude>
+                                <exclude>**/PathEmbeddedDepthTest.java</exclude>
+                                <exclude>**/RenamedFieldPathCaseEmbeddedTest.java</exclude>
+                                <exclude>**/SimplePathCaseEmbeddedTest.java</exclude>
+                                <exclude>**/SearchAfterUninitializedProxyEntityLoadingTest.java</exclude>
+                                <exclude>**/UpdateIndexedEmbeddedCollectionTest.java</exclude>
+                                <exclude>**/LazyCollectionsUpdatingTest.java</exclude>
+                                <exclude>**/SyncWorkerTest.java</exclude>
+                                <exclude>**/WorkerTestCase.java</exclude>
+                                <exclude>**/ConcurrentMergeErrorHandledTest.java</exclude>
+                                <exclude>**/ErrorHandlingDuringDocumentCreationTest.java</exclude>
+                                <exclude>**/LuceneErrorHandlingTest.java</exclude>
+                                <exclude>**/ExplicitIdTest.java</exclude>
+                                <exclude>**/ManualIndexingOnlyInterceptorTest.java</exclude>
+                                <exclude>**/EmbeddedFieldBoostTest.java</exclude>
+                                <exclude>**/DslEmbeddedSearchTest.java</exclude>
+                                <exclude>**/MultiClassesQueryLoaderTest.java</exclude>
+                                <exclude>**/TimeoutTest.java</exclude>
+                                <exclude>**/QueryValidationTest.java</exclude>
+                                <exclude>**/SimilarityTest.java</exclude>
+                                <exclude>**/TokenizationTest.java</exclude>
+                                <exclude>**/SortWithIndexUninvertingTest.java</exclude>
+                                <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude>
+                                <exclude>**/RollbackTransactionTest.java</exclude>
+
+                                <!-- Specific to other backends -->
+                                <exclude>**/CustomBackendTest.java</exclude>
+                                <exclude>**/FSDirectorySelectionTest.java</exclude>
+                                <exclude>**/FSDirectoryTest.java</exclude>
+                                <exclude>**/RamDirectoryTest.java</exclude>
+                                <exclude>**/ExclusiveIndexTest.java</exclude>
+                                <exclude>**/IndexManagerOverrideTest.java</exclude>
+                                <exclude>**/CustomLockProviderTest.java</exclude>
+                                <exclude>**/DirectoryLifecycleTest.java</exclude>
+                                <exclude>**/ScheduledCommitPolicyTest.java</exclude>
+                                <exclude>**/FSSlaveAndMasterDPTest.java</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>

@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.MatchNoDocsQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -104,11 +105,11 @@ public class CombiningLuceneAndElasticSearchIT extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		try {
-			session.createFullTextQuery( new MatchAllDocsQuery(), ResearchPaper.class ).list();
+			session.createFullTextQuery( new MatchNoDocsQuery(), ResearchPaper.class ).list();
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (SearchException se) {
-			assertThat( se.getMessage() ).contains( "HSEARCH000302" );
+			assertThat( se.getMessage() ).contains( "HSEARCH400002" );
 		}
 		finally {
 			tx.commit();
