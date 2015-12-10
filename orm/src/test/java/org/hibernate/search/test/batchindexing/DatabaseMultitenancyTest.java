@@ -6,14 +6,10 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.fest.util.Collections;
 import org.hibernate.Session;
@@ -29,6 +25,8 @@ import org.hibernate.testing.RequiresDialect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * This is a test class to check that search can be used with ORM in multi-tenancy.
@@ -203,20 +201,24 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	private void rebuildIndexWithMassIndexer(Class<?> entityType, String tenantId) throws Exception {
 		FullTextSession session = Search.getFullTextSession( openSessionWithTenantId( tenantId ) );
 		session.createIndexer( entityType ).purgeAllOnStart( true ).startAndWait();
-		IndexReader indexReader = session.getSearchFactory().getIndexReaderAccessor().open( entityType );
-		long tenantIdTermFreq = indexReader.docFreq( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 		session.close();
-		assertThat( tenantIdTermFreq ).isGreaterThan( 0 );
+
+		String indexName = getExtendedSearchIntegrator().getIndexBinding( entityType )
+				.getIndexManagers()[0].getIndexName();
+
+		assertThat( getNumberOfDocumentsInIndexByQuery( indexName, DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) ).isGreaterThan( 0 );
 	}
 
 	private void purgeAll(Class<?> entityType, String tenantId) throws IOException {
 		FullTextSession session = Search.getFullTextSession( openSessionWithTenantId( tenantId ) );
 		session.purgeAll( entityType );
 		session.flushToIndexes();
-		IndexReader indexReader = session.getSearchFactory().getIndexReaderAccessor().open( entityType );
-		long tenantIdTermFreq = indexReader.docFreq( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 		session.close();
-		assertThat( tenantIdTermFreq ).isEqualTo( 0 );
+
+		String indexName = getExtendedSearchIntegrator().getIndexBinding( entityType )
+				.getIndexManagers()[0].getIndexName();
+
+		assertThat( getNumberOfDocumentsInIndexByQuery( indexName, DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) ).isEqualTo( 0 );
 	}
 
 	private Session openSessionWithTenantId(String tenantId) {

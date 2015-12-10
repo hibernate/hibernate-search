@@ -49,8 +49,13 @@ public class ElasticSearchBackendQueueProcessor implements BackendQueueProcessor
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		singleOperation.acceptIndexWorkVisitor(
+				new ElasticSearchIndexWorkVisitor(
+						indexManager.getActualIndexName(),
+						indexManager.searchIntegrator
+				),
+				null
+		);
 	}
 
 	@Override

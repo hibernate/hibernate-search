@@ -23,6 +23,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
@@ -120,6 +121,13 @@ public class ElasticSearchIndexManager implements IndexManager {
 			payload.addProperty( "dynamic", "strict" );
 			JsonObject properties = new JsonObject();
 			payload.add( "properties", properties );
+
+			// Add field for tenant id
+			// TODO At this point we don't know yet whether it's actually going to be needed
+			// Should we make this configurable?
+			JsonObject field = new JsonObject();
+			field.addProperty( "type", "string" );
+			properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
 
 			// normal document fields
 			for ( DocumentFieldMetadata fieldMetadata : descriptor.getDocumentBuilder().getTypeMetadata().getAllDocumentFieldMetadata() ) {
@@ -327,8 +335,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		backend.applyStreamWork( singleOperation, monitor );
 	}
 
 	@Override
