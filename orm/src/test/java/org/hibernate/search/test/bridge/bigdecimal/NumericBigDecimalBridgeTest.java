@@ -9,6 +9,7 @@ package org.hibernate.search.test.bridge.bigdecimal;
 
 import java.math.BigDecimal;
 import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,10 +18,8 @@ import javax.persistence.Table;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.dialect.SQLServer2008Dialect;
 import org.hibernate.dialect.Sybase11Dialect;
 import org.hibernate.dialect.SybaseASE15Dialect;
@@ -31,7 +30,10 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.testing.SkipForDialect;
@@ -73,7 +75,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestBase {
 				.createQuery();
 
 		@SuppressWarnings( "unchecked" )
-		List<Item> resultList = (List<Item>) fullTextSession.createFullTextQuery( rootQuery, Item.class ).list();
+		List<Item> resultList = fullTextSession.createFullTextQuery( rootQuery, Item.class ).list();
 		assertNotNull( resultList );
 		assertEquals( 1, resultList.size() );
 
@@ -112,7 +114,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestBase {
 		}
 	}
 
-	public static class BigDecimalNumericFieldBridge implements TwoWayFieldBridge {
+	public static class BigDecimalNumericFieldBridge implements MetadataProvidingFieldBridge, TwoWayFieldBridge {
 		private static final BigDecimal storeFactor = BigDecimal.valueOf( 100 );
 
 		@Override
@@ -145,6 +147,11 @@ public class NumericBigDecimalBridgeTest extends SearchTestBase {
 		@Override
 		public final String objectToString(final Object object) {
 			return object == null ? null : String.valueOf( object );
+		}
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( name, FieldType.LONG );
 		}
 	}
 }

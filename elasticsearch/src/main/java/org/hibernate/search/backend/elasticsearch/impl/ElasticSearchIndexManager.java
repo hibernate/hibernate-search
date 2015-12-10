@@ -23,7 +23,10 @@ import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReferenc
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -183,24 +186,16 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 			// normal document fields
 			for ( DocumentFieldMetadata fieldMetadata : descriptor.getDocumentBuilder().getTypeMetadata().getAllDocumentFieldMetadata() ) {
-				if ( fieldMetadata.isId() ) {
+				if ( fieldMetadata.isId() || fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." ) ) {
 					continue;
 				}
 
 				addFieldMapping( payload, descriptor, fieldMetadata );
 			}
 
-			// fields contributed by class bridges; only a single named field per class bridge is supported atm. as we
-			// lack the meta-data on all fields potentially created by a class bridge
-			for ( DocumentFieldMetadata fieldMetadata : descriptor.getDocumentBuilder().getTypeMetadata().getClassBridgeMetadata() ) {
-				// TODO should we support dynamically added fields?
-				if ( fieldMetadata.getName() == null || fieldMetadata.getName().isEmpty() ) {
-					throw new SearchException(
-							"Unnamed class-level fields are not supported with the ElasticSearch backend: " + descriptor.getDocumentBuilder().getTypeMetadata().getType()
-					);
-				}
-
-				addFieldMapping( payload, descriptor, fieldMetadata );
+			// bridge-defined fields
+			for ( BridgeDefinedField bridgeDefinedField : getAllBridgeDefinedFields( descriptor ) ) {
+				addFieldMapping( payload, bridgeDefinedField );
 			}
 
 			PutMapping putMapping = new PutMapping.Builder(
@@ -222,14 +217,23 @@ public class ElasticSearchIndexManager implements IndexManager {
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
-	private JsonObject addFieldMapping(JsonObject payload, EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
+	private void addFieldMapping(JsonObject payload, EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
 		String simpleFieldName = fieldMetadata.getName().substring( fieldMetadata.getName().lastIndexOf( "." ) + 1 );
 		JsonObject field = new JsonObject();
 
-		field.addProperty( "type", getFieldType( descriptor, fieldMetadata ) );
+		String fieldType = getFieldType( descriptor, fieldMetadata );
+		if ( fieldType == null ) {
+			LOG.debug( "Not adding a mapping for field " + fieldMetadata.getFieldName() + " as its type could not be determined" );
+			return;
+		}
+
+		field.addProperty( "type", fieldType );
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 		field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
-		field.addProperty( "boost", fieldMetadata.getBoost() );
+
+		if ( fieldMetadata.getBoost() != null ) {
+			field.addProperty( "boost", fieldMetadata.getBoost() );
+		}
 
 		if ( fieldMetadata.indexNullAs() != null ) {
 			// TODO Validate the type; Supported types are converted transparently by ES
@@ -237,6 +241,19 @@ public class ElasticSearchIndexManager implements IndexManager {
 		}
 
 		getOrCreateProperties( payload, fieldMetadata.getName() ).add( simpleFieldName, field );
+	}
+
+	/**
+	 * Adds a type mapping for the given field to the given request payload.
+	 */
+	private JsonObject addFieldMapping(JsonObject payload, BridgeDefinedField bridgeDefinedField) {
+		String simpleFieldName = bridgeDefinedField.getName().substring( bridgeDefinedField.getName().lastIndexOf( "." ) + 1 );
+		JsonObject field = new JsonObject();
+
+		field.addProperty( "type", getFieldType( bridgeDefinedField ) );
+		field.addProperty( "index", "analyzed" );
+
+		getOrCreateProperties( payload, bridgeDefinedField.getName() ).add( simpleFieldName, field );
 		return field;
 	}
 
@@ -272,7 +289,8 @@ public class ElasticSearchIndexManager implements IndexManager {
 			type = "date";
 		}
 		else if ( FieldHelper.isNumeric( fieldMetadata ) ) {
-			NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( fieldMetadata );
+
+			NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( descriptor, fieldMetadata );
 
 			switch( numericEncodingType ) {
 				case INTEGER:
@@ -288,8 +306,11 @@ public class ElasticSearchIndexManager implements IndexManager {
 					type = "double";
 					break;
 				default:
-					throw new SearchException( "Unexpected numeric field type: " + descriptor.getDocumentBuilder().getMetadata().getType() + " "
-						+ fieldMetadata.getName() );
+					// Likely a custom field bridge which does not expose the type of the given field; either correctly
+					// so (because the given name is the default field and this bridge does not wish to use that field
+					// name as is) or incorrectly; The field will not be added to the mapping, causing an exception at
+					// runtime if the bridge writes that field nevertheless
+					type = null;
 			}
 		}
 		else {
@@ -297,6 +318,27 @@ public class ElasticSearchIndexManager implements IndexManager {
 		}
 
 		return type;
+	}
+
+	private String getFieldType(BridgeDefinedField bridgeDefinedField) {
+		switch ( bridgeDefinedField.getType() ) {
+			case BOOLEAN:
+				return "boolean";
+			case DATE:
+				return "date";
+			case FLOAT:
+				return "float";
+			case DOUBLE:
+				return "double";
+			case INTEGER:
+				return "integer";
+			case LONG:
+				return "long";
+			case STRING:
+				return "string";
+			default:
+				throw new SearchException( "Unexpected field type: " + bridgeDefinedField.getType() );
+		}
 	}
 
 	private JsonObject getOrCreateProperties(JsonObject mapping, String fieldName) {
@@ -326,6 +368,31 @@ public class ElasticSearchIndexManager implements IndexManager {
 		}
 
 		return parentProperties;
+	}
+
+	/**
+	 * Recursively collects all the bridge-defined fields for the given type and its embeddables.
+	 */
+	private Set<BridgeDefinedField> getAllBridgeDefinedFields(EntityIndexBinding binding) {
+		Set<BridgeDefinedField> bridgeDefinedFields = new HashSet<>();
+		collectPropertyLevelBridgeDefinedFields( binding.getDocumentBuilder().getMetadata(), bridgeDefinedFields );
+		return bridgeDefinedFields;
+	}
+
+	private void collectPropertyLevelBridgeDefinedFields(TypeMetadata type, Set<BridgeDefinedField> allBridgeDefinedFields) {
+		allBridgeDefinedFields.addAll( type.getClassBridgeDefinedFields() );
+
+		if ( type.getIdPropertyMetadata() != null ) {
+			allBridgeDefinedFields.addAll( type.getIdPropertyMetadata().getBridgeDefinedFields().values() );
+		}
+
+		for ( PropertyMetadata property : type.getAllPropertyMetadata() ) {
+			allBridgeDefinedFields.addAll( property.getBridgeDefinedFields().values() );
+		}
+
+		for ( TypeMetadata embeddedType : type.getEmbeddedTypeMetadata() ) {
+			collectPropertyLevelBridgeDefinedFields( embeddedType, allBridgeDefinedFields );
+		}
 	}
 
 	// Getters

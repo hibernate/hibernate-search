@@ -21,22 +21,29 @@ import org.hibernate.search.bridge.spi.FieldType;
 class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
 	private final Set<String> sortableFields = new HashSet<>();
+	private final Set<BridgeDefinedField> fields = new HashSet<>();
 
 	@Override
 	public FieldMetadataCreationContext field(String name, FieldType type) {
-		return new FieldMetadataCreationContextImpl( name );
+		return new FieldMetadataCreationContextImpl( name, type );
 	}
 
 	public Set<String> getSortableFields() {
 		return sortableFields;
 	}
 
+	public Set<BridgeDefinedField> getFields() {
+		return fields;
+	}
+
 	private class FieldMetadataCreationContextImpl implements FieldMetadataCreationContext {
 
 		private final String fieldName;
+		private DocumentFieldMetadata.Builder builder;
 
-		public FieldMetadataCreationContextImpl(String name) {
+		public FieldMetadataCreationContextImpl(String name, FieldType type) {
 			this.fieldName = name;
+			fields.add( new BridgeDefinedField( name, type ) );
 		}
 
 		@Override

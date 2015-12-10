@@ -15,9 +15,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -31,6 +29,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -115,7 +116,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestBase {
 		private Integer id;
 	}
 
-	public static class FooBridge implements Discriminator, FieldBridge {
+	public static class FooBridge implements Discriminator, MetadataProvidingFieldBridge {
 
 		public static final String[] fieldNames = new String[] { "field1", "field2", "field3" };
 		public static final String[] analyzerNames = new String[] { "analyzer1", "analyzer2", "analyzer3" };
@@ -143,6 +144,13 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestBase {
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			for ( String field : fieldNames ) {
+				builder.field( field, FieldType.STRING );
+			}
 		}
 	}
 

@@ -15,6 +15,7 @@ import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -164,7 +165,8 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 		for ( IndexableField field : document.getFields() ) {
 			if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
-					!field.name().equals( indexBinding.getDocumentBuilder().getIdentifierName() ) ) {
+					!field.name().equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
+					! isDocValueField( field) ) {
 
 				JsonObject parent = getOrCreateDocumentTree( source, field );
 				String jsonPropertyName = field.name().substring( field.name().lastIndexOf( "." ) + 1 );
@@ -269,5 +271,9 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		}
 
 		return parent;
+	}
+
+	private boolean isDocValueField(IndexableField field) {
+		return field.fieldType().docValuesType() != DocValuesType.NONE;
 	}
 }

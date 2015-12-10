@@ -138,6 +138,14 @@ public class TypeMetadata {
 
 	private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata;
 
+	/**
+	 * Fields explicitly declared by {@link org.hibernate.search.bridge.MetadataProvidingFieldBridge}s.
+	 * <p>
+	 * Note: This is only to be used for validation / schema creation in ES, don't use it to drive invocation of field
+	 * bridges at indexing time!
+	 */
+	private final Set<BridgeDefinedField> classBridgeDefinedFields;
+
 	protected TypeMetadata(Builder builder) {
 		this.indexedType = builder.indexedType;
 		this.boost = builder.boost;
@@ -159,6 +167,7 @@ public class TypeMetadata {
 		this.documentFieldNameToFieldMetadata = keyFieldMetadata( builder.propertyMetadataSet );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
 		this.classBridgeSortableFieldMetadata = Collections.unmodifiableSet( builder.classBridgeSortableFieldMetadata );
+		this.classBridgeDefinedFields = Collections.unmodifiableSet( builder.classBridgeDefinedFields );
 	}
 
 	public Class<?> getType() {
@@ -183,6 +192,10 @@ public class TypeMetadata {
 
 	public Set<SortableFieldMetadata> getClassBridgeSortableFieldMetadata() {
 		return classBridgeSortableFieldMetadata;
+	}
+
+	public Set<BridgeDefinedField> getClassBridgeDefinedFields() {
+		return classBridgeDefinedFields;
 	}
 
 	public DocumentFieldMetadata getDocumentFieldMetadataFor(String fieldName) {
@@ -411,6 +424,7 @@ public class TypeMetadata {
 		private PropertyMetadata idPropertyMetadata;
 		private XProperty jpaProperty;
 		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new HashSet<>();
+		private final Set<BridgeDefinedField> classBridgeDefinedFields = new HashSet<>();
 
 		public Builder(Class<?> indexedType, ConfigContext configContext) {
 			this( indexedType, new ScopedAnalyzer( configContext.getDefaultAnalyzer() ) );
@@ -561,7 +575,11 @@ public class TypeMetadata {
 				classBridgeSortableFieldMetadata.add( new SortableFieldMetadata.Builder().fieldName( sortableFieldName ).build() );
 			}
 		}
+
+		public void addClassBridgeDefinedFields(Iterable<BridgeDefinedField> bridgeDefinedFields) {
+			for ( BridgeDefinedField field : bridgeDefinedFields ) {
+				classBridgeDefinedFields.add( field );
+			}
+		}
 	}
 }
-
-

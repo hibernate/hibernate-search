@@ -203,7 +203,6 @@
 
                                 <!-- Bridges -->
                                 <exclude>**/ArrayBridgeTest.java</exclude>
-                                <exclude>**/NumericBigDecimalBridgeTest.java</exclude>
                                 <exclude>**/BridgeTest.java</exclude>
                                 <exclude>**/ClassBridgeTest.java</exclude>
                                 <exclude>**/IterableBridgeTest.java</exclude>
@@ -226,12 +225,10 @@
                                 <exclude>**/WorkDoneOnEntitiesTest.java</exclude>
                                 <exclude>**/NullEmbeddedTest.java</exclude>
                                 <exclude>**/NumericFieldTest.java</exclude>
-                                <exclude>**/CollectionUpdateEventTest.java</exclude>
                                 <exclude>**/DeleteByTermTest.java</exclude>
                                 <exclude>**/UpdateOperationsTest.java</exclude>
                                 <exclude>**/TransactionTest.java</exclude>
                                 <exclude>**/SearchAndEnversIntegrationTest.java</exclude>
-                                <exclude>**/EventBasedEmbeddableCollectionUpdateTest.java</exclude>
                                 <exclude>**/FilterTest.java</exclude>
                                 <exclude>**/EmbeddedIdTest.java</exclude>
                                 <exclude>**/EmbeddedIdWithDocumentIdTest.java</exclude>
@@ -261,7 +258,6 @@
                                 <exclude>**/IndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProjectionQueryTest.java</exclude>
-                                <exclude>**/ScrollableResultsTest.java</exclude>
                                 <exclude>**/SortTest.java</exclude>
                                 <exclude>**/SortUsingEntityManagerTest.java</exclude>
                                 <exclude>**/SortUsingEntityManagerTest.java</exclude>

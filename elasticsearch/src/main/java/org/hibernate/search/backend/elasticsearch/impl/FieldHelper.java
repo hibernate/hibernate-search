@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.FieldType;
+import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
@@ -25,7 +27,6 @@ import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncod
  * Very hack-ish solution which is required atm. as we don't have access to the actual property types when dealing with
  * document fields in the work visitor. All this code should not be needed ideally.
  * <p>
- * TODO: What about fields from class-level bridges?
  *
  * @author Gunnar Morling
  */
@@ -36,10 +37,36 @@ class FieldHelper {
 	private FieldHelper() {
 	}
 
-	static NumericEncodingType getNumericEncodingType(DocumentFieldMetadata field) {
+	// TODO make it work with fields embedded types
+	static NumericEncodingType getNumericEncodingType(EntityIndexBinding indexBinding, DocumentFieldMetadata field) {
 		NumericEncodingType numericEncodingType = field.getNumericEncodingType();
 
+		if ( numericEncodingType == NumericEncodingType.UNKNOWN ) {
+			PropertyMetadata hostingProperty = getPropertyMetadata( indexBinding, field.getName() );
+			if ( hostingProperty != null ) {
+				BridgeDefinedField bridgeDefinedField = hostingProperty.getBridgeDefinedFields().get( field.getName() );
+				if ( bridgeDefinedField != null ) {
+					numericEncodingType = getNumericEncodingType( bridgeDefinedField.getType() );
+				}
+			}
+		}
+
 		return numericEncodingType;
+	}
+
+	private static NumericEncodingType getNumericEncodingType(FieldType fieldType) {
+		switch ( fieldType ) {
+			case FLOAT:
+				return NumericEncodingType.FLOAT;
+			case DOUBLE:
+				return NumericEncodingType.DOUBLE;
+			case INTEGER:
+				return NumericEncodingType.INTEGER;
+			case LONG:
+				return NumericEncodingType.LONG;
+			default:
+				return NumericEncodingType.UNKNOWN;
+		}
 	}
 
 	static boolean isBoolean(EntityIndexBinding indexBinding, String fieldName) {
