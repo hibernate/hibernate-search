@@ -173,7 +173,10 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		JsonArray hits = searchResult.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
 
 		for ( JsonElement hit : hits ) {
-			results.add( searcher.convertQueryHit( hit.getAsJsonObject() ) );
+			EntityInfo entityInfo = searcher.convertQueryHit( hit.getAsJsonObject() );
+			if ( entityInfo != null ) {
+				results.add( entityInfo );
+			}
 		}
 
 		return results;
@@ -250,7 +253,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			Class<?> clazz = entityTypesByName.get( type );
 
 			if ( clazz == null ) {
-				throw new SearchException( "Found unknown type in ElasticSearch index: " + type );
+				LOG.warnf( "Found unknown type in ElasticSearch index: " + type );
+				return null;
 			}
 
 			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( clazz );
