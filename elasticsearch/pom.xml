@@ -193,10 +193,6 @@
                                 <exclude>**/IndexingGeneratedCorpusTest.java</exclude>
                                 <exclude>**/MassIndexerErrorReportingTest.java</exclude>
                                 <exclude>**/MassIndexerIndexedEmbeddedProxyTest.java</exclude>
-                                <exclude>**/AvoidDuplicatesTest.java</exclude>
-                                <exclude>**/FieldBridgeOnLazyFieldReindexTest.java</exclude>
-                                <exclude>**/LazyIndirectCollectionBridgeReindexTest.java</exclude>
-                                <exclude>**/InterceptedMassIndexerTest.java</exclude>
 
                                 <!-- Analyzers -->
                                 <exclude>**/CustomAnalyzerInClassBridgeTest.java</exclude>
@@ -224,14 +220,11 @@
                                 <exclude>**/LuceneIndexingParametersTest.java</exclude>
                                 <exclude>**/ProgrammaticMappingTest.java</exclude>
                                 <exclude>**/ShardsConfigurationTest.java</exclude>
-                                <exclude>**/DocumentIdContainedInTest.java</exclude>
                                 <exclude>**/RecursiveGraphTest.java</exclude>
                                 <exclude>**/WorkDoneOnEntitiesTest.java</exclude>
                                 <exclude>**/NullEmbeddedTest.java</exclude>
                                 <exclude>**/ContainedInWithoutIndexedEmbeddedReindexPropagationTest.java</exclude>
-                                <exclude>**/DirtyChecksDisabledTest.java</exclude>
                                 <exclude>**/NumericFieldTest.java</exclude>
-                                <exclude>**/CollectionUpdateEventsSecondTest.java</exclude>
                                 <exclude>**/CollectionUpdateEventTest.java</exclude>
                                 <exclude>**/DeleteByTermTest.java</exclude>
                                 <exclude>**/UpdateOperationsTest.java</exclude>
@@ -242,7 +235,6 @@
                                 <exclude>**/EmbeddedIdTest.java</exclude>
                                 <exclude>**/EmbeddedIdWithDocumentIdTest.java</exclude>
                                 <exclude>**/ProgrammaticEmbeddedItTest.java</exclude>
-                                <exclude>**/InheritanceTest.java</exclude>
                                 <exclude>**/IndexingActionInterceptorTest.java</exclude>
                                 <exclude>**/IndexControlMBeanTest.java</exclude>
                                 <exclude>**/EntityManagerSerializationTest.java</exclude>
@@ -268,7 +260,6 @@
                                 <exclude>**/StringFacetingTest.java</exclude>
                                 <exclude>**/WebShopTest.java</exclude>
 
-                                <exclude>**/SecondLCAndPCLookupTest.java</exclude>
                                 <exclude>**/LuceneQueryTest.java</exclude>
                                 <exclude>**/IndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>
@@ -288,20 +279,11 @@
                                 <exclude>**/AnalyzerInheritanceTest.java</exclude>
                                 <exclude>**/FetchSizeConfigurationTest.java</exclude>
                                 <exclude>**/ProgressMonitorTest.java</exclude>
-                                <exclude>**/SearchIndexerTest.java</exclude>
-                                <exclude>**/HibernateSearchSessionFactoryObserverTest.java</exclude>
                                 <exclude>**/RetryInitializeTest.java</exclude>
                                 <exclude>**/EmbeddedTest.java</exclude>
                                 <exclude>**/FieldOnCollectionReindexTest.java</exclude>
                                 <exclude>**/LazyM2OContainedInTest.java</exclude>
-                                <exclude>**/NestedContainedInTest.java</exclude>
-                                <exclude>**/DefaultDepthPathCaseEmbeddedTest.java</exclude>
-                                <exclude>**/PathRespectDepthCaseEmbeddedTest.java</exclude>
-                                <exclude>**/IdIncludedInPathCaseEmbeddedTest.java</exclude>
-                                <exclude>**/MultiplePathCaseEmbeddedTest.java</exclude>
                                 <exclude>**/PathEmbeddedDepthTest.java</exclude>
-                                <exclude>**/RenamedFieldPathCaseEmbeddedTest.java</exclude>
-                                <exclude>**/SimplePathCaseEmbeddedTest.java</exclude>
                                 <exclude>**/SearchAfterUninitializedProxyEntityLoadingTest.java</exclude>
                                 <exclude>**/UpdateIndexedEmbeddedCollectionTest.java</exclude>
                                 <exclude>**/LazyCollectionsUpdatingTest.java</exclude>
@@ -310,15 +292,12 @@
                                 <exclude>**/ConcurrentMergeErrorHandledTest.java</exclude>
                                 <exclude>**/ErrorHandlingDuringDocumentCreationTest.java</exclude>
                                 <exclude>**/LuceneErrorHandlingTest.java</exclude>
-                                <exclude>**/ExplicitIdTest.java</exclude>
                                 <exclude>**/ManualIndexingOnlyInterceptorTest.java</exclude>
                                 <exclude>**/EmbeddedFieldBoostTest.java</exclude>
-                                <exclude>**/DslEmbeddedSearchTest.java</exclude>
                                 <exclude>**/MultiClassesQueryLoaderTest.java</exclude>
                                 <exclude>**/TimeoutTest.java</exclude>
                                 <exclude>**/QueryValidationTest.java</exclude>
                                 <exclude>**/SimilarityTest.java</exclude>
-                                <exclude>**/TokenizationTest.java</exclude>
                                 <exclude>**/SortWithIndexUninvertingTest.java</exclude>
                                 <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude>
                                 <exclude>**/RollbackTransactionTest.java</exclude>
