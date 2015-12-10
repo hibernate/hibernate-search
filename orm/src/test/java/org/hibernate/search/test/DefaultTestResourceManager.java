@@ -188,7 +188,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
-		return getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
+		return ContextHelper.getSearchintegratorBySFI( sessionFactory );
 	}
 
 	@Override

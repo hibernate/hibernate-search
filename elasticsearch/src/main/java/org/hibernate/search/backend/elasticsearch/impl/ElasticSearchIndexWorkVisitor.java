@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -31,7 +32,10 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -46,7 +50,11 @@ import io.searchbox.params.Parameters;
  */
 class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
+	private static final Log LOG = LoggerFactory.make();
+
 	private static final Pattern DOT = Pattern.compile( "\\." );
+	private static final String DELETE_ALL_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"match_all\" : { } } } } }";
+	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
 
 	private final String indexName;
 	private final ExtendedSearchIntegrator searchIntegrator;
@@ -58,13 +66,13 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	@Override
 	public Void visitAddWork(AddLuceneWork work, Void p) {
-		indexDocument( work.getIdInString(), work.getDocument(), work.getEntityClass() );
+		indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
 		return null;
 	}
 
 	@Override
 	public Void visitDeleteWork(DeleteLuceneWork work, Void p) {
-		Delete delete = new Delete.Builder( work.getIdInString() )
+		Delete delete = new Delete.Builder( DocumentIdHelper.getDocumentId( work ) )
 			.index( indexName )
 			.type( work.getEntityClass().getName() )
 			// TODO Make configurable?
@@ -72,7 +80,7 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			.build();
 
 		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
-			clientReference.executeRequest( delete );
+			clientReference.executeRequest( delete, false );
 		}
 
 		return null;
@@ -81,14 +89,19 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 	@Override
 	public Void visitOptimizeWork(OptimizeLuceneWork work, Void p) {
 		// TODO implement
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		LOG.warn( "Optimize work is not yet supported for ElasticSearch backend, ignoring it" );
+		return null;
 	}
 
 	@Override
 	public Void visitPurgeAllWork(PurgeAllLuceneWork work, Void p) {
 		// TODO This requires the delete-by-query plug-in on ES 2.0 and beyond; Alternatively
 		// the type mappings could be deleted, think about implications for concurrent access
-		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( "{ \"query\" : { \"match_all\" : {} } }" )
+		String query = work.getTenantId() != null ?
+				String.format( Locale.ENGLISH, DELETE_ALL_FOR_TENANT_QUERY, work.getTenantId() ) :
+				DELETE_ALL_QUERY;
+
+		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( query )
 			.addIndex( indexName );
 
 		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
@@ -111,7 +124,7 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	@Override
 	public Void visitUpdateWork(UpdateLuceneWork work, Void p) {
-		indexDocument( work.getIdInString(), work.getDocument(), work.getEntityClass() );
+		indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
 		return null;
 	}
 

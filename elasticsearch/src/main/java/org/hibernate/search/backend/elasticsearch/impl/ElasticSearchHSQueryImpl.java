@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
@@ -33,6 +35,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FullTextFilter;
@@ -123,16 +126,6 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	@Override
-	public HSQuery tenantIdentifier(String tenantId) {
-		// TODO implement
-		if ( tenantId != null ) {
-			LOG.warnf( "Multi-tenancy not yet implemented for ElasticSearch backend" );
-		}
-
-		return this;
-	}
-
-	@Override
 	public HSQuery filter(Filter filter) {
 		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
@@ -184,7 +177,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	private Object getId(JsonObject hit, EntityIndexBinding binding) {
 		Document tmp = new Document();
-		tmp.add( new StringField( "id", hit.get( "_id" ).getAsString(), Store.NO) );
+		tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO) );
 		Object id = binding.getDocumentBuilder().getIdBridge().get( "id", tmp );
 
 		return id;
@@ -199,8 +192,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		private final Map<String, Class<?>> entityTypesByName;
 
 		private IndexSearcher() {
-			Search.Builder search = new Search.Builder( jsonQuery );
 			entityTypesByName = new HashMap<>();
+			Set<String> indexNames = new HashSet<>();
 
 			for ( Class<?> queriedEntityType : getQueriedEntityTypes() ) {
 				entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
@@ -217,10 +210,19 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 					}
 
 					ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
-					search.addIndex( esIndexManager.getActualIndexName() );
+					indexNames.add( esIndexManager.getActualIndexName() );
 				}
 			}
 
+			// Query filters; always a type filter, possibly a tenant id filter;
+			// TODO feed in user-provided filters
+			JsonObject effectiveFilter = getEffectiveFilter();
+
+			// TODO can we avoid the forth and back between GSON and String?
+			String executedQuery = "{ \"query\" : { \"filtered\" : { " + jsonQuery.substring( 1, jsonQuery.length() - 1 ) + ", \"filter\" : " + effectiveFilter.toString() + " } } }";
+
+			Search.Builder search = new Search.Builder( executedQuery );
+			search.addIndex( indexNames );
 			search.setParameter( "from", firstResult );
 			search.setParameter( "size", maxResults != null ? maxResults : Integer.MAX_VALUE );
 
@@ -231,6 +233,43 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 			this.search = search.build();
+		}
+
+		private JsonObject getEffectiveFilter() {
+			JsonArray filters = new JsonArray();
+
+			JsonObject tenantFilter = getTenantIdFilter();
+			if ( tenantFilter != null ) {
+				filters.add( tenantFilter );
+			}
+
+			// wrap filters into must if there is more than one
+			JsonObject effectiveFilter = new JsonObject();
+			if ( filters.size() == 1 ) {
+				effectiveFilter = filters.get( 0 ).getAsJsonObject();
+			}
+			else {
+				JsonObject must = new JsonObject();
+				must.add( "must", filters );
+				effectiveFilter = new JsonObject();
+				effectiveFilter.add( "bool", must );
+			}
+
+			return effectiveFilter;
+		}
+
+		private JsonObject getTenantIdFilter() {
+			if ( tenantId == null ) {
+				return null;
+			}
+
+			JsonObject value = new JsonObject();
+			value.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
+
+			JsonObject tenantFilter = new JsonObject();
+			tenantFilter.add( "term", value );
+
+			return tenantFilter;
 		}
 
 		private Iterable<Class<?>> getQueriedEntityTypes() {
