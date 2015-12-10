@@ -66,6 +66,11 @@ class FieldHelper {
 		return false;
 	}
 
+	static String[] getFieldNameParts(String fieldName) {
+		boolean isEmbeddedField = fieldName.contains( "." );
+		return isEmbeddedField ? DOT.split( fieldName ) : new String[]{ fieldName };
+	}
+
 	private static String getPropertyTypeName(EntityIndexBinding indexBinding, String fieldName) {
 		PropertyMetadata propertyMetadata = getPropertyMetadata( indexBinding, fieldName );
 		return propertyMetadata != null ? propertyMetadata.getPropertyAccessor().getType().getName() : null;
