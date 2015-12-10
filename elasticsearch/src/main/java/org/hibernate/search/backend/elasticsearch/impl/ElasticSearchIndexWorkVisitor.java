@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
@@ -33,7 +34,9 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import com.google.gson.JsonObject;
 
 import io.searchbox.core.Delete;
+import io.searchbox.core.DeleteByQuery;
 import io.searchbox.core.Index;
+import io.searchbox.indices.Refresh;
 import io.searchbox.params.Parameters;
 
 /**
@@ -81,8 +84,27 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	@Override
 	public Void visitPurgeAllWork(PurgeAllLuceneWork work, Void p) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		// TODO This requires the delete-by-query plug-in on ES 2.0 and beyond; Alternatively
+		// the type mappings could be deleted, think about implications for concurrent access
+		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( "{ \"query\" : { \"match_all\" : {} } }" )
+			.addIndex( indexName );
+
+		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
+		for ( Class<?> typeToDelete : typesToDelete ) {
+			builder.addType( typeToDelete.getName() );
+		}
+
+		DeleteByQuery delete = builder.build();
+		Refresh refresh = new Refresh.Builder().addIndex( indexName ).build();
+
+		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
+			clientReference.executeRequest( delete );
+
+			// TODO Refresh not needed on ES 1.x; Make it configurable?
+			clientReference.executeRequest( refresh );
+		}
+
+		return null;
 	}
 
 	@Override
