@@ -30,12 +30,13 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
@@ -136,7 +137,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 				.get( documentId )
 				.getAsJsonObject();
 
-		try ( JestClientReference client = new JestClientReference( getExtendedSearchIntegrator().getServiceManager() ) ) {
+		try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
 			Explain request = new Explain.Builder(
 					hit.get( "_index" ).getAsString(),
 					hit.get( "_type" ).getAsString(),
@@ -145,7 +146,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 				)
 				.build();
 
-			DocumentResult response = client.executeRequest( request );
+			DocumentResult response = client.get().executeRequest( request );
 			JsonObject explanation = response.getJsonObject().get( "explanation" ).getAsJsonObject();
 
 			return convertExplanation( explanation );
@@ -379,8 +380,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		SearchResult runSearch() {
-			try ( JestClientReference clientReference = new JestClientReference( extendedIntegrator.getServiceManager() ) ) {
-				return clientReference.executeRequest( search );
+			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
+				return client.get().executeRequest( search );
 			}
 		}
 

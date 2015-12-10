@@ -6,31 +6,34 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
-import io.searchbox.client.AbstractJestClient;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.config.HttpClientConfig;
-
+import java.io.IOException;
 import java.util.Properties;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticSearchEnvironment;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.searchbox.action.Action;
+import io.searchbox.client.AbstractJestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.config.HttpClientConfig;
+
 /**
  * Provides access to the JEST client.
  *
  * @author Gunnar Morling
  */
-public class JestClientService implements Service, Startable, Stoppable {
+public class JestClient implements Service, Startable, Stoppable {
 
-	private JestClient client;
+	private io.searchbox.client.JestClient client;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
@@ -62,7 +65,23 @@ public class JestClientService implements Service, Startable, Stoppable {
 		client.shutdownClient();
 	}
 
-	public JestClient getClient() {
-		return client;
+	public <T extends JestResult> T executeRequest(Action<T> request) {
+		return executeRequest( request, true );
+	}
+
+	public <T extends JestResult> T executeRequest(Action<T> request, boolean failOnError) {
+		T result;
+		try {
+			result = client.execute( request );
+
+			if ( failOnError && !result.isSucceeded() ) {
+				throw new SearchException( result.getErrorMessage() );
+			}
+
+			return result;
+		}
+		catch (IOException e) {
+			throw new SearchException( e );
+		}
 	}
 }

@@ -19,7 +19,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticSearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -66,7 +66,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 	ExtendedSearchIntegrator searchIntegrator;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
 
-	private JestClientReference clientReference;
+	private ServiceReference<JestClient> clientReference;
 	private BackendQueueProcessor backend;
 
 	private LuceneWorkSerializer serializer;
@@ -109,7 +109,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 	@Override
 	public void setSearchFactory(ExtendedSearchIntegrator boundSearchIntegrator) {
 		this.searchIntegrator = boundSearchIntegrator;
-		this.clientReference = new JestClientReference( searchIntegrator.getServiceManager() );
+		this.clientReference = searchIntegrator.getServiceManager().requestReference( JestClient.class );
 
 		initializeIndex();
 	}
@@ -137,25 +137,25 @@ public class ElasticSearchIndexManager implements IndexManager {
 	}
 
 	private void createIndex() {
-		clientReference.executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
+		clientReference.get().executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
 	}
 
 	private void createIndexIfNotYetExisting() {
-		if ( clientReference.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), false ).getResponseCode() == 200 ) {
+		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), false ).getResponseCode() == 200 ) {
 			return;
 		}
 
-		clientReference.executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
+		clientReference.get().executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
 	}
 
 	private void deleteIndexIfExisting() {
 		// Not actually needed, but do it to avoid cluttering the ES log
-		if ( clientReference.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), false ).getResponseCode() == 404 ) {
+		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), false ).getResponseCode() == 404 ) {
 			return;
 		}
 
 		try {
-			clientReference.executeRequest( new DeleteIndex.Builder( actualIndexName ).build() );
+			clientReference.get().executeRequest( new DeleteIndex.Builder( actualIndexName ).build() );
 		}
 		catch (SearchException e) {
 			// ignoring deletion of non-existing index
@@ -206,7 +206,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 			.build();
 
 			try {
-				clientReference.executeRequest( putMapping );
+				clientReference.get().executeRequest( putMapping );
 			}
 			catch (Exception e) {
 				throw new SearchException( "Could not create mapping for entity type " + entityType.getName(), e );
