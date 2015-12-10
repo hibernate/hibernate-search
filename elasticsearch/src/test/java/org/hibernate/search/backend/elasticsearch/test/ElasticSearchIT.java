@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.test;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -35,10 +39,6 @@ import org.hibernate.search.test.embedded.Tower;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Gunnar Morling
@@ -350,10 +350,10 @@ public class ElasticSearchIT extends SearchTestBase {
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class )
 				.setFirstResult( 1 )
 				.setMaxResults( 2 )
+				.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) )
 				.list();
 
-		// Order is stable due to the result scoring
-		assertThat( result ).onProperty( "title" ).containsOnly( "ORM modelling", "ORM for dummies" );
+		assertThat( result ).onProperty( "title" ).containsOnly( "Latest in ORM", "High-performance ORM" );
 		tx.commit();
 		s.close();
 	}
@@ -380,7 +380,8 @@ public class ElasticSearchIT extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
-		FullTextQuery fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class );
+		FullTextQuery fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class )
+				.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
 
 		ScrollableResults scrollableResults = fullTextQuery.scroll();
 
@@ -389,22 +390,21 @@ public class ElasticSearchIT extends SearchTestBase {
 		assertEquals( 3, scrollableResults.getRowNumber() );
 		scrollableResults.beforeFirst();
 
-		List<String> expectedTitles = Arrays.asList(
-				"High-performance ORM",
-				"ORM for dummies",
-				"ORM modelling",
-				"Latest in ORM"
-		);
-
-		int position = 0;
+		List<ScientificArticle> articles = new ArrayList<>();
 		while ( scrollableResults.next() ) {
-			ScientificArticle article = (ScientificArticle) scrollableResults.get()[0];
-			assertThat( article.getTitle() ).isEqualTo( expectedTitles.get( position ) );
-			position++;
+			articles.add( (ScientificArticle) scrollableResults.get()[0] );
 		}
 		scrollableResults.close();
 
-		fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class );
+		assertThat( articles ).onProperty( "title" ).containsExactly(
+				"ORM for dummies",
+				"Latest in ORM",
+				"High-performance ORM",
+				"ORM modelling"
+		);
+
+		fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class )
+				.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
 
 		scrollableResults = fullTextQuery
 				.setFirstResult( 1 )
@@ -416,18 +416,16 @@ public class ElasticSearchIT extends SearchTestBase {
 		assertEquals( 1, scrollableResults.getRowNumber() );
 		scrollableResults.beforeFirst();
 
-		expectedTitles = Arrays.asList(
-				"ORM for dummies",
-				"ORM modelling"
-		);
-
-		position = 0;
+		articles = new ArrayList<>();
 		while ( scrollableResults.next() ) {
-			ScientificArticle article = (ScientificArticle) scrollableResults.get()[0];
-			assertThat( article.getTitle() ).isEqualTo( expectedTitles.get( position ) );
-			position++;
+			articles.add( (ScientificArticle) scrollableResults.get()[0] );
 		}
 		scrollableResults.close();
+
+		assertThat( articles ).onProperty( "title" ).containsExactly(
+				"Latest in ORM",
+				"High-performance ORM"
+		);
 
 		tx.commit();
 		s.close();
