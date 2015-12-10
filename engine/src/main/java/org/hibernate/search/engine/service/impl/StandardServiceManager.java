@@ -18,6 +18,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
@@ -79,6 +80,11 @@ public class StandardServiceManager implements ServiceManager {
 		}
 		wrapper.startVirtual();
 		return wrapper.getService();
+	}
+
+	@Override
+	public <S extends Service> ServiceReference<S> requestReference(Class<S> serviceRole) {
+		return new ServiceReference<>( this, serviceRole );
 	}
 
 	@Override
