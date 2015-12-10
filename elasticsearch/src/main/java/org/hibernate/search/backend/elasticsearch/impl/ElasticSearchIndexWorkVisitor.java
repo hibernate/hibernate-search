@@ -29,6 +29,8 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 
 import com.google.gson.JsonObject;
@@ -156,14 +158,21 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
 
-				// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
 				if ( documentFieldMetadata == null ) {
-					String stringValue = field.stringValue();
-					if ( stringValue != null ) {
-						parent.addProperty( jsonPropertyName, stringValue );
-					}
-					else {
-						parent.addProperty( jsonPropertyName, field.numericValue() );
+					String[] fieldNameParts = FieldHelper.getFieldNameParts( field.name() );
+
+					EmbeddedTypeMetadata embeddedType = getEmbeddedTypeMetadata( indexBinding.getDocumentBuilder().getTypeMetadata(), fieldNameParts );
+
+					// Make sure this field does not represent an embeddable (not a field thereof)
+					if ( embeddedType == null ) {
+						// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
+						String stringValue = field.stringValue();
+						if ( stringValue != null ) {
+							parent.addProperty( jsonPropertyName, stringValue );
+						}
+						else {
+							parent.addProperty( jsonPropertyName, field.numericValue() );
+						}
 					}
 				}
 				else if ( FieldHelper.isBoolean( indexBinding, field.name() ) ) {
@@ -200,6 +209,31 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	private boolean isNumeric(IndexableField field) {
 		return field instanceof IntField || field instanceof LongField || field instanceof FloatField || field instanceof DoubleField;
+	}
+
+	private EmbeddedTypeMetadata getEmbeddedTypeMetadata(TypeMetadata type, String[] fieldNameParts) {
+		TypeMetadata parent = type;
+
+		for ( String namePart : fieldNameParts ) {
+			EmbeddedTypeMetadata embeddedType = getDirectEmbeddedTypeMetadata( parent, namePart );
+			if ( embeddedType == null ) {
+				return null;
+			}
+
+			parent = embeddedType;
+		}
+
+		return (EmbeddedTypeMetadata) parent;
+	}
+
+	private EmbeddedTypeMetadata getDirectEmbeddedTypeMetadata(TypeMetadata type, String fieldName) {
+		for ( EmbeddedTypeMetadata embeddedType : type.getEmbeddedTypeMetadata() ) {
+			if ( embeddedType.getEmbeddedFieldName().equals( fieldName ) ) {
+				return embeddedType;
+			}
+		}
+
+		return null;
 	}
 
 	private JsonObject getOrCreateDocumentTree(JsonObject source, IndexableField field) {
