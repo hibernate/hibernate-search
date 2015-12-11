@@ -305,6 +305,11 @@ public class ElasticSearchIndexManager implements IndexManager {
 		return serializer;
 	}
 
+	@Override
+	public void closeIndexWriter() {
+		throw new UnsupportedOperationException( "Access to IndexWriter not supported with ES IndexManager" );
+	}
+
 	private SerializationProvider requestSerializationProvider() {
 		try {
 			return serviceManager.requestService( SerializationProvider.class );

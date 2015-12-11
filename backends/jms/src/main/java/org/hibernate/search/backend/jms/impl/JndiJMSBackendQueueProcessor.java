@@ -77,4 +77,8 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 		}
 	}
 
+	@Override
+	public void closeIndexWriter() {
+		// no-op
+	}
 }

@@ -77,4 +77,9 @@ public interface BackendQueueProcessor {
 
 	}
 
+	/**
+	 * Releases any write lock over the index
+	 */
+	void closeIndexWriter();
+
 }

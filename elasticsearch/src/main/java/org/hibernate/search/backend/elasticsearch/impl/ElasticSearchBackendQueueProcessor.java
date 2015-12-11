@@ -64,4 +64,9 @@ public class ElasticSearchBackendQueueProcessor implements BackendQueueProcessor
 		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
+
+	@Override
+	public void closeIndexWriter() {
+		throw new UnsupportedOperationException();
+	}
 }

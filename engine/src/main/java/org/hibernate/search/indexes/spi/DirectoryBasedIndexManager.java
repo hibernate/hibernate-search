@@ -171,6 +171,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		return serializer;
 	}
 
+	@Override
+	public void closeIndexWriter() {
+		backend.closeIndexWriter();
+	}
+
 	private SerializationProvider requestSerializationProvider() {
 		try {
 			return serviceManager.requestService( SerializationProvider.class );

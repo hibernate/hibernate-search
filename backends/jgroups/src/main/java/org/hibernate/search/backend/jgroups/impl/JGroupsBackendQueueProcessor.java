@@ -150,6 +150,13 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
+	public void closeIndexWriter() {
+		if ( selectionStrategy.isIndexOwnerLocal() ) {
+			delegatedBackend.closeIndexWriter();
+		}
+	}
+
+	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( selectionStrategy.isIndexOwnerLocal() ) {
 			delegatedBackend.applyWork( workList, monitor );

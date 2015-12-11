@@ -100,6 +100,11 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	public void shutDownNow() {
 		getCommitPolicy().onClose();
 		log.shuttingDownBackend( indexManager.getIndexName() );
+		closeIndexWriter();
+	}
+
+	public void closeIndexWriter() {
+		log.closingIndexWriter( indexManager.getIndexName() );
 		writerHolder.closeIndexWriter();
 	}
 

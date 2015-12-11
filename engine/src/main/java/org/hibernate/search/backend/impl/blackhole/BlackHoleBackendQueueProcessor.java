@@ -69,4 +69,9 @@ public class BlackHoleBackendQueueProcessor implements BackendQueueProcessor {
 		log.debug( "BlackHoleBackend reconfigured" );
 	}
 
+	@Override
+	public void closeIndexWriter() {
+		log.debug( "Closing IndexWriter" );
+	}
+
 }
