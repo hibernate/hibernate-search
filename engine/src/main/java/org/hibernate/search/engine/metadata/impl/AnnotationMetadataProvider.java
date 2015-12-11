@@ -7,6 +7,8 @@
 
 package org.hibernate.search.engine.metadata.impl;
 
+import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -88,8 +90,6 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
 
 /**
  * A metadata provider which extracts the required information from annotations.
@@ -444,8 +444,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		ProvidedId explicitProvidedIdAnnotation = null;
 		XClass providedIdHostingClass = null;
 		for ( XClass currentClass : hierarchy ) {
-			if ( currentClass.getAnnotation( ProvidedId.class ) != null ) {
-				explicitProvidedIdAnnotation = currentClass.getAnnotation( ProvidedId.class );
+			ProvidedId providedId = currentClass.getAnnotation( ProvidedId.class );
+			if ( providedId != null ) {
+				explicitProvidedIdAnnotation = providedId;
 				providedIdHostingClass = currentClass;
 			}
 
@@ -902,8 +903,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private void checkForContainedIn(XProperty member, TypeMetadata.Builder typeMetadataBuilder, ParseContext parseContext) {
-		ContainedIn containedInAnnotation = member.getAnnotation( ContainedIn.class );
-		if ( containedInAnnotation == null ) {
+		if ( !member.isAnnotationPresent( ContainedIn.class ) ) {
 			return;
 		}
 
@@ -1783,14 +1783,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private boolean hasExplicitDocumentId(XClass type) {
 		List<XProperty> methods = type.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 		for ( XProperty method : methods ) {
-			if ( method.getAnnotation( DocumentId.class ) != null ) {
+			if ( method.isAnnotationPresent( DocumentId.class ) ) {
 				return true;
 			}
 		}
 
 		List<XProperty> fields = type.getDeclaredProperties( XClass.ACCESS_FIELD );
 		for ( XProperty field : fields ) {
-			if ( field.getAnnotation( DocumentId.class ) != null ) {
+			if ( field.isAnnotationPresent( DocumentId.class ) ) {
 				return true;
 			}
 		}
