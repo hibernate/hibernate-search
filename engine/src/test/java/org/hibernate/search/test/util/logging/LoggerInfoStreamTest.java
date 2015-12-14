@@ -29,7 +29,7 @@ import static junit.framework.TestCase.assertFalse;
 
 public class LoggerInfoStreamTest {
 
-	private static final Version VERSION = Version.LUCENE_5_3_0;
+	private static final Version VERSION = Version.LUCENE_5_4_0;
 	private Level hsearchLevel;
 	private final Logger hsearchLogger = Logger.getLogger( "org.hibernate.search" );
 	private final Logger rootLogger = Logger.getRootLogger();
