@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 5.5.0.Final*
+*Version: 5.6.0-SNAPSHOT*
 
 ## Description
 
@@ -20,7 +20,7 @@ Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the c
 This version of Hibernate Search requires:
 
 * Hibernate ORM 5.0.x
-* Apache Lucene 5.3.x
+* Apache Lucene 5.4.x
 
 ## Instructions
 
@@ -31,7 +31,7 @@ Include the following to your dependency list:
     <dependency>
        <groupId>org.hibernate</groupId>
        <artifactId>hibernate-search-orm</artifactId>
-       <version>5.5.0.Final</version>
+       <version>5.6.0-SNAPSHOT</version>
     </dependency>
 
 ### Sourceforge Bundle
