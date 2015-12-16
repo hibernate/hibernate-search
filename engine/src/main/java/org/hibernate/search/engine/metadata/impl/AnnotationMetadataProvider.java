@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.SortableFields;
@@ -844,7 +846,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
 			.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
-		NumericFieldsConfiguration numericFields = new NumericFieldsConfiguration( typeMetadataBuilder.getIndexedType(), member );
+		NumericFieldsConfiguration numericFields = buildNumericFieldsConfiguration( typeMetadataBuilder.getIndexedType(), member, prefix, pathsContext, parseContext );
 
 		if ( !isProvidedId ) {
 			checkDocumentId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, isRoot, prefix, configContext, pathsContext, parseContext );
@@ -955,6 +957,45 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		catch (InvocationTargetException e) {
 			return UNKNOWN_MAPPED_BY_ROLE;
 		}
+	}
+
+	private NumericFieldsConfiguration buildNumericFieldsConfiguration(Class<?> indexedType,
+			XProperty member,
+			String prefix,
+			PathsContext pathsContext,
+			ParseContext parseContext) {
+		Map<String, NumericField> fieldsMarkedAsNumeric = new HashMap<>();
+
+		NumericField numericFieldAnnotation = member.getAnnotation( NumericField.class );
+		if ( numericFieldAnnotation != null ) {
+			if ( isFieldInPath(
+					numericFieldAnnotation,
+					member,
+					pathsContext,
+					prefix
+			) || !parseContext.isMaxLevelReached() ) {
+				fieldsMarkedAsNumeric.put( numericFieldAnnotation.forField(), numericFieldAnnotation );
+			}
+		}
+
+		NumericFields numericFieldsAnnotation = member.getAnnotation( NumericFields.class );
+		if ( numericFieldsAnnotation != null ) {
+			for ( NumericField numericField : numericFieldsAnnotation.value() ) {
+				if ( isFieldInPath(
+						numericFieldAnnotation,
+						member,
+						pathsContext,
+						prefix
+				) || !parseContext.isMaxLevelReached() ) {
+					NumericField existing = fieldsMarkedAsNumeric.put( numericField.forField(), numericField );
+					if ( existing != null ) {
+						throw log.severalNumericFieldAnnotationsForSameField( indexedType, member.getName() );
+					}
+				}
+			}
+		}
+
+		return new NumericFieldsConfiguration( indexedType, member, fieldsMarkedAsNumeric );
 	}
 
 	private void checkForField(XProperty member,
