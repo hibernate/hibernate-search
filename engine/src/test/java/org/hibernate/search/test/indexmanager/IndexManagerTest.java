@@ -15,15 +15,17 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -32,12 +34,12 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-2012")
 public class IndexManagerTest {
 
+	@Rule
+	public SearchFactoryHolder sfh = new SearchFactoryHolder( Entity.class );
+
 	@Test
 	public void testUnlockIndexWriter() throws Exception {
-		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
-				.addProperty( "hibernate.search.default.indexmanager", RamIndexManager.class.getName() )
-				.addClass( Entity.class );
-		SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+		ExtendedSearchIntegrator searchIntegrator = sfh.getSearchFactory();
 		IndexManager indexManager = searchIntegrator.getIndexBinding( Entity.class ).getIndexManagers()[0];
 		addEntity( searchIntegrator, 1 );
 		assertTrue( isIndexWriterLocked( indexManager ) );
@@ -50,7 +52,7 @@ public class IndexManagerTest {
 	}
 
 	private boolean isIndexWriterLocked(IndexManager indexManager) {
-		Directory directory = ( (RamIndexManager) indexManager ).getDirectoryProvider().getDirectory();
+		Directory directory = ( (DirectoryBasedIndexManager) indexManager ).getDirectoryProvider().getDirectory();
 		Lock lock = null;
 		try {
 			lock = directory.obtainLock( IndexWriter.WRITE_LOCK_NAME );
