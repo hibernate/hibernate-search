@@ -67,6 +67,6 @@ public class ElasticSearchBackendQueueProcessor implements BackendQueueProcessor
 
 	@Override
 	public void closeIndexWriter() {
-		throw new UnsupportedOperationException();
+		// no-op
 	}
 }

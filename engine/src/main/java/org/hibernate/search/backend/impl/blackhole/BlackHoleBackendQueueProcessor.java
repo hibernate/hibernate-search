@@ -71,7 +71,7 @@ public class BlackHoleBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void closeIndexWriter() {
-		log.debug( "Closing IndexWriter" );
+		log.debug( "BlackHoleBackend requested to close the IndexWriter (no-op)" );
 	}
 
 }

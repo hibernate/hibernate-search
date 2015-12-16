@@ -928,7 +928,6 @@ public interface Log extends BasicLogger {
 			+ "indexing backend for index '%s'. Some pending index writes might have been lost.")
 	void timedOutWaitingShutdown(String indexName);
 
-
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 304, value = "Closing index writer for IndexManager '%1$s'")
 	void closingIndexWriter(String indexName);

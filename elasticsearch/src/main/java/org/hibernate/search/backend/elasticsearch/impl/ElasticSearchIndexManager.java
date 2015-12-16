@@ -307,7 +307,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 
 	@Override
 	public void closeIndexWriter() {
-		throw new UnsupportedOperationException( "Access to IndexWriter not supported with ES IndexManager" );
+		// no-op
 	}
 
 	private SerializationProvider requestSerializationProvider() {

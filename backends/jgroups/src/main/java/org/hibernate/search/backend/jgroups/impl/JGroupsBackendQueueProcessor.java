@@ -154,6 +154,9 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		if ( selectionStrategy.isIndexOwnerLocal() ) {
 			delegatedBackend.closeIndexWriter();
 		}
+		else {
+			log.debugf( "Not owning the index '%s' so ignoring request to release IndexWriter lock", indexName );
+		}
 	}
 
 	@Override
