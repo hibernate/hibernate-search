@@ -169,6 +169,9 @@ public final class AnnotationProcessingHelper {
 		else if ( fieldAnn instanceof SortableField ) {
 			fieldName = ( (SortableField) fieldAnn ).forField();
 		}
+		else if ( fieldAnn instanceof NumericField ) {
+			fieldName = ( (NumericField) fieldAnn ).forField();
+		}
 		else {
 			return raiseAssertionOnIncorrectAnnotation( fieldAnn );
 		}
