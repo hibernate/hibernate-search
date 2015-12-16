@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.SortableField;
 
 /**
@@ -22,6 +23,8 @@ import org.hibernate.search.annotations.SortableField;
 @Entity
 @Indexed
 class Villain {
+
+	private static final String ID_SORT = "idSort";
 
 	@Id
 	@SortableField
@@ -44,6 +47,9 @@ class Villain {
 		this.name = name;
 	}
 
+	@Field(name = ID_SORT)
+	@SortableField(forField = ID_SORT)
+	@NumericField(forField = ID_SORT)
 	public Integer getId() {
 		return id;
 	}
