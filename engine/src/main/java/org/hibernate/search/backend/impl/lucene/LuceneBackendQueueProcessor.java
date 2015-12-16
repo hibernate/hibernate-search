@@ -113,7 +113,10 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void closeIndexWriter() {
-		getIndexResources().getWorkspace().closeIndexWriter();
+		LuceneBackendResources backendResources = resources;
+		if ( backendResources != null ) {
+			backendResources.getWorkspace().closeIndexWriter();
+		}
 	}
 
 }
