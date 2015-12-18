@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.query.engine.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
  *
  * @author Gunnar Morling
  */
-public abstract class AbstractHSQuery implements HSQuery {
+public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	private static final Log LOG = LoggerFactory.make();
 
