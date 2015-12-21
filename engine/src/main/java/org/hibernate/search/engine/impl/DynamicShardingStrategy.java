@@ -61,7 +61,7 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 
 	@Override
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		Set<String> shardIdentifiers = shardIdentifierProvider.getAllShardIdentifiers();
+		Set<String> shardIdentifiers = shardIdentifierProvider.getShardIdentifiersForDeletion( entity, id, idInString );
 		return getIndexManagersFromShards( shardIdentifiers );
 	}
 

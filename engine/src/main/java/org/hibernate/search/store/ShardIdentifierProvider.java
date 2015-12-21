@@ -80,6 +80,16 @@ public interface ShardIdentifierProvider {
 	Set<String> getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters);
 
 	/**
+	 * Returns the set of shard identifiers for a deletion.
+	 *
+	 * @param entity the type of the deleted entity
+	 * @param id the id or null
+	 * @param idInString the transformed id or null
+	 * @return the target IndexManager for the deletion operation
+	 */
+	Set<String> getShardIdentifiersForDeletion(Class<?> entity, Serializable id, String idInString);
+
+	/**
 	 * Returns the list of all currently known shard identifiers.
 	 * <br>
 	 * Note: The list can vary between calls!
