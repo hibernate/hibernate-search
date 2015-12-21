@@ -182,6 +182,11 @@ public class LogRotationExampleTest {
 		}
 
 		@Override
+		public Set<String> getShardIdentifiersForDeletion(Class<?> entity, Serializable id, String idInString) {
+			return getAllShardIdentifiers();
+		}
+
+		@Override
 		public Set<String> getAllShardIdentifiers() {
 			return hoursOfDay;
 		}

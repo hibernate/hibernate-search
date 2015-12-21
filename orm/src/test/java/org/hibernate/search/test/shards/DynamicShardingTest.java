@@ -119,6 +119,19 @@ public class DynamicShardingTest extends SearchTestBase {
 		assertThat( getIndexManagersAfterReopening() ).hasSize( 2 );
 	}
 
+	@Test
+	public void testDeletion() throws Exception {
+		insertAnimals( elephant, spider, bear );
+
+		assertNumberOfEntitiesInIndex( "Animal.Mammal", 2 );
+		assertNumberOfEntitiesInIndex( "Animal.Insect", 1 );
+
+		deleteAnimal( elephant );
+
+		assertNumberOfEntitiesInIndex( "Animal.Mammal", 1 );
+		assertNumberOfEntitiesInIndex( "Animal.Insect", 1 );
+	}
+
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( "hibernate.search.Animal.sharding_strategy", AnimalShardIdentifierProvider.class.getName() );
@@ -163,6 +176,14 @@ public class DynamicShardingTest extends SearchTestBase {
 		}
 	}
 
+	private void deleteAnimal(Animal animal) {
+		try (Session session = openSession()) {
+			Transaction tx = session.beginTransaction();
+			session.delete( animal );
+			tx.commit();
+		}
+	}
+
 	private IndexManager[] getIndexManagersAfterReopening() {
 		// build a new independent SessionFactory to verify that the shards are available at restart
 		Configuration config = new Configuration();
@@ -197,6 +218,11 @@ public class DynamicShardingTest extends SearchTestBase {
 				return typeValue;
 			}
 			throw new RuntimeException( "Animal expected but found " + entityType );
+		}
+
+		@Override
+		public Set<String> getShardIdentifiersForDeletion(Class<?> entityType, Serializable id, String idInString) {
+			return getAllShardIdentifiers();
 		}
 
 		@Override

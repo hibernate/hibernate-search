@@ -336,6 +336,11 @@ public class ShardingConfigurationTest {
 		}
 
 		@Override
+		public Set<String> getShardIdentifiersForDeletion(Class<?> entity, Serializable id, String idInString) {
+			return null;
+		}
+
+		@Override
 		public Set<String> getAllShardIdentifiers() {
 			return shards;
 		}
