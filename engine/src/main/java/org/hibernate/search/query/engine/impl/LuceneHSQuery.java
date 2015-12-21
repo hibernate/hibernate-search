@@ -7,7 +7,6 @@
 package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +65,7 @@ import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResu
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class LuceneHSQuery extends AbstractHSQuery implements HSQuery, Serializable {
+public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 	static final Log log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
