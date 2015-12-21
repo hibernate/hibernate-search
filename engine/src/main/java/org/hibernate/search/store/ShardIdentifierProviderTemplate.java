@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.store;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
@@ -57,6 +58,15 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	 */
 	@Override
 	public Set<String> getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+		return getAllShardIdentifiers();
+	}
+
+	/**
+	 * Override this method if the mapping to a specific shard can be inferred just from the pair (id, type).
+	 * The default implementation will perform delete and purge operations on all known indexes.
+	 */
+	@Override
+	public final Set<String> getShardIdentifiersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return getAllShardIdentifiers();
 	}
 

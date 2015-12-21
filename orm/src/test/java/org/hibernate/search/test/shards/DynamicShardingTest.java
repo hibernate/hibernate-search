@@ -221,11 +221,6 @@ public class DynamicShardingTest extends SearchTestBase {
 		}
 
 		@Override
-		public Set<String> getShardIdentifiersForDeletion(Class<?> entityType, Serializable id, String idInString) {
-			return getAllShardIdentifiers();
-		}
-
-		@Override
 		protected Set<String> loadInitialShardNames(Properties properties, BuildContext buildContext) {
 			ServiceManager serviceManager = buildContext.getServiceManager();
 			SessionFactory sessionFactory = serviceManager.requestService( HibernateSessionFactoryService.class ).getSessionFactory();
