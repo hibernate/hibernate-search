@@ -9,7 +9,7 @@ package org.hibernate.search.test.configuration;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.hibernate.search.test.SerializationTestHelper;
+import org.hibernate.search.testsupport.serialization.SerializationTestHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.junit.Test;
 

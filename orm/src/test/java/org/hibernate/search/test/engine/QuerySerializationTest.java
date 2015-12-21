@@ -24,7 +24,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.SerializationTestHelper;
+import org.hibernate.search.testsupport.serialization.SerializationTestHelper;
 import org.junit.Ignore;
 import org.junit.Test;
 

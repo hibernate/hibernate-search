@@ -9,7 +9,7 @@ package org.hibernate.search.test.engine;
 import java.io.IOException;
 
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
-import org.hibernate.search.test.SerializationTestHelper;
+import org.hibernate.search.testsupport.serialization.SerializationTestHelper;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

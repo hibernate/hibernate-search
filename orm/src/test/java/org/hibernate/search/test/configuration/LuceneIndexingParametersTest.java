@@ -12,9 +12,9 @@ import java.util.Properties;
 
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
+import org.hibernate.search.testsupport.serialization.SerializationTestHelper;
 import org.junit.Test;
 
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_BUFFERED_DOCS;
