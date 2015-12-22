@@ -30,7 +30,7 @@ public class ContainedInMetadata {
 		ReflectionHelper.setAccessible( this.containedInMember );
 		this.maxDepth = maxDepth;
 		this.prefix = prefix;
-		this.includePaths = includePaths != null ? new HashSet<>( Arrays.asList( includePaths ) ) : Collections.<String> emptySet();
+		this.includePaths = includePaths != null ? new HashSet<>( Arrays.asList( includePaths ) ) : Collections.<String>emptySet();
 	}
 
 	public XMember getContainedInMember() {
