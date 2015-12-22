@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.annotations.NumericField;
-import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -31,25 +29,10 @@ class NumericFieldsConfiguration {
 	private final Map<String, NumericField> fieldsMarkedAsNumeric;
 	private final Set<String> fieldsOfProperty = new HashSet<>();
 
-	NumericFieldsConfiguration(Class<?> indexedType, XProperty member) {
+	NumericFieldsConfiguration(Class<?> indexedType, XProperty member, Map<String, NumericField> fieldsMarkedAsNumeric) {
 		this.indexedType = indexedType;
 		this.member = member;
-		fieldsMarkedAsNumeric = new HashMap<>();
-
-		NumericField numericFieldAnnotation = member.getAnnotation( NumericField.class );
-		if ( numericFieldAnnotation != null ) {
-			fieldsMarkedAsNumeric.put( numericFieldAnnotation.forField(), numericFieldAnnotation );
-		}
-
-		NumericFields numericFieldsAnnotation = member.getAnnotation( NumericFields.class );
-		if ( numericFieldsAnnotation != null ) {
-			for ( NumericField numericField : numericFieldsAnnotation.value() ) {
-				NumericField existing = fieldsMarkedAsNumeric.put( numericField.forField(), numericField );
-				if ( existing != null ) {
-					throw LOG.severalNumericFieldAnnotationsForSameField( indexedType, member.getName() );
-				}
-			}
-		}
+		this.fieldsMarkedAsNumeric = fieldsMarkedAsNumeric;
 	}
 
 	/**
