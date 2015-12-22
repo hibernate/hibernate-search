@@ -10,12 +10,17 @@ import org.hibernate.annotations.common.reflection.XMember;
 
 /**
  * @author Guillaume Smet
+ * @author Yoann Rodiere
  */
 public class ContainedInMetadataBuilder {
 
 	private final XMember containedInMember;
 
 	private Integer maxDepth;
+
+	private String prefix;
+
+	private String[] includePaths;
 
 	public ContainedInMetadataBuilder(XMember containedInMember) {
 		this.containedInMember = containedInMember;
@@ -26,8 +31,18 @@ public class ContainedInMetadataBuilder {
 		return this;
 	}
 
+	public ContainedInMetadataBuilder prefix(String prefix) {
+		this.prefix = prefix;
+		return this;
+	}
+
+	public ContainedInMetadataBuilder includePaths(String[] includePaths) {
+		this.includePaths = includePaths;
+		return this;
+	}
+
 	public ContainedInMetadata createContainedInMetadata() {
-		return new ContainedInMetadata( containedInMember, maxDepth );
+		return new ContainedInMetadata( containedInMember, maxDepth, prefix, includePaths );
 	}
 
 }
