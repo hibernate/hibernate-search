@@ -879,45 +879,52 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
-		ContainedInMetadataBuilder containedInMetadataBuilder = new ContainedInMetadataBuilder( member );
-		updateContainedInMaxDepths( containedInMetadataBuilder, member );
-		typeMetadataBuilder.addContainedIn( containedInMetadataBuilder.createContainedInMetadata() );
+		ContainedInMetadata containedInMetadata = createContainedInMetadata( member );
+		typeMetadataBuilder.addContainedIn( containedInMetadata );
 
 		parseContext.collectUnqualifiedCollectionRole( member.getName() );
 	}
 
-	private void updateContainedInMaxDepths(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty member) {
-		updateContainedInMaxDepth( containedInMetadataBuilder, member, XClass.ACCESS_FIELD );
-		updateContainedInMaxDepth( containedInMetadataBuilder, member, XClass.ACCESS_PROPERTY );
+	private ContainedInMetadata createContainedInMetadata(XProperty member) {
+		ContainedInMetadataBuilder containedInMetadataBuilder = new ContainedInMetadataBuilder( member );
+		updateContainedInMetadata( containedInMetadataBuilder, member, XClass.ACCESS_FIELD );
+		updateContainedInMetadata( containedInMetadataBuilder, member, XClass.ACCESS_PROPERTY );
+		return containedInMetadataBuilder.createContainedInMetadata();
 	}
 
-	private void updateContainedInMaxDepth(ContainedInMetadataBuilder containedInMetadataBuilder, XMember memberWithContainedIn, String accessType) {
-		XClass memberReturnedType = memberWithContainedIn.getElementClass();
-		String mappedBy = mappedBy( memberWithContainedIn );
+	private void updateContainedInMetadata(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty propertyWithContainedIn, String accessType) {
+		XClass memberReturnedType = propertyWithContainedIn.getElementClass();
+		String mappedBy = mappedBy( propertyWithContainedIn );
 		List<XProperty> returnedTypeProperties = memberReturnedType.getDeclaredProperties( accessType );
 		for ( XProperty property : returnedTypeProperties ) {
-			if ( isCorrespondingIndexedEmbedded( mappedBy, property ) ) {
-				updateDepthProperties( containedInMetadataBuilder, property );
+			if ( isCorrespondingIndexedEmbedded( propertyWithContainedIn, mappedBy, property ) ) {
+				updateContainedInMetadataForProperty( containedInMetadataBuilder, property );
 				break;
 			}
 		}
 	}
 
-	private boolean isCorrespondingIndexedEmbedded(String mappedBy, XProperty property) {
-		if ( !property.isAnnotationPresent( IndexedEmbedded.class ) ) {
+	private boolean isCorrespondingIndexedEmbedded(XProperty memberWithContainedIn, String mappedBy, XProperty candidateProperty) {
+		if ( !candidateProperty.isAnnotationPresent( IndexedEmbedded.class ) ) {
 			return false;
 		}
-		if ( mappedBy.isEmpty() ) {
+		else if ( mappedBy.equals( candidateProperty.getName() ) ) {
 			return true;
 		}
-		if ( mappedBy.equals( property.getName() ) ) {
-			return true;
+		else if ( mappedBy.isEmpty() ) { // Last chance: the mappedBy may be on the other side
+			String reverseMappedBy = mappedBy( candidateProperty );
+			return reverseMappedBy.equals( memberWithContainedIn.getName() );
 		}
-		return false;
+		else {
+			return false;
+		}
 	}
 
-	private void updateDepthProperties(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty property) {
-		containedInMetadataBuilder.maxDepth( property.getAnnotation( IndexedEmbedded.class ).depth() );
+	private void updateContainedInMetadataForProperty(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty property) {
+		IndexedEmbedded indexedEmbeddedAnnotation = property.getAnnotation( IndexedEmbedded.class );
+		containedInMetadataBuilder.maxDepth( indexedEmbeddedAnnotation.depth() );
+		containedInMetadataBuilder.prefix( buildEmbeddedPrefix( "", indexedEmbeddedAnnotation, property ) );
+		containedInMetadataBuilder.includePaths( indexedEmbeddedAnnotation.includePaths() );
 	}
 
 	private String mappedBy(XMember member) {
