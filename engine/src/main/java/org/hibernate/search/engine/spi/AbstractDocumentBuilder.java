@@ -162,13 +162,13 @@ public abstract class AbstractDocumentBuilder {
 	/**
 	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
 	 *
-	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, DepthValidator, String)
+	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, ContainedInRecursionContext, String)
 	 * @param instance the instance to be indexed
 	 * @param workPlan the current work plan
-	 * @param currentDepth the current {@link org.hibernate.search.engine.spi.DepthValidator} object used to check the graph traversal
+	 * @param currentRecursionContext the current {@link org.hibernate.search.engine.spi.ContainedInRecursionContext} object used to check the graph traversal
 	 */
-	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, DepthValidator currentDepth) {
-		appendContainedInWorkForInstance( instance, workPlan, currentDepth, null );
+	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, ContainedInRecursionContext currentRecursionContext) {
+		appendContainedInWorkForInstance( instance, workPlan, currentRecursionContext, null );
 	}
 
 	/**
@@ -176,20 +176,19 @@ public abstract class AbstractDocumentBuilder {
 	 *
 	 * @param instance the instance to be indexed
 	 * @param workPlan the current work plan
-	 * @param currentDepth the current {@link org.hibernate.search.engine.spi.DepthValidator} object used to check the graph traversal
+	 * @param currentRecursionContext the current {@link org.hibernate.search.engine.spi.ContainedInRecursionContext} object used to check the graph traversal
 	 * @param tenantIdentifier the identifier of the tenant or null, if there isn't one
-	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, DepthValidator)
+	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, ContainedInRecursionContext)
 	 */
-	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, DepthValidator currentDepth, String tenantIdentifier) {
+	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, ContainedInRecursionContext currentRecursionContext, String tenantIdentifier) {
 		for ( ContainedInMetadata containedInMetadata : typeMetadata.getContainedInMetadata() ) {
 			XMember member = containedInMetadata.getContainedInMember();
 			Object unproxiedInstance = instanceInitializer.unproxy( instance );
 
-			DepthValidator depth = updateDepth( unproxiedInstance, containedInMetadata, currentDepth );
-			depth.increaseDepth();
+			ContainedInRecursionContext recursionContext = updateContainedInRecursionContext( unproxiedInstance, containedInMetadata, currentRecursionContext );
 
-			if ( depth.isMaxDepthReached() ) {
-				return;
+			if ( recursionContext.isTerminal() ) {
+				continue;
 			}
 
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
@@ -201,7 +200,7 @@ public abstract class AbstractDocumentBuilder {
 			if ( member.isArray() ) {
 				Object[] array = (Object[]) value;
 				for ( Object arrayValue : array ) {
-					processSingleContainedInInstance( workPlan, arrayValue, depth, tenantIdentifier );
+					processSingleContainedInInstance( workPlan, arrayValue, recursionContext, tenantIdentifier );
 				}
 			}
 			else if ( member.isCollection() ) {
@@ -223,12 +222,12 @@ public abstract class AbstractDocumentBuilder {
 				}
 				if ( collection != null ) {
 					for ( Object collectionValue : collection ) {
-						processSingleContainedInInstance( workPlan, collectionValue, depth, tenantIdentifier );
+						processSingleContainedInInstance( workPlan, collectionValue, recursionContext, tenantIdentifier );
 					}
 				}
 			}
 			else {
-				processSingleContainedInInstance( workPlan, value, depth, tenantIdentifier );
+				processSingleContainedInInstance( workPlan, value, recursionContext, tenantIdentifier );
 			}
 		}
 	}
@@ -237,33 +236,70 @@ public abstract class AbstractDocumentBuilder {
 		return instanceInitializer;
 	}
 
-	private DepthValidator updateDepth(Object instance, ContainedInMetadata containedInMetadata, DepthValidator currentDepth) {
-		Integer maxDepth = null;
-		if ( instance != null ) {
-			maxDepth = containedInMetadata.getMaxDepth();
+	private ContainedInRecursionContext updateContainedInRecursionContext(Object containedInstance, ContainedInMetadata containedInMetadata,
+			ContainedInRecursionContext containedContext) {
+		int maxDepth;
+		int depth;
+
+		// Handle @IndexedEmbedded.depth-induced limits
+
+		Integer metadataMaxDepth = containedInMetadata.getMaxDepth();
+		if ( containedInstance != null && metadataMaxDepth != null ) {
+			maxDepth = metadataMaxDepth;
 		}
-		if ( maxDepth != null ) {
-			if ( currentDepth == null ) {
-				return new DepthValidator( maxDepth );
-			}
-			else {
-				int depth = currentDepth.getDepth();
-				if ( depth <= maxDepth ) {
-					return currentDepth;
-				}
-				else {
-					return new DepthValidator( maxDepth );
+		else {
+			maxDepth = containedContext != null ? containedContext.getMaxDepth() : Integer.MAX_VALUE;
+		}
+
+		depth = containedContext != null ? containedContext.getDepth() : 0;
+		if ( depth < Integer.MAX_VALUE ) { // Avoid integer overflow
+			++depth;
+		}
+
+		/*
+		 * Handle @IndexedEmbedded.includePaths-induced limits If the context for the contained element has a
+		 * comprehensive set of included paths, and if the @IndexedEmbedded matching the @ContainedIn we're currently
+		 * processing also has a comprehensive set of embedded paths, *then* we can compute the resulting set of
+		 * embedded fields (which is the intersection of those two sets). If this resulting set is empty, we can safely
+		 * stop the @ContainedIn processing: any changed field wouldn't be included in the Lucene document for
+		 * "containerInstance" anyway.
+		 */
+
+		Set<String> comprehensivePaths;
+		Set<String> metadataIncludePaths = containedInMetadata.getIncludePaths();
+
+		/*
+		 * See @IndexedEmbedded.depth: it should be considered as zero if it has its default value and if includePaths
+		 * contains elements
+		 */
+		if ( metadataIncludePaths != null && !metadataIncludePaths.isEmpty()
+				&& metadataMaxDepth != null && metadataMaxDepth.equals( Integer.MAX_VALUE ) ) {
+			String metadataPrefix = containedInMetadata.getPrefix();
+
+			/*
+			 * If the contained context Filter by contained context's included paths if they are comprehensive This
+			 * allows to detect when a @ContainedIn is irrelevant because the matching @IndexedEmbedded would not
+			 * capture any property.
+			 */
+			Set<String> containedComprehensivePaths =
+					containedContext != null ? containedContext.getComprehensivePaths() : null;
+
+			comprehensivePaths = new HashSet<>();
+			for ( String includedPath : metadataIncludePaths ) {
+				/*
+				 * If the contained context has a comprehensive list of included paths, use it to filter out our own
+				 * list
+				 */
+				if ( containedComprehensivePaths == null || containedComprehensivePaths.contains( includedPath ) ) {
+					comprehensivePaths.add( metadataPrefix + includedPath );
 				}
 			}
 		}
 		else {
-			if ( currentDepth != null ) {
-				return currentDepth;
-			}
-			else {
-				return new DepthValidator( Integer.MAX_VALUE );
-			}
+			comprehensivePaths = null;
 		}
+
+		return new ContainedInRecursionContext( maxDepth, depth, comprehensivePaths );
 	}
 
 	@Override
@@ -292,7 +328,7 @@ public abstract class AbstractDocumentBuilder {
 		return collection;
 	}
 
-	private <T> void processSingleContainedInInstance(WorkPlan workplan, T value, DepthValidator depth, String tenantId) {
+	private <T> void processSingleContainedInInstance(WorkPlan workplan, T value, ContainedInRecursionContext depth, String tenantId) {
 		workplan.recurseContainedIn( value, depth, tenantId );
 	}
 
