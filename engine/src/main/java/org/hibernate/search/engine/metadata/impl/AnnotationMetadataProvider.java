@@ -809,7 +809,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		if ( !sortedFieldName.equals( idFieldName ) && !containsField( propertyMetadataBuilder, sortedFieldName ) ) {
-			if ( !prefix.isEmpty() ) {
+			if ( parseContext.getLevel() != 0 ) {
 				// Sortable defined on a property not indexed when the entity is embedded. We can skip it.
 				return;
 			}
