@@ -1,7 +1,21 @@
 Hibernate Search Changelog
 ==========================
 
-Version 5.5.1.Final (24-10-2015)
+Version 5.5.2.Final (24-12-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-2023] - Race conditions between shutdown of ScheduledCommitPolicy and close of IndexWriter
+    * [HSEARCH-2069] - SortableField on id field will make initialization crash if the entity is @IndexedEmbedded in another
+    * [HSEARCH-2070] - Range queries on embedded Date fields won't return the expected results
+    * [HSEARCH-2074] - @ContainedIn triggers too much works when there is not "depth" on the corresponding @IndexedEmbedded
+
+** Task
+    * [HSEARCH-2059] - Upgrade to Hibernate ORM 5.0.5.Final and align related dependencies
+    * [HSEARCH-2076] - Upgrade to Hibernate ORM 5.0.6 & other WildFly 10.0.0.CR5 upgrades
+
+
+Version 5.5.1.Final (24-11-2015)
 ------------------------
 
 ** Bug
