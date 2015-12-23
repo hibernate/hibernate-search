@@ -6,21 +6,31 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.util.impl.ReflectionHelper;
 
 /**
  * @author Hardy Ferentschik
+ * @author Yoann Rodiere
  */
 public class ContainedInMetadata {
 
 	private final XMember containedInMember;
 	private final Integer maxDepth;
+	private final String prefix;
+	private final Set<String> includePaths;
 
-	public ContainedInMetadata(XMember containedInMember, Integer maxDepth) {
+	public ContainedInMetadata(XMember containedInMember, Integer maxDepth, String prefix, String[] includePaths) {
 		this.containedInMember = containedInMember;
 		ReflectionHelper.setAccessible( this.containedInMember );
 		this.maxDepth = maxDepth;
+		this.prefix = prefix;
+		this.includePaths = includePaths != null ? new HashSet<>( Arrays.asList( includePaths ) ) : Collections.<String>emptySet();
 	}
 
 	public XMember getContainedInMember() {
@@ -29,6 +39,14 @@ public class ContainedInMetadata {
 
 	public Integer getMaxDepth() {
 		return maxDepth;
+	}
+
+	public String getPrefix() {
+		return prefix;
+	}
+
+	public Set<String> getIncludePaths() {
+		return includePaths;
 	}
 
 	@Override
