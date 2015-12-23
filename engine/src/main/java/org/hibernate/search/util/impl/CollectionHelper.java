@@ -8,6 +8,7 @@
 package org.hibernate.search.util.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,4 +68,20 @@ public final class CollectionHelper {
 			return Collections.unmodifiableList( new ArrayList<T>( c ) );
 		}
 	}
+
+	public static Set<String> asImmutableSet(String[] names) {
+		//The intention here is to save some memory by picking the simplest safe representation,
+		// as we usually require immutable sets for long living metadata:
+		if ( names == null || names.length == 0 ) {
+			return Collections.<String>emptySet();
+		}
+		else if ( names.length == 1 ) {
+			return Collections.singleton( names[0] );
+		}
+		else {
+			HashSet<String> hashSet = new HashSet<>( Arrays.asList( names ) );
+			return Collections.unmodifiableSet( hashSet );
+		}
+	}
+
 }

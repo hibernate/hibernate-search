@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 
 /**
@@ -30,7 +28,7 @@ public class ContainedInMetadata {
 		ReflectionHelper.setAccessible( this.containedInMember );
 		this.maxDepth = maxDepth;
 		this.prefix = prefix;
-		this.includePaths = includePaths != null ? new HashSet<>( Arrays.asList( includePaths ) ) : Collections.<String>emptySet();
+		this.includePaths = CollectionHelper.asImmutableSet( includePaths );
 	}
 
 	public XMember getContainedInMember() {
