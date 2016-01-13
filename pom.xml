@@ -156,6 +156,17 @@
         <classMateVersion>1.1.0</classMateVersion>
         <javassistVersion>3.18.1-GA</javassistVersion>
 
+        <!-- OSGi ranges for some primary dependencies -->
+        <!-- Warning:
+            Ranges are maintained as best effort on our knowledge but only the
+            exact versions in this pom are being tested.
+            Essentially we allow older versions when we know no changes were necessary when we upgraded the dependency. -->
+        <luceneOsgiRangeVersion>[5.3.0,5.5.0)</luceneOsgiRangeVersion>
+        <hibernateOrmOsgiRangeVersion>[5.0.0,5.1.0)</hibernateOrmOsgiRangeVersion>
+        <hibernateHcannOsgiRangeVersion>[5,6)</hibernateHcannOsgiRangeVersion>
+        <jGroupsOsgiRangeVersion>[3.6.0,4)</jGroupsOsgiRangeVersion>
+        <jbossLoggingOsgiRangeVersion>[3.3,4.0.0)</jbossLoggingOsgiRangeVersion>
+
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>3.0.2</bytemanVersion>
         <jbossLoggingVersion>3.3.0.Final</jbossLoggingVersion>

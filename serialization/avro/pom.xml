@@ -113,6 +113,7 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
+                            org.hibernate.annotations.common.*;version="${hibernateHcannOsgiRangeVersion}",
                             org.hibernate.search.*;version="[${project.version},${project.version}]",
                             org.apache.avro.*;version="[${avroVersion},1.8.0)"
                         </Import-Package>

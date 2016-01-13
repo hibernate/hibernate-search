@@ -133,7 +133,9 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            org.hibernate.search.*;version="[${project.version},${project.version}]"
+                            org.hibernate.search.*;version="[${project.version},${project.version}]",
+                            org.apache.lucene.*;version="${luceneOsgiRangeVersion}",
+                            org.hibernate.annotations.common.*;version="${hibernateHcannOsgiRangeVersion}",
                         </Import-Package>
                         <Export-Package>
                         </Export-Package>
