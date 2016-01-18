@@ -30,6 +30,7 @@ import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
+import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
 /**
@@ -63,6 +64,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private boolean isIdProvidedImplicit;
 	private IndexManagerFactory indexManagerFactory;
 	private boolean enlistWorkerInTransaction;
+	private Statistics statistics;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingMode = oldFactoryState.getIndexingMode();
@@ -88,6 +90,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		isIdProvidedImplicit = oldFactoryState.isIdProvidedImplicit();
 		indexManagerFactory = oldFactoryState.getIndexManagerFactory();
 		enlistWorkerInTransaction = oldFactoryState.enlistWorkerInTransaction();
+		statistics = oldFactoryState.getStatistics();
 	}
 
 	@Override
@@ -310,6 +313,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setIndexManagerFactory(IndexManagerFactory indexManagerFactory) {
 		this.indexManagerFactory = indexManagerFactory;
+	}
+
+	@Override
+	public Statistics getStatistics() {
+		return statistics;
+	}
+
+	public void setStatistics(Statistics statistics) {
+		this.statistics = statistics;
 	}
 
 }
