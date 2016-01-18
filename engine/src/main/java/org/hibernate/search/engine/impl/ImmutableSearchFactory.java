@@ -131,15 +131,20 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.timeoutExceptionFactory = state.getDefaultTimeoutExceptionFactory();
 		this.timingSource = state.getTimingSource();
 		this.mapping = state.getProgrammaticMapping();
-		this.statistics = new StatisticsImpl( this );
+		if ( state.getStatistics() == null ) {
+			this.statistics = new StatisticsImpl( this );
+			boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
+					configurationProperties, Environment.GENERATE_STATS, false
+			);
+			this.statistics.setStatisticsEnabled( statsEnabled );
+		}
+		else {
+			this.statistics = (StatisticsImpl) state.getStatistics();
+		}
 		this.indexMetadataIsComplete = state.isIndexMetadataComplete();
 		this.isDeleteByTermEnforced = state.isDeleteByTermEnforced();
 		this.isIdProvidedImplicit = state.isIdProvidedImplicit();
 		this.indexManagerFactory = state.getIndexManagerFactory();
-		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
-				configurationProperties, Environment.GENERATE_STATS, false
-		);
-		this.statistics.setStatisticsEnabled( statsEnabled );
 
 		this.enableDirtyChecks = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.ENABLE_DIRTY_CHECK, true

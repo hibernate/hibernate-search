@@ -25,6 +25,7 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.stat.Statistics;
 
 /**
  * Represents the sharable state of a search factory
@@ -77,4 +78,6 @@ public interface SearchFactoryState {
 	IndexManagerFactory getIndexManagerFactory();
 
 	boolean enlistWorkerInTransaction();
+
+	Statistics getStatistics();
 }
