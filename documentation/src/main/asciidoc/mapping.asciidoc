@@ -297,11 +297,11 @@ public class Book {
 
 If there is a single `@Field` declared for a given property, `@SortableField` implicitly applies to this field.
 In case several fields exist for a single property, the `@Field` to be marked as sortable can be specified
-via `@SortField#forField()`. Several sortable fields can be defined with help of the `@SortableFields` annotation.
+via `@SortableField#forField()`. Several sortable fields can be defined with help of the `@SortableFields` annotation.
 
 The field to be marked as sortable must not be analyzed.
 
-Note that sorting also works if a property is not explicitly marked with `@SortField`. This has negative runtime
+Note that sorting also works if a property is not explicitly marked with `@SortableField`. This has negative runtime
 performance and memory consumption implications, though. Therefore it is highly recommended to explicitly mark each
 field to be used for sorting.
 
