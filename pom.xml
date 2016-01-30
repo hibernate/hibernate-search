@@ -173,7 +173,7 @@
         <arquillianVersion>1.1.8.Final</arquillianVersion>
         <arquillianContainerVersion>1.0.0.Final</arquillianContainerVersion>
         <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
-        <wildflyVersion>10.0.0.CR5</wildflyVersion>
+        <wildflyVersion>10.0.0.Final</wildflyVersion>
         <jmhVersion>1.11.2</jmhVersion>
 
         <!-- character encoding -->
