@@ -117,16 +117,15 @@ public final class NumericFieldUtils {
 		if ( value == null ) {
 			return false;
 		}
-		final Class<?> numericClass = value.getClass();
-		return Double.class.isAssignableFrom( numericClass ) ||
-				Long.class.isAssignableFrom( numericClass ) ||
-				Integer.class.isAssignableFrom( numericClass ) ||
-				Float.class.isAssignableFrom( numericClass ) ||
-				Calendar.class.isAssignableFrom( numericClass ) ||
+		return value instanceof Double ||
+				value instanceof Long ||
+				value instanceof Integer ||
+				value instanceof Float ||
+				value instanceof Calendar ||
 				( JavaTimeBridgeProvider.isActive() && (
-					java.time.Instant.class.isAssignableFrom( numericClass ) ||
-					java.time.Year.class.isAssignableFrom( numericClass ) ||
-					java.time.Duration.class.isAssignableFrom( numericClass )
-				));
+						value instanceof java.time.Instant ||
+						value instanceof java.time.Year ||
+						value instanceof java.time.Duration
+					));
 	}
 }
