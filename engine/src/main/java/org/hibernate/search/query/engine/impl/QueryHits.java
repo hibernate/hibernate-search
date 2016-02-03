@@ -305,6 +305,10 @@ public class QueryHits {
 			FacetResult facetResult = getFacetResultForLongRange( facetRequest );
 			facets = new ArrayList<>( facetResult.labelValues.length );
 			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
+				if ( !facetRequest.hasZeroCountsIncluded() && (int) labelAndValue.value == 0 ) {
+					continue;
+				}
+
 				Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
 				facets.add( facet );
 			}
