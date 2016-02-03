@@ -45,13 +45,15 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 0 ).to( 1000 )
 				.from( 1001 ).to( 1500 )
 				.from( 1501 ).to( 3000 )
+				.from( 3001 ).to( 8000 )
+				.includeZeroCounts( true )
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
 		FacetManager facetManager = query.getFacetManager();
 		facetManager.enableFaceting( rangeRequest );
 
 		List<Facet> facets = facetManager.getFacets( priceRange );
-		assertFacetCounts( facets, new int[] { 5, 3, 2 } );
+		assertFacetCounts( facets, new int[] { 5, 3, 2, 0 } );
 	}
 
 	@Test
@@ -165,6 +167,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 1500 ).to( 2000 ).excludeLimit()
 				.above( 2000 )
 				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ORDER )
+				.includeZeroCounts( true )
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
 		query.getFacetManager().enableFaceting( rangeRequest );
@@ -305,11 +308,11 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		facetManager.enableFaceting( rangeRequest );
 
 		List<Facet> facets = facetManager.getFacets( facetingName );
-		assertFacetCounts( facets, new int[] { 1, 2, 2, 0, 5 } );
+		assertFacetCounts( facets, new int[] { 1, 2, 2, 5 } );
 
-		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 4 ) );
+		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 3 ) );
 		facets = facetManager.getFacets( facetingName );
-		assertFacetCounts( facets, new int[] { 0, 0, 0, 0, 5 } );
+		assertFacetCounts( facets, new int[] { 5 } );
 	}
 
 	@Test
