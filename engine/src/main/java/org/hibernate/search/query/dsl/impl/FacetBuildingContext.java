@@ -145,7 +145,7 @@ class FacetBuildingContext<T> {
 		}
 		else {
 			if ( FacetSortOrder.RANGE_DEFINITION_ORDER.equals( sort ) ) {
-				throw log.rangeDefinitionOrderRequestedForDiscrteFacetRequest();
+				throw log.rangeDefinitionOrderRequestedForDiscreteFacetRequest();
 			}
 			request = new DiscreteFacetRequest( name, fieldName );
 		}

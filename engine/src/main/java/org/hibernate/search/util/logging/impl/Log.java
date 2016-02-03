@@ -817,7 +817,7 @@ public interface Log extends BasicLogger {
 	SearchException noStartOrEndSpecifiedForRangeQuery(String facetRequestName);
 
 	@Message(id = 271, value = "RANGE_DEFINITION_ORDER is not a valid sort order for a discrete faceting request.")
-	SearchException rangeDefinitionOrderRequestedForDiscrteFacetRequest();
+	SearchException rangeDefinitionOrderRequestedForDiscreteFacetRequest();
 
 	@Message(id = 272, value = "Entity '%1$s' is not an indexed entity. Unable to create faceting request")
 	SearchException attemptToCreateFacetingRequestForUnindexedEntity(String entityName);
