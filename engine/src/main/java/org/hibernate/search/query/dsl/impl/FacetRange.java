@@ -87,6 +87,20 @@ public class FacetRange<T> {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( ( fieldName == null ) ? 0 : fieldName.hashCode() );
+		result = prime * result + ( includeMax ? 1231 : 1237 );
+		result = prime * result + ( includeMin ? 1231 : 1237 );
+		result = prime * result + ( ( max == null ) ? 0 : max.hashCode() );
+		result = prime * result + ( ( min == null ) ? 0 : min.hashCode() );
+		result = prime * result + ( ( rangeString == null ) ? 0 : rangeString.hashCode() );
+		result = prime * result + ( ( rangeType == null ) ? 0 : rangeType.getName().hashCode() );
+		return result;
+	}
+
+	@Override
 	public String toString() {
 		return "FacetRange"
 				+ "{min=" + min

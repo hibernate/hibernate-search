@@ -53,12 +53,12 @@ import org.apache.lucene.util.Counter;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
-import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.DistanceCollector;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -88,7 +88,7 @@ public class QueryHits {
 	private final LazyQueryState searcher;
 	private final Filter filter;
 	private final Sort sort;
-	private final Map<String, FacetingRequestImpl> facetRequests;
+	private final Map<String, FacetingRequest> facetRequests;
 	private final TimeoutManagerImpl timeoutManager;
 
 	private int totalHits;
@@ -106,7 +106,7 @@ public class QueryHits {
 			Filter filter,
 			Sort sort,
 			TimeoutManagerImpl timeoutManager,
-			Map<String, FacetingRequestImpl> facetRequests,
+			Map<String, FacetingRequest> facetRequests,
 			TimeoutExceptionFactory timeoutExceptionFactory,
 			Coordinates spatialSearchCenter,
 			String spatialFieldName)
@@ -129,7 +129,7 @@ public class QueryHits {
 			Sort sort,
 			Integer n,
 			TimeoutManagerImpl timeoutManager,
-			Map<String, FacetingRequestImpl> facetRequests,
+			Map<String, FacetingRequest> facetRequests,
 			TimeoutExceptionFactory timeoutExceptionFactory,
 			Coordinates spatialSearchCenter,
 			String spatialFieldName)
@@ -274,7 +274,7 @@ public class QueryHits {
 
 	private void updateFacets() throws IOException {
 		facetMap = new HashMap<>();
-		for ( FacetingRequestImpl facetRequest : facetRequests.values() ) {
+		for ( FacetingRequest facetRequest : facetRequests.values() ) {
 			ArrayList<Facet> facets;
 			if ( facetRequest instanceof DiscreteFacetRequest ) {
 				facets = updateStringFacets( (DiscreteFacetRequest) facetRequest );

@@ -25,6 +25,7 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.backend.elasticsearch.json.JsonBuilder;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -39,7 +40,9 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import io.searchbox.core.Delete;
 import io.searchbox.core.DeleteByQuery;
@@ -167,6 +170,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		for ( IndexableField field : document.getFields() ) {
 			if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
 					!field.name().equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
+					!"$facets".equals( field.name() ) &&
 					! isDocValueField( field) ) {
 
 				JsonObject parent = getOrCreateDocumentTree( source, field );
@@ -184,17 +188,19 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 						// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
 						String stringValue = field.stringValue();
 						if ( stringValue != null ) {
-							parent.addProperty( jsonPropertyName, stringValue );
+							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName, new JsonPrimitive( stringValue ) );
 						}
 						else {
-							parent.addProperty( jsonPropertyName, field.numericValue() );
+							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+									field.numericValue() != null ? new JsonPrimitive( field.numericValue() ) : null );
 						}
 					}
 				}
 				else if ( FieldHelper.isBoolean( indexBinding, field.name() ) ) {
 					FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
 					Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
-					parent.addProperty( jsonPropertyName, value );
+					addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+							value != null ? new JsonPrimitive( value ) : null );
 				}
 				// TODO falling back for now to checking actual Field type to cover numeric fields created by custom
 				// bridges
@@ -206,7 +212,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 						value = null;
 					}
 
-					parent.addProperty( jsonPropertyName, value );
+					addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+							value != null ? new JsonPrimitive( value ) : null );
 				}
 				else {
 					// Explicitly propagate null in case value is not given and let ES handle the default token set in the meta-data
@@ -215,12 +222,27 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 						value = null;
 					}
 
-					parent.addProperty( jsonPropertyName, value );
+					addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+							value != null ? new JsonPrimitive( value ) : null );
 				}
 			}
 		}
 
 		return source;
+	}
+
+	private void addPropertyOfPotentiallyMultipleCardinality(JsonObject parent, String propertyName, JsonPrimitive value) {
+		JsonElement currentValue = parent.get( propertyName );
+		if ( currentValue == null ) {
+			JsonBuilder.object( parent ).add( propertyName, value );
+		}
+		else if ( !currentValue.isJsonArray() ) {
+			parent.remove( propertyName );
+			parent.add( propertyName, JsonBuilder.array().add( currentValue ).add( value ).build() );
+		}
+		else {
+			currentValue.getAsJsonArray().add( value );
+		}
 	}
 
 	private boolean isNumeric(IndexableField field) {

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
@@ -28,4 +29,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 2,
 			value = "Lucene query '%1$s' cannot be transformed into equivalent Elasticsearch query" )
 	SearchException cannotTransformLuceneQueryIntoEsQuery(Query query);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 3,
+			value = "Lucene filter '%1$s' cannot be transformed into equivalent ElasticSearch query" )
+	SearchException cannotTransformLuceneFilterIntoEsQuery(Filter filter);
 }
