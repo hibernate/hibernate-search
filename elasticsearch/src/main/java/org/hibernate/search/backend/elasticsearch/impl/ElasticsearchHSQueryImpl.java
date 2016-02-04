@@ -10,10 +10,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -31,6 +34,8 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.backend.elasticsearch.json.JsonBuilder;
+import org.hibernate.search.backend.elasticsearch.json.ToElasticSearch;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -43,14 +48,22 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
+import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
+import org.hibernate.search.query.dsl.impl.FacetRange;
+import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.engine.impl.AbstractHSQuery;
 import org.hibernate.search.query.engine.impl.EntityInfoImpl;
+import org.hibernate.search.query.engine.impl.FacetManagerImpl;
+import org.hibernate.search.query.engine.impl.QueryHits.FacetComparator;
 import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -72,6 +85,15 @@ import io.searchbox.core.search.sort.Sort.Sorting;
  */
 public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
+	// TODO GSM: Copied from QueryHits: should probably be in one place only.
+	private static final EnumMap<FacetSortOrder, FacetComparator> facetComparators = new EnumMap<>( FacetSortOrder.class );
+
+	static {
+		facetComparators.put( FacetSortOrder.COUNT_ASC, new FacetComparator( FacetSortOrder.COUNT_ASC ) );
+		facetComparators.put( FacetSortOrder.COUNT_DESC, new FacetComparator( FacetSortOrder.COUNT_DESC ) );
+		facetComparators.put( FacetSortOrder.FIELD_VALUE, new FacetComparator( FacetSortOrder.FIELD_VALUE ) );
+	}
+
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
@@ -81,13 +103,15 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	 */
 	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
 
-	private final String jsonQuery;
+	private final JsonObject jsonQuery;
 
 	private Integer resultSize;
 	private IndexSearcher searcher;
 	private SearchResult searchResult;
 
-	public ElasticsearchHSQueryImpl(String jsonQuery, ExtendedSearchIntegrator extendedIntegrator) {
+	private transient FacetManagerImpl facetManager;
+
+	public ElasticsearchHSQueryImpl(JsonObject jsonQuery, ExtendedSearchIntegrator extendedIntegrator) {
 		super( extendedIntegrator );
 		this.jsonQuery = jsonQuery;
 	}
@@ -98,9 +122,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	@Override
-	public FacetManager getFacetManager() {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not yet implemented" );
+	public FacetManagerImpl getFacetManager() {
+		if ( facetManager == null ) {
+			facetManager = new FacetManagerImpl( this );
+		}
+		return facetManager;
 	}
 
 	@Override
@@ -113,12 +139,18 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		return new ElasticsearchDocumentExtractor();
 	}
 
+	SearchResult getSearchResult() {
+		if ( searchResult == null ) {
+			execute();
+		}
+		return searchResult;
+	}
+
 	@Override
 	public int queryResultSize() {
 		if ( searchResult == null ) {
 			execute();
 		}
-
 		return resultSize;
 	}
 
@@ -200,6 +232,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	protected void clearCachedResults() {
+		searchResult = null;
 		resultSize = null;
 	}
 
@@ -271,7 +304,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
 						throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
 							queriedEntityType,
-							jsonQuery
+							jsonQuery.toString()
 						);
 					}
 
@@ -289,8 +322,23 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			// TODO feed in user-provided filters
 			JsonObject effectiveFilter = getEffectiveFilter( typeFilters );
 
-			// TODO can we avoid the forth and back between GSON and String?
-			executedQuery = "{ \"query\" : { \"filtered\" : { " + jsonQuery.substring( 1, jsonQuery.length() - 1 ) + ", \"filter\" : " + effectiveFilter.toString() + " } } }";
+			JsonBuilder.Object completeQuery = JsonBuilder.object();
+
+			completeQuery.add( "query",
+					JsonBuilder.object()
+							.add( "filtered", JsonBuilder.object( jsonQuery ).add( "filter", effectiveFilter ) ) );
+
+			if ( !getFacetManager().getFacetRequests().isEmpty() ) {
+				JsonBuilder.Object facets = JsonBuilder.object();
+
+				for ( Entry<String, FacetingRequest> facetRequestEntry : getFacetManager().getFacetRequests().entrySet() ) {
+					ToElasticSearch.addFacetingRequest( facets, facetRequestEntry.getValue() );
+				}
+
+				completeQuery.add( "aggregations", facets );
+			}
+
+			executedQuery = completeQuery.build().toString();
 
 			Search.Builder search = new Search.Builder( executedQuery );
 			search.addIndex( indexNames );
@@ -319,31 +367,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 
 			// wrap type filters into should if there is more than one
-			JsonObject effectiveTypeFilter = new JsonObject();
-			if ( typeFilters.size() == 1 ) {
-				effectiveTypeFilter = typeFilters.get( 0 ).getAsJsonObject();
+			filters.add( ToElasticSearch.condition( "should", typeFilters ) );
+
+			// facet filters
+			Filter facetFilter = getFacetManager().getFacetFilter();
+			if ( facetFilter != null ) {
+				filters.add( ToElasticSearch.fromLuceneFilter( getFacetManager().getFacetFilter() ) );
 			}
-			else {
-				JsonObject should = new JsonObject();
-				should.add( "should", typeFilters );
-				effectiveTypeFilter = new JsonObject();
-				effectiveTypeFilter.add( "bool", should );
-			}
-			filters.add( effectiveTypeFilter );
 
 			// wrap filters into must if there is more than one
-			JsonObject effectiveFilter = new JsonObject();
-			if ( filters.size() == 1 ) {
-				effectiveFilter = filters.get( 0 ).getAsJsonObject();
-			}
-			else {
-				JsonObject must = new JsonObject();
-				must.add( "must", filters );
-				effectiveFilter = new JsonObject();
-				effectiveFilter.add( "bool", must );
-			}
-
-			return effectiveFilter;
+			return ToElasticSearch.condition( "must", filters );
 		}
 
 		private JsonObject getEntityTypeFilter(Class<?> queriedEntityType) {
@@ -551,6 +584,78 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 			return parent.getAsJsonObject().get( field );
 		}
+	}
+
+	@Override
+	protected void extractFacetResults() {
+		SearchResult searchResult = getSearchResult();
+		JsonElement aggregationsElement = searchResult.getJsonObject().get( "aggregations" );
+		if ( aggregationsElement == null ) {
+			return;
+		}
+		JsonObject aggregations = aggregationsElement.getAsJsonObject();
+
+		Map<String, List<Facet>> results = new HashMap<>();
+		for ( FacetingRequest facetRequest : getFacetManager().getFacetRequests().values() ) {
+			List<Facet> facets;
+			if ( facetRequest instanceof DiscreteFacetRequest ) {
+				facets = updateStringFacets( aggregations, (DiscreteFacetRequest) facetRequest );
+				// Discrete facets are sorted by ElasticSearch
+			}
+			else {
+				facets = updateRangeFacets( aggregations, (RangeFacetRequest<?>) facetRequest );
+				if ( !FacetSortOrder.RANGE_DEFINITION_ORDER.equals( facetRequest.getSort() ) ) {
+					Collections.sort( facets, facetComparators.get( facetRequest.getSort() ) );
+				}
+			}
+
+			results.put( facetRequest.getFacetingName(), facets );
+		}
+		getFacetManager().setFacetResults( results );
+	}
+
+	private List<Facet> updateRangeFacets(JsonObject aggregations, RangeFacetRequest<?> facetRequest) {
+		if ( !ReflectionHelper.isIntegerType( facetRequest.getFacetValueType() )
+				&& !Date.class.isAssignableFrom( facetRequest.getFacetValueType() )
+				&& !ReflectionHelper.isFloatingPointType( facetRequest.getFacetValueType() ) ) {
+			throw LOG.unsupportedFacetRangeParameter( facetRequest.getFacetValueType().getName() );
+		}
+
+		ArrayList<Facet> facets = new ArrayList<>();
+		for ( FacetRange<?> facetRange : facetRequest.getFacetRangeList() ) {
+			JsonElement aggregation = aggregations.get( facetRequest.getFacetingName() + "-" + facetRange.hashCode() );
+			if ( aggregation == null ) {
+				continue;
+			}
+			int docCount = aggregation.getAsJsonObject().get( "doc_count" ).getAsInt();
+			if ( docCount == 0 && !facetRequest.hasZeroCountsIncluded() ) {
+				continue;
+			}
+			facets.add( facetRequest.createFacet( facetRange.getRangeString(), docCount ) );
+		}
+		return facets;
+	}
+
+	private List<Facet> updateStringFacets(JsonObject aggregations, DiscreteFacetRequest facetRequest) {
+		JsonElement aggregation = aggregations.get( facetRequest.getFacetingName() );
+		if ( aggregation == null ) {
+			return Collections.emptyList();
+		}
+		// deal with nested aggregation for nested documents
+		if ( facetRequest.getFieldName().contains( "." ) ) {
+			aggregation = aggregation.getAsJsonObject().get( facetRequest.getFacetingName() );
+		}
+		if ( aggregation == null ) {
+			return Collections.emptyList();
+		}
+
+		ArrayList<Facet> facets = new ArrayList<>();
+		for ( JsonElement bucket : aggregation.getAsJsonObject().get( "buckets" ).getAsJsonArray() ) {
+			facets.add( facetRequest.createFacet(
+					bucket.getAsJsonObject().get( "key" ).getAsString(),
+					bucket.getAsJsonObject().get( "doc_count" ).getAsInt() ) );
+		}
+		return facets;
 	}
 
 	// TODO: Investigate scrolling API:

@@ -16,9 +16,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
-
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
-import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetCombine;
@@ -37,7 +35,7 @@ public class FacetManagerImpl implements FacetManager {
 	/**
 	 * The map of currently active/enabled facet requests.
 	 */
-	private final Map<String, FacetingRequestImpl> facetRequests = newHashMap();
+	private final Map<String, FacetingRequest> facetRequests = newHashMap();
 
 	/**
 	 * Keep track of the current facet selection groups.
@@ -58,9 +56,9 @@ public class FacetManagerImpl implements FacetManager {
 	/**
 	 * The query from which this manager was retrieved
 	 */
-	private final LuceneHSQuery query;
+	private final AbstractHSQuery query;
 
-	FacetManagerImpl(LuceneHSQuery query) {
+	public FacetManagerImpl(AbstractHSQuery query) {
 		this.query = query;
 	}
 
@@ -94,8 +92,7 @@ public class FacetManagerImpl implements FacetManager {
 		if ( facets != null ) {
 			return facets;
 		}
-		DocumentExtractor queryDocumentExtractor = query.queryDocumentExtractor();
-		queryDocumentExtractor.close();
+		query.extractFacetResults();
 		//handle edge case of an empty index
 		if ( facetResults == null ) {
 			return Collections.emptyList();
@@ -122,11 +119,11 @@ public class FacetManagerImpl implements FacetManager {
 		return selection;
 	}
 
-	Map<String, FacetingRequestImpl> getFacetRequests() {
+	public Map<String, FacetingRequest> getFacetRequests() {
 		return facetRequests;
 	}
 
-	void setFacetResults(Map<String, List<Facet>> facetResults) {
+	public void setFacetResults(Map<String, List<Facet>> facetResults) {
 		this.facetResults = facetResults;
 	}
 
@@ -136,7 +133,7 @@ public class FacetManagerImpl implements FacetManager {
 		query.clearCachedResults();
 	}
 
-	Filter getFacetFilter() {
+	public Filter getFacetFilter() {
 		if ( facetFilter == null ) {
 			BooleanQuery boolQuery = new BooleanQuery();
 			for ( FacetSelectionImpl selection : facetSelection.values() ) {

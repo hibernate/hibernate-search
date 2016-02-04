@@ -266,6 +266,12 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		resultSize = null;
 	}
 
+	@Override
+	protected void extractFacetResults() {
+		DocumentExtractor queryDocumentExtractor = queryDocumentExtractor();
+		queryDocumentExtractor.close();
+	}
+
 	/**
 	 * Execute the lucene search and return the matching hits.
 	 *

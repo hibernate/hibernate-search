@@ -249,24 +249,17 @@
                                 <exclude>**/ToStringTest.java</exclude>
                                 <exclude>**/DynamicBoostingTest.java</exclude>
                                 <exclude>**/DSLTest.java</exclude>
+                                <exclude>**/DSLEmbeddedSearchTest.java</exclude>
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>
                                 <exclude>**/ExplanationTest.java</exclude>
+                                <exclude>**/EmbeddedSortableIdFieldTest.java</exclude>
 
                                 <!-- Needs range queries on nested fields -->
                                 <exclude>**/DslEmbeddedSearchTest.java</exclude>
 
                                 <!-- Faceting -->
-                                <exclude>**/CollectionFacetingTest.java</exclude>
-                                <exclude>**/EdgeCaseFacetTest.java</exclude>
-                                <exclude>**/FacetFilteringTest.java</exclude>
-                                <exclude>**/ManyToOneFacetingTest.java</exclude>
-                                <exclude>**/NoQueryResultsFacetingTest.java</exclude>
-                                <exclude>**/NumberFacetingTest.java</exclude>
-                                <exclude>**/RangeFacetingTest.java</exclude>
-                                <exclude>**/SimpleFacetingTest.java</exclude>
-                                <exclude>**/StringFacetingTest.java</exclude>
-                                <exclude>**/WebShopTest.java</exclude>
+                                <exclude>**/FacetIndexingFailureTest.java</exclude>
 
                                 <exclude>**/IndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>

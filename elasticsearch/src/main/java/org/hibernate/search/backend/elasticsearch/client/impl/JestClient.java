@@ -35,6 +35,11 @@ public class JestClient implements Service, Startable, Stoppable {
 
 	private io.searchbox.client.JestClient client;
 
+	public static final Gson GSON = new GsonBuilder()
+			.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT )
+			.serializeNulls()
+			.create();
+
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		JestClientFactory factory = new JestClientFactory();
@@ -43,17 +48,12 @@ public class JestClient implements Service, Startable, Stoppable {
 				properties, ElasticsearchEnvironment.SERVER_URI, "http://localhost:9200"
 		);
 
-		Gson gson = new GsonBuilder()
-				.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT )
-				.serializeNulls()
-				.create();
-
 		factory.setHttpClientConfig(
 			new HttpClientConfig.Builder( serverUri )
 				.multiThreaded( true )
 				.readTimeout( 2000 )
 				.connTimeout( 2000 )
-				.gson( gson )
+				.gson( GSON )
 				.build()
 		);
 

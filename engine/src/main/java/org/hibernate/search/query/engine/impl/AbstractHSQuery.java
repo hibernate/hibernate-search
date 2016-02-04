@@ -210,6 +210,8 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	// hooks to be implemented by specific sub-classes
 
+	protected abstract void extractFacetResults();
+
 	protected abstract void clearCachedResults();
 
 	protected abstract TimeoutManagerImpl buildTimeoutManager();

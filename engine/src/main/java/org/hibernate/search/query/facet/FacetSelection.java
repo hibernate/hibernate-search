@@ -8,6 +8,8 @@ package org.hibernate.search.query.facet;
 
 import java.util.List;
 
+import org.apache.lucene.search.BooleanClause;
+
 /**
  * Groups a set of {@link org.hibernate.search.query.facet.Facet} to be applied onto a query.
  * The facet criteria within a {@code FacetSelection} are combined in a disjunction (logical OR).
@@ -32,6 +34,11 @@ public interface FacetSelection {
 	 * @return returns an unmodifiable list of the currently selected facets
 	 */
 	List<Facet> getSelectedFacets();
+
+	/**
+	 * @return the operator used to combine the facets.
+	 */
+	BooleanClause.Occur getOccurType();
 
 	/**
 	 * @param facets An array of facets to e removed from the current facet. Facets which were not part of this

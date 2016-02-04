@@ -636,20 +636,26 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					);
 				}
 				else if ( Date.class.isAssignableFrom( value.getClass() ) ) {
+					// XXX GSM: this is a workaround for now, we need to find something cleaner.
 					Date date = (Date) value;
 					FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
-					// if we have a date and the actual value is not indexed as a numeric value we will run into
-					// problems. Better fail early
-					if ( !( fieldBridge instanceof NumericEncodingDateBridge ) ) {
+					if ( fieldBridge instanceof NumericEncodingDateBridge ) {
+						NumericEncodingDateBridge dateBridge = (NumericEncodingDateBridge) fieldBridge;
+						long numericDateValue = DateTools.round( date.getTime(), dateBridge.getResolution() );
+
+						facetField = new NumericDocValuesField( facetMetadata.getFacetName(), numericDateValue );
+					}
+					else if ( fieldBridge instanceof TwoWayFieldBridge ) {
+						// Date might be stored in String for specific backends (ElasticSearch for instance).
+						facetField = new SortedSetDocValuesFacetField( facetMetadata.getFacetName(),
+								( (TwoWayFieldBridge) fieldBridge ).objectToString( value ) );
+					}
+					else {
 						log.numericDateFacetForNonNumericField(
 								facetMetadata.getFacetName(),
-								fieldMetadata.getFieldName()
-						);
+								fieldMetadata.getFieldName() );
+						throw new AssertionFailure( "Invalid FieldBridge for date faceting: " + fieldBridge );
 					}
-					NumericEncodingDateBridge dateBridge = (NumericEncodingDateBridge) fieldBridge;
-					long numericDateValue = DateTools.round( date.getTime(), dateBridge.getResolution() );
-
-					facetField = new NumericDocValuesField( facetMetadata.getFacetName(), numericDateValue );
 				}
 				else if ( Calendar.class.isAssignableFrom( value.getClass() ) ) {
 					Calendar calendar = (Calendar) value;
