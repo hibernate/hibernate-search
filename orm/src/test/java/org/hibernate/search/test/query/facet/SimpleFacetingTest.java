@@ -6,16 +6,17 @@
  */
 package org.hibernate.search.test.query.facet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.FacetManager;
@@ -23,12 +24,7 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.TestForIssue;
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -183,45 +179,6 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		}
 		catch (IllegalArgumentException e) {
 			// success
-		}
-	}
-
-	@Test
-	public void testUnknownFieldNameThrowsException() {
-		FacetingRequest request = queryBuilder( Car.class ).facet()
-				.name( "foo" ) // faceting name is irrelevant
-				.onField( "foobar" ) // foobar is not a valid field name
-				.discrete()
-				.createFacetingRequest();
-		FullTextQuery query = queryHondaWithFacet( request );
-
-		try {
-			query.getFacetManager().getFacets( "foo" );
-			fail( "The specified field name did not exist. Faceting request should fail" );
-		}
-		catch (SearchException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000268" ) );
-		}
-	}
-
-	@Test
-	public void testKnownFieldNameNotConfiguredForFacetingThrowsException() {
-		FacetingRequest request = queryBuilder( Fruit.class ).facet()
-				.name( "foo" ) // faceting name is irrelevant
-				.onField( "name" ) // name is a valid property of apple, but not configured for faceting
-				.discrete()
-				.createFacetingRequest();
-
-		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Fruit.class );
-		query.getFacetManager().enableFaceting( request );
-		assertEquals( "Wrong number of query matches", 1, query.getResultSize() );
-
-		try {
-			query.getFacetManager().getFacets( "foo" );
-			fail( "The specified field name did not exist. Faceting request should fail" );
-		}
-		catch (SearchException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000268" ) );
 		}
 	}
 
