@@ -40,10 +40,6 @@ public class ToElasticSearch {
 	private ToElasticSearch() {
 	}
 
-	public static JsonObject matchAll() {
-		return JsonBuilder.object().add( "match_all", new JsonObject() ).build();
-	}
-
 	public static void addFacetingRequest(JsonBuilder.Object jsonQuery, FacetingRequest facetingRequest) {
 		if ( facetingRequest instanceof DiscreteFacetRequest ) {
 			String field = facetingRequest.getFieldName();
@@ -89,48 +85,6 @@ public class ToElasticSearch {
 			throw new IllegalArgumentException( "Faceting request of type " + facetingRequest.getClass().getName() + " not supported" );
 		}
 	}
-
-	// TODO GSM: see if Lucene query translations is sufficient to get everything working.
-//	public static JsonObject fromFacetSelection(FacetSelection selection) {
-//		JsonBuilder.Array query = JsonBuilder.array();
-//		for ( Facet facet : selection.getSelectedFacets() ) {
-//			query.add( fromLuceneQuery( facet.getFacetQuery() ) );
-//		}
-//		if ( query.size() == 0 ) {
-//			return null;
-//		}
-//		return condition( selection.getOccurType().name().toLowerCase(), query.build() );
-//	}
-
-//	public static JsonObject queryFromFacet(Facet facet) {
-//		if ( facet instanceof RangeFacet ) {
-//			RangeFacet<?> rangeFacet = (RangeFacet<?>) facet;
-//			JsonBuilder.Object rangeQuery = JsonBuilder.object();
-//			if ( rangeFacet.getMin() != null ) {
-//				if ( rangeFacet.isIncludeMin() ) {
-//					rangeQuery.addProperty( "gte", rangeFacet.getMin() );
-//				}
-//				else {
-//					rangeQuery.addProperty( "gt", rangeFacet.getMin() );
-//				}
-//			}
-//			if ( rangeFacet.getMax() != null ) {
-//				if ( rangeFacet.isIncludeMax() ) {
-//					rangeQuery.addProperty( "lte", rangeFacet.getMax() );
-//				}
-//				else {
-//					rangeQuery.addProperty( "lt", rangeFacet.getMax() );
-//				}
-//			}
-//			return JsonBuilder.object().add( "range",
-//					JsonBuilder.object().add( facet.getFieldName(), rangeQuery ) ).build();
-//		}
-//		else {
-//			return JsonBuilder.object().add( "term",
-//					JsonBuilder.object().addProperty( facet.getFieldName(), facet.getValue() ) )
-//					.build();
-//		}
-//	}
 
 	private static JsonObject fromFacetSortOrder(FacetSortOrder sortOrder) {
 		JsonObject sort = new JsonObject();
@@ -187,9 +141,7 @@ public class ToElasticSearch {
 	}
 
 	private static JsonObject convertMatchAllDocsQuery(MatchAllDocsQuery matchAllDocsQuery) {
-		JsonObject matchAll = new JsonObject();
-		matchAll.add( "match_all", new JsonObject() );
-		return matchAll;
+		return JsonBuilder.object().add( "match_all", new JsonObject() ).build();
 	}
 
 	private static JsonObject convertBooleanQuery(BooleanQuery booleanQuery) {
@@ -253,49 +205,23 @@ public class ToElasticSearch {
 	private static JsonObject convertTermQuery(TermQuery termQuery) {
 		String field = termQuery.getTerm().field();
 
-		JsonObject term = new JsonObject();
-		term.addProperty( field, termQuery.getTerm().text() );
+		JsonObject matchQuery = JsonBuilder.object()
+				.add( "match",
+						JsonBuilder.object().addProperty( field, termQuery.getTerm().text() ) )
+				.build();
 
-		JsonObject matchQuery = new JsonObject();
-		matchQuery.add( "match", term );
-
-		// prepare query on nested property
-		if ( field.contains( "." ) ) {
-			String path = field.substring( 0, field.lastIndexOf( "." ) );
-
-			JsonObject nested = new JsonObject();
-			nested.addProperty( "path", path );
-			nested.add( "query", matchQuery );
-
-			matchQuery = new JsonObject();
-			matchQuery.add( "nested", nested );
-		}
-
-		return matchQuery;
+		return wrapQueryForNestedIfRequired( field, matchQuery );
 	}
 
 	private static JsonObject convertWildcardQuery(WildcardQuery query) {
 		String field = query.getTerm().field();
 
-		JsonObject term = new JsonObject();
-		term.addProperty( field, query.getTerm().text() );
+		JsonObject wildcardQuery = JsonBuilder.object()
+				.add( "wildcard",
+						JsonBuilder.object().addProperty( field, query.getTerm().text() ) )
+				.build();
 
-		JsonObject wildcardQuery = new JsonObject();
-		wildcardQuery.add( "wildcard", term );
-
-		// prepare query on nested property
-		if ( isFieldNested( field ) ) {
-			String path = getFieldNestedPath( field );
-
-			JsonObject nested = new JsonObject();
-			nested.addProperty( "path", path );
-			nested.add( "query", wildcardQuery );
-
-			wildcardQuery = new JsonObject();
-			wildcardQuery.add( "nested", nested );
-		}
-
-		return wildcardQuery;
+		return wrapQueryForNestedIfRequired( field, wildcardQuery );
 	}
 
 	private static JsonObject convertTermRangeQuery(TermRangeQuery query) {
@@ -308,27 +234,40 @@ public class ToElasticSearch {
 			interval.addProperty( query.includesUpper() ? "lte" : "lt", query.getUpperTerm().utf8ToString() );
 		}
 
-		JsonObject term = new JsonObject();
-		term.add( query.getField(), interval );
+		JsonObject range = JsonBuilder.object().add( "range",
+						JsonBuilder.object().add( query.getField(), interval ))
+				.build();
 
-		JsonObject range = new JsonObject();
-		range.add( "range", term );
-
-		return range;
+		return wrapQueryForNestedIfRequired( query.getField(), range);
 	}
 
 	private static JsonObject convertNumericRangeQuery(NumericRangeQuery<?> query) {
 		JsonObject interval = new JsonObject();
-		interval.addProperty( query.includesMin() ? "gte" : "gt", query.getMin() );
-		interval.addProperty( query.includesMax() ? "lte" : "lt", query.getMax() );
+		if ( query.getMin() != null ) {
+			interval.addProperty( query.includesMin() ? "gte" : "gt", query.getMin() );
+		}
+		if ( query.getMax() != null ) {
+			interval.addProperty( query.includesMax() ? "lte" : "lt", query.getMax() );
+		}
 
-		JsonObject term = new JsonObject();
-		term.add( query.getField(), interval );
+		JsonObject range = JsonBuilder.object().add( "range",
+						JsonBuilder.object().add( query.getField(), interval ))
+				.build();
 
-		JsonObject range = new JsonObject();
-		range.add( "range", term );
+		return wrapQueryForNestedIfRequired( query.getField(), range);
+	}
 
-		return range;
+	private static JsonObject wrapQueryForNestedIfRequired(String field, JsonObject query) {
+		if ( !isFieldNested( field ) ) {
+			return query;
+		}
+		String path = getFieldNestedPath( field );
+
+		return JsonBuilder.object().add( "nested",
+				JsonBuilder.object()
+						.addProperty( "path", path )
+						.add( "query", query ) )
+				.build();
 	}
 
 	public static JsonObject fromLuceneFilter(Filter luceneFilter) {
