@@ -6,24 +6,30 @@
  */
 package org.hibernate.search.test.util;
 
+import java.io.Closeable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.Metadata;
-import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl;
 import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
+import org.hibernate.engine.jdbc.spi.SqlStatementLogger;
+import org.hibernate.service.spi.ServiceRegistryImplementor;
+import org.hibernate.testing.boot.JdbcConnectionAccessImpl;
 import org.hibernate.testing.env.ConnectionProviderBuilder;
-import org.hibernate.tool.schema.internal.TargetDatabaseImpl;
-import org.hibernate.tool.schema.spi.SchemaManagementTool;
+import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool;
+import org.hibernate.tool.schema.internal.SchemaCreatorImpl;
+import org.hibernate.tool.schema.internal.SchemaDropperImpl;
+import org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase;
+import org.hibernate.tool.schema.internal.exec.JdbcConnectionContextNonSharedImpl;
 
 /**
  * Utility to help setting up a test SessionFactory which uses multi-tenancy based
@@ -32,27 +38,26 @@ import org.hibernate.tool.schema.spi.SchemaManagementTool;
  * @author Sanne Grinovero
  * @since 5.4
  */
-public class MultitenancyTestHelper {
+public class MultitenancyTestHelper implements Closeable {
 
 	private final Set<String> tenantIds;
 	private final boolean multitenancyEnabled;
-
-	private AbstractMultiTenantConnectionProvider multiTenantConnectionProvider;
-	private Map<String,DriverManagerConnectionProviderImpl> tenantSpecificConnectionProviders = new HashMap<>();
+	private final AbstractMultiTenantConnectionProvider multiTenantConnectionProvider;
+	private final Map<String,DriverManagerConnectionProviderImpl> tenantSpecificConnectionProviders = new HashMap<>();
 
 	public MultitenancyTestHelper(Set<String> tenantIds) {
 		this.tenantIds = tenantIds;
 		this.multitenancyEnabled = tenantIds != null && tenantIds.size() != 0;
+		if ( multitenancyEnabled ) {
+			multiTenantConnectionProvider = buildMultiTenantConnectionProvider();
+		}
+		else {
+			multiTenantConnectionProvider = null;
+		}
 	}
 
 	public void enableIfNeeded(StandardServiceRegistryBuilder registryBuilder) {
 		registryBuilder.addService( MultiTenantConnectionProvider.class, multiTenantConnectionProvider );
-	}
-
-	public void start() {
-		if ( multitenancyEnabled ) {
-			multiTenantConnectionProvider = buildMultiTenantConnectionProvider();
-		}
 	}
 
 	private AbstractMultiTenantConnectionProvider buildMultiTenantConnectionProvider() {
@@ -78,41 +83,47 @@ public class MultitenancyTestHelper {
 		};
 	}
 
+	@Override
 	public void close() {
 		for ( DriverManagerConnectionProviderImpl connectionProvider : tenantSpecificConnectionProviders.values() ) {
 			connectionProvider.stop();
 		}
 	}
 
-	public void exportSchema(StandardServiceRegistry serviceRegistry, Metadata metadata, Map<String, Object> settings) {
-		final TargetDatabaseImpl[] targets = createDatabaseTargets();
-
-		serviceRegistry.getService( SchemaManagementTool.class ).getSchemaDropper( settings ).doDrop(
+	public void exportSchema(ServiceRegistryImplementor serviceRegistry, Metadata metadata, Map<String, Object> settings) {
+		HibernateSchemaManagementTool tool = new HibernateSchemaManagementTool();
+		tool.injectServices( serviceRegistry );
+		final GenerationTargetToDatabase[] databaseTargets = createSchemaTargets();
+		new SchemaDropperImpl( serviceRegistry ).doDrop(
 				metadata,
+				serviceRegistry,
+				settings,
 				true,
-				targets
-		);
-
-		serviceRegistry.getService( SchemaManagementTool.class ).getSchemaCreator( settings ).doCreation(
+				databaseTargets
+			);
+		new SchemaCreatorImpl( serviceRegistry ).doCreation(
 				metadata,
+				serviceRegistry,
+				settings,
 				true,
-				targets
-		);
+				databaseTargets
+			);
 	}
 
-	private TargetDatabaseImpl[] createDatabaseTargets() {
-		int tenantsNumber = tenantIds.size();
-		TargetDatabaseImpl[] targets = new TargetDatabaseImpl[tenantsNumber];
-		Iterator<String> iterator = tenantIds.iterator();
-		for ( int i = 0; i < tenantsNumber; i++ ) {
-			targets[i] = createDatabaseTarget( iterator.next() );
+	private GenerationTargetToDatabase[] createSchemaTargets() {
+		GenerationTargetToDatabase[] targets = new GenerationTargetToDatabase[tenantSpecificConnectionProviders.size()];
+		int index = 0;
+		for ( Entry<String, DriverManagerConnectionProviderImpl> e : tenantSpecificConnectionProviders.entrySet() ) {
+			ConnectionProvider connectionProvider = e.getValue();
+			targets[index] = new GenerationTargetToDatabase(
+						new JdbcConnectionContextNonSharedImpl(
+								new JdbcConnectionAccessImpl( connectionProvider ),
+								new SqlStatementLogger( false, false ),
+								true )
+					);
+			index++;
 		}
 		return targets;
-	}
-
-	private TargetDatabaseImpl createDatabaseTarget(String tenantId) {
-		DriverManagerConnectionProviderImpl connectionProviderImpl = tenantSpecificConnectionProviders.get( tenantId );
-		return new TargetDatabaseImpl( new JdbcConnectionAccessImpl( connectionProviderImpl ) );
 	}
 
 	public void forceConfigurationSettings(Map<String, Object> settings) {
