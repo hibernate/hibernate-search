@@ -149,11 +149,11 @@
         <jgroupsVersion>3.6.10.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
-        <hibernateVersion>5.0.11.Final</hibernateVersion>
+        <hibernateVersion>5.1.9.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>5.0.1.Final</hibernateCommonsAnnotationVersion>
-        <jandexVersion>2.0.0.Final</jandexVersion>
-        <classMateVersion>1.1.0</classMateVersion>
-        <javassistVersion>3.18.1-GA</javassistVersion>
+        <jandexVersion>2.0.3.Final</jandexVersion>
+        <classMateVersion>1.3.3</classMateVersion>
+        <javassistVersion>3.20.0-GA</javassistVersion>
 
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>3.0.2</bytemanVersion>

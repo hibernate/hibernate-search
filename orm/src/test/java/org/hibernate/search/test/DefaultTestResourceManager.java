@@ -22,7 +22,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
@@ -39,6 +38,7 @@ import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 /**
  * Manages bootstrap and teardown of an Hibernate SessionFactory for purposes of
@@ -88,10 +88,9 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
 			.applySettings( settings );
 
-		multitenancy.start();
 		multitenancy.enableIfNeeded( registryBuilder );
 
-		StandardServiceRegistry serviceRegistry = registryBuilder.build();
+		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
 
 		MetadataSources ms = new MetadataSources( serviceRegistry );
 		Class<?>[] annotatedClasses = test.getAnnotatedClasses();
