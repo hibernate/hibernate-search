@@ -83,9 +83,11 @@ public class DslEmbeddedSearchTest extends SearchTestBase {
 	@Override
 	@After
 	public void tearDown() throws Exception {
-		s.clear();
-		deleteAll( s, ContainerEntity.class );
-		s.close();
+		if ( s != null ) {
+			s.clear();
+			deleteAll( s, ContainerEntity.class );
+			s.close();
+		}
 		super.tearDown();
 	}
 
