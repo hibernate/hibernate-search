@@ -124,6 +124,7 @@ public interface FullTextEntityManager extends EntityManager {
 	boolean isSearchTransactionInProgress();
 
 	/**
+	 * @inheritDoc
 	 * @throws IllegalStateException if search-transaction is still in progress. underlying EntityManager is still
 	 * closed.
 	 */

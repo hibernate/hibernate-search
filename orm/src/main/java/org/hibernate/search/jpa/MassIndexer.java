@@ -21,6 +21,10 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
  */
 public interface MassIndexer {
 
+	//Note (Martin Braun):
+	//This is the JPA version of the MassIndexer interface which does not contain
+	//any Hibernate ORM specific features like setting the CacheMode
+
 	/**
 	 * Sets the number of entity types to be indexed in parallel.
 	 * Defaults to 1.
