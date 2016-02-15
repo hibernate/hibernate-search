@@ -7,14 +7,14 @@
 package org.hibernate.search.backend.elasticsearch;
 
 /**
- * Projection constants specific to the ElasticSearch backend.
+ * Projection constants specific to the Elasticsearch backend.
  *
  * @author Gunnar Morling
  */
 public interface ProjectionConstants extends org.hibernate.search.engine.ProjectionConstants {
 
 	/**
-	 * The JSON document as stored in ElasticSearch.
+	 * The JSON document as stored in Elasticsearch.
 	 */
 	String SOURCE = "__HSearch_Source";
 

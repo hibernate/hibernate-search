@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.cfg;
 
 /**
- * Strategy for creating/deleting the indexes in ElasticSearch upon session factory initialization and shut-down.
+ * Strategy for creating/deleting the indexes in Elasticsearch upon session factory initialization and shut-down.
  *
  * @author Gunnar Morling
  */

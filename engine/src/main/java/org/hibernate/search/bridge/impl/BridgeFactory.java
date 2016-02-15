@@ -47,7 +47,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class BridgeFactory {
 
-	private static final String ELASTICSEARCH_BRIDGE_PROVIDER_CLASS = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchBridgeProvider";
+	private static final String ELASTICSEARCH_BRIDGE_PROVIDER_CLASS = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBridgeProvider";
 
 	private static final Log LOG = LoggerFactory.make();
 

@@ -25,7 +25,7 @@ import org.hibernate.search.bridge.impl.ExtendedBridgeProvider;
  * @author Gunnar Morling
  */
 // TODO Handle Calendar
-public class ElasticSearchBridgeProvider extends ExtendedBridgeProvider {
+public class ElasticsearchBridgeProvider extends ExtendedBridgeProvider {
 
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext bridgeContext) {

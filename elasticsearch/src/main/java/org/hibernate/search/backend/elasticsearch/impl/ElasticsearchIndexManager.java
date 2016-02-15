@@ -17,7 +17,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticSearchEnvironment;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
@@ -50,11 +50,11 @@ import io.searchbox.indices.IndicesExists;
 import io.searchbox.indices.mapping.PutMapping;
 
 /**
- * An {@link IndexManager} applying indexing work to an ElasticSearch server.
+ * An {@link IndexManager} applying indexing work to an Elasticsearch server.
  *
  * @author Gunnar Morling
  */
-public class ElasticSearchIndexManager implements IndexManager {
+public class ElasticsearchIndexManager implements IndexManager {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -82,7 +82,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 		try ( ServiceReference<ConfigurationPropertiesProvider> propertiesProvider = serviceManager.requestReference( ConfigurationPropertiesProvider.class ) ) {
 			this.indexManagementStrategy = getIndexManagementStrategy( propertiesProvider.get().getProperties() );
 		}
-		this.actualIndexName = IndexNameNormalizer.getElasticSearchIndexName( this.indexName );
+		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
 		this.similarity = similarity;
 		this.backend = BackendFactory.createBackend( this, context, properties );
 	}
@@ -93,7 +93,7 @@ public class ElasticSearchIndexManager implements IndexManager {
 	}
 
 	private IndexManagementStrategy getIndexManagementStrategy(Properties properties) {
-		String strategy = properties.getProperty( ElasticSearchEnvironment.INDEX_MANAGEMENT_STRATEGY );
+		String strategy = properties.getProperty( ElasticsearchEnvironment.INDEX_MANAGEMENT_STRATEGY );
 		return strategy != null ? IndexManagementStrategy.valueOf( strategy ) : IndexManagementStrategy.NONE;
 	}
 

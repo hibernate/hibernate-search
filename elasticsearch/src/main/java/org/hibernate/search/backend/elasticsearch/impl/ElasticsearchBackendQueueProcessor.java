@@ -17,17 +17,17 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
- * {@link BackendQueueProcessor} applying index changes to an ElasticSearch server.
+ * {@link BackendQueueProcessor} applying index changes to an Elasticsearch server.
  *
  * @author Gunnar Morling
  */
-public class ElasticSearchBackendQueueProcessor implements BackendQueueProcessor {
+public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor {
 
-	private ElasticSearchIndexManager indexManager;
+	private ElasticsearchIndexManager indexManager;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
-		this.indexManager = (ElasticSearchIndexManager) indexManager;
+		this.indexManager = (ElasticsearchIndexManager) indexManager;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class ElasticSearchBackendQueueProcessor implements BackendQueueProcessor
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		for ( LuceneWork luceneWork : workList ) {
 			luceneWork.acceptIndexWorkVisitor(
-					new ElasticSearchIndexWorkVisitor(
+					new ElasticsearchIndexWorkVisitor(
 							indexManager.getActualIndexName(),
 							indexManager.searchIntegrator
 					),
@@ -50,7 +50,7 @@ public class ElasticSearchBackendQueueProcessor implements BackendQueueProcessor
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		singleOperation.acceptIndexWorkVisitor(
-				new ElasticSearchIndexWorkVisitor(
+				new ElasticsearchIndexWorkVisitor(
 						indexManager.getActualIndexName(),
 						indexManager.searchIntegrator
 				),

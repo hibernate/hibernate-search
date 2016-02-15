@@ -17,7 +17,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
-import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.Startable;
@@ -39,7 +39,7 @@ import com.google.gson.JsonObject;
  *
  * @author Gunnar Morling
  */
-public class ElasticSearchLuceneQueryTranslator implements LuceneQueryTranslator, Startable {
+public class ElasticsearchLuceneQueryTranslator implements LuceneQueryTranslator, Startable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -57,7 +57,7 @@ public class ElasticSearchLuceneQueryTranslator implements LuceneQueryTranslator
 		JsonObject query = new JsonObject();
 		query.add( "query", convertedQuery );
 
-		return ElasticSearchQueries.fromJson( query.toString() );
+		return ElasticsearchQueries.fromJson( query.toString() );
 	}
 
 	private JsonObject convertQuery(Query query) {
@@ -98,7 +98,7 @@ public class ElasticSearchLuceneQueryTranslator implements LuceneQueryTranslator
 			IndexManager[] indexManagers = binding.getIndexManagers();
 
 			for ( IndexManager indexManager : indexManagers ) {
-				if ( indexManager instanceof ElasticSearchIndexManager ) {
+				if ( indexManager instanceof ElasticsearchIndexManager ) {
 					return true;
 				}
 			}

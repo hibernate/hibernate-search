@@ -66,11 +66,11 @@ import io.searchbox.core.search.sort.Sort;
 import io.searchbox.core.search.sort.Sort.Sorting;
 
 /**
- * Query implementation based on ElasticSearch.
+ * Query implementation based on Elasticsearch.
  *
  * @author Gunnar Morling
  */
-public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
+public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -87,14 +87,14 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 	private IndexSearcher searcher;
 	private SearchResult searchResult;
 
-	public ElasticSearchHSQueryImpl(String jsonQuery, ExtendedSearchIntegrator extendedIntegrator) {
+	public ElasticsearchHSQueryImpl(String jsonQuery, ExtendedSearchIntegrator extendedIntegrator) {
 		super( extendedIntegrator );
 		this.jsonQuery = jsonQuery;
 	}
 
 	@Override
 	public HSQuery luceneQuery(Query query) {
-		throw new UnsupportedOperationException( "Cannot use Lucene query with ElasticSearch" );
+		throw new UnsupportedOperationException( "Cannot use Lucene query with Elasticsearch" );
 	}
 
 	@Override
@@ -105,12 +105,12 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public Query getLuceneQuery() {
-		throw new UnsupportedOperationException( "Cannot use Lucene query with ElasticSearch" );
+		throw new UnsupportedOperationException( "Cannot use Lucene query with Elasticsearch" );
 	}
 
 	@Override
 	public DocumentExtractor queryDocumentExtractor() {
-		return new ElasticSearchDocumentExtractor();
+		return new ElasticsearchDocumentExtractor();
 	}
 
 	@Override
@@ -268,7 +268,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 				IndexManager[] indexManagers = binding.getIndexManagers();
 
 				for ( IndexManager indexManager : indexManagers ) {
-					if ( !( indexManager instanceof ElasticSearchIndexManager ) ) {
+					if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
 						throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
 							queriedEntityType,
 							jsonQuery
@@ -278,7 +278,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 					// TODO will this be a problem when querying multiple entity types, with one using a field as id
 					// field and the other not; is that possible?
 					idFieldName = binding.getDocumentBuilder().getIdentifierName();
-					ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
+					ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
 					indexNames.add( esIndexManager.getActualIndexName() );
 				}
 
@@ -390,7 +390,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			Class<?> clazz = entityTypesByName.get( type );
 
 			if ( clazz == null ) {
-				LOG.warnf( "Found unknown type in ElasticSearch index: " + type );
+				LOG.warnf( "Found unknown type in Elasticsearch index: " + type );
 				return null;
 			}
 
@@ -410,9 +410,9 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 							projections[i] = hit.getAsJsonObject().get( "_source" ).toString();
 							break;
 						case ProjectionConstants.DOCUMENT:
-							throw new IllegalArgumentException( "Projection of Lucene document not supported with ElasticSearch backend" );
+							throw new IllegalArgumentException( "Projection of Lucene document not supported with Elasticsearch backend" );
 						case DOCUMENT_ID:
-							throw new IllegalArgumentException( "Projection of Lucene document id not supported with ElasticSearch backend" );
+							throw new IllegalArgumentException( "Projection of Lucene document id not supported with Elasticsearch backend" );
 						case ProjectionConstants.EXPLANATION:
 							throw new UnsupportedOperationException( "Not yet implemented" );
 						case ProjectionConstants.ID:
@@ -555,12 +555,12 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	// TODO: Investigate scrolling API:
 	// https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
-	private class ElasticSearchDocumentExtractor implements DocumentExtractor {
+	private class ElasticsearchDocumentExtractor implements DocumentExtractor {
 
 		private final IndexSearcher searcher;
 		private List<EntityInfo> results;
 
-		private ElasticSearchDocumentExtractor() {
+		private ElasticsearchDocumentExtractor() {
 			searcher = new IndexSearcher();
 		}
 
@@ -593,7 +593,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 		@Override
 		public TopDocs getTopDocs() {
-			throw new UnsupportedOperationException( "TopDocs not available with ElasticSearch backend" );
+			throw new UnsupportedOperationException( "TopDocs not available with Elasticsearch backend" );
 		}
 
 		private void runSearch() {

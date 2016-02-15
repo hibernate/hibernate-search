@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticSearchEnvironment;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
@@ -40,7 +40,7 @@ public class JestClient implements Service, Startable, Stoppable {
 		JestClientFactory factory = new JestClientFactory();
 
 		String serverUri = ConfigurationParseHelper.getString(
-				properties, ElasticSearchEnvironment.SERVER_URI, "http://localhost:9200"
+				properties, ElasticsearchEnvironment.SERVER_URI, "http://localhost:9200"
 		);
 
 		Gson gson = new GsonBuilder()

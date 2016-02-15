@@ -14,7 +14,7 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 /**
- * Hibernate Search ElasticSearch backend log abstraction.
+ * Hibernate Search Elasticsearch backend log abstraction.
  *
  * @author Gunnar Morling
  */
@@ -22,10 +22,10 @@ import org.jboss.logging.annotations.MessageLogger;
 public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 1,
-			value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is indexed through a non-ElasticSearch backend")
+			value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is indexed through a non-Elasticsearch backend")
 	SearchException cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(@FormatWith(ClassFormatter.class) Class<?> entityType, String query);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 2,
-			value = "Lucene query '%1$s' cannot be transformed into equivalent ElasticSearch query" )
+			value = "Lucene query '%1$s' cannot be transformed into equivalent Elasticsearch query" )
 	SearchException cannotTransformLuceneQueryIntoEsQuery(Query query);
 }

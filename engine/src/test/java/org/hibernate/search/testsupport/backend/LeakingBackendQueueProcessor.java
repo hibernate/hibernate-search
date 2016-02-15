@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * This backend wraps the default backend to leak out the last performed list of work for testing purposes: tests can
  * inspect the queue being sent to a backend.
  * <p>
- * Depending on the given index manager, either the (local) Lucene-based backend or the ElasticSearch backend will be
+ * Depending on the given index manager, either the (local) Lucene-based backend or the Elasticsearch backend will be
  * used as delegate.
  *
  * @author Sanne Grinovero
@@ -31,8 +31,8 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  */
 public class LeakingBackendQueueProcessor implements BackendQueueProcessor {
 
-	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager";
-	private static final String ES_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchBackendQueueProcessor";
+	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager";
+	private static final String ES_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendQueueProcessor";
 
 	private static volatile List<LuceneWork> lastProcessedQueue = new ArrayList<LuceneWork>();
 
@@ -44,7 +44,7 @@ public class LeakingBackendQueueProcessor implements BackendQueueProcessor {
 			delegate = ClassLoaderHelper.instanceFromName(
 					BackendQueueProcessor.class,
 					ES_BACKEND_QUEUE_PROCESSOR,
-					"ElasticSearch backend",
+					"Elasticsearch backend",
 					context.getServiceManager()
 			);
 		}

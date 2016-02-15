@@ -16,7 +16,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
@@ -32,7 +32,7 @@ import static org.fest.assertions.Fail.fail;
 /**
  * @author Gunnar Morling
  */
-public class CombiningLuceneAndElasticSearchIT extends SearchTestBase {
+public class CombiningLuceneAndElasticsearchIT extends SearchTestBase {
 
 	private final QueryParser queryParser = new QueryParser( "id", TestConstants.simpleAnalyzer );
 
@@ -52,13 +52,13 @@ public class CombiningLuceneAndElasticSearchIT extends SearchTestBase {
 	}
 
 	@Test
-	public void canUseLuceneAndElasticSearchForDifferentEntities() throws Exception {
+	public void canUseLuceneAndElasticsearchForDifferentEntities() throws Exception {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
 		List<?> result = session.createFullTextQuery(
-				ElasticSearchQueries.fromQueryString( "title:important" ),
+				ElasticsearchQueries.fromQueryString( "title:important" ),
 				ResearchPaper.class
 		).list();
 
@@ -76,14 +76,14 @@ public class CombiningLuceneAndElasticSearchIT extends SearchTestBase {
 	}
 
 	@Test
-	public void cannotUseElasticSearchQueryWithLuceneIndexedEntity() throws Exception {
+	public void cannotUseElasticsearchQueryWithLuceneIndexedEntity() throws Exception {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
 		try {
 			session.createFullTextQuery(
-					ElasticSearchQueries.fromQueryString( "title:tales" ),
+					ElasticsearchQueries.fromQueryString( "title:tales" ),
 					ComicBook.class
 			).list();
 
@@ -99,7 +99,7 @@ public class CombiningLuceneAndElasticSearchIT extends SearchTestBase {
 	}
 
 	@Test
-	public void cannotUseLuceneQueryWithElasticSearchIndexedEntity() throws Exception {
+	public void cannotUseLuceneQueryWithElasticsearchIndexedEntity() throws Exception {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
@@ -123,7 +123,7 @@ public class CombiningLuceneAndElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
 		List<?> result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
 		for ( Object entity : result ) {

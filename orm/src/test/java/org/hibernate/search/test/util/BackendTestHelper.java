@@ -28,7 +28,7 @@ import org.hibernate.search.test.TestResourceManager;
  */
 public abstract class BackendTestHelper {
 
-	private static final String ELASTIC_SEARCH_TEST_HELPER_CLASS_NAME = "org.hibernate.search.backend.elasticsearch.testutil.ElasticSearchBackendTestHelper";
+	private static final String ELASTIC_SEARCH_TEST_HELPER_CLASS_NAME = "org.hibernate.search.backend.elasticsearch.testutil.ElasticsearchBackendTestHelper";
 
 	protected BackendTestHelper() {
 	}

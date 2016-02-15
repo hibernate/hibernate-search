@@ -41,8 +41,8 @@ public final class BackendFactory {
 	private static final String JGROUPS_AUTO_SELECTOR = "org.hibernate.search.backend.jgroups.impl.AutoNodeSelector";
 	private static final String JGROUPS_SELECTOR_BASE_TYPE = "org.hibernate.search.backend.jgroups.impl.NodeSelectorStrategy";
 
-	private static final String ES_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchBackendQueueProcessor";
-	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager";
+	private static final String ES_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendQueueProcessor";
+	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager";
 
 	private BackendFactory() {
 		//not allowed
@@ -64,7 +64,7 @@ public final class BackendFactory {
 				backendQueueProcessor = ClassLoaderHelper.instanceFromName(
 						BackendQueueProcessor.class,
 						ES_BACKEND_QUEUE_PROCESSOR,
-						"ElasticSearch backend",
+						"Elasticsearch backend",
 						buildContext.getServiceManager()
 				);
 			}
@@ -74,7 +74,7 @@ public final class BackendFactory {
 		}
 		else if ( "lucene".equalsIgnoreCase( backend ) ) {
 			if ( indexManager.getClass().getName().equals( ES_INDEX_MANAGER ) ) {
-				throw new SearchException( "Cannot use Lucene backend together with ElasticSearch index manager" );
+				throw new SearchException( "Cannot use Lucene backend together with Elasticsearch index manager" );
 			}
 			else {
 				backendQueueProcessor = new LuceneBackendQueueProcessor();

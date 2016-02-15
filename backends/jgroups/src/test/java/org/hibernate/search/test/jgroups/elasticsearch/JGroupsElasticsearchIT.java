@@ -14,8 +14,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
@@ -31,7 +31,7 @@ import org.junit.Test;
  * @author Lukasz Moren
  * @author Sanne Grinovero
  */
-public class JGroupsElasticSearchIT extends MultipleSessionsSearchTestCase {
+public class JGroupsElasticsearchIT extends MultipleSessionsSearchTestCase {
 
 	public static final String TESTING_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
 	public static final long NETWORK_WAIT_MILLISECONDS = 100;
@@ -73,7 +73,7 @@ public class JGroupsElasticSearchIT extends MultipleSessionsSearchTestCase {
 				Thread.sleep( NETWORK_WAIT_MILLISECONDS );
 
 				masterSession.getTransaction().begin();
-				QueryDescriptor esQuery = ElasticSearchQueries.fromQueryString( "logo:Boston or logo:Mapple leaves" );
+				QueryDescriptor esQuery = ElasticsearchQueries.fromQueryString( "logo:Boston or logo:Mapple leaves" );
 				org.hibernate.Query query = masterSession.createFullTextQuery( esQuery );
 				List<?> result = query.list();
 				masterSession.getTransaction().commit();
@@ -100,7 +100,7 @@ public class JGroupsElasticSearchIT extends MultipleSessionsSearchTestCase {
 				//need to sleep for the message consumption
 				Thread.sleep( NETWORK_WAIT_MILLISECONDS );
 
-				QueryDescriptor esQuery = ElasticSearchQueries.fromQueryString( "logo:Peter pan" );
+				QueryDescriptor esQuery = ElasticsearchQueries.fromQueryString( "logo:Peter pan" );
 				masterSession.getTransaction().begin();
 				org.hibernate.Query query = masterSession.createFullTextQuery( esQuery );
 				List<?> result = query.list();
@@ -127,7 +127,7 @@ public class JGroupsElasticSearchIT extends MultipleSessionsSearchTestCase {
 				//need to sleep for the message consumption
 				Thread.sleep( NETWORK_WAIT_MILLISECONDS );
 
-				QueryDescriptor esQuery = ElasticSearchQueries.fromQueryString( "logo:Boston or logo:Mapple leaves" );
+				QueryDescriptor esQuery = ElasticsearchQueries.fromQueryString( "logo:Boston or logo:Mapple leaves" );
 				masterSession.getTransaction().begin();
 				org.hibernate.Query query = masterSession.createFullTextQuery( esQuery );
 				List<?> result = query.list();
@@ -167,7 +167,7 @@ public class JGroupsElasticSearchIT extends MultipleSessionsSearchTestCase {
 	 * @param cfg the configuration to isolate
 	 */
 	protected void applyCommonJGroupsChannelConfiguration(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.indexmanager", ElasticSearchIndexManager.class.getName() );
+		cfg.put( "hibernate.search.default.indexmanager", ElasticsearchIndexManager.class.getName() );
 		cfg.put( "hibernate.search.default." + DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
 		cfg.put( DispatchMessageSender.CONFIGURATION_FILE, TESTING_JGROUPS_CONFIGURATION_FILE );
 	}

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch;
 
-import org.hibernate.search.backend.elasticsearch.impl.ElasticSearchHSQueryImpl;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchHSQueryImpl;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
@@ -15,17 +15,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * Creates queries to be used with the ElasticSearch backend.
+ * Creates queries to be used with the Elasticsearch backend.
  *
  * @author Gunnar Morling
  */
-public class ElasticSearchQueries {
+public class ElasticsearchQueries {
 
-	private ElasticSearchQueries() {
+	private ElasticsearchQueries() {
 	}
 
 	/**
-	 * Creates an ElasticSearch query from the given JSON query representation. See the <a
+	 * Creates an Elasticsearch query from the given JSON query representation. See the <a
 	 * href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html">official
 	 * documentation</a> for the complete query syntax.
 	 */
@@ -33,12 +33,12 @@ public class ElasticSearchQueries {
 		// TODO Parse + Re-render using Gson for now to leverage single quote support
 		jsonQuery = new JsonParser().parse( jsonQuery ).toString();
 
-		return new ElasticSearchJsonQuery( jsonQuery );
+		return new ElasticsearchJsonQuery( jsonQuery );
 	}
 
 	/**
-	 * Creates an ElasticSearch query from the given Query String Query, as e.g. to be used with the "q" parameter in
-	 * the ElasticSearch API. See the <a
+	 * Creates an Elasticsearch query from the given Query String Query, as e.g. to be used with the "q" parameter in
+	 * the Elasticsearch API. See the <a
 	 * href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">official
 	 * documentation</a> for a description of the query syntax.
 	 */
@@ -55,20 +55,20 @@ public class ElasticSearchQueries {
 		JsonObject queryObject = new JsonObject();
 		queryObject.add( "query", queryString );
 
-		return new ElasticSearchJsonQuery( queryObject.toString() );
+		return new ElasticsearchJsonQuery( queryObject.toString() );
 	}
 
-	private static class ElasticSearchJsonQuery implements QueryDescriptor {
+	private static class ElasticsearchJsonQuery implements QueryDescriptor {
 
 		private final String jsonQuery;
 
-		public ElasticSearchJsonQuery(String jsonQuery) {
+		public ElasticsearchJsonQuery(String jsonQuery) {
 			this.jsonQuery = jsonQuery;
 		}
 
 		@Override
 		public HSQuery createHSQuery(ExtendedSearchIntegrator extendedIntegrator) {
-			return new ElasticSearchHSQueryImpl( jsonQuery, extendedIntegrator );
+			return new ElasticsearchHSQueryImpl( jsonQuery, extendedIntegrator );
 		}
 
 		@Override

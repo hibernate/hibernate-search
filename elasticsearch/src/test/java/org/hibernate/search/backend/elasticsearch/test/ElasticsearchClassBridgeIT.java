@@ -15,7 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
@@ -27,7 +27,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Gunnar Morling
  */
-public class ElasticSearchClassBridgeIT extends SearchTestBase {
+public class ElasticsearchClassBridgeIT extends SearchTestBase {
 
 	@Before
 	public void setupTestData() {
@@ -64,7 +64,7 @@ public class ElasticSearchClassBridgeIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
 		List<?> result = session.createFullTextQuery( query ).list();
 
 		for ( Object entity : result ) {
@@ -81,11 +81,11 @@ public class ElasticSearchClassBridgeIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "fullName:\"Klaus Hergesheimer\"" );
+		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "fullName:\"Klaus Hergesheimer\"" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
 		assertThat( result ).onProperty( "id" ).describedAs( "Class-brigde provided string field" ).containsOnly( 1L );
 
-		query = ElasticSearchQueries.fromQueryString( "age:34" );
+		query = ElasticsearchQueries.fromQueryString( "age:34" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
 		assertThat( result ).onProperty( "id" ).describedAs( "Class-brigde provided numeric field" ).containsOnly( 1L );
 
@@ -99,7 +99,7 @@ public class ElasticSearchClassBridgeIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "Hergesheimer" );
+		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "Hergesheimer" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
 				.setProjection( "fullName", "age" )
 				.list();

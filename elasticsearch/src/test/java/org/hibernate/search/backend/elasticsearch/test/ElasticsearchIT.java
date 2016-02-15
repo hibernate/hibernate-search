@@ -25,7 +25,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
@@ -43,7 +43,7 @@ import org.junit.Test;
 /**
  * @author Gunnar Morling
  */
-public class ElasticSearchIT extends SearchTestBase {
+public class ElasticsearchIT extends SearchTestBase {
 
 	@Before
 	public void setupTestData() {
@@ -138,7 +138,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
 		List<?> result = session.createFullTextQuery( query ).list();
 
 		for ( Object entity : result ) {
@@ -155,7 +155,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly(
@@ -174,7 +174,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'range' : { 'wordCount' : { 'gte' : 8, 'lt' : 10 } } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'range' : { 'wordCount' : { 'gte' : 8, 'lt' : 10 } } } }" );
 		List<?> result = session.createFullTextQuery( query ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Latest in ORM", "ORM for beginners" );
@@ -207,7 +207,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		QueryDescriptor query;
 		List<?> result;
 
-		query = ElasticSearchQueries.fromJson(
+		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
 						"'nested' : { " +
@@ -224,7 +224,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		result = session.createFullTextQuery( query, Tower.class ).list();
 		assertEquals( "unable to find property in embedded", 1, result.size() );
 
-		query = ElasticSearchQueries.fromJson(
+		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
 						"'nested' : { " +
@@ -241,7 +241,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		result = session.createFullTextQuery( query, Tower.class ).list();
 		assertEquals( "unable to find property in embedded", 1, result.size() );
 
-		query = ElasticSearchQueries.fromJson(
+		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
 						"'nested' : { " +
@@ -258,7 +258,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		result = session.createFullTextQuery( query, Tower.class ).list();
 		assertEquals( "unable to find property by id of embedded", 1, result.size() );
 
-		query = ElasticSearchQueries.fromJson(
+		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
 						"'nested' : { " +
@@ -286,7 +286,7 @@ public class ElasticSearchIT extends SearchTestBase {
 
 		session = Search.getFullTextSession( s );
 
-		query = ElasticSearchQueries.fromJson(
+		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
 						"'nested' : { " +
@@ -318,7 +318,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'title' : 'findings' } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'title' : 'findings' } } }" );
 		List<?> result = session.createFullTextQuery( query, MasterThesis.class, BachelorThesis.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Great findings", "Latest findings" );
@@ -332,7 +332,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		List<?> result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Very important research on Hibernate", "Some research" );
@@ -346,7 +346,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class )
 				.setFirstResult( 1 )
 				.setMaxResults( 2 )
@@ -364,7 +364,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		FullTextQuery fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class );
 
 		assertThat( fullTextQuery.getResultSize() ).isEqualTo( 4 );
@@ -379,7 +379,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		FullTextQuery fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class )
 				.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
 
@@ -437,7 +437,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 
 		// by title, ascending
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class )
@@ -473,7 +473,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson(
+		QueryDescriptor query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query': {" +
 						"'bool' : {" +
@@ -503,7 +503,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "abstract:Hibernate" );
+		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "abstract:Hibernate" );
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly(
@@ -513,7 +513,7 @@ public class ElasticSearchIT extends SearchTestBase {
 				"ORM modelling"
 		);
 
-		query = ElasticSearchQueries.fromQueryString( "abstract:important OR title:important" );
+		query = ElasticsearchQueries.fromQueryString( "abstract:important OR title:important" );
 		result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsExactly(
@@ -521,7 +521,7 @@ public class ElasticSearchIT extends SearchTestBase {
 				"Some research"
 		);
 
-		query = ElasticSearchQueries.fromQueryString( "wordCount:[8 TO 10}" );
+		query = ElasticsearchQueries.fromQueryString( "wordCount:[8 TO 10}" );
 		result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Latest in ORM", "ORM for beginners" );
@@ -536,7 +536,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "lastName:Hergesheimer" );
+		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "lastName:Hergesheimer" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
 				.setProjection(
 						ProjectionConstants.ID,
@@ -583,7 +583,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson(
+		QueryDescriptor query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query': {" +
 						"'ids' : {" +
@@ -600,7 +600,7 @@ public class ElasticSearchIT extends SearchTestBase {
 				"ORM for beginners"
 		);
 
-		query = ElasticSearchQueries.fromQueryString( "_id:1 OR _id:3" );
+		query = ElasticsearchQueries.fromQueryString( "_id:1 OR _id:3" );
 		result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly(
@@ -618,7 +618,7 @@ public class ElasticSearchIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match' : { 'puttingStrength' : '2.5' } } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'puttingStrength' : '2.5' } } }" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
 				.setProjection( ProjectionConstants.ID, "puttingStrength" )
 				.list();

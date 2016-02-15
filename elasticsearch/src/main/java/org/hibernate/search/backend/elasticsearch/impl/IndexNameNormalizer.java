@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import java.util.Locale;
 
 /**
- * Applies rules imposed by ElasticSearch to index names.
+ * Applies rules imposed by Elasticsearch to index names.
  *
  * @author Gunnar Morling
  */
@@ -18,7 +18,7 @@ public class IndexNameNormalizer {
 	private IndexNameNormalizer() {
 	}
 
-	public static String getElasticSearchIndexName(String indexName) {
+	public static String getElasticsearchIndexName(String indexName) {
 		String esIndexName = indexName.toLowerCase( Locale.ENGLISH );
 		if ( !esIndexName.equals( indexName ) ) {
 			// TODO LOG

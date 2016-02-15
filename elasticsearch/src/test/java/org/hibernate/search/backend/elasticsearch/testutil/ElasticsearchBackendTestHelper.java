@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticSearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.impl.IndexNameNormalizer;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
@@ -22,15 +22,15 @@ import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
 
 /**
- * {@link BackendTestHelper} implementation based on ElasticSearch.
+ * {@link BackendTestHelper} implementation based on Elasticsearch.
  *
  * @author Gunnar Morling
  */
-public class ElasticSearchBackendTestHelper extends BackendTestHelper {
+public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 	private TestResourceManager resourceManager;
 
-	public ElasticSearchBackendTestHelper(TestResourceManager resourceManager) {
+	public ElasticsearchBackendTestHelper(TestResourceManager resourceManager) {
 		this.resourceManager = resourceManager;
 	}
 
@@ -45,7 +45,7 @@ public class ElasticSearchBackendTestHelper extends BackendTestHelper {
 		List<String> indexNames = new ArrayList<>( indexManagers.length );
 
 		for ( IndexManager indexManager : indexManagers ) {
-			indexNames.add( ( (ElasticSearchIndexManager)indexManager ).getActualIndexName() );
+			indexNames.add( ( (ElasticsearchIndexManager)indexManager ).getActualIndexName() );
 		}
 
 		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
@@ -66,7 +66,7 @@ public class ElasticSearchBackendTestHelper extends BackendTestHelper {
 
 		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
 			Count request = new Count.Builder()
-					.addIndex( IndexNameNormalizer.getElasticSearchIndexName( indexName ) )
+					.addIndex( IndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.build();
 
 			CountResult response = client.get().executeRequest( request );
@@ -82,7 +82,7 @@ public class ElasticSearchBackendTestHelper extends BackendTestHelper {
 
 		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
 			Count request = new Count.Builder()
-					.addIndex( IndexNameNormalizer.getElasticSearchIndexName( indexName ) )
+					.addIndex( IndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.query( "{ \"query\" : { \"" + query + "\" : { \"" + fieldName + "\" : \"" + value + "\" } } }" )
 					.build();
 

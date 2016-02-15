@@ -50,7 +50,7 @@ import io.searchbox.params.Parameters;
 /**
  * @author Gunnar Morling
  */
-class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
+class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -61,7 +61,7 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 	private final String indexName;
 	private final ExtendedSearchIntegrator searchIntegrator;
 
-	public ElasticSearchIndexWorkVisitor(String indexName, ExtendedSearchIntegrator searchIntegrator) {
+	public ElasticsearchIndexWorkVisitor(String indexName, ExtendedSearchIntegrator searchIntegrator) {
 		this.indexName = indexName;
 		this.searchIntegrator = searchIntegrator;
 	}
@@ -91,7 +91,7 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 	@Override
 	public Void visitOptimizeWork(OptimizeLuceneWork work, Void p) {
 		// TODO implement
-		LOG.warn( "Optimize work is not yet supported for ElasticSearch backend, ignoring it" );
+		LOG.warn( "Optimize work is not yet supported for Elasticsearch backend, ignoring it" );
 		return null;
 	}
 

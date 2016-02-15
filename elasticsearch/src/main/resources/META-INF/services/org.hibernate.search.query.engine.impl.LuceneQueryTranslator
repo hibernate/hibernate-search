@@ -1,1 +1,1 @@
-org.hibernate.search.backend.elasticsearch.impl.ElasticSearchLuceneQueryTranslator
+org.hibernate.search.backend.elasticsearch.impl.ElasticsearchLuceneQueryTranslator

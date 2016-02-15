@@ -15,7 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.elasticsearch.ElasticSearchQueries;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
@@ -27,7 +27,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Gunnar Morling
  */
-public class ElasticSearchNullValueIT extends SearchTestBase {
+public class ElasticsearchNullValueIT extends SearchTestBase {
 
 	@Before
 	public void setupTestData() {
@@ -65,7 +65,7 @@ public class ElasticSearchNullValueIT extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		//TODO verify this is no longer needed after we implement the delete operations
-		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
 		List<?> result = session.createFullTextQuery( query ).list();
 
 		for ( Object entity : result ) {
@@ -84,19 +84,19 @@ public class ElasticSearchNullValueIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "firstName:&lt;NULL&gt;" );
+		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "firstName:&lt;NULL&gt;" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
 		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded String" ).containsOnly( 2L );
 
-		query = ElasticSearchQueries.fromQueryString( "dateOfBirth:1970-01-01" );
+		query = ElasticsearchQueries.fromQueryString( "dateOfBirth:1970-01-01" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
 		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Date" ).containsOnly( 2L );
 
-		query = ElasticSearchQueries.fromQueryString( "active:false" );
+		query = ElasticsearchQueries.fromQueryString( "active:false" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
 		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Boolean" ).containsOnly( 2L );
 
-		query = ElasticSearchQueries.fromQueryString( "driveWidth:\\-1" );
+		query = ElasticsearchQueries.fromQueryString( "driveWidth:\\-1" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
 		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Integer" ).containsOnly( 2L );
 
@@ -110,7 +110,7 @@ public class ElasticSearchNullValueIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "lastName:Kidd" );
+		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "lastName:Kidd" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
 				.setProjection(
 						"firstName",
