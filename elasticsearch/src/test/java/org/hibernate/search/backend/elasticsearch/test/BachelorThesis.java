@@ -4,23 +4,22 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.backend.elasticsearch;
+package org.hibernate.search.backend.elasticsearch.test;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 /**
- * @author Richard Hallier
+ * @author Gunnar Morling
  */
 @Entity
-@Indexed
-public class ResearchPaper {
+@Indexed(index = "studentwork")
+public class BachelorThesis {
 
 	@Id
 	@GeneratedValue
@@ -28,26 +27,17 @@ public class ResearchPaper {
 	private Long id;
 
 	@Field
-	@Boost(2)
 	private String title;
-
-	@Field(name = "abstract")
-	private String summary;
 
 	@Field
 	private String text;
 
-	@Field
-	private int wordCount;
-
-	ResearchPaper() {
+	BachelorThesis() {
 	}
 
-	public ResearchPaper(String title, String summary, String text, int wordCount) {
-		this.summary = summary;
+	public BachelorThesis(String title, String text) {
 		this.text = text;
 		this.title = title;
-		this.wordCount = wordCount;
 	}
 
 	public Long getId() {
@@ -66,27 +56,11 @@ public class ResearchPaper {
 		this.title = title;
 	}
 
-	public String getSummary() {
-		return summary;
-	}
-
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
-
 	public String getText() {
 		return text;
 	}
 
 	public void setText(String text) {
 		this.text = text;
-	}
-
-	public int getWordCount() {
-		return wordCount;
-	}
-
-	public void setWordCount(int wordCount) {
-		this.wordCount = wordCount;
 	}
 }

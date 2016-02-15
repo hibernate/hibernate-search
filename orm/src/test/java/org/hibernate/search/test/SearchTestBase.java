@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.testing.junit4.CustomRunner;
@@ -34,8 +35,11 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 
 	protected static final Boolean PERFORMANCE_TESTS_ENABLED = TestConstants.arePerformanceTestsEnabled();
 
-	// access only via getter, since instance gets lazily initalized
+	// access only via getter, since instance gets lazily initialized
 	private DefaultTestResourceManager testResourceManager;
+
+	// access only via getter, since instance gets lazily initialized
+	private BackendTestHelper backendTestHelper;
 
 	@Before
 	public void setUp() throws Exception {
@@ -108,11 +112,33 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 		return Collections.emptySet();
 	}
 
+	protected int getNumberOfDocumentsInIndex(Class<?> entityType) {
+		return getBackendTestHelper().getNumberOfDocumentsInIndex( entityType );
+	}
+
+	protected int getNumberOfDocumentsInIndex(String indexName) {
+		return getBackendTestHelper().getNumberOfDocumentsInIndex( indexName );
+	}
+
+	protected int getNumberOfDocumentsInIndexByQuery(String indexName, String fieldName, String value) {
+		return getBackendTestHelper().getNumberOfDocumentsInIndexByQuery(
+				indexName, fieldName, value
+		);
+	}
+
 	// synchronized due to lazy initialization
 	private synchronized DefaultTestResourceManager getTestResourceManager() {
 		if ( testResourceManager == null ) {
 			testResourceManager = new DefaultTestResourceManager( this, this.getClass() );
 		}
 		return testResourceManager;
+	}
+
+	private BackendTestHelper getBackendTestHelper() {
+		if ( backendTestHelper == null ) {
+			backendTestHelper = BackendTestHelper.getInstance( getTestResourceManager() );
+		}
+
+		return backendTestHelper;
 	}
 }

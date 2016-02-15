@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
@@ -13,6 +15,7 @@ import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -21,19 +24,27 @@ import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.service.spi.ServiceReference;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 import io.searchbox.core.Delete;
+import io.searchbox.core.DeleteByQuery;
 import io.searchbox.core.Index;
+import io.searchbox.indices.Refresh;
 import io.searchbox.params.Parameters;
 
 /**
@@ -41,7 +52,11 @@ import io.searchbox.params.Parameters;
  */
 class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
+	private static final Log LOG = LoggerFactory.make();
+
 	private static final Pattern DOT = Pattern.compile( "\\." );
+	private static final String DELETE_ALL_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"match_all\" : { } } } } }";
+	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
 
 	private final String indexName;
 	private final ExtendedSearchIntegrator searchIntegrator;
@@ -53,21 +68,21 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	@Override
 	public Void visitAddWork(AddLuceneWork work, Void p) {
-		indexDocument( work.getIdInString(), work.getDocument(), work.getEntityClass() );
+		indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
 		return null;
 	}
 
 	@Override
 	public Void visitDeleteWork(DeleteLuceneWork work, Void p) {
-		Delete delete = new Delete.Builder( work.getIdInString() )
+		Delete delete = new Delete.Builder( DocumentIdHelper.getDocumentId( work ) )
 			.index( indexName )
 			.type( work.getEntityClass().getName() )
 			// TODO Make configurable?
 			.setParameter( Parameters.REFRESH, true )
 			.build();
 
-		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
-			clientReference.executeRequest( delete );
+		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+			client.get().executeRequest( delete, false );
 		}
 
 		return null;
@@ -76,18 +91,42 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 	@Override
 	public Void visitOptimizeWork(OptimizeLuceneWork work, Void p) {
 		// TODO implement
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		LOG.warn( "Optimize work is not yet supported for ElasticSearch backend, ignoring it" );
+		return null;
 	}
 
 	@Override
 	public Void visitPurgeAllWork(PurgeAllLuceneWork work, Void p) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		// TODO This requires the delete-by-query plug-in on ES 2.0 and beyond; Alternatively
+		// the type mappings could be deleted, think about implications for concurrent access
+		String query = work.getTenantId() != null ?
+				String.format( Locale.ENGLISH, DELETE_ALL_FOR_TENANT_QUERY, work.getTenantId() ) :
+				DELETE_ALL_QUERY;
+
+		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( query )
+			.addIndex( indexName );
+
+		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
+		for ( Class<?> typeToDelete : typesToDelete ) {
+			builder.addType( typeToDelete.getName() );
+		}
+
+		DeleteByQuery delete = builder.build();
+		Refresh refresh = new Refresh.Builder().addIndex( indexName ).build();
+
+		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+			client.get().executeRequest( delete );
+
+			// TODO Refresh not needed on ES 1.x; Make it configurable?
+			client.get().executeRequest( refresh );
+		}
+
+		return null;
 	}
 
 	@Override
 	public Void visitUpdateWork(UpdateLuceneWork work, Void p) {
-		indexDocument( work.getIdInString(), work.getDocument(), work.getEntityClass() );
+		indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
 		return null;
 	}
 
@@ -116,8 +155,8 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			.setParameter( Parameters.REFRESH, true )
 			.build();
 
-		try ( JestClientReference clientReference = new JestClientReference( searchIntegrator.getServiceManager() ) ) {
-			clientReference.executeRequest( index );
+		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+			client.get().executeRequest( index );
 		}
 	}
 
@@ -127,21 +166,29 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 		for ( IndexableField field : document.getFields() ) {
 			if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
-					!field.name().equals( indexBinding.getDocumentBuilder().getIdentifierName() ) ) {
+					!field.name().equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
+					! isDocValueField( field) ) {
 
 				JsonObject parent = getOrCreateDocumentTree( source, field );
 				String jsonPropertyName = field.name().substring( field.name().lastIndexOf( "." ) + 1 );
 
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
 
-				// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
 				if ( documentFieldMetadata == null ) {
-					String stringValue = field.stringValue();
-					if ( stringValue != null ) {
-						parent.addProperty( jsonPropertyName, stringValue );
-					}
-					else {
-						parent.addProperty( jsonPropertyName, field.numericValue() );
+					String[] fieldNameParts = FieldHelper.getFieldNameParts( field.name() );
+
+					EmbeddedTypeMetadata embeddedType = getEmbeddedTypeMetadata( indexBinding.getDocumentBuilder().getTypeMetadata(), fieldNameParts );
+
+					// Make sure this field does not represent an embeddable (not a field thereof)
+					if ( embeddedType == null ) {
+						// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
+						String stringValue = field.stringValue();
+						if ( stringValue != null ) {
+							parent.addProperty( jsonPropertyName, stringValue );
+						}
+						else {
+							parent.addProperty( jsonPropertyName, field.numericValue() );
+						}
 					}
 				}
 				else if ( FieldHelper.isBoolean( indexBinding, field.name() ) ) {
@@ -180,6 +227,31 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		return field instanceof IntField || field instanceof LongField || field instanceof FloatField || field instanceof DoubleField;
 	}
 
+	private EmbeddedTypeMetadata getEmbeddedTypeMetadata(TypeMetadata type, String[] fieldNameParts) {
+		TypeMetadata parent = type;
+
+		for ( String namePart : fieldNameParts ) {
+			EmbeddedTypeMetadata embeddedType = getDirectEmbeddedTypeMetadata( parent, namePart );
+			if ( embeddedType == null ) {
+				return null;
+			}
+
+			parent = embeddedType;
+		}
+
+		return (EmbeddedTypeMetadata) parent;
+	}
+
+	private EmbeddedTypeMetadata getDirectEmbeddedTypeMetadata(TypeMetadata type, String fieldName) {
+		for ( EmbeddedTypeMetadata embeddedType : type.getEmbeddedTypeMetadata() ) {
+			if ( embeddedType.getEmbeddedFieldName().equals( fieldName ) ) {
+				return embeddedType;
+			}
+		}
+
+		return null;
+	}
+
 	private JsonObject getOrCreateDocumentTree(JsonObject source, IndexableField field) {
 		// top-level property
 		if ( !field.name().contains( "." ) ) {
@@ -200,5 +272,9 @@ class ElasticSearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		}
 
 		return parent;
+	}
+
+	private boolean isDocValueField(IndexableField field) {
+		return field.fieldType().docValuesType() != DocValuesType.NONE;
 	}
 }

@@ -16,7 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
@@ -25,7 +24,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -298,19 +296,7 @@ public class NumericFieldTest extends SearchTestBase {
 	}
 
 	private int countSizeForType(Class<?> type) {
-		try ( Session session = openSession() ) {
-			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			SearchFactory searchFactory = fullTextSession.getSearchFactory();
-			int numDocs = -1; // to have it fail in case of errors
-			IndexReader locationIndexReader = searchFactory.getIndexReaderAccessor().open( type );
-			try {
-				numDocs = locationIndexReader.numDocs();
-			}
-			finally {
-				searchFactory.getIndexReaderAccessor().close( locationIndexReader );
-			}
-			return numDocs;
-		}
+		return getNumberOfDocumentsInIndex( type );
 	}
 
 	@Override

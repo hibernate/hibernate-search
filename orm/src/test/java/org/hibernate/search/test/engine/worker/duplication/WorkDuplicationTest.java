@@ -6,19 +6,16 @@
  */
 package org.hibernate.search.test.engine.worker.duplication;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TopDocs;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.WorkQueue;
@@ -28,9 +25,6 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Testcase for HSEARCH-257.
@@ -77,25 +71,21 @@ public class WorkDuplicationTest extends SearchTestBase {
 		// Now try to delete
 		tx = s.beginTransaction();
 		int id = person.getId();
-		person = (SpecialPerson) s.get( SpecialPerson.class, id );
+		person = s.get( SpecialPerson.class, id );
 		s.delete( person );
 		tx.commit();
 
 		// Search and the record via Lucene directly
 		tx = s.beginTransaction();
 
-		SearchFactory searchFactory = s.getSearchFactory();
-		IndexReader indexReader = searchFactory.getIndexReaderAccessor().open( SpecialPerson.class );
-		try {
-			IndexSearcher searcher = new IndexSearcher( indexReader );
+		String indexName = getExtendedSearchIntegrator().getIndexBinding( SpecialPerson.class )
+				.getIndexManagers()[0].getIndexName();
+
 			// we have to test using Lucene directly since query loaders will ignore hits for which there is no
 			// database entry
-			TopDocs topDocs = searcher.search( luceneQuery, null, 1 );
-			assertTrue( "We should have no hit", topDocs.totalHits == 0 );
-		}
-		finally {
-			searchFactory.getIndexReaderAccessor().close( indexReader );
-		}
+
+		assertEquals( "We should have no hit", 0, getNumberOfDocumentsInIndexByQuery( indexName, "Content", "Joe" ) );
+
 		tx.commit();
 		s.close();
 	}

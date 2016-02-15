@@ -9,9 +9,12 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
@@ -27,12 +30,14 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClientReference;
+import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.service.spi.ServiceReference;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FullTextFilter;
@@ -53,6 +58,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import io.searchbox.core.DocumentResult;
+import io.searchbox.core.Explain;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
@@ -66,11 +73,19 @@ import io.searchbox.core.search.sort.Sort.Sorting;
 public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
 	private static final Pattern DOT = Pattern.compile( "\\." );
+
+	/**
+	 * ES default limit for (firstResult + maxResult)
+	 */
+	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
 
 	private final String jsonQuery;
 
 	private Integer resultSize;
+	private IndexSearcher searcher;
+	private SearchResult searchResult;
 
 	public ElasticSearchHSQueryImpl(String jsonQuery, ExtendedSearchIntegrator extendedIntegrator) {
 		super( extendedIntegrator );
@@ -100,11 +115,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public int queryResultSize() {
-		if ( resultSize == null ) {
-			IndexSearcher searcher = new IndexSearcher();
-			SearchResult searchResult = searcher.runSearch();
-
-			resultSize = searchResult.getTotal();
+		if ( searchResult == null ) {
+			execute();
 		}
 
 		return resultSize;
@@ -112,24 +124,60 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public Explanation explain(int documentId) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		if ( searchResult == null ) {
+			execute();
+		}
+
+		JsonObject hit = searchResult.getJsonObject()
+				.get( "hits" )
+				.getAsJsonObject()
+				.get( "hits" )
+				.getAsJsonArray()
+				// TODO Is it right to use the document id that way? I am not quite clear about its semantics
+				.get( documentId )
+				.getAsJsonObject();
+
+		try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
+			Explain request = new Explain.Builder(
+					hit.get( "_index" ).getAsString(),
+					hit.get( "_type" ).getAsString(),
+					hit.get( "_id" ).getAsString(),
+					searcher.executedQuery
+				)
+				.build();
+
+			DocumentResult response = client.get().executeRequest( request );
+			JsonObject explanation = response.getJsonObject().get( "explanation" ).getAsJsonObject();
+
+			return convertExplanation( explanation );
+		}
+	}
+
+	private Explanation convertExplanation(JsonObject explanation) {
+		float value = explanation.get( "value" ).getAsFloat();
+		String description = explanation.get( "description" ).getAsString();
+		JsonElement explanationDetails = explanation.get( "details" );
+
+		List<Explanation> details;
+
+		if ( explanationDetails != null ) {
+			details = new ArrayList<>( explanationDetails.getAsJsonArray().size() );
+
+			for ( JsonElement detail : explanationDetails.getAsJsonArray() ) {
+				details.add( convertExplanation( detail.getAsJsonObject() ) );
+			}
+		}
+		else {
+			details = Collections.emptyList();
+		}
+
+		return Explanation.match( value, description, details );
 	}
 
 	@Override
 	public HSQuery setSpatialParameters(Coordinates center, String fieldName) {
 		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
-	}
-
-	@Override
-	public HSQuery tenantIdentifier(String tenantId) {
-		// TODO implement
-		if ( tenantId != null ) {
-			LOG.warnf( "Multi-tenancy not yet implemented for ElasticSearch backend" );
-		}
-
-		return this;
 	}
 
 	@Override
@@ -166,22 +214,33 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public List<EntityInfo> queryEntityInfos() {
-		IndexSearcher searcher = new IndexSearcher();
-		SearchResult searchResult = searcher.runSearch();
+		if ( searchResult == null ) {
+			execute();
+		}
 
 		List<EntityInfo> results = new ArrayList<>( searchResult.getTotal() );
 		JsonArray hits = searchResult.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
 
 		for ( JsonElement hit : hits ) {
-			results.add( searcher.convertQueryHit( hit.getAsJsonObject() ) );
+			EntityInfo entityInfo = searcher.convertQueryHit( hit.getAsJsonObject() );
+			if ( entityInfo != null ) {
+				results.add( entityInfo );
+			}
 		}
 
 		return results;
 	}
 
+	private void execute() {
+		searcher = new IndexSearcher();
+
+		searchResult = searcher.runSearch();
+		resultSize = searchResult.getTotal();
+	}
+
 	private Object getId(JsonObject hit, EntityIndexBinding binding) {
 		Document tmp = new Document();
-		tmp.add( new StringField( "id", hit.get( "_id" ).getAsString(), Store.NO) );
+		tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO) );
 		Object id = binding.getDocumentBuilder().getIdBridge().get( "id", tmp );
 
 		return id;
@@ -194,10 +253,13 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 
 		private final Search search;
 		private final Map<String, Class<?>> entityTypesByName;
+		private final String executedQuery;
 
 		private IndexSearcher() {
-			Search.Builder search = new Search.Builder( jsonQuery );
 			entityTypesByName = new HashMap<>();
+			String idFieldName = null;
+			JsonArray typeFilters = new JsonArray();
+			Set<String> indexNames = new HashSet<>();
 
 			for ( Class<?> queriedEntityType : getQueriedEntityTypes() ) {
 				entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
@@ -213,21 +275,99 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 						);
 					}
 
+					// TODO will this be a problem when querying multiple entity types, with one using a field as id
+					// field and the other not; is that possible?
+					idFieldName = binding.getDocumentBuilder().getIdentifierName();
 					ElasticSearchIndexManager esIndexManager = (ElasticSearchIndexManager) indexManager;
-					search.addIndex( esIndexManager.getActualIndexName() );
+					indexNames.add( esIndexManager.getActualIndexName() );
 				}
+
+				typeFilters.add( getEntityTypeFilter( queriedEntityType ) );
 			}
 
-			search.setParameter( "from", firstResult );
-			search.setParameter( "size", maxResults != null ? maxResults : Integer.MAX_VALUE );
+			// Query filters; always a type filter, possibly a tenant id filter;
+			// TODO feed in user-provided filters
+			JsonObject effectiveFilter = getEffectiveFilter( typeFilters );
 
-			// TODO: Id, embedded fields
+			// TODO can we avoid the forth and back between GSON and String?
+			executedQuery = "{ \"query\" : { \"filtered\" : { " + jsonQuery.substring( 1, jsonQuery.length() - 1 ) + ", \"filter\" : " + effectiveFilter.toString() + " } } }";
+
+			Search.Builder search = new Search.Builder( executedQuery );
+			search.addIndex( indexNames );
+			search.setParameter( "from", firstResult );
+
+			// If the user has given a value, take it as is, let ES itself complain if it's too high; if no value is
+			// given, I take as much as possible, as by default only 10 rows would be returned
+			search.setParameter( "size", maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult );
+
+			// TODO: embedded fields
 			if ( sort != null ) {
 				for ( SortField sortField : sort.getSort() ) {
-					search.addSort( new Sort( sortField.getField(), sortField.getReverse() ? Sorting.DESC : Sorting.ASC ) );
+					String sortFieldName = sortField.getField().equals( idFieldName ) ? "_uid" : sortField.getField();
+					search.addSort( new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC ) );
 				}
 			}
 			this.search = search.build();
+		}
+
+		private JsonObject getEffectiveFilter(JsonArray typeFilters) {
+			JsonArray filters = new JsonArray();
+
+			JsonObject tenantFilter = getTenantIdFilter();
+			if ( tenantFilter != null ) {
+				filters.add( tenantFilter );
+			}
+
+			// wrap type filters into should if there is more than one
+			JsonObject effectiveTypeFilter = new JsonObject();
+			if ( typeFilters.size() == 1 ) {
+				effectiveTypeFilter = typeFilters.get( 0 ).getAsJsonObject();
+			}
+			else {
+				JsonObject should = new JsonObject();
+				should.add( "should", typeFilters );
+				effectiveTypeFilter = new JsonObject();
+				effectiveTypeFilter.add( "bool", should );
+			}
+			filters.add( effectiveTypeFilter );
+
+			// wrap filters into must if there is more than one
+			JsonObject effectiveFilter = new JsonObject();
+			if ( filters.size() == 1 ) {
+				effectiveFilter = filters.get( 0 ).getAsJsonObject();
+			}
+			else {
+				JsonObject must = new JsonObject();
+				must.add( "must", filters );
+				effectiveFilter = new JsonObject();
+				effectiveFilter.add( "bool", must );
+			}
+
+			return effectiveFilter;
+		}
+
+		private JsonObject getEntityTypeFilter(Class<?> queriedEntityType) {
+			JsonObject value = new JsonObject();
+			value.addProperty( "value", queriedEntityType.getName() );
+
+			JsonObject type = new JsonObject();
+			type.add( "type", value );
+
+			return type;
+		}
+
+		private JsonObject getTenantIdFilter() {
+			if ( tenantId == null ) {
+				return null;
+			}
+
+			JsonObject value = new JsonObject();
+			value.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
+
+			JsonObject tenantFilter = new JsonObject();
+			tenantFilter.add( "term", value );
+
+			return tenantFilter;
 		}
 
 		private Iterable<Class<?>> getQueriedEntityTypes() {
@@ -240,8 +380,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		SearchResult runSearch() {
-			try ( JestClientReference clientReference = new JestClientReference( extendedIntegrator.getServiceManager() ) ) {
-				return clientReference.executeRequest( search );
+			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
+				return client.get().executeRequest( search );
 			}
 		}
 
@@ -250,7 +390,8 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			Class<?> clazz = entityTypesByName.get( type );
 
 			if ( clazz == null ) {
-				throw new SearchException( "Found unknown type in ElasticSearch index: " + type );
+				LOG.warnf( "Found unknown type in ElasticSearch index: " + type );
+				return null;
 			}
 
 			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( clazz );
@@ -317,7 +458,15 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 						+ binding.getDocumentBuilder().getMetadata().getType().getName() );
 			}
 
-			JsonElement value = getFieldValue( hit.get( "_source" ).getAsJsonObject(), projectedField );
+			JsonElement value;
+
+			if ( field.isId() ) {
+				value = hit.get( "_id" );
+			}
+			else {
+				value = getFieldValue( hit.get( "_source" ).getAsJsonObject(), projectedField );
+			}
+
 			if ( value == null || value.isJsonNull() ) {
 				return null;
 			}
@@ -335,7 +484,7 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 				Document tmp = new Document();
 
 				if ( FieldHelper.isNumeric( field ) ) {
-					NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( field );
+					NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( binding, field );
 
 					switch( numericEncodingType ) {
 						case INTEGER:
@@ -453,7 +602,10 @@ public class ElasticSearchHSQueryImpl extends AbstractHSQuery {
 			results = new ArrayList<>( searchResult.getTotal() );
 
 			for ( JsonElement hit : hits ) {
-				results.add( searcher.convertQueryHit( hit.getAsJsonObject() ) );
+				EntityInfo converted = searcher.convertQueryHit( hit.getAsJsonObject() );
+				if ( converted != null ) {
+					results.add( converted );
+				}
 			}
 		}
 	}

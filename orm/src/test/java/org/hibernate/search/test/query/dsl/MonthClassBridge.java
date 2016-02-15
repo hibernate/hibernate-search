@@ -7,15 +7,17 @@
 package org.hibernate.search.test.query.dsl;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * Adds a custom field to be queried via explicitly passed field bridge.
  *
  * @author Gunnar Morling
  */
-public class MonthClassBridge implements FieldBridge {
+public class MonthClassBridge implements MetadataProvidingFieldBridge {
 
 	public static final String FIELD_NAME_1 = "monthValueAsRomanNumberFromClassBridge1";
 	public static final String FIELD_NAME_2 = "monthValueAsRomanNumberFromClassBridge2";
@@ -35,5 +37,11 @@ public class MonthClassBridge implements FieldBridge {
 				new RomanNumberFieldBridge().objectToString( month.getMonthValue() ),
 				document
 		);
+	}
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( FIELD_NAME_1, FieldType.STRING )
+			.field( FIELD_NAME_2, FieldType.STRING );
 	}
 }

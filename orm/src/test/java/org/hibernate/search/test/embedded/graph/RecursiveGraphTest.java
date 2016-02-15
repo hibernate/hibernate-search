@@ -6,15 +6,11 @@
  */
 package org.hibernate.search.test.embedded.graph;
 
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
+import static org.junit.Assert.assertEquals;
 
 import org.hibernate.Session;
-
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * TestCase to verify proper management of saving of complex relations and collections. See HSEARCH-476
@@ -32,7 +28,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 		people[0] = parent;
 		people[1] = child;
 		savePeople( people );
-		assertEquals( 2, getDocumentNbr( Person.class ) );
+		assertEquals( 2, getNumberOfDocumentsInIndex( Person.class ) );
 	}
 
 	private void connectChildToParent(Person child, Person parent) {
@@ -59,15 +55,4 @@ public class RecursiveGraphTest extends SearchTestBase {
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Event.class, Person.class, ParentOfBirthEvent.class };
 	}
-
-	private int getDocumentNbr(Class type) throws Exception {
-		IndexReader reader = DirectoryReader.open( getDirectory( type ) );
-		try {
-			return reader.numDocs();
-		}
-		finally {
-			reader.close();
-		}
-	}
-
 }

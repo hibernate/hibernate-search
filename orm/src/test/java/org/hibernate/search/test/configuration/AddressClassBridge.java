@@ -7,16 +7,22 @@
 package org.hibernate.search.test.configuration;
 
 import org.apache.lucene.document.Document;
-
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * @author Emmanuel Bernard
  */
-public class AddressClassBridge implements FieldBridge {
+public class AddressClassBridge implements MetadataProvidingFieldBridge {
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		luceneOptions.addFieldToDocument( "AddressClassBridge", "Applied!", document );
+	}
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( "AddressClassBridge", FieldType.STRING );
 	}
 }

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.backend.elasticsearch;
+package org.hibernate.search.backend.elasticsearch.test;
 
 import java.util.Calendar;
 import java.util.List;
@@ -27,7 +27,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Gunnar Morling
  */
-public class ElasticSearchClassBridgeIT extends SearchTestBase {
+public class ElasticSearchNullValueIT extends SearchTestBase {
 
 	@Before
 	public void setupTestData() {
@@ -64,6 +64,7 @@ public class ElasticSearchClassBridgeIT extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
+		//TODO verify this is no longer needed after we implement the delete operations
 		QueryDescriptor query = ElasticSearchQueries.fromJson( "{ 'query': { 'match_all' : {} } }" );
 		List<?> result = session.createFullTextQuery( query ).list();
 
@@ -75,40 +76,63 @@ public class ElasticSearchClassBridgeIT extends SearchTestBase {
 		s.close();
 	}
 
+
+
 	@Test
-	public void testQueryOnClassBridgeField() {
+	public void testQueryOnNullToken() {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "fullName:\"Klaus Hergesheimer\"" );
+		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "firstName:&lt;NULL&gt;" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Class-brigde provided string field" ).containsOnly( 1L );
+		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded String" ).containsOnly( 2L );
 
-		query = ElasticSearchQueries.fromQueryString( "age:34" );
+		query = ElasticSearchQueries.fromQueryString( "dateOfBirth:1970-01-01" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Class-brigde provided numeric field" ).containsOnly( 1L );
+		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Date" ).containsOnly( 2L );
+
+		query = ElasticSearchQueries.fromQueryString( "active:false" );
+		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
+		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Boolean" ).containsOnly( 2L );
+
+		query = ElasticSearchQueries.fromQueryString( "driveWidth:\\-1" );
+		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
+		assertThat( result ).onProperty( "id" ).describedAs( "Querying null-encoded Integer" ).containsOnly( 2L );
 
 		tx.commit();
 		s.close();
 	}
 
 	@Test
-	public void testProjectionOfClassBridgeField() {
+	public void testProjectionOfNullValues() {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
-		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "Hergesheimer" );
+		QueryDescriptor query = ElasticSearchQueries.fromQueryString( "lastName:Kidd" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( "fullName", "age" )
+				.setProjection(
+						"firstName",
+						"lastName",
+						"active",
+						"dateOfBirth",
+						"handicap",
+						"driveWidth",
+						"ranking.value"
+				)
 				.list();
 
 		assertThat( result ).hasSize( 1 );
 
 		Object[] projection = (Object[]) result.iterator().next();
-		assertThat( projection[0] ).describedAs( "fullName" ).isEqualTo( "Klaus Hergesheimer" );
-		assertThat( ( (Number) projection[1] ).intValue() ).describedAs( "age" ).isEqualTo( 34 );
+		assertThat( projection[0] ).describedAs( "firstName" ).isNull();
+		assertThat( projection[1] ).describedAs( "lastName" ).isEqualTo( "Kidd" );
+		assertThat( projection[2] ).describedAs( "active" ).isNull();
+		assertThat( projection[3] ).describedAs( "dateOfBirth" ).isNull();
+		assertThat( projection[4] ).describedAs( "handicap" ).isEqualTo( 0.0D );
+		assertThat( projection[5] ).describedAs( "driveWidth" ).isNull();
+		assertThat( projection[6] ).describedAs( "ranking value" ).isNull();
 
 		tx.commit();
 		s.close();

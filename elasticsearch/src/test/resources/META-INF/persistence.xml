@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+    <persistence-unit name="EntityManagerSerializationTestPU">
+        <class>org.hibernate.search.test.jpa.Bretzel</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
+    <persistence-unit name="EntityManagerTestPU">
+        <class>org.hibernate.search.test.jpa.Bretzel</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
+    <persistence-unit name="SpatialQueryingJPATestPU">
+        <class>org.hibernate.search.test.spatial.POI</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
+    <persistence-unit name="JPATimeoutTestPU">
+        <class>org.hibernate.search.test.query.timeout.Clock</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+    
+    <persistence-unit name="SortUsingEntityManagerTest">
+        <class>org.hibernate.search.test.query.timeout.Clock</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+    
+    <persistence-unit name="SortUsingEntityManagerTestPU">
+        <class>org.hibernate.search.test.query.ProductArticle</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
+    <persistence-unit name="EventBasedEmbeddableCollectionUpdateTestPU">
+        <class>org.hibernate.search.test.event.autoindexembeddable.Book</class>
+        <class>org.hibernate.search.test.event.autoindexembeddable.EmbeddableCategories</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
+    <persistence-unit name="ToStringTestPU">
+        <class>org.hibernate.search.test.jpa.ToStringTest$Foo</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
+</persistence>

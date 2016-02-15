@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.testutil.backend.elasticsearch;
+package org.hibernate.search.backend.elasticsearch.testutil;
 
 import org.hibernate.search.exception.AssertionFailure;
 import org.json.JSONException;
@@ -23,8 +23,16 @@ public class JsonHelper {
 	}
 
 	public static void assertJsonEquals(String expectedJson, String actualJson) {
+		assertJsonEquals( expectedJson, actualJson, JSONCompareMode.NON_EXTENSIBLE );
+	}
+
+	public static void assertJsonEqualsIgnoringUnknownFields(String expectedJson, String actualJson) {
+		assertJsonEquals( expectedJson, actualJson, JSONCompareMode.LENIENT );
+	}
+
+	private static void assertJsonEquals(String expectedJson, String actualJson, JSONCompareMode mode) {
 		try {
-			JSONCompareResult result = JSONCompare.compareJSON( expectedJson, actualJson, JSONCompareMode.NON_EXTENSIBLE );
+			JSONCompareResult result = JSONCompare.compareJSON( expectedJson, actualJson, mode );
 
 			if ( result.failed() ) {
 				throw new AssertionFailure( result.getMessage() + "; Actual: " + actualJson );

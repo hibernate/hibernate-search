@@ -28,7 +28,7 @@
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest</artifactId>
-            <version>0.1.7</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
@@ -55,8 +55,23 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
             <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>simple-jndi</groupId>
+            <artifactId>simple-jndi</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -85,6 +100,12 @@
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
             <version>1.2.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.takari.junit</groupId>
+            <artifactId>takari-cpsuite</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -163,6 +184,130 @@
                         </goals>
                         <configuration>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                            <dependenciesToScan>
+                                <dependency>org.hibernate:hibernate-search-orm</dependency>
+                            </dependenciesToScan>
+                            <includes>
+                                <include>**/*IT.java</include>
+                                <include>**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <!-- Mass indexer -->
+                                <exclude>**/MassIndexerCancellingTest.java</exclude>
+                                <exclude>**/IndexingGeneratedCorpusTest.java</exclude>
+                                <exclude>**/MassIndexerErrorReportingTest.java</exclude>
+
+                                <!-- Analyzers -->
+                                <exclude>**/CustomAnalyzerInClassBridgeTest.java</exclude>
+                                <exclude>**/SolrAnalyzerTest.java</exclude>
+
+                                <!-- Bridges -->
+                                <exclude>**/ArrayBridgeTest.java</exclude>
+                                <exclude>**/BridgeTest.java</exclude>
+                                <exclude>**/ClassBridgeTest.java</exclude>
+                                <exclude>**/IterableBridgeTest.java</exclude>
+                                <exclude>**/MapBridgeTest.java</exclude>
+                                <exclude>**/BridgeProviderTest.java</exclude>
+                                <exclude>**/TikaBridgeBlobSupportTest.java</exclude>
+                                <exclude>**/TikaBridgeTest.java</exclude>
+
+                                <exclude>**/HibernateSearchIntegratorTest.java</exclude>
+                                <exclude>**/OptimizationTriggerTest.java</exclude>
+                                <exclude>**/WorkQueueLengthConfiguredTest.java</exclude>
+                                <exclude>**/CollectionInitializeTest.java</exclude>
+                                <exclude>**/CompressionTest.java</exclude>
+                                <exclude>**/ConcurrentFlushTest.java</exclude>
+                                <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
+                                <exclude>**/LuceneIndexingParametersTest.java</exclude>
+                                <exclude>**/ProgrammaticMappingTest.java</exclude>
+                                <exclude>**/ShardsConfigurationTest.java</exclude>
+                                <exclude>**/RecursiveGraphTest.java</exclude>
+                                <exclude>**/WorkDoneOnEntitiesTest.java</exclude>
+                                <exclude>**/NullEmbeddedTest.java</exclude>
+                                <exclude>**/NumericFieldTest.java</exclude>
+                                <exclude>**/DeleteByTermTest.java</exclude>
+                                <exclude>**/UpdateOperationsTest.java</exclude>
+                                <exclude>**/TransactionTest.java</exclude>
+                                <exclude>**/SearchAndEnversIntegrationTest.java</exclude>
+                                <exclude>**/FilterTest.java</exclude>
+                                <exclude>**/EmbeddedIdTest.java</exclude>
+                                <exclude>**/EmbeddedIdWithDocumentIdTest.java</exclude>
+                                <exclude>**/ProgrammaticEmbeddedItTest.java</exclude>
+                                <exclude>**/IndexingActionInterceptorTest.java</exclude>
+                                <exclude>**/IndexControlMBeanTest.java</exclude>
+                                <exclude>**/SpatialQueryingJPATest.java</exclude>
+                                <exclude>**/ToStringTest.java</exclude>
+                                <exclude>**/DynamicBoostingTest.java</exclude>
+                                <exclude>**/DSLTest.java</exclude>
+                                <exclude>**/MoreLikeThisTest.java</exclude>
+                                <exclude>**/NumericEncodingQueriesTest.java</exclude>
+                                <exclude>**/ExplanationTest.java</exclude>
+
+                                <!-- Faceting -->
+                                <exclude>**/CollectionFacetingTest.java</exclude>
+                                <exclude>**/EdgeCaseFacetTest.java</exclude>
+                                <exclude>**/FacetFilteringTest.java</exclude>
+                                <exclude>**/ManyToOneFacetingTest.java</exclude>
+                                <exclude>**/NoQueryResultsFacetingTest.java</exclude>
+                                <exclude>**/NumberFacetingTest.java</exclude>
+                                <exclude>**/RangeFacetingTest.java</exclude>
+                                <exclude>**/SimpleFacetingTest.java</exclude>
+                                <exclude>**/StringFacetingTest.java</exclude>
+                                <exclude>**/WebShopTest.java</exclude>
+
+                                <exclude>**/IndexAndQueryNullTest.java</exclude>
+                                <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>
+                                <exclude>**/ProjectionQueryTest.java</exclude>
+                                <exclude>**/SortTest.java</exclude>
+                                <exclude>**/SortUsingEntityManagerTest.java</exclude>
+                                <exclude>**/SortUsingEntityManagerTest.java</exclude>
+                                <exclude>**/TermVectorTest.java</exclude>
+                                <exclude>**/JPATimeoutTest.java</exclude>
+                                <exclude>**/DirectoryProviderForQueryTest.java</exclude>
+                                <exclude>**/DirectorySelectionTest.java</exclude>
+                                <exclude>**/SpatialIndexingTest.java</exclude>
+                                <exclude>**/SpatialSearchSortByDistanceAndPagingTest.java</exclude>
+                                <exclude>**/AnalyzerTest.java</exclude>
+                                <exclude>**/DoubleAnalyzerTest.java</exclude>
+                                <exclude>**/AnalyzerInheritanceTest.java</exclude>
+                                <exclude>**/FetchSizeConfigurationTest.java</exclude>
+                                <exclude>**/ProgressMonitorTest.java</exclude>
+                                <exclude>**/RetryInitializeTest.java</exclude>
+                                <exclude>**/EmbeddedTest.java</exclude>
+                                <exclude>**/FieldOnCollectionReindexTest.java</exclude>
+                                <exclude>**/LazyM2OContainedInTest.java</exclude>
+                                <exclude>**/PathEmbeddedDepthTest.java</exclude>
+                                <exclude>**/SearchAfterUninitializedProxyEntityLoadingTest.java</exclude>
+                                <exclude>**/UpdateIndexedEmbeddedCollectionTest.java</exclude>
+                                <exclude>**/LazyCollectionsUpdatingTest.java</exclude>
+                                <exclude>**/SyncWorkerTest.java</exclude>
+                                <exclude>**/WorkerTestCase.java</exclude>
+                                <exclude>**/ConcurrentMergeErrorHandledTest.java</exclude>
+                                <exclude>**/ErrorHandlingDuringDocumentCreationTest.java</exclude>
+                                <exclude>**/LuceneErrorHandlingTest.java</exclude>
+                                <exclude>**/ManualIndexingOnlyInterceptorTest.java</exclude>
+                                <exclude>**/EmbeddedFieldBoostTest.java</exclude>
+                                <exclude>**/MultiClassesQueryLoaderTest.java</exclude>
+                                <exclude>**/TimeoutTest.java</exclude>
+                                <exclude>**/QueryValidationTest.java</exclude>
+                                <exclude>**/SimilarityTest.java</exclude>
+                                <exclude>**/SortWithIndexUninvertingTest.java</exclude>
+                                <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude>
+                                <exclude>**/RollbackTransactionTest.java</exclude>
+
+                                <!-- Specific to other backends -->
+                                <exclude>**/CustomBackendTest.java</exclude>
+                                <exclude>**/FSDirectorySelectionTest.java</exclude>
+                                <exclude>**/FSDirectoryTest.java</exclude>
+                                <exclude>**/RamDirectoryTest.java</exclude>
+                                <exclude>**/ExclusiveIndexTest.java</exclude>
+                                <exclude>**/IndexManagerOverrideTest.java</exclude>
+                                <exclude>**/CustomLockProviderTest.java</exclude>
+                                <exclude>**/DirectoryLifecycleTest.java</exclude>
+                                <exclude>**/ScheduledCommitPolicyTest.java</exclude>
+                                <exclude>**/FSSlaveAndMasterDPTest.java</exclude>
+                                <exclude>**/IndexReaderSeeOptimizedIndexTest.java</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>
@@ -172,7 +317,30 @@
                 <groupId>org.bsc.maven</groupId>
                 <artifactId>maven-processor-plugin</artifactId>
             </plugin>
-
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.elasticsearch.plugin</groupId>
+                                    <artifactId>delete-by-query</artifactId>
+                                    <version>2.0.0</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
@@ -180,6 +348,7 @@
                     <clusterName>hsearch-es-test-cluster</clusterName>
                     <tcpPort>9300</tcpPort>
                     <httpPort>9200</httpPort>
+                    <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
                 </configuration>
                 <executions>
                     <execution>

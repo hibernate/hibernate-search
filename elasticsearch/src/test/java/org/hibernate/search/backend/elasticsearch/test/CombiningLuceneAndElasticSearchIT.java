@@ -4,13 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.backend.elasticsearch;
+package org.hibernate.search.backend.elasticsearch.test;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.MatchNoDocsQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -104,11 +105,11 @@ public class CombiningLuceneAndElasticSearchIT extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		try {
-			session.createFullTextQuery( new MatchAllDocsQuery(), ResearchPaper.class ).list();
+			session.createFullTextQuery( new MatchNoDocsQuery(), ResearchPaper.class ).list();
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (SearchException se) {
-			assertThat( se.getMessage() ).contains( "HSEARCH000302" );
+			assertThat( se.getMessage() ).contains( "HSEARCH400002" );
 		}
 		finally {
 			tx.commit();

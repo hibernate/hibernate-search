@@ -6,6 +6,12 @@
  */
 package org.hibernate.search.test.query;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,26 +19,18 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
 import org.hibernate.FetchMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.stat.Statistics;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard
@@ -290,6 +288,7 @@ public class LuceneQueryTest extends SearchTestBase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 6 );
 
@@ -435,6 +434,7 @@ public class LuceneQueryTest extends SearchTestBase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 
 

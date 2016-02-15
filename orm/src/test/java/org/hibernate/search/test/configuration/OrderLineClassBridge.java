@@ -9,16 +9,18 @@ package org.hibernate.search.test.configuration;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * A class bridge which is used via the configuration API.
  *
  * @author Gunnar Morling
  */
-public class OrderLineClassBridge implements FieldBridge, ParameterizedBridge {
+public class OrderLineClassBridge implements MetadataProvidingFieldBridge, ParameterizedBridge {
 
 	private String fieldName;
 
@@ -35,5 +37,10 @@ public class OrderLineClassBridge implements FieldBridge, ParameterizedBridge {
 	@Override
 	public void setParameterValues(Map<String, String> parameters) {
 		this.fieldName = parameters.get( "fieldName" );
+	}
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( fieldName != null ? fieldName : name, FieldType.STRING );
 	}
 }

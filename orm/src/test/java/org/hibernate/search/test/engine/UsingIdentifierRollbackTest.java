@@ -17,7 +17,7 @@ import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
-import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,7 +71,7 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 		Assert.assertNull( "unexpected exception detected", errorHandler.getLastException() );
-		List<LuceneWork> processedQueue = LeakingLuceneBackend.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
 		Assert.assertEquals( 1, processedQueue.size() );
 		LuceneWork luceneWork = processedQueue.get( 0 );
 		Assert.assertEquals( "100", luceneWork.getIdInString() );
@@ -87,14 +87,14 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 		super.configure( cfg );
 		cfg.put( "hibernate.use_identifier_rollback", "true" );
 		cfg.put( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
-		cfg.put( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
 	}
 
 	@Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		LeakingLuceneBackend.reset();
+		LeakingBackendQueueProcessor.reset();
 	}
 
 }
