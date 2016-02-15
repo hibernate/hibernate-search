@@ -25,7 +25,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
 import org.junit.Test;
 
 /**
@@ -47,7 +47,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 		verifyMatchExistsWithName( "friends.name", "Rachel", 0L, 1L, 2L, 3L, 4L, 6L );
 		verifyNoMatchExists( "friends.name", "Gunter" );
 
-		LeakingLuceneBackend.reset();
+		LeakingBackendQueueProcessor.reset();
 		renamePerson( 5L, "Rachelita" ); // Rename Rachel, friend to anyone
 		assertEquals( 1, countWorksDoneOnPerson( 0L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
@@ -57,7 +57,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 		assertEquals( 1, countWorksDoneOnPerson( 5L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 6L ) );
 
-		LeakingLuceneBackend.reset();
+		LeakingBackendQueueProcessor.reset();
 		renamePerson( 0L, "Rossito" ); // Rename Ross, friend to anyone but Gunter
 		assertEquals( 1, countWorksDoneOnPerson( 0L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
@@ -170,7 +170,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 	}
 
 	private int countWorksDoneOnPerson(Long pk) {
-		List<LuceneWork> processedQueue = LeakingLuceneBackend.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
 		int count = 0;
 		for ( LuceneWork luceneWork : processedQueue ) {
 			Serializable id = luceneWork.getId();
@@ -188,7 +188,7 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String, Object> cfg) {
-		cfg.put( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
 	}
 
 }

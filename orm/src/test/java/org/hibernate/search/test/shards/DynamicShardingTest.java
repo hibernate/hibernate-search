@@ -119,13 +119,13 @@ public class DynamicShardingTest extends SearchTestBase {
 	public void testDeletion() throws Exception {
 		insertAnimals( elephant, spider, bear );
 
-		assertNumberOfEntitiesInIndex( "Animal.Mammal", 2 );
-		assertNumberOfEntitiesInIndex( "Animal.Insect", 1 );
+		assertEquals( 2, getNumberOfDocumentsInIndex( "Animal.Mammal" ) );
+		assertEquals( 1, getNumberOfDocumentsInIndex( "Animal.Insect" ) );
 
 		deleteAnimal( elephant );
 
-		assertNumberOfEntitiesInIndex( "Animal.Mammal", 1 );
-		assertNumberOfEntitiesInIndex( "Animal.Insect", 1 );
+		assertEquals( 1, getNumberOfDocumentsInIndex( "Animal.Mammal" ) );
+		assertEquals( 1, getNumberOfDocumentsInIndex( "Animal.Insect" ) );
 	}
 
 	@Override

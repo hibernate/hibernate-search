@@ -89,4 +89,9 @@ public class LeakingBackendQueueProcessor implements BackendQueueProcessor {
 	public static void reset() {
 		lastProcessedQueue = new ArrayList<LuceneWork>();
 	}
+
+	@Override
+	public void closeIndexWriter() {
+		delegate.closeIndexWriter();
+	}
 }
