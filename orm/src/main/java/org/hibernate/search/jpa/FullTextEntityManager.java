@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 import javax.persistence.EntityManager;
 
-import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
 
 /**

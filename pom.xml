@@ -5,7 +5,8 @@
  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate</groupId>
@@ -39,6 +40,19 @@
         <module>integrationtest/osgi/karaf-features</module>
         <module>integrationtest/sandbox</module>
         <module>integrationtest/engine-performance</module>
+
+        <module>genericjpa/util</module>
+        <module>genericjpa/standalone</module>
+        <module>genericjpa/db</module>
+		<module>genericjpa/async-updates</module>
+        <module>genericjpa/jpa</module>
+        <module>genericjpa/ejb</module>
+        <module>genericjpa/integrationtest/mysql</module>
+        <module>genericjpa/integrationtest/postgres</module>
+        <module>genericjpa/integrationtest/glassfish</module>
+
+        <module>orm-async</module>
+        <!-- TODO: integration tests for TomEE and Glassfish -->
     </modules>
 
     <issueManagement>
@@ -50,7 +64,7 @@
         <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-search</url>
-      <tag>HEAD</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <organization>
@@ -194,6 +208,8 @@
 
         <!-- Eclipse plugin options -->
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+
+        <hibernate.search.genericjpa.integrationtest.skip>true</hibernate.search.genericjpa.integrationtest.skip>
 
     </properties>
 
@@ -428,7 +444,7 @@
                 <artifactId>hibernate-search-infinispan</artifactId>
                 <version>${project.version}</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-orm</artifactId>
                 <version>${project.version}</version>
@@ -657,6 +673,41 @@
                 <artifactId>xml-apis</artifactId>
                 <version>1.3.03</version>
             </dependency>
+
+            <!-- additional GenericJPA dependencies -->
+            <dependency>
+                <groupId>org.hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>2.3.3</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>9.3-1103-jdbc41</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.persistence</groupId>
+                <artifactId>eclipselink</artifactId>
+                <version>2.5.0</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- is this okay? -->
+
+            <dependency>
+                <groupId>javax</groupId>
+                <artifactId>javaee-api</artifactId>
+                <version>7.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.enterprise.concurrent</groupId>
+                <artifactId>javax.enterprise.concurrent-api</artifactId>
+                <version>1.0</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -676,18 +727,18 @@
                 </configuration>
             </plugin>
             <plugin>
-               <groupId>com.github.marschall</groupId>
-               <artifactId>jdeps-maven-plugin</artifactId>
-               <!--
-                   Not enabling automatic executions; run:
-                    > mvn jdeps:jdeps
-                    to get a report.
-               -->
-               <configuration>
-                  <!-- Allows to see which JRE profiles will be needed -->
-                  <profile>true</profile>
-                  <failOnWarning>true</failOnWarning>
-               </configuration>
+                <groupId>com.github.marschall</groupId>
+                <artifactId>jdeps-maven-plugin</artifactId>
+                <!--
+                    Not enabling automatic executions; run:
+                     > mvn jdeps:jdeps
+                     to get a report.
+                -->
+                <configuration>
+                    <!-- Allows to see which JRE profiles will be needed -->
+                    <profile>true</profile>
+                    <failOnWarning>true</failOnWarning>
+                </configuration>
             </plugin>
             <plugin>
                 <!-- This defines the properties 'parsedVersion.majorVersion'
@@ -697,11 +748,11 @@
                 <version>1.9.1</version>
                 <executions>
                     <execution>
-                    <id>parse-version</id>
-                    <goals>
-                        <goal>parse-version</goal>
-                    </goals>
-                  </execution>
+                        <id>parse-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -768,7 +819,7 @@
                         <requireMavenVersion>
                             <version>3.2.3</version>
                         </requireMavenVersion>
-                        <DependencyConvergence />
+                        <DependencyConvergence/>
                     </rules>
                 </configuration>
             </plugin>
@@ -858,7 +909,9 @@
                                 <processors>
                                     <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                                 </processors>
-                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.7 -target 1.7</compilerArguments>
+                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source
+                                    1.7 -target 1.7
+                                </compilerArguments>
                             </configuration>
                         </execution>
                     </executions>
@@ -889,7 +942,9 @@
                             <!-- See HSEARCH-1444 -->
                             <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
-                            <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
+                            <org.hibernate.search.enable_performance_tests>
+                                ${org.hibernate.search.enable_performance_tests}
+                            </org.hibernate.search.enable_performance_tests>
                         </systemPropertyVariables>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
@@ -1005,46 +1060,46 @@
                     <executions>
                         <execution>
                             <id>verify-forbidden-apis</id>
-                                <configuration>
-                                     <targetVersion>1.7</targetVersion>
-                                     <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                                     <internalRuntimeForbidden>true</internalRuntimeForbidden>
-                                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                     <excludes>
-                                         <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
-                                         <exclude>**/Log_$logger.class</exclude>
-                                     </excludes>
-                                     <bundledSignatures>
-                                         <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                         <bundledSignature>jdk-unsafe</bundledSignature>
-                                         <bundledSignature>jdk-deprecated</bundledSignature>
-                                         <bundledSignature>jdk-system-out</bundledSignature>
-                                     </bundledSignatures>
-                                 </configuration>
-                             <phase>compile</phase>
-                             <goals>
-                                 <goal>check</goal>
-                             </goals>
-                         </execution>
-                         <execution>
-                             <id>verify-forbidden-test-apis</id>
-                             <configuration>
-                                 <targetVersion>1.7</targetVersion>
-                                 <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                                 <internalRuntimeForbidden>true</internalRuntimeForbidden>
-                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                 <bundledSignatures>
-                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                     <bundledSignature>jdk-unsafe</bundledSignature>
-                                     <bundledSignature>jdk-deprecated</bundledSignature>
-                                 </bundledSignatures>
-                             </configuration>
-                             <phase>test-compile</phase>
-                             <goals>
-                                 <goal>testCheck</goal>
-                             </goals>
+                            <configuration>
+                                <targetVersion>1.7</targetVersion>
+                                <!-- disallow undocumented classes like sun.misc.Unsafe: -->
+                                <internalRuntimeForbidden>true</internalRuntimeForbidden>
+                                <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                                <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                                <excludes>
+                                    <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
+                                    <exclude>**/Log_$logger.class</exclude>
+                                </excludes>
+                                <bundledSignatures>
+                                    <!-- This will automatically choose the right signatures based on 'targetVersion': -->
+                                    <bundledSignature>jdk-unsafe</bundledSignature>
+                                    <bundledSignature>jdk-deprecated</bundledSignature>
+                                    <bundledSignature>jdk-system-out</bundledSignature>
+                                </bundledSignatures>
+                            </configuration>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify-forbidden-test-apis</id>
+                            <configuration>
+                                <targetVersion>1.7</targetVersion>
+                                <!-- disallow undocumented classes like sun.misc.Unsafe: -->
+                                <internalRuntimeForbidden>true</internalRuntimeForbidden>
+                                <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                                <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                                <bundledSignatures>
+                                    <!-- This will automatically choose the right signatures based on 'targetVersion': -->
+                                    <bundledSignature>jdk-unsafe</bundledSignature>
+                                    <bundledSignature>jdk-deprecated</bundledSignature>
+                                </bundledSignatures>
+                            </configuration>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>testCheck</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>
@@ -1084,7 +1139,9 @@
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <resourceIncludes>**/*.xml,**/*.properties</resourceIncludes>
                         <!-- generated respectively copied code -->
-                        <excludes>**/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java</excludes>
+                        <excludes>
+                            **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>
@@ -1120,7 +1177,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -1134,7 +1191,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -1147,7 +1204,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -1160,7 +1217,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -1173,7 +1230,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -1187,7 +1244,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -1245,6 +1302,14 @@
         </profile>
 
         <profile>
+            <id>genericjpa</id>
+            <!-- enable the integration tests for this build -->
+            <properties>
+                <hibernate.search.genericjpa.integrationtest.skip>false</hibernate.search.genericjpa.integrationtest.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>docs</id>
             <activation>
                 <!-- asciidoctor won't work on JDK9  -->
@@ -1297,8 +1362,8 @@
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
-                <jdbc.pass />
-                <jdbc.isolation />
+                <jdbc.pass/>
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1327,7 +1392,7 @@
                 <jdbc.url>jdbc:mysql://vmg02.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1348,7 +1413,7 @@
                 <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1368,7 +1433,7 @@
                 <jdbc.url>jdbc:postgresql://localhost:5432/testingdb</jdbc.url>
                 <jdbc.user>hibernate_user</jdbc.user>
                 <jdbc.pass>hibernate_password</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1389,7 +1454,7 @@
                 <jdbc.url>jdbc:mariadb://localhost/testingdb</jdbc.url>
                 <jdbc.user>hibernate_user</jdbc.user>
                 <jdbc.pass>hibernate_password</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1416,7 +1481,7 @@
                 <jdbc.url>jdbc:db2://vmg06.mw.lab.eng.bos.redhat.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1437,7 +1502,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1457,7 +1522,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1480,7 +1545,7 @@
                 </jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
         <profile>
@@ -1501,7 +1566,7 @@
                 </jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1522,7 +1587,7 @@
                 <jdbc.url>jdbc:sybase:Tds:vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
         <profile>
@@ -1541,7 +1606,7 @@
                 <jdbc.url>jdbc:jtds:sybase://vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -1586,5 +1651,6 @@
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
         </profile>
+
     </profiles>
 </project>

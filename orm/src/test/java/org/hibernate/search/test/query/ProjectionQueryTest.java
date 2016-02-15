@@ -154,7 +154,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		// Is the 'FullTextQuery.ID' value correct here? Do we want the Lucene internal document number?
+		// Is the 'HibernateFullTextQuery.ID' value correct here? Do we want the Lucene internal document number?
 		hibQuery.setProjection(
 				"id",
 				"lastname",
