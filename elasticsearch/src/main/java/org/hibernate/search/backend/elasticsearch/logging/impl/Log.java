@@ -33,4 +33,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 3,
 			value = "Lucene filter '%1$s' cannot be transformed into equivalent Elasticsearch query" )
 	SearchException cannotTransformLuceneFilterIntoEsQuery(Filter filter);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 4,
+			value = "The sort order RANGE_DEFINITION_ORDER should not be sent to the Elasticsearch backend" )
+	SearchException cannotSendRangeDefinitionOrderToElasticsearchBackend();
 }
