@@ -99,8 +99,7 @@ public class ToElasticsearch {
 				sort.addProperty( "_term", "asc" );
 				break;
 			case RANGE_DEFINITION_ORDER:
-				// TODO implement
-				throw new UnsupportedOperationException( "Not yet implemented" );
+				throw LOG.cannotSendRangeDefinitionOrderToElasticsearchBackend();
 		}
 		return sort;
 	}
