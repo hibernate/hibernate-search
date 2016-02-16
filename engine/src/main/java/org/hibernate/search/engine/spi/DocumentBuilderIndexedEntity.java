@@ -646,7 +646,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						facetField = new NumericDocValuesField( facetMetadata.getFacetName(), numericDateValue );
 					}
 					else if ( fieldBridge instanceof TwoWayFieldBridge ) {
-						// Date might be stored in String for specific backends (ElasticSearch for instance).
+						// Date might be stored in String for specific backends (Elasticsearch for instance).
 						facetField = new SortedSetDocValuesFacetField( facetMetadata.getFacetName(),
 								( (TwoWayFieldBridge) fieldBridge ).objectToString( value ) );
 					}

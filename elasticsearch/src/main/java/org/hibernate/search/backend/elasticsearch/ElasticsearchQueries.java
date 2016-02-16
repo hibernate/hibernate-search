@@ -35,7 +35,7 @@ public class ElasticsearchQueries {
 	}
 
 	/**
-	 * Creates an ElasticSearch query from the given JSON query representation. See the <a
+	 * Creates an Elasticsearch query from the given JSON query representation. See the <a
 	 * href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html">official
 	 * documentation</a> for the complete query syntax.
 	 */

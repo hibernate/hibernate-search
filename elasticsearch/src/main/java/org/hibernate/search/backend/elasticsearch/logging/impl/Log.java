@@ -31,6 +31,6 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException cannotTransformLuceneQueryIntoEsQuery(Query query);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 3,
-			value = "Lucene filter '%1$s' cannot be transformed into equivalent ElasticSearch query" )
+			value = "Lucene filter '%1$s' cannot be transformed into equivalent Elasticsearch query" )
 	SearchException cannotTransformLuceneFilterIntoEsQuery(Filter filter);
 }
