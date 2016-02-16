@@ -600,7 +600,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			List<Facet> facets;
 			if ( facetRequest instanceof DiscreteFacetRequest ) {
 				facets = updateStringFacets( aggregations, (DiscreteFacetRequest) facetRequest );
-				// Discrete facets are sorted by ElasticSearch
+				// Discrete facets are sorted by Elasticsearch
 			}
 			else {
 				facets = updateRangeFacets( aggregations, (RangeFacetRequest<?>) facetRequest );
