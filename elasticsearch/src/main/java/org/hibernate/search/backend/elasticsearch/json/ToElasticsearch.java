@@ -105,7 +105,7 @@ public class ToElasticsearch {
 	}
 
 	public static JsonObject condition(String operator, JsonArray conditions) {
-		JsonObject jsonCondition = new JsonObject();
+		JsonObject jsonCondition;
 		if ( conditions.size() == 1 ) {
 			jsonCondition = conditions.get( 0 ).getAsJsonObject();
 		}
