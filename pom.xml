@@ -141,11 +141,11 @@
         <minJdkVersion>1.8</minJdkVersion>
 
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
-        <lucene.module.slot>5.4</lucene.module.slot>
+        <lucene.module.slot>5.5</lucene.module.slot>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>5.4.1</luceneVersion>
+        <luceneVersion>5.5.0</luceneVersion>
         <infinispanVersion>8.1.0.Final</infinispanVersion>
         <jgroupsVersion>3.6.6.Final</jgroupsVersion>
 
@@ -161,7 +161,7 @@
             Ranges are maintained as best effort on our knowledge but only the
             exact versions in this pom are being tested.
             Essentially we allow older versions when we know no changes were necessary when we upgraded the dependency. -->
-        <luceneOsgiRangeVersion>[5.3.0,5.5.0)</luceneOsgiRangeVersion>
+        <luceneOsgiRangeVersion>[5.3.0,5.6.0)</luceneOsgiRangeVersion>
         <hibernateOrmOsgiRangeVersion>[5.0.0,5.1.0)</hibernateOrmOsgiRangeVersion>
         <hibernateHcannOsgiRangeVersion>[5,6)</hibernateHcannOsgiRangeVersion>
         <jGroupsOsgiRangeVersion>[3.6.0,4)</jGroupsOsgiRangeVersion>
