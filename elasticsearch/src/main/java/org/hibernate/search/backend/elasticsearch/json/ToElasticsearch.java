@@ -28,16 +28,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 /**
- * Various utilities to transform Hibernate Search API into Elastic Search JSON.
+ * Various utilities to transform Hibernate Search API into Elasticsearch JSON.
  *
  * @author Guillaume Smet
  * @author Gunnar Morling
  */
-public class ToElasticSearch {
+public class ToElasticsearch {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private ToElasticSearch() {
+	private ToElasticsearch() {
 	}
 
 	public static void addFacetingRequest(JsonBuilder.Object jsonQuery, FacetingRequest facetingRequest) {

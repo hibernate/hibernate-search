@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
-import org.hibernate.search.backend.elasticsearch.json.ToElasticSearch;
+import org.hibernate.search.backend.elasticsearch.json.ToElasticsearch;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -41,7 +41,7 @@ public class ElasticsearchLuceneQueryTranslator implements LuceneQueryTranslator
 
 	@Override
 	public QueryDescriptor convertLuceneQuery(Query luceneQuery) {
-		JsonObject convertedQuery = ToElasticSearch.fromLuceneQuery( luceneQuery );
+		JsonObject convertedQuery = ToElasticsearch.fromLuceneQuery( luceneQuery );
 
 		JsonObject query = new JsonObject();
 		query.add( "query", convertedQuery );

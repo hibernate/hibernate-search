@@ -35,7 +35,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.json.JsonBuilder;
-import org.hibernate.search.backend.elasticsearch.json.ToElasticSearch;
+import org.hibernate.search.backend.elasticsearch.json.ToElasticsearch;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -332,7 +332,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				JsonBuilder.Object facets = JsonBuilder.object();
 
 				for ( Entry<String, FacetingRequest> facetRequestEntry : getFacetManager().getFacetRequests().entrySet() ) {
-					ToElasticSearch.addFacetingRequest( facets, facetRequestEntry.getValue() );
+					ToElasticsearch.addFacetingRequest( facets, facetRequestEntry.getValue() );
 				}
 
 				completeQuery.add( "aggregations", facets );
@@ -367,16 +367,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 
 			// wrap type filters into should if there is more than one
-			filters.add( ToElasticSearch.condition( "should", typeFilters ) );
+			filters.add( ToElasticsearch.condition( "should", typeFilters ) );
 
 			// facet filters
 			Filter facetFilter = getFacetManager().getFacetFilter();
 			if ( facetFilter != null ) {
-				filters.add( ToElasticSearch.fromLuceneFilter( getFacetManager().getFacetFilter() ) );
+				filters.add( ToElasticsearch.fromLuceneFilter( getFacetManager().getFacetFilter() ) );
 			}
 
 			// wrap filters into must if there is more than one
-			return ToElasticSearch.condition( "must", filters );
+			return ToElasticsearch.condition( "must", filters );
 		}
 
 		private JsonObject getEntityTypeFilter(Class<?> queriedEntityType) {
