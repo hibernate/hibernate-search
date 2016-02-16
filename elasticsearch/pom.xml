@@ -249,11 +249,9 @@
                                 <exclude>**/ToStringTest.java</exclude>
                                 <exclude>**/DynamicBoostingTest.java</exclude>
                                 <exclude>**/DSLTest.java</exclude>
-                                <exclude>**/DSLEmbeddedSearchTest.java</exclude>
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>
                                 <exclude>**/ExplanationTest.java</exclude>
-                                <exclude>**/EmbeddedSortableIdFieldTest.java</exclude>
 
                                 <!-- Needs range queries on nested fields -->
                                 <exclude>**/DslEmbeddedSearchTest.java</exclude>
