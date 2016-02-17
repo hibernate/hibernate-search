@@ -566,7 +566,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private JsonElement getFieldValue(JsonObject parent, String projectedField) {
 			String field = projectedField;
 
-			if ( projectedField.contains( "." ) ) {
+			if ( FieldHelper.isEmbeddedField( projectedField ) ) {
 				String[] parts = DOT.split( projectedField );
 				field = parts[parts.length - 1];
 
@@ -640,7 +640,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return Collections.emptyList();
 		}
 		// deal with nested aggregation for nested documents
-		if ( facetRequest.getFieldName().contains( "." ) ) {
+		if ( FieldHelper.isEmbeddedField( facetRequest.getFieldName() ) ) {
 			aggregation = aggregation.getAsJsonObject().get( facetRequest.getFacetingName() );
 		}
 		if ( aggregation == null ) {

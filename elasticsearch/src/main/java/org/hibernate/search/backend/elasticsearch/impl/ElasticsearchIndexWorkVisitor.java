@@ -173,7 +173,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 					! isDocValueField( field) ) {
 
 				JsonObject parent = getOrCreateDocumentTree( source, field );
-				String jsonPropertyName = field.name().substring( field.name().lastIndexOf( "." ) + 1 );
+				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
 
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
 
@@ -275,7 +275,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 
 	private JsonObject getOrCreateDocumentTree(JsonObject source, IndexableField field) {
 		// top-level property
-		if ( !field.name().contains( "." ) ) {
+		if ( !FieldHelper.isEmbeddedField( field.name() ) ) {
 			return source;
 		}
 
