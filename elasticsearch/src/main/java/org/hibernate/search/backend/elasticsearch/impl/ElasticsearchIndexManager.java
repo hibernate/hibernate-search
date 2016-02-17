@@ -218,7 +218,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
 	private void addFieldMapping(JsonObject payload, EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
-		String simpleFieldName = fieldMetadata.getName().substring( fieldMetadata.getName().lastIndexOf( "." ) + 1 );
+		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( fieldMetadata.getName() );
 		JsonObject field = new JsonObject();
 
 		String fieldType = getFieldType( descriptor, fieldMetadata );
@@ -247,7 +247,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
 	private JsonObject addFieldMapping(JsonObject payload, BridgeDefinedField bridgeDefinedField) {
-		String simpleFieldName = bridgeDefinedField.getName().substring( bridgeDefinedField.getName().lastIndexOf( "." ) + 1 );
+		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( bridgeDefinedField.getName() );
 		JsonObject field = new JsonObject();
 
 		field.addProperty( "type", getFieldType( bridgeDefinedField ) );
@@ -342,7 +342,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 	}
 
 	private JsonObject getOrCreateProperties(JsonObject mapping, String fieldName) {
-		if ( !fieldName.contains( "." ) ) {
+		if ( !FieldHelper.isEmbeddedField( fieldName ) ) {
 			return mapping.getAsJsonObject( "properties" );
 		}
 

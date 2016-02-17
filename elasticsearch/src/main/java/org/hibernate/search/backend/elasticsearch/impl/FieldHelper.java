@@ -94,7 +94,7 @@ class FieldHelper {
 	}
 
 	static String[] getFieldNameParts(String fieldName) {
-		boolean isEmbeddedField = fieldName.contains( "." );
+		boolean isEmbeddedField = isEmbeddedField( fieldName );
 		return isEmbeddedField ? DOT.split( fieldName ) : new String[]{ fieldName };
 	}
 
@@ -106,7 +106,7 @@ class FieldHelper {
 	private static PropertyMetadata getPropertyMetadata(EntityIndexBinding indexBinding, String fieldName) {
 		TypeMetadata typeMetadata;
 
-		boolean isEmbeddedField = fieldName.contains( "." );
+		boolean isEmbeddedField = isEmbeddedField( fieldName );
 		String[] fieldNameParts = isEmbeddedField ? DOT.split( fieldName ) : new String[]{ fieldName };
 
 		if ( isEmbeddedField ) {
@@ -190,5 +190,17 @@ class FieldHelper {
 		}
 
 		return null;
+	}
+
+	public static boolean isEmbeddedField(String field) {
+		return field.contains( "." );
+	}
+
+	public static String getEmbeddedFieldPath(String field) {
+		return field.substring( 0, field.lastIndexOf( "." ) );
+	}
+
+	public static String getEmbeddedFieldPropertyName(String field) {
+		return field.substring( field.lastIndexOf( "." ) + 1 );
 	}
 }
