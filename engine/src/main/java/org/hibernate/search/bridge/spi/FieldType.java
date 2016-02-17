@@ -26,7 +26,7 @@ public enum FieldType {
 	BOOLEAN,
 
 	/**
-	 * A date, mapped to a formatted String in Lucene.
+	 * A date, mapped to a long in Lucene, corresponding to the number of milliseconds from Epoch.
 	 */
 	DATE,
 
@@ -36,17 +36,17 @@ public enum FieldType {
 	INTEGER,
 
 	/**
-	 * An long field.
+	 * A long field.
 	 */
 	LONG,
 
 	/**
-	 * An float field.
+	 * A float field.
 	 */
 	FLOAT,
 
 	/**
-	 * An double field.
+	 * A double field.
 	 */
 	DOUBLE
 }
