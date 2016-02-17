@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.backend.elasticsearch.impl.GsonBuilderHolder;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
@@ -17,11 +18,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import io.searchbox.action.Action;
-import io.searchbox.client.AbstractJestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
@@ -34,11 +31,6 @@ import io.searchbox.client.config.HttpClientConfig;
 public class JestClient implements Service, Startable, Stoppable {
 
 	private io.searchbox.client.JestClient client;
-
-	public static final Gson GSON = new GsonBuilder()
-			.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT )
-			.serializeNulls()
-			.create();
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
@@ -53,7 +45,7 @@ public class JestClient implements Service, Startable, Stoppable {
 				.multiThreaded( true )
 				.readTimeout( 2000 )
 				.connTimeout( 2000 )
-				.gson( GSON )
+				.gson( GsonBuilderHolder.BUILDER )
 				.build()
 		);
 
