@@ -6,13 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch;
 
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchHSQueryImpl;
-import org.hibernate.search.backend.elasticsearch.json.JsonBuilder;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchJsonQueryDescriptor;
+import org.hibernate.search.backend.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
@@ -31,16 +28,7 @@ public class ElasticsearchQueries {
 	 * documentation</a> for the complete query syntax.
 	 */
 	public static QueryDescriptor fromJson(String jsonQuery) {
-		return new ElasticsearchJsonQuery( new JsonParser().parse( jsonQuery ).getAsJsonObject() );
-	}
-
-	/**
-	 * Creates an Elasticsearch query from the given JSON query representation. See the <a
-	 * href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html">official
-	 * documentation</a> for the complete query syntax.
-	 */
-	public static QueryDescriptor fromJson(JsonObject jsonQuery) {
-		return new ElasticsearchJsonQuery( jsonQuery );
+		return new ElasticsearchJsonQueryDescriptor( new JsonParser().parse( jsonQuery ).getAsJsonObject() );
 	}
 
 	/**
@@ -57,25 +45,6 @@ public class ElasticsearchQueries {
 				JsonBuilder.object().add( "queryString",
 						JsonBuilder.object().addProperty( "query", queryStringQuery ) ) );
 
-		return new ElasticsearchJsonQuery( query.build() );
-	}
-
-	private static class ElasticsearchJsonQuery implements QueryDescriptor {
-
-		private final JsonObject jsonQuery;
-
-		public ElasticsearchJsonQuery(JsonObject jsonQuery) {
-			this.jsonQuery = jsonQuery;
-		}
-
-		@Override
-		public HSQuery createHSQuery(ExtendedSearchIntegrator extendedIntegrator) {
-			return new ElasticsearchHSQueryImpl( jsonQuery, extendedIntegrator );
-		}
-
-		@Override
-		public String toString() {
-			return jsonQuery.toString();
-		}
+		return new ElasticsearchJsonQueryDescriptor( query.build() );
 	}
 }

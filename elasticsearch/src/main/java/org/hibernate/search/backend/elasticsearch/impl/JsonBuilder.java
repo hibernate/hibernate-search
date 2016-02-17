@@ -4,11 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.json;
+package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.util.Date;
-
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -119,7 +117,7 @@ public class JsonBuilder {
 			}
 			else if (value instanceof Date) {
 				// we use this Gson formatter to be sure the date format is in sync with the JestClient configuration
-				jsonObject.addProperty( property, JestClient.GSON.toJson( value ).replace( "\"", "" ) );
+				jsonObject.addProperty( property, GsonBuilderHolder.BUILDER.toJson( value ).replace( "\"", "" ) );
 			}
 			// TODO GSM: see if we have to support Calendar here as Gson serializes Calendar in a weird fashion
 			else {
