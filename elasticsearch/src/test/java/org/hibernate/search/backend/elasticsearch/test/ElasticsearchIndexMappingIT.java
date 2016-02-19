@@ -51,6 +51,9 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 			.handicap( 3.4 )
 			.puttingStrength( 2.5 )
 			.driveWidth( 285 )
+			.strength( "precision" )
+			.strength( "willingness" )
+			.strength( "stamina" )
 			.build();
 		s.persist( hergesheimer );
 
@@ -99,7 +102,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 		String source = (String) ( (Object[]) result.iterator().next() )[0];
 
-		JsonHelper.assertJsonEquals(
+		JsonHelper.assertJsonEqualsIgnoringUnknownFields(
 				"{" +
 					"\"active\": true," +
 					"\"dateOfBirth\": \"1958-04-07T00:00:00Z\"," +
@@ -137,6 +140,33 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 					"\"ranking\": {" +
 						"\"value\": \"311\"" +
 					"}" +
+				"}",
+				source
+		);
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testElementCollectionOfBasicTypeMapping() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Hergesheimer' } } }" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+				.setProjection( ProjectionConstants.SOURCE )
+				.list();
+
+		String source = (String) ( (Object[]) result.iterator().next() )[0];
+
+		JsonHelper.assertJsonEqualsIgnoringUnknownFields(
+				"{" +
+					"\"lastName\": \"Hergesheimer\"," +
+					"\"strengths\": [" +
+						"\"willingness\", \"precision\", \"stamina\"" +
+					"]" +
 				"}",
 				source
 		);

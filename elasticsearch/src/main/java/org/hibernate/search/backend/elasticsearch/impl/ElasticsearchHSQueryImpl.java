@@ -533,6 +533,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 			// Should only be the case for custom bridges
 			else {
+				// TODO: should we do it?
+				if ( !value.isJsonPrimitive() ) {
+					throw new SearchException( "Projection of non-JSON-primitive field values is not supported: " + value );
+				}
+
 				JsonPrimitive primitive = value.getAsJsonPrimitive();
 
 				if ( primitive.isBoolean() ) {

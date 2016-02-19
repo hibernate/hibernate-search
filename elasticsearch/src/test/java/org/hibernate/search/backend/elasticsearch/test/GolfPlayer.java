@@ -8,7 +8,10 @@ package org.hibernate.search.backend.elasticsearch.test;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -68,6 +71,11 @@ public class GolfPlayer {
 
 	@IndexedEmbedded
 	private Ranking ranking;
+
+	@ElementCollection
+	@Field
+	@IndexedEmbedded
+	private Set<String> strengths;
 
 	GolfPlayer() {
 	}
@@ -144,6 +152,15 @@ public class GolfPlayer {
 		this.ranking = ranking;
 	}
 
+	public Set<String> getStrengths() {
+		return strengths;
+	}
+
+
+	public void setStrengths(Set<String> strengths) {
+		this.strengths = strengths;
+	}
+
 	public static class Builder {
 
 		private String firstName;
@@ -154,6 +171,7 @@ public class GolfPlayer {
 		private double puttingStrength;
 		private Integer driveWidth;
 		private Integer ranking;
+		private Set<String> strengths = new HashSet<>();
 
 		public Builder firstName(String firstName) {
 			this.firstName = firstName;
@@ -195,6 +213,11 @@ public class GolfPlayer {
 			return this;
 		}
 
+		public Builder strength(String strength) {
+			this.strengths.add( strength );
+			return this;
+		}
+
 		GolfPlayer build() {
 			GolfPlayer player = new GolfPlayer();
 
@@ -208,6 +231,7 @@ public class GolfPlayer {
 			if ( ranking != null ) {
 				player.setRanking( new Ranking( BigInteger.valueOf( ranking ) ) );
 			}
+			player.setStrengths( strengths );
 			return player;
 		}
 	}

@@ -125,6 +125,9 @@ public class ElasticsearchIT extends SearchTestBase {
 			.puttingStrength( 2.5 )
 			.driveWidth( 285 )
 			.ranking( 311 )
+			.strength( "precision" )
+			.strength( "willingness" )
+			.strength( "stamina" )
 			.build();
 		s.persist( hergesheimer );
 
@@ -284,6 +287,31 @@ public class ElasticsearchIT extends SearchTestBase {
 		s.delete( s.get( Tower.class, tower.getId() ) );
 		tx.commit();
 
+		s.close();
+	}
+
+	@Test
+	public void testEmbeddedIndexingOfElementCollection() throws Exception {
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+
+		FullTextSession session = Search.getFullTextSession( s );
+		QueryDescriptor query;
+		List<?> result;
+
+		query = ElasticsearchQueries.fromJson(
+				"{" +
+					"'query' : { " +
+						"'match' : { " +
+							"'strengths' : 'willingness'" +
+						" }" +
+					" }" +
+				" }"
+		);
+		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
+		assertEquals( "unable to find property in embedded element collection", 1, result.size() );
+
+		tx.commit();
 		s.close();
 	}
 
