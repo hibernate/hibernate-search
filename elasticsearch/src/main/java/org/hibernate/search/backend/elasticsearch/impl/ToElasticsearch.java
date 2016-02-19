@@ -51,7 +51,7 @@ public class ToElasticsearch {
 							.addProperty( "min_doc_count", facetingRequest.hasZeroCountsIncluded() ? 0 : 1 )
 					).build();
 
-			if ( FieldHelper.isEmbeddedField( fieldName ) ) {
+			if ( isNested( fieldName ) ) {
 				JsonBuilder.Object facetJsonQuery = JsonBuilder.object();
 				facetJsonQuery.add( "nested", JsonBuilder.object()
 								.addProperty( "path", FieldHelper.getEmbeddedFieldPath( fieldName ) ) );
@@ -257,7 +257,7 @@ public class ToElasticsearch {
 	}
 
 	private static JsonObject wrapQueryForNestedIfRequired(String field, JsonObject query) {
-		if ( !FieldHelper.isEmbeddedField( field ) ) {
+		if ( !isNested( field ) ) {
 			return query;
 		}
 		String path = FieldHelper.getEmbeddedFieldPath( field );
@@ -267,6 +267,12 @@ public class ToElasticsearch {
 						.addProperty( "path", path )
 						.add( "query", query ) )
 				.build();
+	}
+
+	private static boolean isNested(String field) {
+		//TODO Drive through meta-data
+//		return FieldHelper.isEmbeddedField( field );
+		return false;
 	}
 
 	public static JsonObject fromLuceneFilter(Filter luceneFilter) {

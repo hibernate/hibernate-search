@@ -629,8 +629,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		if ( aggregation == null ) {
 			return Collections.emptyList();
 		}
+
 		// deal with nested aggregation for nested documents
-		if ( FieldHelper.isEmbeddedField( facetRequest.getFieldName() ) ) {
+		if ( isNested( facetRequest ) ) {
 			aggregation = aggregation.getAsJsonObject().get( facetRequest.getFacetingName() );
 		}
 		if ( aggregation == null ) {
@@ -644,6 +645,12 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					bucket.getAsJsonObject().get( "doc_count" ).getAsInt() ) );
 		}
 		return facets;
+	}
+
+	private boolean isNested(DiscreteFacetRequest facetRequest) {
+		//TODO Drive through meta-data
+//		return FieldHelper.isEmbeddedField( facetRequest.getFieldName() );
+		return false;
 	}
 
 	// TODO: Investigate scrolling API:

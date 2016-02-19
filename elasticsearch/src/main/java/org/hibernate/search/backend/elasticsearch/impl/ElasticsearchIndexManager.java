@@ -398,7 +398,13 @@ public class ElasticsearchIndexManager implements IndexManager {
 			JsonObject property = parentProperties.getAsJsonObject( part );
 			if ( property == null ) {
 				property = new JsonObject();
-				property.addProperty( "type", "nested" );
+
+				// TODO enable nested mapping as needed:
+				// * only needed for embedded *-to-many with more than one field
+				// * for these, the user should be able to opt out (nested would be the safe default mapping in this
+				// case, but they could want to opt out when only ever querying on single fields of the embeddable)
+
+//				property.addProperty( "type", "nested" );
 
 				JsonObject properties = new JsonObject();
 				property.add( "properties", properties );
@@ -508,5 +514,10 @@ public class ElasticsearchIndexManager implements IndexManager {
 	@Override
 	public void optimize() {
 		// TODO Is there such thing for ES?
+	}
+
+	@Override
+	public String toString() {
+		return "ElasticsearchIndexManager [actualIndexName=" + actualIndexName + "]";
 	}
 }

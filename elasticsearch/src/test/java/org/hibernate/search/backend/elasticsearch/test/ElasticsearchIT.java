@@ -210,13 +210,8 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
-						"'nested' : { " +
-							"'path' : 'address'," +
-							" 'query': { " +
-								"'match' : { " +
-									"'address.street' : 'place'" +
-								" }" +
-							" }" +
+						"'match' : { " +
+							"'address.street' : 'place'" +
 						" }" +
 					" }" +
 				" }"
@@ -227,13 +222,8 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
-						"'nested' : { " +
-							"'path' : 'address'," +
-							" 'query': { " +
-								"'match' : { " +
-									"'address.ownedBy_name' : 'renting'" +
-								" }" +
-							" }" +
+						"'match' : { " +
+							"'address.ownedBy_name' : 'renting'" +
 						" }" +
 					" }" +
 				" }"
@@ -244,13 +234,8 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
-						"'nested' : { " +
-							"'path' : 'address'," +
-							" 'query': { " +
-								"'match' : { " +
-									"'address.id' : " + a.getId() +
-								" }" +
-							" }" +
+						"'match' : { " +
+							"'address.id' : " + a.getId() +
 						" }" +
 					" }" +
 				" }"
@@ -261,13 +246,8 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
-						"'nested' : { " +
-							"'path' : 'address.country'," +
-							" 'query': { " +
-								"'match' : { " +
-									"'address.country.name' : 'France'" +
-								" }" +
-							" }" +
+						"'match' : { " +
+							"'address.country.name' : 'France'" +
 						" }" +
 					" }" +
 				" }"
@@ -289,13 +269,8 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromJson(
 				"{" +
 					"'query' : { " +
-						"'nested' : { " +
-							"'path' : 'address'," +
-							" 'query': { " +
-								"'match' : { " +
-									"'address.ownedBy_name' : 'buckhead'" +
-								" }" +
-							" }" +
+						"'match' : { " +
+							"'address.ownedBy_name' : 'buckhead'" +
 						" }" +
 					" }" +
 				" }"
@@ -562,7 +537,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		Object[] projection = (Object[]) result.iterator().next();
 		assertThat( projection[0] ).describedAs( "id" ).isEqualTo( 1L );
 		assertThat( projection[1] ).describedAs( "object class" ).isEqualTo( GolfPlayer.class );
-		assertThat( projection[2] ).describedAs( "score" ).isEqualTo( 1.0F );
+		assertThat( projection[2] ).describedAs( "score" ).isEqualTo( 0.30685282F );
 		assertThat( projection[3] ).describedAs( "this" ).isInstanceOf( GolfPlayer.class );
 		assertThat( ( (GolfPlayer) projection[3] ).getId() ).isEqualTo( 1L );
 		assertThat( projection[4] ).describedAs( "firstName" ).isEqualTo( "Klaus" );
