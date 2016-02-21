@@ -1056,7 +1056,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.12.1</version>
+                    <version>2.17</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.hibernate</groupId>
@@ -1089,7 +1089,10 @@
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <resourceIncludes>**/*.xml,**/*.properties</resourceIncludes>
                         <!-- generated respectively copied code -->
-                        <excludes>**/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java</excludes>
+                        <excludes>
+                            **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
+                            **/Log_$logger.java
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>
