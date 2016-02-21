@@ -100,6 +100,7 @@
         <module name="EqualsAvoidNull" />
 
         <!-- <module name="DeclarationOrder" /> -->
+        <!-- not checking for Constructor here: -->
         <module name="RedundantModifier">
             <property name="tokens"
                       value="METHOD_DEF, VARIABLE_DEF, ANNOTATION_FIELD_DEF, INTERFACE_DEF, CLASS_DEF, ENUM_DEF"/>
@@ -111,12 +112,20 @@
             <property name="allowLineBreaks" value="false" />
         </module>
 
-        <!-- Checks for blocks. You know, those {}'s -->
+        <!-- Checks for blocks. You know, those {}'s, not doing this for methods because of 1 line getters/setters-->
         <module name="LeftCurly">
-            <property name="option" value="eol" />
+            <property name="option" value="eol"/>
+            <property name="tokens" value="INTERFACE_DEF, CLASS_DEF, ANNOTATION_DEF, ENUM_DEF, CTOR_DEF,
+                        ENUM_CONSTANT_DEF, LITERAL_WHILE, LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY,
+                        LITERAL_SYNCHRONIZED, LITERAL_SWITCH, LITERAL_DO, LITERAL_IF, LITERAL_ELSE, LITERAL_FOR,
+                        STATIC_INIT, OBJBLOCK" />
         </module>
+        <!-- not doing this for methods because of 1 line getters/setters -->
         <module name="RightCurly">
-            <property name="option" value="alone" />
+            <property name="option" value="alone"/>
+            <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF,
+                        LITERAL_ELSE, CLASS_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, LITERAL_DO,
+                        STATIC_INIT, INSTANCE_INIT" />
         </module>
 
         <!-- METHOD_CALL breaks inline casts

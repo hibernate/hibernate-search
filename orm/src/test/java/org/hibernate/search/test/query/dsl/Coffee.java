@@ -36,7 +36,7 @@ public class Coffee {
 
 	@Field(termVector = TermVector.NO, store = Store.YES)
 	public String getName() { return name; }
-	public void setName(String name) { this.name = name; };
+	public void setName(String name) { this.name = name; }
 	private String name;
 
 	@Field(termVector = TermVector.YES)

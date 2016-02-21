@@ -64,7 +64,7 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		private final IndexOutput delegate;
 
 		public IndexOutputDelegate(IndexOutput delegate) {
-			super( "Testing Delegate: " + delegate.toString());
+			super( "Testing Delegate: " + delegate.toString() );
 			this.delegate = delegate;
 		}
 

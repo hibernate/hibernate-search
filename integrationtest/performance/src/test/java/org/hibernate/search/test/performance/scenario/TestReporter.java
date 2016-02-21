@@ -189,7 +189,7 @@ public class TestReporter {
 			};
 			return new PrintStream( stream, false, "UTF-8" );
 		}
-		catch (FileNotFoundException|UnsupportedEncodingException e) {
+		catch (FileNotFoundException | UnsupportedEncodingException e) {
 			throw new RuntimeException( e );
 		}
 	}

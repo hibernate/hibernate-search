@@ -315,7 +315,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 
 			NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( descriptor, fieldMetadata );
 
-			switch( numericEncodingType ) {
+			switch ( numericEncodingType ) {
 				case INTEGER:
 					type = "integer";
 					break;
