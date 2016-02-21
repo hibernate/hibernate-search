@@ -430,7 +430,7 @@ public final class BridgeFactory {
 		return bridge;
 	}
 
-	private static enum ContainerType {
+	private enum ContainerType {
 		SINGLE,
 		ARRAY,
 		ITERABLE,

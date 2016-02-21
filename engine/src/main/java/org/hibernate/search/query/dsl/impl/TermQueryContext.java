@@ -60,7 +60,7 @@ class TermQueryContext {
 		this.threshold = threshold;
 	}
 
-	public static enum Approximation {
+	public enum Approximation {
 		EXACT,
 		WILDCARD,
 		FUZZY

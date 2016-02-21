@@ -126,7 +126,7 @@ public enum IndexWriterSetting implements Serializable {
 	/**
 	 * @see org.apache.lucene.index.IndexWriterConfig#setInfoStream(org.apache.lucene.util.InfoStream)
 	 */
-	INFOSTREAM ( "infostream" ) {
+	INFOSTREAM( "infostream" ) {
 		@Override
 		public Integer parseVal(String value) {
 			return INFOSTREAM.parseBoolean( value );

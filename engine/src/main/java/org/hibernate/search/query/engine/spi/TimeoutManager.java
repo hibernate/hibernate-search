@@ -34,7 +34,7 @@ public interface TimeoutManager {
 
 	Type getType();
 
-	public static enum Type {
+	enum Type {
 		NONE,
 		EXCEPTION,
 		LIMIT

@@ -57,7 +57,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 	 * to save memory pressure.
 	 * If the code becomes too nasty, change it.
 	 */
-	public static enum INPUT_TYPE {
+	public enum INPUT_TYPE {
 		ID,
 		ENTITY,
 		READER,

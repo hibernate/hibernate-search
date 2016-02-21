@@ -273,8 +273,7 @@ public final class Environment {
 
 	public static final Map<Class<? extends Service>, String> DEFAULT_SERVICES_MAP;
 	// TODO for now we hard code the default services. This could/should be made configurable (HF)
-	static
-	{
+	static {
 		DEFAULT_SERVICES_MAP = CollectionHelper.newHashMap( 1 );
 		DEFAULT_SERVICES_MAP.put( IndexManagerFactory.class, DefaultIndexManagerFactory.class.getName() );
 	}

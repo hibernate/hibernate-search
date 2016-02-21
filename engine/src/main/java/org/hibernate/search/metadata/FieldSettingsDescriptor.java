@@ -78,7 +78,7 @@ public interface FieldSettingsDescriptor {
 	/**
 	 * Defines different logical field types
 	 */
-	public enum Type {
+	enum Type {
 		/**
 		 * A basic field
 		 */

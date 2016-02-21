@@ -27,7 +27,7 @@ public interface NumericFieldSettingsDescriptor extends FieldSettingsDescriptor 
 	/**
 	 * Defines different logical field types
 	 */
-	public enum NumericEncodingType {
+	enum NumericEncodingType {
 		/**
 		 * An integer encoded numeric field
 		 */
