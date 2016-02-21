@@ -195,6 +195,8 @@
         <!-- Eclipse plugin options -->
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
+        <puppycrawl.checkstyle.version>6.15</puppycrawl.checkstyle.version>
+
     </properties>
 
     <dependencyManagement>
@@ -1069,6 +1071,11 @@
                              see https://github.com/jcgay/maven-color/wiki/Problems
                              If that causes problem, that can be removed
                              but maven-color won't work -->
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${puppycrawl.checkstyle.version}</version>
+                        </dependency>
                         <dependency>
                             <groupId>org.slf4j</groupId>
                             <artifactId>jcl-over-slf4j</artifactId>

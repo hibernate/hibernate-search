@@ -100,8 +100,11 @@
         <module name="EqualsAvoidNull" />
 
         <!-- <module name="DeclarationOrder" /> -->
-        <module name="RedundantModifier"/>
-        <module name="MissingOverride"/>
+        <module name="RedundantModifier">
+            <property name="tokens"
+                      value="METHOD_DEF, VARIABLE_DEF, ANNOTATION_FIELD_DEF, INTERFACE_DEF, CLASS_DEF, ENUM_DEF"/>
+        </module>
+        <module name="MissingOverride" />
 
         <module name="MethodParamPad">
             <property name="option" value="nospace" />
@@ -116,9 +119,12 @@
             <property name="option" value="alone" />
         </module>
 
+        <!-- METHOD_CALL breaks inline casts
+            (i.e. Iterable<?> collection = ((Map<?,?>) value).values();)
+            in 6.15-->
         <module name="ParenPad">
-            <property name="tokens" value="CTOR_CALL, METHOD_CALL, SUPER_CTOR_CALL" />
-            <property name="option" value="space" />
+            <property name="tokens" value="CTOR_CALL, SUPER_CTOR_CALL"/>
+            <property name="option" value="space"/>
         </module>
 
         <module name="org.hibernate.checkstyle.checks.regexp.DoubleSpaces">
