@@ -299,6 +299,7 @@
                                 <exclude>**/SortWithIndexUninvertingTest.java</exclude>
                                 <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude>
                                 <exclude>**/RollbackTransactionTest.java</exclude>
+                                <exclude>**/PrefixedEmbeddedCaseInPathTest.java</exclude>
 
                                 <!-- Specific to other backends -->
                                 <exclude>**/CustomBackendTest.java</exclude>

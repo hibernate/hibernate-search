@@ -638,8 +638,7 @@ public class ElasticsearchIT extends SearchTestBase {
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[]{
-				ScientificArticle.class, Tower.class, Address.class, Country.class, State.class, StateCandidate.class, ResearchPaper.class, BachelorThesis.class, MasterThesis.class, GolfPlayer.class
-		};
+		return new Class[] { ScientificArticle.class, Tower.class, Address.class, Country.class, State.class, StateCandidate.class, ResearchPaper.class,
+				BachelorThesis.class, MasterThesis.class, GolfPlayer.class, GolfCourse.class, Hole.class };
 	}
 }

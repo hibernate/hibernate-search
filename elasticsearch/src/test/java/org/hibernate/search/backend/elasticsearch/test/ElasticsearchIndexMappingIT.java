@@ -20,11 +20,6 @@ import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.testutil.JsonHelper;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.embedded.Address;
-import org.hibernate.search.test.embedded.Country;
-import org.hibernate.search.test.embedded.State;
-import org.hibernate.search.test.embedded.StateCandidate;
-import org.hibernate.search.test.embedded.Tower;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +62,31 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 			.lastName( "Kidd" )
 			.build();
 		s.persist( kidd );
+
+		GolfCourse purbeck = new GolfCourse(
+				"Purbeck",
+				127.3,
+				new Hole( 433, (byte) 4 ), new Hole( 163, (byte) 3 )
+		);
+		s.persist( purbeck );
+
+		GolfCourse mountMaja = new GolfCourse(
+				"Mount Maja",
+				111.9,
+				new Hole( 512, (byte) 5 ), new Hole( 113, (byte) 3 )
+		);
+		s.persist( mountMaja );
+
+		GolfPlayer brand = new GolfPlayer.Builder()
+				.lastName( "Brand" )
+				.playedCourses( purbeck, mountMaja )
+				.build();
+		s.persist( brand );
+
+		purbeck.getPlayedBy().add( brand );
+		mountMaja.getPlayedBy().add( brand );
+
+		s.persist( brand );
 
 		tx.commit();
 		s.close();
@@ -176,6 +196,48 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 	}
 
 	@Test
+	public void testEmbeddedListOfEntityMapping() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Brand' } } }" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+						.setProjection( ProjectionConstants.SOURCE )
+						.list();
+
+		String source = (String) ( (Object[]) result.iterator().next() )[0];
+
+		JsonHelper.assertJsonEqualsIgnoringUnknownFields(
+			"{" +
+				"'lastName' : 'Brand'," +
+				"'playedCourses': [" +
+					"{" +
+						"'name' : 'Purbeck'," +
+						"'rating' : 127.3, " +
+						"'holes': [" +
+							"{ 'par' : 4, 'length' : 433 }," +
+							"{ 'par' : 3, 'length' : 163 }" +
+						"]" +
+					"}," +
+					"{" +
+						"'name' : 'Mount Maja'," +
+						"'rating' : 111.9, " +
+						"'holes': [" +
+							"{ 'par' : 5, 'length' : 512 }," +
+							"{ 'par' : 3, 'length' : 113 }" +
+						"]" +
+					"}" +
+				"]" +
+			"}",
+			source
+		);
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
 	public void testNullTokenMapping() {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
@@ -213,8 +275,6 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[]{
-				ScientificArticle.class, Tower.class, Address.class, Country.class, State.class, StateCandidate.class, ResearchPaper.class, BachelorThesis.class, MasterThesis.class, GolfPlayer.class
-		};
+		return new Class[] { GolfPlayer.class, GolfCourse.class, Hole.class };
 	}
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.util;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * Inspired from {@code org.hibernate.util.StringHelper}, but removing
@@ -79,6 +80,37 @@ public final class StringHelper {
 			}
 
 			sb.append( object );
+		}
+
+		return sb.toString();
+	}
+
+	/**
+	 * Joins the elements of the given iterable to a string, separated by the given separator string.
+	 *
+	 * @param iterable the iterable to join
+	 * @param separator the separator string
+	 *
+	 * @return a string made up of the string representations of the given iterable members, separated by the given separator
+	 *         string
+	 */
+	public static String join(Iterator<?> iterator, String separator) {
+		if ( iterator == null ) {
+			return null;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		boolean isFirst = true;
+
+		while ( iterator.hasNext() ) {
+			if ( !isFirst ) {
+				sb.append( separator );
+			}
+			else {
+				isFirst = false;
+			}
+
+			sb.append( iterator.next() );
 		}
 
 		return sb.toString();
