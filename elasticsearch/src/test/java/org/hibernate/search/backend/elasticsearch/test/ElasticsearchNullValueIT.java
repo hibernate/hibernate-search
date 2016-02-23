@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.test;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -21,8 +23,6 @@ import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Gunnar Morling
@@ -140,6 +140,6 @@ public class ElasticsearchNullValueIT extends SearchTestBase {
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[]{ GolfPlayer.class };
+		return new Class[]{ GolfPlayer.class, GolfCourse.class, Hole.class };
 	}
 }

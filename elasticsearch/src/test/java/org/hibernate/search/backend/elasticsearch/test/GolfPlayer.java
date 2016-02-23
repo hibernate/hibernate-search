@@ -16,6 +16,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 
 import org.hibernate.search.annotations.ClassBridge;
@@ -76,6 +77,10 @@ public class GolfPlayer {
 	@Field
 	@IndexedEmbedded
 	private Set<String> strengths;
+
+	@ManyToMany
+	@IndexedEmbedded
+	private Set<GolfCourse> playedCourses;
 
 	GolfPlayer() {
 	}
@@ -156,9 +161,16 @@ public class GolfPlayer {
 		return strengths;
 	}
 
-
 	public void setStrengths(Set<String> strengths) {
 		this.strengths = strengths;
+	}
+
+	public Set<GolfCourse> getPlayedCourses() {
+		return playedCourses;
+	}
+
+	public void setPlayedCourses(Set<GolfCourse> playedCourses) {
+		this.playedCourses = playedCourses;
 	}
 
 	public static class Builder {
@@ -172,6 +184,7 @@ public class GolfPlayer {
 		private Integer driveWidth;
 		private Integer ranking;
 		private Set<String> strengths = new HashSet<>();
+		private final Set<GolfCourse> playedCourses = new HashSet<>();
 
 		public Builder firstName(String firstName) {
 			this.firstName = firstName;
@@ -218,6 +231,14 @@ public class GolfPlayer {
 			return this;
 		}
 
+		public Builder playedCourses(GolfCourse... courses) {
+			for ( GolfCourse course : courses ) {
+				this.playedCourses.add( course );
+			}
+
+			return this;
+		}
+
 		GolfPlayer build() {
 			GolfPlayer player = new GolfPlayer();
 
@@ -232,6 +253,9 @@ public class GolfPlayer {
 				player.setRanking( new Ranking( BigInteger.valueOf( ranking ) ) );
 			}
 			player.setStrengths( strengths );
+			if ( !playedCourses.isEmpty() ) {
+				player.setPlayedCourses( playedCourses );
+			}
 			return player;
 		}
 	}

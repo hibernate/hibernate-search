@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
@@ -43,7 +44,9 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -61,6 +64,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 	private static final Log LOG = LoggerFactory.make();
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
+	private static final Pattern NAME_AND_INDEX = Pattern.compile( "(.+?)(\\[([0-9])+\\])?" );
+
 	private static final String DELETE_ALL_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"match_all\" : { } } } } }";
 	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
 
@@ -170,13 +175,20 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		EntityIndexBinding indexBinding = searchIntegrator.getIndexBinding( entityType );
 		JsonObject source = new JsonObject();
 
+		String parentPath = null;
 		for ( IndexableField field : document.getFields() ) {
+			// marker field for denoting the parent element of the subsequent fields
+			if ( "$nesting".equals( field.name() ) ) {
+				parentPath = field.stringValue();
+				continue;
+			}
+
 			if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
 					!field.name().equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
 					!FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( field.name() ) &&
 					!isDocValueField( field ) ) {
 
-				JsonObject parent = getOrCreateDocumentTree( source, field );
+				JsonObject parent = getOrCreateDocumentTree( source, parentPath );
 				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
 
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
@@ -264,7 +276,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 				else {
 					value = field.numericValue();
 				}
-				JsonObject parent = getOrCreateDocumentTree( source, field );
+				JsonObject parent = getOrCreateDocumentTree( source, parentPath );
 				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
 				addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
 						value != null ? new JsonPrimitive( value ) : null );
@@ -317,27 +329,53 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		return null;
 	}
 
-	private JsonObject getOrCreateDocumentTree(JsonObject source, IndexableField field) {
-		return getOrCreateDocumentTree( source, field.name() );
-	}
-
-	private JsonObject getOrCreateDocumentTree(JsonObject source, String fieldName) {
-		// top-level property
-		if ( !FieldHelper.isEmbeddedField( fieldName ) ) {
+	private JsonObject getOrCreateDocumentTree(JsonObject source, String path) {
+		if ( path == null ) {
 			return source;
 		}
 
 		// embedded property Create JSON hierarchy as needed
-		String[] parts = DOT.split( fieldName );
+		String[] parts = DOT.split( path );
 		JsonObject parent = source;
 
-		for ( int i = 0; i < parts.length - 1; i++ ) {
-			JsonObject newParent = parent.getAsJsonObject( parts[i] );
-			if ( newParent == null ) {
-				newParent = new JsonObject();
-				parent.add( parts[i], newParent );
+		for ( int i = 0; i < parts.length; i++ ) {
+			Matcher nameAndIndex = NAME_AND_INDEX.matcher( parts[i] );
+			nameAndIndex.matches();
+
+			String name = nameAndIndex.group( 1 );
+			String idx = nameAndIndex.group( 3 );
+			Integer index = null;
+
+			if ( idx != null ) {
+				index = Integer.valueOf( idx );
+				JsonArray array = parent.getAsJsonArray( name );
+				if ( array == null ) {
+					array = new JsonArray();
+					parent.add( name, array );
+				}
+
+				JsonObject newParent = index < array.size() ? array.get( index ).getAsJsonObject() : null;
+				if ( newParent == null ) {
+					newParent = new JsonObject();
+
+					if ( index >= array.size() ) {
+						for ( int j = array.size(); j <= index; j++ ) {
+							array.add( JsonNull.INSTANCE );
+						}
+					}
+					array.set( index, newParent );
+				}
+
+				parent = newParent;
 			}
-			parent = newParent;
+			else {
+				JsonObject newParent = parent.getAsJsonObject( name );
+				if ( newParent == null ) {
+					newParent = new JsonObject();
+					parent.add( name, newParent );
+				}
+				parent = newParent;
+			}
 		}
 
 		return parent;

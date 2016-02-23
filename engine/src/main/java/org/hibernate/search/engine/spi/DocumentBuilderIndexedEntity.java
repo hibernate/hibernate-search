@@ -61,6 +61,10 @@ import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.nesting.impl.DefaultNestingContextFactory;
+import org.hibernate.search.engine.nesting.impl.NestingContext;
+import org.hibernate.search.engine.nesting.impl.NestingContextFactory;
+import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -128,6 +132,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 */
 	private PropertyMetadata idPropertyMetadata;
 
+	private NestingContextFactory nestingContextFactory;
+
 	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
 	 *
@@ -167,6 +173,21 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 		this.entityState = EntityState.INDEXED;
 		this.identifierName = idProvided ? null : idPropertyMetadata.getPropertyAccessor().getName();
+
+		this.nestingContextFactory = getNestingContextFactory( context );
+	}
+
+	private static NestingContextFactory getNestingContextFactory(ConfigContext context) {
+		try {
+			NestingContextFactoryProvider nestingContextFactoryProvider = context.getServiceManager().requestService( NestingContextFactoryProvider.class );
+			return nestingContextFactoryProvider.getNestingContextFactory();
+		}
+		catch (Exception e) {
+			return DefaultNestingContextFactory.INSTANCE;
+		}
+		finally {
+			context.getServiceManager().releaseService( NestingContextFactoryProvider.class );
+		}
 	}
 
 	public XMember getIdGetter() {
@@ -358,7 +379,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				conversionContext,
 				objectInitializer,
 				documentLevelBoost,
-				false
+				false,
+				nestingContextFactory.createNestingContext( getTypeMetadata().getType() )
 		);
 
 
@@ -404,7 +426,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			ConversionContext conversionContext,
 			InstanceInitializer objectInitializer,
 			final float inheritedBoost,
-			boolean multiValued) {
+			boolean multiValued,
+			NestingContext nestingContext) {
 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
@@ -436,7 +459,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				objectInitializer,
 				inheritedBoost,
 				unproxiedInstance,
-				multiValued
+				multiValued,
+				nestingContext
 		);
 	}
 
@@ -449,11 +473,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			InstanceInitializer objectInitializer,
 			float inheritedBoost,
 			Object unproxiedInstance,
-			boolean multiValued) {
+			boolean multiValued,
+			NestingContext nestingContext) {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
 			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
 			conversionContext.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
+			nestingContext.push( embeddedTypeMetadata.getEmbeddedFieldName(), embeddedTypeMetadata.getEmbeddedContainer() );
 			try {
 				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 				if ( value == null ) {
@@ -465,6 +491,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					case ARRAY:
 						Object[] array = objectInitializer.initializeArray( (Object[]) value );
 						for ( Object arrayValue : array ) {
+							nestingContext.mark( doc );
 							buildDocumentFields(
 									arrayValue,
 									doc,
@@ -475,13 +502,16 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									conversionContext,
 									objectInitializer,
 									embeddedBoost,
-									true
+									true,
+									nestingContext
 							);
+							nestingContext.incrementCollectionIndex();
 						}
 						break;
 					case COLLECTION:
 						Collection<?> collection = objectInitializer.initializeCollection( (Collection<?>) value );
 						for ( Object collectionValue : collection ) {
+							nestingContext.mark( doc );
 							buildDocumentFields(
 									collectionValue,
 									doc,
@@ -492,13 +522,16 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									conversionContext,
 									objectInitializer,
 									embeddedBoost,
-									true
+									true,
+									nestingContext
 							);
+							nestingContext.incrementCollectionIndex();
 						}
 						break;
 					case MAP:
 						Map<?, ?> map = objectInitializer.initializeMap( (Map<?, ?>) value );
 						for ( Object collectionValue : map.values() ) {
+							nestingContext.mark( doc );
 							buildDocumentFields(
 									collectionValue,
 									doc,
@@ -509,11 +542,14 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									conversionContext,
 									objectInitializer,
 									embeddedBoost,
-									true
+									true,
+									nestingContext
 							);
+							nestingContext.incrementCollectionIndex();
 						}
 						break;
 					case OBJECT:
+						nestingContext.mark( doc );
 						buildDocumentFields(
 								value,
 								doc,
@@ -524,7 +560,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 								conversionContext,
 								objectInitializer,
 								embeddedBoost,
-								multiValued
+								multiValued,
+								nestingContext
 						);
 						break;
 					default:
@@ -536,6 +573,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			}
 			finally {
 				conversionContext.popProperty();
+				nestingContext.pop();
 			}
 		}
 	}
