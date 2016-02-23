@@ -203,7 +203,6 @@
     </module>
 
     <module name="SuppressionCommentFilter" />
-    
     <module name="RegexpSingleline">
         <!-- not using an "illegal import" rule as it might be needed for API reasons -->
         <property name="format" value="\s+LOGGER = Logger.getLogger\("/>

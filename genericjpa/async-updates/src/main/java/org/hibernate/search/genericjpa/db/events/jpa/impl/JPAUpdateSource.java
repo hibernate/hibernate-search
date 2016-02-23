@@ -143,71 +143,6 @@ public class JPAUpdateSource implements AsyncUpdateSource {
 		this.delimitedIdentifierToken = delimitedIdentifierToken;
 	}
 
-	private static ThreadFactory tf() {
-		return new NamingThreadFactory( "JPAUpdateSource Thread" );
-	}
-
-	public static MultiQueryAccess query(
-			JPAUpdateSource updateSource,
-			EntityManagerWrapper em) {
-		Map<String, Long> countMap = new HashMap<>();
-		Map<String, QueryWrapper> queryMap = new HashMap<>();
-		for ( EventModelInfo evi : updateSource.eventModelInfos ) {
-			long count;
-			{
-				count = ((Number) em.createNativeQuery(
-						"SELECT count(*) " + updateSource.fromPart( evi )
-				).getSingleResult()).longValue();
-			}
-			countMap.put( evi.getUpdateTableName(), count );
-
-			{
-				//SELECT part
-				StringBuilder queryString = new StringBuilder().append( "SELECT " )
-						.append( updateSource.escape( "t1" ) )
-						.append( "." )
-						.append( updateSource.escape( evi.getUpdateIdColumn() ) )
-						.append( ", " )
-						.append( updateSource.escape( "t1" ) )
-						.append( "." )
-						.append( updateSource.escape( evi.getEventTypeColumn() ) );
-				for ( EventModelInfo.IdInfo idInfo : evi.getIdInfos() ) {
-					for ( String column : idInfo.getColumnsInUpdateTable() ) {
-						queryString.append( ", " )
-								.append( updateSource.escape( "t1" ) )
-								.append( "." )
-								.append( updateSource.escape( column ) );
-					}
-				}
-				//FROM PART
-				queryString.append( updateSource.fromPart( evi ) );
-
-				//ORDER BY part
-				queryString.append(
-						" ORDER BY "
-				).append( updateSource.escape( "t1" ) )
-						.append( "." )
-						.append( updateSource.escape( evi.getUpdateIdColumn() ) )
-						.append( " ASC" );
-
-				log.trace( "querying for updates: " + queryString.toString() );
-				QueryWrapper query = em.createNativeQuery(
-						queryString.toString()
-				);
-				queryMap.put( evi.getUpdateTableName(), query );
-			}
-		}
-		return new MultiQueryAccess(
-				countMap, queryMap, (first, second) -> {
-			int res = Long.compare( updateSource.id( first ), updateSource.id( second ) );
-			if ( res == 0 ) {
-				throw new IllegalStateException( "database contained two update entries with the same id!" );
-			}
-			return res;
-		}, updateSource.batchSizeForDatabaseQueries
-		);
-	}
-
 	@Override
 	public void setUpdateConsumers(List<UpdateConsumer> updateConsumers) {
 		this.updateConsumers = updateConsumers;
@@ -382,6 +317,71 @@ public class JPAUpdateSource implements AsyncUpdateSource {
 		finally {
 			this.lock.unlock();
 		}
+	}
+
+	private static ThreadFactory tf() {
+		return new NamingThreadFactory( "JPAUpdateSource Thread" );
+	}
+
+	public static MultiQueryAccess query(
+			JPAUpdateSource updateSource,
+			EntityManagerWrapper em) {
+		Map<String, Long> countMap = new HashMap<>();
+		Map<String, QueryWrapper> queryMap = new HashMap<>();
+		for ( EventModelInfo evi : updateSource.eventModelInfos ) {
+			long count;
+			{
+				count = ((Number) em.createNativeQuery(
+						"SELECT count(*) " + updateSource.fromPart( evi )
+				).getSingleResult()).longValue();
+			}
+			countMap.put( evi.getUpdateTableName(), count );
+
+			{
+				//SELECT part
+				StringBuilder queryString = new StringBuilder().append( "SELECT " )
+						.append( updateSource.escape( "t1" ) )
+						.append( "." )
+						.append( updateSource.escape( evi.getUpdateIdColumn() ) )
+						.append( ", " )
+						.append( updateSource.escape( "t1" ) )
+						.append( "." )
+						.append( updateSource.escape( evi.getEventTypeColumn() ) );
+				for ( EventModelInfo.IdInfo idInfo : evi.getIdInfos() ) {
+					for ( String column : idInfo.getColumnsInUpdateTable() ) {
+						queryString.append( ", " )
+								.append( updateSource.escape( "t1" ) )
+								.append( "." )
+								.append( updateSource.escape( column ) );
+					}
+				}
+				//FROM PART
+				queryString.append( updateSource.fromPart( evi ) );
+
+				//ORDER BY part
+				queryString.append(
+						" ORDER BY "
+				).append( updateSource.escape( "t1" ) )
+						.append( "." )
+						.append( updateSource.escape( evi.getUpdateIdColumn() ) )
+						.append( " ASC" );
+
+				log.trace( "querying for updates: " + queryString.toString() );
+				QueryWrapper query = em.createNativeQuery(
+						queryString.toString()
+				);
+				queryMap.put( evi.getUpdateTableName(), query );
+			}
+		}
+		return new MultiQueryAccess(
+				countMap, queryMap, (first, second) -> {
+			int res = Long.compare( updateSource.id( first ), updateSource.id( second ) );
+			if ( res == 0 ) {
+				throw new IllegalStateException( "database contained two update entries with the same id!" );
+			}
+			return res;
+		}, updateSource.batchSizeForDatabaseQueries
+		);
 	}
 
 	private String fromPart(EventModelInfo evi) {
