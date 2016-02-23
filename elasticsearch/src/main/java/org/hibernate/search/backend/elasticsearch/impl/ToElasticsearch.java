@@ -41,21 +41,20 @@ public class ToElasticsearch {
 	}
 
 	public static void addFacetingRequest(JsonBuilder.Object jsonQuery, FacetingRequest facetingRequest) {
+		String fieldName = facetingRequest.getFieldName();
 		if ( facetingRequest instanceof DiscreteFacetRequest ) {
-			String field = facetingRequest.getFieldName();
-
 			JsonObject termsJsonQuery = JsonBuilder.object().add( "terms",
 					JsonBuilder.object()
-							.addProperty( "field", field )
+							.addProperty( "field", fieldName )
 							.addProperty( "size", facetingRequest.getMaxNumberOfFacets() == -1 ? 0 : facetingRequest.getMaxNumberOfFacets() )
 							.add( "order", fromFacetSortOrder( facetingRequest.getSort() ) )
 							.addProperty( "min_doc_count", facetingRequest.hasZeroCountsIncluded() ? 0 : 1 )
 					).build();
 
-			if ( FieldHelper.isEmbeddedField( field ) ) {
+			if ( FieldHelper.isEmbeddedField( fieldName ) ) {
 				JsonBuilder.Object facetJsonQuery = JsonBuilder.object();
 				facetJsonQuery.add( "nested", JsonBuilder.object()
-								.addProperty( "path", FieldHelper.getEmbeddedFieldPath( field ) ) );
+								.addProperty( "path", FieldHelper.getEmbeddedFieldPath( fieldName ) ) );
 				facetJsonQuery.add( "aggregations", JsonBuilder.object().add( facetingRequest.getFacetingName(), termsJsonQuery));
 				jsonQuery.add( facetingRequest.getFacetingName(), facetJsonQuery);
 			}
@@ -66,19 +65,20 @@ public class ToElasticsearch {
 		else if ( facetingRequest instanceof RangeFacetRequest<?> ) {
 			RangeFacetRequest<?> rangeFacetingRequest = (RangeFacetRequest<?>) facetingRequest;
 			for ( FacetRange<?> facetRange : rangeFacetingRequest.getFacetRangeList() ) {
-				JsonBuilder.Object rangeQuery = JsonBuilder.object();
+				JsonBuilder.Object comparisonFragment = JsonBuilder.object();
 				if ( facetRange.getMin() != null ) {
-					rangeQuery.addProperty( facetRange.isMinIncluded() ? "gte" : "gt", facetRange.getMin() );
+					comparisonFragment.addProperty( facetRange.isMinIncluded() ? "gte" : "gt", facetRange.getMin() );
 				}
 				if ( facetRange.getMax() != null ) {
-					rangeQuery.addProperty( facetRange.isMaxIncluded() ? "lte" : "lt", facetRange.getMax() );
+					comparisonFragment.addProperty( facetRange.isMaxIncluded() ? "lte" : "lt", facetRange.getMax() );
 				}
 
+				JsonObject rangeQuery = wrapQueryForNestedIfRequired( fieldName,
+						JsonBuilder.object().add( "range",
+								JsonBuilder.object().add( fieldName, comparisonFragment)).build());
+
 				jsonQuery.add( facetingRequest.getFacetingName() + "-" + facetRange.hashCode(),
-						JsonBuilder.object().add( "filter",
-								JsonBuilder.object().add( "range",
-										JsonBuilder.object().add( facetingRequest.getFieldName(),
-												rangeQuery)))).build();
+						JsonBuilder.object().add( "filter", rangeQuery));
 			}
 		}
 		else {
