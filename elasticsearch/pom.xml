@@ -259,7 +259,6 @@
                                 <!-- Faceting -->
                                 <exclude>**/FacetIndexingFailureTest.java</exclude>
                                 <exclude>**/FacetUnknownFieldFailureTest.java</exclude>
-                                <exclude>**/WebShopTest.java</exclude>
 
                                 <exclude>**/IndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>

@@ -25,12 +25,14 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
@@ -241,6 +243,14 @@ public class ElasticsearchIndexManager implements IndexManager {
 		}
 
 		getOrCreateProperties( payload, fieldMetadata.getName() ).add( simpleFieldName, field );
+
+		// Create facet fields if needed: if the facet has the same name as the field, we don't need to create an
+		// extra field for it
+		for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
+			if ( !facetMetadata.getFacetName().equals( fieldMetadata.getFieldName() ) ) {
+				addFieldMapping( payload, facetMetadata );
+			}
+		}
 	}
 
 	/**
@@ -254,6 +264,19 @@ public class ElasticsearchIndexManager implements IndexManager {
 		field.addProperty( "index", "analyzed" );
 
 		getOrCreateProperties( payload, bridgeDefinedField.getName() ).add( simpleFieldName, field );
+		return field;
+	}
+
+	private JsonObject addFieldMapping(JsonObject payload, FacetMetadata facetMetadata) {
+		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( facetMetadata.getFacetName() );
+		String fullFieldName = facetMetadata.getFacetName();
+
+		JsonObject field = new JsonObject();
+		field.addProperty( "type", getFieldType( facetMetadata ) );
+		field.addProperty( "store", false );
+		field.addProperty( "index", "not_analyzed" );
+
+		getOrCreateProperties( payload, fullFieldName).add( simpleFieldName, field );
 		return field;
 	}
 
@@ -338,6 +361,26 @@ public class ElasticsearchIndexManager implements IndexManager {
 				return "string";
 			default:
 				throw new SearchException( "Unexpected field type: " + bridgeDefinedField.getType() );
+		}
+	}
+
+	private String getFieldType(FacetMetadata facetMetadata) {
+		switch ( facetMetadata.getEncoding() ) {
+			case DOUBLE:
+				return "double";
+			case LONG:
+				return "long";
+			case STRING:
+				return "string";
+			case AUTO:
+				throw new AssertionFailure( "The facet type should have been resolved during bootstrapping" );
+			default: {
+				throw new AssertionFailure(
+						"Unexpected facet encoding type '"
+								+ facetMetadata.getEncoding()
+								+ "' Has the enum been modified?"
+				);
+			}
 		}
 	}
 

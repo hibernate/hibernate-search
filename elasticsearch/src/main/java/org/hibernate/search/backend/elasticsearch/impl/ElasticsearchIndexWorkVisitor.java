@@ -11,10 +11,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.document.SortedSetDocValuesField;
+import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -169,8 +173,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 		for ( IndexableField field : document.getFields() ) {
 			if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
 					!field.name().equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
-					!"$facets".equals( field.name() ) &&
-					! isDocValueField( field) ) {
+					!FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( field.name() ) &&
+					!isDocValueField( field ) ) {
 
 				JsonObject parent = getOrCreateDocumentTree( source, field );
 				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
@@ -225,6 +229,46 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 							value != null ? new JsonPrimitive( value ) : null );
 				}
 			}
+			else if ( FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( field.name() )
+					&& field instanceof SortedSetDocValuesField ) {
+				// String facet fields
+				String[] facetParts = FacetsConfig.stringToPath( field.binaryValue().utf8ToString() );
+				if ( facetParts == null || facetParts.length != 2 ) {
+					continue;
+				}
+				String fieldName = facetParts[0];
+				String value = facetParts[1];
+
+				// if it's not just a facet field, we ignore it as the field is going to be created by the standard
+				// mechanism
+				if ( indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( fieldName ) != null ) {
+					continue;
+				}
+
+				JsonObject parent = getOrCreateDocumentTree( source, fieldName );
+				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldName );
+				addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+						value != null ? new JsonPrimitive( value ) : null );
+			}
+			else if ( isDocValueField( field ) && field instanceof NumericDocValuesField ) {
+				// Numeric facet fields: we also get fields created for sorting so we need to exclude them.
+				if ( indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() ) != null ) {
+					continue;
+				}
+
+				Number value;
+				if ( field instanceof DoubleDocValuesField ) {
+					// double values are encoded so we need to decode them
+					value = Double.longBitsToDouble( field.numericValue().longValue() );
+				}
+				else {
+					value = field.numericValue();
+				}
+				JsonObject parent = getOrCreateDocumentTree( source, field );
+				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
+				addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+						value != null ? new JsonPrimitive( value ) : null );
+			}
 		}
 
 		return source;
@@ -274,13 +318,17 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 	}
 
 	private JsonObject getOrCreateDocumentTree(JsonObject source, IndexableField field) {
+		return getOrCreateDocumentTree( source, field.name() );
+	}
+
+	private JsonObject getOrCreateDocumentTree(JsonObject source, String fieldName) {
 		// top-level property
-		if ( !FieldHelper.isEmbeddedField( field.name() ) ) {
+		if ( !FieldHelper.isEmbeddedField( fieldName ) ) {
 			return source;
 		}
 
 		// embedded property Create JSON hierarchy as needed
-		String[] parts = DOT.split( field.name() );
+		String[] parts = DOT.split( fieldName );
 		JsonObject parent = source;
 
 		for ( int i = 0; i < parts.length - 1; i++ ) {
