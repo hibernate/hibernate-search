@@ -27,15 +27,15 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
+import org.hibernate.search.backend.elasticsearch.test.model.Address;
+import org.hibernate.search.backend.elasticsearch.test.model.Country;
+import org.hibernate.search.backend.elasticsearch.test.model.Owner;
+import org.hibernate.search.backend.elasticsearch.test.model.Person;
+import org.hibernate.search.backend.elasticsearch.test.model.State;
+import org.hibernate.search.backend.elasticsearch.test.model.StateCandidate;
+import org.hibernate.search.backend.elasticsearch.test.model.Tower;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.embedded.Address;
-import org.hibernate.search.test.embedded.Country;
-import org.hibernate.search.test.embedded.Owner;
-import org.hibernate.search.test.embedded.Person;
-import org.hibernate.search.test.embedded.State;
-import org.hibernate.search.test.embedded.StateCandidate;
-import org.hibernate.search.test.embedded.Tower;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -226,7 +226,7 @@ public class ElasticsearchIT extends SearchTestBase {
 				"{" +
 					"'query' : { " +
 						"'match' : { " +
-							"'address.ownedBy_name' : 'renting'" +
+							"'address.ownedBy.name' : 'renting'" +
 						" }" +
 					" }" +
 				" }"
@@ -273,7 +273,7 @@ public class ElasticsearchIT extends SearchTestBase {
 				"{" +
 					"'query' : { " +
 						"'match' : { " +
-							"'address.ownedBy_name' : 'buckhead'" +
+							"'address.ownedBy.name' : 'buckhead'" +
 						" }" +
 					" }" +
 				" }"
