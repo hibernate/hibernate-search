@@ -15,6 +15,10 @@ public class FacetRange<T> {
 	private static final String MAX_INCLUDED = "]";
 	private static final String MAX_EXCLUDED = ")";
 
+	private static final String IDENTIFIER_INCLUDED = "i";
+	private static final String IDENTIFIER_EXCLUDED = "e";
+	private static final String IDENTIFIER_SEPARATOR = "_";
+
 	private final T min;
 	private final T max;
 	private final boolean includeMin;
@@ -86,18 +90,31 @@ public class FacetRange<T> {
 		return builder.toString();
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ( ( fieldName == null ) ? 0 : fieldName.hashCode() );
-		result = prime * result + ( includeMax ? 1231 : 1237 );
-		result = prime * result + ( includeMin ? 1231 : 1237 );
-		result = prime * result + ( ( max == null ) ? 0 : max.hashCode() );
-		result = prime * result + ( ( min == null ) ? 0 : min.hashCode() );
-		result = prime * result + ( ( rangeString == null ) ? 0 : rangeString.hashCode() );
-		result = prime * result + ( ( rangeType == null ) ? 0 : rangeType.getName().hashCode() );
-		return result;
+	/**
+	 * Returns a string suitable to use as an identifier.
+	 */
+	public String getIdentifier() {
+		StringBuilder builder = new StringBuilder();
+		if ( includeMin ) {
+			builder.append( IDENTIFIER_INCLUDED );
+		}
+		else {
+			builder.append( IDENTIFIER_EXCLUDED );
+		}
+		if ( min != null ) {
+			builder.append( min );
+		}
+		builder.append( IDENTIFIER_SEPARATOR );
+		if ( max != null ) {
+			builder.append( max );
+		}
+		if ( includeMax ) {
+			builder.append( IDENTIFIER_INCLUDED );
+		}
+		else {
+			builder.append( IDENTIFIER_EXCLUDED );
+		}
+		return builder.toString();
 	}
 
 	@Override

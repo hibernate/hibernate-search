@@ -611,7 +611,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		ArrayList<Facet> facets = new ArrayList<>();
 		for ( FacetRange<?> facetRange : facetRequest.getFacetRangeList() ) {
-			JsonElement aggregation = aggregations.get( facetRequest.getFacetingName() + "-" + facetRange.hashCode() );
+			JsonElement aggregation = aggregations.get( facetRequest.getFacetingName() + "-" + facetRange.getIdentifier() );
 			if ( aggregation == null ) {
 				continue;
 			}
