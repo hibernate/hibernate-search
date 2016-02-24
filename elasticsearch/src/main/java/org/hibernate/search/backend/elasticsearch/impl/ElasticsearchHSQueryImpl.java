@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,8 +50,8 @@ import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.engine.impl.AbstractHSQuery;
 import org.hibernate.search.query.engine.impl.EntityInfoImpl;
+import org.hibernate.search.query.engine.impl.FacetComparators;
 import org.hibernate.search.query.engine.impl.FacetManagerImpl;
-import org.hibernate.search.query.engine.impl.QueryHits.FacetComparator;
 import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -82,15 +81,6 @@ import io.searchbox.core.search.sort.Sort.Sorting;
  * @author Gunnar Morling
  */
 public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
-
-	// TODO GSM: Copied from QueryHits: should probably be in one place only.
-	private static final EnumMap<FacetSortOrder, FacetComparator> facetComparators = new EnumMap<>( FacetSortOrder.class );
-
-	static {
-		facetComparators.put( FacetSortOrder.COUNT_ASC, new FacetComparator( FacetSortOrder.COUNT_ASC ) );
-		facetComparators.put( FacetSortOrder.COUNT_DESC, new FacetComparator( FacetSortOrder.COUNT_DESC ) );
-		facetComparators.put( FacetSortOrder.FIELD_VALUE, new FacetComparator( FacetSortOrder.FIELD_VALUE ) );
-	}
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -603,7 +593,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			else {
 				facets = updateRangeFacets( aggregations, (RangeFacetRequest<?>) facetRequest );
 				if ( !FacetSortOrder.RANGE_DEFINITION_ORDER.equals( facetRequest.getSort() ) ) {
-					Collections.sort( facets, facetComparators.get( facetRequest.getSort() ) );
+					Collections.sort( facets, FacetComparators.get( facetRequest.getSort() ) );
 				}
 			}
 
