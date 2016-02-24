@@ -44,12 +44,12 @@ public class Car {
 			@Facet(name = "cubicCapacity", forField = "cubicCapacity", encoding = FacetEncodingType.STRING),
 			@Facet(name = "cubicCapacity_Numeric", forField = "cubicCapacity", encoding = FacetEncodingType.LONG)
 	})
-	private int cubicCapacity;
+	private Integer cubicCapacity;
 
 	public Car() {
 	}
 
-	public Car(String make, String color, int cubicCapacity) {
+	public Car(String make, String color, Integer cubicCapacity) {
 		this.color = color;
 		this.cubicCapacity = cubicCapacity;
 		this.make = make;
@@ -59,7 +59,7 @@ public class Car {
 		return color;
 	}
 
-	public int getCubicCapacity() {
+	public Integer getCubicCapacity() {
 		return cubicCapacity;
 	}
 
