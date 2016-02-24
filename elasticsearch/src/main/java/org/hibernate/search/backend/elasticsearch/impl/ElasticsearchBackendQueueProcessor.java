@@ -25,6 +25,11 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 	private ElasticsearchIndexManager indexManager;
 
+	/**
+	 * Use getInitializedIndexWorkVisitor() to access the initialized indexWorkVisitor.
+	 */
+	private ElasticsearchIndexWorkVisitor indexWorkVisitor;
+
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.indexManager = (ElasticsearchIndexManager) indexManager;
@@ -37,25 +42,13 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		for ( LuceneWork luceneWork : workList ) {
-			luceneWork.acceptIndexWorkVisitor(
-					new ElasticsearchIndexWorkVisitor(
-							indexManager.getActualIndexName(),
-							indexManager.searchIntegrator
-					),
-					null
-			);
+			luceneWork.acceptIndexWorkVisitor( getInitializedIndexWorkVisitor(), null );
 		}
 	}
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-		singleOperation.acceptIndexWorkVisitor(
-				new ElasticsearchIndexWorkVisitor(
-						indexManager.getActualIndexName(),
-						indexManager.searchIntegrator
-				),
-				null
-		);
+		singleOperation.acceptIndexWorkVisitor( getInitializedIndexWorkVisitor(), null );
 	}
 
 	@Override
@@ -73,5 +66,21 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	@Override
 	public void closeIndexWriter() {
 		// no-op
+	}
+
+	/**
+	 * Initializes the ElasticsearchIndexWorkVisitor.
+	 *
+	 * It is lazily initialized as the indexManager is not completely initialized when passed to the constructor.
+	 *
+	 * @return an initialized and reusable ElasticsearchIndexWorkVisitor
+	 */
+	private ElasticsearchIndexWorkVisitor getInitializedIndexWorkVisitor() {
+		if ( indexWorkVisitor == null ) {
+			indexWorkVisitor = new ElasticsearchIndexWorkVisitor(
+					indexManager.getActualIndexName(),
+					indexManager.searchIntegrator );
+		}
+		return indexWorkVisitor;
 	}
 }
