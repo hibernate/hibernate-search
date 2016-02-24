@@ -77,7 +77,7 @@ public class ToElasticsearch {
 						JsonBuilder.object().add( "range",
 								JsonBuilder.object().add( fieldName, comparisonFragment)).build());
 
-				jsonQuery.add( facetingRequest.getFacetingName() + "-" + facetRange.hashCode(),
+				jsonQuery.add( facetingRequest.getFacetingName() + "-" + facetRange.getIdentifier(),
 						JsonBuilder.object().add( "filter", rangeQuery));
 			}
 		}
