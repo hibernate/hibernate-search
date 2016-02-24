@@ -660,10 +660,20 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			DocumentFieldMetadata fieldMetadata,
 			FacetMetadata facetMetadata,
 			Object value) {
+		// we don't add null values to the facet field
+		if ( value == null ) {
+			return;
+		}
+
 		Field facetField;
 		switch ( facetMetadata.getEncoding() ) {
 			case STRING: {
-				facetField = new SortedSetDocValuesFacetField( facetMetadata.getFacetName(), value.toString() );
+				String stringValue = value.toString();
+				// we don't add empty strings to the facet field
+				if ( stringValue.isEmpty() ) {
+					return;
+				}
+				facetField = new SortedSetDocValuesFacetField( facetMetadata.getFacetName(), stringValue );
 				break;
 			}
 			case LONG: {
