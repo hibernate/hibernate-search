@@ -7,12 +7,9 @@
 package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -77,13 +74,7 @@ public class QueryHits {
 
 	private static final int DEFAULT_TOP_DOC_RETRIEVAL_SIZE = 100;
 	private static final int DEFAULT_FACET_RETRIEVAL_SIZE = 100;
-	private static final EnumMap<FacetSortOrder, FacetComparator> facetComparators = new EnumMap<>( FacetSortOrder.class );
 
-	static {
-		facetComparators.put( FacetSortOrder.COUNT_ASC, new FacetComparator( FacetSortOrder.COUNT_ASC ) );
-		facetComparators.put( FacetSortOrder.COUNT_DESC, new FacetComparator( FacetSortOrder.COUNT_DESC ) );
-		facetComparators.put( FacetSortOrder.FIELD_VALUE, new FacetComparator( FacetSortOrder.FIELD_VALUE ) );
-	}
 
 	private final LazyQueryState searcher;
 	private final Filter filter;
@@ -285,7 +276,7 @@ public class QueryHits {
 
 			// sort if necessary
 			if ( !facetRequest.getSort().equals( FacetSortOrder.RANGE_DEFINITION_ORDER ) ) {
-				Collections.sort( facets, facetComparators.get( facetRequest.getSort() ) );
+				Collections.sort( facets, FacetComparators.get( facetRequest.getSort() ) );
 			}
 
 			// trim to the expected size
@@ -541,24 +532,4 @@ public class QueryHits {
 		return topCollector;
 	}
 
-	public static class FacetComparator implements Comparator<Facet>, Serializable {
-		private final FacetSortOrder sortOder;
-
-		public FacetComparator(FacetSortOrder sortOrder) {
-			this.sortOder = sortOrder;
-		}
-
-		@Override
-		public int compare(Facet facet1, Facet facet2) {
-			if ( FacetSortOrder.COUNT_ASC.equals( sortOder ) ) {
-				return facet1.getCount() - facet2.getCount();
-			}
-			else if ( FacetSortOrder.COUNT_DESC.equals( sortOder ) ) {
-				return facet2.getCount() - facet1.getCount();
-			}
-			else {
-				return facet1.getValue().compareTo( facet2.getValue() );
-			}
-		}
-	}
 }
