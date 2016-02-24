@@ -44,7 +44,7 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 
 	private static class ElasticsearchNestingContextFactory implements NestingContextFactory {
 
-		private final ConcurrentMap<String, ContextCreationStratey> strategies = new ConcurrentHashMap<>();
+		private final ConcurrentMap<String, ContextCreationStrategy> strategies = new ConcurrentHashMap<>();
 		private ExtendedSearchIntegrator searchIntegrator;
 
 		public ElasticsearchNestingContextFactory(ExtendedSearchIntegrator searchIntegrator) {
@@ -53,10 +53,10 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 
 		@Override
 		public NestingContext createNestingContext(Class<?> indexedEntityType) {
-			ContextCreationStratey strategy = strategies.get( indexedEntityType.getName() );
+			ContextCreationStrategy strategy = strategies.get( indexedEntityType.getName() );
 
 			if ( strategy == null ) {
-				strategy = isMappedToElasticsearch( indexedEntityType ) ? ContextCreationStratey.ES : ContextCreationStratey.NO_OP;
+				strategy = isMappedToElasticsearch( indexedEntityType ) ? ContextCreationStrategy.ES : ContextCreationStrategy.NO_OP;
 				strategies.putIfAbsent( indexedEntityType.getName(), strategy );
 			}
 
@@ -81,7 +81,7 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 		}
 	}
 
-	private enum ContextCreationStratey {
+	private enum ContextCreationStrategy {
 		NO_OP {
 			@Override
 			NestingContext create() {
