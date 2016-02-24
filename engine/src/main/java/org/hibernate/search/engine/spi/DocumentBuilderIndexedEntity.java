@@ -651,10 +651,9 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 								( (TwoWayFieldBridge) fieldBridge ).objectToString( value ) );
 					}
 					else {
-						log.numericDateFacetForNonNumericField(
+						throw log.numericDateFacetForNonNumericField(
 								facetMetadata.getFacetName(),
 								fieldMetadata.getFieldName() );
-						throw new AssertionFailure( "Invalid FieldBridge for date faceting: " + fieldBridge );
 					}
 				}
 				else if ( Calendar.class.isAssignableFrom( value.getClass() ) ) {
