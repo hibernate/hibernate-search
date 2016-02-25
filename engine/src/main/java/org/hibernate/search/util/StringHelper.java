@@ -86,12 +86,12 @@ public final class StringHelper {
 	}
 
 	/**
-	 * Joins the elements of the given iterable to a string, separated by the given separator string.
+	 * Joins the elements of the given iterator to a string, separated by the given separator string.
 	 *
-	 * @param iterable the iterable to join
+	 * @param iterator the iterator to join
 	 * @param separator the separator string
 	 *
-	 * @return a string made up of the string representations of the given iterable members, separated by the given separator
+	 * @return a string made up of the string representations of the given iterator members, separated by the given separator
 	 *         string
 	 */
 	public static String join(Iterator<?> iterator, String separator) {
