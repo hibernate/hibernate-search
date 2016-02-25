@@ -12,29 +12,30 @@ import java.util.Map;
 
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
-import javax.persistence.EntityTransaction;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.StoredProcedureQuery;
 import javax.persistence.TypedQuery;
-import javax.persistence.metamodel.Metamodel;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.metamodel.Metamodel;
 
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.FullTextQuery;
-import org.hibernate.search.MassIndexer;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.Session;
 
 /**
  * @author Emmanuel Bernard
@@ -94,6 +95,12 @@ final class FullTextEntityManagerImpl implements FullTextEntityManager, Serializ
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
 		FullTextSession ftSession = getFullTextSession();
 		return new FullTextQueryImpl( ftSession.createFullTextQuery( luceneQuery, entities ), ftSession );
+	}
+
+	@Override
+	public FullTextQuery createFullTextQuery(QueryDescriptor descriptor, Class<?>... entities) {
+		FullTextSession ftSession = getFullTextSession();
+		return new FullTextQueryImpl( ftSession.createFullTextQuery( descriptor, entities ), ftSession );
 	}
 
 	@Override

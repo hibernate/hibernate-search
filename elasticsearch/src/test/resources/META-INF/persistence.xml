@@ -19,12 +19,12 @@
         <class>org.hibernate.search.test.query.timeout.Clock</class>
         <exclude-unlisted-classes />
     </persistence-unit>
-    
+
     <persistence-unit name="SortUsingEntityManagerTest">
         <class>org.hibernate.search.test.query.timeout.Clock</class>
         <exclude-unlisted-classes />
     </persistence-unit>
-    
+
     <persistence-unit name="SortUsingEntityManagerTestPU">
         <class>org.hibernate.search.test.query.ProductArticle</class>
         <exclude-unlisted-classes />
@@ -38,6 +38,13 @@
 
     <persistence-unit name="ToStringTestPU">
         <class>org.hibernate.search.test.jpa.ToStringTest$Foo</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
+    <persistence-unit name="ElasticsearchJpaITPU" transaction-type="RESOURCE_LOCAL">
+        <class>org.hibernate.search.backend.elasticsearch.test.GolfPlayer</class>
+        <class>org.hibernate.search.backend.elasticsearch.test.GolfCourse</class>
+        <class>org.hibernate.search.backend.elasticsearch.test.Hole</class>
         <exclude-unlisted-classes />
     </persistence-unit>
 
