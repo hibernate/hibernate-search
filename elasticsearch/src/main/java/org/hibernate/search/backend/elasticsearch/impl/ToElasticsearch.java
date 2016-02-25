@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
@@ -135,6 +136,9 @@ public class ToElasticsearch {
 		else if ( query instanceof WildcardQuery ) {
 			return convertWildcardQuery( (WildcardQuery) query );
 		}
+		else if ( query instanceof FuzzyQuery ) {
+			return convertFuzzyQuery( (FuzzyQuery) query );
+		}
 
 		throw LOG.cannotTransformLuceneQueryIntoEsQuery( query );
 	}
@@ -221,6 +225,22 @@ public class ToElasticsearch {
 				.build();
 
 		return wrapQueryForNestedIfRequired( field, wildcardQuery );
+	}
+
+	private static JsonObject convertFuzzyQuery(FuzzyQuery query) {
+		String field = query.getTerm().field();
+
+		JsonObject fuzzyQuery = JsonBuilder.object()
+				.add( "fuzzy",
+						JsonBuilder.object().add( field,
+								JsonBuilder.object()
+										.addProperty( "value", query.getTerm().text() )
+										.addProperty( "fuzziness", query.getMaxEdits() )
+										.addProperty( "prefix_length", query.getPrefixLength() )
+						)
+				).build();
+
+		return wrapQueryForNestedIfRequired( field, fuzzyQuery );
 	}
 
 	private static JsonObject convertTermRangeQuery(TermRangeQuery query) {
