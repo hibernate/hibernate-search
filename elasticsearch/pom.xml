@@ -263,7 +263,6 @@
                                 <exclude>**/IndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>
                                 <exclude>**/ProjectionQueryTest.java</exclude>
-                                <exclude>**/SortTest.java</exclude>
                                 <exclude>**/SortUsingEntityManagerTest.java</exclude>
                                 <exclude>**/SortUsingEntityManagerTest.java</exclude>
                                 <exclude>**/TermVectorTest.java</exclude>
