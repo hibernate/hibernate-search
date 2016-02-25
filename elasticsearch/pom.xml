@@ -314,6 +314,7 @@
                                 <exclude>**/FSSlaveAndMasterDPTest.java</exclude>
                                 <exclude>**/IndexReaderSeeOptimizedIndexTest.java</exclude>
                             </excludes>
+                            <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress</excludedGroups>
                         </configuration>
                     </execution>
                 </executions>
