@@ -210,8 +210,12 @@ public class ToElasticsearch {
 
 		JsonObject matchQuery = JsonBuilder.object()
 				.add( "match",
-						JsonBuilder.object().addProperty( field, termQuery.getTerm().text() ) )
-				.build();
+						JsonBuilder.object().add( field,
+								JsonBuilder.object()
+										.addProperty( "query", termQuery.getTerm().text() )
+										.addProperty( "boost", termQuery.getBoost() )
+						)
+				).build();
 
 		return wrapQueryForNestedIfRequired( field, matchQuery );
 	}
@@ -221,8 +225,12 @@ public class ToElasticsearch {
 
 		JsonObject wildcardQuery = JsonBuilder.object()
 				.add( "wildcard",
-						JsonBuilder.object().addProperty( field, query.getTerm().text() ) )
-				.build();
+						JsonBuilder.object().add( field,
+								JsonBuilder.object()
+										.addProperty( "value", query.getTerm().text() )
+										.addProperty( "boost", query.getBoost() )
+						)
+				).build();
 
 		return wrapQueryForNestedIfRequired( field, wildcardQuery );
 	}
@@ -237,6 +245,7 @@ public class ToElasticsearch {
 										.addProperty( "value", query.getTerm().text() )
 										.addProperty( "fuzziness", query.getMaxEdits() )
 										.addProperty( "prefix_length", query.getPrefixLength() )
+										.addProperty( "boost", query.getBoost() )
 						)
 				).build();
 
@@ -252,6 +261,7 @@ public class ToElasticsearch {
 		if ( query.getUpperTerm() != null ) {
 			interval.addProperty( query.includesUpper() ? "lte" : "lt", query.getUpperTerm().utf8ToString() );
 		}
+		interval.addProperty( "boost", query.getBoost() );
 
 		JsonObject range = JsonBuilder.object().add( "range",
 						JsonBuilder.object().add( query.getField(), interval ))
@@ -268,6 +278,7 @@ public class ToElasticsearch {
 		if ( query.getMax() != null ) {
 			interval.addProperty( query.includesMax() ? "lte" : "lt", query.getMax() );
 		}
+		interval.addProperty( "boost", query.getBoost() );
 
 		JsonObject range = JsonBuilder.object().add( "range",
 						JsonBuilder.object().add( query.getField(), interval ))
