@@ -339,8 +339,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			// TODO: embedded fields
 			if ( sort != null ) {
 				for ( SortField sortField : sort.getSort() ) {
-					String sortFieldName = sortField.getField().equals( idFieldName ) ? "_uid" : sortField.getField();
-					search.addSort( new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC ) );
+					search.addSort( getSort( sortField, idFieldName ) );
 				}
 			}
 			this.search = search.build();
@@ -398,6 +397,31 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			else {
 				return indexedTargetedEntities;
 			}
+		}
+
+		private Sort getSort(SortField sortField, String idFieldName) {
+			String sortFieldName;
+			if ( sortField.getField() == null ) {
+				switch (sortField.getType()) {
+					case DOC:
+						sortFieldName = "_uid";
+						break;
+					case SCORE:
+						sortFieldName = "_score";
+						break;
+					default:
+						throw LOG.cannotUseThisSortTypeWithNullSortFieldName( sortField.getType() );
+				}
+			}
+			else {
+				if ( sortField.getField().equals( idFieldName ) ) {
+					sortFieldName = "_uid";
+				}
+				else {
+					sortFieldName = sortField.getField();
+				}
+			}
+			return new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC );
 		}
 
 		SearchResult runSearch() {

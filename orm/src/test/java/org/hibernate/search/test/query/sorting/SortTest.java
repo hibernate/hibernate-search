@@ -6,6 +6,11 @@
  */
 package org.hibernate.search.test.query.sorting;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
@@ -46,14 +51,11 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Hardy Ferentschik
@@ -126,6 +128,7 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
+	@Category(SkipOnElasticsearch.class)
 	public void testResultOrderedByIdAlteringSortStyle() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -203,6 +206,7 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
+	@Category(SkipOnElasticsearch.class)
 	public void testCustomFieldComparatorAscendingSort() {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -225,6 +229,7 @@ public class SortTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
+	@Category(SkipOnElasticsearch.class)
 	public void testCustomFieldComparatorDescendingSort() {
 		Transaction tx = fullTextSession.beginTransaction();
 
