@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.query.engine.spi.QueryDescriptor;
 
 /**
  * Extends an EntityManager with Full-Text operations
@@ -33,6 +34,11 @@ public interface FullTextEntityManager extends EntityManager {
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
 	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
+
+	/**
+	 * Creates a fulltext query from the given query descriptor.
+	 */
+	FullTextQuery createFullTextQuery(QueryDescriptor descriptor, Class<?>... entities);
 
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
