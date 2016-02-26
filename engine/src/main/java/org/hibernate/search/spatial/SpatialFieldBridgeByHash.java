@@ -6,16 +6,17 @@
  */
 package org.hibernate.search.spatial;
 
-import org.apache.lucene.document.Document;
+import java.util.Map;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
+import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spatial.impl.SpatialNumericDocValueField;
-import org.hibernate.search.spatial.impl.Point;
-
-import java.util.Map;
 
 /**
  * Hibernate Search field bridge, binding a Coordinates to a spatial hash field in the index
@@ -46,6 +47,20 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 		this.bottomSpatialHashLevel = bottomSpatialHashLevel;
 		this.latitudeField = latitudeField;
 		this.longitudeField = longitudeField;
+	}
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		super.configureFieldMetadata( name, builder );
+		if ( spatialHashIndex ) {
+			for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
+				builder.field( SpatialHelper.formatFieldName( i, name ), FieldType.STRING );
+			}
+		}
+		if ( numericFieldsIndex ) {
+			builder.field( SpatialHelper.formatLatitude( name ), FieldType.DOUBLE );
+			builder.field( SpatialHelper.formatLongitude( name ), FieldType.DOUBLE );
+		}
 	}
 
 	/**

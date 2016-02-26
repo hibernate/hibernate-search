@@ -9,6 +9,8 @@ package org.hibernate.search.spatial;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spatial.impl.SpatialNumericDocValueField;
 
@@ -25,6 +27,14 @@ public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 	public SpatialFieldBridgeByRange(String latitudeField, String longitudeField) {
 		this.latitudeField = latitudeField;
 		this.longitudeField = longitudeField;
+	}
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		super.configureFieldMetadata( name, builder );
+
+		builder.field( SpatialHelper.formatLatitude( name ), FieldType.DOUBLE );
+		builder.field( SpatialHelper.formatLongitude( name ), FieldType.DOUBLE );
 	}
 
 	/**
