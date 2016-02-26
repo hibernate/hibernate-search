@@ -34,16 +34,16 @@
     Note this substitution applies to property values only at the point they are read from
     the config file. Tokens in system properties won't be substituted.
     -->
-    
+
     <!-- Disable to avoid creating temporary transaction logs on disk (default is YES) -->
     <entry key="CoordinatorEnvironmentBean.transactionStatusManagerEnable">NO</entry>
 
     <!-- (default is YES) -->
     <entry key="CoordinatorEnvironmentBean.commitOnePhase">YES</entry>
 
-    <!-- default is under user.home - must be writeable!) 
+    <!-- default is under user.home - must be writeable!)
     <entry key="ObjectStoreEnvironmentBean.objectStoreDir">PutObjectStoreDirHere</entry> -->
-    
+
     <!-- The VolatileStore won't be able to recover anything - use only for simple tests! -->
     <entry key="ObjectStoreEnvironmentBean.objectStoreType">com.arjuna.ats.internal.arjuna.objectstore.VolatileStore</entry>
 
