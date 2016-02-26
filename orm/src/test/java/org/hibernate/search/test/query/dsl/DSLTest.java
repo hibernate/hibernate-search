@@ -6,6 +6,12 @@
  */
 package org.hibernate.search.test.query.dsl;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -39,10 +45,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
-import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.Log;
@@ -51,12 +54,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
@@ -265,7 +262,7 @@ public class DSLTest extends SearchTestBase {
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
 
-		//combined query, January and february both contain whitening but February in a longer text
+		//combined query, January and February both contain whitening but February in a longer text
 		Query query = monthQb
 				.bool()
 				.should( monthQb.keyword().onField( "mythology" ).matching( "whitening" ).createQuery() )
@@ -276,7 +273,7 @@ public class DSLTest extends SearchTestBase {
 		assertEquals( 2, results.size() );
 		assertEquals( "January", results.get( 0 ).getName() );
 
-		//boosted query, January and february both contain whitening but February in a longer text
+		//boosted query, January and February both contain whitening but February in a longer text
 		//since history is boosted, February should come first though
 		query = monthQb
 				.bool()
@@ -300,7 +297,7 @@ public class DSLTest extends SearchTestBase {
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
-		//combined query, January and february both contain whitening but February in a longer text
+		//combined query, January and February both contain whitening but February in a longer text
 		Query query = monthQb.keyword()
 				.onField( "mythology" )
 				.andField( "history" )
@@ -311,7 +308,7 @@ public class DSLTest extends SearchTestBase {
 		assertEquals( 2, results.size() );
 		assertEquals( "January", results.get( 0 ).getName() );
 
-		//combined query, January and february both contain whitening but February in a longer text
+		//combined query, January and February both contain whitening but February in a longer text
 		query = monthQb.keyword()
 				.onFields( "mythology", "history" )
 					.boostedTo( 30 )
@@ -321,7 +318,7 @@ public class DSLTest extends SearchTestBase {
 		assertEquals( 2, results.size() );
 		assertEquals( "January", results.get( 0 ).getName() );
 
-		//boosted query, January and february both contain whitening but February in a longer text
+		//boosted query, January and February both contain whitening but February in a longer text
 		//since history is boosted, February should come first though
 		query = monthQb.keyword()
 				.onField( "mythology" )
@@ -481,7 +478,23 @@ public class DSLTest extends SearchTestBase {
 
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		query = monthQb
+		transaction.commit();
+	}
+
+	@Test
+	public void testRangeQueryFromToIgnoreFieldBridge() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		calendar.set( 1900, 2, 12, 0, 0, 0 );
+		calendar.set( Calendar.MILLISECOND, 0 );
+		Date from = calendar.getTime();
+		calendar.set( 1910, 2, 12, 0, 0, 0 );
+		Date to = calendar.getTime();
+
+		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
 						.ignoreFieldBridge()
@@ -517,19 +530,6 @@ public class DSLTest extends SearchTestBase {
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "March", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
-		query = monthQb
-				.range()
-					.onField( "estimatedCreation" )
-						.ignoreFieldBridge()
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
-					.below( DateTools.round( to, DateTools.Resolution.MINUTE ) )
-					.createQuery();
-
-		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
-		assertEquals( 1, hibQuery.getResultSize() );
-		assertEquals( "March", ( (Month) hibQuery.list().get( 0 ) ).getName() );
-
 		query = monthQb.range()
 				.onField( "raindropInMm" )
 				.below( 0.24d )
@@ -541,6 +541,32 @@ public class DSLTest extends SearchTestBase {
 
 		assertEquals( "test range numeric ", 1, results.size() );
 		assertEquals( "test range numeric ", "January", ( (Month) results.get( 0 ) ).getName() );
+
+		transaction.commit();
+	}
+
+	@Test
+	public void testRangeQueryBelowIgnoreFieldBridge() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		calendar.set( 10 + 1800, 2, 12, 0, 0, 0 );
+		Date to = calendar.getTime();
+
+		Query query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+						.ignoreFieldBridge()
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.below( DateTools.round( to, DateTools.Resolution.MINUTE ) )
+					.createQuery();
+
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "March", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
 		transaction.commit();
 	}
@@ -596,7 +622,20 @@ public class DSLTest extends SearchTestBase {
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
-		query = monthQb
+		transaction.commit();
+	}
+
+	@Test
+	public void testRangeQueryAboveIgnoreFieldBridge() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		calendar.set( 10 + 1900, 2, 12, 0, 0, 0 );
+		Date to = calendar.getTime();
+
+		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
 						.ignoreFieldBridge()
@@ -604,7 +643,7 @@ public class DSLTest extends SearchTestBase {
 						.ignoreFieldBridge().ignoreAnalyzer()
 					.above( DateTools.round( to, DateTools.Resolution.MINUTE ) )
 					.createQuery();
-		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
@@ -661,16 +700,6 @@ public class DSLTest extends SearchTestBase {
 		Query query = monthQb
 				.phrase()
 					.onField( "mythology" )
-					.sentence( "colder and whitening" )
-					.createQuery();
-
-		assertEquals(
-				"test exact phrase", 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize()
-		);
-
-		query = monthQb
-				.phrase()
-					.onField( "mythology" )
 					.sentence( "Month whitening" )
 					.createQuery();
 
@@ -706,6 +735,25 @@ public class DSLTest extends SearchTestBase {
 //					.createQuery();
 //
 //		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		transaction.commit();
+	}
+
+	@Test
+	public void testPhraseQueryWithStopWords() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb
+				.phrase()
+					.onField( "mythology" )
+					.sentence( "colder and whitening" )
+					.createQuery();
+
+		assertEquals(
+				"test exact phrase", 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize()
+		);
 
 		transaction.commit();
 	}
@@ -859,39 +907,6 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testSpatialQueries() {
-		Transaction transaction = fullTextSession.beginTransaction();
-		final QueryBuilder builder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder().forEntity( POI.class ).get();
-
-		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );
-		Query query = builder
-				.spatial()
-					.onField( "location" )
-					.within( 51, Unit.KM )
-						.ofCoordinates( coordinates )
-					.createQuery();
-
-		List<?> results = fullTextSession.createFullTextQuery( query, POI.class ).list();
-
-		assertEquals( "test spatial hash based spatial query", 1, results.size() );
-		assertEquals( "test spatial hash based spatial query", "Bozo", ( (POI) results.get( 0 ) ).getName() );
-
-		query = builder
-				.spatial()
-					.onField( "location" )
-					.within( 500, Unit.KM )
-						.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
-					.createQuery();
-		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
-
-		assertEquals( "test spatial hash based spatial query", 1, results.size() );
-		assertEquals( "test spatial hash based spatial query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
-
-		transaction.commit();
-	}
-
-	@Test
 	@TestForIssue( jiraKey = "HSEARCH-703" )
 	public void testPolymorphicQueryForUnindexedSuperTypeReturnsIndexedSubType() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -905,7 +920,7 @@ public class DSLTest extends SearchTestBase {
 		Query query = builder.all().createQuery();
 		List<?> results = fullTextSession.createFullTextQuery( query, Object.class ).list();
 
-		assertEquals( "expected all instances of all indexed types", 10, results.size() );
+		assertEquals( "expected all instances of all indexed types", 8, results.size() );
 
 		transaction.commit();
 	}
@@ -1074,11 +1089,6 @@ public class DSLTest extends SearchTestBase {
 				)
 		);
 
-		POI poi = new POI( 1, "Tour Eiffel", 48.858333d, 2.294444d, "Monument" );
-		fullTextSession.persist( poi );
-		poi = new POI( 2, "Bozo", 24d, 32d, "Monument" );
-		fullTextSession.persist( poi );
-
 		Car car = new SportsCar( 1, "Leyland", 100 );
 		fullTextSession.persist( car );
 
@@ -1108,7 +1118,6 @@ public class DSLTest extends SearchTestBase {
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Month.class,
-				POI.class,
 				Car.class,
 				SportsCar.class,
 				Animal.class,

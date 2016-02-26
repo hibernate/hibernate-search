@@ -249,6 +249,7 @@
                                 <exclude>**/ToStringTest.java</exclude>
                                 <exclude>**/DynamicBoostingTest.java</exclude>
                                 <exclude>**/DSLTest.java</exclude>
+                                <exclude>**/SpatialDSLTest</exclude>
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>
                                 <exclude>**/ExplanationTest.java</exclude>
