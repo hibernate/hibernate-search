@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
@@ -139,6 +141,9 @@ public class ToElasticsearch {
 		else if ( query instanceof FuzzyQuery ) {
 			return convertFuzzyQuery( (FuzzyQuery) query );
 		}
+		else if ( query instanceof PhraseQuery ) {
+			return convertPhraseQuery( (PhraseQuery) query );
+		}
 
 		throw LOG.cannotTransformLuceneQueryIntoEsQuery( query );
 	}
@@ -250,6 +255,32 @@ public class ToElasticsearch {
 				).build();
 
 		return wrapQueryForNestedIfRequired( field, fuzzyQuery );
+	}
+
+	private static JsonObject convertPhraseQuery(PhraseQuery query) {
+		Term[] terms = query.getTerms();
+
+		if ( terms.length == 0 ) {
+			throw LOG.cannotQueryOnEmptyPhraseQuery();
+		}
+
+		String field = terms[0].field(); // phrase queries are only supporting one field
+		StringBuilder phrase = new StringBuilder();
+		for ( Term term : terms ) {
+			phrase.append( " " ).append( term.text() );
+		}
+
+		JsonObject phraseQuery = JsonBuilder.object()
+				.add( "match_phrase",
+						JsonBuilder.object().add( field,
+								JsonBuilder.object()
+										.addProperty( "query", phrase.toString().trim() )
+										.addProperty( "slop", query.getSlop() )
+										.addProperty( "boost", query.getBoost() )
+						)
+				).build();
+
+		return wrapQueryForNestedIfRequired( field, phraseQuery );
 	}
 
 	private static JsonObject convertTermRangeQuery(TermRangeQuery query) {

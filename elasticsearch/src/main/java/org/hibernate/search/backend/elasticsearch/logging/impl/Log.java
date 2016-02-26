@@ -42,4 +42,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 5,
 			value = "The SortType '%1$s' cannot be used with a null sort field name")
 	SearchException cannotUseThisSortTypeWithNullSortFieldName(SortField.Type sortType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 6,
+			value = "Empty phrase queries are not supported")
+	SearchException cannotQueryOnEmptyPhraseQuery();
+
 }
