@@ -248,8 +248,7 @@
                                 <exclude>**/SpatialQueryingJPATest.java</exclude>
                                 <exclude>**/ToStringTest.java</exclude>
                                 <exclude>**/DynamicBoostingTest.java</exclude>
-                                <exclude>**/DSLTest.java</exclude>
-                                <exclude>**/SpatialDSLTest</exclude>
+                                <exclude>**/SpatialDSLTest.java</exclude>
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>
                                 <exclude>**/ExplanationTest.java</exclude>

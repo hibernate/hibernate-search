@@ -48,12 +48,14 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Emmanuel Bernard
@@ -140,6 +142,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testTermQueryOnAnalyzer() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -482,6 +485,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testRangeQueryFromToIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -546,6 +550,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testRangeQueryBelowIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -626,6 +631,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testRangeQueryAboveIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -740,6 +746,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testPhraseQueryWithStopWords() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -760,6 +767,7 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1074")
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testPhraseQueryWithNoTermsAfterAnalyzerApplication() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
