@@ -12,10 +12,10 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.genericjpa.annotations.IdColumn;
-import org.hibernate.search.genericjpa.annotations.IdInfo;
-import org.hibernate.search.genericjpa.annotations.UpdateInfo;
-import org.hibernate.search.genericjpa.db.ColumnType;
+import org.hibernate.search.annotations.IdColumn;
+import org.hibernate.search.annotations.IdInfo;
+import org.hibernate.search.annotations.UpdateInfo;
+import org.hibernate.search.db.ColumnType;
 
 /**
  * @author Emmanuel Bernard

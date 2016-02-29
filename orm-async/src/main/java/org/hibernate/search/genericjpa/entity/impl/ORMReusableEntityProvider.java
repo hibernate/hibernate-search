@@ -15,7 +15,7 @@ import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.genericjpa.exception.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
 
 /**

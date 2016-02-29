@@ -20,29 +20,28 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
-import org.hibernate.search.genericjpa.db.events.impl.AsyncUpdateSource;
-import org.hibernate.search.genericjpa.db.events.index.impl.IndexUpdater;
-import org.hibernate.search.genericjpa.db.events.jpa.impl.SQLJPAAsyncUpdateSourceProvider;
-import org.hibernate.search.genericjpa.db.events.triggers.TriggerSQLStringSource;
+import org.hibernate.search.db.events.impl.AsyncUpdateSource;
+import org.hibernate.search.db.events.index.impl.IndexUpdater;
+import org.hibernate.search.db.events.jpa.impl.SQLJPAAsyncUpdateSourceProvider;
+import org.hibernate.search.db.events.triggers.TriggerSQLStringSource;
 import org.hibernate.search.genericjpa.entity.impl.ORMReusableEntityProvider;
-import org.hibernate.search.genericjpa.exception.AssertionFailure;
-import org.hibernate.search.genericjpa.exception.SearchException;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.factory.StandaloneSearchConfiguration;
-import org.hibernate.search.genericjpa.jpa.util.impl.ORMEntityManagerFactoryWrapper;
+import org.hibernate.search.db.util.impl.ORMEntityManagerFactoryWrapper;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataRehasher;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataUtil;
 import org.hibernate.search.genericjpa.metadata.impl.RehashedTypeMetadata;
-import org.hibernate.search.spi.BuildContext;
 
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_DEFAULT_VALUE;
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_KEY;
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE;
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DEFAULT_VALUE;
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DROP_CREATE;
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_KEY;
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_SOURCE_KEY;
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.UPDATE_DELAY_DEFAULT_VALUE;
-import static org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants.UPDATE_DELAY_KEY;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_DEFAULT_VALUE;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_KEY;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DEFAULT_VALUE;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DROP_CREATE;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_KEY;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_SOURCE_KEY;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.UPDATE_DELAY_DEFAULT_VALUE;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.UPDATE_DELAY_KEY;
 
 /**
  * Created by Martin on 14.11.2015.

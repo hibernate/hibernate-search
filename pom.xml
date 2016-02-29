@@ -42,7 +42,7 @@
         <module>integrationtest/engine-performance</module>
 
         <module>genericjpa/util</module>
-        <module>genericjpa/standalone</module>
+        <module>genericjpa/common-apis</module>
         <module>genericjpa/db</module>
         <module>genericjpa/async-updates</module>
 

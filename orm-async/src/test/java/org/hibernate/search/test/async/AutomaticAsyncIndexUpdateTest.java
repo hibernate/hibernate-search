@@ -9,8 +9,8 @@ package org.hibernate.search.test.async;
 import java.util.Map;
 
 import org.hibernate.search.backend.triggers.impl.TriggerServiceConstants;
-import org.hibernate.search.genericjpa.db.events.jpa.impl.AsyncUpdateConstants;
-import org.hibernate.search.genericjpa.db.events.triggers.HSQLDBTriggerSQLStringSource;
+import org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants;
+import org.hibernate.search.db.events.triggers.HSQLDBTriggerSQLStringSource;
 
 /**
  * Created by Martin on 14.11.2015.
