@@ -123,6 +123,23 @@ public final class DistanceFilter extends Filter {
 		};
 	}
 
+	public String getCoordinatesField() {
+		if ( coordinatesField != null ) {
+			return coordinatesField;
+		}
+		else {
+			return SpatialHelper.getSpatialFieldRootName( latitudeField );
+		}
+	}
+
+	public double getRadius() {
+		return radius;
+	}
+
+	public Point getCenter() {
+		return center;
+	}
+
 	private String getLatitudeField() {
 		if ( latitudeField != null ) {
 			return latitudeField;

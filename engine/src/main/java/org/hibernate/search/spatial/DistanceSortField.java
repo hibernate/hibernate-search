@@ -21,11 +21,19 @@ import org.hibernate.search.spatial.impl.Point;
  */
 public class DistanceSortField extends SortField {
 
+	private Coordinates center;
+
 	public DistanceSortField(Coordinates center, String fieldName) {
 		super( fieldName, new DistanceComparatorSource( center ) );
+		this.center = center;
 	}
 
 	public DistanceSortField(double latitude, double longitude, String fieldName) {
 		this( Point.fromDegrees( latitude, longitude ), fieldName );
+		this.center = Point.fromDegrees( latitude, longitude );
+	}
+
+	public Coordinates getCenter() {
+		return center;
 	}
 }
