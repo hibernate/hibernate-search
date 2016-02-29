@@ -1,6 +1,31 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.6.0.Alpha2 (29-2-2016)
+------------------------
+
+** Bug
+    * [HSEARCH-1917] - Cannot index null or empty values for faceted fields
+
+** New Feature
+    * [HSEARCH-2065] - Support the Faceting feature over Elasticsearch
+    * [HSEARCH-2114] - Allow to use "elasticsearch" as alias for index manager configuration
+    * [HSEARCH-2117] - Add FullTextEntityManager#createFullTextQuery(QueryDescriptor, Class<?>...)
+
+** Task
+    * [HSEARCH-2131] - Include basic Elasticsearch getting started elements in the documentation
+
+** Improvement
+    * [HSEARCH-2099] - Upgrade to Apache Lucene 5.5.0
+    * [HSEARCH-2105] - Don't use nested mapping by default with ES backend
+    * [HSEARCH-2113] - Elasticsearch - Better sort support
+    * [HSEARCH-2118] - Add infrastructure to be able to ignore tests when running the Elasticsearch backend
+    * [HSEARCH-2121] - Split DSLTest to facilitate Elasticsearch testing
+    * [HSEARCH-2122] - Elasticsearch - add support for FuzzyQuery
+    * [HSEARCH-2123] - Elasticsearch - add support for boost
+    * [HSEARCH-2124] - Elasticsearch - add support for phrase query
+
+
 Version 5.6.0.Alpha1 (16-2-2016)
 ------------------------
 
