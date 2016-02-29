@@ -74,12 +74,12 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] fourthResult = (Object[]) results.get( 3 );
 		Object[] fifthResult = (Object[]) results.get( 4 );
 		Object[] sixthResult = (Object[]) results.get( 5 );
-		Assert.assertEquals( 0.0, (Double) firstResult[1], 0.0001 );
-		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.0001 );
-		Assert.assertEquals( 11.1195, (Double) thirdResult[1], 0.0001 );
-		Assert.assertEquals( 15.0636, (Double) fourthResult[1], 0.0001 );
-		Assert.assertEquals( 22.239, (Double) fifthResult[1], 0.001 );
-		Assert.assertEquals( 24.446, (Double) sixthResult[1], 0.001 );
+		Assert.assertEquals( 0.0, (Double) firstResult[1], 0.01 );
+		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
+		Assert.assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
+		Assert.assertEquals( 15.0636, (Double) fourthResult[1], 0.01 );
+		Assert.assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
+		Assert.assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
 
 		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
 		for ( Object entity : pois ) {
@@ -132,12 +132,12 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] fourthResult = (Object[]) results.get( 3 );
 		Object[] fifthResult = (Object[]) results.get( 4 );
 		Object[] sixthResult = (Object[]) results.get( 5 );
-		Assert.assertEquals( 0.0, (Double) firstResult[1], 0.0001 );
-		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.0001 );
-		Assert.assertEquals( 11.1195, (Double) thirdResult[1], 0.0001 );
-		Assert.assertEquals( 15.0636, (Double) fourthResult[1], 0.0001 );
-		Assert.assertEquals( 22.239, (Double) fifthResult[1], 0.001 );
-		Assert.assertEquals( 24.446, (Double) sixthResult[1], 0.001 );
+		Assert.assertEquals( 0.0, (Double) firstResult[1], 0.01 );
+		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
+		Assert.assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
+		Assert.assertEquals( 15.0636, (Double) fourthResult[1], 0.01 );
+		Assert.assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
+		Assert.assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
 
 		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
 		for ( Object entity : pois ) {
@@ -251,9 +251,9 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
 		Object[] thirdResult = (Object[]) results.get( 2 );
-		Assert.assertEquals( 0.0, (Double) firstResult[1], 0.0001 );
-		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.0001 );
-		Assert.assertEquals( 11.1195, (Double) thirdResult[1], 0.0001 );
+		Assert.assertEquals( 0.0, (Double) firstResult[1], 0.01 );
+		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
+		Assert.assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
 
 		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
 		for ( Object entity : pois ) {
@@ -306,12 +306,12 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] fourthResult = (Object[]) results.get( 3 );
 		Object[] fifthResult = (Object[]) results.get( 4 );
 		Object[] sixthResult = (Object[]) results.get( 5 );
-		Assert.assertEquals( (Double) firstResult[1], 0.0, 0.0001 );
-		Assert.assertEquals( (Double) secondResult[1], 10.1582, 0.0001 );
-		Assert.assertEquals( (Double) thirdResult[1], 11.1195, 0.0001 );
-		Assert.assertEquals( (Double) fourthResult[1], 15.0636, 0.0001 );
-		Assert.assertEquals( (Double) fifthResult[1], 22.239, 0.001 );
-		Assert.assertEquals( (Double) sixthResult[1], 24.446, 0.001 );
+		Assert.assertEquals( (Double) firstResult[1], 0.0, 0.01 );
+		Assert.assertEquals( (Double) secondResult[1], 10.1582, 0.01 );
+		Assert.assertEquals( (Double) thirdResult[1], 11.1195, 0.01 );
+		Assert.assertEquals( (Double) fourthResult[1], 15.0636, 0.01 );
+		Assert.assertEquals( (Double) fifthResult[1], 22.239, 0.02 );
+		Assert.assertEquals( (Double) sixthResult[1], 24.446, 0.02 );
 
 		//Tests with @Latitude+@Longitude
 		luceneQuery = builder.spatial()
@@ -328,11 +328,11 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		fifthResult = (Object[]) results.get( 4 );
 		sixthResult = (Object[]) results.get( 5 );
 		Assert.assertEquals( (Double) firstResult[1], 0.0, 0.0001 );
-		Assert.assertEquals( (Double) secondResult[1], 10.1582, 0.0001 );
-		Assert.assertEquals( (Double) thirdResult[1], 11.1195, 0.0001 );
-		Assert.assertEquals( (Double) fourthResult[1], 15.0636, 0.0001 );
-		Assert.assertEquals( (Double) fifthResult[1], 22.239, 0.001 );
-		Assert.assertEquals( (Double) sixthResult[1], 24.446, 0.001 );
+		Assert.assertEquals( (Double) secondResult[1], 10.1582, 0.01 );
+		Assert.assertEquals( (Double) thirdResult[1], 11.1195, 0.01 );
+		Assert.assertEquals( (Double) fourthResult[1], 15.0636, 0.01 );
+		Assert.assertEquals( (Double) fifthResult[1], 22.239, 0.02 );
+		Assert.assertEquals( (Double) sixthResult[1], 24.446, 0.02 );
 
 
 		List<?> pois = em.createQuery( "from " + DoubleIndexedPOI.class.getName() ).getResultList();

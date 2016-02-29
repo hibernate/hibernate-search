@@ -245,10 +245,8 @@
                                 <exclude>**/FilterTest.java</exclude>
                                 <exclude>**/IndexingActionInterceptorTest.java</exclude>
                                 <exclude>**/IndexControlMBeanTest.java</exclude>
-                                <exclude>**/SpatialQueryingJPATest.java</exclude>
                                 <exclude>**/ToStringTest.java</exclude>
                                 <exclude>**/DynamicBoostingTest.java</exclude>
-                                <exclude>**/SpatialDSLTest.java</exclude>
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>
                                 <exclude>**/ExplanationTest.java</exclude>
@@ -275,8 +273,6 @@
                                 <exclude>**/JPATimeoutTest.java</exclude>
                                 <exclude>**/DirectoryProviderForQueryTest.java</exclude>
                                 <exclude>**/DirectorySelectionTest.java</exclude>
-                                <exclude>**/SpatialIndexingTest.java</exclude>
-                                <exclude>**/SpatialSearchSortByDistanceAndPagingTest.java</exclude>
                                 <exclude>**/AnalyzerTest.java</exclude>
                                 <exclude>**/DoubleAnalyzerTest.java</exclude>
                                 <exclude>**/AnalyzerInheritanceTest.java</exclude>
