@@ -27,4 +27,6 @@ include::spatial.asciidoc[]
 
 include::advanced-features.asciidoc[]
 
+include::elasticsearch-integration.asciidoc[]
+
 include::further-reading.asciidoc[]
