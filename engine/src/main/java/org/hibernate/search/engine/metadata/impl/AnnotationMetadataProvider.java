@@ -654,14 +654,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		typeMetadataBuilder.addClassBridgeField( fieldMetadata );
 
-		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
-			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
+		contributeClassBridgeDefinedFields( typeMetadataBuilder, fieldName, fieldBridge );
 
-			FieldMetadataBuilderImpl classBridgeContributedFieldMetadata = getBridgeContributedFieldMetadata( fieldName, metadataProvidingFieldBridge );
-
-			typeMetadataBuilder.addClassBridgeSortableFields( classBridgeContributedFieldMetadata.getSortableFields() );
-			typeMetadataBuilder.addClassBridgeDefinedFields( classBridgeContributedFieldMetadata.getFields() );
-		}
 		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer( classBridgeAnnotation.analyzer(), configContext );
 		typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
 	}
@@ -698,6 +692,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
+		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
+			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
+			FieldMetadataBuilderImpl bridgeContributedMetadata = getBridgeContributedFieldMetadata( fieldName, metadataProvidingFieldBridge );
+			for ( BridgeDefinedField field : bridgeContributedMetadata.getFields() ) {
+				propertyMetadataBuilder.addBridgeDefinedField( field );
+			}
+		}
+
 		if ( member.isCollection() ) {
 			parseContext.collectUnqualifiedCollectionRole( member.getName() );
 		}
@@ -733,14 +735,22 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		typeMetadataBuilder.addClassBridgeField( fieldMetadata );
 
-		if ( spatialBridge instanceof MetadataProvidingFieldBridge ) {
-			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) spatialBridge;
-			typeMetadataBuilder.addClassBridgeSortableFields( getBridgeContributedFieldMetadata( fieldName, metadataProvidingFieldBridge ).getSortableFields() );
-		}
+		contributeClassBridgeDefinedFields( typeMetadataBuilder, fieldName, spatialBridge );
 
 		Analyzer analyzer = typeMetadataBuilder.getAnalyzer();
 		if ( analyzer == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
+		}
+	}
+
+	private void contributeClassBridgeDefinedFields(TypeMetadata.Builder typeMetadataBuilder, String fieldName, FieldBridge fieldBridge) {
+		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
+			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
+
+			FieldMetadataBuilderImpl classBridgeContributedFieldMetadata = getBridgeContributedFieldMetadata( fieldName, metadataProvidingFieldBridge );
+
+			typeMetadataBuilder.addClassBridgeSortableFields( classBridgeContributedFieldMetadata.getSortableFields() );
+			typeMetadataBuilder.addClassBridgeDefinedFields( classBridgeContributedFieldMetadata.getFields() );
 		}
 	}
 
