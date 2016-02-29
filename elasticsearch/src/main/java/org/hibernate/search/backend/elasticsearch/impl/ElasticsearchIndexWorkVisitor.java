@@ -39,6 +39,7 @@ import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -171,20 +172,48 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
 
 				if ( documentFieldMetadata == null ) {
-					String[] fieldNameParts = FieldHelper.getFieldNameParts( field.name() );
+					if ( SpatialHelper.isSpatialField( jsonPropertyName ) ) {
+						// we only consider the latitude and the longitude fields
+						if ( isNumeric( field ) && ( SpatialHelper.isSpatialFieldLatitude( jsonPropertyName ) ||
+								SpatialHelper.isSpatialFieldLongitude( jsonPropertyName ) ) ) {
+							Number value = field.numericValue();
+							String spatialJsonPropertyName = SpatialHelper.getSpatialFieldRootName( jsonPropertyName );
+							JsonObject spatialParent;
 
-					EmbeddedTypeMetadata embeddedType = getEmbeddedTypeMetadata( indexBinding.getDocumentBuilder().getTypeMetadata(), fieldNameParts );
+							if ( parent.get( spatialJsonPropertyName ) != null ) {
+								spatialParent = parent.get( spatialJsonPropertyName ).getAsJsonObject();
+							}
+							else {
+								spatialParent = new JsonObject();
+								parent.add( spatialJsonPropertyName, spatialParent );
+							}
 
-					// Make sure this field does not represent an embeddable (not a field thereof)
-					if ( embeddedType == null ) {
-						// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
-						String stringValue = field.stringValue();
-						if ( stringValue != null ) {
-							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName, new JsonPrimitive( stringValue ) );
+							if ( SpatialHelper.isSpatialFieldLatitude( jsonPropertyName ) ) {
+								addPropertyOfPotentiallyMultipleCardinality( spatialParent, "lat",
+										value != null ? new JsonPrimitive( value ) : null );
+							}
+							else if ( SpatialHelper.isSpatialFieldLongitude( jsonPropertyName ) ) {
+								addPropertyOfPotentiallyMultipleCardinality( spatialParent, "lon",
+										value != null ? new JsonPrimitive( value ) : null );
+							}
 						}
-						else {
-							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-									field.numericValue() != null ? new JsonPrimitive( field.numericValue() ) : null );
+					}
+					else {
+						String[] fieldNameParts = FieldHelper.getFieldNameParts( field.name() );
+
+						EmbeddedTypeMetadata embeddedType = getEmbeddedTypeMetadata( indexBinding.getDocumentBuilder().getTypeMetadata(), fieldNameParts );
+
+						// Make sure this field does not represent an embeddable (not a field thereof)
+						if ( embeddedType == null ) {
+							// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
+							String stringValue = field.stringValue();
+							if ( stringValue != null ) {
+								addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName, new JsonPrimitive( stringValue ) );
+							}
+							else {
+								addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+										field.numericValue() != null ? new JsonPrimitive( field.numericValue() ) : null );
+							}
 						}
 					}
 				}
@@ -197,7 +226,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<
 				// TODO falling back for now to checking actual Field type to cover numeric fields created by custom
 				// bridges
 				else if ( FieldHelper.isNumeric( documentFieldMetadata ) || isNumeric( field ) ) {
-					// Explicitly propagate null in case value is not given and let ES handle the default token set in the meta-data
+					// Explicitly propagate null in case value is not given and let ES handle the default token set
+					// in the meta-data
 					Number value = field.numericValue();
 
 					if ( value != null && value.toString().equals( documentFieldMetadata.indexNullAs() ) ) {
