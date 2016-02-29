@@ -32,6 +32,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
+import org.hibernate.search.backend.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
@@ -59,7 +60,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -85,6 +86,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
+
+	private static final String SPATIAL_DISTANCE_FIELD = "_distance";
 
 	/**
 	 * ES default limit for (firstResult + maxResult)
@@ -192,12 +195,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		return Explanation.match( value, description, details );
-	}
-
-	@Override
-	public HSQuery setSpatialParameters(Coordinates center, String fieldName) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override
@@ -326,6 +323,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				completeQuery.add( "aggregations", facets );
 			}
 
+			addScriptFields( completeQuery );
+
 			executedQuery = completeQuery.build().toString();
 
 			Search.Builder search = new Search.Builder( executedQuery );
@@ -336,7 +335,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			// given, I take as much as possible, as by default only 10 rows would be returned
 			search.setParameter( "size", maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult );
 
-			// TODO: embedded fields
+			// TODO: embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
 			if ( sort != null ) {
 				for ( SortField sortField : sort.getSort() ) {
 					search.addSort( getSort( sortField, idFieldName ) );
@@ -400,28 +399,55 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private Sort getSort(SortField sortField, String idFieldName) {
-			String sortFieldName;
-			if ( sortField.getField() == null ) {
-				switch (sortField.getType()) {
-					case DOC:
-						sortFieldName = "_uid";
-						break;
-					case SCORE:
-						sortFieldName = "_score";
-						break;
-					default:
-						throw LOG.cannotUseThisSortTypeWithNullSortFieldName( sortField.getType() );
-				}
+			if ( sortField instanceof DistanceSortField ) {
+				DistanceSortField distanceSortField = (DistanceSortField) sortField;
+				return new DistanceSort( distanceSortField.getField(),
+						distanceSortField.getCenter(),
+						distanceSortField.getReverse() ? Sorting.DESC : Sorting.ASC );
 			}
 			else {
-				if ( sortField.getField().equals( idFieldName ) ) {
-					sortFieldName = "_uid";
+				String sortFieldName;
+				if ( sortField.getField() == null ) {
+					switch (sortField.getType()) {
+						case DOC:
+							sortFieldName = "_uid";
+							break;
+						case SCORE:
+							sortFieldName = "_score";
+							break;
+						default:
+							throw LOG.cannotUseThisSortTypeWithNullSortFieldName( sortField.getType() );
+					}
 				}
 				else {
-					sortFieldName = sortField.getField();
+					if ( sortField.getField().equals( idFieldName ) ) {
+						sortFieldName = "_uid";
+					}
+					else {
+						sortFieldName = sortField.getField();
+					}
 				}
+				return new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC );
 			}
-			return new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC );
+		}
+
+		private void addScriptFields(JsonBuilder.Object query) {
+			if ( isPartOfProjectedFields( ProjectionConstants.SPATIAL_DISTANCE ) ) {
+				// we add a script_field to return the distance
+				query.add( "script_fields",
+						JsonBuilder.object().add( SPATIAL_DISTANCE_FIELD, JsonBuilder.object()
+								.add( "params",
+										JsonBuilder.object()
+												.addProperty( "lat", spatialSearchCenter.getLatitude() )
+												.addProperty( "lon", spatialSearchCenter.getLongitude() )
+								)
+								.addProperty( "script", "doc[\u0027" + spatialFieldName + "\u0027].arcDistanceInKm(lat,lon)" )
+						)
+				);
+				// in this case, the _source field is not present in the Elasticsearch results
+				// we need to ask for it explicitely
+				query.add( "fields", JsonBuilder.array().add( new JsonPrimitive( "_source" ) ) );
+			}
 		}
 
 		SearchResult runSearch() {
@@ -470,7 +496,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							projections[i] = hit.getAsJsonObject().get( "_score" ).getAsFloat();
 							break;
 						case ProjectionConstants.SPATIAL_DISTANCE:
-							throw new UnsupportedOperationException( "Not yet implemented" );
+							projections[i] = hit.getAsJsonObject().get( "fields" ).getAsJsonObject().get( SPATIAL_DISTANCE_FIELD ).getAsDouble();
+							break;
 						case ProjectionConstants.THIS:
 							indexesOfThis.add( i );
 							break;
@@ -679,6 +706,18 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private boolean isNested(DiscreteFacetRequest facetRequest) {
 		//TODO Drive through meta-data
 //		return FieldHelper.isEmbeddedField( facetRequest.getFieldName() );
+		return false;
+	}
+
+	private boolean isPartOfProjectedFields(String projectionName) {
+		if ( projectedFields == null ) {
+			return false;
+		}
+		for ( String projectedField : projectedFields ) {
+			if ( projectionName.equals( projectedField ) ) {
+				return true;
+			}
+		}
 		return false;
 	}
 

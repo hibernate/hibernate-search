@@ -9,7 +9,9 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.FilteredQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
@@ -25,6 +27,7 @@ import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.spatial.impl.DistanceFilter;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -143,6 +146,15 @@ public class ToElasticsearch {
 		}
 		else if ( query instanceof PhraseQuery ) {
 			return convertPhraseQuery( (PhraseQuery) query );
+		}
+		else if ( query instanceof ConstantScoreQuery ) {
+			return convertConstantScoreQuery( (ConstantScoreQuery) query );
+		}
+		else if ( query instanceof FilteredQuery ) {
+			return convertFilteredQuery( (FilteredQuery) query );
+		}
+		else if ( query instanceof Filter ) {
+			return fromLuceneFilter( (Filter) query );
 		}
 
 		throw LOG.cannotTransformLuceneQueryIntoEsQuery( query );
@@ -318,6 +330,44 @@ public class ToElasticsearch {
 		return wrapQueryForNestedIfRequired( query.getField(), range);
 	}
 
+	private static JsonObject convertConstantScoreQuery(ConstantScoreQuery query) {
+		JsonObject constantScoreQuery = JsonBuilder.object()
+				.add( "constant_score",
+						JsonBuilder.object()
+								.add( "filter", fromLuceneQuery( query.getQuery() ) )
+								.addProperty( "boost", query.getBoost() )
+				).build();
+
+		return constantScoreQuery;
+	}
+
+	private static JsonObject convertFilteredQuery(FilteredQuery query) {
+		JsonObject filteredQuery = JsonBuilder.object()
+				.add( "filtered",
+						JsonBuilder.object()
+								.add( "query", fromLuceneQuery( query.getQuery() ) )
+								.add( "filter", fromLuceneQuery( query.getFilter() ) )
+								.addProperty( "boost", query.getBoost() )
+				).build();
+
+		return filteredQuery;
+	}
+
+	private static JsonObject convertDistanceFilter(DistanceFilter filter) {
+		JsonObject distanceQuery = JsonBuilder.object()
+				.add( "geo_distance",
+						JsonBuilder.object()
+								.addProperty( "distance", filter.getRadius() + "km" )
+								.add( filter.getCoordinatesField(),
+										JsonBuilder.object()
+												.addProperty( "lat", filter.getCenter().getLatitude() )
+												.addProperty( "lon", filter.getCenter().getLongitude() )
+								)
+				).build();
+
+		return wrapQueryForNestedIfRequired( filter.getCoordinatesField(), distanceQuery );
+	}
+
 	private static JsonObject wrapQueryForNestedIfRequired(String field, JsonObject query) {
 		if ( !isNested( field ) ) {
 			return query;
@@ -339,7 +389,12 @@ public class ToElasticsearch {
 
 	public static JsonObject fromLuceneFilter(Filter luceneFilter) {
 		if ( luceneFilter instanceof QueryWrapperFilter ) {
-			return fromLuceneQuery( ( (QueryWrapperFilter) luceneFilter ).getQuery() );
+			Query query = ( (QueryWrapperFilter) luceneFilter ).getQuery();
+			query.setBoost( luceneFilter.getBoost() * query.getBoost() );
+			return fromLuceneQuery( query );
+		}
+		else if ( luceneFilter instanceof DistanceFilter ) {
+			return convertDistanceFilter( (DistanceFilter) luceneFilter );
 		}
 		throw LOG.cannotTransformLuceneFilterIntoEsQuery( luceneFilter );
 	}

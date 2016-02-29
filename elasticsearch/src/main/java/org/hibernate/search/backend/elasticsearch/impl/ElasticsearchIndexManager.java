@@ -40,6 +40,7 @@ import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
+import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -188,7 +189,8 @@ public class ElasticsearchIndexManager implements IndexManager {
 
 			// normal document fields
 			for ( DocumentFieldMetadata fieldMetadata : descriptor.getDocumentBuilder().getTypeMetadata().getAllDocumentFieldMetadata() ) {
-				if ( fieldMetadata.isId() || fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." ) ) {
+				if ( fieldMetadata.isId() || fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." )
+						|| fieldMetadata.isSpatial() ) {
 					continue;
 				}
 
@@ -256,15 +258,33 @@ public class ElasticsearchIndexManager implements IndexManager {
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
-	private JsonObject addFieldMapping(JsonObject payload, BridgeDefinedField bridgeDefinedField) {
-		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( bridgeDefinedField.getName() );
-		JsonObject field = new JsonObject();
+	private void addFieldMapping(JsonObject payload, BridgeDefinedField bridgeDefinedField) {
+		String fieldName = bridgeDefinedField.getName();
+		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( fieldName );
+		if ( !SpatialHelper.isSpatialField( simpleFieldName ) ) {
+			JsonObject field = new JsonObject();
 
-		field.addProperty( "type", getFieldType( bridgeDefinedField ) );
-		field.addProperty( "index", "analyzed" );
+			field.addProperty( "type", getFieldType( bridgeDefinedField ) );
+			field.addProperty( "index", "analyzed" );
 
-		getOrCreateProperties( payload, bridgeDefinedField.getName() ).add( simpleFieldName, field );
-		return field;
+			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
+			// is defined before the double field and we want to keep the geo_point one
+			JsonObject parent = getOrCreateProperties( payload, fieldName );
+			if ( !parent.has( simpleFieldName ) ) {
+				parent.add( simpleFieldName, field );
+			}
+		}
+		else {
+			if ( SpatialHelper.isSpatialFieldLatitude( simpleFieldName ) ) {
+				// we only add the geo_point once
+				JsonObject field = new JsonObject();
+
+				field.addProperty( "type", "geo_point" );
+
+				// in this case, the spatial field has precedence over an already defined field
+				getOrCreateProperties( payload, fieldName ).add( SpatialHelper.getSpatialFieldRootName( simpleFieldName ), field );
+			}
+		}
 	}
 
 	private JsonObject addFieldMapping(JsonObject payload, FacetMetadata facetMetadata) {
