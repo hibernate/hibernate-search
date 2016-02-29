@@ -181,6 +181,11 @@
         <activeMQVersion>5.8.0</activeMQVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
 
+        <!-- Elasticsearch -->
+        <elasticsearchMavenPluginVersion>2.0</elasticsearchMavenPluginVersion>
+        <!-- Keep in sync with the dependency required by Elasticsearch -->
+        <elasticsearchGroovyVersion>2.4.4</elasticsearchGroovyVersion>
+
         <!-- Integration tests -->
         <arquillianVersion>1.1.8.Final</arquillianVersion>
         <arquillianContainerVersion>1.0.0.Final</arquillianContainerVersion>
@@ -1215,14 +1220,22 @@
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>
                     <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>2.0</version>
+                    <version>${elasticsearchMavenPluginVersion}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.slf4j</groupId>
                             <artifactId>slf4j-api</artifactId>
                             <version>${slf4jVersion}</version>
                         </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-all</artifactId>
+                            <version>${elasticsearchGroovyVersion}</version>
+                        </dependency>
                     </dependencies>
+                    <configuration>
+                        <configPath>${basedir}/src/test/resources/elasticsearch/config</configPath>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
