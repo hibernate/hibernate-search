@@ -8,7 +8,7 @@ package org.hibernate.checkstyle.checks.regexp;
 
 import java.util.HashSet;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -18,7 +18,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author Sanne Grinovero
  */
-public class IllegalImport extends Check {
+public class IllegalImport extends AbstractCheck {
 
 	private final HashSet<String> notAllowedImports = new HashSet<String>();
 	private String message = "";
