@@ -1093,6 +1093,7 @@
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <violationSeverity>error</violationSeverity>
+                        <includeTestResources>true</includeTestResources>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <resourceIncludes>**/*.xml,**/*.properties</resourceIncludes>
                         <!-- generated respectively copied code -->
