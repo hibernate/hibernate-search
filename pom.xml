@@ -195,7 +195,7 @@
         <!-- Eclipse plugin options -->
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
-        <puppycrawl.checkstyle.version>6.15</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>6.16</puppycrawl.checkstyle.version>
 
     </properties>
 
