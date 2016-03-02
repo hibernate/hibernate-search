@@ -26,11 +26,9 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * Hibernate Search spatial : unit tests on indexing POIs in with Grid and Grid+Distance
@@ -182,7 +180,6 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1708")
-	@Category(ElasticsearchSupportInProgress.class)
 	public void testNonGeoDistanceSortOnNonSpatialField() throws Exception {
 		double centerLatitude = 24.0d;
 		double centerLongitude = 32.0d;
@@ -208,7 +205,6 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1708")
-	@Category(ElasticsearchSupportInProgress.class)
 	public void testNonGeoDistanceSortOnMissingField() throws Exception {
 		double centerLatitude = 24.0d;
 		double centerLongitude = 32.0d;
