@@ -1106,8 +1106,10 @@
                         <execution>
                             <id>check-style</id>
                             <phase>verify</phase>
+                            <!-- not using checkstyle:checkstyle here, as for
+                                some reason checkstyle:check finds more errors -->
                             <goals>
-                                <goal>checkstyle</goal>
+                                <goal>check</goal>
                             </goals>
                         </execution>
                     </executions>
