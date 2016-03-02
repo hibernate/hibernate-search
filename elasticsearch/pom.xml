@@ -23,7 +23,7 @@
     <properties>
         <!-- In theory we're not coupled to a specific version of Elasticsearch; this property
              controls which version is being used to run integration tests. -->
-        <test.elasticsearch.version>2.0.0</test.elasticsearch.version>
+        <test.elasticsearch.version>2.2.0</test.elasticsearch.version>
     </properties>
 
     <dependencies>

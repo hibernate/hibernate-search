@@ -59,7 +59,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		assertFacetCounts( newFacetList, new int[] { 5, 0, 0, 0 } );
 
 		facetManager.getFacetGroup( facetName ).selectFacets( facetList.get( 1 ) );
-		query.setMaxResults( Integer.MAX_VALUE );
+		query.setMaxResults( 1000 ); // When testing against Elasticsearch you need to stay under the maximum page limit
 		assertEquals( "Wrong number of query matches", 9, query.list().size() );
 		newFacetList = facetManager.getFacets( facetName );
 		assertFacetCounts( newFacetList, new int[] { 5, 4, 0, 0 } );
