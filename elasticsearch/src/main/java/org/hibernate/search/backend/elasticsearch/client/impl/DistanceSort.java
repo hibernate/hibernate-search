@@ -44,6 +44,7 @@ public class DistanceSort extends Sort {
 		innerMap.put( fieldName, location );
 
 		innerMap.put( "unit", "km" );
+		innerMap.put( "distance_type", "arc" );
 
 		return rootMap;
 	}
