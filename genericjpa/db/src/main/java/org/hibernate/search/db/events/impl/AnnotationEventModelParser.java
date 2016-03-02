@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.annotations.Hint;
-import org.hibernate.search.annotations.IdColumn;
-import org.hibernate.search.annotations.IdInfo;
-import org.hibernate.search.annotations.UpdateInfo;
+import org.hibernate.search.db.annotations.Hint;
+import org.hibernate.search.db.annotations.IdColumn;
+import org.hibernate.search.db.annotations.IdInfo;
+import org.hibernate.search.db.annotations.UpdateInfo;
 import org.hibernate.search.db.ColumnType;
 import org.hibernate.search.db.IdConverter;
 import org.hibernate.search.exception.AssertionFailure;

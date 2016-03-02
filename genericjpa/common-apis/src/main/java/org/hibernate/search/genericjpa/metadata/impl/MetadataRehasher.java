@@ -8,7 +8,6 @@ package org.hibernate.search.genericjpa.metadata.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery.Type;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -19,12 +18,20 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
+ * this class converts {@link org.hibernate.search.engine.metadata.impl.TypeMetadata}
+ * into {@link RehashedTypeMetadata} that is in a better format for the async backend
+ * to understand.
+ *
  * @author Martin Braun
  */
 public final class MetadataRehasher {
 
 	public List<RehashedTypeMetadata> rehash(List<TypeMetadata> originals) {
-		return originals.stream().map( this::rehash ).collect( Collectors.toList() );
+		List<RehashedTypeMetadata> ret = new ArrayList<>();
+		for ( TypeMetadata orig : originals ) {
+			ret.add( this.rehash( orig ) );
+		}
+		return ret;
 	}
 
 	public RehashedTypeMetadata rehash(TypeMetadata original) {

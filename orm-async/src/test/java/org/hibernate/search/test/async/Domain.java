@@ -12,9 +12,9 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IdColumn;
-import org.hibernate.search.annotations.IdInfo;
-import org.hibernate.search.annotations.UpdateInfo;
+import org.hibernate.search.db.annotations.IdColumn;
+import org.hibernate.search.db.annotations.IdInfo;
+import org.hibernate.search.db.annotations.UpdateInfo;
 import org.hibernate.search.db.ColumnType;
 
 /**

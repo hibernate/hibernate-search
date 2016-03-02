@@ -13,7 +13,7 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
-import org.hibernate.search.annotations.InIndex;
+import org.hibernate.search.genericjpa.annotations.InIndex;
 
 /**
  * @author Martin Braun

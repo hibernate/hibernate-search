@@ -16,6 +16,12 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 
 /**
+ * This class represents a "rehashed" version of the
+ * TypeMetadata the engine gives us. These are mostly needed
+ * for the async backend to know where to find the id fields
+ * (on the class and in the index so the index can be held up-to-date
+ * properly) and the types of the fields
+ *
  * @author Martin Braun
  */
 public final class RehashedTypeMetadata {

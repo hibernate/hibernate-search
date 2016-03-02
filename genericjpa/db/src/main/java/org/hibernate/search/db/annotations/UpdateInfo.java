@@ -4,8 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.annotations;
+package org.hibernate.search.db.annotations;
 
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -20,8 +21,30 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target({FIELD, METHOD, TYPE})
 @Retention(RUNTIME)
-public @interface UpdateInfos {
+@Repeatable(UpdateInfos.class)
+public @interface UpdateInfo {
 
-	UpdateInfo[] value();
+	/**
+	 * the name of the original table
+	 */
+	String tableName();
+
+	/**
+	 * the name of the table the events are stored in
+	 */
+	String updateTableName() default "";
+
+	/**
+	 * the name for the update table's id column
+	 * (unrelated to your domain model)
+	 */
+	String updateTableIdColumn() default "";
+
+	/**
+	 * the name for the update table's event column
+	 */
+	String updateTableEventTypeColumn() default "";
+
+	IdInfo[] idInfos();
 
 }

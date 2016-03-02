@@ -11,8 +11,15 @@ import javax.transaction.Synchronization;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.genericjpa.transaction.TransactionContext;
+import org.hibernate.search.backend.TransactionContext;
 
+/**
+ * Standalone version of a Hibernate Search transaction
+ * that can be manually controlled without notion of any
+ * JPA/database transaction
+ *
+ * @author Martin Braun
+ */
 public class Transaction implements TransactionContext {
 
 	private boolean progress = true;
