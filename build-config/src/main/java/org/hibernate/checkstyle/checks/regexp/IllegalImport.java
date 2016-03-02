@@ -42,7 +42,17 @@ public class IllegalImport extends AbstractCheck {
 
 	@Override
 	public int[] getDefaultTokens() {
-		return new int[] { TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT };
+		return getAcceptableTokens();
+	}
+
+	@Override
+	public int[] getAcceptableTokens() {
+		return new int[]{ TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT };
+	}
+
+	@Override
+	public int[] getRequiredTokens() {
+		return getAcceptableTokens();
 	}
 
 	@Override
