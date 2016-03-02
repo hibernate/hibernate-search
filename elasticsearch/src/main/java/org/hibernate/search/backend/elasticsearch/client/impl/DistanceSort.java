@@ -37,7 +37,7 @@ public class DistanceSort extends Sort {
 		Map<String, Object> rootMap = super.toMap();
 		Map<String, Object> innerMap = (Map<String, Object>) rootMap.get(GEO_DISTANCE_FIELD);
 
-		Map<String, Double> location = new HashMap<String, Double>(2);
+		Map<String, Double> location = new HashMap<String, Double>(3);
 		location.put( "lat", center.getLatitude() );
 		location.put( "lon", center.getLongitude() );
 
