@@ -278,8 +278,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			String idFieldName = null;
 			JsonArray typeFilters = new JsonArray();
 			Set<String> indexNames = new HashSet<>();
+			Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
 
-			for ( Class<?> queriedEntityType : getQueriedEntityTypes() ) {
+			for ( Class<?> queriedEntityType : queriedEntityTypes ) {
 				entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
 
 				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
@@ -337,6 +338,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 			// TODO: embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
 			if ( sort != null ) {
+				validateSortFields( extendedIntegrator, queriedEntityTypes );
 				for ( SortField sortField : sort.getSort() ) {
 					search.addSort( getSort( sortField, idFieldName ) );
 				}

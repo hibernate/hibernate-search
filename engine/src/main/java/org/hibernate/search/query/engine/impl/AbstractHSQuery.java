@@ -14,13 +14,18 @@ import java.util.Set;
 
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
+import org.hibernate.search.metadata.FieldDescriptor;
+import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -206,6 +211,37 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	@Override
 	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
 		return extendedIntegrator;
+	}
+
+	protected void validateSortFields(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities) {
+		SortField[] sortFields = sort.getSort();
+		for ( SortField sortField : sortFields ) {
+			if ( sortField instanceof DistanceSortField ) {
+				validateDistanceSortField( extendedIntegrator, targetedEntities, sortField );
+			}
+		}
+	}
+
+	private void validateDistanceSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities,
+			SortField sortField) {
+		boolean indexedField = false;
+		String field = sortField.getField();
+		if ( field != null ) {
+			for ( Class<?> clazz : targetedEntities ) {
+				IndexedTypeDescriptor indexedTypeDescriptor = extendedIntegrator.getIndexedTypeDescriptor( clazz );
+				FieldDescriptor fieldDescriptor = indexedTypeDescriptor.getIndexedField( field );
+				if ( fieldDescriptor != null ) {
+					indexedField = true;
+					if ( fieldDescriptor.getType() != Type.SPATIAL ) {
+						throw LOG.distanceSortRequiresSpatialField( field );
+					}
+					break;
+				}
+			}
+		}
+		if ( !indexedField ) {
+			throw LOG.sortRequiresIndexedField( sortField.getClass(), field );
+		}
 	}
 
 	// hooks to be implemented by specific sub-classes
