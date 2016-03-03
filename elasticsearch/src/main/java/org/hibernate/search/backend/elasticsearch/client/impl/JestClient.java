@@ -43,8 +43,8 @@ public class JestClient implements Service, Startable, Stoppable {
 		factory.setHttpClientConfig(
 			new HttpClientConfig.Builder( serverUri )
 				.multiThreaded( true )
-				.readTimeout( 2000 )
-				.connTimeout( 2000 )
+				.readTimeout( 10000 )
+				.connTimeout( 10000 )
 				.gson( GsonBuilderHolder.BUILDER )
 				.build()
 		);
