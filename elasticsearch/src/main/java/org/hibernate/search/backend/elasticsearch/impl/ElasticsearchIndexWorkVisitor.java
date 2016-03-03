@@ -29,7 +29,6 @@ import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -38,7 +37,6 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.util.logging.impl.Log;
@@ -50,16 +48,15 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import io.searchbox.action.Action;
 import io.searchbox.core.Delete;
 import io.searchbox.core.DeleteByQuery;
 import io.searchbox.core.Index;
-import io.searchbox.indices.Refresh;
-import io.searchbox.params.Parameters;
 
 /**
  * @author Gunnar Morling
  */
-class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
+class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<?>> {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -78,36 +75,30 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 	}
 
 	@Override
-	public Void visitAddWork(AddLuceneWork work, Void p) {
-		indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
-		return null;
+	public Action<?> visitAddWork(AddLuceneWork work, Boolean refresh) {
+		return indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
 	}
 
 	@Override
-	public Void visitDeleteWork(DeleteLuceneWork work, Void p) {
+	public Action<?> visitDeleteWork(DeleteLuceneWork work, Boolean refresh) {
 		Delete delete = new Delete.Builder( DocumentIdHelper.getDocumentId( work ) )
 			.index( indexName )
 			.type( work.getEntityClass().getName() )
-			// TODO Make configurable?
-			.setParameter( Parameters.REFRESH, true )
+			.refresh( refresh )
 			.build();
 
-		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-			client.get().executeRequest( delete, false );
-		}
-
-		return null;
+		return delete;
 	}
 
 	@Override
-	public Void visitOptimizeWork(OptimizeLuceneWork work, Void p) {
+	public Action<?> visitOptimizeWork(OptimizeLuceneWork work, Boolean refresh) {
 		// TODO implement
 		LOG.warn( "Optimize work is not yet supported for Elasticsearch backend, ignoring it" );
 		return null;
 	}
 
 	@Override
-	public Void visitPurgeAllWork(PurgeAllLuceneWork work, Void p) {
+	public Action<?> visitPurgeAllWork(PurgeAllLuceneWork work, Boolean refresh) {
 		// TODO This requires the delete-by-query plug-in on ES 2.0 and beyond; Alternatively
 		// the type mappings could be deleted, think about implications for concurrent access
 		String query = work.getTenantId() != null ?
@@ -122,39 +113,28 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			builder.addType( typeToDelete.getName() );
 		}
 
-		DeleteByQuery delete = builder.build();
-		Refresh refresh = new Refresh.Builder().addIndex( indexName ).build();
-
-		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-			client.get().executeRequest( delete );
-
-			// TODO Refresh not needed on ES 1.x; Make it configurable?
-			client.get().executeRequest( refresh );
-		}
-
-		return null;
+		return builder.build();
 	}
 
 	@Override
-	public Void visitUpdateWork(UpdateLuceneWork work, Void p) {
-		indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
-		return null;
+	public Action<?> visitUpdateWork(UpdateLuceneWork work, Boolean refresh) {
+		return indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
 	}
 
 	@Override
-	public Void visitFlushWork(FlushLuceneWork work, Void p) {
+	public Action<?> visitFlushWork(FlushLuceneWork work, Boolean refresh) {
 		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
-	public Void visitDeleteByQueryWork(
-			DeleteByQueryLuceneWork work, Void p) {
+	public Action<?> visitDeleteByQueryWork(
+			DeleteByQueryLuceneWork work, Boolean refresh) {
 		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
-	private void indexDocument(String id, Document document, Class<?> entityType) {
+	private Action<?> indexDocument(String id, Document document, Class<?> entityType, boolean refresh) {
 		JsonObject source = convertToJson( document, entityType );
 		String type = entityType.getName();
 
@@ -162,13 +142,10 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, Void> {
 			.index( indexName )
 			.type( type )
 			.id( id )
-			// TODO Make configurable?
-			.setParameter( Parameters.REFRESH, true )
+			.refresh( refresh )
 			.build();
 
-		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-			client.get().executeRequest( index );
-		}
+		return index;
 	}
 
 	private JsonObject convertToJson(Document document, Class<?> entityType) {
