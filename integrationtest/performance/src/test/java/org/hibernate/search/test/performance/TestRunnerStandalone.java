@@ -39,10 +39,7 @@ public class TestRunnerStandalone {
 		setDefaultProperty( properties, "hibernate.dialect", "org.hibernate.dialect.H2Dialect" );
 		setDefaultProperty( properties, "hibernate.connection.provider_class", "org.hibernate.hikaricp.internal.HikariCPConnectionProvider" );
 		setDefaultProperty( properties, "hibernate.hikari.maximumPoolSize", "20" );
-		setDefaultProperty( properties, "hibernate.hikari.dataSourceClassName", "org.h2.jdbcx.JdbcDataSource" );
 		setDefaultProperty( properties, "hibernate.hikari.dataSource.url", "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;MULTI_THREADED=1" );
-		setDefaultProperty( properties, "hibernate.hikari.dataSource.user", "sa" );
-		setDefaultProperty( properties, "hibernate.hikari.dataSource.password", "" );
 		setDefaultProperty( properties, "hibernate.connection.isolation", "TRANSACTION_READ_COMMITTED" );
 		return properties;
 	}
