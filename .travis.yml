@@ -1,0 +1,37 @@
+language: java
+jdk:
+  - oraclejdk8
+addons:
+  postgresql: '9.4'
+  mariadb: '10.1'
+  apt:
+    packages:
+      - oracle-java8-installer
+# might be useful to push reports to an S3 bucket
+#  artifacts:
+#    paths:
+#      - $(find $HOME -name surefire-reports | tr "\n" ":")
+#    debug: true
+#  s3_region: 'us-west-2'
+cache:
+  directories:
+    - $HOME/.m2
+env:
+  - DB=h2
+# for now, let's test only with H2
+#  - DB=pgsql
+#  - DB=mariadb
+install:
+  - mvn -v
+  # first run to download all the Maven dependencies without logging
+  - mvn -s settings-example.xml -B -q clean compile -DskipTests=true
+before_script: 
+  - if [[ "$DB" == "pgsql" ]]; then psql -U postgres -f 'travis/pgsql.sql';fi 
+  - if [[ "$DB" == "mariadb" ]]; then mysql -u root < 'travis/mariadb.sql'; fi
+script:
+  # we run checkstyle first to fail fast if there is a styling error
+  - mvn -s settings-example.xml checkstyle:check
+  - if [[ "$DB" == "h2" ]]; then mvn -s settings-example.xml -Ph2 verify;fi 
+  - if [[ "$DB" == "pgsql" ]]; then mvn -s settings-example.xml -Pci-postgresql verify;fi 
+  - if [[ "$DB" == "mariadb" ]]; then mvn -s settings-example.xml -Pci-mariadb verify; fi
+  
