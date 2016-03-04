@@ -24,8 +24,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.PhraseTermination;
 
@@ -132,12 +130,12 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		else if ( size <= 1 ) {
 			final List<Term> terms = termsPerPosition.values().iterator().next();
 			if ( terms.size() == 1 ) {
-				perFieldQuery = new TermQuery( terms.get( 0 ) );
+				perFieldQuery = new PhraseAsTermQuery( terms.get( 0 ) );
 			}
 			else {
 				BooleanQuery query = new BooleanQuery( );
 				for ( Term term : terms ) {
-					query.add( new TermQuery(term), BooleanClause.Occur.SHOULD );
+					query.add( new PhraseAsTermQuery(term), BooleanClause.Occur.SHOULD );
 				}
 				perFieldQuery = query;
 			}
