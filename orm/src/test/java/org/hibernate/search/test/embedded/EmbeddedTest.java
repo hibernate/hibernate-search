@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.embedded;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,17 +17,15 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Emmanuel Bernard
@@ -34,6 +34,8 @@ import static org.junit.Assert.assertEquals;
 public class EmbeddedTest extends SearchTestBase {
 
 	@Test
+	// other separators than "." not supported for now
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testEmbeddedIndexing() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
@@ -78,7 +80,7 @@ public class EmbeddedTest extends SearchTestBase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		Address address = (Address) s.get( Address.class, a.getId() );
+		Address address = s.get( Address.class, a.getId() );
 		address.getOwnedBy().setName( "Buckhead community" );
 		tx.commit();
 
@@ -133,6 +135,8 @@ public class EmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
+	// other separators than "." not supported for now
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testContainedIn() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
@@ -153,7 +157,7 @@ public class EmbeddedTest extends SearchTestBase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		Address address = (Address) s.get( Address.class, a.getId() );
+		Address address = s.get( Address.class, a.getId() );
 		address.setStreet( "Peachtree Road NE" );
 		tx.commit();
 
@@ -171,7 +175,7 @@ public class EmbeddedTest extends SearchTestBase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		address = (Address) s.get( Address.class, a.getId() );
+		address = s.get( Address.class, a.getId() );
 		Tower tower1 = address.getTowers().iterator().next();
 		tower1.setAddress( null );
 		address.getTowers().remove( tower1 );

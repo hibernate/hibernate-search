@@ -230,25 +230,19 @@
                                 <exclude>**/HibernateSearchIntegratorTest.java</exclude>
                                 <exclude>**/OptimizationTriggerTest.java</exclude>
                                 <exclude>**/WorkQueueLengthConfiguredTest.java</exclude>
-                                <exclude>**/CollectionInitializeTest.java</exclude>
                                 <exclude>**/CompressionTest.java</exclude>
                                 <exclude>**/ConcurrentFlushTest.java</exclude>
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
-                                <exclude>**/LuceneIndexingParametersTest.java</exclude>
                                 <exclude>**/ProgrammaticMappingTest.java</exclude>
                                 <exclude>**/ShardsConfigurationTest.java</exclude>
                                 <exclude>**/RecursiveGraphTest.java</exclude>
                                 <exclude>**/WorkDoneOnEntitiesTest.java</exclude>
-                                <exclude>**/NullEmbeddedTest.java</exclude>
                                 <exclude>**/NumericFieldTest.java</exclude>
                                 <exclude>**/DeleteByTermTest.java</exclude>
                                 <exclude>**/UpdateOperationsTest.java</exclude>
                                 <exclude>**/TransactionTest.java</exclude>
                                 <exclude>**/SearchAndEnversIntegrationTest.java</exclude>
                                 <exclude>**/FilterTest.java</exclude>
-                                <exclude>**/EmbeddedIdTest.java</exclude>
-                                <exclude>**/EmbeddedIdWithDocumentIdTest.java</exclude>
-                                <exclude>**/ProgrammaticEmbeddedItTest.java</exclude>
                                 <exclude>**/IndexingActionInterceptorTest.java</exclude>
                                 <exclude>**/IndexControlMBeanTest.java</exclude>
                                 <exclude>**/SpatialQueryingJPATest.java</exclude>
@@ -258,6 +252,12 @@
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>
                                 <exclude>**/ExplanationTest.java</exclude>
+
+                                <!-- Embedded ids -->
+                                <exclude>**/EmbeddedIdTest.java</exclude>
+                                <exclude>**/EmbeddedIdWithDocumentIdTest.java</exclude>
+                                <exclude>**/ProgrammaticEmbeddedItTest.java</exclude>
+                                <exclude>**/CollectionInitializeTest.java</exclude>
 
                                 <!-- Needs range queries on nested fields -->
                                 <exclude>**/DslEmbeddedSearchTest.java</exclude>
@@ -283,7 +283,6 @@
                                 <exclude>**/FetchSizeConfigurationTest.java</exclude>
                                 <exclude>**/ProgressMonitorTest.java</exclude>
                                 <exclude>**/RetryInitializeTest.java</exclude>
-                                <exclude>**/EmbeddedTest.java</exclude>
                                 <exclude>**/FieldOnCollectionReindexTest.java</exclude>
                                 <exclude>**/LazyM2OContainedInTest.java</exclude>
                                 <exclude>**/PathEmbeddedDepthTest.java</exclude>
@@ -318,6 +317,7 @@
                                 <exclude>**/ScheduledCommitPolicyTest.java</exclude>
                                 <exclude>**/FSSlaveAndMasterDPTest.java</exclude>
                                 <exclude>**/IndexReaderSeeOptimizedIndexTest.java</exclude>
+                                <exclude>**/LuceneIndexingParametersTest.java</exclude>
                             </excludes>
                             <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress</excludedGroups>
                         </configuration>

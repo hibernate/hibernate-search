@@ -6,22 +6,22 @@
  */
 package org.hibernate.search.test.embedded.nullindexed;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Davide D'Alto
@@ -78,6 +78,9 @@ public class NullEmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
+	// "IS NULL" for intermediary element in the graph (pet) needs to be mapped to missing filter:
+	// https://www.elastic.co/guide/en/elasticsearch/guide/current/_dealing_with_null_values.html
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testNestedEmebeddedNullIndexing() throws Exception {
 		Man withPet = new Man( "Davide" );
 
@@ -123,6 +126,9 @@ public class NullEmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
+	// "IS NULL" for intermediary element in the graph (pet) needs to be mapped to missing filter:
+	// https://www.elastic.co/guide/en/elasticsearch/guide/current/_dealing_with_null_values.html
+	@Category(ElasticsearchSupportInProgress.class)
 	public void testEmbeddedNullIndexing() throws Exception {
 		Man me = new Man( "Davide" );
 		Pet dog = new Pet( "dog" );
