@@ -362,7 +362,7 @@
                     <httpPort>9200</httpPort>
                     <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
                     <outputDirectory>${project.build.directory}/elastisearchnode1</outputDirectory>
-                    <configPath>${basedir}/elasticsearchconfiguration</configPath>
+                    <configPath>${basedir}/elasticsearchconfiguration/</configPath>
                 </configuration>
                 <executions>
                     <execution>
@@ -385,6 +385,11 @@
                         <groupId>org.elasticsearch</groupId>
                         <artifactId>elasticsearch</artifactId>
                         <version>${test.elasticsearch.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-search-sharedtestresources</artifactId>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
