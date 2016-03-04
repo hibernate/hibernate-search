@@ -8,7 +8,6 @@ package org.hibernate.search.test.db.events;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ public class AnnotationEventModelParserTest {
 
 	@Test
 	public void testCorrectUsage() {
-		List<EventModelInfo> infos = parser.parse( new HashSet<>( Arrays.asList( SomeEntity.class ) ) );
+		List<EventModelInfo> infos = parser.parse( Arrays.asList( SomeEntity.class ) );
 		Collections.sort(
 				infos,
 				(first, second) -> first.getOriginalTableName().compareTo( second.getOriginalTableName() )
@@ -74,25 +73,25 @@ public class AnnotationEventModelParserTest {
 
 	@Test(expected = SearchException.class)
 	public void testSameTableTwice() {
-		List<EventModelInfo> infos = parser.parse( new HashSet<>( Arrays.asList( SameTableTwice.class ) ) );
+		List<EventModelInfo> infos = parser.parse( Arrays.asList( SameTableTwice.class ) );
 		System.err.println( infos );
 	}
 
 	@Test(expected = SearchException.class)
 	public void testNamingConflictSameAnnotation() {
-		List<EventModelInfo> infos = parser.parse( new HashSet<>( Arrays.asList( NamingConflictSameAnnotation.class ) ) );
+		List<EventModelInfo> infos = parser.parse( Arrays.asList( NamingConflictSameAnnotation.class ) );
 		System.err.println( infos );
 	}
 
 	@Test(expected = SearchException.class)
 	public void testNamingConflictTwoAnnotations() {
-		List<EventModelInfo> infos = parser.parse( new HashSet<>( Arrays.asList( NamingConflictTwoAnnotations.class ) ) );
+		List<EventModelInfo> infos = parser.parse( Arrays.asList( NamingConflictTwoAnnotations.class ) );
 		System.err.println( infos );
 	}
 
 	@Test
 	public void testManualValues() {
-		List<EventModelInfo> infos = parser.parse( new HashSet<>( Arrays.asList( ManualValues.class ) ) );
+		List<EventModelInfo> infos = parser.parse( Arrays.asList( ManualValues.class ) );
 
 		EventModelInfo info = infos.get( 0 );
 

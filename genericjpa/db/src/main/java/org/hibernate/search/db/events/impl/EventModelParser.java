@@ -7,14 +7,11 @@
 package org.hibernate.search.db.events.impl;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Martin on 16.07.2015.
  */
 public interface EventModelParser {
-
-	List<EventModelInfo> parse(Set<Class<?>> updateClasses);
 
 	List<EventModelInfo> parse(List<Class<?>> updateClasses);
 

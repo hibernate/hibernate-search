@@ -4,12 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.db.util.impl;
+package org.hibernate.search.backend.triggers.impl;
 
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.search.db.util.impl.QueryWrapper;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**

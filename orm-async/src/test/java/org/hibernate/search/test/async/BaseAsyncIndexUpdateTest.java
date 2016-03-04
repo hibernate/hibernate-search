@@ -29,6 +29,7 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 	protected Session session;
 
 	protected abstract void setup();
+
 	protected abstract void shutdown();
 
 	@Before

@@ -25,16 +25,13 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 
 /**
- * Created by Martin on 20.07.2015.
+ * Default EventModelParser that uses
+ * the {@link UpdateInfo} annotations
+ * to generate the {@link EventModelInfo}s
+ *
+ * @author Martin Braun
  */
 public class AnnotationEventModelParser implements EventModelParser {
-
-	@Override
-	public List<EventModelInfo> parse(Set<Class<?>> updateClasses) {
-		ArrayList<Class<?>> l = new ArrayList<>( updateClasses.size() );
-		l.addAll( updateClasses );
-		return this.parse( l );
-	}
 
 	@Override
 	public List<EventModelInfo> parse(List<Class<?>> updateClasses) {

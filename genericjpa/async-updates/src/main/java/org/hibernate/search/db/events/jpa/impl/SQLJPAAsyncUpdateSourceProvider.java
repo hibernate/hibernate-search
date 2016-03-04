@@ -53,6 +53,17 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 			Properties properties,
 			EntityManagerFactoryWrapper emf) {
 		EventModelParser eventModelParser = new AnnotationEventModelParser();
+		return this.getUpdateSource( delay, timeUnit, batchSizeForUpdates, properties, emf, eventModelParser );
+	}
+
+	@Override
+	public AsyncUpdateSource getUpdateSource(
+			long delay,
+			TimeUnit timeUnit,
+			int batchSizeForUpdates,
+			Properties properties,
+			EntityManagerFactoryWrapper emf,
+			EventModelParser eventModelParser) {
 		List<EventModelInfo> eventModelInfos = eventModelParser.parse( new ArrayList<>( this.entityClasses ) );
 		this.setupTriggers( emf, eventModelInfos, properties );
 		JPAUpdateSource updateSource = new JPAUpdateSource(

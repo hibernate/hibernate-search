@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.db.events.impl.AnnotationEventModelParser;
+import org.hibernate.search.db.events.impl.EventModelParser;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
@@ -24,11 +26,9 @@ import org.hibernate.search.db.events.impl.AsyncUpdateSource;
 import org.hibernate.search.db.events.index.impl.IndexUpdater;
 import org.hibernate.search.db.events.jpa.impl.SQLJPAAsyncUpdateSourceProvider;
 import org.hibernate.search.db.events.triggers.TriggerSQLStringSource;
-import org.hibernate.search.genericjpa.entity.impl.ORMReusableEntityProvider;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.factory.StandaloneSearchConfiguration;
-import org.hibernate.search.db.util.impl.ORMEntityManagerFactoryWrapper;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataRehasher;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataUtil;
 import org.hibernate.search.genericjpa.metadata.impl.RehashedTypeMetadata;
@@ -134,12 +134,17 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 				)
 		);
 
+		//TODO: replace this with ORMEventModelParser
+		//as with Hibernate ORM we have more information available
+		EventModelParser eventModelParser = new AnnotationEventModelParser();
+
 		this.asyncUpdateSource = asyncUpdateSourceProvider.getUpdateSource(
 				updateDelay,
 				TimeUnit.MILLISECONDS,
 				batchSizeForUpdates,
 				properties,
-				new ORMEntityManagerFactoryWrapper( sessionFactory )
+				new ORMEntityManagerFactoryWrapper( sessionFactory ),
+				eventModelParser
 		);
 
 

@@ -7,7 +7,6 @@
 package org.hibernate.search.test.db.events;
 
 import java.util.Arrays;
-import java.util.HashSet;
 
 import org.hibernate.search.db.events.impl.AnnotationEventModelParser;
 import org.hibernate.search.db.events.impl.EventModelInfo;
@@ -43,7 +42,7 @@ public class TriggerSQLStringSourceTest {
 
 	private void test(TriggerSQLStringSource triggerSource) {
 		EventModelParser parser = new AnnotationEventModelParser();
-		EventModelInfo info = parser.parse( new HashSet<>( Arrays.asList( Place.class ) ) ).get( 0 );
+		EventModelInfo info = parser.parse( Arrays.asList( Place.class ) ).get( 0 );
 		System.out.println( "UNSETUP CODE: " + Arrays.asList( triggerSource.getUnSetupCode() ) );
 		System.out.println( "SETUP CODE: " + Arrays.asList( triggerSource.getSetupCode() ) );
 		for ( int eventType : EventType.values() ) {

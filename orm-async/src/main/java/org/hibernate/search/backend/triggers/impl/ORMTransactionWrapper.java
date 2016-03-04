@@ -4,10 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.db.util.impl;
+package org.hibernate.search.backend.triggers.impl;
 
 
 import org.hibernate.Transaction;
+import org.hibernate.search.db.util.impl.TransactionWrapper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

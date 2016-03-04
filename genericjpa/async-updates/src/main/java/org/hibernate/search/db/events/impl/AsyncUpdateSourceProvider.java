@@ -17,11 +17,23 @@ import org.hibernate.search.db.util.impl.EntityManagerFactoryWrapper;
  */
 public interface AsyncUpdateSourceProvider {
 
+	/**
+	 * this uses a {@link AnnotationEventModelParser as default}
+	 */
 	AsyncUpdateSource getUpdateSource(
 			long delay,
 			TimeUnit timeUnit,
 			int batchSizeForUpdates,
 			Properties properties,
 			EntityManagerFactoryWrapper emf);
+
+	AsyncUpdateSource getUpdateSource(
+			long delay,
+			TimeUnit timeUnit,
+			int batchSizeForUpdates,
+			Properties properties,
+			EntityManagerFactoryWrapper emf,
+			EventModelParser eventModelParser
+	);
 
 }
