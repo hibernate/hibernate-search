@@ -36,10 +36,8 @@ public class POI {
 	@Field(store = Store.YES, index = Index.YES)
 	String type;
 
-	@Field(store = Store.YES, index = Index.YES)
 	double latitude;
 
-	@Field(store = Store.YES, index = Index.YES)
 	double longitude;
 
 	@Field(store = Store.YES, index = Index.YES, analyze = Analyze.NO)
