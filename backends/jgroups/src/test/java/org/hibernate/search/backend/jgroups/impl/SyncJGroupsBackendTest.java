@@ -43,13 +43,13 @@ public class SyncJGroupsBackendTest {
 
 	private static final Log log = LoggerFactory.make();
 	private static final String JGROUPS_CONFIGURATION = "testing-flush-loopback.xml";
-	private static final int JGROUPS_MESSAGES_TIMEOUT = 1000;
+	private static final long JGROUPS_MESSAGES_TIMEOUT = 1000;
 
 	@Rule
 	public SearchFactoryHolder slaveNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", "jgroupsSlave" )
 		.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
-		.withProperty( "hibernate.search.dvds.jgroups.messages_timeout", JGROUPS_MESSAGES_TIMEOUT )
+		.withProperty( "hibernate.search.dvds.jgroups.messages_timeout", String.valueOf( JGROUPS_MESSAGES_TIMEOUT ) )
 		.withProperty( "hibernate.search.books.worker.execution", "async" )
 		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
 		.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
