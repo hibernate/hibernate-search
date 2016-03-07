@@ -34,6 +34,8 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 	private boolean spatialHashIndex = true;
 	private boolean numericFieldsIndex = true;
 
+	private String[] hashIndexedFieldNames;
+
 	public SpatialFieldBridgeByHash() {
 	}
 
@@ -54,12 +56,22 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 		super.configureFieldMetadata( name, builder );
 		if ( spatialHashIndex ) {
 			for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
-				builder.field( SpatialHelper.formatFieldName( i, name ), FieldType.STRING );
+				builder.field( hashIndexedFieldNames[i], FieldType.STRING );
 			}
 		}
 		if ( numericFieldsIndex ) {
 			builder.field( SpatialHelper.formatLatitude( name ), FieldType.DOUBLE );
 			builder.field( SpatialHelper.formatLongitude( name ), FieldType.DOUBLE );
+		}
+	}
+
+	@Override
+	protected void initializeIndexedFieldNames(String fieldName) {
+		super.initializeIndexedFieldNames( fieldName );
+
+		hashIndexedFieldNames = new String[bottomSpatialHashLevel + 1];
+		for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
+			hashIndexedFieldNames[i] = SpatialHelper.formatFieldName( i, fieldName );
 		}
 	}
 
@@ -84,29 +96,27 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 					Point point = Point.fromDegrees( latitude, longitude );
 
 					for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
-						luceneOptions.addFieldToDocument( SpatialHelper.formatFieldName( i, name ), SpatialHelper.getSpatialHashCellId( point, i ), document );
+						luceneOptions.addFieldToDocument( hashIndexedFieldNames[i], SpatialHelper.getSpatialHashCellId( point, i ), document );
 					}
 				}
 
 				if ( numericFieldsIndex ) {
-					final String latitudeFieldName = SpatialHelper.formatLatitude( name );
-					final String longitudeFieldName = SpatialHelper.formatLongitude( name );
 					luceneOptions.addNumericFieldToDocument(
-							latitudeFieldName,
+							latitudeIndexedFieldName,
 							latitude,
 							document
 					);
 
 					luceneOptions.addNumericFieldToDocument(
-							longitudeFieldName,
+							longitudeIndexedFieldName,
 							longitude,
 							document
 					);
 
-					Field latitudeDocValuesField = new SpatialNumericDocValueField( latitudeFieldName, latitude );
+					Field latitudeDocValuesField = new SpatialNumericDocValueField( latitudeIndexedFieldName, latitude );
 					document.add( latitudeDocValuesField );
 
-					Field longitudeDocValuesField = new SpatialNumericDocValueField( longitudeFieldName, longitude );
+					Field longitudeDocValuesField = new SpatialNumericDocValueField( longitudeIndexedFieldName, longitude );
 					document.add( longitudeDocValuesField );
 				}
 			}

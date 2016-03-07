@@ -11,7 +11,6 @@ import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
-import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spatial.impl.SpatialNumericDocValueField;
 
 /**
@@ -33,8 +32,8 @@ public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
 		super.configureFieldMetadata( name, builder );
 
-		builder.field( SpatialHelper.formatLatitude( name ), FieldType.DOUBLE );
-		builder.field( SpatialHelper.formatLongitude( name ), FieldType.DOUBLE );
+		builder.field( latitudeIndexedFieldName, FieldType.DOUBLE );
+		builder.field( longitudeIndexedFieldName, FieldType.DOUBLE );
 	}
 
 	/**
@@ -53,25 +52,22 @@ public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 			Double longitude = getLongitude( value );
 
 			if ( ( latitude != null ) && ( longitude != null ) ) {
-				final String latitudeFieldName = SpatialHelper.formatLatitude( name );
-				final String longitudeFieldName = SpatialHelper.formatLongitude( name );
-
 				luceneOptions.addNumericFieldToDocument(
-						latitudeFieldName,
+						latitudeIndexedFieldName,
 						latitude,
 						document
 				);
 
 				luceneOptions.addNumericFieldToDocument(
-						longitudeFieldName,
+						longitudeIndexedFieldName,
 						longitude,
 						document
 				);
 
-				Field latitudeDocValuesField = new SpatialNumericDocValueField( latitudeFieldName, latitude );
+				Field latitudeDocValuesField = new SpatialNumericDocValueField( latitudeIndexedFieldName, latitude );
 				document.add( latitudeDocValuesField );
 
-				Field longitudeDocValuesField = new SpatialNumericDocValueField( longitudeFieldName, longitude );
+				Field longitudeDocValuesField = new SpatialNumericDocValueField( longitudeIndexedFieldName, longitude );
 				document.add( longitudeDocValuesField );
 			}
 		}
