@@ -25,7 +25,9 @@ public @interface IdInfo {
 	Class<?> entity() default void.class;
 
 	/**
-	 * the id-columns for the entity this corresponds to
+	 * the id-columns (in table from the {@link UpdateInfo}
+	 * this {@link IdInfo} is hosted in)
+	 * for the entity this corresponds to
 	 */
 	IdColumn[] columns();
 
@@ -36,7 +38,9 @@ public @interface IdInfo {
 
 	/**
 	 * hints for the entity-provider used while updating
+	 * (this is currently only used if you provide your own)
 	 */
+	// genericjpa
 	Hint[] hints() default {};
 
 }
