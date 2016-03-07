@@ -105,6 +105,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 			deleteIndexIfExisting();
 		}
 
+		backend.close();
 		clientReference.close();
 	}
 
