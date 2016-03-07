@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.spatial;
+package org.hibernate.search.backend.elasticsearch.test;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -17,7 +17,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
+import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 
 /**
  * Hibernate Search spatial : Point Of Interest test entity
@@ -41,7 +41,7 @@ public class POI {
 	double longitude;
 
 	@Field(store = Store.YES, index = Index.YES, analyze = Analyze.NO)
-	@FieldBridge(impl = SpatialFieldBridgeByHash.class)
+	@FieldBridge(impl = SpatialFieldBridgeByRange.class)
 	@Embedded
 	public Coordinates getLocation() {
 		return new Coordinates() {

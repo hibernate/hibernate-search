@@ -9,6 +9,7 @@ package org.hibernate.search.spatial.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
@@ -22,6 +23,10 @@ import org.hibernate.search.spatial.Coordinates;
 public abstract class SpatialHelper {
 
 	private static final double LOG2 = Math.log( 2 );
+
+	private static final String SPATIAL_FIELD_SUFFIX = "_HSSI_";
+	private static final String SPATIAL_LATITUDE_SUFFIX = SPATIAL_FIELD_SUFFIX + "Latitude";
+	private static final String SPATIAL_LONGITUDE_SUFFIX = SPATIAL_FIELD_SUFFIX + "Longitude";
 
 	/**
 	 * Private constructor locking down utility class
@@ -213,15 +218,34 @@ public abstract class SpatialHelper {
 	}
 
 	public static String formatFieldName(final int spatialHashLevel, final String fieldName) {
-		return fieldName + "_HSSI_" + spatialHashLevel;
+		return fieldName + SPATIAL_FIELD_SUFFIX + spatialHashLevel;
 	}
 
 	public static String formatLatitude(final String fieldName) {
-		return fieldName + "_HSSI_Latitude";
+		return fieldName + SPATIAL_LATITUDE_SUFFIX;
 	}
 
 	public static String formatLongitude(final String fieldName) {
-		return fieldName + "_HSSI_Longitude";
+		return fieldName + SPATIAL_LONGITUDE_SUFFIX;
+	}
+
+	public static boolean isSpatialField(String fieldName) {
+		return fieldName.contains( SPATIAL_FIELD_SUFFIX );
+	}
+
+	public static boolean isSpatialFieldLatitude(String fieldName) {
+		return fieldName.endsWith( SPATIAL_LATITUDE_SUFFIX );
+	}
+
+	public static boolean isSpatialFieldLongitude(String fieldName) {
+		return fieldName.endsWith( SPATIAL_LONGITUDE_SUFFIX );
+	}
+
+	public static String getSpatialFieldRootName(String fieldName) {
+		if ( !isSpatialField( fieldName ) ) {
+			throw new AssertionFailure( "The field " + fieldName + " is not a spatial field." );
+		}
+		return fieldName.substring( 0, fieldName.indexOf( SPATIAL_FIELD_SUFFIX ) );
 	}
 
 	public static String formatSpatialHashCellId(final int xIndex, final int yIndex) {

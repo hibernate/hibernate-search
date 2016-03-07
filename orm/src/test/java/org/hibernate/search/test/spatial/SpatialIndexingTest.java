@@ -144,11 +144,11 @@ public class SpatialIndexingTest extends SearchTestBase {
 		Object[] fifthResult = (Object[]) results.get( 4 );
 		Object[] sixthResult = (Object[]) results.get( 5 );
 		Assert.assertEquals( ( (Double) firstResult[1] ), 0.0, 0.0001 );
-		Assert.assertEquals( ( (Double) secondResult[1] ), 10.1582, 0.0001 );
-		Assert.assertEquals( ( (Double) thirdResult[1] ), 11.1195, 0.0001 );
-		Assert.assertEquals( ( (Double) fourthResult[1] ), 15.0636, 0.0001 );
-		Assert.assertEquals( ( (Double) fifthResult[1] ), 22.239, 0.001 );
-		Assert.assertEquals( ( (Double) sixthResult[1] ), 24.446, 0.001 );
+		Assert.assertEquals( ( (Double) secondResult[1] ), 10.1582, 0.01 );
+		Assert.assertEquals( ( (Double) thirdResult[1] ), 11.1195, 0.01 );
+		Assert.assertEquals( ( (Double) fourthResult[1] ), 15.0636, 0.01 );
+		Assert.assertEquals( ( (Double) fifthResult[1] ), 22.239, 0.02 );
+		Assert.assertEquals( ( (Double) sixthResult[1] ), 24.446, 0.02 );
 	}
 
 	@Test
@@ -541,8 +541,8 @@ public class SpatialIndexingTest extends SearchTestBase {
 		Assert.assertEquals( 2, results.size() );
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
-		Assert.assertEquals( 6.0492d, (Double) firstResult[1], 0.0001 );
-		Assert.assertEquals( 4132.8166d, (Double) secondResult[1], 0.0001 );
+		Assert.assertEquals( 6.0492d, (Double) firstResult[1], 0.001 );
+		Assert.assertEquals( 4132.8166d, (Double) secondResult[1], 1 );
 
 		//Tests with @Longitude+@Latitude
 		luceneQuery = builder.spatial()
@@ -555,8 +555,8 @@ public class SpatialIndexingTest extends SearchTestBase {
 		Assert.assertEquals( 2, results.size() );
 		firstResult = (Object[]) results.get( 0 );
 		secondResult = (Object[]) results.get( 1 );
-		Assert.assertEquals( 6.0492d, (Double) firstResult[1], 0.0001 );
-		Assert.assertEquals( 4132.8166d, (Double) secondResult[1], 0.0001 );
+		Assert.assertEquals( 6.0492d, (Double) firstResult[1], 0.001 );
+		Assert.assertEquals( 4132.8166d, (Double) secondResult[1], 1 );
 	}
 
 	@Override

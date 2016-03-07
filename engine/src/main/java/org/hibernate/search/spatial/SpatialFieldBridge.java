@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.spatial;
 
+import static java.util.Locale.ENGLISH;
+
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -19,8 +21,6 @@ import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static java.util.Locale.ENGLISH;
 
 public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge {
 

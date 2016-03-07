@@ -32,6 +32,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
+import org.hibernate.search.backend.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
@@ -59,7 +60,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -86,6 +87,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
 
+	private static final String SPATIAL_DISTANCE_FIELD = "_distance";
+
 	/**
 	 * ES default limit for (firstResult + maxResult)
 	 */
@@ -96,6 +99,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private Integer resultSize;
 	private IndexSearcher searcher;
 	private SearchResult searchResult;
+
+	private int sortByDistanceIndex = -1;
 
 	private transient FacetManagerImpl facetManager;
 
@@ -195,12 +200,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	@Override
-	public HSQuery setSpatialParameters(Coordinates center, String fieldName) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not yet implemented" );
-	}
-
-	@Override
 	public HSQuery filter(Filter filter) {
 		// TODO implement
 		throw new UnsupportedOperationException( "Not yet implemented" );
@@ -281,8 +280,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			String idFieldName = null;
 			JsonArray typeFilters = new JsonArray();
 			Set<String> indexNames = new HashSet<>();
+			Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
 
-			for ( Class<?> queriedEntityType : getQueriedEntityTypes() ) {
+			for ( Class<?> queriedEntityType : queriedEntityTypes ) {
 				entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
 
 				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
@@ -326,6 +326,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				completeQuery.add( "aggregations", facets );
 			}
 
+			// Initialize the sortByDistanceIndex to detect if the results are sorted by distance and the position
+			// of the sort
+			sortByDistanceIndex = getSortByDistanceIndex();
+			addScriptFields( completeQuery );
+
 			executedQuery = completeQuery.build().toString();
 
 			Search.Builder search = new Search.Builder( executedQuery );
@@ -336,8 +341,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			// given, I take as much as possible, as by default only 10 rows would be returned
 			search.setParameter( "size", maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult );
 
-			// TODO: embedded fields
+			// TODO: embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
 			if ( sort != null ) {
+				validateSortFields( extendedIntegrator, queriedEntityTypes );
 				for ( SortField sortField : sort.getSort() ) {
 					search.addSort( getSort( sortField, idFieldName ) );
 				}
@@ -400,28 +406,81 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private Sort getSort(SortField sortField, String idFieldName) {
-			String sortFieldName;
-			if ( sortField.getField() == null ) {
-				switch (sortField.getType()) {
-					case DOC:
-						sortFieldName = "_uid";
-						break;
-					case SCORE:
-						sortFieldName = "_score";
-						break;
-					default:
-						throw LOG.cannotUseThisSortTypeWithNullSortFieldName( sortField.getType() );
-				}
+			if ( sortField instanceof DistanceSortField ) {
+				DistanceSortField distanceSortField = (DistanceSortField) sortField;
+				return new DistanceSort( distanceSortField.getField(),
+						distanceSortField.getCenter(),
+						distanceSortField.getReverse() ? Sorting.DESC : Sorting.ASC );
 			}
 			else {
-				if ( sortField.getField().equals( idFieldName ) ) {
-					sortFieldName = "_uid";
+				String sortFieldName;
+				if ( sortField.getField() == null ) {
+					switch (sortField.getType()) {
+						case DOC:
+							sortFieldName = "_uid";
+							break;
+						case SCORE:
+							sortFieldName = "_score";
+							break;
+						default:
+							throw LOG.cannotUseThisSortTypeWithNullSortFieldName( sortField.getType() );
+					}
 				}
 				else {
-					sortFieldName = sortField.getField();
+					if ( sortField.getField().equals( idFieldName ) ) {
+						sortFieldName = "_uid";
+					}
+					else {
+						sortFieldName = sortField.getField();
+					}
+				}
+				return new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC );
+			}
+		}
+
+		/**
+		 * Returns the index of the DistanceSortField in the Sort array.
+		 *
+		 * @return the index, -1 if no DistanceSortField has been found
+		 */
+		private int getSortByDistanceIndex() {
+			int i = 0;
+			if ( sort != null ) {
+				for ( SortField sortField : sort.getSort() ) {
+					if ( sortField instanceof DistanceSortField ) {
+						return i;
+					}
+					i++;
 				}
 			}
-			return new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC );
+			return -1;
+		}
+
+		/**
+		 * Indicates if the results are sorted by distance (note that it might be a secondary order).
+		 */
+		private boolean isSortedByDistance() {
+			return sortByDistanceIndex >= 0;
+		}
+
+		private void addScriptFields(JsonBuilder.Object query) {
+			if ( isPartOfProjectedFields( ProjectionConstants.SPATIAL_DISTANCE ) && !isSortedByDistance() ) {
+				// when the results are sorted by distance, Elasticsearch returns the distance in a "sort" field in
+				// the results. If we don't sort by distance, we need to request for the distance using a script_field.
+				query.add( "script_fields",
+						JsonBuilder.object().add( SPATIAL_DISTANCE_FIELD, JsonBuilder.object()
+								.add( "params",
+										JsonBuilder.object()
+												.addProperty( "lat", spatialSearchCenter.getLatitude() )
+												.addProperty( "lon", spatialSearchCenter.getLongitude() )
+								)
+								.addProperty( "script", "doc[\u0027" + spatialFieldName + "\u0027].arcDistanceInKm(lat,lon)" )
+						)
+				);
+				// in this case, the _source field is not present in the Elasticsearch results
+				// we need to ask for it explicitely
+				query.add( "fields", JsonBuilder.array().add( new JsonPrimitive( "_source" ) ) );
+			}
 		}
 
 		SearchResult runSearch() {
@@ -470,7 +529,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							projections[i] = hit.getAsJsonObject().get( "_score" ).getAsFloat();
 							break;
 						case ProjectionConstants.SPATIAL_DISTANCE:
-							throw new UnsupportedOperationException( "Not yet implemented" );
+							// if we sort by distance, we need to find the index of the DistanceSortField and use it
+							// to extract the values from the sort array
+							// if we don't sort by distance, we use the field generated by the script_field added earlier
+							if ( isSortedByDistance() ) {
+								projections[i] = hit.getAsJsonObject().get( "sort" ).getAsJsonArray().get( sortByDistanceIndex ).getAsDouble();
+							}
+							else {
+								projections[i] = hit.getAsJsonObject().get( "fields" ).getAsJsonObject().get( SPATIAL_DISTANCE_FIELD ).getAsDouble();
+							}
+							break;
 						case ProjectionConstants.THIS:
 							indexesOfThis.add( i );
 							break;
@@ -679,6 +747,18 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private boolean isNested(DiscreteFacetRequest facetRequest) {
 		//TODO Drive through meta-data
 //		return FieldHelper.isEmbeddedField( facetRequest.getFieldName() );
+		return false;
+	}
+
+	private boolean isPartOfProjectedFields(String projectionName) {
+		if ( projectedFields == null ) {
+			return false;
+		}
+		for ( String projectedField : projectedFields ) {
+			if ( projectionName.equals( projectedField ) ) {
+				return true;
+			}
+		}
 		return false;
 	}
 

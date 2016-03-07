@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.query.engine.impl;
 
+import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInstance;
+import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResults;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -23,7 +26,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -46,20 +48,13 @@ import org.hibernate.search.filter.impl.DefaultFilterKey;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.metadata.FieldDescriptor;
-import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
-import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
-import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInstance;
-import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResults;
 
 /**
  * @author Emmanuel Bernard
@@ -466,7 +461,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		}
 
 		if ( this.sort != null ) {
-			validateSortFields( extendedIntegrator );
+			validateSortFields( extendedIntegrator, this.classesAndSubclasses );
 		}
 
 		//set up the searcher
@@ -571,36 +566,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 		for ( EmbeddedTypeMetadata embeddedType : embeddedTypeMetadata.getEmbeddedTypeMetadata() ) {
 			collectSortableFields( sortConfigurations, embeddedType );
-		}
-	}
-
-	private void validateSortFields(ExtendedSearchIntegrator extendedIntegrator) {
-		SortField[] sortFields = sort.getSort();
-		for ( SortField sortField : sortFields ) {
-			if ( sortField instanceof DistanceSortField ) {
-				validateDistanceSortField( extendedIntegrator, sortField );
-			}
-		}
-	}
-
-	private void validateDistanceSortField(ExtendedSearchIntegrator extendedIntegrator, SortField sortField) {
-		boolean indexedField = false;
-		String field = sortField.getField();
-		if ( field != null ) {
-			for ( Class<?> clazz : classesAndSubclasses ) {
-				IndexedTypeDescriptor indexedTypeDescriptor = extendedIntegrator.getIndexedTypeDescriptor( clazz );
-				FieldDescriptor fieldDescriptor = indexedTypeDescriptor.getIndexedField( field );
-				if ( fieldDescriptor != null ) {
-					indexedField = true;
-					if ( fieldDescriptor.getType() != Type.SPATIAL ) {
-						throw log.distanceSortRequiresSpatialField( field );
-					}
-					break;
-				}
-			}
-		}
-		if ( !indexedField ) {
-			throw log.sortRequiresIndexedField( sortField.getClass(), field );
 		}
 	}
 
