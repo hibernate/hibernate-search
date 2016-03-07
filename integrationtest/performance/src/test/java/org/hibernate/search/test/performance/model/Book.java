@@ -32,6 +32,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
@@ -62,12 +63,15 @@ public class Book {
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	@DateBridge(resolution = Resolution.DAY)
+	@SortableField
 	private Date publicationDate;
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
+	@SortableField
 	private Float rating;
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
+	@SortableField
 	private Long totalSold;
 
 	@IndexedEmbedded
