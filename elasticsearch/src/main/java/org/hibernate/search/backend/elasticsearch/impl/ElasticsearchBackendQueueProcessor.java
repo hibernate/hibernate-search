@@ -36,11 +36,16 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 	private ElasticsearchIndexManager indexManager;
 	private ExtendedSearchIntegrator searchIntegrator;
+	private ElasticsearchIndexWorkVisitor visitor;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.indexManager = (ElasticsearchIndexManager) indexManager;
 		this.searchIntegrator = context.getUninitializedSearchIntegrator();
+		this.visitor = new ElasticsearchIndexWorkVisitor(
+				this.indexManager.getActualIndexName(),
+				this.searchIntegrator
+		);
 	}
 
 	@Override
@@ -53,13 +58,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 		// group actions into bulks if their type permits it; otherwise execute them right away and start a new bulk
 		for ( LuceneWork luceneWork : workList ) {
-			Action<?> action = luceneWork.acceptIndexWorkVisitor(
-					new ElasticsearchIndexWorkVisitor(
-							indexManager.getActualIndexName(),
-							indexManager.searchIntegrator
-					),
-					false
-			);
+			Action<?> action = luceneWork.acceptIndexWorkVisitor( visitor, false );
 
 			// either add to bulk
 			if ( action instanceof BulkableAction ) {
@@ -111,13 +110,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-		Action<?> action = singleOperation.acceptIndexWorkVisitor(
-				new ElasticsearchIndexWorkVisitor(
-						indexManager.getActualIndexName(),
-						indexManager.searchIntegrator
-				),
-				true
-		);
+		Action<?> action = singleOperation.acceptIndexWorkVisitor( visitor, true );
 
 		if ( action == null ) {
 			return;
