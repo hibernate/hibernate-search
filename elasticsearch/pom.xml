@@ -20,12 +20,6 @@
     <name>Hibernate Search Elasticsearch Backend</name>
     <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>
 
-    <properties>
-        <!-- In theory we're not coupled to a specific version of Elasticsearch; this property
-             controls which version is being used to run integration tests. -->
-        <test.elasticsearch.version>2.2.0</test.elasticsearch.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -339,10 +333,20 @@
                                 <artifactItem>
                                     <groupId>org.elasticsearch.plugin</groupId>
                                     <artifactId>delete-by-query</artifactId>
-                                    <version>${test.elasticsearch.version}</version>
+                                    <version>${testElasticsearchVersion}</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.elasticsearch.module</groupId>
+                                    <artifactId>lang-groovy</artifactId>
+                                    <version>${testElasticsearchVersion}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/_ES_PLUGINS_/lang-groovy</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
