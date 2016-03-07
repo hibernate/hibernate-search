@@ -13,10 +13,12 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
+import org.hibernate.search.analyzer.spi.AnalyzerDefiner;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
@@ -41,6 +43,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.impl.DelegateNamedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -56,7 +59,7 @@ import io.searchbox.indices.mapping.PutMapping;
  *
  * @author Gunnar Morling
  */
-public class ElasticsearchIndexManager implements IndexManager {
+public class ElasticsearchIndexManager implements IndexManager, AnalyzerDefiner {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -233,6 +236,14 @@ public class ElasticsearchIndexManager implements IndexManager {
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 		field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
 
+		if ( fieldMetadata.getAnalyzer() != null ) {
+			String analyzerName = analyzerName( fieldMetadata );
+			// TODO: Should I throw an exception otherwise?
+			if ( analyzerName != null ) {
+				field.addProperty( "analyzer", analyzerName );
+			}
+		}
+
 		if ( fieldMetadata.getBoost() != null ) {
 			field.addProperty( "boost", fieldMetadata.getBoost() );
 		}
@@ -251,6 +262,19 @@ public class ElasticsearchIndexManager implements IndexManager {
 				addFieldMapping( payload, facetMetadata );
 			}
 		}
+	}
+
+	private String analyzerName(DocumentFieldMetadata fieldMetadata) {
+		Analyzer analyzer = fieldMetadata.getAnalyzer();
+		if ( analyzer instanceof DelegateNamedAnalyzer ) {
+			DelegateNamedAnalyzer namedAnalyzer = (DelegateNamedAnalyzer) analyzer;
+			analyzer = namedAnalyzer.getWrappedAnalyzer( namedAnalyzer.getName() );
+		}
+		if ( analyzer instanceof ElasticsearchAnalyzer ) {
+			ElasticsearchAnalyzer elasticsearchAnalyzer = (ElasticsearchAnalyzer) analyzer;
+			return elasticsearchAnalyzer.getName();
+		}
+		return null;
 	}
 
 	/**
@@ -497,6 +521,16 @@ public class ElasticsearchIndexManager implements IndexManager {
 
 	public String getActualIndexName() {
 		return actualIndexName;
+	}
+
+	@Override
+	public Analyzer createAnalyzer(String name) {
+		return new ElasticsearchAnalyzer( name );
+	}
+
+	@Override
+	public boolean supportsAdditionalAnalyzer() {
+		return true;
 	}
 
 	// Runtime ops

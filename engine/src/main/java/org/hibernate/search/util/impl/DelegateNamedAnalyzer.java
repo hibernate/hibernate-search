@@ -42,7 +42,7 @@ public final class DelegateNamedAnalyzer extends AnalyzerWrapper {
 	}
 
 	@Override
-	protected Analyzer getWrappedAnalyzer(String fieldName) {
+	public Analyzer getWrappedAnalyzer(String fieldName) {
 		return delegate;
 	}
 

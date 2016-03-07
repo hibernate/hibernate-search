@@ -49,4 +49,10 @@ node.local: true
 index.number_of_shards: 1
 index.number_of_replicas: 0
 
+# Custom analyzer used in tests
+index.analysis.analyzer.custom-analyzer:
+  type: custom
+  tokenizer: standard
+  filter: standard, lowercase
+
 

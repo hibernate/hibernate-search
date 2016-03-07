@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +24,7 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XPackage;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.analyzer.spi.AnalyzerDefiner;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Factory;
@@ -32,10 +32,14 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.EntityDescriptor;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -282,7 +286,7 @@ public final class ConfigContext {
 		filterDefs.put( defAnn.name(), filterDef );
 	}
 
-	public Map<String, Analyzer> initLazyAnalyzers() {
+	public Map<String, Analyzer> initLazyAnalyzers(IndexManagerHolder indexesFactory) {
 		Map<String, Analyzer> initializedAnalyzers = new HashMap<String, Analyzer>( analyzerDefs.size() );
 
 		for ( DelegateNamedAnalyzer namedAnalyzer : lazyAnalyzers ) {
@@ -297,7 +301,8 @@ public final class ConfigContext {
 					initializedAnalyzers.put( name, analyzer );
 				}
 				else {
-					throw new SearchException( "Analyzer found with an unknown definition: " + name );
+					// Check if the analyzer definition has a special meaning for some of the index managers
+					checkIfIndexManagerRecognizeTheAnalyzerDef( indexesFactory, initializedAnalyzers, namedAnalyzer, name );
 				}
 			}
 		}
@@ -310,6 +315,27 @@ public final class ConfigContext {
 			}
 		}
 		return Collections.unmodifiableMap( initializedAnalyzers );
+	}
+
+	private void checkIfIndexManagerRecognizeTheAnalyzerDef(IndexManagerHolder indexesFactory, Map<String, Analyzer> initializedAnalyzers, DelegateNamedAnalyzer namedAnalyzer, String name) {
+		boolean found = false;
+		Collection<IndexManager> indexManagers = indexesFactory.getIndexManagers();
+		for ( IndexManager indexManager : indexManagers ) {
+			if ( indexManager instanceof AnalyzerDefiner ) {
+				AnalyzerDefiner analyzerDefiner = (AnalyzerDefiner) indexManager;
+				if ( analyzerDefiner.supportsAdditionalAnalyzer() ) {
+					// Built-in analyzer definition (for example Elasticsearch whitespace, simple, english, ...)
+					final Analyzer analyzer = analyzerDefiner.createAnalyzer( namedAnalyzer.getName() );
+					namedAnalyzer.setDelegate( analyzer );
+					initializedAnalyzers.put( name, analyzer );
+					found = true;
+					break;
+				}
+			}
+		}
+		if ( !found ) {
+			throw new SearchException( "Analyzer found with an unknown definition: " + name );
+		}
 	}
 
 	public Map<String, FilterDef> initFilters() {
