@@ -26,9 +26,11 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * Hibernate Search spatial : unit tests on indexing POIs in with Grid and Grid+Distance
@@ -107,11 +109,20 @@ public class SpatialIndexingTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testIndexing() throws Exception {
+	@Category(SkipOnElasticsearch.class)
+	// Elasticsearch does not support a radius of 0 (starting from 2.2.0)
+	public void testIndexingRadius0() throws Exception {
 		double centerLatitude = 24;
 		double centerLongitude = 32;
 
 		assertNumberOfPointsOfInterestWithinRadius( centerLatitude, centerLongitude, 0, 1 );
+	}
+
+	@Test
+	public void testIndexing() throws Exception {
+		double centerLatitude = 24;
+		double centerLongitude = 32;
+
 		assertNumberOfPointsOfInterestWithinRadius( centerLatitude, centerLongitude, 10, 1 );
 		assertNumberOfPointsOfInterestWithinRadius( centerLatitude, centerLongitude, 20, 4 );
 		assertNumberOfPointsOfInterestWithinRadius( centerLatitude, centerLongitude, 30, 6 );

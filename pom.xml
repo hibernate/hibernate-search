@@ -182,9 +182,10 @@
         <commonsLangVersion>2.6</commonsLangVersion>
 
         <!-- Elasticsearch -->
-        <elasticsearchMavenPluginVersion>2.0</elasticsearchMavenPluginVersion>
-        <!-- Keep in sync with the dependency required by Elasticsearch -->
-        <elasticsearchGroovyVersion>2.4.4</elasticsearchGroovyVersion>
+        <testElasticsearchMavenPluginVersion>2.0</testElasticsearchMavenPluginVersion>
+        <!-- In theory we're not coupled to a specific version of Elasticsearch; this property
+             controls which version is being used to run integration tests. -->
+        <testElasticsearchVersion>2.2.0</testElasticsearchVersion>
 
         <!-- Integration tests -->
         <arquillianVersion>1.1.8.Final</arquillianVersion>
@@ -1220,7 +1221,7 @@
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>
                     <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>${elasticsearchMavenPluginVersion}</version>
+                    <version>${testElasticsearchMavenPluginVersion}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.slf4j</groupId>
@@ -1228,14 +1229,11 @@
                             <version>${slf4jVersion}</version>
                         </dependency>
                         <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-all</artifactId>
-                            <version>${elasticsearchGroovyVersion}</version>
+                            <groupId>org.elasticsearch</groupId>
+                            <artifactId>elasticsearch</artifactId>
+                            <version>${testElasticsearchVersion}</version>
                         </dependency>
                     </dependencies>
-                    <configuration>
-                        <configPath>${basedir}/src/test/resources/elasticsearch/config</configPath>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

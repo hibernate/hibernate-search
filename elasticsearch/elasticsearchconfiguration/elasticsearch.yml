@@ -49,4 +49,5 @@ node.local: true
 index.number_of_shards: 1
 index.number_of_replicas: 0
 
-
+# Enable Groovy scripting support for search: useful for spatial queries
+script.engine.groovy.inline.search: on
