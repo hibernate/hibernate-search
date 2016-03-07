@@ -17,6 +17,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
+import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -28,6 +29,9 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 
 	protected String latitudeField;
 	protected String longitudeField;
+
+	protected String latitudeIndexedFieldName;
+	protected String longitudeIndexedFieldName;
 
 	@Override
 	public abstract void set(String name, Object value, Document document, LuceneOptions luceneOptions);
@@ -49,8 +53,15 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 
 	@Override
 	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		initializeIndexedFieldNames( name );
+
 		builder.field( name, FieldType.DOUBLE )
 			.sortable( true );
+	}
+
+	protected void initializeIndexedFieldNames(String fieldName) {
+		latitudeIndexedFieldName = SpatialHelper.formatLatitude( fieldName );
+		longitudeIndexedFieldName = SpatialHelper.formatLongitude( fieldName );
 	}
 
 	private Double getCoordinateFromField(String coordinateField, Object value) {
