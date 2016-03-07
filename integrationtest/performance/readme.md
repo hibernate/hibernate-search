@@ -67,10 +67,10 @@ username and password.
         mvn clean test -Pmysql51 -Dtest=TestRunnerStandalone \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario \
         -Dhibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect \
-        -Dhibernate.hikari.dataSourceClassName=com.mysql.jdbc.jdbc2.optional.MysqlDataSource \
-        -Dhibernate.hikari.dataSource.url=jdbc:mysql://hostname:3306/hibperf \
-        -Dhibernate.hikari.dataSource.user=foo \
-        -Dhibernate.hikari.dataSource.password=foo \
+        -Dhibernate.connection.driver_class=com.mysql.jdbc.Driver \
+        -Dhibernate.connection.url=jdbc:mysql://hostname:3306/hibperf \
+        -Dhibernate.connection.username=foo \
+        -Dhibernate.connection.password=foo \
         -Dorg.hibernate.search.enable_performance_tests=true
 
 ### In container against a data source

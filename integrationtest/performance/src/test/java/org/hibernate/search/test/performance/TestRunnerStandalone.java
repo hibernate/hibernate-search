@@ -38,8 +38,11 @@ public class TestRunnerStandalone {
 		Properties properties = scenario.getHibernateProperties();
 		setDefaultProperty( properties, "hibernate.dialect", "org.hibernate.dialect.H2Dialect" );
 		setDefaultProperty( properties, "hibernate.connection.provider_class", "org.hibernate.hikaricp.internal.HikariCPConnectionProvider" );
+		setDefaultProperty( properties, "hibernate.connection.driver_class", "org.h2.Driver" );
+		setDefaultProperty( properties, "hibernate.connection.username", "sa" );
+		setDefaultProperty( properties, "hibernate.connection.password", "" );
+		setDefaultProperty( properties, "hibernate.connection.url", "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;MULTI_THREADED=1" );
 		setDefaultProperty( properties, "hibernate.hikari.maximumPoolSize", "20" );
-		setDefaultProperty( properties, "hibernate.hikari.dataSource.url", "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1;MULTI_THREADED=1" );
 		setDefaultProperty( properties, "hibernate.connection.isolation", "TRANSACTION_READ_COMMITTED" );
 		return properties;
 	}
