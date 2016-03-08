@@ -7,6 +7,7 @@
 package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.lucene.index.DocsEnum;
@@ -81,6 +82,14 @@ public final class SpatialHashFilter extends Filter {
 		else {
 			return null;
 		}
+	}
+
+	public List<String> getSpatialHashCellsIds() {
+		return Collections.unmodifiableList( spatialHashCellsIds );
+	}
+
+	public String getFieldName() {
+		return fieldName;
 	}
 
 	@Override

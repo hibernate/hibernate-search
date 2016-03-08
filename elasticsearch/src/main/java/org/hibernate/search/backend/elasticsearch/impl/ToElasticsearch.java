@@ -28,6 +28,7 @@ import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.impl.DistanceFilter;
+import org.hibernate.search.spatial.impl.SpatialHashFilter;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -365,7 +366,35 @@ public class ToElasticsearch {
 								)
 				).build();
 
-		return wrapQueryForNestedIfRequired( filter.getCoordinatesField(), distanceQuery );
+		distanceQuery = wrapQueryForNestedIfRequired( filter.getCoordinatesField(), distanceQuery );
+
+		// we only implement the previous filter optimization when we use the hash method as Elasticsearch
+		// automatically optimize the geo_distance query with a bounding box filter so we don't need to do it
+		// ourselves when we use the range method.
+		Filter previousFilter = filter.getPreviousFilter();
+		if ( previousFilter instanceof SpatialHashFilter ) {
+			distanceQuery = JsonBuilder.object()
+					.add( "filtered", JsonBuilder.object()
+							.add( "query", distanceQuery )
+							.add( "filter", convertSpatialHashFilter( (SpatialHashFilter) previousFilter ) )
+					).build();
+		}
+
+		return distanceQuery;
+	}
+
+	private static JsonObject convertSpatialHashFilter(SpatialHashFilter filter) {
+		JsonArray cellsIdsJsonArray = new JsonArray();
+		for ( String cellId : filter.getSpatialHashCellsIds() ) {
+			cellsIdsJsonArray.add( cellId );
+		}
+
+		JsonObject spatialHashFilter = JsonBuilder.object()
+				.add( "terms", JsonBuilder.object()
+						.add( filter.getFieldName(), cellsIdsJsonArray )
+				).build();
+
+		return wrapQueryForNestedIfRequired( filter.getFieldName(), spatialHashFilter );
 	}
 
 	private static JsonObject wrapQueryForNestedIfRequired(String field, JsonObject query) {
@@ -395,6 +424,9 @@ public class ToElasticsearch {
 		}
 		else if ( luceneFilter instanceof DistanceFilter ) {
 			return convertDistanceFilter( (DistanceFilter) luceneFilter );
+		}
+		else if ( luceneFilter instanceof SpatialHashFilter ) {
+			return convertSpatialHashFilter( (SpatialHashFilter) luceneFilter );
 		}
 		throw LOG.cannotTransformLuceneFilterIntoEsQuery( luceneFilter );
 	}

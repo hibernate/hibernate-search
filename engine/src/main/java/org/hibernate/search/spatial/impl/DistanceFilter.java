@@ -140,6 +140,10 @@ public final class DistanceFilter extends Filter {
 		return center;
 	}
 
+	public Filter getPreviousFilter() {
+		return previousFilter;
+	}
+
 	private String getLatitudeField() {
 		if ( latitudeField != null ) {
 			return latitudeField;
