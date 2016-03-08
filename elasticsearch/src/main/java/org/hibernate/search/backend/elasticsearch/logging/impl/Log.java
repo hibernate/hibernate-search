@@ -47,4 +47,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Empty phrase queries are not supported")
 	SearchException cannotQueryOnEmptyPhraseQuery();
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 7,
+			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
+	)
+	SearchException elasticsearchRequestFailed(String request, String response);
+
 }
