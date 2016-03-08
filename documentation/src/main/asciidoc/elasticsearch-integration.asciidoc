@@ -115,6 +115,20 @@ List<?> result = session.createFullTextQuery(query, GolfPlayer.class).list();
 ----
 ====
 
+==== Spatial queries
+
+The Elasticsearch integration supports spatial queries by using either the DSL or native Elasticsearch queries.
+
+For regular usage, there are no particular requirements for spatial support.
+
+However, if you want to calculate the distance from your entities to a point without sorting by the distance to this point,
+you need to enable the Groovy plugin by adding the following snippet to your Elasticsearch configuration:
+
+.Enabling Groovy support in your elasticsearch.yml
+----
+script.engine.groovy.inline.search: on
+----
+
 ==== Limitations
 
 Many features are not implemented yet: this preview is not very useful yet!
@@ -123,7 +137,6 @@ On the other hand, implementing some of these is not very hard: this might be th
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
  - Analyzer support
- - Spatial queries
  - Filters
  - Faceting
  - Optimisation
