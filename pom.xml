@@ -185,8 +185,11 @@
         <!-- Elasticsearch -->
         <testElasticsearchMavenPluginVersion>2.0</testElasticsearchMavenPluginVersion>
         <!-- In theory we're not coupled to a specific version of Elasticsearch; this property
-             controls which version is being used to run integration tests. -->
+             controls which version is being used to run integration tests. When updating,
+             make sure to use the right JNA version, too
+        -->
         <testElasticsearchVersion>2.2.0</testElasticsearchVersion>
+        <testElasticsearchJnaVersion>4.1.0</testElasticsearchJnaVersion>
 
         <!-- Integration tests -->
         <arquillianVersion>1.1.8.Final</arquillianVersion>
@@ -1245,6 +1248,14 @@
                             <groupId>org.hibernate</groupId>
                             <artifactId>hibernate-search-sharedtestresources</artifactId>
                             <version>${project.version}</version>
+                        </dependency>
+
+                        <!-- JNA isn't part of the ES fat JAR; Adding it so ES doesn't complain 
+                             upon start-up -->
+                        <dependency>
+                            <groupId>net.java.dev.jna</groupId>
+                            <artifactId>jna</artifactId>
+                            <version>${testElasticsearchJnaVersion}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
