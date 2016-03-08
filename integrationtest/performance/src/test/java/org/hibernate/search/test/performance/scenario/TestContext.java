@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.test.performance.task.AbstractTask;
@@ -46,6 +47,7 @@ public class TestContext {
 	public final AtomicLong authorIdCounter = new AtomicLong( 0 );
 	public final Random bookRandom = new Random();
 	public final Random authorRandom = new Random();
+	public final AtomicReference<RuntimeException> firstKnownError = new AtomicReference<>();
 
 	public long startTime;
 	public long stopTime;
@@ -90,6 +92,22 @@ public class TestContext {
 		catch (InterruptedException e) {
 			throw new RuntimeException( e );
 		}
+		RuntimeException firstRuntimeError = getFirstRuntimeError();
+		if ( firstRuntimeError != null ) {
+			throw firstRuntimeError;
+		}
+	}
+
+	public void reportRuntimeException(RuntimeException e) {
+		//We only want to track the first exception:
+		//having any error is enough to invalidate the results,
+		//and if there are multiple it's likely that they are either
+		//repeated errors, or that others are caused by the first one.
+		firstKnownError.compareAndSet( null, e );
+	}
+
+	private RuntimeException getFirstRuntimeError() {
+		return firstKnownError.get();
 	}
 
 }
