@@ -53,15 +53,11 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 
 	@Override
 	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
-		initializeIndexedFieldNames( name );
+		latitudeIndexedFieldName = SpatialHelper.formatLatitude( name );
+		longitudeIndexedFieldName = SpatialHelper.formatLongitude( name );
 
 		builder.field( name, FieldType.DOUBLE )
 			.sortable( true );
-	}
-
-	protected void initializeIndexedFieldNames(String fieldName) {
-		latitudeIndexedFieldName = SpatialHelper.formatLatitude( fieldName );
-		longitudeIndexedFieldName = SpatialHelper.formatLongitude( fieldName );
 	}
 
 	private Double getCoordinateFromField(String coordinateField, Object value) {
