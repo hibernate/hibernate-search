@@ -1225,6 +1225,13 @@
                     <version>${testElasticsearchMavenPluginVersion}</version>
                     <dependencies>
                         <dependency>
+                            <groupId>org.elasticsearch</groupId>
+                            <artifactId>elasticsearch</artifactId>
+                            <version>${testElasticsearchVersion}</version>
+                        </dependency>
+
+                        <!-- The next three are used to get ES log output into the Maven console -->
+                        <dependency>
                             <groupId>org.slf4j</groupId>
                             <artifactId>slf4j-api</artifactId>
                             <version>${slf4jVersion}</version>
@@ -1235,14 +1242,9 @@
                             <version>${slf4jVersion}</version>
                         </dependency>
                         <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-all</artifactId>
-                            <version>${elasticsearchGroovyVersion}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.elasticsearch</groupId>
-                            <artifactId>elasticsearch</artifactId>
-                            <version>${testElasticsearchVersion}</version>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-search-sharedtestresources</artifactId>
+                            <version>${project.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>

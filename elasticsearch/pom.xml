@@ -338,8 +338,6 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
                                 </artifactItem>
-                            </artifactItems>
-                            <artifactItems>
                                 <artifactItem>
                                     <groupId>org.elasticsearch.module</groupId>
                                     <artifactId>lang-groovy</artifactId>
@@ -380,18 +378,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.elasticsearch</groupId>
-                        <artifactId>elasticsearch</artifactId>
-                        <version>${test.elasticsearch.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-search-sharedtestresources</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
         </plugins>
