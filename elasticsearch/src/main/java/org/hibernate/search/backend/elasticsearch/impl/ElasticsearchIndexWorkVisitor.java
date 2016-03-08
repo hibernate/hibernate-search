@@ -173,9 +173,9 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<
 
 				if ( documentFieldMetadata == null ) {
 					if ( SpatialHelper.isSpatialField( jsonPropertyName ) ) {
-						// we only consider the latitude and the longitude fields
 						if ( isNumeric( field ) && ( SpatialHelper.isSpatialFieldLatitude( jsonPropertyName ) ||
 								SpatialHelper.isSpatialFieldLongitude( jsonPropertyName ) ) ) {
+							// work on the latitude/longitude fields
 							Number value = field.numericValue();
 							String spatialJsonPropertyName = SpatialHelper.getSpatialFieldRootName( jsonPropertyName );
 							JsonObject spatialParent;
@@ -196,6 +196,12 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<
 								addPropertyOfPotentiallyMultipleCardinality( spatialParent, "lon",
 										value != null ? new JsonPrimitive( value ) : null );
 							}
+						}
+						else {
+							// here, we have the hash fields used for spatial hash indexing
+							String value = field.stringValue();
+							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+									value != null ? new JsonPrimitive( value ) : null );
 						}
 					}
 					else {

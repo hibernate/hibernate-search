@@ -276,14 +276,26 @@ public class ElasticsearchIndexManager implements IndexManager {
 			}
 		}
 		else {
-			if ( SpatialHelper.isSpatialFieldLatitude( simpleFieldName ) ) {
-				// we only add the geo_point once
+			if ( SpatialHelper.isSpatialFieldLongitude( simpleFieldName ) ) {
+				// we ignore the longitude field, we will create the geo_point mapping only once with the latitude field
+				return;
+			}
+			else if ( SpatialHelper.isSpatialFieldLatitude( simpleFieldName ) ) {
+				// we only add the geo_point for the latitude field
 				JsonObject field = new JsonObject();
 
 				field.addProperty( "type", "geo_point" );
 
 				// in this case, the spatial field has precedence over an already defined field
 				getOrCreateProperties( payload, fieldName ).add( SpatialHelper.getSpatialFieldRootName( simpleFieldName ), field );
+			}
+			else {
+				// the fields potentially created for the spatial hash queries
+				JsonObject field = new JsonObject();
+				field.addProperty( "type", "string" );
+				field.addProperty( "index", "not_analyzed" );
+
+				getOrCreateProperties( payload, fieldName ).add( fieldName, field );
 			}
 		}
 	}

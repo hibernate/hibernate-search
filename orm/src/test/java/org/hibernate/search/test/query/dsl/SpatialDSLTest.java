@@ -49,7 +49,7 @@ public class SpatialDSLTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testSpatialQueries() {
+	public void testSpatialRangeQueries() {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( POI.class ).get();
@@ -81,6 +81,39 @@ public class SpatialDSLTest extends SearchTestBase {
 		transaction.commit();
 	}
 
+	@Test
+	public void testSpatialHashQueries() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( POIHash.class ).get();
+
+		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );
+		Query query = builder
+				.spatial()
+				.onField( "location" )
+				.within( 51, Unit.KM )
+				.ofCoordinates( coordinates )
+				.createQuery();
+
+		List<?> results = fullTextSession.createFullTextQuery( query, POIHash.class ).list();
+
+		assertEquals( "test spatial hash based spatial query", 1, results.size() );
+		assertEquals( "test spatial hash based spatial query", "Bozo", ( (POIHash) results.get( 0 ) ).getName() );
+
+		query = builder
+				.spatial()
+				.onField( "location" )
+				.within( 500, Unit.KM )
+				.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
+				.createQuery();
+		results = fullTextSession.createFullTextQuery( query, POIHash.class ).list();
+
+		assertEquals( "test spatial hash based spatial query", 1, results.size() );
+		assertEquals( "test spatial hash based spatial query", "Tour Eiffel", ( (POIHash) results.get( 0 ) ).getName() );
+
+		transaction.commit();
+	}
+
 	private void indexTestData() {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -89,6 +122,11 @@ public class SpatialDSLTest extends SearchTestBase {
 		poi = new POI( 2, "Bozo", 24d, 32d, "Monument" );
 		fullTextSession.persist( poi );
 
+		POIHash poiHash = new POIHash( 1, "Tour Eiffel", 48.858333d, 2.294444d, "Monument" );
+		fullTextSession.persist( poiHash );
+		poiHash = new POIHash( 2, "Bozo", 24d, 32d, "Monument" );
+		fullTextSession.persist( poiHash );
+
 		tx.commit();
 		fullTextSession.clear();
 	}
@@ -96,7 +134,7 @@ public class SpatialDSLTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
-				POI.class
+				POI.class, POIHash.class
 		};
 	}
 
