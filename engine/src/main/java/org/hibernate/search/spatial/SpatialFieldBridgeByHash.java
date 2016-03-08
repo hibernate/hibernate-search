@@ -55,23 +55,17 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
 		super.configureFieldMetadata( name, builder );
 		if ( spatialHashIndex ) {
+			hashIndexedFieldNames = new String[bottomSpatialHashLevel + 1];
+
 			for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
-				builder.field( hashIndexedFieldNames[i], FieldType.STRING );
+				String fieldName = SpatialHelper.formatFieldName( i, name );
+				hashIndexedFieldNames[i] = fieldName;
+				builder.field( fieldName, FieldType.STRING );
 			}
 		}
 		if ( numericFieldsIndex ) {
-			builder.field( SpatialHelper.formatLatitude( name ), FieldType.DOUBLE );
-			builder.field( SpatialHelper.formatLongitude( name ), FieldType.DOUBLE );
-		}
-	}
-
-	@Override
-	protected void initializeIndexedFieldNames(String fieldName) {
-		super.initializeIndexedFieldNames( fieldName );
-
-		hashIndexedFieldNames = new String[bottomSpatialHashLevel + 1];
-		for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
-			hashIndexedFieldNames[i] = SpatialHelper.formatFieldName( i, fieldName );
+			builder.field( latitudeIndexedFieldName, FieldType.DOUBLE );
+			builder.field( longitudeIndexedFieldName, FieldType.DOUBLE );
 		}
 	}
 
