@@ -107,6 +107,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<
 				DELETE_ALL_QUERY;
 
 		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( query )
+			.refresh( refresh )
 			.addIndex( indexName );
 
 		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
