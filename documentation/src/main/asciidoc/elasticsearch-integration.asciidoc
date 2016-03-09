@@ -65,11 +65,12 @@ you will need the new `hibernate-search-backend-elasticsearch` jar.
 
 ==== Configuration
 
-Just three new configuration properties have been introduced so far:
+Just a few new configuration properties have been introduced so far:
 
 Hostname and port for Elasticsearch:: `hibernate.search.elasticsearch.host \http://127.0.0.1:9200`
 Define which indexes should use it:: `hibernate.search.default.indexmanager elasticsearch`
 Decide who manages the index creation:: `hibernate.search.elasticsearch.index_management_strategy CREATE_DELETE`
+Timeout in ms when waiting for indexes to become available after creation:: `hibernate.search.elasticsearch.index_management_wait_timeout 10000`
 
 Other options for the `hibernate.search.elasticsearch.index_management_strategy` property are:
 
