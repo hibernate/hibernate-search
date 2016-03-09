@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceReference;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
@@ -34,10 +35,12 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	private ElasticsearchIndexManager indexManager;
 	private ExtendedSearchIntegrator searchIntegrator;
 	private ElasticsearchIndexWorkVisitor visitor;
+	private ErrorHandler errorHandler;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.indexManager = (ElasticsearchIndexManager) indexManager;
+		this.errorHandler = context.getErrorHandler();
 		this.searchIntegrator = context.getUninitializedSearchIntegrator();
 		this.visitor = new ElasticsearchIndexWorkVisitor(
 				this.indexManager.getActualIndexName(),
@@ -53,17 +56,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		// Run single action, with refresh
 		if ( workList.size() == 1 ) {
-			LuceneWork work = workList.iterator().next();
-			BackendRequest<?> request = work.acceptIndexWorkVisitor( visitor, true );
-
-			try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-				client.get().executeRequest( request );
-			}
-
-			// DBQ ignores the refresh parameter for some reason, so doing it explicitly
-			if ( request.getAction() instanceof DeleteByQuery ) {
-				refreshIndex();
-			}
+			doApplySingleWork( workList.iterator().next() );
 		}
 		// Create bulk action
 		else {
@@ -121,14 +114,23 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-		BackendRequest<?> action = singleOperation.acceptIndexWorkVisitor( visitor, true );
+		doApplySingleWork( singleOperation );
+	}
 
-		if ( action == null ) {
+	private void doApplySingleWork(LuceneWork work) {
+		BackendRequest<?> request = work.acceptIndexWorkVisitor( visitor, true );
+
+		if ( request == null ) {
 			return;
 		}
 
 		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-			client.get().executeRequest( action );
+			client.get().executeRequest( request );
+		}
+
+		// DBQ ignores the refresh parameter for some reason, so doing it explicitly
+		if ( request.getAction() instanceof DeleteByQuery ) {
+			refreshIndex();
 		}
 	}
 
