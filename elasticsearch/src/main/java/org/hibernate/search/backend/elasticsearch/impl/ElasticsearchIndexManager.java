@@ -181,7 +181,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 			}
 		};
 
-		JestResult result = clientReference.get().executeRequest( health, false );
+		JestResult result = clientReference.get().executeRequest( health );
 
 		if ( !result.isSucceeded() ) {
 			throw new SearchException( "Index " + actualIndexName + " wasn't created in time; Reason: " + result.getErrorMessage() );
@@ -189,7 +189,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 	}
 
 	private void createIndexIfNotYetExisting() {
-		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), false ).getResponseCode() == 200 ) {
+		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 200 ) {
 			return;
 		}
 
@@ -198,7 +198,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 
 	private void deleteIndexIfExisting() {
 		// Not actually needed, but do it to avoid cluttering the ES log
-		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), false ).getResponseCode() == 404 ) {
+		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 404 ) {
 			return;
 		}
 

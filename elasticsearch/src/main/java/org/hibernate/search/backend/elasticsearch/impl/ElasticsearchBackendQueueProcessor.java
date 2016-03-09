@@ -20,13 +20,9 @@ import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
-import io.searchbox.action.Action;
 import io.searchbox.action.BulkableAction;
-import io.searchbox.core.Bulk;
-import io.searchbox.core.Bulk.Builder;
 import io.searchbox.core.DeleteByQuery;
 import io.searchbox.indices.Refresh;
-import io.searchbox.params.Parameters;
 
 /**
  * {@link BackendQueueProcessor} applying index changes to an Elasticsearch server.
@@ -58,35 +54,35 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 		// Run single action, with refresh
 		if ( workList.size() == 1 ) {
 			LuceneWork work = workList.iterator().next();
-			Action<?> action = work.acceptIndexWorkVisitor( visitor, true );
+			BackendRequest<?> request = work.acceptIndexWorkVisitor( visitor, true );
 
 			try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-				client.get().executeRequest( action );
+				client.get().executeRequest( request );
 			}
 
 			// DBQ ignores the refresh parameter for some reason, so doing it explicitly
-			if ( action instanceof DeleteByQuery ) {
+			if ( request.getAction() instanceof DeleteByQuery ) {
 				refreshIndex();
 			}
 		}
 		// Create bulk action
 		else {
-			List<BulkableAction<?>> actions = new ArrayList<>( workList.size() );
+			List<BackendRequest<?>> actions = new ArrayList<>( workList.size() );
 
 			// group actions into bulks if their type permits it; otherwise execute them right away and start a new bulk
 			for ( LuceneWork luceneWork : workList ) {
-				Action<?> action = luceneWork.acceptIndexWorkVisitor( visitor, false );
+				BackendRequest<?> request = luceneWork.acceptIndexWorkVisitor( visitor, false );
 
 				// either add to bulk
-				if ( action instanceof BulkableAction ) {
-					actions.add( (BulkableAction<?>) action );
+				if ( request.getAction() instanceof BulkableAction ) {
+					actions.add( request );
 				}
 				// or execute the bulk built so far and execute the non-bulkable action
 				else {
 					executeBulkAndClear( actions, false );
 
 					try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-						client.get().executeRequest( action );
+						client.get().executeRequest( request );
 					}
 				}
 			}
@@ -109,20 +105,13 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	/**
 	 * Creates a bulk action from the given list, executes it and clears the list.
 	 */
-	private boolean executeBulkAndClear(List<BulkableAction<?>> actions, boolean refresh) {
+	private boolean executeBulkAndClear(List<BackendRequest<?>> actions, boolean refresh) {
 		if ( actions.isEmpty() ) {
 			return false;
 		}
 
-		Builder bulkBuilder = new Bulk.Builder()
-				.setParameter( Parameters.REFRESH, refresh );
-
-		for ( BulkableAction<?> action : actions ) {
-			bulkBuilder.addAction( action );
-		}
-
 		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-			client.get().executeRequest( bulkBuilder.build() );
+			client.get().executeBulkRequest( actions, refresh );
 		}
 
 		actions.clear();
@@ -132,7 +121,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-		Action<?> action = singleOperation.acceptIndexWorkVisitor( visitor, true );
+		BackendRequest<?> action = singleOperation.acceptIndexWorkVisitor( visitor, true );
 
 		if ( action == null ) {
 			return;

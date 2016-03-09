@@ -52,12 +52,13 @@ import com.google.gson.JsonPrimitive;
 import io.searchbox.action.Action;
 import io.searchbox.core.Delete;
 import io.searchbox.core.DeleteByQuery;
+import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
 
 /**
  * @author Gunnar Morling
  */
-class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<?>> {
+class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, BackendRequest<?>> {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -76,30 +77,31 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<
 	}
 
 	@Override
-	public Action<?> visitAddWork(AddLuceneWork work, Boolean refresh) {
-		return indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
+	public BackendRequest<?> visitAddWork(AddLuceneWork work, Boolean refresh) {
+		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
+		return new BackendRequest<>( index );
 	}
 
 	@Override
-	public Action<?> visitDeleteWork(DeleteLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitDeleteWork(DeleteLuceneWork work, Boolean refresh) {
 		Delete delete = new Delete.Builder( DocumentIdHelper.getDocumentId( work ) )
 			.index( indexName )
 			.type( work.getEntityClass().getName() )
 			.refresh( refresh )
 			.build();
 
-		return delete;
+		return new BackendRequest<DocumentResult>( delete, 404 );
 	}
 
 	@Override
-	public Action<?> visitOptimizeWork(OptimizeLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitOptimizeWork(OptimizeLuceneWork work, Boolean refresh) {
 		// TODO implement
 		LOG.warn( "Optimize work is not yet supported for Elasticsearch backend, ignoring it" );
 		return null;
 	}
 
 	@Override
-	public Action<?> visitPurgeAllWork(PurgeAllLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitPurgeAllWork(PurgeAllLuceneWork work, Boolean refresh) {
 		// TODO This requires the delete-by-query plug-in on ES 2.0 and beyond; Alternatively
 		// the type mappings could be deleted, think about implications for concurrent access
 		String query = work.getTenantId() != null ?
@@ -115,22 +117,23 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Action<
 			builder.addType( typeToDelete.getName() );
 		}
 
-		return builder.build();
+		return new BackendRequest<>( builder.build() );
 	}
 
 	@Override
-	public Action<?> visitUpdateWork(UpdateLuceneWork work, Boolean refresh) {
-		return indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
+	public BackendRequest<?> visitUpdateWork(UpdateLuceneWork work, Boolean refresh) {
+		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
+		return new BackendRequest<>( index );
 	}
 
 	@Override
-	public Action<?> visitFlushWork(FlushLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitFlushWork(FlushLuceneWork work, Boolean refresh) {
 		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
-	public Action<?> visitDeleteByQueryWork(
+	public BackendRequest<?> visitDeleteByQueryWork(
 			DeleteByQueryLuceneWork work, Boolean refresh) {
 		// TODO implement
 		throw new UnsupportedOperationException( "Not implemented yet" );
