@@ -226,10 +226,10 @@ public class ToElasticsearch {
 		String field = termQuery.getTerm().field();
 
 		JsonObject matchQuery = JsonBuilder.object()
-				.add( "match",
+				.add( "term",
 						JsonBuilder.object().add( field,
 								JsonBuilder.object()
-										.addProperty( "query", termQuery.getTerm().text() )
+										.addProperty( "value", termQuery.getTerm().text() )
 										.addProperty( "boost", termQuery.getBoost() )
 						)
 				).build();
