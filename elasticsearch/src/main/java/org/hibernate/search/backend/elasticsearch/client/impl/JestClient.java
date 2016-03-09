@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.backend.elasticsearch.impl.GsonBuilderHolder;
+import org.hibernate.search.backend.elasticsearch.impl.GsonHolder;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
@@ -48,7 +48,7 @@ public class JestClient implements Service, Startable, Stoppable {
 				.multiThreaded( true )
 				.readTimeout( 60000 )
 				.connTimeout( 2000 )
-				.gson( GsonBuilderHolder.BUILDER )
+				.gson( GsonHolder.GSON )
 				.build()
 		);
 

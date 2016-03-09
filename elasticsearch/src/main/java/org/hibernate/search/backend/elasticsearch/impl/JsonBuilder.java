@@ -117,7 +117,7 @@ public class JsonBuilder {
 			}
 			else if (value instanceof Date) {
 				// we use this Gson formatter to be sure the date format is in sync with the JestClient configuration
-				jsonObject.addProperty( property, GsonBuilderHolder.BUILDER.toJson( value ).replace( "\"", "" ) );
+				jsonObject.addProperty( property, GsonHolder.GSON.toJson( value ).replace( "\"", "" ) );
 			}
 			// TODO GSM: see if we have to support Calendar here as Gson serializes Calendar in a weird fashion
 			else {

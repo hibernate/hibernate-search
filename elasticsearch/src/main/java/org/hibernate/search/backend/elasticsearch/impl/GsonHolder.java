@@ -12,18 +12,17 @@ import com.google.gson.GsonBuilder;
 import io.searchbox.client.AbstractJestClient;
 
 /**
- * Centralizes the configuration of the Gson builder.
+ * Centralizes the configuration of the Gson object.
  *
  * @author Guillaume Smet
  */
-public class GsonBuilderHolder {
+public class GsonHolder {
 
-	private GsonBuilderHolder() {
+	private GsonHolder() {
 	}
 
-	public static final Gson BUILDER = new GsonBuilder()
+	public static final Gson GSON = new GsonBuilder()
 			.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT )
 			.serializeNulls()
 			.create();
-
 }
