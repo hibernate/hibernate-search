@@ -80,6 +80,22 @@ public class JestClient implements Service, Startable, Stoppable {
 		return executeRequest( request, asSet( ignoredErrorStatuses ) );
 	}
 
+	public <T extends JestResult> T executeRequest(Action<T> request, Set<Integer> ignoredErrorStatuses) {
+		try {
+			T result = client.execute( request );
+
+			// The request failed with a status that's not ignore-able
+			if ( !result.isSucceeded() && !isIgnored( result.getResponseCode(), ignoredErrorStatuses ) ) {
+				throw LOG.elasticsearchRequestFailed( requestToString( request ), resultToString( result ), null );
+			}
+
+			return result;
+		}
+		catch (IOException e) {
+			throw LOG.elasticsearchRequestFailed( requestToString( request ), null, e );
+		}
+	}
+
 	/**
 	 * Creates a bulk action from the given list and executes it.
 	 */
@@ -108,22 +124,6 @@ public class JestClient implements Service, Startable, Stoppable {
 						erroneousItems
 				);
 			}
-		}
-		catch (IOException e) {
-			throw LOG.elasticsearchRequestFailed( requestToString( request ), null, e );
-		}
-	}
-
-	public <T extends JestResult> T executeRequest(Action<T> request, Set<Integer> ignoredErrorStatuses) {
-		try {
-			T result = client.execute( request );
-
-			// The request failed with a status that's not ignore-able
-			if ( !result.isSucceeded() && !isIgnored( result.getResponseCode(), ignoredErrorStatuses ) ) {
-				throw LOG.elasticsearchRequestFailed( requestToString( request ), resultToString( result ), null );
-			}
-
-			return result;
 		}
 		catch (IOException e) {
 			throw LOG.elasticsearchRequestFailed( requestToString( request ), null, e );
