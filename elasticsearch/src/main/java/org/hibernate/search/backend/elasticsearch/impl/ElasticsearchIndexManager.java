@@ -103,7 +103,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 
 	private IndexManagementStrategy getIndexManagementStrategy(Properties properties) {
 		String strategy = properties.getProperty( ElasticsearchEnvironment.INDEX_MANAGEMENT_STRATEGY );
-		return strategy != null ? IndexManagementStrategy.valueOf( strategy ) : IndexManagementStrategy.NONE;
+		return strategy != null ? IndexManagementStrategy.valueOf( strategy ) : ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_STRATEGY;
 	}
 
 	private String getIndexManagementWaitTimeout(Properties properties) {

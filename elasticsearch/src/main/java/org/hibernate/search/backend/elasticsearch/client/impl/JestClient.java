@@ -37,7 +37,9 @@ public class JestClient implements Service, Startable, Stoppable {
 		JestClientFactory factory = new JestClientFactory();
 
 		String serverUri = ConfigurationParseHelper.getString(
-				properties, ElasticsearchEnvironment.SERVER_URI, "http://localhost:9200"
+				properties,
+				ElasticsearchEnvironment.SERVER_URI,
+				ElasticsearchEnvironment.Defaults.SERVER_URI
 		);
 
 		// TODO HSEARCH-2062 Make timeouts configurable
