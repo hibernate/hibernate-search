@@ -1,9 +1,3 @@
-/*
- * Hibernate Search, full-text search for your domain model
- *
- * License: GNU Lesser General Public License (LGPL), version 2.1 or later
- * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
- */
 package org.hibernate.search.test.async;
 
 import java.util.Properties;
@@ -12,13 +6,21 @@ import org.hibernate.search.backend.triggers.impl.TriggerAsyncBackendService;
 import org.hibernate.search.backend.triggers.impl.TriggerAsyncBackendServiceImpl;
 import org.hibernate.search.backend.triggers.impl.TriggerServiceConstants;
 import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
-import org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants;
-import org.hibernate.search.db.events.triggers.HSQLDBTriggerSQLStringSource;
 
 /**
- * Created by Martin on 14.11.2015.
+ * Created by Martin on 09.03.2016.
+ *
+ * this starts the service by hand
  */
-public class ManualAsyncIndexUpdateTest extends BaseAsyncIndexUpdateTest {
+public class ManualAsyncIndexUpdateStartTest extends BaseAsyncIndexUpdateTest {
+
+	public ManualAsyncIndexUpdateStartTest() {
+		super( true );
+	}
+
+	protected ManualAsyncIndexUpdateStartTest(boolean isProfileTest) {
+		super( isProfileTest );
+	}
 
 	private TriggerAsyncBackendService triggerAsyncBackendService;
 
@@ -26,8 +28,6 @@ public class ManualAsyncIndexUpdateTest extends BaseAsyncIndexUpdateTest {
 	protected void setup() {
 		this.triggerAsyncBackendService = new TriggerAsyncBackendServiceImpl();
 		Properties properties = new Properties();
-		properties.setProperty( AsyncUpdateConstants.TRIGGER_SOURCE_KEY, HSQLDBTriggerSQLStringSource.class.getName() );
-		properties.setProperty( TriggerServiceConstants.TRIGGER_BASED_BACKEND_KEY, "true" );
 		this.triggerAsyncBackendService.start(
 				this.getSessionFactory(),
 				this.getExtendedSearchIntegrator(),

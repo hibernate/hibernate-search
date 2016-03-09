@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.test.async;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
@@ -14,6 +17,8 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.backend.triggers.impl.TriggerServiceConstants;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.util.Sleep;
 import org.hibernate.search.test.SearchTestBase;
 
@@ -25,6 +30,13 @@ import org.junit.Test;
  * Created by Martin on 12.11.2015.
  */
 public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
+
+	private final boolean isProfileTest;
+	private boolean skipProfileTests = false;
+
+	protected BaseAsyncIndexUpdateTest(boolean isProfileTest) {
+		this.isProfileTest = isProfileTest;
+	}
 
 	protected Session session;
 
@@ -46,6 +58,11 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 
 	@Test
 	public void test() {
+		if ( this.isProfileTest && this.skipProfileTests ) {
+			System.out.println("skipping this test for the selected profile");
+			return;
+		}
+
 		this.session.getTransaction().begin();
 
 		Domain domain = new Domain();
@@ -92,6 +109,18 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 		cfg.put( "hibernate.connection.autocommit", "true" );
 
 		cfg.put( "hibernate.search.indexing_strategy", "manual" );
+
+		Properties hibernateProperties = new Properties();
+		try (InputStream is = BaseAsyncIndexUpdateTest.class.getResourceAsStream( "/hibernate.properties" )) {
+			hibernateProperties.load( is );
+		}
+		catch (IOException e) {
+			throw new AssertionFailure( "unexpected Exception", e );
+		}
+		this.skipProfileTests = hibernateProperties.getProperty( "skipProfileTests", "false" ).equals( "true" );
+		if ( !(this.skipProfileTests && this.isProfileTest) ) {
+			cfg.put( TriggerServiceConstants.TRIGGER_BASED_BACKEND_KEY, "true" );
+		}
 	}
 
 }
