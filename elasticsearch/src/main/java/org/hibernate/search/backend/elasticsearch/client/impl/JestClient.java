@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +21,6 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -80,12 +80,8 @@ public class JestClient implements Service, Startable, Stoppable {
 		return executeRequest( request, asSet( ignoredErrorStatuses ) );
 	}
 
-	public <T extends JestResult> T executeRequest(BackendRequest<T> request) {
-		return executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
-	}
-
 	/**
-	 * Creates a bulk action from the given list, executes it and clears the list.
+	 * Creates a bulk action from the given list and executes it.
 	 */
 	public void executeBulkRequest(List<BackendRequest<?>> actions, boolean refresh) {
 		Builder bulkBuilder = new Bulk.Builder()
@@ -97,48 +93,60 @@ public class JestClient implements Service, Startable, Stoppable {
 
 		Bulk request = bulkBuilder.build();
 
-		BulkResult response = executeRequest( request );
+		try {
+			BulkResult response = client.execute( request );
 
-		// TODO: Ideally this should not be needed, but for some reason the ES response is not always set to erroneous
-		// also if there is an erroneous item; I suppose that's a bug in ES? For now we are examining the result items
-		// and check if there is any erroneous
-		if ( containsErroneousItem( actions, response ) ) {
-			throw LOG.elasticsearchRequestFailed( requestToString( request ), resultToString( response ) );
+			// TODO: Ideally I could just check on the status of the bulk, but for some reason the ES response is not
+			// always set to erroneous also if there is an erroneous item; I suppose that's a bug in ES? For now we are
+			// examining the result items and check if there is any erroneous
+			List<BackendRequest<?>> erroneousItems = getErroneousItems( actions, response );
+
+			if ( !erroneousItems.isEmpty() ) {
+				throw LOG.elasticsearchBulkRequestFailed(
+						requestToString( request ),
+						resultToString( response ),
+						erroneousItems
+				);
+			}
+		}
+		catch (IOException e) {
+			throw LOG.elasticsearchRequestFailed( requestToString( request ), null, e );
 		}
 	}
 
-	private <T extends JestResult> T executeRequest(Action<T> request, Set<Integer> ignoredErrorStatuses) {
-		T result;
+	public <T extends JestResult> T executeRequest(Action<T> request, Set<Integer> ignoredErrorStatuses) {
 		try {
-			result = client.execute( request );
+			T result = client.execute( request );
 
 			// The request failed with a status that's not ignore-able
 			if ( !result.isSucceeded() && !isIgnored( result.getResponseCode(), ignoredErrorStatuses ) ) {
-				throw LOG.elasticsearchRequestFailed( requestToString( request ), resultToString( result ) );
+				throw LOG.elasticsearchRequestFailed( requestToString( request ), resultToString( result ), null );
 			}
 
 			return result;
 		}
 		catch (IOException e) {
-			throw new SearchException( e );
+			throw LOG.elasticsearchRequestFailed( requestToString( request ), null, e );
 		}
 	}
 
-	private boolean containsErroneousItem(List<BackendRequest<?>> actions, BulkResult response) {
+	private List<BackendRequest<?>> getErroneousItems(List<BackendRequest<?>> actions, BulkResult response) {
 		int i = 0;
+
+		List<BackendRequest<?>> erroneousItems = new ArrayList<>();
 
 		for ( BulkResultItem resultItem : response.getItems() ) {
 			// When getting a 404 for a DELETE, the error is null :(, so checking both
 			if ( resultItem.error != null || resultItem.status >= 400 ) {
 				BackendRequest<?> action = actions.get( i );
 				if ( !action.getIgnoredErrorStatuses().contains( resultItem.status ) ) {
-					return true;
+					erroneousItems.add( action );
 				}
 			}
 			i++;
 		}
 
-		return false;
+		return erroneousItems;
 	}
 
 	private boolean isIgnored(int responseCode, Set<Integer> ignoredStatuses) {

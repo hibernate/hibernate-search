@@ -6,14 +6,22 @@
  */
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
+import java.util.List;
+
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.backend.elasticsearch.client.impl.BulkRequestFailedException;
+import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.jboss.logging.annotations.Param;
+
+import io.searchbox.client.JestResult;
 
 /**
  * Hibernate Search Elasticsearch backend log abstraction.
@@ -50,6 +58,11 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 7,
 			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
 	)
-	SearchException elasticsearchRequestFailed(String request, String response);
+	SearchException elasticsearchRequestFailed(String request, String response, @Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 8,
+			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
+	)
+	BulkRequestFailedException elasticsearchBulkRequestFailed(String request, String response, @Param List<BackendRequest<? extends JestResult>> erroneousItems);
 
 }

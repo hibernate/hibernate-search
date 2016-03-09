@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.search.backend.LuceneWork;
+
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 
@@ -24,9 +26,11 @@ public class BackendRequest<T extends JestResult> {
 
 	private Action<T> action;
 	private Set<Integer> ignoredErrorStatuses;
+	private LuceneWork luceneWork;
 
-	public BackendRequest(Action<T> action, int... ignoredErrorStatuses) {
+	public BackendRequest(Action<T> action, LuceneWork luceneWork, int... ignoredErrorStatuses) {
 		this.action = action;
+		this.luceneWork = luceneWork;
 		this.ignoredErrorStatuses = asSet( ignoredErrorStatuses );
 	}
 
@@ -46,6 +50,13 @@ public class BackendRequest<T extends JestResult> {
 
 			return Collections.unmodifiableSet( ignored );
 		}
+	}
+
+	/**
+	 * Returns the original Lucene work from which this request was derived.
+	 */
+	public LuceneWork getLuceneWork() {
+		return luceneWork;
 	}
 
 	public Action<T> getAction() {

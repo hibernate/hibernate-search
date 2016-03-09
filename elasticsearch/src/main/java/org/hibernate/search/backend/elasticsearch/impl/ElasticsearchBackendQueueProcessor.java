@@ -7,17 +7,20 @@
 package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.elasticsearch.client.impl.BulkRequestFailedException;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
@@ -60,32 +63,61 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 		}
 		// Create bulk action
 		else {
-			List<BackendRequest<?>> actions = new ArrayList<>( workList.size() );
+			doApplyListOfWork( workList );
+		}
+	}
 
-			// group actions into bulks if their type permits it; otherwise execute them right away and start a new bulk
-			for ( LuceneWork luceneWork : workList ) {
-				BackendRequest<?> request = luceneWork.acceptIndexWorkVisitor( visitor, false );
+	/**
+	 * Groups the given work list into executable bulks and executes them. For each bulk, the error handler - if
+	 * registered - will be invoked with the items of that bulk.
+	 */
+	private void doApplyListOfWork(List<LuceneWork> workList) {
+		BackendRequestGroup nextBulk = null;
 
-				// either add to bulk
-				if ( request.getAction() instanceof BulkableAction ) {
-					actions.add( request );
-				}
-				// or execute the bulk built so far and execute the non-bulkable action
-				else {
-					executeBulkAndClear( actions, false );
+		for ( BackendRequestGroup backendRequestGroup : createRequestGroups( workList ) ) {
+			nextBulk = backendRequestGroup;
+			nextBulk.execute();
+		}
 
-					try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-						client.get().executeRequest( request );
-					}
-				}
+		// Make sure a final refresh has been issued
+		try {
+			nextBulk.ensureRefreshed();
+		}
+		catch (BulkRequestFailedException brfe) {
+			errorHandler.handleException( "Refresh failed", brfe );
+		}
+	}
+
+	/**
+	 * Organizes the given work list into {@link BackendRequestGroup}s to be executed.
+	 */
+	private List<BackendRequestGroup> createRequestGroups(List<LuceneWork> workList) {
+		List<BackendRequestGroup> groups = new ArrayList<>();
+		List<BackendRequest<?>> currentBulk = new ArrayList<>();
+
+		for ( LuceneWork luceneWork : workList ) {
+			BackendRequest<?> request = luceneWork.acceptIndexWorkVisitor( visitor, false );
+
+			// either add to current bulk...
+			if ( request.getAction() instanceof BulkableAction ) {
+				currentBulk.add( request );
 			}
-
-			boolean lastActionWasBulk = executeBulkAndClear( actions, true );
-
-			if ( !lastActionWasBulk ) {
-				refreshIndex();
+			// ... or finish up current bulk and add single request for non-bulkable request
+			else {
+				if ( !currentBulk.isEmpty() ) {
+					groups.add( new BackendRequestBulk( currentBulk, false ) );
+					currentBulk.clear();
+				}
+				groups.add( new SingleRequest( request ) );
 			}
 		}
+
+		// finish up last bulk
+		if ( !currentBulk.isEmpty() ) {
+			groups.add( new BackendRequestBulk( currentBulk, true ) );
+		}
+
+		return groups;
 	}
 
 	private void refreshIndex() {
@@ -95,42 +127,36 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 		}
 	}
 
-	/**
-	 * Creates a bulk action from the given list, executes it and clears the list.
-	 */
-	private boolean executeBulkAndClear(List<BackendRequest<?>> actions, boolean refresh) {
-		if ( actions.isEmpty() ) {
-			return false;
-		}
-
-		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-			client.get().executeBulkRequest( actions, refresh );
-		}
-
-		actions.clear();
-
-		return true;
-	}
-
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		doApplySingleWork( singleOperation );
 	}
 
 	private void doApplySingleWork(LuceneWork work) {
-		BackendRequest<?> request = work.acceptIndexWorkVisitor( visitor, true );
+		try {
+			BackendRequest<?> request = work.acceptIndexWorkVisitor( visitor, true );
 
-		if ( request == null ) {
-			return;
+			if ( request == null ) {
+				return;
+			}
+
+			try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+				client.get().executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
+			}
+
+			// DBQ ignores the refresh parameter for some reason, so doing it explicitly
+			if ( request.getAction() instanceof DeleteByQuery ) {
+				refreshIndex();
+			}
 		}
+		catch (Exception e) {
+			ErrorContextBuilder builder = new ErrorContextBuilder();
 
-		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-			client.get().executeRequest( request );
-		}
+			builder.allWorkToBeDone( Collections.singleton( work ) );
+			builder.addWorkThatFailed( work );
+			builder.errorThatOccurred( e );
 
-		// DBQ ignores the refresh parameter for some reason, so doing it explicitly
-		if ( request.getAction() instanceof DeleteByQuery ) {
-			refreshIndex();
+			errorHandler.handle( builder.createErrorContext() );
 		}
 	}
 
@@ -149,5 +175,103 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	@Override
 	public void closeIndexWriter() {
 		// no-op
+	}
+
+	/**
+	 * Represents a group of backend requests, which may either be backed by an actual bulk request or by a single
+	 * request "pseudo group". Allows for uniform handling of these two cases.
+	 */
+	private interface BackendRequestGroup {
+		void execute();
+		void ensureRefreshed();
+	}
+
+	/**
+	 * A request group backed by an actual bulk request.
+	 */
+	private class BackendRequestBulk implements BackendRequestGroup {
+
+		private List<BackendRequest<?>> requests;
+		private boolean refresh;
+
+		public BackendRequestBulk(List<BackendRequest<?>> requests, boolean refresh) {
+			this.requests = requests;
+			this.refresh = refresh;
+		}
+
+		@Override
+		public void execute() {
+			try {
+				try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+					client.get().executeBulkRequest( requests, refresh );
+				}
+			}
+			catch (BulkRequestFailedException brfe) {
+				ErrorContextBuilder builder = new ErrorContextBuilder();
+				List<LuceneWork> allWork = new ArrayList<>();
+
+				for ( BackendRequest<?> backendRequest : requests ) {
+					allWork.add( backendRequest.getLuceneWork() );
+					if ( !brfe.getErroneousItems().contains( backendRequest ) ) {
+						builder.workCompleted( backendRequest.getLuceneWork() );
+					}
+				}
+
+				builder.allWorkToBeDone( allWork );
+
+				for ( BackendRequest<?> failedAction : brfe.getErroneousItems() ) {
+					builder.addWorkThatFailed( failedAction.getLuceneWork() );
+				}
+
+				builder.errorThatOccurred( brfe );
+
+				errorHandler.handle( builder.createErrorContext() );
+			}
+			catch (Exception e) {
+				errorHandler.handleException( "Bulk request failed", e );
+			}
+		}
+
+		@Override
+		public void ensureRefreshed() {
+			if ( !refresh ) {
+				refreshIndex();
+			}
+		}
+	}
+
+	/**
+	 * A "group" just comprising a single, non-bulkable request.
+	 */
+	private class SingleRequest implements BackendRequestGroup {
+
+		private BackendRequest<?> request;
+
+		public SingleRequest(BackendRequest<?> request) {
+			this.request = request;
+		}
+
+		@Override
+		public void execute() {
+			try {
+				try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
+					client.get().executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
+				}
+			}
+			catch (Exception e) {
+				ErrorContextBuilder builder = new ErrorContextBuilder();
+
+				builder.allWorkToBeDone( Collections.singletonList( request.getLuceneWork() ) );
+				builder.addWorkThatFailed( request.getLuceneWork() );
+				builder.errorThatOccurred( e );
+
+				errorHandler.handle( builder.createErrorContext() );
+			}
+		}
+
+		@Override
+		public void ensureRefreshed() {
+			refreshIndex();
+		}
 	}
 }
