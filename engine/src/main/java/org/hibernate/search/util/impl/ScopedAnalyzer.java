@@ -12,6 +12,9 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A {@code ScopedAnalyzer} is a wrapper class containing all analyzers for a given class.
@@ -24,26 +27,28 @@ import org.apache.lucene.analysis.AnalyzerWrapper;
  */
 public final class ScopedAnalyzer extends AnalyzerWrapper {
 
-	private Analyzer globalAnalyzer;
-	private final Map<String, Analyzer> scopedAnalyzers = new HashMap<String, Analyzer>();
+	private static final Log log = LoggerFactory.make();
 
-	public ScopedAnalyzer(Analyzer globalAnalyzer) {
-		this( globalAnalyzer, Collections.<String, Analyzer>emptyMap() );
+	private AnalyzerReference globalAnalyzer;
+	private final Map<String, AnalyzerReference> scopedAnalyzers = new HashMap<String, AnalyzerReference>();
+
+	public ScopedAnalyzer(AnalyzerReference globalAnalyzer) {
+		this( globalAnalyzer, Collections.<String, AnalyzerReference>emptyMap() );
 	}
 
-	private ScopedAnalyzer(Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
+	private ScopedAnalyzer(AnalyzerReference globalAnalyzer, Map<String, AnalyzerReference> scopedAnalyzers) {
 		super( PER_FIELD_REUSE_STRATEGY );
 		this.globalAnalyzer = globalAnalyzer;
-		for ( Map.Entry<String, Analyzer> entry : scopedAnalyzers.entrySet() ) {
+		for ( Map.Entry<String, AnalyzerReference> entry : scopedAnalyzers.entrySet() ) {
 			addScopedAnalyzer( entry.getKey(), entry.getValue() );
 		}
 	}
 
-	public void setGlobalAnalyzer(Analyzer globalAnalyzer) {
+	public void setGlobalAnalyzer(AnalyzerReference globalAnalyzer) {
 		this.globalAnalyzer = globalAnalyzer;
 	}
 
-	public void addScopedAnalyzer(String scope, Analyzer scopedAnalyzer) {
+	public void addScopedAnalyzer(String scope, AnalyzerReference scopedAnalyzer) {
 		scopedAnalyzers.put( scope, scopedAnalyzer );
 	}
 
@@ -71,12 +76,19 @@ public final class ScopedAnalyzer extends AnalyzerWrapper {
 
 	@Override
 	protected Analyzer getWrappedAnalyzer(String fieldName) {
-		final Analyzer analyzer = scopedAnalyzers.get( fieldName );
+		final AnalyzerReference analyzer = scopedAnalyzers.get( fieldName );
 		if ( analyzer == null ) {
-			return globalAnalyzer;
+			return globalAnalyzer.getAnalyzer();
+		}
+		else if ( analyzer.getAnalyzer() != null ) {
+			return analyzer.getAnalyzer();
+		}
+		else if ( analyzer.getRemote() != null ) {
+			// Remote analyzer don't have an implementation
+			return PassThroughAnalyzer.INSTANCE;
 		}
 		else {
-			return analyzer;
+			throw log.analyzerReferenceNotInitialized( fieldName, analyzer.getName() );
 		}
 	}
 

@@ -113,7 +113,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	}
 
 	private static Query createKeywordRangeQuery(String fieldName, RangeQueryContext rangeContext, QueryBuildingContext queryContext, ConversionContext conversionContext, FieldContext fieldContext) {
-		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
+		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer() != null ? queryContext.getQueryAnalyzer().getAnalyzer() : null;
 		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
 		final String fromString = rangeContext.hasFrom() ?
 				fieldContext.objectToString( documentBuilder, rangeContext.getFrom(), conversionContext ) :

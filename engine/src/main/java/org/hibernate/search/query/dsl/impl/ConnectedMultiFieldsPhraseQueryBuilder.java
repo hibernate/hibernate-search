@@ -74,7 +74,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		final String sentence = phraseContext.getSentence();
 		try {
 			Reader reader = new StringReader( sentence );
-			stream = queryContext.getQueryAnalyzer().tokenStream( fieldName, reader);
+			stream = queryContext.getQueryAnalyzer().getAnalyzer().tokenStream( fieldName, reader);
 
 			CharTermAttribute termAttribute = stream.addAttribute( CharTermAttribute.class );
 			PositionIncrementAttribute positionAttribute = stream.addAttribute( PositionIncrementAttribute.class );

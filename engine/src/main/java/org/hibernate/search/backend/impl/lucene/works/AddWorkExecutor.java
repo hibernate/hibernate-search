@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
@@ -90,7 +91,9 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 				log.unableToRetrieveNamedAnalyzer( entry.getValue() );
 			}
 			else {
-				analyzerClone.addScopedAnalyzer( entry.getKey(), analyzer );
+				final AnalyzerReference reference = new AnalyzerReference();
+				reference.setAnalyzer( analyzer );
+				analyzerClone.addScopedAnalyzer( entry.getKey(), reference );
 			}
 		}
 		return analyzerClone;

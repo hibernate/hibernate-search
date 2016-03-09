@@ -13,6 +13,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -97,7 +98,7 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public Map<String, Analyzer> getAnalyzers() {
+	public Map<String, AnalyzerReference> getAnalyzers() {
 		return delegate.getAnalyzers();
 	}
 
@@ -200,6 +201,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	@Override
 	public Analyzer getAnalyzer(String name) {
 		return delegate.getAnalyzer( name );
+	}
+
+	@Override
+	public AnalyzerReference getAnalyzerReference(String name) {
+		return delegate.getAnalyzerReference( name );
 	}
 
 	@Override

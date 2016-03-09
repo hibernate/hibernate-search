@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -52,7 +53,7 @@ public class AnalyzerDefAnnotationTest {
 
 	@Test
 	public void shouldContainOnlyTheDefinedAnalyzers() throws Exception {
-		Map<String, Analyzer> analyzers = ( (SearchFactoryState) sfHolder.getSearchFactory() ).getAnalyzers();
+		Map<String, AnalyzerReference> analyzers = ( (SearchFactoryState) sfHolder.getSearchFactory() ).getAnalyzers();
 		assertThat( analyzers.keySet() ).containsOnly( "package-analyzer", "class-analyzer" );
 	}
 

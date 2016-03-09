@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 
@@ -29,7 +30,9 @@ public final class ConcurrentlyMutableAnalyzer extends DelegatingAnalyzerWrapper
 			current.set( (ScopedAnalyzer) initialAnalyzer );
 		}
 		else {
-			current.set( new ScopedAnalyzer( initialAnalyzer ) );
+			final AnalyzerReference reference = new AnalyzerReference();
+			reference.setAnalyzer( initialAnalyzer );
+			current.set( new ScopedAnalyzer( reference ) );
 		}
 	}
 

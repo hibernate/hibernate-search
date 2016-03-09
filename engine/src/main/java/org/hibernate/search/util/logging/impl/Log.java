@@ -931,4 +931,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 304, value = "Closing index writer for IndexManager '%1$s'")
 	void closingIndexWriter(String indexName);
+
+	@Message(id = 305, value = "Analyzer reference with name '%2$s' not initialized for field '%1$s' ")
+	SearchException analyzerReferenceNotInitialized(String fieldName, String name);
 }
