@@ -13,8 +13,18 @@ package org.hibernate.search.backend.elasticsearch.cfg;
  */
 public final class ElasticsearchEnvironment {
 
+	public static final class Defaults {
+		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
+	}
+
 	public static final String SERVER_URI = "hibernate.search.elasticsearch.host";
 	public static final String INDEX_MANAGEMENT_STRATEGY = "hibernate.search.elasticsearch.index_management_strategy";
+
+	/**
+	 * Property for specifying the timeout for index management operations (index creation etc.) in milli-seconds.
+	 * Defaults to {@link Defaults#INDEX_MANAGEMENT_WAIT_TIMEOUT} ms.
+	 */
+	public static final String INDEX_MANAGEMENT_WAIT_TIMEOUT = "hibernate.search.elasticsearch.index_management_wait_timeout";
 
 	private ElasticsearchEnvironment() {
 	}

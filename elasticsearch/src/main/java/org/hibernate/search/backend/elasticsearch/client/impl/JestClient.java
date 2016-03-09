@@ -40,10 +40,11 @@ public class JestClient implements Service, Startable, Stoppable {
 				properties, ElasticsearchEnvironment.SERVER_URI, "http://localhost:9200"
 		);
 
+		// TODO HSEARCH-2062 Make timeouts configurable
 		factory.setHttpClientConfig(
 			new HttpClientConfig.Builder( serverUri )
 				.multiThreaded( true )
-				.readTimeout( 2000 )
+				.readTimeout( 60000 )
 				.connTimeout( 2000 )
 				.gson( GsonBuilderHolder.BUILDER )
 				.build()

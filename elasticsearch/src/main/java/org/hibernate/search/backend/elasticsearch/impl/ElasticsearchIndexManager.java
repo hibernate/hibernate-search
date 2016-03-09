@@ -42,11 +42,15 @@ import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
+import io.searchbox.client.JestResult;
+import io.searchbox.cluster.Health;
+import io.searchbox.cluster.Health.Builder;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
@@ -64,6 +68,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 	private String indexName;
 	private String actualIndexName;
 	private IndexManagementStrategy indexManagementStrategy;
+	private String indexManagementWaitTimeout;
 	private Similarity similarity;
 
 	ExtendedSearchIntegrator searchIntegrator;
@@ -84,6 +89,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 		this.indexName = getIndexName( indexName, properties );
 		try ( ServiceReference<ConfigurationPropertiesProvider> propertiesProvider = serviceManager.requestReference( ConfigurationPropertiesProvider.class ) ) {
 			this.indexManagementStrategy = getIndexManagementStrategy( propertiesProvider.get().getProperties() );
+			this.indexManagementWaitTimeout = getIndexManagementWaitTimeout( propertiesProvider.get().getProperties() );
 		}
 		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
 		this.similarity = similarity;
@@ -98,6 +104,20 @@ public class ElasticsearchIndexManager implements IndexManager {
 	private IndexManagementStrategy getIndexManagementStrategy(Properties properties) {
 		String strategy = properties.getProperty( ElasticsearchEnvironment.INDEX_MANAGEMENT_STRATEGY );
 		return strategy != null ? IndexManagementStrategy.valueOf( strategy ) : IndexManagementStrategy.NONE;
+	}
+
+	private String getIndexManagementWaitTimeout(Properties properties) {
+		int timeout = ConfigurationParseHelper.getIntValue(
+				properties,
+				ElasticsearchEnvironment.INDEX_MANAGEMENT_WAIT_TIMEOUT,
+				ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_WAIT_TIMEOUT
+		);
+
+		if ( timeout < 0 ) {
+			throw new SearchException( "Positive timeout value expected, but it was: " + timeout );
+		}
+
+		return timeout + "ms";
 	}
 
 	@Override
@@ -141,7 +161,31 @@ public class ElasticsearchIndexManager implements IndexManager {
 	}
 
 	private void createIndex() {
-		clientReference.get().executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
+		CreateIndex createIndex = new CreateIndex.Builder( actualIndexName )
+				.build();
+
+		clientReference.get().executeRequest( createIndex );
+
+		waitForIndexCreation();
+	}
+
+	private void waitForIndexCreation() {
+		Builder healthBuilder = new Health.Builder()
+				.setParameter( "wait_for_status", "green" )
+				.setParameter( "timeout", indexManagementWaitTimeout );
+
+		Health health = new Health( healthBuilder ) {
+			@Override
+			protected String buildURI() {
+				return super.buildURI() + actualIndexName;
+			}
+		};
+
+		JestResult result = clientReference.get().executeRequest( health, false );
+
+		if ( !result.isSucceeded() ) {
+			throw new SearchException( "Index " + actualIndexName + " wasn't created in time; Reason: " + result.getErrorMessage() );
+		}
 	}
 
 	private void createIndexIfNotYetExisting() {
