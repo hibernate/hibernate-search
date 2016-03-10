@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.client.impl.BulkRequestFailedE
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -39,6 +38,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	private ExtendedSearchIntegrator searchIntegrator;
 	private ElasticsearchIndexWorkVisitor visitor;
 	private ErrorHandler errorHandler;
+	private JestClient jestClient;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
@@ -49,10 +49,12 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 				this.indexManager.getActualIndexName(),
 				this.searchIntegrator
 		);
+		this.jestClient = context.getServiceManager().requestService( JestClient.class );
 	}
 
 	@Override
 	public void close() {
+		searchIntegrator.getServiceManager().releaseService( JestClient.class );
 	}
 
 	@Override
@@ -122,9 +124,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 	private void refreshIndex() {
 		Refresh refresh = new Refresh.Builder().addIndex( indexManager.getActualIndexName() ).build();
-		try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-			client.get().executeRequest( refresh );
-		}
+		jestClient.executeRequest( refresh );
 	}
 
 	@Override
@@ -140,9 +140,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 				return;
 			}
 
-			try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-				client.get().executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
-			}
+			jestClient.executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
 
 			// DBQ ignores the refresh parameter for some reason, so doing it explicitly
 			if ( request.getAction() instanceof DeleteByQuery ) {
@@ -191,8 +189,8 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	 */
 	private class BackendRequestBulk implements BackendRequestGroup {
 
-		private List<BackendRequest<?>> requests;
-		private boolean refresh;
+		private final List<BackendRequest<?>> requests;
+		private final boolean refresh;
 
 		public BackendRequestBulk(List<BackendRequest<?>> requests, boolean refresh) {
 			this.requests = requests;
@@ -202,9 +200,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 		@Override
 		public void execute() {
 			try {
-				try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-					client.get().executeBulkRequest( requests, refresh );
-				}
+				jestClient.executeBulkRequest( requests, refresh );
 			}
 			catch (BulkRequestFailedException brfe) {
 				ErrorContextBuilder builder = new ErrorContextBuilder();
@@ -245,7 +241,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	 */
 	private class SingleRequest implements BackendRequestGroup {
 
-		private BackendRequest<?> request;
+		private final BackendRequest<?> request;
 
 		public SingleRequest(BackendRequest<?> request) {
 			this.request = request;
@@ -254,9 +250,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 		@Override
 		public void execute() {
 			try {
-				try ( ServiceReference<JestClient> client = searchIntegrator.getServiceManager().requestReference( JestClient.class ) ) {
-					client.get().executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
-				}
+				jestClient.executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
 			}
 			catch (Exception e) {
 				ErrorContextBuilder builder = new ErrorContextBuilder();
