@@ -198,7 +198,6 @@
                             </includes>
                             <excludes>
                                 <!-- Unknown cause failures (to be explored still) -->
-                                <exclude>**/RecursiveGraphIncludePathsTest.java</exclude>
                                 <exclude>**/EmbeddedSortableIdFieldTest.java</exclude>
                                 <exclude>**/CollectionUpdateEventTest.java</exclude>
 
@@ -224,7 +223,6 @@
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
                                 <exclude>**/ProgrammaticMappingTest.java</exclude>
                                 <exclude>**/ShardsConfigurationTest.java</exclude>
-                                <exclude>**/RecursiveGraphTest.java</exclude>
                                 <exclude>**/WorkDoneOnEntitiesTest.java</exclude>
                                 <exclude>**/NumericFieldTest.java</exclude>
                                 <exclude>**/DeleteByTermTest.java</exclude>
@@ -265,14 +263,10 @@
                                 <exclude>**/AnalyzerTest.java</exclude>
                                 <exclude>**/DoubleAnalyzerTest.java</exclude>
                                 <exclude>**/AnalyzerInheritanceTest.java</exclude>
-                                <exclude>**/FetchSizeConfigurationTest.java</exclude>
                                 <exclude>**/ProgressMonitorTest.java</exclude>
                                 <exclude>**/RetryInitializeTest.java</exclude>
-                                <exclude>**/FieldOnCollectionReindexTest.java</exclude>
                                 <exclude>**/LazyM2OContainedInTest.java</exclude>
-                                <exclude>**/PathEmbeddedDepthTest.java</exclude>
                                 <exclude>**/SearchAfterUninitializedProxyEntityLoadingTest.java</exclude>
-                                <exclude>**/UpdateIndexedEmbeddedCollectionTest.java</exclude>
                                 <exclude>**/LazyCollectionsUpdatingTest.java</exclude>
                                 <exclude>**/SyncWorkerTest.java</exclude>
                                 <exclude>**/WorkerTestCase.java</exclude>
@@ -287,7 +281,6 @@
                                 <exclude>**/SimilarityTest.java</exclude>
                                 <exclude>**/SortWithIndexUninvertingTest.java</exclude>
                                 <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude>
-                                <exclude>**/RollbackTransactionTest.java</exclude>
                                 <exclude>**/PrefixedEmbeddedCaseInPathTest.java</exclude>
 
                                 <!-- Specific to other backends -->
