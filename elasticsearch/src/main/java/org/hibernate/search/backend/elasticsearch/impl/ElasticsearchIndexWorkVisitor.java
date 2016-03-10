@@ -140,8 +140,28 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 		);
 		String type = work.getEntityClass().getName();
 
-		JsonObject query = new JsonObject();
-		query.add( "query", convertedQuery );
+		JsonObject query;
+
+		// Add filter on tenant id if needed
+		if ( work.getTenantId() != null ) {
+			query = JsonBuilder.object()
+				.add( "query", JsonBuilder.object()
+					.add( "filtered", JsonBuilder.object()
+						.add( "filter", JsonBuilder.object()
+							.add( "term", JsonBuilder.object()
+								.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, work.getTenantId() )
+							)
+						)
+						.add( "query", convertedQuery )
+					)
+				)
+				.build();
+		}
+		else {
+			query = JsonBuilder.object()
+				.add( "query", convertedQuery )
+				.build();
+		}
 
 		DeleteByQuery deleteByQuery = new DeleteByQuery.Builder( query.toString() )
 			.addIndex( indexName )
