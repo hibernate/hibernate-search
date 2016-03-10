@@ -133,10 +133,23 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 	}
 
 	@Override
-	public BackendRequest<?> visitDeleteByQueryWork(
-			DeleteByQueryLuceneWork work, Boolean refresh) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	public BackendRequest<?> visitDeleteByQueryWork(DeleteByQueryLuceneWork work, Boolean refresh) {
+		JsonObject convertedQuery = ToElasticsearch.fromDeletionQuery(
+				searchIntegrator.getIndexBinding( work.getEntityClass() ).getDocumentBuilder(),
+				work.getDeletionQuery()
+		);
+		String type = work.getEntityClass().getName();
+
+		JsonObject query = new JsonObject();
+		query.add( "query", convertedQuery );
+
+		DeleteByQuery deleteByQuery = new DeleteByQuery.Builder( query.toString() )
+			.addIndex( indexName )
+			.addType( type )
+			.refresh( refresh )
+			.build();
+
+		return new BackendRequest<>( deleteByQuery, work );
 	}
 
 	private Action<?> indexDocument(String id, Document document, Class<?> entityType, boolean refresh) {

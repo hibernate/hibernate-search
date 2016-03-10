@@ -22,6 +22,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.spi.DeletionQuery;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
@@ -159,6 +161,10 @@ public class ToElasticsearch {
 		}
 
 		throw LOG.cannotTransformLuceneQueryIntoEsQuery( query );
+	}
+
+	public static JsonObject fromDeletionQuery(DocumentBuilderIndexedEntity metadata, DeletionQuery deletionQuery) {
+		return fromLuceneQuery( deletionQuery.toLuceneQuery( metadata.getAnalyzer() ) );
 	}
 
 	private static JsonObject convertMatchAllDocsQuery(MatchAllDocsQuery matchAllDocsQuery) {
