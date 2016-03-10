@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,6 +27,7 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.batchindexing.impl.MassIndexerImpl;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
@@ -32,10 +37,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 /**
  * Tests the fullTextSession.createIndexer() API for basic functionality.
@@ -173,9 +174,13 @@ public class IndexingGeneratedCorpusTest {
 
 	private void verifyIndexIsLocked(boolean isLocked, Class type) throws IOException {
 		SearchIntegrator searchIntegrator = builder.getSearchFactory().unwrap( SearchIntegrator.class );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchIntegrator.getIndexBinding( type ).getIndexManagers()[0];
-		Directory directory = indexManager.getDirectoryProvider().getDirectory();
-		Assert.assertEquals( isLocked, IndexWriter.isLocked( directory ) );
+		IndexManager indexManager = searchIntegrator.getIndexBinding( type ).getIndexManagers()[0];
+
+		// No need to check for alternative implementations such as ES
+		if ( indexManager instanceof DirectoryBasedIndexManager ) {
+			Directory directory = ( (DirectoryBasedIndexManager) indexManager ).getDirectoryProvider().getDirectory();
+			Assert.assertEquals( isLocked, IndexWriter.isLocked( directory ) );
+		}
 	}
 
 	@SuppressWarnings("unchecked")

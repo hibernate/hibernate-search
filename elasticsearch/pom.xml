@@ -202,11 +202,6 @@
                                 <exclude>**/EmbeddedSortableIdFieldTest.java</exclude>
                                 <exclude>**/CollectionUpdateEventTest.java</exclude>
 
-                                <!-- Mass indexer -->
-                                <exclude>**/MassIndexerCancellingTest.java</exclude>
-                                <exclude>**/IndexingGeneratedCorpusTest.java</exclude>
-                                <exclude>**/MassIndexerErrorReportingTest.java</exclude>
-
                                 <!-- Analyzers -->
                                 <exclude>**/CustomAnalyzerInClassBridgeTest.java</exclude>
                                 <exclude>**/SolrAnalyzerTest.java</exclude>

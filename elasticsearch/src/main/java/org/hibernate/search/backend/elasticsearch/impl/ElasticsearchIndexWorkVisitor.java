@@ -128,8 +128,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 
 	@Override
 	public BackendRequest<?> visitFlushWork(FlushLuceneWork work, Boolean refresh) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		// Nothing to do
+		return null;
 	}
 
 	@Override
