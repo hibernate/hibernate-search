@@ -230,6 +230,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 			// Should we make this configurable?
 			JsonObject field = new JsonObject();
 			field.addProperty( "type", "string" );
+			field.addProperty( "index", "not_analyzed" );
 			properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
 
 			// normal document fields
