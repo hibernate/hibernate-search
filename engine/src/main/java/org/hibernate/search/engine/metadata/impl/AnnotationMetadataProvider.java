@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.hibernate.annotations.common.reflection.ClassLoadingException;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -32,6 +31,7 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XPackage;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -251,7 +251,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
 		// property > entity analyzer (no field analyzer)
-		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer(
+		AnalyzerReference analyzer = AnnotationProcessingHelper.getAnalyzer(
 				member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
 				configContext
 		);
@@ -555,7 +555,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		XClass clazz = parseContext.getCurrentClass();
 		// check for a class level specified analyzer
-		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer(
+		AnalyzerReference analyzer = AnnotationProcessingHelper.getAnalyzer(
 				clazz.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
 				configContext
 		);
@@ -656,7 +656,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		contributeClassBridgeDefinedFields( typeMetadataBuilder, fieldName, fieldBridge );
 
-		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer( classBridgeAnnotation.analyzer(), configContext );
+		AnalyzerReference analyzer = AnnotationProcessingHelper.getAnalyzer( classBridgeAnnotation.analyzer(), configContext );
 		typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
 	}
 
@@ -737,7 +737,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		contributeClassBridgeDefinedFields( typeMetadataBuilder, fieldName, spatialBridge );
 
-		Analyzer analyzer = typeMetadataBuilder.getAnalyzer();
+		AnalyzerReference analyzer = typeMetadataBuilder.getAnalyzer();
 		if ( analyzer == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
 		}
@@ -1169,7 +1169,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( nullTokenCodec != NotEncodingCodec.SINGLETON && fieldBridge instanceof TwoWayFieldBridge ) {
 			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
 		}
-		Analyzer analyzer = determineAnalyzer( fieldAnnotation, member, configContext );
+		AnalyzerReference analyzer = determineAnalyzer( fieldAnnotation, member, configContext );
 
 		// adjust the type analyzer
 		analyzer = typeMetadataBuilder.addToScopedAnalyzer(
@@ -1352,10 +1352,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private Analyzer determineAnalyzer(org.hibernate.search.annotations.Field fieldAnnotation,
+	private AnalyzerReference determineAnalyzer(org.hibernate.search.annotations.Field fieldAnnotation,
 			XProperty member,
 			ConfigContext context) {
-		Analyzer analyzer = null;
+		AnalyzerReference analyzer = null;
 		// check for a nested @Analyzer annotation with @Field
 		if ( fieldAnnotation != null ) {
 			analyzer = AnnotationProcessingHelper.getAnalyzer( fieldAnnotation.analyzer(), context );
@@ -1669,7 +1669,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 			embeddedTypeMetadataBuilder.boost( AnnotationProcessingHelper.getBoost( member, null ) );
 			//property > entity analyzer
-			Analyzer analyzer = AnnotationProcessingHelper.
+			AnalyzerReference analyzer = AnnotationProcessingHelper.
 					getAnalyzer(
 							member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
 							configContext

@@ -16,19 +16,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.util.impl.PassThroughAnalyzer;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -110,7 +110,7 @@ public class TypeMetadata {
 	/**
 	 * The scoped analyzer for this entity
 	 */
-	private final ScopedAnalyzer scopedAnalyzer;
+	private final ScopedAnalyzerReference scopedAnalyzer;
 
 	/**
 	 * Whether we can optimize the indexing work by inspecting the changed fields
@@ -307,7 +307,7 @@ public class TypeMetadata {
 		return boost * classBoostStrategy.defineBoost( value );
 	}
 
-	public ScopedAnalyzer getDefaultAnalyzer() {
+	public ScopedAnalyzerReference getDefaultAnalyzer() {
 		return scopedAnalyzer;
 	}
 
@@ -406,12 +406,12 @@ public class TypeMetadata {
 
 	public static class Builder {
 		private final Class<?> indexedType;
-		private final ScopedAnalyzer scopedAnalyzer;
-		private final PassThroughAnalyzer passThroughAnalyzer;
+		private final ScopedAnalyzerReference scopedAnalyzer;
+		private final AnalyzerReference passThroughAnalyzer;
 
 		private float boost;
 		private BoostStrategy classBoostStrategy;
-		private Analyzer analyzer;
+		private AnalyzerReference analyzer;
 		private Discriminator discriminator;
 		private XMember discriminatorGetter;
 		private boolean stateInspectionOptimizationsEnabled = true;
@@ -427,13 +427,13 @@ public class TypeMetadata {
 		private final Set<BridgeDefinedField> classBridgeDefinedFields = new HashSet<>();
 
 		public Builder(Class<?> indexedType, ConfigContext configContext) {
-			this( indexedType, new ScopedAnalyzer( configContext.getDefaultAnalyzer() ) );
+			this( indexedType, new ScopedAnalyzerReference( configContext.getDefaultAnalyzer() ) );
 		}
 
-		public Builder(Class<?> indexedType, ScopedAnalyzer scopedAnalyzer) {
+		public Builder(Class<?> indexedType, ScopedAnalyzerReference scopedAnalyzer) {
 			this.indexedType = indexedType;
 			this.scopedAnalyzer = scopedAnalyzer;
-			this.passThroughAnalyzer = PassThroughAnalyzer.INSTANCE;
+			this.passThroughAnalyzer = LuceneAnalyzerReference.PASS_THROUGH;
 		}
 
 		public Builder idProperty(PropertyMetadata propertyMetadata) {
@@ -451,7 +451,7 @@ public class TypeMetadata {
 			return this;
 		}
 
-		public Builder analyzer(Analyzer analyzer) {
+		public Builder analyzer(AnalyzerReference analyzer) {
 			this.analyzer = analyzer;
 			return this;
 		}
@@ -512,7 +512,7 @@ public class TypeMetadata {
 		}
 
 		@SuppressWarnings( "deprecation" )
-		public Analyzer addToScopedAnalyzer(String fieldName, Analyzer analyzer, Field.Index index) {
+		public AnalyzerReference addToScopedAnalyzer(String fieldName, AnalyzerReference analyzer, Field.Index index) {
 			if ( analyzer == null ) {
 				analyzer = this.getAnalyzer();
 			}
@@ -541,11 +541,11 @@ public class TypeMetadata {
 			return classBoostStrategy;
 		}
 
-		public Analyzer getAnalyzer() {
+		public AnalyzerReference getAnalyzer() {
 			return analyzer;
 		}
 
-		public ScopedAnalyzer getScopedAnalyzer() {
+		public ScopedAnalyzerReference getScopedAnalyzer() {
 			return scopedAnalyzer;
 		}
 

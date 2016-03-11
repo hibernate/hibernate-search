@@ -21,6 +21,7 @@ import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -31,6 +32,7 @@ import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.impl.DistanceFilter;
 import org.hibernate.search.spatial.impl.SpatialHashFilter;
+import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -164,7 +166,8 @@ public class ToElasticsearch {
 	}
 
 	public static JsonObject fromDeletionQuery(DocumentBuilderIndexedEntity metadata, DeletionQuery deletionQuery) {
-		return fromLuceneQuery( deletionQuery.toLuceneQuery( metadata.getAnalyzer() ) );
+		ScopedAnalyzer scopedAnalyzer = (ScopedAnalyzer) metadata.getAnalyzer().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+		return fromLuceneQuery( deletionQuery.toLuceneQuery( scopedAnalyzer ) );
 	}
 
 	private static JsonObject convertMatchAllDocsQuery(MatchAllDocsQuery matchAllDocsQuery) {

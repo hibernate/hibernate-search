@@ -14,6 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
@@ -85,7 +87,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
-	private final Map<String, Analyzer> analyzers;
+	private final Map<String, AnalyzerReference> analyzers;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
@@ -232,7 +234,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 			serviceManager.releaseAllServices();
 
-			for ( Analyzer an : this.analyzers.values() ) {
+			for ( AnalyzerReference an : this.analyzers.values() ) {
 				an.close();
 			}
 			for ( AbstractDocumentBuilder documentBuilder : this.documentBuildersContainedEntities.values() ) {
@@ -301,8 +303,23 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
+	// This method is a bit convoluted but it is going to be removed
+	// At the moment we cannot change this API because it's public
 	public Analyzer getAnalyzer(String name) {
-		final Analyzer analyzer = analyzers.get( name );
+		final AnalyzerReference reference = analyzers.get( name );
+		if ( reference == null || !reference.is( LuceneAnalyzerReference.class ) ) {
+			throw new SearchException( "Unknown Analyzer definition: " + name );
+		}
+		Analyzer analyzer = reference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+		if ( analyzer == null ) {
+			throw new SearchException( "Unknown Analyzer definition: " + name );
+		}
+		return analyzer;
+	}
+
+	@Override
+	public AnalyzerReference getAnalyzerReference(String name) {
+		final AnalyzerReference analyzer = analyzers.get( name );
 		if ( analyzer == null ) {
 			throw new SearchException( "Unknown Analyzer definition: " + name );
 		}
@@ -313,7 +330,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	public Analyzer getAnalyzer(Class<?> clazz) {
 		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( clazz );
 		DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
-		return builder.getAnalyzer();
+		return builder.getAnalyzer().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 	}
 
 	@Override
@@ -337,7 +354,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public Map<String, Analyzer> getAnalyzers() {
+	public Map<String, AnalyzerReference> getAnalyzers() {
 		return analyzers;
 	}
 

@@ -29,7 +29,7 @@ import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -121,7 +121,7 @@ public abstract class AbstractDocumentBuilder {
 		return typeMetadata;
 	}
 
-	public ScopedAnalyzer getAnalyzer() {
+	public ScopedAnalyzerReference getAnalyzer() {
 		return typeMetadata.getDefaultAnalyzer();
 	}
 

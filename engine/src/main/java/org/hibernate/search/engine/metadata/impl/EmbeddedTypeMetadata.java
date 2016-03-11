@@ -12,7 +12,7 @@ import java.util.Map;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 
 /**
  * Class containing all the meta data extracted for a single type.
@@ -85,7 +85,7 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 		private String embeddedNullToken;
 		private FieldBridge embeddedNullFieldBridge;
 
-		public Builder(Class<?> indexedType, XMember embeddedGetter, ScopedAnalyzer scopedAnalyzer) {
+		public Builder(Class<?> indexedType, XMember embeddedGetter, ScopedAnalyzerReference scopedAnalyzer) {
 			super( indexedType, scopedAnalyzer );
 			ReflectionHelper.setAccessible( embeddedGetter );
 			this.embeddedFieldName = embeddedGetter.getName();

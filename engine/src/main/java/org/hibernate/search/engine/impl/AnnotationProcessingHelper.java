@@ -13,6 +13,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DynamicBoost;
@@ -125,32 +127,37 @@ public final class AnnotationProcessingHelper {
 		}
 	}
 
-	public static Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
+	public static AnalyzerReference getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
 		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
 		if ( analyzerClass == void.class ) {
-			String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
-			if ( StringHelper.isEmpty( definition ) ) {
-				return null;
-			}
-			else {
-				return configContext.buildLazyAnalyzer( definition );
-			}
+			return analyzerFromDefinition( analyzerAnn, configContext );
 		}
 		else {
-			try {
-				return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, configContext.getLuceneMatchVersion() );
-			}
-			catch (ClassCastException e) {
-				throw new SearchException(
-						"Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(),
-						e
-				);
-			}
-			catch (Exception e) {
-				throw new SearchException(
-						"Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e
-				);
-			}
+			return analyzerFromClass( configContext, analyzerClass );
+		}
+	}
+
+	private static AnalyzerReference analyzerFromDefinition(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
+		String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
+		if ( StringHelper.isEmpty( definition ) ) {
+			return null;
+		}
+		return configContext.buildLazyAnalyzer( definition );
+	}
+
+	private static AnalyzerReference analyzerFromClass(ConfigContext configContext, Class<?> analyzerClass) {
+		try {
+			// For now only local analyzer can be created from a class
+			// this should be easy to extend to remote analyzer using a common interface/super-class
+			Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, configContext.getLuceneMatchVersion() );
+			AnalyzerReference reference = new LuceneAnalyzerReference( analyzer );
+			return reference;
+		}
+		catch (ClassCastException e) {
+			throw new SearchException( "Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(), e );
+		}
+		catch (Exception e) {
+			throw new SearchException( "Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e );
 		}
 	}
 

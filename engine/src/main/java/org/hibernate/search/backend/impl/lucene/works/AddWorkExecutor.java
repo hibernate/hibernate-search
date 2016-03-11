@@ -10,14 +10,14 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.store.Workspace;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -45,7 +45,7 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 		final Class<?> entityType = work.getEntityClass();
 		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
-		ScopedAnalyzer analyzer = documentBuilder.getAnalyzer();
+		ScopedAnalyzerReference analyzer = documentBuilder.getAnalyzer();
 		analyzer = updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
 		if ( log.isTraceEnabled() ) {
 			log.trace( "add to Lucene index: " + entityType + "#" + work.getId() + ":" + work.getDocument() );
@@ -77,20 +77,20 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 	 * @return <code>scopedAnalyzer</code> in case <code>fieldToAnalyzerMap</code> is <code>null</code> or empty. Otherwise
 	 *         a clone of <code>scopedAnalyzer</code> is created where the analyzers get overriden according to <code>fieldToAnalyzerMap</code>.
 	 */
-	static ScopedAnalyzer updateAnalyzerMappings(Workspace workspace, ScopedAnalyzer scopedAnalyzer, Map<String, String> fieldToAnalyzerMap) {
+	static ScopedAnalyzerReference updateAnalyzerMappings(Workspace workspace, ScopedAnalyzerReference scopedAnalyzer, Map<String, String> fieldToAnalyzerMap) {
 		// for backwards compatibility
 		if ( fieldToAnalyzerMap == null || fieldToAnalyzerMap.isEmpty() ) {
 			return scopedAnalyzer;
 		}
 
-		ScopedAnalyzer analyzerClone = scopedAnalyzer.clone();
+		ScopedAnalyzerReference analyzerClone = scopedAnalyzer.clone();
 		for ( Map.Entry<String, String> entry : fieldToAnalyzerMap.entrySet() ) {
 			Analyzer analyzer = workspace.getAnalyzer( entry.getValue() );
 			if ( analyzer == null ) {
 				log.unableToRetrieveNamedAnalyzer( entry.getValue() );
 			}
 			else {
-				analyzerClone.addScopedAnalyzer( entry.getKey(), analyzer );
+				analyzerClone.addScopedAnalyzer( entry.getKey(), new LuceneAnalyzerReference( analyzer ) );
 			}
 		}
 		return analyzerClone;
