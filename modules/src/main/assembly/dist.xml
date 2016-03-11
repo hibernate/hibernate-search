@@ -60,6 +60,11 @@
             <outputDirectory>/org/hibernate/search/backend-jgroups/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
+        <file>
+            <source>${module.xml.basedir}/search/backend-elasticsearch/module.xml</source>
+            <outputDirectory>/org/hibernate/search/backend-elasticsearch/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
     </files>
 
     <dependencySets>
@@ -124,6 +129,20 @@
                 <include>org.apache.lucene:lucene-queries</include>
                 <include>org.apache.lucene:lucene-facet</include>
                 <include>org.apache.lucene:lucene-analyzers-common</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/backend-elasticsearch/${hibernate.search.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-search-backend-elasticsearch</include>
+                <include>com.google.code.gson:gson</include>
+                <include>io.searchbox:jest</include>
+                <include>io.searchbox:jest-common</include>
+                <include>org.apache.commons:commons-lang3</include>
             </includes>
         </dependencySet>
 
