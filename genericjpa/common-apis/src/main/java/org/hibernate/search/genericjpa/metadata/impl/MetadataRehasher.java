@@ -76,7 +76,7 @@ public final class MetadataRehasher {
 			TypeMetadata original,
 			RehashedTypeMetadata rehashed,
 			PropertyMetadata propertyMetadata) {
-		for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
+		for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 			// this must either be id or id of an embedded object
 			if ( documentFieldMetadata.isIdInEmbedded() || documentFieldMetadata.isId() ) {
 				Class<?> type = original.getType();
