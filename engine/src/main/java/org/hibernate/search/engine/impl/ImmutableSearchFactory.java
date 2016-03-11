@@ -271,7 +271,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		return indexBindingForEntities.get( entityType );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(Class entityType) {
 		return documentBuildersContainedEntities.get( entityType );
