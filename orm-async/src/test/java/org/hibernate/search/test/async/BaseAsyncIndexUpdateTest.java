@@ -21,6 +21,12 @@ import org.hibernate.search.backend.triggers.impl.TriggerServiceConstants;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.util.Sleep;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.entities.Domain;
+import org.hibernate.search.test.entities.OverrideEntity;
+import org.hibernate.search.test.entities.Place;
+import org.hibernate.search.test.entities.SecondaryTableEntity;
+import org.hibernate.search.test.entities.Sorcerer;
+import org.hibernate.search.test.entities.TopLevel;
 
 import org.junit.After;
 import org.junit.Before;
@@ -57,7 +63,7 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 	}
 
 	@Test
-	public void test() {
+	public void testDomain() {
 		if ( this.isProfileTest && this.skipProfileTests ) {
 			System.out.println("skipping this test for the selected profile");
 			return;
@@ -89,7 +95,7 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 			);
 		}
 		catch (InterruptedException e) {
-			throw new AssertionError( e );
+			throw new AssertionFailure( "Exception", e );
 		}
 
 	}
@@ -97,7 +103,12 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
-				Domain.class
+				Domain.class,
+				OverrideEntity.class,
+				Place.class,
+				SecondaryTableEntity.class,
+				Sorcerer.class,
+				TopLevel.class
 		};
 	}
 

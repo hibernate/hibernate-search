@@ -102,7 +102,7 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 						for ( int eventType : EventType.values() ) {
 							String[] triggerDropStrings = this.triggerSource.getTriggerDropCode( info, eventType );
 							for ( String triggerDropString : triggerDropStrings ) {
-								log.trace( triggerDropString );
+								log.triggerCreationSQL( triggerDropString );
 								this.doQueryOrLogException(
 										emf,
 										triggerDropString,
@@ -112,19 +112,19 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 						}
 
 						for ( String unSetupCode : this.triggerSource.getSpecificUnSetupCode( info ) ) {
-							log.trace( unSetupCode );
+							log.triggerCreationSQL( unSetupCode );
 							this.doQueryOrLogException( emf, unSetupCode, true );
 						}
 
 						for ( String str : triggerSource.getUpdateTableDropCode( info ) ) {
-							log.trace( str );
+							log.triggerCreationSQL( str );
 							this.doQueryOrLogException( emf, str, true );
 						}
 
 					}
 
 					for ( String str : triggerSource.getUnSetupCode() ) {
-						log.trace( str );
+						log.triggerCreationSQL( str );
 						this.doQueryOrLogException( emf, str, true );
 					}
 				}
@@ -132,18 +132,18 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 				//CREATE EVERYTHING
 				try {
 					for ( String str : triggerSource.getSetupCode() ) {
-						log.trace( str );
+						log.triggerCreationSQL( str );
 						this.doQueryOrLogException( emf, str, false );
 					}
 
 					for ( EventModelInfo info : eventModelInfos ) {
 						for ( String str : triggerSource.getUpdateTableCreationCode( info ) ) {
-							log.trace( str );
+							log.triggerCreationSQL( str );
 							this.doQueryOrLogException( emf, str, false );
 						}
 
 						for ( String setupCode : this.triggerSource.getSpecificSetupCode( info ) ) {
-							log.trace( setupCode );
+							log.triggerCreationSQL( setupCode );
 							this.doQueryOrLogException( emf, setupCode, false );
 						}
 
@@ -153,7 +153,7 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 									eventType
 							);
 							for ( String triggerCreationString : triggerCreationStrings ) {
-								log.trace( triggerCreationString );
+								log.triggerCreationSQL( triggerCreationString );
 								this.doQueryOrLogException(
 										emf,
 										triggerCreationString,

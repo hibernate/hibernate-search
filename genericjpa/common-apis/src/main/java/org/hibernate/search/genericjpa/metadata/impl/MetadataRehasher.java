@@ -66,10 +66,7 @@ public final class MetadataRehasher {
 				return;
 			}
 		}
-		throw new IllegalArgumentException(
-				"couldn't find any id field for: " + original.getType()
-						+ "! This is required in order to use Hibernate Search with JPA!"
-		);
+		//we didn't find any id, but this should be okay (-> Embeddable)
 	}
 
 	private boolean handlePropertyMetadata(

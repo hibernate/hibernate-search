@@ -8,7 +8,6 @@ package org.hibernate.search.test.async;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.triggers.impl.TriggerServiceConstants;
 import org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants;
 import org.hibernate.search.db.events.triggers.HSQLDBTriggerSQLStringSource;
 
@@ -25,16 +24,26 @@ public class HSQLDBAutomaticAsyncIndexUpdateTest extends AutomaticAsyncIndexUpda
 	public void configure(Map<String, Object> cfg) {
 		super.configure( cfg );
 		cfg.put( AsyncUpdateConstants.TRIGGER_SOURCE_KEY, HSQLDBTriggerSQLStringSource.class.getName() );
-		cfg.put( "hibernate.dialect",
-				 "org.hibernate.dialect.HSQLDialect");
-		cfg.put( "hibernate.connection.driver_class",
-				 "org.hsqldb.jdbcDriver");
-		cfg.put( "hibernate.connection.url",
-				 "jdbc:hsqldb:mem:test");
-		cfg.put( "hibernate.connection.username",
-				 "hibernate_user");
-		cfg.put( "hibernate.connection.password",
-				 "hibernate_password");
+		cfg.put(
+				"hibernate.dialect",
+				"org.hibernate.dialect.HSQLDialect"
+		);
+		cfg.put(
+				"hibernate.connection.driver_class",
+				"org.hsqldb.jdbcDriver"
+		);
+		cfg.put(
+				"hibernate.connection.url",
+				"jdbc:hsqldb:mem:test"
+		);
+		cfg.put(
+				"hibernate.connection.username",
+				"hibernate_user"
+		);
+		cfg.put(
+				"hibernate.connection.password",
+				"hibernate_password"
+		);
 	}
 
 }

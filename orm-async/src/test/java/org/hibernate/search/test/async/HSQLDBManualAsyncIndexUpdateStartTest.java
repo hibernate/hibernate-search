@@ -7,12 +7,7 @@
 package org.hibernate.search.test.async;
 
 import java.util.Map;
-import java.util.Properties;
 
-import org.hibernate.search.backend.triggers.impl.TriggerAsyncBackendService;
-import org.hibernate.search.backend.triggers.impl.TriggerAsyncBackendServiceImpl;
-import org.hibernate.search.backend.triggers.impl.TriggerServiceConstants;
-import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
 import org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants;
 import org.hibernate.search.db.events.triggers.HSQLDBTriggerSQLStringSource;
 

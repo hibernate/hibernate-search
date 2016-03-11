@@ -4,30 +4,31 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.async;
+package org.hibernate.search.test.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.db.annotations.IdColumn;
-import org.hibernate.search.db.annotations.IdInfo;
-import org.hibernate.search.db.annotations.UpdateInfo;
-import org.hibernate.search.db.ColumnType;
 
 /**
  * @author Emmanuel Bernard
+ * @author Martin Braun
  */
 @Entity(name = "DOMAIN")
 @Indexed
-@UpdateInfo(tableName = "DOMAIN", idInfos = @IdInfo(columns = @IdColumn(column = "id", columnType = ColumnType.INTEGER), entity = Domain.class))
+@Table(name = "DOMAIN")
 public class Domain {
 	@Id
 	@DocumentId
+	@Column(name = "id")
 	private Integer id;
 	@Field
+	@Column(name = "name")
 	private String name;
 
 	public Domain() {

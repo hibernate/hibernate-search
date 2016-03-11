@@ -936,10 +936,27 @@ public interface Log extends BasicLogger {
 	SearchException analyzerReferenceNotInitialized(String fieldName, String name);
 
 	@LogMessage(level = Level.WARN)
-	@Message(id = 3022, value = "unknown eventType-id found during index updating: %d")
-	void unknownEventTypeFoundDuringIndexUpdating(int eventType);
+	@Message(id = 306, value = "class '%1$s' not found in any index during index updating")
+	void entityClassNotFoundInAnyIndexIndexUpdating(Class<?> entityClass);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = 307, value = "class '%1$s' is persisted with a persister that does not inherit from AbstractEntityPersister" +
+			", trying to find update information from @UpdateInfo annotations")
+	void usingAnnotationParserForTypeNoAEPFound(Class<?> entityClass);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = 308, value = "SQL (Trigger Creation): %1$s")
+	void triggerCreationSQL(String sql);
+
+	@Message(id = 309, value = "An Update Table has been manually specified via" +
+			" @UpdateInfo on an Entity (tableName: '%1$s', updateTable: '%2$s')" +
+			" which is in conflict with" +
+			" an update table is to be auto-generated.")
+	SearchException namingConflictEventModel(
+			String originalTable,
+			String updateTable);
 
 	@LogMessage(level = Level.WARN)
-	@Message(id = 306, value = "class '%1$s' not found in any index during index updating")
-	void entityClassNotFoundInAnyIndexIndexUpdating( Class<?> entityClass );
+	@Message(id = 310, value = "unknown eventType-id found during index updating: %d")
+	void unknownEventTypeFoundDuringIndexUpdating(int eventType);
 }

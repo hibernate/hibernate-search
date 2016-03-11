@@ -27,11 +27,11 @@ public class EventModelInfo {
 	private final String updateIdColumn;
 
 	public EventModelInfo(
-			String tableName,
+			String updateTableName,
 			String originalTableName,
 			String eventTypeColumn, String updateIdColumn,
 			List<IdInfo> idInfos) {
-		this.updateTableName = tableName;
+		this.updateTableName = updateTableName;
 		this.originalTableName = originalTableName;
 		this.eventTypeColumn = eventTypeColumn;
 		this.idInfos = idInfos;

@@ -135,6 +135,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	public void sessionFactoryClosed(SessionFactory factory) {
 		if ( this.triggerAsyncBackendService != null ) {
 			this.triggerAsyncBackendService.stop();
+			this.extendedIntegrator.getServiceManager().releaseService( TriggerAsyncBackendService.class );
 		}
 		if ( extendedIntegrator != null ) {
 			extendedIntegrator.close();
