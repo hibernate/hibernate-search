@@ -136,19 +136,23 @@ final class SyncWorkProcessor implements WorkProcessor {
 		@Override
 		public void run() {
 			Iterable<Changeset> changesets;
-			while ( ! stop ) {
-				changesets = transferQueue.drainToDetachedIterable();
-				while ( changesets == null && ! stop ) {
-					// Avoid busy wait
-					parkCurrentThread();
+			try {
+				while ( !stop ) {
 					changesets = transferQueue.drainToDetachedIterable();
+					while ( changesets == null && !stop ) {
+						// Avoid busy wait
+						parkCurrentThread();
+						changesets = transferQueue.drainToDetachedIterable();
+					}
+					if ( changesets != null ) {
+						applyChangesets( changesets );
+					}
 				}
-				if ( changesets != null ) {
-					applyChangesets( changesets );
-				}
+				log.stoppingSyncConsumerThread( indexName );
 			}
-			log.stoppingSyncConsumerThread( indexName );
-			shutdownLatch.countDown();
+			finally {
+				shutdownLatch.countDown();
+			}
 		}
 
 		private void applyChangesets(Iterable<Changeset> changesets) {
