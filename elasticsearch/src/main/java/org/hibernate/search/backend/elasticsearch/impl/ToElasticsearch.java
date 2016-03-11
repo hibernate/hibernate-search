@@ -24,6 +24,7 @@ import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
+import org.hibernate.search.query.dsl.impl.PhraseAsTermQuery;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -126,6 +127,9 @@ public class ToElasticsearch {
 	public static JsonObject fromLuceneQuery(Query query) {
 		if ( query instanceof MatchAllDocsQuery ) {
 			return convertMatchAllDocsQuery( (MatchAllDocsQuery) query );
+		}
+		else if ( query instanceof PhraseAsTermQuery ) {
+			return convertPhraseQuery( (PhraseAsTermQuery) query );
 		}
 		else if ( query instanceof TermQuery ) {
 			return convertTermQuery( (TermQuery) query );
@@ -289,6 +293,31 @@ public class ToElasticsearch {
 								JsonBuilder.object()
 										.addProperty( "query", phrase.toString().trim() )
 										.addProperty( "slop", query.getSlop() )
+										.addProperty( "boost", query.getBoost() )
+						)
+				).build();
+
+		return wrapQueryForNestedIfRequired( field, phraseQuery );
+	}
+
+	private static JsonObject convertPhraseQuery(PhraseAsTermQuery query) {
+		Term[] terms = { query.getTerm() };
+
+		if ( terms.length == 0 ) {
+			throw LOG.cannotQueryOnEmptyPhraseQuery();
+		}
+
+		String field = terms[0].field(); // phrase queries are only supporting one field
+		StringBuilder phrase = new StringBuilder();
+		for ( Term term : terms ) {
+			phrase.append( " " ).append( term.text() );
+		}
+
+		JsonObject phraseQuery = JsonBuilder.object()
+				.add( "match_phrase",
+						JsonBuilder.object().add( field,
+								JsonBuilder.object()
+										.addProperty( "query", phrase.toString().trim() )
 										.addProperty( "boost", query.getBoost() )
 						)
 				).build();

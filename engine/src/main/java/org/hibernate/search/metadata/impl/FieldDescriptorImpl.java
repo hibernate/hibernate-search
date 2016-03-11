@@ -8,7 +8,6 @@ package org.hibernate.search.metadata.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
@@ -16,6 +15,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
@@ -49,7 +49,12 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		this.norms = determineNormsType( documentFieldMetadata.getIndex() );
 		this.boost = documentFieldMetadata.getBoost();
 		this.indexNullAs = documentFieldMetadata.indexNullAs();
-		this.analyzer = documentFieldMetadata.getAnalyzer();
+		if ( documentFieldMetadata.getAnalyzer() != null ) {
+			this.analyzer = documentFieldMetadata.getAnalyzer().getAnalyzer();
+		}
+		else {
+			this.analyzer = null;
+		}
 		this.fieldBridge = documentFieldMetadata.getFieldBridge();
 		this.fieldType = determineFieldType( documentFieldMetadata );
 	}

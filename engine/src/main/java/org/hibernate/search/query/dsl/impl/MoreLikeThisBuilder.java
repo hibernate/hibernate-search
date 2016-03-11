@@ -478,7 +478,7 @@ public class MoreLikeThisBuilder<T> {
 	private void addTermFrequencies(Reader r, Map<String, Int> termFreqMap, FieldContext fieldContext)
 			throws IOException {
 		String fieldName = fieldContext.getField();
-		Analyzer analyzer = queryContext.getQueryAnalyzer();
+		Analyzer analyzer = queryContext.getQueryAnalyzer() != null ? queryContext.getQueryAnalyzer().getAnalyzer() : null;
 		if ( !fieldContext.applyAnalyzer() ) {
 			// essentially does the Reader to String conversion for us
 			analyzer = PassThroughAnalyzer.INSTANCE;

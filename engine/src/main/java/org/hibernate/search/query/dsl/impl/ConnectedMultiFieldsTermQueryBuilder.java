@@ -9,6 +9,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -19,6 +20,7 @@ import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
@@ -190,7 +192,15 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		return query;
 	}
 
-	private List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) {
+	private List<String> getAllTermsFromText(String fieldName, String localText, AnalyzerReference analyzerReference) {
+		Analyzer analyzer = null;
+		if ( analyzerReference.getAnalyzer() != null ) {
+			analyzer = analyzerReference.getAnalyzer();
+		}
+		else if ( analyzerReference.getRemote() != null ) {
+			return Arrays.asList( localText );
+		}
+
 		//it's better not to apply the analyzer with wildcard as * and ? can be mistakenly removed
 		List<String> terms = new ArrayList<String>();
 		if ( termContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {

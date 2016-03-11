@@ -10,7 +10,7 @@ package org.hibernate.search.spi.impl;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
@@ -45,7 +45,7 @@ public interface SearchFactoryState {
 
 	FilterCachingStrategy getFilterCachingStrategy();
 
-	Map<String, Analyzer> getAnalyzers();
+	Map<String, AnalyzerReference> getAnalyzers();
 
 	int getCacheBitResultsSize();
 

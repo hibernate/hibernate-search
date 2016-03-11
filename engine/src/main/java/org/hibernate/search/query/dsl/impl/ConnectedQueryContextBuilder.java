@@ -9,6 +9,8 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.util.Set;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -51,8 +53,11 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 				throw log.cantQueryUnindexedType( entityType.getCanonicalName() );
 			}
 
-			queryAnalyzer = new ScopedAnalyzer( factory.getAnalyzer( indexBoundType ) );
-			context = new QueryBuildingContext( factory, queryAnalyzer, indexBoundType );
+			Analyzer analyzer = factory.getAnalyzer( indexBoundType );
+			final AnalyzerReference reference = new AnalyzerReference();
+			reference.setAnalyzer( analyzer );
+			queryAnalyzer = new ScopedAnalyzer( reference );
+			context = new QueryBuildingContext( factory, reference, indexBoundType );
 		}
 
 		/**
@@ -79,7 +84,10 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 		@Override
 		public EntityContext overridesForField(String field, String analyzerName) {
-			queryAnalyzer.addScopedAnalyzer( field, factory.getAnalyzer( analyzerName ) );
+			Analyzer analyzer = factory.getAnalyzer( analyzerName );
+			AnalyzerReference reference = new AnalyzerReference();
+			reference.setAnalyzer( analyzer );
+			queryAnalyzer.addScopedAnalyzer( field, reference );
 			return this;
 		}
 

@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.test.configuration.mutablefactory;
 
-import org.apache.lucene.analysis.Analyzer;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.FullTextFilterDef;
@@ -21,9 +24,6 @@ import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Makes sure that Filter and Analyzer definitions survive a hot reboot
@@ -62,8 +62,8 @@ public class DefinitionsOnHotRebootTest {
 	}
 
 	private boolean analyzerExists(SearchIntegrator sf, String analyzerName) {
-		Analyzer analyzer = sf.unwrap( SearchFactoryState.class ).getAnalyzers().get( analyzerName );
-		return analyzer != null;
+		AnalyzerReference analyzer = sf.unwrap( SearchFactoryState.class ).getAnalyzers().get( analyzerName );
+		return analyzer != null && analyzer.getAnalyzer() != null;
 	}
 
 	private int countAnalyzers(SearchIntegrator sf) {

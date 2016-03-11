@@ -16,12 +16,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.ConfigContext;
@@ -411,7 +411,7 @@ public class TypeMetadata {
 
 		private float boost;
 		private BoostStrategy classBoostStrategy;
-		private Analyzer analyzer;
+		private AnalyzerReference analyzer;
 		private Discriminator discriminator;
 		private XMember discriminatorGetter;
 		private boolean stateInspectionOptimizationsEnabled = true;
@@ -451,7 +451,7 @@ public class TypeMetadata {
 			return this;
 		}
 
-		public Builder analyzer(Analyzer analyzer) {
+		public Builder analyzer(AnalyzerReference analyzer) {
 			this.analyzer = analyzer;
 			return this;
 		}
@@ -512,7 +512,7 @@ public class TypeMetadata {
 		}
 
 		@SuppressWarnings( "deprecation" )
-		public Analyzer addToScopedAnalyzer(String fieldName, Analyzer analyzer, Field.Index index) {
+		public AnalyzerReference addToScopedAnalyzer(String fieldName, AnalyzerReference analyzer, Field.Index index) {
 			if ( analyzer == null ) {
 				analyzer = this.getAnalyzer();
 			}
@@ -523,8 +523,10 @@ public class TypeMetadata {
 				}
 			}
 			else {
+				final AnalyzerReference reference = new AnalyzerReference();
+				reference.setAnalyzer( passThroughAnalyzer );
 				// no analyzer is used, add a fake one for queries
-				scopedAnalyzer.addScopedAnalyzer( fieldName, passThroughAnalyzer );
+				scopedAnalyzer.addScopedAnalyzer( fieldName, reference );
 			}
 			return analyzer;
 		}
@@ -541,7 +543,7 @@ public class TypeMetadata {
 			return classBoostStrategy;
 		}
 
-		public Analyzer getAnalyzer() {
+		public AnalyzerReference getAnalyzer() {
 			return analyzer;
 		}
 

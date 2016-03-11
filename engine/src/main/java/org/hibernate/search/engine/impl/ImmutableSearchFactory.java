@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
@@ -85,7 +86,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
-	private final Map<String, Analyzer> analyzers;
+	private final Map<String, AnalyzerReference> analyzers;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
@@ -232,7 +233,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 			serviceManager.releaseAllServices();
 
-			for ( Analyzer an : this.analyzers.values() ) {
+			for ( AnalyzerReference an : this.analyzers.values() ) {
 				an.close();
 			}
 			for ( AbstractDocumentBuilder documentBuilder : this.documentBuildersContainedEntities.values() ) {
@@ -302,7 +303,16 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 	@Override
 	public Analyzer getAnalyzer(String name) {
-		final Analyzer analyzer = analyzers.get( name );
+		final AnalyzerReference analyzer = analyzers.get( name );
+		if ( analyzer == null || analyzer.getAnalyzer() == null ) {
+			throw new SearchException( "Unknown Analyzer definition: " + name );
+		}
+		return analyzer.getAnalyzer();
+	}
+
+	@Override
+	public AnalyzerReference getAnalyzerReference(String name) {
+		final AnalyzerReference analyzer = analyzers.get( name );
 		if ( analyzer == null ) {
 			throw new SearchException( "Unknown Analyzer definition: " + name );
 		}
@@ -337,7 +347,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public Map<String, Analyzer> getAnalyzers() {
+	public Map<String, AnalyzerReference> getAnalyzers() {
 		return analyzers;
 	}
 

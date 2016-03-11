@@ -7,7 +7,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 
 /**
@@ -17,10 +17,10 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
  */
 public class QueryBuildingContext {
 	private final ExtendedSearchIntegrator factory;
-	private final Analyzer queryAnalyzer;
+	private final AnalyzerReference queryAnalyzer;
 	private final Class<?> entityType;
 
-	public QueryBuildingContext(ExtendedSearchIntegrator factory, Analyzer queryAnalyzer, Class<?> entityType) {
+	public QueryBuildingContext(ExtendedSearchIntegrator factory, AnalyzerReference queryAnalyzer, Class<?> entityType) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
 		this.entityType = entityType;
@@ -30,7 +30,7 @@ public class QueryBuildingContext {
 		return factory;
 	}
 
-	public Analyzer getQueryAnalyzer() {
+	public AnalyzerReference getQueryAnalyzer() {
 		return queryAnalyzer;
 	}
 
