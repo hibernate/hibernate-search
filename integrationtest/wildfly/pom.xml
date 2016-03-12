@@ -237,6 +237,34 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>com.github.alexcojocaru</groupId>
+                <artifactId>elasticsearch-maven-plugin</artifactId>
+                <configuration>
+                    <clusterName>hsearch-es-test-cluster</clusterName>
+                    <tcpPort>9300</tcpPort>
+                    <httpPort>9200</httpPort>
+                    <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
+                    <outputDirectory>${project.build.directory}/elastisearchnode1</outputDirectory>
+                    <configPath>${basedir}/elasticsearchconfiguration/</configPath>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>start-elasticsearch</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop-elasticsearch</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
