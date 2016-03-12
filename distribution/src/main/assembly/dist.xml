@@ -109,6 +109,16 @@
         </dependencySet>
 
         <dependencySet>
+            <outputDirectory>dist/lib/optional/clustering/backend-elasticsearch</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-backend-elasticsearch</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
             <outputDirectory>dist/lib/optional/clustering/serialization-avro</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
