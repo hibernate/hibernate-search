@@ -109,7 +109,7 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional/clustering/backend-elasticsearch</outputDirectory>
+            <outputDirectory>dist/lib/optional/elasticsearch</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
