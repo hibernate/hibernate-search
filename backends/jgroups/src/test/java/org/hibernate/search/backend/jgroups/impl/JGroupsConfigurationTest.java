@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.jgroups.impl;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,11 +73,6 @@ public class JGroupsConfigurationTest {
 		SearchIntegrator searchIntegrator = null;
 		try {
 			searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
-		}
-		catch (SearchException se) {
-			//we know we're getting a generic failure, but we want to make assert on the details message of
-			// the cause:
-			throw se.getCause();
 		}
 		finally {
 			if ( searchIntegrator != null ) {

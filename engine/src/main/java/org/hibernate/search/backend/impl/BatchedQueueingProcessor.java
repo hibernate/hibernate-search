@@ -14,6 +14,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -30,12 +31,13 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private static final Log log = LoggerFactory.make();
 
 	private final int batchSize;
-
 	private final Map<Class<?>, EntityIndexBinding> entityIndexBindings;
+	private final TransactionalOperationExecutorSelector executorSelector;
 
-	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexBinding> entityIndexBindings, Properties properties) {
+	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexBinding> entityIndexBindings, Properties properties, IndexManagerHolder indexManagerHolder) {
 		this.entityIndexBindings = entityIndexBindings;
 		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
+		this.executorSelector = new TransactionalOperationExecutorSelector( indexManagerHolder );
 	}
 
 	@Override
@@ -75,7 +77,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			final Class<?> entityType = work.getEntityClass();
 			EntityIndexBinding entityIndexBinding = entityIndexBindings.get( entityType );
 			IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-			TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( TransactionalOperationExecutorSelector.INSTANCE, null );
+			TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( executorSelector, null );
 			executor.performOperation( work, shardingStrategy, context );
 		}
 		context.commitOperations( null );
