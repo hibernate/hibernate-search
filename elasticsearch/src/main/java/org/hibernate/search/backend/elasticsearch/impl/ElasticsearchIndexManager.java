@@ -16,14 +16,12 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.client.impl.BulkRequestFailedException;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
@@ -82,8 +80,6 @@ public class ElasticsearchIndexManager implements IndexManager {
 	ExtendedSearchIntegrator searchIntegrator;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
 
-	private BackendQueueProcessor backend;
-
 	private LuceneWorkSerializer serializer;
 	private SerializationProvider serializationProvider;
 	private ServiceManager serviceManager;
@@ -107,8 +103,6 @@ public class ElasticsearchIndexManager implements IndexManager {
 		this.similarity = similarity;
 
 		this.jestClient = serviceManager.requestService( JestClient.class );
-		this.backend = BackendFactory.createBackend( this, context, properties );
-
 		this.errorHandler = context.getErrorHandler();
 		this.visitor = new ElasticsearchIndexWorkVisitor( this.actualIndexName, context.getUninitializedSearchIntegrator() );
 	}
@@ -142,8 +136,6 @@ public class ElasticsearchIndexManager implements IndexManager {
 		if ( indexManagementStrategy == IndexManagementStrategy.CREATE_DELETE ) {
 			deleteIndexIfExisting();
 		}
-
-		backend.close();
 
 		searchIntegrator.getServiceManager().releaseService( JestClient.class );
 	}
@@ -699,11 +691,6 @@ public class ElasticsearchIndexManager implements IndexManager {
 	@Override
 	public void optimize() {
 		// TODO Is there such thing for ES?
-	}
-
-	@Override
-	public BackendQueueProcessor getBackendQueueProcessor() {
-		return backend;
 	}
 
 	@Override

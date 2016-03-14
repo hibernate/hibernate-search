@@ -57,7 +57,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 			if ( nodeSelector != null && nodeSelector.isIndexOwnerLocal() ) {
 				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( offset, bufferLength, rawBuffer );
 				final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
-				final BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
+				final BackendQueueProcessor backendQueueProcessor = context.getAllIndexesManager().getBackendQueueProcessor( indexName );
 				if ( backendQueueProcessor != null ) {
 					final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
 					applyLuceneWorkLocally( queue, backendQueueProcessor, message );
