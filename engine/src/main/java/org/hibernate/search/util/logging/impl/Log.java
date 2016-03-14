@@ -976,4 +976,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 317, value = "Projection constant '%s' is not supported for this query.")
 	SearchException unexpectedProjectionConstant(String constantName);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 318, value = "The backend name 'lucene' is deprecated. Use 'local' instead")
+	void deprecatedBackendName();
 }
