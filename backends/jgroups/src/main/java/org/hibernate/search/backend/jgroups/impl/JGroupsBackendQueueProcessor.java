@@ -112,7 +112,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, luceneWorkSerializer, block, messageTimeout );
 
 		if ( selectionStrategy.isIndexOwnerLocal() ) {
-			String backend = ConfigurationParseHelper.getString( jgroupsProperties, DELEGATE_BACKEND, null );
+			String backend = ConfigurationParseHelper.getString( jgroupsProperties, DELEGATE_BACKEND, "local" );
 			delegatedBackend = BackendFactory.createBackend( backend, indexManager, context, props );
 		}
 	}

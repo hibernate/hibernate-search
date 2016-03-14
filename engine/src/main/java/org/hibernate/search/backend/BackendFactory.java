@@ -14,7 +14,6 @@ import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcesso
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -42,9 +41,6 @@ public final class BackendFactory {
 	private static final String JGROUPS_AUTO_SELECTOR = "org.hibernate.search.backend.jgroups.impl.AutoNodeSelector";
 	private static final String JGROUPS_SELECTOR_BASE_TYPE = "org.hibernate.search.backend.jgroups.impl.NodeSelectorStrategy";
 
-	private static final String ES_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendQueueProcessor";
-	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager";
-
 	private BackendFactory() {
 		//not allowed
 	}
@@ -60,26 +56,12 @@ public final class BackendFactory {
 			Properties properties) {
 		final BackendQueueProcessor backendQueueProcessor;
 
-		if ( StringHelper.isEmpty( backend ) ) {
-			if ( indexManager.getClass().getName().equals( ES_INDEX_MANAGER ) ) {
-				backendQueueProcessor = ClassLoaderHelper.instanceFromName(
-						BackendQueueProcessor.class,
-						ES_BACKEND_QUEUE_PROCESSOR,
-						"Elasticsearch backend",
-						buildContext.getServiceManager()
-				);
-			}
-			else {
-				backendQueueProcessor = new LocalBackendQueueProcessor();
-			}
+		if ( StringHelper.isEmpty( backend ) || "local".equalsIgnoreCase( backend ) ) {
+			backendQueueProcessor = new LocalBackendQueueProcessor();
 		}
 		else if ( "lucene".equalsIgnoreCase( backend ) ) {
-			if ( indexManager.getClass().getName().equals( ES_INDEX_MANAGER ) ) {
-				throw new SearchException( "Cannot use Lucene backend together with Elasticsearch index manager" );
-			}
-			else {
-				backendQueueProcessor = new LocalBackendQueueProcessor();
-			}
+			log.deprecatedBackendName();
+			backendQueueProcessor = new LocalBackendQueueProcessor();
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
