@@ -288,8 +288,8 @@ public class JMSMasterTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		// explicitly set the backend even though lucene is default.
-		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "lucene" );
+		// explicitly set the backend even though local is default.
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "local" );
 	}
 
 	@Override

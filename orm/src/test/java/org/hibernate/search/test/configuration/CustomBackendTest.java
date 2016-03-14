@@ -26,6 +26,7 @@ public class CustomBackendTest {
 	@Test
 	public void test() {
 		verifyBackendUsage( "blackhole", BlackHoleBackendQueueProcessor.class );
+		verifyBackendUsage( "local", LocalBackendQueueProcessor.class );
 		verifyBackendUsage( "lucene", LocalBackendQueueProcessor.class );
 		verifyBackendUsage( BlackHoleBackendQueueProcessor.class );
 		verifyBackendUsage( LocalBackendQueueProcessor.class );
