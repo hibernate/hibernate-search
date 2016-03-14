@@ -14,7 +14,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -135,7 +134,4 @@ public interface IndexManager {
 	 * @return the {@code IndexManagerType} of this implementation.
 	 */
 	IndexManagerType getIndexManagerType();
-
-	// TODO: Temporary, remove
-	BackendQueueProcessor getBackendQueueProcessor();
 }

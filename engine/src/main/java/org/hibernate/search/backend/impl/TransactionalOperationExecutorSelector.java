@@ -15,6 +15,7 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -33,8 +34,6 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<Void, TransactionalOperationExecutor> {
 
-	public static final TransactionalOperationExecutorSelector INSTANCE = new TransactionalOperationExecutorSelector();
-
 	private final AddSelectionExecutor addExecutor = new AddSelectionExecutor();
 	private final DeleteSelectionExecutor deleteExecutor = new DeleteSelectionExecutor();
 	private final OptimizeSelectionExecutor optimizeExecutor = new OptimizeSelectionExecutor();
@@ -42,8 +41,10 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 	private final FlushSelectionExecutor flushExecutor = new FlushSelectionExecutor();
 	private final DeleteByQuerySelectionExecutor deleteByQueryExecutor = new DeleteByQuerySelectionExecutor();
 
-	private TransactionalOperationExecutorSelector() {
-		// use INSTANCE as this delegator is stateless
+	private final IndexManagerHolder indexManagerHolder;
+
+	public TransactionalOperationExecutorSelector(IndexManagerHolder indexManagerHolder) {
+		this.indexManagerHolder = indexManagerHolder;
 	}
 
 	@Override
@@ -81,7 +82,7 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 		return deleteByQueryExecutor;
 	}
 
-	private static class AddSelectionExecutor implements TransactionalOperationExecutor {
+	private class AddSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -92,12 +93,12 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 					work.getIdInString(),
 					work.getDocument()
 			);
-			context.getIndexManagerQueue( indexManager ).add( work );
+			context.getIndexManagerQueue( indexManager.getIndexName(), indexManagerHolder ).add( work );
 		}
 
 	}
 
-	private static class DeleteSelectionExecutor implements TransactionalOperationExecutor {
+	private class DeleteSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -108,13 +109,13 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 					work.getIdInString()
 			);
 			for ( IndexManager indexManager : indexManagers ) {
-				context.getIndexManagerQueue( indexManager ).add( work );
+				context.getIndexManagerQueue( indexManager.getIndexName(), indexManagerHolder ).add( work );
 			}
 		}
 
 	}
 
-	private static class DeleteByQuerySelectionExecutor implements TransactionalOperationExecutor {
+	private class DeleteByQuerySelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -125,7 +126,7 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 					work.getIdInString()
 			);
 			for ( IndexManager indexManager : indexManagers ) {
-				context.getIndexManagerQueue( indexManager ).add( work );
+				context.getIndexManagerQueue( indexManager.getIndexName(), indexManagerHolder ).add( work );
 			}
 		}
 
@@ -161,7 +162,7 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 
 	}
 
-	private static class PurgeAllSelectionExecutor implements TransactionalOperationExecutor {
+	private class PurgeAllSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -172,7 +173,7 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 					work.getIdInString()
 			);
 			for ( IndexManager indexManager : indexManagers ) {
-				context.getIndexManagerQueue( indexManager ).add( work );
+				context.getIndexManagerQueue( indexManager.getIndexName(), indexManagerHolder ).add( work );
 			}
 		}
 

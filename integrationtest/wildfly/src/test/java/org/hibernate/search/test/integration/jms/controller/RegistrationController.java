@@ -20,10 +20,9 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.integration.jms.DeploymentJmsMasterSlave;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.hibernate.search.util.logging.impl.Log;
@@ -119,9 +118,8 @@ public class RegistrationController {
 		}
 
 		// Check the running backend type
-		SearchIntegrator searchIntegrator = Search.getFullTextEntityManager( em ).getSearchFactory().unwrap( SearchIntegrator.class );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchIntegrator.getIndexManager( "membersIndex" );
-		BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
+		ExtendedSearchIntegrator searchIntegrator = Search.getFullTextEntityManager( em ).getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
+		BackendQueueProcessor backendQueueProcessor = searchIntegrator.getIndexManagerHolder().getBackendQueueProcessor( "membersIndex" );
 		final String backendName = backendQueueProcessor.getClass().getName();
 		if ( ! backendName.equals( expectedBackendImplementation ) ) {
 			throw new IllegalStateException( "Not running the expected backend '" + expectedBackendImplementation + "' but running '" + backendName + "'" );
