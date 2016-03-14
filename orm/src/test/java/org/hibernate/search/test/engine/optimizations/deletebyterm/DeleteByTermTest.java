@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
@@ -59,7 +59,7 @@ public class DeleteByTermTest {
 
 		// add a document that matches the entity a identifier to see if it is removed when the entity is removed
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) fts.getSearchFactory().unwrap( SearchIntegrator.class ).getIndexManager( "index1" );
-		LuceneBackendQueueProcessor backendProcessor = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
+		WorkspaceHolder backendProcessor = (WorkspaceHolder) indexManager.getWorkspaceHolder();
 		IndexWriter writer = backendProcessor.getIndexResources().getWorkspace().getIndexWriter();
 		Document document = new Document();
 		document.add( new StringField( "id", "1", org.apache.lucene.document.Field.Store.NO ) );
@@ -111,7 +111,7 @@ public class DeleteByTermTest {
 
 		// add a document that matches the entity a identifier to see if it is removed when the entity is removed
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) fts.getSearchFactory().unwrap( SearchIntegrator.class ).getIndexManager( "index1" );
-		LuceneBackendQueueProcessor backendProcessor = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
+		WorkspaceHolder backendProcessor = (WorkspaceHolder) indexManager.getWorkspaceHolder();
 		IndexWriter writer = backendProcessor.getIndexResources().getWorkspace().getIndexWriter();
 		Document document = new Document();
 		document.add( new StringField( "id", "1", org.apache.lucene.document.Field.Store.NO ) );

@@ -9,8 +9,6 @@ package org.hibernate.search.backend.jms.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -21,6 +19,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -67,6 +66,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 		this.indexName = indexManager.getIndexName();
 		this.integrator = context.getUninitializedSearchIntegrator();
 		this.factory = initializeJMSQueueConnectionFactory( props );
+
 		if ( ! isTransactional ) {
 			// if we are not transactional, we can eagerly initialize the queue and connection
 			this.jmsQueue = initializeJMSQueue( factory, props );
@@ -102,24 +102,20 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
 
-		Runnable operation = new JmsBackendQueueTask( indexName, workList, indexManager, this );
-		operation.run();
+		LuceneWorkSerializer luceneWorkSerializer = integrator.getServiceManager().requestService( LuceneWorkSerializer.class );
+
+		try {
+			Runnable operation = new JmsBackendQueueTask( indexName, workList, this, luceneWorkSerializer );
+			operation.run();
+		}
+		finally {
+			integrator.getServiceManager().releaseService( LuceneWorkSerializer.class );
+		}
 	}
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		applyWork( Collections.singletonList( singleOperation ), monitor );
-	}
-
-	@Override
-	public Lock getExclusiveWriteLock() {
-		log.warnSuspiciousBackendDirectoryCombination( indexName );
-		return new ReentrantLock(); // keep the invoker happy, still it's useless
-	}
-
-	@Override
-	public void indexMappingChanged() {
-		// no-op
 	}
 
 	public QueueConnection getJMSConnection() {

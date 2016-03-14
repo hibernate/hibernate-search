@@ -15,21 +15,20 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.util.BytesRef;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.test.util.SerializationTestHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -44,14 +43,21 @@ public class DocValuesSerializationTest {
 
 	@Before
 	public void setUp() {
-		ServiceManager serviceManager = new StandardServiceManager(
+		ServiceManager serviceManager = getTestServiceManager();
+		workSerializer = serviceManager.requestService( LuceneWorkSerializer.class );
+	}
+
+	private ServiceManager getTestServiceManager() {
+		SearchConfigurationForTest searchConfiguration = new SearchConfigurationForTest();
+		return new StandardServiceManager(
 				new SearchConfigurationForTest(),
-				null
-		);
-		SerializationProvider serializationProvider = serviceManager.requestService( SerializationProvider.class );
-		workSerializer = new LuceneWorkSerializerImpl(
-				serializationProvider,
-				searchFactoryHolder.getSearchFactory()
+				new BuildContextForTest( searchConfiguration ) {
+
+					@Override
+					public ExtendedSearchIntegrator getUninitializedSearchIntegrator() {
+						return searchFactoryHolder.getSearchFactory();
+					};
+				}
 		);
 	}
 

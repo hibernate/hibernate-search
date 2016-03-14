@@ -17,7 +17,7 @@ import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 
 		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
-		Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
+		Document entity = s.get( Document.class, Long.valueOf( 1 ) );
 		Assert.assertNotNull( entity );
 		s.delete( entity );
 		s.getTransaction().commit();
@@ -65,13 +65,13 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 
 		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
-		PersonWithBrokenSocialSecurityNumber entity = (PersonWithBrokenSocialSecurityNumber) s.get( PersonWithBrokenSocialSecurityNumber.class, Long.valueOf( 2 ) );
+		PersonWithBrokenSocialSecurityNumber entity = s.get( PersonWithBrokenSocialSecurityNumber.class, Long.valueOf( 2 ) );
 		Assert.assertNotNull( entity );
 		s.delete( entity );
 		s.getTransaction().commit();
 		s.close();
 		Assert.assertNull( "unexpected exception detected", errorHandler.getLastException() );
-		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		Assert.assertEquals( 1, processedQueue.size() );
 		LuceneWork luceneWork = processedQueue.get( 0 );
 		Assert.assertEquals( "100", luceneWork.getIdInString() );
@@ -87,14 +87,14 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 		super.configure( cfg );
 		cfg.put( "hibernate.use_identifier_rollback", "true" );
 		cfg.put( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
-		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingLocalBackend.class.getName() );
 	}
 
 	@Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 	}
 
 }

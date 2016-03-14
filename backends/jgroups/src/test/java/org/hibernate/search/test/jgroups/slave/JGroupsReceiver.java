@@ -8,14 +8,14 @@ package org.hibernate.search.test.jgroups.slave;
 
 import java.util.List;
 
-import org.jgroups.Message;
-import org.jgroups.ReceiverAdapter;
-
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.impl.MessageSerializationHelper;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.jgroups.Message;
+import org.jgroups.ReceiverAdapter;
 
 /**
  * @author Lukasz Moren
@@ -41,12 +41,16 @@ public class JGroupsReceiver extends ReceiverAdapter {
 			final byte[] rawBuffer = message.getRawBuffer();
 			final int messageOffset = message.getOffset();
 			final int bufferLength = message.getLength();
-			String indexName = MessageSerializationHelper.extractIndexName( messageOffset, rawBuffer );
 			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( messageOffset, bufferLength, rawBuffer );
-			IndexManager indexManager = integrator.getIndexManager( indexName );
-			List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
+
+			ServiceManager serviceManager = integrator.getServiceManager();
+			LuceneWorkSerializer luceneWorkSerializer = serviceManager.requestService( LuceneWorkSerializer.class );
+
+			List<LuceneWork> queue = luceneWorkSerializer.toLuceneWorks( serializedQueue );
 			queues++;
 			works += queue.size();
+
+			serviceManager.releaseService( LuceneWorkSerializer.class );
 		}
 		catch (ClassCastException e) {
 			throw new SearchException( e );

@@ -13,7 +13,6 @@ import java.util.concurrent.locks.Lock;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -30,7 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
+public class WorkspaceHolder {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -40,7 +39,6 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	private LuceneBackendTaskStreamer streamWorker;
 	private WorkProcessor workProcessor;
 
-	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
 		if ( workspaceOverride == null ) {
@@ -63,14 +61,12 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		}
 	}
 
-	@Override
 	public void close() {
 		//The order is important! The work processor uses the resources.
 		workProcessor.shutdown();
 		resources.shutdown();
 	}
 
-	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		if ( singleOperation == null ) {
 			throw new IllegalArgumentException( "singleOperation should not be null" );
@@ -78,7 +74,6 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		streamWorker.doWork( singleOperation, monitor );
 	}
 
-	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
@@ -86,7 +81,6 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		workProcessor.submit( workList, monitor );
 	}
 
-	@Override
 	public Lock getExclusiveWriteLock() {
 		return resources.getExclusiveModificationLock();
 	}
@@ -105,13 +99,11 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		this.workspaceOverride = workspace;
 	}
 
-	@Override
 	public void indexMappingChanged() {
 		resources = resources.onTheFlyRebuild();
 		workProcessor.updateResources( resources );
 	}
 
-	@Override
 	public void closeIndexWriter() {
 		LuceneBackendResources backendResources = resources;
 		if ( backendResources != null ) {

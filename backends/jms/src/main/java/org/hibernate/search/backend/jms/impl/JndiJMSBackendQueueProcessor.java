@@ -76,9 +76,4 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 			throw log.jmsInitialContextException( jmsConnectionFactoryName, getIndexName(), e );
 		}
 	}
-
-	@Override
-	public void closeIndexWriter() {
-		// no-op
-	}
 }

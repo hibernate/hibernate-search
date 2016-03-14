@@ -12,11 +12,9 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
-
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -121,13 +119,7 @@ public interface IndexManager {
 	void optimize();
 
 	/**
-	 * @return the Serializer implementation used for this IndexManager
-	 */
-	LuceneWorkSerializer getSerializer();
-
-	/**
 	 * Close the underlying index writer, releasing the index lock.
 	 */
 	void closeIndexWriter();
-
 }

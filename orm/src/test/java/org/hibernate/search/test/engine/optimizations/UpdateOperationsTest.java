@@ -6,18 +6,16 @@
  */
 package org.hibernate.search.test.engine.optimizations;
 
-
 import java.util.List;
-
-import org.junit.Assert;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.hibernate.search.testsupport.optimizer.LeakingOptimizer;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -39,7 +37,7 @@ public class UpdateOperationsTest {
 		FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory( indexMetadataIsComplete );
 		try {
 			LeakingOptimizer.reset();
-			LeakingBackendQueueProcessor.reset();
+			LeakingLocalBackend.reset();
 			FullTextSession session = fullTextSessionBuilder.openFullTextSession();
 			Assert.assertEquals( 0, LeakingOptimizer.getTotalOperations() );
 
@@ -48,7 +46,7 @@ public class UpdateOperationsTest {
 			tx.commit();
 
 			Assert.assertEquals( 1, LeakingOptimizer.getTotalOperations() );
-			Assert.assertEquals( 1, LeakingBackendQueueProcessor.getLastProcessedQueue().size() );
+			Assert.assertEquals( 1, LeakingLocalBackend.getLastProcessedQueue().size() );
 
 			tx = session.beginTransaction();
 			List list = session.createFullTextQuery( new MatchAllDocsQuery() ).list();
@@ -56,7 +54,7 @@ public class UpdateOperationsTest {
 			doc.setSummary( "Example of what was used in ancient times to read" );
 			tx.commit();
 
-			Assert.assertEquals( 1, LeakingBackendQueueProcessor.getLastProcessedQueue().size() );
+			Assert.assertEquals( 1, LeakingLocalBackend.getLastProcessedQueue().size() );
 			Assert.assertEquals( expectedBackendOperations, LeakingOptimizer.getTotalOperations() );
 		}
 		finally {
@@ -66,7 +64,7 @@ public class UpdateOperationsTest {
 
 	private static FullTextSessionBuilder createSearchFactory(boolean indexMetadataIsComplete) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
-				.setProperty( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() )
+				.setProperty( "hibernate.search.default.worker.backend", LeakingLocalBackend.class.getName() )
 				.setProperty( "hibernate.search.default.optimizer.implementation", LeakingOptimizer.class.getCanonicalName() )
 				.addAnnotatedClass( Document.class );
 		if ( !indexMetadataIsComplete ) {

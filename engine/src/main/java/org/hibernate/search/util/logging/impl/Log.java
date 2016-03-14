@@ -7,6 +7,12 @@
 
 package org.hibernate.search.util.logging.impl;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.TRACE;
+import static org.jboss.logging.Logger.Level.WARN;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -33,12 +39,6 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
-
-import static org.jboss.logging.Logger.Level.DEBUG;
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.TRACE;
-import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -522,8 +522,8 @@ public interface Log extends BasicLogger {
 	SearchException duplicateDocumentIdFound(String beanXClassName);
 
 	@LogMessage(level = Level.INFO)
-	@Message(id = 168, value = "Serialization service %2$s being used for index '%1$s'")
-	void indexManagerUsesSerializationService(String indexName, String serializerDescription);
+	@Message(id = 168, value = "Using serialization service %1$s")
+	void usingSerializationService(String serializerDescription);
 
 	@Message(id = 169, value = "FieldBridge '%1$s' does not have a objectToString method: field '%2$s' in '%3$s'" +
 			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query")
@@ -931,4 +931,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 304, value = "Closing index writer for IndexManager '%1$s'")
 	void closingIndexWriter(String indexName);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 305, value = "The backend name 'lucene' is deprecated. Use 'local' instead")
+	void deprecatedBackendName();
 }
