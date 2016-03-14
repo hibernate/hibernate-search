@@ -10,9 +10,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
@@ -34,7 +33,7 @@ public class DocumentFieldMetadata {
 	private final Field.TermVector termVector;
 	private final FieldBridge fieldBridge;
 	private final Float boost;
-	private final Analyzer analyzer;
+	private final AnalyzerReference analyzer;
 	private final boolean isId;
 	private final boolean isIdInEmbedded;
 	private final NullMarkerCodec nullMarkerCodec;
@@ -94,7 +93,7 @@ public class DocumentFieldMetadata {
 		return boost;
 	}
 
-	public Analyzer getAnalyzer() {
+	public AnalyzerReference getAnalyzer() {
 		return analyzer;
 	}
 
@@ -161,7 +160,7 @@ public class DocumentFieldMetadata {
 		// optional parameters
 		private FieldBridge fieldBridge;
 		private Float boost;
-		private Analyzer analyzer;
+		private AnalyzerReference analyzer;
 		private boolean isId;
 		private boolean isIdInEmbedded;
 		private boolean isNumeric;
@@ -193,7 +192,7 @@ public class DocumentFieldMetadata {
 			return this;
 		}
 
-		public Builder analyzer(Analyzer analyzer) {
+		public Builder analyzer(AnalyzerReference analyzer) {
 			this.analyzer = analyzer;
 			return this;
 		}

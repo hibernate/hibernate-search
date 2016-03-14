@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,9 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XPackage;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Factory;
@@ -36,10 +40,11 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.impl.DelegateNamedAnalyzer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -98,8 +103,8 @@ public final class ConfigContext {
 	 */
 	private final Map<String, FilterDef> filterDefs = new HashMap<String, FilterDef>();
 
-	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
-	private final Analyzer defaultAnalyzer;
+	private final List<LazyAnalyzerReference> lazyAnalyzers = new ArrayList<LazyAnalyzerReference>();
+	private final AnalyzerReference defaultAnalyzer;
 	private final boolean jpaPresent;
 	private final Version luceneMatchVersion;
 	private final String nullToken;
@@ -172,10 +177,10 @@ public final class ConfigContext {
 		}
 	}
 
-	public Analyzer buildLazyAnalyzer(String name) {
-		final DelegateNamedAnalyzer delegateNamedAnalyzer = new DelegateNamedAnalyzer( name );
-		lazyAnalyzers.add( delegateNamedAnalyzer );
-		return delegateNamedAnalyzer;
+	public AnalyzerReference buildLazyAnalyzer(String name) {
+		final LazyAnalyzerReference reference = new LazyAnalyzerReference( name );
+		lazyAnalyzers.add( reference );
+		return reference;
 	}
 
 	/**
@@ -185,8 +190,9 @@ public final class ConfigContext {
 	 *
 	 * @return The Lucene analyzer to use for tokenization.
 	 */
-	private Analyzer initAnalyzer(SearchConfiguration cfg) {
-		Class analyzerClass;
+	@SuppressWarnings("unchecked")
+	private AnalyzerReference initAnalyzer(SearchConfiguration cfg) {
+		Class<? extends Analyzer> analyzerClass;
 		String analyzerClassName = cfg.getProperty( Environment.ANALYZER_CLASS );
 		if ( analyzerClassName != null ) {
 			try {
@@ -199,7 +205,9 @@ public final class ConfigContext {
 		else {
 			analyzerClass = StandardAnalyzer.class;
 		}
-		return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
+		Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
+		AnalyzerReference reference = new LuceneAnalyzerReference( analyzer );
+		return reference;
 	}
 
 	private String initNullToken(SearchConfiguration cfg) {
@@ -214,7 +222,7 @@ public final class ConfigContext {
 		return nullToken;
 	}
 
-	public Analyzer getDefaultAnalyzer() {
+	public AnalyzerReference getDefaultAnalyzer() {
 		return defaultAnalyzer;
 	}
 
@@ -282,22 +290,24 @@ public final class ConfigContext {
 		filterDefs.put( defAnn.name(), filterDef );
 	}
 
-	public Map<String, Analyzer> initLazyAnalyzers() {
-		Map<String, Analyzer> initializedAnalyzers = new HashMap<String, Analyzer>( analyzerDefs.size() );
-
-		for ( DelegateNamedAnalyzer namedAnalyzer : lazyAnalyzers ) {
-			String name = namedAnalyzer.getName();
-			if ( initializedAnalyzers.containsKey( name ) ) {
-				namedAnalyzer.setDelegate( initializedAnalyzers.get( name ) );
+	public Map<String, AnalyzerReference> initLazyAnalyzers(IndexManagerHolder indexesFactory) {
+		final Map<String, AnalyzerReference> initializedAnalyzers = new HashMap<>( analyzerDefs.size() );
+		for ( LazyAnalyzerReference namedAnalyzer : lazyAnalyzers ) {
+			if ( initializedAnalyzers.containsKey( namedAnalyzer.getName() ) ) {
+				AnalyzerReference reference = initializedAnalyzers.get( namedAnalyzer.getName() );
+				namedAnalyzer.setDelegate( reference );
 			}
 			else {
-				if ( analyzerDefs.containsKey( name ) ) {
-					final Analyzer analyzer = buildAnalyzer( analyzerDefs.get( name ) );
-					namedAnalyzer.setDelegate( analyzer );
-					initializedAnalyzers.put( name, analyzer );
+				if ( analyzerDefs.containsKey( namedAnalyzer.getName() ) ) {
+					initLocalAnalyzer( initializedAnalyzers, namedAnalyzer );
 				}
 				else {
-					throw new SearchException( "Analyzer found with an unknown definition: " + name );
+					initRemoteAnalyzer( initializedAnalyzers, namedAnalyzer, indexesFactory );
+				}
+
+				if ( !initializedAnalyzers.containsKey( namedAnalyzer.getName() ) ) {
+					// Does not have a definition and it's not a remote analyzer
+					throw new SearchException( "Analyzer found with an unknown definition: " + namedAnalyzer.getName() );
 				}
 			}
 		}
@@ -306,10 +316,30 @@ public final class ConfigContext {
 		for ( Map.Entry<String, AnalyzerDef> entry : analyzerDefs.entrySet() ) {
 			if ( !initializedAnalyzers.containsKey( entry.getKey() ) ) {
 				final Analyzer analyzer = buildAnalyzer( entry.getValue() );
-				initializedAnalyzers.put( entry.getKey(), analyzer );
+				final AnalyzerReference reference = new LuceneAnalyzerReference( analyzer );
+				initializedAnalyzers.put( entry.getKey(), reference );
 			}
 		}
 		return Collections.unmodifiableMap( initializedAnalyzers );
+	}
+
+	private void initRemoteAnalyzer(Map<String, AnalyzerReference> initializedAnalyzers, LazyAnalyzerReference namedAnalyzer, IndexManagerHolder indexesFactory) {
+		Collection<IndexManager> indexManagers = indexesFactory.getIndexManagers();
+		for ( IndexManager indexManager : indexManagers ) {
+			if ( indexManager instanceof RemoteAnalyzerProvider ) {
+				// The definition is missing, we assume this is a remote analyzer
+				final AnalyzerReference remoteAnalyzer = ( (RemoteAnalyzerProvider) indexManager ).getRemoteAnalyzer( namedAnalyzer.getName() );
+				namedAnalyzer.setDelegate( remoteAnalyzer );
+				initializedAnalyzers.put( namedAnalyzer.getName(), namedAnalyzer );
+				break;
+			}
+		}
+	}
+
+	private void initLocalAnalyzer(Map<String, AnalyzerReference> initializedAnalyzers, LazyAnalyzerReference namedAnalyzer) {
+		final Analyzer analyzer = buildAnalyzer( analyzerDefs.get( namedAnalyzer.getName() ) );
+		namedAnalyzer.setDelegate( new LuceneAnalyzerReference( analyzer ) );
+		initializedAnalyzers.put( namedAnalyzer.getName(), namedAnalyzer );
 	}
 
 	public Map<String, FilterDef> initFilters() {

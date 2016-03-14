@@ -15,8 +15,10 @@ import org.hibernate.search.backend.elasticsearch.client.impl.BulkRequestFailedE
 import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
+import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
@@ -65,4 +67,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	BulkRequestFailedException elasticsearchBulkRequestFailed(String request, String response, @Param List<BackendRequest<? extends JestResult>> erroneousItems);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,
+			value = "'%1$s' is not a remote analyzer. It will be ignored")
+	void analyzerIsNotRemote(String name);
 }

@@ -393,7 +393,7 @@ public class SearchIntegratorBuilder {
 		);
 
 		factoryState.addFilterDefinitions( configContext.initFilters() );
-		factoryState.addAnalyzers( configContext.initLazyAnalyzers() );
+		factoryState.addAnalyzers( configContext.initLazyAnalyzers( indexesFactory ) );
 	}
 
 	/**

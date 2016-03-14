@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -125,4 +126,15 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * fields. If not allowed, an exception will be raised in this situation.
 	 */
 	boolean isIndexUninvertingAllowed();
+
+	/**
+	 * Retrieve an analyzer reference instance by its definition name
+	 *
+	 * @param name the name of the analyzer
+	 *
+	 * @return analyzer with the specified name
+	 *
+	 * @throws org.hibernate.search.exception.SearchException if the definition name is unknown
+	 */
+	AnalyzerReference getAnalyzerReference(String name);
 }

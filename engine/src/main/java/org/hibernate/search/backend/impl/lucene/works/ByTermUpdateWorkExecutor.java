@@ -22,7 +22,7 @@ import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -75,7 +75,7 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 				log.tracef( "Updating %s#%s by id using an IndexWriter#updateDocument.", managedType, id );
 				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 				Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
-				ScopedAnalyzer analyzer = builder.getAnalyzer();
+				ScopedAnalyzerReference analyzer = builder.getAnalyzer();
 				analyzer = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
 				delegate.updateDocument( idTerm, work.getDocument(), analyzer );
 			}

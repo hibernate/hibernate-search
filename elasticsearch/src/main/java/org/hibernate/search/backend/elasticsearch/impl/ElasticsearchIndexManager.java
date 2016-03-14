@@ -13,6 +13,9 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
@@ -20,6 +23,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -43,7 +47,6 @@ import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncod
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -61,9 +64,9 @@ import io.searchbox.indices.mapping.PutMapping;
  *
  * @author Gunnar Morling
  */
-public class ElasticsearchIndexManager implements IndexManager {
+public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerProvider {
 
-	private static final Log LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private String indexName;
 	private String actualIndexName;
@@ -264,6 +267,15 @@ public class ElasticsearchIndexManager implements IndexManager {
 		}
 	}
 
+	private String analyzerName(DocumentFieldMetadata fieldMetadata) {
+		AnalyzerReference analyzer = fieldMetadata.getAnalyzer();
+		if ( analyzer.is( RemoteAnalyzerReference.class ) ) {
+			return analyzer.unwrap( RemoteAnalyzerReference.class ).getName();
+		}
+		LOG.analyzerIsNotRemote( String.valueOf( analyzer ) );
+		return null;
+	}
+
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
@@ -280,6 +292,13 @@ public class ElasticsearchIndexManager implements IndexManager {
 		field.addProperty( "type", fieldType );
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 		field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
+
+		if ( fieldMetadata.getAnalyzer() != null ) {
+			String analyzerName = analyzerName( fieldMetadata );
+			if ( analyzerName != null ) {
+				field.addProperty( "analyzer", analyzerName );
+			}
+		}
 
 		if ( fieldMetadata.getBoost() != null ) {
 			field.addProperty( "boost", fieldMetadata.getBoost() );
@@ -597,5 +616,10 @@ public class ElasticsearchIndexManager implements IndexManager {
 	@Override
 	public String toString() {
 		return "ElasticsearchIndexManager [actualIndexName=" + actualIndexName + "]";
+	}
+
+	@Override
+	public AnalyzerReference getRemoteAnalyzer(String name) {
+		return new RemoteAnalyzerReference( name );
 	}
 }

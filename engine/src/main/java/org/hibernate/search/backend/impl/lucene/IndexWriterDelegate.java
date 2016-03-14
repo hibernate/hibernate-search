@@ -15,8 +15,10 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.impl.lucene.analysis.ConcurrentlyMutableAnalyzer;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 
 /**
  * Encapsulates various operations to be performed on a single IndexWriter.
@@ -48,17 +50,18 @@ public final class IndexWriterDelegate {
 		indexWriter.deleteDocuments( idTerm );
 	}
 
-	public void addDocument(final Document document, final ScopedAnalyzer analyzer) throws IOException {
+	public void addDocument(final Document document, final ScopedAnalyzerReference analyzer) throws IOException {
 		//This is now equivalent to the old "addDocument" method:
 		updateDocument( null, document, analyzer );
 	}
 
-	public void updateDocument(final Term idTerm, final Document document, final ScopedAnalyzer analyzer) throws IOException {
+	public void updateDocument(final Term idTerm, final Document document, final ScopedAnalyzerReference analyzer) throws IOException {
 		// Try being optimistic first:
+		ScopedAnalyzer scopedAnalyzer = (ScopedAnalyzer) analyzer.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 		final boolean applyWithinReadLock;
 		readLock.lock();
 		try {
-			applyWithinReadLock = mutableAnalyzer.isCompatibleWith( analyzer );
+			applyWithinReadLock = mutableAnalyzer.isCompatibleWith( scopedAnalyzer );
 			if ( applyWithinReadLock ) {
 				indexWriter.updateDocument( idTerm, document );
 			}
@@ -70,7 +73,7 @@ public final class IndexWriterDelegate {
 		if ( ! applyWithinReadLock ) {
 			writeLock.lock();
 			try {
-				mutableAnalyzer.updateAnalyzer( analyzer );
+				mutableAnalyzer.updateAnalyzer( scopedAnalyzer );
 				indexWriter.updateDocument( idTerm, document );
 			}
 			finally {
