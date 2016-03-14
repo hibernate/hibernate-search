@@ -210,6 +210,8 @@
 
         <puppycrawl.checkstyle.version>6.16</puppycrawl.checkstyle.version>
 
+        <!-- Version to be used as baseline for API/SPI change reports -->
+        <previous.stable>5.5.2.Final</previous.stable>
     </properties>
 
     <dependencyManagement>
@@ -814,20 +816,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <!-- Creates a report by running "mvn clirr:clirr" -->
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>clirr-maven-plugin</artifactId>
-                    <version>2.6.1</version>
-                    <configuration>
-                        <comparisonVersion>5.4.0.Final</comparisonVersion>
-                        <excludes>
-                            <exclude>org/hibernate/search/**/impl/**</exclude>
-                        </excludes>
-                        <logResults>true</logResults>
-                        <minSeverity>info</minSeverity>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>com.github.marschall</groupId>
                     <artifactId>jdeps-maven-plugin</artifactId>
                     <version>0.4.0</version>
@@ -850,7 +838,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.3</version>
+                    <version>3.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1286,6 +1274,68 @@
             <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.9</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>cmp-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+                <configuration>
+                    <skip>true</skip>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${previous.stable}</version>
+                            <type>${project.packaging}</type>
+                        </dependency>
+                    </oldVersion>
+                    <newVersion>
+                        <file>
+                            <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
+                        </file>
+                    </newVersion>
+                    <parameter>
+                        <onlyModified>true</onlyModified>
+                        <excludes>
+                            <exclude>org.hibernate.search.*.impl</exclude>
+                        </excludes>
+                        <accessModifier>public</accessModifier>
+                        <!--
+                            The next two should make sure that this report is not run for this POM-packaged parent module itself
+                            That's not working, though, resulting a build failure. I'm thus setting skip to "true" below, which
+                            needs to be overridden within those modules for which this report should be created
+                        -->
+                        <skipPomModules>true</skipPomModules>
+                        <packagingSupporteds>
+                            <packagingSupported>jar</packagingSupported>
+                        </packagingSupporteds>
+                    </parameter>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <profiles>
         <profile>
