@@ -20,9 +20,12 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
@@ -96,6 +99,38 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testMultipleFieldsCustomAnalyzer() throws Exception {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Tweet tweet = new Tweet();
+			tweet.setMultipleTweets( "close OPEN SOURCE test1" );
+			tweet( session, tweet );
+
+			@SuppressWarnings("unchecked")
+			List<Tweet> expectedResult = fullTextSession.createFullTextQuery( termQuery( "tweetWithCustom", "open" ), Tweet.class ).list();
+			assertThat( expectedResult ).onProperty( "multipleTweets" ).containsExactly( tweet.getMultipleTweets() );
+
+			@SuppressWarnings("unchecked")
+			List<Tweet> expectedEmpty = fullTextSession.createFullTextQuery( termQuery( "tweetWithCustom", "CLOSE" ), Tweet.class ).list();
+			assertThat( expectedEmpty ).as( "Custom analyzer or filter not applied" ).isEmpty();
+		}
+	}
+
+	@Test
+	public void testMultipleFieldIgnoreAnalyzer() throws Exception {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Tweet tweet = new Tweet();
+			tweet.setMultipleTweets( "close OPEN SOURCE test1" );
+			tweet( session, tweet );
+
+			@SuppressWarnings("unchecked")
+			List<Tweet> expectedResult = fullTextSession.createFullTextQuery( termQuery( "tweetNotAnalyzed", "close OPEN SOURCE test1" ), Tweet.class ).list();
+			assertThat( expectedResult ).onProperty( "multipleTweets" ).containsExactly( tweet.getMultipleTweets() );
+		}
+	}
+
 	private TermQuery termQuery(String fld, String text) {
 		TermQuery query = new TermQuery( new Term( fld, text ) );
 		return query;
@@ -128,6 +163,11 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 		// Defined in the elasticsearch.yml configuration file
 		@Analyzer(definition = "custom-analyzer")
 		private String customTweet;
+
+		@Fields({
+				@Field(name = "tweetNotAnalyzed", analyze = Analyze.NO, store = Store.YES),
+				@Field(name = "tweetWithCustom", analyzer = @Analyzer(definition = "custom-analyzer") ) })
+		private String multipleTweets;
 
 		private String defaultAnalyzer;
 
@@ -169,6 +209,14 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 
 		public void setDefaultTweet(String defaultAnalyzer) {
 			this.defaultAnalyzer = defaultAnalyzer;
+		}
+
+		public String getMultipleTweets() {
+			return multipleTweets;
+		}
+
+		public void setMultipleTweets(String multipleMessage) {
+			this.multipleTweets = multipleMessage;
 		}
 
 		@Override
