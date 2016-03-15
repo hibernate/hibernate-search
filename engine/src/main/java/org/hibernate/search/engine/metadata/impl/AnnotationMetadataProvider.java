@@ -1664,7 +1664,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					new EmbeddedTypeMetadata.Builder(
 							reflectionManager.toClass( elementClass ),
 							member,
-							typeMetadataBuilder.getScopedAnalyzer()
+							typeMetadataBuilder.getScopedAnalyzerBuilder()
 					);
 
 			embeddedTypeMetadataBuilder.boost( AnnotationProcessingHelper.getBoost( member, null ) );

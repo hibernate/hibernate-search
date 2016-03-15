@@ -77,16 +77,16 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	}
 
 	public static class Builder extends TypeMetadata.Builder {
-		private String embeddedFieldName;
-		private XMember embeddedGetter;
-		private Container embeddedContainer;
+		private final String embeddedFieldName;
+		private final XMember embeddedGetter;
+		private final Container embeddedContainer;
 
 		private String embeddedNullFieldName;
 		private String embeddedNullToken;
 		private FieldBridge embeddedNullFieldBridge;
 
-		public Builder(Class<?> indexedType, XMember embeddedGetter, ScopedAnalyzerReference scopedAnalyzer) {
-			super( indexedType, scopedAnalyzer );
+		public Builder(Class<?> indexedType, XMember embeddedGetter, ScopedAnalyzerReference.Builder scopedAnalyzerBuilder) {
+			super( indexedType, scopedAnalyzerBuilder );
 			ReflectionHelper.setAccessible( embeddedGetter );
 			this.embeddedFieldName = embeddedGetter.getName();
 			this.embeddedGetter = embeddedGetter;

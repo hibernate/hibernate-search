@@ -22,26 +22,12 @@ import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
  */
 public final class ScopedAnalyzerReference implements AnalyzerReference {
 
-	private final Map<String, AnalyzerReference> analyzers = new HashMap<>();
-	private AnalyzerReference globalAnalyzer;
+	private final Map<String, AnalyzerReference> analyzers;
+	private final AnalyzerReference globalAnalyzer;
 
-	public ScopedAnalyzerReference(AnalyzerReference analyzerReference) {
-		this( analyzerReference, Collections.<String, AnalyzerReference>emptyMap() );
-	}
-
-	private ScopedAnalyzerReference(AnalyzerReference globalAnalyzer, Map<String, AnalyzerReference> scopedAnalyzers) {
+	private ScopedAnalyzerReference(AnalyzerReference globalAnalyzer, Map<String, AnalyzerReference> analyzers) {
 		this.globalAnalyzer = globalAnalyzer;
-		for ( Map.Entry<String, AnalyzerReference> entry : scopedAnalyzers.entrySet() ) {
-			addScopedAnalyzer( entry.getKey(), entry.getValue() );
-		}
-	}
-
-	public void setGlobalAnalyzer(AnalyzerReference globalAnalyzer) {
-		this.globalAnalyzer = globalAnalyzer;
-	}
-
-	public void addScopedAnalyzer(String scope, AnalyzerReference analyzer) {
-		analyzers.put( scope, analyzer );
+		this.analyzers = Collections.unmodifiableMap( analyzers );
 	}
 
 	private static Analyzer luceneAnalyzer(AnalyzerReference scopedAnalyzer) {
@@ -69,12 +55,6 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public ScopedAnalyzerReference clone() {
-		ScopedAnalyzerReference clone = new ScopedAnalyzerReference( globalAnalyzer, analyzers );
-		return clone;
 	}
 
 	@Override
@@ -116,6 +96,41 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 		}
 		for ( AnalyzerReference entry : analyzers.values() ) {
 			entry.close();
+		}
+	}
+
+	/**
+	 * Builds a new {@link ScopedAnalyzerReference}.
+	 *
+	 * @author Gunnar Morling
+	 */
+	public static class Builder {
+
+		private final Map<String, AnalyzerReference> analyzers;
+		private AnalyzerReference globalAnalyzer;
+
+		public Builder(ScopedAnalyzerReference original) {
+			this.analyzers = new HashMap<>( original.analyzers );
+			this.globalAnalyzer = original.globalAnalyzer;
+		}
+
+		public Builder(AnalyzerReference globalAnalyzer) {
+			analyzers = new HashMap<>();
+			this.globalAnalyzer = globalAnalyzer;
+		}
+
+		public Builder addAnalyzer(String scope, AnalyzerReference analyzer) {
+			analyzers.put( scope, analyzer );
+			return this;
+		}
+
+		public Builder setGlobalAnalyzer(AnalyzerReference globalAnalyzer) {
+			this.globalAnalyzer = globalAnalyzer;
+			return this;
+		}
+
+		public ScopedAnalyzerReference build() {
+			return new ScopedAnalyzerReference( globalAnalyzer, analyzers );
 		}
 	}
 }

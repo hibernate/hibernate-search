@@ -83,17 +83,17 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 			return scopedAnalyzer;
 		}
 
-		ScopedAnalyzerReference analyzerClone = scopedAnalyzer.clone();
+		ScopedAnalyzerReference.Builder copyBuilder = new ScopedAnalyzerReference.Builder( scopedAnalyzer );
 		for ( Map.Entry<String, String> entry : fieldToAnalyzerMap.entrySet() ) {
 			Analyzer analyzer = workspace.getAnalyzer( entry.getValue() );
 			if ( analyzer == null ) {
 				log.unableToRetrieveNamedAnalyzer( entry.getValue() );
 			}
 			else {
-				analyzerClone.addScopedAnalyzer( entry.getKey(), new LuceneAnalyzerReference( analyzer ) );
+				copyBuilder.addAnalyzer( entry.getKey(), new LuceneAnalyzerReference( analyzer ) );
 			}
 		}
-		return analyzerClone;
+		return copyBuilder.build();
 	}
 
 }
