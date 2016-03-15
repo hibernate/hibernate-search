@@ -68,6 +68,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
+	private static final String ANALYZED = "analyzed";
+
 	private String indexName;
 	private String actualIndexName;
 	private IndexManagementStrategy indexManagementStrategy;
@@ -291,9 +293,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 		field.addProperty( "type", fieldType );
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
-		field.addProperty( "index", getIndex( descriptor, fieldMetadata ) );
 
-		if ( fieldMetadata.getAnalyzer() != null ) {
+		String index = getIndex( descriptor, fieldMetadata );
+		field.addProperty( "index", index );
+
+		if ( isAnalyzed( index ) && fieldMetadata.getAnalyzer() != null ) {
 			String analyzerName = analyzerName( fieldMetadata );
 			if ( analyzerName != null ) {
 				field.addProperty( "analyzer", analyzerName );
@@ -320,6 +324,10 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
+	private boolean isAnalyzed(String index) {
+		return ANALYZED.equals( index );
+	}
+
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
@@ -330,7 +338,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			JsonObject field = new JsonObject();
 
 			field.addProperty( "type", getFieldType( bridgeDefinedField ) );
-			field.addProperty( "index", "analyzed" );
+			field.addProperty( "index", ANALYZED );
 
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
@@ -387,7 +395,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		switch ( fieldMetadata.getIndex() ) {
 			case ANALYZED:
 			case ANALYZED_NO_NORMS:
-				return "analyzed";
+				return ANALYZED;
 			case NOT_ANALYZED:
 			case NOT_ANALYZED_NO_NORMS:
 				return "not_analyzed";
