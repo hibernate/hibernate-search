@@ -172,7 +172,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void closeIndexWriter() {
+	public void flushAndReleaseResources() {
 		backend.closeIndexWriter();
 	}
 

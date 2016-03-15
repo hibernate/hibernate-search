@@ -126,8 +126,9 @@ public interface IndexManager {
 	LuceneWorkSerializer getSerializer();
 
 	/**
-	 * Close the underlying index writer, releasing the index lock.
+	 * Flushes any pending write operations and closes underlying resources, for example
+	 * release the index locks if this implementation uses a Lucene IndexWriter.
 	 */
-	void closeIndexWriter();
+	void flushAndReleaseResources();
 
 }

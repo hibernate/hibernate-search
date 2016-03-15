@@ -579,7 +579,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	@Override
-	public void closeIndexWriter() {
+	public void flushAndReleaseResources() {
 		// no-op
 	}
 

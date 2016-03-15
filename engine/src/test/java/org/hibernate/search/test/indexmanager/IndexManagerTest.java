@@ -44,7 +44,7 @@ public class IndexManagerTest {
 		addEntity( searchIntegrator, 1 );
 		assertTrue( isIndexWriterLocked( indexManager ) );
 
-		indexManager.closeIndexWriter();
+		indexManager.flushAndReleaseResources();
 		assertFalse( isIndexWriterLocked( indexManager ) );
 
 		addEntity( searchIntegrator, 2 );

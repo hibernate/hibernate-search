@@ -97,7 +97,7 @@ class DummyIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void closeIndexWriter() {
+	public void flushAndReleaseResources() {
 		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
 	}
 }
