@@ -1,6 +1,58 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.6.0.Alpha3 (16-3-2016)
+------------------------
+
+** Bug
+    * [HSEARCH-2126] - Checkstyle fails when explicitly called via goal checkstyle:check
+    * [HSEARCH-2127] - SpatialFieldBridges implement MetadataProvidingFieldBridge but does not provide useful information about the added fields
+    * [HSEARCH-2129] - Spatial FieldBrige defined fields are not contributed correctly in the DocumentBuilderIndexedEntity
+    * [HSEARCH-2160] - JGroups Backend SyncJGroupsBackendTest doesn't work after 2150 on anymore.
+    * [HSEARCH-2163] - ElasticsearchIndexManager should close the underlying BackendQueueProcessor
+    * [HSEARCH-2169] - TermQuery should be translated to term query not match query
+    * [HSEARCH-2179] - Hanging during shutdown of SyncWorkProcessor
+
+** New Feature
+    * [HSEARCH-2108] - Allow to configure custom analyzers with ES backend
+
+** Task
+    * [HSEARCH-2132] - Upgrade Elasticsearch used for testing to 2.2.0
+    * [HSEARCH-2134] - Include Elasticsearch modules and dependencies in the release distribution
+    * [HSEARCH-2136] - Enable scripting support for Elasticsearch
+    * [HSEARCH-2140] - Checkstyle upgrade broke testing on JDK9
+    * [HSEARCH-2143] - On SearchException in JestClient we should describe which operation was attempted
+    * [HSEARCH-2144] - Explicitly define the Elasticsearch version and configuration file used for integration testing
+    * [HSEARCH-2145] - Make our IllegalImport checkstyle check consistent with the official ones
+    * [HSEARCH-2146] - Wait for index status green after index creation on Elasticsearch
+    * [HSEARCH-2147] - Elasticsearch - spatial: implement the HASH strategy
+    * [HSEARCH-2148] - Add Travis support
+    * [HSEARCH-2149] - Fix the HikariCP configuration of TestRunnerStandalone
+    * [HSEARCH-2150] - The JGroups messages timeout in SyncJGroupsBackendTest is too low
+    * [HSEARCH-2151] - Make sure failures in the Elasticsearch backend are handled by the Errorhandler
+    * [HSEARCH-2155] - Make sure Elasticsearch exceptions are logged in the build output
+    * [HSEARCH-2161] - Missing @SortableField in performance tests
+    * [HSEARCH-2162] - Make TestRunnerStandalone work in Maven *and* Eclipse with and without a database profile
+
+** Improvement
+    * [HSEARCH-2091] - ElasticSearchIndexWorkVisitor should not be allocated for each operation
+    * [HSEARCH-2130] - Elasticsearch - add spatial support
+    * [HSEARCH-2133] - Add various accessors and utilities to be able to exploit the spatial structures
+    * [HSEARCH-2139] - SpatialFieldBridge implementations should reuse target field name
+    * [HSEARCH-2142] - Upgrade JGroups to version 3.6.8.Final
+    * [HSEARCH-2152] - Create bulk request for one List<LuceneWork> where possible
+    * [HSEARCH-2154] - Enable some more tests around embeddables
+    * [HSEARCH-2173] - Support delete-by-query with ES backend
+    * [HSEARCH-2174] - Tenant id should not be analyzed
+    * [HSEARCH-2175] - Enable some more tests
+    * [HSEARCH-2176] - Avoid repeated service look-ups in ElasticsearchBackendQueueProcessor
+    * [HSEARCH-2180] - Rename IndexManager#closeIndexWriter() into flushAndReleaseResources()
+    * [HSEARCH-2182] - Configure plug-in for creating API/SPI change report
+
+** Patch
+    * [HSEARCH-2166] - Runtime exceptions during the performance tests should fail the benchmark
+
+
 Version 5.6.0.Alpha2 (29-2-2016)
 ------------------------
 
