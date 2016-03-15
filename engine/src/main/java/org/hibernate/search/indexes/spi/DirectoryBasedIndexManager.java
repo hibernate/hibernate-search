@@ -173,7 +173,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void flushAndReleaseResources() {
-		backend.closeIndexWriter();
+		backend.flushAndReleaseResources();
 	}
 
 	private SerializationProvider requestSerializationProvider() {

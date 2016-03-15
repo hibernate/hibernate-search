@@ -171,7 +171,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	}
 
 	@Override
-	public void closeIndexWriter() {
+	public void flushAndReleaseResources() {
 		// no-op
 	}
 

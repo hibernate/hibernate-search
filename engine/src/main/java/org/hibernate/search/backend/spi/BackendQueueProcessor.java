@@ -78,8 +78,9 @@ public interface BackendQueueProcessor {
 	}
 
 	/**
-	 * Releases any write lock over the index
+	 * Flushes any pending write operations and closes underlying resources, for example
+	 * release the index locks if this implementation uses a Lucene IndexWriter.
 	 */
-	void closeIndexWriter();
+	void flushAndReleaseResources();
 
 }

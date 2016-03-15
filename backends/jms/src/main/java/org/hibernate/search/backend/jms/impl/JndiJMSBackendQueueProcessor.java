@@ -78,7 +78,7 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 	}
 
 	@Override
-	public void closeIndexWriter() {
+	public void flushAndReleaseResources() {
 		// no-op
 	}
 }

@@ -70,7 +70,7 @@ public class BlackHoleBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
-	public void closeIndexWriter() {
+	public void flushAndReleaseResources() {
 		log.debug( "BlackHoleBackend requested to close the IndexWriter (no-op)" );
 	}
 

@@ -91,7 +91,7 @@ public class LeakingBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
-	public void closeIndexWriter() {
-		delegate.closeIndexWriter();
+	public void flushAndReleaseResources() {
+		delegate.flushAndReleaseResources();
 	}
 }
