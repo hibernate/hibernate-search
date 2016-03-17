@@ -14,6 +14,8 @@ import org.hibernate.search.db.EventType;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**
+ * Implementation of a {@link TriggerSQLStringSource} that can be used with PostgreSQL (or compatible) Databases.
+ *
  * @author Martin Braun
  */
 public class PostgreSQLTriggerSQLStringSource implements TriggerSQLStringSource {

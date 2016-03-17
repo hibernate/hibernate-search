@@ -14,10 +14,12 @@ import org.hibernate.search.db.EventType;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**
+ * Implementation of a {@link TriggerSQLStringSource} that can be used with HSQLDB (or compatible) Databases. <br>
+ *
  * We don't escape the column names that come from the EventModelInfos
  * as we don't have any control over how these are defined
  *
- * @author Martin
+ * @author Martin Braun
  */
 public class HSQLDBTriggerSQLStringSource implements TriggerSQLStringSource {
 

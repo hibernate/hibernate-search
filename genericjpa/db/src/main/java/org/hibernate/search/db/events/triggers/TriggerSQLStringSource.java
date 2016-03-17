@@ -13,14 +13,33 @@ import org.hibernate.search.db.EventType;
  * Classes that implement this interface provide means to create the Triggers needed on the database to write C_UD
  * information about entities in the index into the specific Updates-Table.
  *
+ * The order of execution during creation is:
+ * <ol>
+ *     <li>{@link #getSetupCode()}</li>
+ *     <li>{@link #getUpdateTableCreationCode(EventModelInfo)}</li>
+ *     <li>{@link #getSpecificSetupCode(EventModelInfo)}</li>
+ *     <li>{@link #getTriggerCreationCode(EventModelInfo, int)}</li>
+ * </ol>
+ *
+ * The order during deletion is:
+ * <ol>
+ *     <li>{@link #getTriggerDropCode(EventModelInfo, int)}</li>
+ *     <li>{@link #getSpecificUnSetupCode(EventModelInfo)}</li>
+ *     <li>{@link #getUpdateTableDropCode(EventModelInfo)}</li>
+ *     <li>{@link #getUnSetupCode()}</li>
+ * </ol>
+ *
  * @author Martin Braun
  */
 public interface TriggerSQLStringSource {
 
+	/**
+	 * this undoes the changes from {@link #getSetupCode()}
+	 */
 	String[] getUnSetupCode();
 
 	/**
-	 * this is executed first, this can not be undone
+	 * this is executed first
 	 */
 	String[] getSetupCode();
 
@@ -54,10 +73,23 @@ public interface TriggerSQLStringSource {
 	 */
 	String[] getTriggerDropCode(EventModelInfo eventModelInfo, int eventType);
 
-	String[] getUpdateTableCreationCode(EventModelInfo info);
+	/**
+	 * the code to create the Update tables with
+	 *
+	 * @param eventModelInfo the EventModelInfo/columnTypes this corresponds to
+	 */
+	String[] getUpdateTableCreationCode(EventModelInfo eventModelInfo);
 
-	String[] getUpdateTableDropCode(EventModelInfo info);
+	/**
+	 * the code to drop the Update tables with
+	 *
+	 * @param eventModelInfo the EventModelInfo/columnTypes this corresponds to
+	 */
+	String[] getUpdateTableDropCode(EventModelInfo eventModelInfo);
 
+	/**
+	 * @return the token to delimit identifiers with in this database
+	 */
 	String getDelimitedIdentifierToken();
 
 }
