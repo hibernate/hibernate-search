@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Martin Braun
@@ -20,7 +21,7 @@ import org.hibernate.search.annotations.Indexed;
 @Table(name = "TablePerClassTwo")
 public class TablePerClassTwo extends TablePerClass {
 
-	@Field
+	@Field(store = Store.YES)
 	private String two;
 
 	public String getTwo() {

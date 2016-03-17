@@ -244,6 +244,38 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 			this.assertCount( TablePerClassOne.class, 1, new MatchAllDocsQuery() );
 			this.assertCount( TablePerClassTwo.class, 1, new MatchAllDocsQuery() );
 		}
+
+		//test whether updates work accross indexes
+		{
+			this.session.getTransaction().begin();
+
+			TablePerClassOne obj = this.session.get( TablePerClassOne.class, 1 );
+			obj.setOne( "toast" );
+			this.session.merge( obj );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( TablePerClass.class, 1, new TermQuery( new Term( "one", "toast" ) ) );
+			this.assertCount( TablePerClassOne.class, 1, new TermQuery( new Term( "one", "toast" ) ) );
+			this.assertCount( TablePerClassTwo.class, 0, new TermQuery( new Term( "one", "toast" ) ) );
+		}
+
+		//test whether deletes work accross indexes
+		{
+			this.session.getTransaction().begin();
+
+			TablePerClassOne obj = this.session.get( TablePerClassOne.class, 1 );
+			this.session.delete( obj );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( TablePerClass.class, 0, new TermQuery( new Term( "one", "toast" ) ) );
+			this.assertCount( TablePerClassOne.class, 0, new TermQuery( new Term( "one", "toast" ) ) );
+
+			this.assertCount( TablePerClass.class, 2, new MatchAllDocsQuery() );
+			this.assertCount( TablePerClassOne.class, 0, new MatchAllDocsQuery() );
+			this.assertCount( TablePerClassTwo.class, 1, new MatchAllDocsQuery() );
+		}
 	}
 
 	private void assertCount(Class<?> entityClass, int count, Query query) throws InterruptedException {
@@ -285,9 +317,6 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 		// for this test we explicitly set the auto commit mode since we are not explicitly starting a transaction
 		// which could be a problem in some databases.
 		cfg.put( "hibernate.connection.autocommit", "true" );
-
-		//cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
-		//cfg.put( "hibernate.search.default.indexBase", "indexes" );
 
 		cfg.put( "hibernate.search.indexing_strategy", "manual" );
 

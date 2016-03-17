@@ -7,7 +7,10 @@
 package org.hibernate.search.genericjpa.metadata.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery.Type;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -26,19 +29,19 @@ import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncod
  */
 public final class MetadataRehasher {
 
-	public List<RehashedTypeMetadata> rehash(List<TypeMetadata> originals) {
+	public List<RehashedTypeMetadata> rehash(List<TypeMetadata> originals, Collection<Class<?>> checkHierarchyFor) {
 		List<RehashedTypeMetadata> ret = new ArrayList<>();
 		for ( TypeMetadata orig : originals ) {
-			ret.add( this.rehash( orig ) );
+			ret.add( this.rehash( orig, checkHierarchyFor ) );
 		}
 		return ret;
 	}
 
-	public RehashedTypeMetadata rehash(TypeMetadata original) {
+	public RehashedTypeMetadata rehash(TypeMetadata original, Collection<Class<?>> checkHierarchyFor) {
 		RehashedTypeMetadata rehashed = new RehashedTypeMetadata();
 		rehashed.originalTypeMetadata = original;
 
-		if ( !this.handlePropertyMetadata( original, rehashed, original.getIdPropertyMetadata() ) ) {
+		if ( !this.handlePropertyMetadata( original, rehashed, original.getIdPropertyMetadata(), checkHierarchyFor ) ) {
 			throw new IllegalArgumentException(
 					"couldn't find any id field for: " + original.getType()
 							+ "! This is required in order to use Hibernate Search with JPA!"
@@ -46,23 +49,29 @@ public final class MetadataRehasher {
 		}
 
 		for ( EmbeddedTypeMetadata embedded : original.getEmbeddedTypeMetadata() ) {
-			this.rehashRec( embedded, rehashed );
+			this.rehashRec( embedded, rehashed, checkHierarchyFor );
 		}
 		return rehashed;
 	}
 
-	private void rehashRec(EmbeddedTypeMetadata original, RehashedTypeMetadata rehashed) {
+	private void rehashRec(
+			EmbeddedTypeMetadata original,
+			RehashedTypeMetadata rehashed,
+			Collection<Class<?>> checkHierarchyFor) {
 		// handle the current TypeMetadata
-		this.handleTypeMetadata( original, rehashed );
+		this.handleTypeMetadata( original, rehashed, checkHierarchyFor );
 		// recursion
 		for ( EmbeddedTypeMetadata embedded : original.getEmbeddedTypeMetadata() ) {
-			this.rehashRec( embedded, rehashed );
+			this.rehashRec( embedded, rehashed, checkHierarchyFor );
 		}
 	}
 
-	private void handleTypeMetadata(EmbeddedTypeMetadata original, RehashedTypeMetadata rehashed) {
+	private void handleTypeMetadata(
+			EmbeddedTypeMetadata original,
+			RehashedTypeMetadata rehashed,
+			Collection<Class<?>> checkHierarchyFor) {
 		for ( PropertyMetadata propertyMetadata : original.getAllPropertyMetadata() ) {
-			if ( this.handlePropertyMetadata( original, rehashed, propertyMetadata ) ) {
+			if ( this.handlePropertyMetadata( original, rehashed, propertyMetadata, checkHierarchyFor ) ) {
 				return;
 			}
 		}
@@ -72,19 +81,29 @@ public final class MetadataRehasher {
 	private boolean handlePropertyMetadata(
 			TypeMetadata original,
 			RehashedTypeMetadata rehashed,
-			PropertyMetadata propertyMetadata) {
+			PropertyMetadata propertyMetadata,
+			Collection<Class<?>> checkHierarchyFor) {
 		for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 			// this must either be id or id of an embedded object
 			if ( documentFieldMetadata.isIdInEmbedded() || documentFieldMetadata.isId() ) {
-				Class<?> type = original.getType();
-				rehashed.idFieldNamesForType.computeIfAbsent( type, (key) -> new ArrayList<>() ).add(
-						documentFieldMetadata.getName()
-				);
-				rehashed.idPropertyNameForType.put( type, propertyMetadata.getPropertyAccessorName() );
-				if ( rehashed.documentFieldMetadataForIdFieldName.containsKey( documentFieldMetadata.getName() ) ) {
-					throw new AssertionFailure( "field handled twice!" );
+				Set<Class<?>> types = new HashSet<>();
+				types.add( original.getType() );
+				for ( Class<?> check : checkHierarchyFor ) {
+					if ( original.getType().isAssignableFrom( check ) ) {
+						types.add( check );
+					}
 				}
-				rehashed.idPropertyAccessorForType.put( type, propertyMetadata.getPropertyAccessor() );
+				for ( Class<?> type : types ) {
+					rehashed.idFieldNamesForType.computeIfAbsent( type, (key) -> new ArrayList<>() ).add(
+							documentFieldMetadata.getName()
+					);
+					rehashed.idPropertyNameForType.put( type, propertyMetadata.getPropertyAccessorName() );
+					rehashed.idPropertyAccessorForType.put( type, propertyMetadata.getPropertyAccessor() );
+				}
+
+				if ( rehashed.documentFieldMetadataForIdFieldName.containsKey( documentFieldMetadata.getName() ) ) {
+					throw new AssertionFailure( "field handled twice" + documentFieldMetadata.getName() );
+				}
 				rehashed.documentFieldMetadataForIdFieldName.put(
 						documentFieldMetadata.getName(),
 						documentFieldMetadata
@@ -123,6 +142,7 @@ public final class MetadataRehasher {
 				return true;
 			}
 		}
+
 		return false;
 	}
 }

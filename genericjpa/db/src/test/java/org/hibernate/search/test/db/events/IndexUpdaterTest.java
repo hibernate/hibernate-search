@@ -9,6 +9,7 @@ package org.hibernate.search.test.db.events;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +65,10 @@ public class IndexUpdaterTest {
 		List<RehashedTypeMetadata> rehashedTypeMetadatas = new ArrayList<>();
 		rehashedTypeMetadataPerIndexRoot = new HashMap<>();
 		for ( Class<?> indexRootType : Arrays.asList( Place.class ) ) {
-			RehashedTypeMetadata rehashed = rehasher.rehash( metadataProvider.getTypeMetadataFor( indexRootType ) );
+			RehashedTypeMetadata rehashed = rehasher.rehash(
+					metadataProvider.getTypeMetadataFor( indexRootType ), Collections
+							.emptySet()
+			);
 			rehashedTypeMetadatas.add( rehashed );
 			rehashedTypeMetadataPerIndexRoot.put( indexRootType, rehashed );
 		}

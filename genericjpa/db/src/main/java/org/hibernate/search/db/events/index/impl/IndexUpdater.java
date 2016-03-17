@@ -25,6 +25,7 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.db.EventType;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.entity.EntityProvider;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
 import org.hibernate.search.exception.SearchException;
@@ -243,8 +244,11 @@ public final class IndexUpdater {
 							field
 					);
 					SingularTermDeletionQuery.Type idType = metadata.getSingularTermDeletionQueryTypeForIdFieldName()
-							.get( entityClass );
+							.get( field );
 					Object idValueForDeletion;
+					if ( idType == null ) {
+						throw new AssertionFailure( "idType was null for field " + field + " and class " + entityClass );
+					}
 					if ( idType == SingularTermDeletionQuery.Type.STRING ) {
 						FieldBridge fb = metaDataForIdField.getFieldBridge();
 						if ( !(fb instanceof StringBridge) ) {

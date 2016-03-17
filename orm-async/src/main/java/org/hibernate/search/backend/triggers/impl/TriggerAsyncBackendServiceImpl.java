@@ -86,7 +86,10 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 
 		rehashedTypeMetadataPerIndexRoot = new HashMap<>();
 		for ( Class<?> indexRootType : indexRootTypes ) {
-			RehashedTypeMetadata rehashed = rehasher.rehash( metadataProvider.getTypeMetadataFor( indexRootType ) );
+			RehashedTypeMetadata rehashed = rehasher.rehash(
+					metadataProvider.getTypeMetadataFor( indexRootType ),
+					entities
+			);
 			rehashedTypeMetadatas.add( rehashed );
 			rehashedTypeMetadataPerIndexRoot.put( indexRootType, rehashed );
 		}

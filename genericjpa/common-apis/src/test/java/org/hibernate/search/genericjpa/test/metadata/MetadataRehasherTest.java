@@ -49,7 +49,7 @@ public class MetadataRehasherTest {
 	@Test
 	public void testBasic() {
 		TypeMetadata fromRoot = this.metadataProvider.getTypeMetadataFor( RootEntity.class );
-		RehashedTypeMetadata fromRootRehashed = this.metadataRehasher.rehash( fromRoot );
+		RehashedTypeMetadata fromRootRehashed = this.metadataRehasher.rehash( fromRoot, new HashSet<>() );
 		{
 
 			assertEquals( fromRoot, fromRootRehashed.getOriginalTypeMetadata() );
@@ -100,7 +100,7 @@ public class MetadataRehasherTest {
 		}
 
 		TypeMetadata fromAnotherRoot = this.metadataProvider.getTypeMetadataFor( AnotherRootEntity.class );
-		RehashedTypeMetadata fromAnotherRootRehashed = this.metadataRehasher.rehash( fromAnotherRoot );
+		RehashedTypeMetadata fromAnotherRootRehashed = this.metadataRehasher.rehash( fromAnotherRoot, Collections.emptySet() );
 
 		Set<Class<?>> indexRelevantEntities = MetadataUtil.calculateIndexRelevantEntities(
 				Arrays.asList(
@@ -146,7 +146,7 @@ public class MetadataRehasherTest {
 	@Test
 	public void testInheritanceIndexRelevancy() {
 		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
-		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash( typeMetadata );
+		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash( typeMetadata, Collections.emptySet() );
 
 		Set<Class<?>> indexRelevantEntities = MetadataUtil.calculateIndexRelevantEntities(
 				Collections.singletonList(
@@ -159,7 +159,7 @@ public class MetadataRehasherTest {
 	@Test
 	public void testInheritanceInIndex() {
 		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
-		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash( typeMetadata );
+		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash( typeMetadata, Collections.emptySet() );
 
 		Map<Class<?>, Set<Class<?>>> inIndexOf = MetadataUtil.calculateInIndexOf(
 				Collections.singletonList( rehashed ),
