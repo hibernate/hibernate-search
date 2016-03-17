@@ -19,7 +19,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
 
 /**
- * Created by Martin on 14.11.2015.
+ * @author Martin Braun
  */
 public class ORMReusableEntityProvider implements ReusableEntityProvider {
 

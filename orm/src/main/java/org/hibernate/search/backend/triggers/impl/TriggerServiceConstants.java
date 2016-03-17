@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.triggers.impl;
 
 /**
- * Created by Martin on 14.11.2015.
+ * @author Martin Braun
  */
 public class TriggerServiceConstants {
 

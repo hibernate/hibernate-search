@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by Martin on 20.07.2015.
+ * @author Martin Braun
  */
 public class AnnotationEventModelParserTest {
 

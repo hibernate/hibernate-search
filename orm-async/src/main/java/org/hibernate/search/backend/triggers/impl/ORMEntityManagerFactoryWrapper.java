@@ -11,7 +11,7 @@ import org.hibernate.search.db.util.impl.EntityManagerFactoryWrapper;
 import org.hibernate.search.db.util.impl.EntityManagerWrapper;
 
 /**
- * Created by Martin on 12.11.2015.
+ * @author Martin Braun
  */
 public final class ORMEntityManagerFactoryWrapper implements EntityManagerFactoryWrapper {
 

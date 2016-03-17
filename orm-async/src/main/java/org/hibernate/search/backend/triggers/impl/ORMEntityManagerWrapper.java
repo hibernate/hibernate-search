@@ -12,7 +12,7 @@ import org.hibernate.search.db.util.impl.QueryWrapper;
 import org.hibernate.search.db.util.impl.TransactionWrapper;
 
 /**
- * Created by Martin on 12.11.2015.
+ * @author Martin Braun
  */
 public final class ORMEntityManagerWrapper implements EntityManagerWrapper {
 

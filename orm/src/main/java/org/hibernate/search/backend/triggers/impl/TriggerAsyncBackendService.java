@@ -14,7 +14,7 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 
 /**
- * Created by Martin on 14.11.2015.
+ * @author Martin Braun
  * <p>
  * Service that controls the trigger based asynchronous index updating mechanism
  * <p>

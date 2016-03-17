@@ -39,7 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by Martin on 12.11.2015.
+ * @author Martin Braun
  */
 public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 

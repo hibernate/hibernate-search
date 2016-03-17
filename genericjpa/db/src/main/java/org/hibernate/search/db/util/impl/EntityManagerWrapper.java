@@ -7,7 +7,7 @@
 package org.hibernate.search.db.util.impl;
 
 /**
- * Created by Martin on 11.11.2015.
+ * @author Martin Braun
  */
 public interface EntityManagerWrapper {
 

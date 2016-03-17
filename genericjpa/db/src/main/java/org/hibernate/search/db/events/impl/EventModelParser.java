@@ -9,7 +9,7 @@ package org.hibernate.search.db.events.impl;
 import java.util.List;
 
 /**
- * Created by Martin on 16.07.2015.
+ * @author Martin Braun
  */
 public interface EventModelParser {
 

@@ -7,7 +7,7 @@
 package org.hibernate.search.db.events.jpa.impl;
 
 /**
- * Created by Martin on 10.11.2015.
+ * @author Martin Braun
  */
 public final class AsyncUpdateConstants {
 

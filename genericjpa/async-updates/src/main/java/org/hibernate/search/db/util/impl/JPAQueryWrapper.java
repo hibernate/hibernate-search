@@ -10,7 +10,7 @@ import javax.persistence.Query;
 import java.util.List;
 
 /**
- * Created by Martin on 11.11.2015.
+ * @author Martin Braun
  */
 public final class JPAQueryWrapper implements QueryWrapper {
 

@@ -13,7 +13,7 @@ import org.hibernate.search.backend.triggers.impl.TriggerAsyncBackendServiceImpl
 import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
 
 /**
- * Created by Martin on 09.03.2016.
+ * @author Martin Braun
  *
  * this starts the service by hand
  */

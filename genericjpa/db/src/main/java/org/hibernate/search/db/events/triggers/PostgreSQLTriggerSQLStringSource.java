@@ -14,7 +14,7 @@ import org.hibernate.search.db.EventType;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**
- * Created by Martin on 30.06.2015.
+ * @author Martin Braun
  */
 public class PostgreSQLTriggerSQLStringSource implements TriggerSQLStringSource {
 

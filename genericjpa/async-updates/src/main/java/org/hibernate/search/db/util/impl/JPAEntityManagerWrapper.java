@@ -10,7 +10,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.TransactionManager;
 
 /**
- * Created by Martin on 11.11.2015.
+ * @author Martin Braun
  */
 public final class JPAEntityManagerWrapper implements EntityManagerWrapper {
 

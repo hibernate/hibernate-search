@@ -29,7 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Manually defines the configuration. Classes and properties are the only implemented options at the moment
  *
- * @author Martin Braun (adaption), Emmanuel Bernard
+ * @author Martin Braun
  */
 public class StandaloneSearchConfiguration extends SearchConfigurationBase implements SearchConfiguration {
 

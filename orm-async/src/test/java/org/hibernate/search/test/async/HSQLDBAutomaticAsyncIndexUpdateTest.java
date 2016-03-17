@@ -12,7 +12,7 @@ import org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants;
 import org.hibernate.search.db.events.triggers.HSQLDBTriggerSQLStringSource;
 
 /**
- * Created by Martin on 14.11.2015.
+ * @author Martin Braun
  */
 public class HSQLDBAutomaticAsyncIndexUpdateTest extends AutomaticAsyncIndexUpdateTest {
 

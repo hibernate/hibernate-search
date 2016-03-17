@@ -14,7 +14,7 @@ import org.hibernate.search.db.util.impl.QueryWrapper;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**
- * Created by Martin on 12.11.2015.
+ * @author Martin Braun
  */
 public final class ORMQueryWrapper implements QueryWrapper {
 

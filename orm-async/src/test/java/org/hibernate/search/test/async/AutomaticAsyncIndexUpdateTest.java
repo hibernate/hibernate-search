@@ -9,7 +9,7 @@ package org.hibernate.search.test.async;
 import java.util.Map;
 
 /**
- * Created by Martin on 09.03.2016.
+ * @author Martin Braun
  */
 public class AutomaticAsyncIndexUpdateTest extends BaseAsyncIndexUpdateTest {
 

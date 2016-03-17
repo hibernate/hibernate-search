@@ -13,7 +13,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Created by Martin on 12.11.2015.
+ * @author Martin Braun
  */
 public final class ORMTransactionWrapper implements TransactionWrapper {
 
