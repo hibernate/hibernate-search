@@ -142,14 +142,7 @@ public final class IndexUpdater {
 							}
 							catch (Exception e) {
 								tx.rollback();
-								log.exceptionOccurred(
-										"Error while updating the index! Your index might be corrupt!",
-										e
-								);
-								exception[0] = new SearchException(
-										"Error while updating the index! Your index might be corrupt!",
-										e
-								);
+								throw e;
 							}
 						}
 						finally {
@@ -157,6 +150,16 @@ public final class IndexUpdater {
 								((ReusableEntityProvider) provider).close();
 							}
 						}
+					}
+					catch (Exception e) {
+						log.exceptionOccurred(
+								"Error while updating the index! Your index might be corrupt!",
+								e
+						);
+						exception[0] = new SearchException(
+								"Error while updating the index! Your index might be corrupt!",
+								e
+						);
 					}
 					finally {
 						latch.countDown();

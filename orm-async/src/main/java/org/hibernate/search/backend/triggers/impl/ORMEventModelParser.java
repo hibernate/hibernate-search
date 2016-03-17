@@ -42,6 +42,9 @@ import org.hibernate.type.Type;
  */
 public class ORMEventModelParser implements EventModelParser {
 
+	//TODO: support for multivalued Ids, or do the support
+	//via the @UpdateInfo annotation?
+
 	public static final String HSEARCH_UPDATES_SUFFIX = "hsearchupdates";
 	public static final String EVENT_TYPE_COLUMN = HSEARCH_UPDATES_SUFFIX + "eventType" + HSEARCH_UPDATES_SUFFIX;
 	public static final String UPDATE_ID_COLUMN = "hs" + "updateId" + HSEARCH_UPDATES_SUFFIX;

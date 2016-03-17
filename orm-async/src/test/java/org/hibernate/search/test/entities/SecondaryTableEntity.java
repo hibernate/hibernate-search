@@ -14,14 +14,18 @@ import javax.persistence.SecondaryTables;
 import javax.persistence.Table;
 import javax.persistence.SecondaryTable;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 /**
  * @author Martin Braun
  */
 @Entity
-@Table(name = "PRIMARY")
+@Table(name = "PRIME")
 @SecondaryTables(@SecondaryTable(name = "SECONDARY",
 		pkJoinColumns = @PrimaryKeyJoinColumn(name = "SEC_ID", referencedColumnName = "ID")
 ))
+@Indexed
 public class SecondaryTableEntity {
 
 	@Id
@@ -29,6 +33,7 @@ public class SecondaryTableEntity {
 	public Long id;
 
 	@Column(name = "SEC_STRING", table = "SECONDARY")
+	@Field
 	public String secondary;
 
 	public Long getId() {

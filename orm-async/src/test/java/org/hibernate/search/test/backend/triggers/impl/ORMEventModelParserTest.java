@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.triggers.impl.ORMEventModelParser;
 import org.hibernate.search.db.ColumnType;
+import org.hibernate.search.db.events.impl.AnnotationEventModelParser;
 import org.hibernate.search.db.events.impl.EventModelInfo;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.entities.Domain;
@@ -95,7 +96,7 @@ public class ORMEventModelParserTest extends SearchTestBase {
 		List<EventModelInfo> eventModelInfos = parser.parse( Collections.singletonList( SecondaryTableEntity.class ) );
 		Map<String, EventModelInfo> map = toMap( eventModelInfos );
 
-		this.assertInfos( map, SecondaryTableEntity.class, ColumnType.LONG, "PRIMARY", "ID" );
+		this.assertInfos( map, SecondaryTableEntity.class, ColumnType.LONG, "PRIME", "ID" );
 		this.assertInfos( map, SecondaryTableEntity.class, ColumnType.LONG, "SECONDARY", "SEC_ID" );
 
 		assertEquals( 2, eventModelInfos.size() );
@@ -103,7 +104,11 @@ public class ORMEventModelParserTest extends SearchTestBase {
 
 	@Test
 	public void testOverrideMapping() {
-		ORMEventModelParser parser = new ORMEventModelParser( this.getSessionFactory(), set( OverrideEntity.class ) );
+		ORMEventModelParser parser = new ORMEventModelParser(
+				this.getSessionFactory(),
+				set( OverrideEntity.class ),
+				new AnnotationEventModelParser()
+		);
 
 		List<EventModelInfo> eventModelInfos = parser.parse( Collections.singletonList( OverrideEntity.class ) );
 		Map<String, EventModelInfo> map = toMap( eventModelInfos );

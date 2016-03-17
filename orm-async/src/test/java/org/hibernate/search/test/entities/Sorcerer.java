@@ -39,6 +39,7 @@ public class Sorcerer {
 	@JoinTable(name = "Sorcerer_Place",
 			joinColumns = {@JoinColumn(name = "place_id")},
 			inverseJoinColumns = {@JoinColumn(name = "sorcerer_id")})
+	@ContainedIn
 	private Place place;
 
 	/**

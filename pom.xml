@@ -217,6 +217,7 @@
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
         <puppycrawl.checkstyle.version>6.16</puppycrawl.checkstyle.version>
+
         <hibernate.search.genericjpa.integrationtest.skip>true</hibernate.search.genericjpa.integrationtest.skip>
 
         <!-- Version to be used as baseline for API/SPI change reports -->

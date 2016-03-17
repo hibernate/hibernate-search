@@ -37,15 +37,16 @@ public class ORMReusableEntityProvider implements ReusableEntityProvider {
 	@Override
 	public void close() {
 		if ( this.session == null ) {
-			throw new AssertionFailure( "ORMReusableEntityProvider was not open!" );
+			throw new AssertionFailure( "ORMReusableEntityProvider is not open!" );
 		}
 		this.session.close();
+		this.session = null;
 	}
 
 	@Override
 	public void open() {
 		if ( this.session != null ) {
-			throw new AssertionFailure( "ORMReusableEntityProvider was already open!" );
+			throw new AssertionFailure( "ORMReusableEntityProvider is already open!" );
 		}
 		this.session = this.sessionFactory.openSession();
 	}

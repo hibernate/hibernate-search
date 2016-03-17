@@ -8,13 +8,12 @@ package org.hibernate.search.test.entities;
 
 import javax.persistence.Embeddable;
 
-import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
 
 @Embeddable
 public class Embedded {
 
-	//we need Ids
-	@DocumentId
+	@Field
 	private String someValue;
 
 	public String getSomeValue() {
