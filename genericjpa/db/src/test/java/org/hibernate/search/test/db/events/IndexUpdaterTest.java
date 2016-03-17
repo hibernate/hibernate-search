@@ -48,7 +48,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class IndexUpdaterTest {
 
-	Map<Class<?>, List<Class<?>>> containedInIndexOf;
+	Map<Class<?>, Set<Class<?>>> containedInIndexOf;
 	Map<Class<?>, RehashedTypeMetadata> rehashedTypeMetadataPerIndexRoot;
 	ReusableEntityProvider entityProvider;
 	List<UpdateEventInfo> updateInfos;
@@ -68,7 +68,7 @@ public class IndexUpdaterTest {
 			rehashedTypeMetadatas.add( rehashed );
 			rehashedTypeMetadataPerIndexRoot.put( indexRootType, rehashed );
 		}
-		this.containedInIndexOf = MetadataUtil.calculateInIndexOf( rehashedTypeMetadatas );
+		this.containedInIndexOf = MetadataUtil.calculateInIndexOf( rehashedTypeMetadatas, new HashSet<>() );
 		this.entityProvider = new ReusableEntityProvider() {
 
 			@SuppressWarnings("rawtypes")
@@ -105,7 +105,7 @@ public class IndexUpdaterTest {
 			@Override
 			public void delete(
 					Class<?> entityClass,
-					List<Class<?>> inIndexOf,
+					Set<Class<?>> inIndexOf,
 					Object id,
 					EntityProvider entityProvider,
 					Transaction tx) {

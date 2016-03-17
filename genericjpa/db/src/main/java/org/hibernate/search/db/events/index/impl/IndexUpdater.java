@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,13 +55,13 @@ public final class IndexUpdater {
 	private static final int HSQUERY_BATCH = 50;
 
 	private final Map<Class<?>, RehashedTypeMetadata> metadataForIndexRoot;
-	private final Map<Class<?>, List<Class<?>>> containedInIndexOf;
+	private final Map<Class<?>, Set<Class<?>>> containedInIndexOf;
 	private final ReusableEntityProvider entityProvider;
 	private final ExecutorService exec;
 	private IndexWrapper indexWrapper;
 
 	public IndexUpdater(
-			Map<Class<?>, RehashedTypeMetadata> metadataForIndexRoot, Map<Class<?>, List<Class<?>>> containedInIndexOf,
+			Map<Class<?>, RehashedTypeMetadata> metadataForIndexRoot, Map<Class<?>, Set<Class<?>>> containedInIndexOf,
 			ReusableEntityProvider entityProvider, IndexWrapper indexWrapper) {
 		this.metadataForIndexRoot = metadataForIndexRoot;
 		this.containedInIndexOf = containedInIndexOf;
@@ -71,7 +72,7 @@ public final class IndexUpdater {
 
 	public IndexUpdater(
 			Map<Class<?>, RehashedTypeMetadata> metadataPerForIndexRoot,
-			Map<Class<?>, List<Class<?>>> containedInIndexOf,
+			Map<Class<?>, Set<Class<?>>> containedInIndexOf,
 			ReusableEntityProvider entityProvider,
 			ExtendedSearchIntegrator searchIntegrator) {
 		this( metadataPerForIndexRoot, containedInIndexOf, entityProvider, (IndexWrapper) null );
@@ -103,7 +104,7 @@ public final class IndexUpdater {
 								for ( UpdateConsumer.UpdateEventInfo updateInfo : updateInfos ) {
 									Class<?> entityClass = updateInfo.getEntityClass();
 									Map<String, Object> hints = Collections.unmodifiableMap( updateInfo.getHints() );
-									List<Class<?>> inIndexOf = IndexUpdater.this.containedInIndexOf.get( entityClass );
+									Set<Class<?>> inIndexOf = IndexUpdater.this.containedInIndexOf.get( entityClass );
 									if ( inIndexOf != null && inIndexOf.size() != 0 ) {
 										int eventType = updateInfo.getEventType();
 										Object id = updateInfo.getId();
@@ -185,7 +186,7 @@ public final class IndexUpdater {
 
 	public void delete(
 			Class<?> entityClass,
-			List<Class<?>> inIndexOf,
+			Set<Class<?>> inIndexOf,
 			Object id,
 			EntityProvider entityProvider,
 			Transaction tx) {
@@ -208,7 +209,7 @@ public final class IndexUpdater {
 
 		void delete(
 				Class<?> entityClass,
-				List<Class<?>> inIndexOf,
+				Set<Class<?>> inIndexOf,
 				Object id,
 				EntityProvider entityProvider,
 				Transaction tx);
@@ -230,7 +231,7 @@ public final class IndexUpdater {
 		@Override
 		public void delete(
 				Class<?> entityClass,
-				List<Class<?>> inIndexOf,
+				Set<Class<?>> inIndexOf,
 				Object id,
 				EntityProvider entityProvider,
 				Transaction tx) {

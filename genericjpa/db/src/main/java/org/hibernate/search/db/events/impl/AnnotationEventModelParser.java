@@ -34,11 +34,11 @@ import org.hibernate.search.exception.SearchException;
 public class AnnotationEventModelParser implements EventModelParser {
 
 	@Override
-	public List<EventModelInfo> parse(List<Class<?>> updateClasses) {
-		List<EventModelInfo> ret = new ArrayList<>( updateClasses.size() );
-		Set<String> handledOriginalTableNames = new HashSet<>( updateClasses.size() );
-		Set<String> updateTableNames = new HashSet<>( updateClasses.size() );
-		for ( Class<?> clazz : updateClasses ) {
+	public List<EventModelInfo> parse(List<Class<?>> entities) {
+		List<EventModelInfo> ret = new ArrayList<>( entities.size() );
+		Set<String> handledOriginalTableNames = new HashSet<>( entities.size() );
+		Set<String> updateTableNames = new HashSet<>( entities.size() );
+		for ( Class<?> clazz : entities ) {
 			{
 				UpdateInfo[] classUpdateInfos = clazz.getAnnotationsByType( UpdateInfo.class );
 				this.addUpdateInfosToList(

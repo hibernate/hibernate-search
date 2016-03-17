@@ -7,11 +7,15 @@
 package org.hibernate.search.genericjpa.test.metadata;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
@@ -43,7 +47,7 @@ public class MetadataRehasherTest {
 	}
 
 	@Test
-	public void test() {
+	public void testBasic() {
 		TypeMetadata fromRoot = this.metadataProvider.getTypeMetadataFor( RootEntity.class );
 		RehashedTypeMetadata fromRootRehashed = this.metadataRehasher.rehash( fromRoot );
 		{
@@ -102,18 +106,18 @@ public class MetadataRehasherTest {
 				Arrays.asList(
 						fromRootRehashed,
 						fromAnotherRootRehashed
-				)
+				), Collections.emptySet()
 		);
 		assertEquals( 3, indexRelevantEntities.size() );
 		assertTrue( indexRelevantEntities.contains( RootEntity.class ) );
 		assertTrue( indexRelevantEntities.contains( AnotherRootEntity.class ) );
 		assertTrue( indexRelevantEntities.contains( SubEntity.class ) );
 
-		Map<Class<?>, List<Class<?>>> inIndexOf = MetadataUtil.calculateInIndexOf(
+		Map<Class<?>, Set<Class<?>>> inIndexOf = MetadataUtil.calculateInIndexOf(
 				Arrays.asList(
 						fromRootRehashed,
 						fromAnotherRootRehashed
-				)
+				), new HashSet<>()
 		);
 		assertEquals( 1, inIndexOf.get( RootEntity.class ).size() );
 		assertTrue( inIndexOf.get( RootEntity.class ).contains( RootEntity.class ) );
@@ -137,6 +141,52 @@ public class MetadataRehasherTest {
 
 		// FIXME: unit-test the TermDeletion stuff for Numeric ids?
 		//... nvm. as of Hibernate Search 5.3.0.Beta1 all ids are Strings in the document
+	}
+
+	@Test
+	public void testInheritanceIndexRelevancy() {
+		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
+		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash( typeMetadata );
+
+		Set<Class<?>> indexRelevantEntities = MetadataUtil.calculateIndexRelevantEntities(
+				Collections.singletonList(
+						rehashed
+				), new HashSet<>( Collections.singletonList( Sub.class ) )
+		);
+		assertEquals( 2, indexRelevantEntities.size() );
+	}
+
+	@Test
+	public void testInheritanceInIndex() {
+		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
+		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash( typeMetadata );
+
+		Map<Class<?>, Set<Class<?>>> inIndexOf = MetadataUtil.calculateInIndexOf(
+				Collections.singletonList( rehashed ),
+				new HashSet<>( Arrays.asList( Sub.class, Useless.class ) )
+		);
+		assertEquals( 2, inIndexOf.size() );
+		assertTrue( inIndexOf.get( Root.class ).contains( Root.class ) );
+		assertTrue( inIndexOf.get( Sub.class ).contains( Root.class ) );
+	}
+
+	@Indexed
+	public static class Root {
+
+		@DocumentId
+		private Integer id;
+
+		@Field
+		private String field;
+
+	}
+
+	public static class Sub extends Root {
+
+	}
+
+	public static class Useless {
+
 	}
 
 	private void assertStringDeletion(RehashedTypeMetadata rehashed, String fieldName) {

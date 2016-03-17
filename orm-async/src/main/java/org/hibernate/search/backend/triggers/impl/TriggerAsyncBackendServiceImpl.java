@@ -82,7 +82,6 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 		MetadataRehasher rehasher = new MetadataRehasher();
 		List<RehashedTypeMetadata> rehashedTypeMetadatas = new ArrayList<>();
 
-		Map<Class<?>, List<Class<?>>> containedInIndexOf;
 		Map<Class<?>, RehashedTypeMetadata> rehashedTypeMetadataPerIndexRoot;
 
 		rehashedTypeMetadataPerIndexRoot = new HashMap<>();
@@ -91,7 +90,11 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 			rehashedTypeMetadatas.add( rehashed );
 			rehashedTypeMetadataPerIndexRoot.put( indexRootType, rehashed );
 		}
-		containedInIndexOf = MetadataUtil.calculateInIndexOf( rehashedTypeMetadatas );
+
+		Map<Class<?>, Set<Class<?>>> containedInIndexOf = MetadataUtil.calculateInIndexOf(
+				rehashedTypeMetadatas,
+				entities
+		);
 		Map<Class<?>, String> idProperties = MetadataUtil.calculateIdProperties( rehashedTypeMetadatas );
 
 		SQLJPAAsyncUpdateSourceProvider asyncUpdateSourceProvider;
@@ -136,7 +139,10 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 				)
 		);
 
-		Set<Class<?>> indexRelevantEntities = MetadataUtil.calculateIndexRelevantEntities( rehashedTypeMetadatas );
+		Set<Class<?>> indexRelevantEntities = MetadataUtil.calculateIndexRelevantEntities(
+				rehashedTypeMetadatas,
+				entities
+		);
 		EventModelParser eventModelParser = new ORMEventModelParser( sessionFactory, indexRelevantEntities );
 
 		this.asyncUpdateSource = asyncUpdateSourceProvider.getUpdateSource(

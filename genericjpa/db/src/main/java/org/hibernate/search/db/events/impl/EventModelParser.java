@@ -21,6 +21,6 @@ import java.util.List;
  */
 public interface EventModelParser {
 
-	List<EventModelInfo> parse(List<Class<?>> updateClasses);
+	List<EventModelInfo> parse(List<Class<?>> entities);
 
 }

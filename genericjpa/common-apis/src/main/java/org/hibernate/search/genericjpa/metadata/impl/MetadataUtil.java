@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.genericjpa.metadata.impl;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -90,23 +90,42 @@ public class MetadataUtil {
 	 *
 	 * @return all Entity-Classes found in the rehashedTypeMetadatas
 	 */
-	public static Set<Class<?>> calculateIndexRelevantEntities(List<RehashedTypeMetadata> rehashedTypeMetadatas) {
+	public static Set<Class<?>> calculateIndexRelevantEntities(
+			List<RehashedTypeMetadata> rehashedTypeMetadatas,
+			Collection<Class<?>> additionalCandidates) {
 		Set<Class<?>> indexRelevantEntities = new HashSet<>();
 		for ( RehashedTypeMetadata rehashed : rehashedTypeMetadatas ) {
 			indexRelevantEntities.addAll( rehashed.getIdPropertyNameForType().keySet() );
 		}
+		Set<Class<?>> additional = new HashSet<>();
+		for ( Class<?> clz : indexRelevantEntities ) {
+			for ( Class<?> candidate : additionalCandidates ) {
+				if ( clz.isAssignableFrom( candidate ) ) {
+					additional.add( candidate );
+				}
+			}
+		}
+		indexRelevantEntities.addAll( additional );
 		return indexRelevantEntities;
 	}
 
 	/**
-	 * calculates a map that contains a list of all Entity-Classes in which the keyed Entity-Class is contained in
+	 * calculates a map that contains a set of all Entity-Classes in which the keyed Entity-Class is contained in
 	 */
-	public static Map<Class<?>, List<Class<?>>> calculateInIndexOf(List<RehashedTypeMetadata> rehashedTypeMetadatas) {
-		Map<Class<?>, List<Class<?>>> inIndexOf = new HashMap<>();
+	public static Map<Class<?>, Set<Class<?>>> calculateInIndexOf(
+			List<RehashedTypeMetadata> rehashedTypeMetadatas,
+			Collection<Class<?>> additionalCandidates) {
+		Map<Class<?>, Set<Class<?>>> inIndexOf = new HashMap<>();
 		for ( RehashedTypeMetadata rehashed : rehashedTypeMetadatas ) {
 			Class<?> rootType = rehashed.getOriginalTypeMetadata().getType();
 			for ( Class<?> type : rehashed.getIdPropertyNameForType().keySet() ) {
-				inIndexOf.computeIfAbsent( type, (key) -> new ArrayList<>() ).add( rootType );
+				inIndexOf.computeIfAbsent( type, (key) -> new HashSet<>() ).add( rootType );
+
+				for ( Class<?> clz : additionalCandidates ) {
+					if ( type.isAssignableFrom( clz ) ) {
+						inIndexOf.computeIfAbsent( clz, (key) -> new HashSet<>() ).add( rootType );
+					}
+				}
 			}
 		}
 		return inIndexOf;

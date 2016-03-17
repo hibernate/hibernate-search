@@ -63,9 +63,6 @@ public class ORMEventModelParser implements EventModelParser {
 
 	/**
 	 * used for tests
-	 *
-	 * @param sessionFactory
-	 * @param manualParser
 	 */
 	public ORMEventModelParser(
 			SessionFactory sessionFactory,
@@ -77,7 +74,7 @@ public class ORMEventModelParser implements EventModelParser {
 	}
 
 	@Override
-	public List<EventModelInfo> parse(List<Class<?>> updateClasses) {
+	public List<EventModelInfo> parse(List<Class<?>> entities) {
 		SessionFactoryImplementor impl = (SessionFactoryImplementor) this.sessionFactory;
 
 		Map<String, EventModelInfo> tableEventModelInfos = new HashMap<>();
@@ -91,7 +88,7 @@ public class ORMEventModelParser implements EventModelParser {
 			Method getKeyColumns = AbstractEntityPersister.class.getDeclaredMethod( "getKeyColumns", int.class );
 			getKeyColumns.setAccessible( true );
 
-			for ( Class<?> updateClass : updateClasses ) {
+			for ( Class<?> updateClass : entities ) {
 				if ( !this.indexRelevantEntities.contains( updateClass ) ) {
 					continue;
 				}
@@ -109,7 +106,6 @@ public class ORMEventModelParser implements EventModelParser {
 
 					//TODO: is the relation table detection okay?
 
-					//FIXME: check subclasses
 					int tableSpan = (Integer) getTableSpan.invoke( entityPersister );
 					for ( int i = 0; i < tableSpan; ++i ) {
 						String originalTableName = (String) getTableName.invoke( entityPersister, i );
@@ -202,7 +198,7 @@ public class ORMEventModelParser implements EventModelParser {
 			}
 
 
-			List<EventModelInfo> manuallySetValues = this.manualParser.parse( updateClasses );
+			List<EventModelInfo> manuallySetValues = this.manualParser.parse( entities );
 			Map<String, EventModelInfo> manuallySetPerOriginal = new HashMap<>();
 			Map<String, EventModelInfo> manuallySetPerUpdate = new HashMap<>();
 			for ( EventModelInfo eventModelInfo : manuallySetValues ) {

@@ -32,6 +32,9 @@ import org.hibernate.search.test.entities.OverrideEntity;
 import org.hibernate.search.test.entities.Place;
 import org.hibernate.search.test.entities.SecondaryTableEntity;
 import org.hibernate.search.test.entities.Sorcerer;
+import org.hibernate.search.test.entities.TablePerClass;
+import org.hibernate.search.test.entities.TablePerClassOne;
+import org.hibernate.search.test.entities.TablePerClassTwo;
 import org.hibernate.search.test.entities.TopLevel;
 
 import org.junit.After;
@@ -194,6 +197,55 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testTablePerClass() throws InterruptedException {
+		if ( this.isProfileTest && this.skipProfileTests ) {
+			System.out.println( "skipping this test for the selected profile" );
+			return;
+		}
+
+		{
+			this.session.getTransaction().begin();
+
+			TablePerClass obj = new TablePerClass();
+			obj.setId( 0 );
+			this.session.persist( obj );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( TablePerClass.class, 1, new TermQuery( new Term( "id", "0" ) ) );
+		}
+
+		{
+			this.session.getTransaction().begin();
+
+			TablePerClassOne obj = new TablePerClassOne();
+			obj.setId( 1 );
+			obj.setOne( "one" );
+			this.session.persist( obj );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( TablePerClass.class, 2, new MatchAllDocsQuery() );
+			this.assertCount( TablePerClassOne.class, 1, new MatchAllDocsQuery() );
+			this.assertCount( TablePerClassTwo.class, 0, new MatchAllDocsQuery() );
+		}
+
+		{
+			this.session.getTransaction().begin();
+			TablePerClassTwo obj = new TablePerClassTwo();
+			obj.setId( 2 );
+			obj.setTwo( "two" );
+			this.session.persist( obj );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( TablePerClass.class, 3, new MatchAllDocsQuery() );
+			this.assertCount( TablePerClassOne.class, 1, new MatchAllDocsQuery() );
+			this.assertCount( TablePerClassTwo.class, 1, new MatchAllDocsQuery() );
+		}
+	}
+
 	private void assertCount(Class<?> entityClass, int count, Query query) throws InterruptedException {
 		Sleep.sleep(
 				100_000, () -> {
@@ -220,7 +272,10 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 				SecondaryTableEntity.class,
 				Sorcerer.class,
 				TopLevel.class,
-				Embedded.class
+				Embedded.class,
+				TablePerClass.class,
+				TablePerClassOne.class,
+				TablePerClassTwo.class
 		};
 	}
 

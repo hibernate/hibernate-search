@@ -26,6 +26,9 @@ import org.hibernate.search.test.entities.OverrideEntity;
 import org.hibernate.search.test.entities.Place;
 import org.hibernate.search.test.entities.SecondaryTableEntity;
 import org.hibernate.search.test.entities.Sorcerer;
+import org.hibernate.search.test.entities.TablePerClass;
+import org.hibernate.search.test.entities.TablePerClassOne;
+import org.hibernate.search.test.entities.TablePerClassTwo;
 import org.hibernate.search.test.entities.TopLevel;
 
 import org.junit.Test;
@@ -140,6 +143,33 @@ public class ORMEventModelParserTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testTablePerClass() {
+		{
+			ORMEventModelParser parser = new ORMEventModelParser(
+					this.getSessionFactory(), set(
+					TablePerClass.class,
+					TablePerClassOne.class,
+					TablePerClassTwo.class
+			)
+			);
+			List<EventModelInfo> eventModelInfos = parser.parse(
+					Arrays.asList(
+							TablePerClass.class,
+							TablePerClassOne.class,
+							TablePerClassTwo.class
+					)
+			);
+			assertEquals( 3, eventModelInfos.size() );
+
+			Map<String, EventModelInfo> map = toMap( eventModelInfos );
+
+			this.assertInfos( map, TablePerClass.class, ColumnType.INTEGER, "TablePerClass", "ID" );
+			this.assertInfos( map, TablePerClassOne.class, ColumnType.INTEGER, "TablePerClassOne", "ID" );
+			this.assertInfos( map, TablePerClassTwo.class, ColumnType.INTEGER, "TablePerClassTwo", "ID" );
+		}
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
@@ -148,7 +178,10 @@ public class ORMEventModelParserTest extends SearchTestBase {
 				Domain.class,
 				Place.class,
 				Sorcerer.class,
-				SecondaryTableEntity.class
+				SecondaryTableEntity.class,
+				TablePerClass.class,
+				TablePerClassOne.class,
+				TablePerClassTwo.class
 		};
 	}
 
