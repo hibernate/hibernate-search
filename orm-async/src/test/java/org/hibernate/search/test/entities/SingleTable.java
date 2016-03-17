@@ -6,31 +6,31 @@
  */
 package org.hibernate.search.test.entities;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
 
 /**
  * @author Martin Braun
  */
 @Entity
 @Indexed
-@Table(name = "TablePerClassOne")
-public class TablePerClassOne extends TablePerClass {
+@Table(name = "SingleTable")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public class SingleTable {
 
-	@Field(store = Store.YES)
-	@Column
-	private String one;
+	@Id
+	private Integer id;
 
-	public String getOne() {
-		return one;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setOne(String one) {
-		this.one = one;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 }

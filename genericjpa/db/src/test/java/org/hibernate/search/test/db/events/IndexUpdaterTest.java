@@ -66,9 +66,9 @@ public class IndexUpdaterTest {
 		rehashedTypeMetadataPerIndexRoot = new HashMap<>();
 		for ( Class<?> indexRootType : Arrays.asList( Place.class ) ) {
 			RehashedTypeMetadata rehashed = rehasher.rehash(
-					metadataProvider.getTypeMetadataFor( indexRootType ), Collections
+					Collections.singletonList( metadataProvider.getTypeMetadataFor( indexRootType ) ), Collections
 							.emptySet()
-			);
+			).get( 0 );
 			rehashedTypeMetadatas.add( rehashed );
 			rehashedTypeMetadataPerIndexRoot.put( indexRootType, rehashed );
 		}

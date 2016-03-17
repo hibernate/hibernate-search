@@ -25,6 +25,7 @@ import org.hibernate.search.db.events.jpa.impl.SQLJPAAsyncUpdateSourceProvider;
 import org.hibernate.search.db.events.triggers.TriggerSQLStringSource;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
@@ -79,19 +80,25 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 				.collect( Collectors.toList() );
 
 		MetadataProvider metadataProvider = MetadataUtil.getDummyMetadataProvider( new StandaloneSearchConfiguration() );
-		MetadataRehasher rehasher = new MetadataRehasher();
-		List<RehashedTypeMetadata> rehashedTypeMetadatas = new ArrayList<>();
 
-		Map<Class<?>, RehashedTypeMetadata> rehashedTypeMetadataPerIndexRoot;
 
-		rehashedTypeMetadataPerIndexRoot = new HashMap<>();
+		List<TypeMetadata> typeMetadatas = new ArrayList<>();
 		for ( Class<?> indexRootType : indexRootTypes ) {
-			RehashedTypeMetadata rehashed = rehasher.rehash(
-					metadataProvider.getTypeMetadataFor( indexRootType ),
-					entities
+			typeMetadatas.add( metadataProvider.getTypeMetadataFor( indexRootType ) );
+		}
+
+		MetadataRehasher rehasher = new MetadataRehasher();
+		Map<Class<?>, RehashedTypeMetadata> rehashedTypeMetadataPerIndexRoot = new HashMap<>();
+
+		List<RehashedTypeMetadata> rehashedTypeMetadatas = rehasher.rehash(
+				typeMetadatas,
+				entities
+		);
+		for ( RehashedTypeMetadata rehashedTypeMetadata : rehashedTypeMetadatas ) {
+			rehashedTypeMetadataPerIndexRoot.put(
+					rehashedTypeMetadata.getOriginalTypeMetadata().getType(),
+					rehashedTypeMetadata
 			);
-			rehashedTypeMetadatas.add( rehashed );
-			rehashedTypeMetadataPerIndexRoot.put( indexRootType, rehashed );
 		}
 
 		Map<Class<?>, Set<Class<?>>> containedInIndexOf = MetadataUtil.calculateInIndexOf(

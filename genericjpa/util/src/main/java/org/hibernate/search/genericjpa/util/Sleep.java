@@ -7,6 +7,7 @@
 package org.hibernate.search.genericjpa.util;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /**
  * @author Martin Braun
@@ -27,13 +28,18 @@ public final class Sleep {
 
 	public static void sleep(long millis, BooleanSupplier condition, long delayMillis, String message)
 			throws InterruptedException {
+		sleep( millis, condition, delayMillis, () -> message );
+	}
+
+	public static void sleep(long millis, BooleanSupplier condition, long delayMillis, Supplier<String> message)
+			throws InterruptedException {
 		long waited = 0;
 		long start = System.currentTimeMillis();
 		while ( !condition.getAsBoolean() ) {
 			Thread.sleep( delayMillis );
 			waited += System.currentTimeMillis() - start;
 			if ( waited >= millis ) {
-				throw new RuntimeException( "timeout: " + message );
+				throw new RuntimeException( "timeout: " + message.get() );
 			}
 		}
 	}

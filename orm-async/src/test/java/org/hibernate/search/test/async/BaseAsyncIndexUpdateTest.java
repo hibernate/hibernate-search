@@ -31,6 +31,8 @@ import org.hibernate.search.test.entities.Embedded;
 import org.hibernate.search.test.entities.OverrideEntity;
 import org.hibernate.search.test.entities.Place;
 import org.hibernate.search.test.entities.SecondaryTableEntity;
+import org.hibernate.search.test.entities.SingleTable;
+import org.hibernate.search.test.entities.SingleTableOne;
 import org.hibernate.search.test.entities.Sorcerer;
 import org.hibernate.search.test.entities.TablePerClass;
 import org.hibernate.search.test.entities.TablePerClassOne;
@@ -198,7 +200,7 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testTablePerClass() throws InterruptedException {
+	public void testInheritanceTablePerClass() throws InterruptedException {
 		if ( this.isProfileTest && this.skipProfileTests ) {
 			System.out.println( "skipping this test for the selected profile" );
 			return;
@@ -278,7 +280,48 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testInheritanceSingleTable() throws InterruptedException {
+		if ( this.isProfileTest && this.skipProfileTests ) {
+			System.out.println( "skipping this test for the selected profile" );
+			return;
+		}
+
+		{
+			this.session.getTransaction().begin();
+
+			SingleTable singleTable = new SingleTable();
+			singleTable.setId( 0 );
+			this.session.persist( singleTable );
+
+			SingleTableOne singleTableOne = new SingleTableOne();
+			singleTableOne.setId( 1 );
+			singleTableOne.setOne( "one" );
+			this.session.persist( singleTableOne );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( SingleTable.class, 2, new MatchAllDocsQuery() );
+			this.assertCount( SingleTableOne.class, 1, new MatchAllDocsQuery() );
+
+			this.assertCount( SingleTable.class, 1, new TermQuery( new Term( "id", "1" ) ) );
+		}
+
+		{
+			this.session.getTransaction().begin();
+
+			SingleTable obj = this.session.get( SingleTable.class, 1 );
+			this.session.delete( obj );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( SingleTable.class, 1, new MatchAllDocsQuery() );
+			this.assertCount( SingleTableOne.class, 0, new MatchAllDocsQuery() );
+		}
+	}
+
 	private void assertCount(Class<?> entityClass, int count, Query query) throws InterruptedException {
+		int cnt[] = new int[1];
 		Sleep.sleep(
 				100_000, () -> {
 					this.session.getTransaction().begin();
@@ -287,11 +330,12 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 							query,
 							entityClass
 					);
+					cnt[0] = ftQuery.getResultSize();
 					boolean ret = ftQuery.getResultSize() == count;
 					this.session.getTransaction().commit();
 					return ret;
 				}
-				, 100, "index didn't update properly"
+				, 100, () -> "index didn't update properly. Expected count: " + count + ", was: " + cnt[0]
 		);
 	}
 
@@ -307,7 +351,9 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 				Embedded.class,
 				TablePerClass.class,
 				TablePerClassOne.class,
-				TablePerClassTwo.class
+				TablePerClassTwo.class,
+				SingleTable.class,
+				SingleTableOne.class
 		};
 	}
 

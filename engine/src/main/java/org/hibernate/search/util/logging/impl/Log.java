@@ -959,4 +959,9 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.WARN)
 	@Message(id = 310, value = "unknown eventType-id found during index updating: %d")
 	void unknownEventTypeFoundDuringIndexUpdating(int eventType);
+
+	@Message(id = 311, value = "idFieldName settings of '%1$s' were overriden in subclass '%2$s'")
+	SearchException overriddenIdSettings(
+			@FormatWith(ClassFormatter.class) Class<?> root,
+			@FormatWith(ClassFormatter.class) Class<?> sub);
 }

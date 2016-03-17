@@ -124,6 +124,10 @@ public class MetadataUtil {
 				for ( Class<?> clz : additionalCandidates ) {
 					if ( type.isAssignableFrom( clz ) ) {
 						inIndexOf.computeIfAbsent( clz, (key) -> new HashSet<>() ).add( rootType );
+
+						//the root entity should be marked here as well
+						//this is required for SingleTable inheritance
+						inIndexOf.computeIfAbsent( type, (key) -> new HashSet<>() ).add( rootType );
 					}
 				}
 			}

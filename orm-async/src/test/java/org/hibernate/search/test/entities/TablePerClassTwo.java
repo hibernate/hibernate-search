@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -22,6 +23,7 @@ import org.hibernate.search.annotations.Store;
 public class TablePerClassTwo extends TablePerClass {
 
 	@Field(store = Store.YES)
+	@Column
 	private String two;
 
 	public String getTwo() {

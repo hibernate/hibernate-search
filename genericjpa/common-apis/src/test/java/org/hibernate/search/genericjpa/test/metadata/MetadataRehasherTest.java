@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.genericjpa.test.metadata;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
@@ -49,14 +49,17 @@ public class MetadataRehasherTest {
 	@Test
 	public void testBasic() {
 		TypeMetadata fromRoot = this.metadataProvider.getTypeMetadataFor( RootEntity.class );
-		RehashedTypeMetadata fromRootRehashed = this.metadataRehasher.rehash( fromRoot, new HashSet<>() );
+		RehashedTypeMetadata fromRootRehashed = this.metadataRehasher.rehash(
+				Collections.singletonList( fromRoot ),
+				new HashSet<>()
+		).get( 0 );
 		{
 
 			assertEquals( fromRoot, fromRootRehashed.getOriginalTypeMetadata() );
 
 			// THE ID FIELD NAMES
 			{
-				Map<Class<?>, List<String>> idFieldNamesForType = fromRootRehashed.getIdFieldNamesForType();
+				Map<Class<?>, Set<String>> idFieldNamesForType = fromRootRehashed.getIdFieldNamesForType();
 
 				assertEquals( 3, idFieldNamesForType.get( RootEntity.class ).size() );
 				assertTrue( idFieldNamesForType.get( RootEntity.class ).contains( "MAYBE_ROOT_NOT_NAMED_ID" ) );
@@ -88,19 +91,17 @@ public class MetadataRehasherTest {
 
 			// THE DOCUMENT_FIELD_META_DATA
 			{
-				assertEquals( 5, fromRootRehashed.getDocumentFieldMetadataForIdFieldName().size() );
-				// make sure all of these are different
-				assertEquals(
-						5, new HashSet<>(
-								fromRootRehashed.getDocumentFieldMetadataForIdFieldName()
-										.values()
-						).size()
-				);
+				assertEquals( 5, fromRootRehashed.getFieldBridgeForIdFieldName().size() );
 			}
 		}
 
 		TypeMetadata fromAnotherRoot = this.metadataProvider.getTypeMetadataFor( AnotherRootEntity.class );
-		RehashedTypeMetadata fromAnotherRootRehashed = this.metadataRehasher.rehash( fromAnotherRoot, Collections.emptySet() );
+		RehashedTypeMetadata fromAnotherRootRehashed = this.metadataRehasher.rehash(
+				Collections.singletonList(
+						fromAnotherRoot
+				),
+				Collections.emptySet()
+		).get( 0 );
 
 		Set<Class<?>> indexRelevantEntities = MetadataUtil.calculateIndexRelevantEntities(
 				Arrays.asList(
@@ -146,7 +147,11 @@ public class MetadataRehasherTest {
 	@Test
 	public void testInheritanceIndexRelevancy() {
 		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
-		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash( typeMetadata, Collections.emptySet() );
+		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash(
+				Collections.singletonList( typeMetadata ),
+				new ArrayList<>( Collections.singletonList( Sub.class ) )
+		).get( 0 );
+
 
 		Set<Class<?>> indexRelevantEntities = MetadataUtil.calculateIndexRelevantEntities(
 				Collections.singletonList(
@@ -159,7 +164,10 @@ public class MetadataRehasherTest {
 	@Test
 	public void testInheritanceInIndex() {
 		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
-		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash( typeMetadata, Collections.emptySet() );
+		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash(
+				Collections.singletonList( typeMetadata ),
+				new ArrayList<>( Collections.singletonList( Sub.class ) )
+		).get( 0 );
 
 		Map<Class<?>, Set<Class<?>>> inIndexOf = MetadataUtil.calculateInIndexOf(
 				Collections.singletonList( rehashed ),
@@ -168,6 +176,44 @@ public class MetadataRehasherTest {
 		assertEquals( 2, inIndexOf.size() );
 		assertTrue( inIndexOf.get( Root.class ).contains( Root.class ) );
 		assertTrue( inIndexOf.get( Sub.class ).contains( Root.class ) );
+	}
+
+	@Test
+	public void testInheritanceCopyProperties() {
+		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
+		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash(
+				Collections.singletonList( typeMetadata ),
+				new ArrayList<>( Collections.singletonList( Sub.class ) )
+		).get( 0 );
+
+		assertEquals(
+				rehashed.getIdFieldNamesForType().get( Root.class ),
+				rehashed.getIdFieldNamesForType().get( Sub.class )
+		);
+		assertEquals(
+				rehashed.getIdPropertyNameForType().get( Root.class ),
+				rehashed.getIdPropertyNameForType().get( Sub.class )
+		);
+		assertEquals(
+				rehashed.getIdPropertyAccessorForType().get( Root.class ),
+				rehashed.getIdPropertyAccessorForType().get( Sub.class )
+		);
+	}
+
+	@Test
+	public void testInheritanceRelevantSubclasses() {
+		Map<Class<?>, Set<Class<?>>> map = this.metadataRehasher.calculateRelevantSubclasses(
+				Arrays.asList(
+						Root.class,
+						Sub.class
+				)
+		);
+		assertEquals( 2, map.size() );
+		assertEquals( 2, map.get( Root.class ).size() );
+		assertTrue( map.get( Root.class ).contains( Root.class ) );
+		assertTrue( map.get( Root.class ).contains( Sub.class ) );
+		assertEquals( 1, map.get( Sub.class ).size() );
+		assertTrue( map.get( Sub.class ).contains( Sub.class ) );
 	}
 
 	@Indexed

@@ -7,12 +7,12 @@
 package org.hibernate.search.genericjpa.metadata.impl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 
 /**
@@ -35,7 +35,7 @@ public final class RehashedTypeMetadata {
 	 * this contains all the possible fields in the lucene index for every given class contained in the index this
 	 * metadata object corresponds to
 	 */
-	Map<Class<?>, List<String>> idFieldNamesForType = new HashMap<>();
+	Map<Class<?>, Set<String>> idFieldNamesForType = new HashMap<>();
 
 	/**
 	 * this contains the Java Bean property name of the id field for every given class contained in the index. every
@@ -50,7 +50,7 @@ public final class RehashedTypeMetadata {
 	 * this contains the DocumentFieldMetadata for each id-fieldname. This provides info about how each id is stored in
 	 * the index
 	 */
-	Map<String, DocumentFieldMetadata> documentFieldMetadataForIdFieldName = new HashMap<>();
+	Map<String, FieldBridge> fieldBridgeForIdFieldName = new HashMap<>();
 
 	Map<String, SingularTermDeletionQuery.Type> singularTermDeletionQueryTypeForIdFieldName = new HashMap<>();
 
@@ -71,14 +71,14 @@ public final class RehashedTypeMetadata {
 	/**
 	 * @return the idFieldNamesForType
 	 */
-	public Map<Class<?>, List<String>> getIdFieldNamesForType() {
+	public Map<Class<?>, Set<String>> getIdFieldNamesForType() {
 		return idFieldNamesForType;
 	}
 
 	/**
 	 * @param idFieldNamesForType the idFieldNamesForType to set
 	 */
-	public void setIdFieldNamesForType(Map<Class<?>, List<String>> idFieldNamesForType) {
+	public void setIdFieldNamesForType(Map<Class<?>, Set<String>> idFieldNamesForType) {
 		this.idFieldNamesForType = idFieldNamesForType;
 	}
 
@@ -97,17 +97,17 @@ public final class RehashedTypeMetadata {
 	}
 
 	/**
-	 * @return the documentFieldMetadataForIdFieldName
+	 * @return the fieldBridgeForIdFieldName
 	 */
-	public Map<String, DocumentFieldMetadata> getDocumentFieldMetadataForIdFieldName() {
-		return documentFieldMetadataForIdFieldName;
+	public Map<String, FieldBridge> getFieldBridgeForIdFieldName() {
+		return fieldBridgeForIdFieldName;
 	}
 
 	/**
-	 * @param documentFieldMetadataForIdFieldName the documentFieldMetadataForIdFieldName to set
+	 * @param fieldBridgeForIdFieldName the fieldBridgeForIdFieldName to set
 	 */
-	public void setDocumentFieldMetadataForIdFieldName(Map<String, DocumentFieldMetadata> documentFieldMetadataForIdFieldName) {
-		this.documentFieldMetadataForIdFieldName = documentFieldMetadataForIdFieldName;
+	public void setFieldBridgeForIdFieldName(Map<String, FieldBridge> fieldBridgeForIdFieldName) {
+		this.fieldBridgeForIdFieldName = fieldBridgeForIdFieldName;
 	}
 
 	/**

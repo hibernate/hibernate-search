@@ -20,15 +20,14 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.db.EventType;
 import org.hibernate.search.db.events.UpdateConsumer;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
-import org.hibernate.search.db.EventType;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.entity.EntityProvider;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.factory.Transaction;
 import org.hibernate.search.genericjpa.metadata.impl.RehashedTypeMetadata;
 import org.hibernate.search.genericjpa.util.NamingThreadFactory;
@@ -143,8 +142,15 @@ public final class IndexUpdater {
 								tx.commit();
 							}
 							catch (Exception e) {
+								log.exceptionOccurred(
+										"Error while updating the index! Your index might be corrupt!",
+										e
+								);
+								exception[0] = new SearchException(
+										"Error while updating the index! Your index might be corrupt!",
+										e
+								);
 								tx.rollback();
-								throw e;
 							}
 						}
 						finally {
@@ -166,7 +172,6 @@ public final class IndexUpdater {
 					finally {
 						latch.countDown();
 					}
-
 				}
 		);
 		try {
@@ -237,12 +242,22 @@ public final class IndexUpdater {
 				EntityProvider entityProvider,
 				Transaction tx) {
 			for ( Class<?> indexClass : inIndexOf ) {
-				RehashedTypeMetadata metadata = IndexUpdater.this.metadataForIndexRoot.get( indexClass );
-				List<String> fields = metadata.getIdFieldNamesForType().get( entityClass );
-				for ( String field : fields ) {
-					DocumentFieldMetadata metaDataForIdField = metadata.getDocumentFieldMetadataForIdFieldName().get(
-							field
+
+				//this is in this loop to make sure we are performing this on
+				//a indexed entity
+				if ( indexClass.isAssignableFrom( entityClass ) ) {
+					this.searchIntegrator.getWorker().performWork(
+							new Work(
+									entityClass,
+									(Serializable) id,
+									WorkType.DELETE
+							), tx
 					);
+				}
+
+				RehashedTypeMetadata metadata = IndexUpdater.this.metadataForIndexRoot.get( indexClass );
+				Set<String> fields = metadata.getIdFieldNamesForType().get( entityClass );
+				for ( String field : fields ) {
 					SingularTermDeletionQuery.Type idType = metadata.getSingularTermDeletionQueryTypeForIdFieldName()
 							.get( field );
 					Object idValueForDeletion;
@@ -250,60 +265,60 @@ public final class IndexUpdater {
 						throw new AssertionFailure( "idType was null for field " + field + " and class " + entityClass );
 					}
 					if ( idType == SingularTermDeletionQuery.Type.STRING ) {
-						FieldBridge fb = metaDataForIdField.getFieldBridge();
+						FieldBridge fb = metadata.getFieldBridgeForIdFieldName()
+								.get(
+										field
+								);
 						if ( !(fb instanceof StringBridge) ) {
-							throw new IllegalArgumentException( "no TwoWayStringBridge found for field: " + field );
+							throw new IllegalArgumentException( "no StringBridge found for field: " + field );
 						}
-						idValueForDeletion = ((StringBridge) fb).objectToString( id );
+						try {
+							idValueForDeletion = ((StringBridge) fb).objectToString( id );
+						}
+						catch (Exception e) {
+							//the field and the bridge are not compatible
+							//but because of Inheritance this can be valid
+							continue;
+						}
 					}
 					else {
 						idValueForDeletion = id;
 					}
-					if ( indexClass.equals( entityClass ) ) {
-						this.searchIntegrator.getWorker().performWork(
-								new Work(
-										entityClass,
-										(Serializable) id,
-										WorkType.DELETE
-								), tx
-						);
-					}
-					else {
-						HSQuery hsQuery = this.searchIntegrator
-								.createHSQuery()
-								.targetedEntities( Collections.singletonList( indexClass ) )
-								.luceneQuery(
-										this.searchIntegrator.buildQueryBuilder()
-												.forEntity( indexClass )
-												.get()
-												.keyword()
-												.onField( field )
-												.matching( idValueForDeletion )
-												.createQuery()
-								);
-						int count = hsQuery.queryResultSize();
-						int processed = 0;
-						// this was just contained somewhere
-						// so we have to update the containing entity
-						while ( processed < count ) {
-							for ( EntityInfo entityInfo : hsQuery.firstResult( processed ).projection(
-									ProjectionConstants.ID
-							).maxResults( HSQUERY_BATCH )
-									.queryEntityInfos() ) {
-								Serializable originalId = (Serializable) entityInfo.getProjection()[0];
-								Object original = entityProvider.get( indexClass, originalId );
-								if ( original != null ) {
-									this.update( original, tx );
-								}
-								else {
-									// original is not available in the
-									// database, but it will be deleted by its
-									// own delete event
-									// TODO: log this?
-								}
+
+					HSQuery hsQuery = this.searchIntegrator
+							.createHSQuery()
+							.targetedEntities( Collections.singletonList( indexClass ) )
+							.luceneQuery(
+									this.searchIntegrator.buildQueryBuilder()
+											.forEntity( indexClass )
+											.get()
+											.keyword()
+											.onField( field )
+											.matching( idValueForDeletion )
+											.createQuery()
+							);
+					int count = hsQuery.queryResultSize();
+					int processed = 0;
+					// this was just contained somewhere
+					// so we have to update the containing entity
+					while ( processed < count ) {
+						for ( EntityInfo entityInfo : hsQuery.firstResult( processed ).projection(
+								ProjectionConstants.ID
+						).maxResults( HSQUERY_BATCH )
+								.queryEntityInfos() ) {
+							Serializable originalId = (Serializable) entityInfo.getProjection()[0];
+							Object original = entityProvider.get( indexClass, originalId );
+							if ( original != null && !entityClass.isAssignableFrom( original.getClass() ) ) {
+								//this was not already handled above
+								this.update( original, tx );
+
+								// TODO: log if
+								// original is not available in the
+								// database, but it will be deleted by its
+								// own delete event?
 							}
-							processed += HSQUERY_BATCH;
 						}
+						processed += HSQUERY_BATCH;
 					}
 				}
 			}
