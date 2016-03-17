@@ -7,6 +7,11 @@
 package org.hibernate.search.db.util.impl;
 
 /**
+ * Instances of this class are used for easier Transaction handling.
+ * In a general JPA context we would have to decide whether to use a
+ * JTA transaction or the the JPA transaction. This is encapsulated away in
+ * instances of this interface.
+ *
  * @author Martin Braun
  */
 public interface TransactionWrapper {

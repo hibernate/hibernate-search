@@ -15,6 +15,10 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Contains multiple {@link UpdateInfo}
+ * <br> <br>
+ * For more information see {@link UpdateInfo}
+ *
  * @author Martin Braun
  * @hsearch.experimental
  */

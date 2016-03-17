@@ -9,6 +9,14 @@ package org.hibernate.search.db.events.impl;
 import java.util.List;
 
 /**
+ * EventModelParsers are used to find out in which Tables entities are stored.
+ *
+ * Specific implementations might rely on Annotations to be present or try to parse Metadata
+ * received from the JPA provider
+ *
+ * These {@link EventModelInfo}s are then used during Update table generation as well as
+ * while querying for Updates in the Update tables
+ *
  * @author Martin Braun
  */
 public interface EventModelParser {

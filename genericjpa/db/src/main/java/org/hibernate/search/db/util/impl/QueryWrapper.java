@@ -9,6 +9,10 @@ package org.hibernate.search.db.util.impl;
 import java.util.List;
 
 /**
+ * The Wrapper for Queries used in the async-backend.
+ *
+ * see {@link EntityManagerFactoryWrapper} for more info
+ *
  * @author Martin Braun
  */
 public interface QueryWrapper {

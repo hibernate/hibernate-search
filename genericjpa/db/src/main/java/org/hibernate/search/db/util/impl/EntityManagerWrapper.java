@@ -7,6 +7,10 @@
 package org.hibernate.search.db.util.impl;
 
 /**
+ * The Wrapper for EntityManagers/Sessions used in the async-backend.
+ *
+ * see {@link EntityManagerFactoryWrapper} for more info
+ *
  * @author Martin Braun
  */
 public interface EntityManagerWrapper {

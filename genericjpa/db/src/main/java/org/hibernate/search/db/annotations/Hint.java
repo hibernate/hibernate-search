@@ -11,6 +11,8 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Used to specify additional hints for custom EntityProviders (GenericJPA only)
+ *
  * @author Martin Braun
  * @hsearch.experimental
  */

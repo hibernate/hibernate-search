@@ -19,6 +19,11 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
 
 /**
+ * An implementation of {@link ReusableEntityProvider} for the Hibernate ORM case
+ *
+ * With Hibernate ORM we have more native access to all APIs, so this uses a {@link SessionFactory}
+ * internally
+ *
  * @author Martin Braun
  */
 public class ORMReusableEntityProvider implements ReusableEntityProvider {

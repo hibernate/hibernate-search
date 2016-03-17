@@ -10,6 +10,8 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 
 /**
+ * Represents a (Java-esque) ColumnType.
+ *
  * @author Martin Braun
  * @hsearch.experimental
  */

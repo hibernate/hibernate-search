@@ -14,6 +14,11 @@ import org.hibernate.search.db.util.impl.QueryWrapper;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**
+ * An implementation of {@link QueryWrapper} for the Hibernate ORM case
+ *
+ * With Hibernate ORM we have more native access to all APIs, so this uses a Hibernate {@link Query}
+ * internally
+ *
  * @author Martin Braun
  */
 public final class ORMQueryWrapper implements QueryWrapper {

@@ -16,6 +16,8 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * This annotation is used to manually specify information about where Updates are (to be) stored in the async backend.
+ *
  * @author Martin Braun
  * @hsearch.experimental
  */
@@ -45,6 +47,9 @@ public @interface UpdateInfo {
 	 */
 	String updateTableEventTypeColumn() default "";
 
+	/**
+	 * information about the Ids in the table this annotation represents
+	 */
 	IdInfo[] idInfos();
 
 }

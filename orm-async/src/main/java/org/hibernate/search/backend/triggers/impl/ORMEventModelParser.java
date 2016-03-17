@@ -34,7 +34,7 @@ import org.hibernate.type.CollectionType;
 import org.hibernate.type.Type;
 
 /**
- * This EventModelParser should be used when Hibernate ORM
+ * This instance of an {@link EventModelParser} should be used when Hibernate ORM
  * is available we have more information about how stuff
  * is persisted available compared to plain JPA
  *

@@ -7,12 +7,19 @@
 package org.hibernate.search.backend.triggers.impl;
 
 
+import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.search.db.util.impl.EntityManagerWrapper;
 import org.hibernate.search.db.util.impl.TransactionWrapper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * An implementation of {@link EntityManagerWrapper} for the Hibernate ORM case
+ *
+ * With Hibernate ORM we have more native access to all APIs, so this uses the {@link Session}'s {@link Transaction}
+ * internally
+ *
  * @author Martin Braun
  */
 public final class ORMTransactionWrapper implements TransactionWrapper {

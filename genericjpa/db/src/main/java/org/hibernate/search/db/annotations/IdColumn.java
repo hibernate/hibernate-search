@@ -21,8 +21,6 @@ public @interface IdColumn {
 
 	/**
 	 * the column-name in the original table
-	 *
-	 * @return
 	 */
 	String column();
 
@@ -31,6 +29,11 @@ public @interface IdColumn {
 	 */
 	String updateTableColumn() default "";
 
+	/**
+	 * If you need something else than String, Integer or Long
+	 * you have to specify CUSTOM and also give a suitable {@link org.hibernate.search.db.IdConverter} in the
+	 * {@link IdInfo} and manually give the columnDefinition in {@link #columnDefinition()}
+	 */
 	ColumnType columnType();
 
 	/**

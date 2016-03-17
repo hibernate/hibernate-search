@@ -44,6 +44,8 @@ import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.UPDAT
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.UPDATE_DELAY_KEY;
 
 /**
+ * Implementation of {@link TriggerAsyncBackendService}
+ *
  * @author Martin Braun
  */
 public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendService {

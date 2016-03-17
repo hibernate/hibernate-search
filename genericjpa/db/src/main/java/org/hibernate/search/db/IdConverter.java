@@ -7,6 +7,8 @@
 package org.hibernate.search.db;
 
 /**
+ * Converts primitive values from the database to IDs usable in JPA
+ *
  * @author Martin Braun
  * @hsearch.experimental
  */

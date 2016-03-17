@@ -13,6 +13,8 @@ import org.hibernate.search.db.IdConverter;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Contains Information about where the Ids are stored and how to build a Java object from it again
+ *
  * @author Martin Braun
  * @hsearch.experimental
  */
@@ -20,7 +22,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface IdInfo {
 
 	/**
-	 * the Java type of the entity this corresponds to
+	 * the Java type of the entity this corresponds to.  If this equals {@code void.class} on the Class level
+	 * the Class's type is assumed (this does not work on the Member level)
 	 */
 	Class<?> entity() default void.class;
 
@@ -38,7 +41,7 @@ public @interface IdInfo {
 
 	/**
 	 * hints for the entity-provider used while updating
-	 * (this is currently only used if you provide your own)
+	 * (this is currently only used if you provide your own) (GenericJPA only)
 	 */
 	// genericjpa
 	Hint[] hints() default {};

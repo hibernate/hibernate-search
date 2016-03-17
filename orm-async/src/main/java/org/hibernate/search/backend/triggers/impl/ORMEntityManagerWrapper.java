@@ -9,9 +9,13 @@ package org.hibernate.search.backend.triggers.impl;
 import org.hibernate.Session;
 import org.hibernate.search.db.util.impl.EntityManagerWrapper;
 import org.hibernate.search.db.util.impl.QueryWrapper;
-import org.hibernate.search.db.util.impl.TransactionWrapper;
 
 /**
+ * An implementation of {@link EntityManagerWrapper} for the Hibernate ORM case
+ *
+ * With Hibernate ORM we have more native access to all APIs, so this uses a {@link Session}
+ * internally
+ *
  * @author Martin Braun
  */
 public final class ORMEntityManagerWrapper implements EntityManagerWrapper {
@@ -35,7 +39,7 @@ public final class ORMEntityManagerWrapper implements EntityManagerWrapper {
 	}
 
 	@Override
-	public TransactionWrapper getTransaction() {
+	public ORMTransactionWrapper getTransaction() {
 		return this.transaction;
 	}
 
