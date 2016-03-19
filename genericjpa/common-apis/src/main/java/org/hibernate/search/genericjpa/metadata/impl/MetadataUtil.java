@@ -30,6 +30,9 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.IndexingMode;
 
 /**
+ * Static Utility class that contains helpful methods for handling Metadata for the
+ * async backend.
+ *
  * @author Martin Braun
  */
 public class MetadataUtil {

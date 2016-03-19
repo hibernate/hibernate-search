@@ -14,12 +14,14 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 
 /**
- * @author Martin Braun
  * <p>
  * Service that controls the trigger based asynchronous index updating mechanism
  * <p>
  * Does not implement Startable and Stoppable as its lifecycle needs to be controlled
- * explicitly
+ * explicitly. Also this requires a reference to the SessionFactory which the Startable interface
+ * is not able to provide.
+ *
+ * @author Martin Braun
  */
 public interface TriggerAsyncBackendService extends Service {
 
