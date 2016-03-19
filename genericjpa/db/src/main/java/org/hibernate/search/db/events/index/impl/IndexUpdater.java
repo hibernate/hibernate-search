@@ -29,7 +29,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.entity.EntityProvider;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
 import org.hibernate.search.genericjpa.factory.Transaction;
-import org.hibernate.search.genericjpa.metadata.impl.RehashedTypeMetadata;
+import org.hibernate.search.genericjpa.metadata.impl.ExtendedTypeMetadata;
 import org.hibernate.search.genericjpa.util.NamingThreadFactory;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -54,14 +54,14 @@ public final class IndexUpdater {
 
 	private static final int HSQUERY_BATCH = 50;
 
-	private final Map<Class<?>, RehashedTypeMetadata> metadataForIndexRoot;
+	private final Map<Class<?>, ExtendedTypeMetadata> metadataForIndexRoot;
 	private final Map<Class<?>, Set<Class<?>>> containedInIndexOf;
 	private final ReusableEntityProvider entityProvider;
 	private final ExecutorService exec;
 	private IndexWrapper indexWrapper;
 
 	public IndexUpdater(
-			Map<Class<?>, RehashedTypeMetadata> metadataForIndexRoot, Map<Class<?>, Set<Class<?>>> containedInIndexOf,
+			Map<Class<?>, ExtendedTypeMetadata> metadataForIndexRoot, Map<Class<?>, Set<Class<?>>> containedInIndexOf,
 			ReusableEntityProvider entityProvider, IndexWrapper indexWrapper) {
 		this.metadataForIndexRoot = metadataForIndexRoot;
 		this.containedInIndexOf = containedInIndexOf;
@@ -71,7 +71,7 @@ public final class IndexUpdater {
 	}
 
 	public IndexUpdater(
-			Map<Class<?>, RehashedTypeMetadata> metadataPerForIndexRoot,
+			Map<Class<?>, ExtendedTypeMetadata> metadataPerForIndexRoot,
 			Map<Class<?>, Set<Class<?>>> containedInIndexOf,
 			ReusableEntityProvider entityProvider,
 			ExtendedSearchIntegrator searchIntegrator) {
@@ -255,7 +255,7 @@ public final class IndexUpdater {
 					);
 				}
 
-				RehashedTypeMetadata metadata = IndexUpdater.this.metadataForIndexRoot.get( indexClass );
+				ExtendedTypeMetadata metadata = IndexUpdater.this.metadataForIndexRoot.get( indexClass );
 				Set<String> fields = metadata.getIdFieldNamesForType().get( entityClass );
 				for ( String field : fields ) {
 					SingularTermDeletionQuery.Type idType = metadata.getSingularTermDeletionQueryTypeForIdFieldName()

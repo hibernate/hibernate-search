@@ -80,24 +80,24 @@ public class MetadataUtil {
 		return new AnnotationMetadataProvider( new JavaReflectionManager(), configContext );
 	}
 
-	public static Map<Class<?>, String> calculateIdProperties(List<RehashedTypeMetadata> rehashedTypeMetadatas) {
+	public static Map<Class<?>, String> calculateIdProperties(List<ExtendedTypeMetadata> extendedTypeMetadatas) {
 		Map<Class<?>, String> idProperties = new HashMap<>();
-		for ( RehashedTypeMetadata rehashed : rehashedTypeMetadatas ) {
+		for ( ExtendedTypeMetadata rehashed : extendedTypeMetadatas ) {
 			idProperties.putAll( rehashed.getIdPropertyNameForType() );
 		}
 		return idProperties;
 	}
 
 	/**
-	 * calculates the Entity-Classes that are relevant for the indexes represented by the rehashedTypeMetadatas
+	 * calculates the Entity-Classes that are relevant for the indexes represented by the extendedTypeMetadatas
 	 *
-	 * @return all Entity-Classes found in the rehashedTypeMetadatas
+	 * @return all Entity-Classes found in the extendedTypeMetadatas
 	 */
 	public static Set<Class<?>> calculateIndexRelevantEntities(
-			List<RehashedTypeMetadata> rehashedTypeMetadatas,
+			List<ExtendedTypeMetadata> extendedTypeMetadatas,
 			Collection<Class<?>> additionalCandidates) {
 		Set<Class<?>> indexRelevantEntities = new HashSet<>();
-		for ( RehashedTypeMetadata rehashed : rehashedTypeMetadatas ) {
+		for ( ExtendedTypeMetadata rehashed : extendedTypeMetadatas ) {
 			indexRelevantEntities.addAll( rehashed.getIdPropertyNameForType().keySet() );
 		}
 		Set<Class<?>> additional = new HashSet<>();
@@ -116,10 +116,10 @@ public class MetadataUtil {
 	 * calculates a map that contains a set of all Entity-Classes in which the keyed Entity-Class is contained in
 	 */
 	public static Map<Class<?>, Set<Class<?>>> calculateInIndexOf(
-			List<RehashedTypeMetadata> rehashedTypeMetadatas,
+			List<ExtendedTypeMetadata> extendedTypeMetadatas,
 			Collection<Class<?>> additionalCandidates) {
 		Map<Class<?>, Set<Class<?>>> inIndexOf = new HashMap<>();
-		for ( RehashedTypeMetadata rehashed : rehashedTypeMetadatas ) {
+		for ( ExtendedTypeMetadata rehashed : extendedTypeMetadatas ) {
 			Class<?> rootType = rehashed.getOriginalTypeMetadata().getType();
 			for ( Class<?> type : rehashed.getIdPropertyNameForType().keySet() ) {
 				inIndexOf.computeIfAbsent( type, (key) -> new HashSet<>() ).add( rootType );

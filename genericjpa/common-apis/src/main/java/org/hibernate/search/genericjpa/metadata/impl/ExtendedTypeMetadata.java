@@ -24,7 +24,7 @@ import org.hibernate.search.engine.metadata.impl.TypeMetadata;
  *
  * @author Martin Braun
  */
-public final class RehashedTypeMetadata {
+public final class ExtendedTypeMetadata {
 
 	/**
 	 * the original TypeMetadata object this object rehashes

@@ -31,9 +31,9 @@ import org.hibernate.search.genericjpa.entity.EntityProvider;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
 import org.hibernate.search.genericjpa.factory.StandaloneSearchConfiguration;
 import org.hibernate.search.genericjpa.factory.Transaction;
-import org.hibernate.search.genericjpa.metadata.impl.MetadataRehasher;
+import org.hibernate.search.genericjpa.metadata.impl.MetadataExtender;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataUtil;
-import org.hibernate.search.genericjpa.metadata.impl.RehashedTypeMetadata;
+import org.hibernate.search.genericjpa.metadata.impl.ExtendedTypeMetadata;
 import org.hibernate.search.test.db.entities.Place;
 import org.hibernate.search.test.db.entities.Sorcerer;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
@@ -50,7 +50,7 @@ import static org.junit.Assert.assertTrue;
 public class IndexUpdaterTest {
 
 	Map<Class<?>, Set<Class<?>>> containedInIndexOf;
-	Map<Class<?>, RehashedTypeMetadata> rehashedTypeMetadataPerIndexRoot;
+	Map<Class<?>, ExtendedTypeMetadata> rehashedTypeMetadataPerIndexRoot;
 	ReusableEntityProvider entityProvider;
 	List<UpdateEventInfo> updateInfos;
 	boolean changed;
@@ -61,18 +61,18 @@ public class IndexUpdaterTest {
 		this.changed = false;
 		this.deletedSorcerer = false;
 		MetadataProvider metadataProvider = MetadataUtil.getDummyMetadataProvider( new StandaloneSearchConfiguration() );
-		MetadataRehasher rehasher = new MetadataRehasher();
-		List<RehashedTypeMetadata> rehashedTypeMetadatas = new ArrayList<>();
+		MetadataExtender rehasher = new MetadataExtender();
+		List<ExtendedTypeMetadata> extendedTypeMetadatas = new ArrayList<>();
 		rehashedTypeMetadataPerIndexRoot = new HashMap<>();
 		for ( Class<?> indexRootType : Arrays.asList( Place.class ) ) {
-			RehashedTypeMetadata rehashed = rehasher.rehash(
+			ExtendedTypeMetadata rehashed = rehasher.rehash(
 					Collections.singletonList( metadataProvider.getTypeMetadataFor( indexRootType ) ), Collections
 							.emptySet()
 			).get( 0 );
-			rehashedTypeMetadatas.add( rehashed );
+			extendedTypeMetadatas.add( rehashed );
 			rehashedTypeMetadataPerIndexRoot.put( indexRootType, rehashed );
 		}
-		this.containedInIndexOf = MetadataUtil.calculateInIndexOf( rehashedTypeMetadatas, new HashSet<>() );
+		this.containedInIndexOf = MetadataUtil.calculateInIndexOf( extendedTypeMetadatas, new HashSet<>() );
 		this.entityProvider = new ReusableEntityProvider() {
 
 			@SuppressWarnings("rawtypes")

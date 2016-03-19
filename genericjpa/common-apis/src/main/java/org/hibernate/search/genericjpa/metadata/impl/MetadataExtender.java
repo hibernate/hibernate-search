@@ -27,27 +27,27 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * this class converts {@link org.hibernate.search.engine.metadata.impl.TypeMetadata}
- * into {@link RehashedTypeMetadata} that is in a better format for the async backend
+ * into {@link ExtendedTypeMetadata} that is in a better format for the async backend
  * to understand.
  *
  * @author Martin Braun
  */
-public final class MetadataRehasher {
+public final class MetadataExtender {
 
 	private static final Log log = LoggerFactory.make();
 
-	public List<RehashedTypeMetadata> rehash(List<TypeMetadata> originals, Collection<Class<?>> checkHierarchyFor) {
+	public List<ExtendedTypeMetadata> rehash(List<TypeMetadata> originals, Collection<Class<?>> checkHierarchyFor) {
 		Map<Class<?>, TypeMetadata> typeMetadataPerClass = new HashMap<>();
 		for ( TypeMetadata metadata : originals ) {
 			typeMetadataPerClass.put( metadata.getType(), metadata );
 		}
-		Map<Class<?>, RehashedTypeMetadata> rehashedPerType = new HashMap<>();
+		Map<Class<?>, ExtendedTypeMetadata> rehashedPerType = new HashMap<>();
 
 		List<Class<?>> classesToConsiderForHierarchies = new ArrayList<>();
 		classesToConsiderForHierarchies.addAll( checkHierarchyFor );
 
 		for ( TypeMetadata orig : originals ) {
-			RehashedTypeMetadata rehashed = this.rehash( orig, checkHierarchyFor );
+			ExtendedTypeMetadata rehashed = this.rehash( orig, checkHierarchyFor );
 			rehashedPerType.put( rehashed.getOriginalTypeMetadata().getType(), rehashed );
 			classesToConsiderForHierarchies.add( rehashed.getOriginalTypeMetadata().getType() );
 		}
@@ -56,19 +56,19 @@ public final class MetadataRehasher {
 				classesToConsiderForHierarchies
 		);
 
-		for ( Map.Entry<Class<?>, RehashedTypeMetadata> entry : rehashedPerType.entrySet() ) {
+		for ( Map.Entry<Class<?>, ExtendedTypeMetadata> entry : rehashedPerType.entrySet() ) {
 			Class<?> parent = entry.getKey();
-			RehashedTypeMetadata rehashedTypeMetadata = entry.getValue();
+			ExtendedTypeMetadata extendedTypeMetadata = entry.getValue();
 
 			Set<Class<?>> relevantSub = relevantSubClasses.get( parent );
 			for ( Class<?> sub : relevantSub ) {
 				if ( !sub.equals( parent ) ) {
-					RehashedTypeMetadata subRehashed = rehashedPerType.get( sub );
+					ExtendedTypeMetadata subRehashed = rehashedPerType.get( sub );
 					if ( subRehashed != null ) {
 						//we have some additional stuff here
 						//this has to be merged into the parent's info
 						//so we have this available during index updating
-						Set<String> idFieldNames = rehashedTypeMetadata.idFieldNamesForType.computeIfAbsent(
+						Set<String> idFieldNames = extendedTypeMetadata.idFieldNamesForType.computeIfAbsent(
 								parent,
 								(key) -> new HashSet<>()
 						);
@@ -76,22 +76,22 @@ public final class MetadataRehasher {
 								subRehashed.idFieldNamesForType.get( sub )
 						);
 
-						if ( !rehashedTypeMetadata.idPropertyNameForType.get( parent )
+						if ( !extendedTypeMetadata.idPropertyNameForType.get( parent )
 								.equals( subRehashed.idPropertyNameForType.get( sub ) ) ) {
 							throw log.overriddenIdSettings( parent, sub );
 						}
-						if ( !rehashedTypeMetadata.idPropertyAccessorForType.get( parent ).getName()
+						if ( !extendedTypeMetadata.idPropertyAccessorForType.get( parent ).getName()
 								.equals( subRehashed.idPropertyAccessorForType.get( sub ).getName() ) ) {
 							throw log.overriddenIdSettings( parent, sub );
 						}
 
 						//we dont want users overriding the fieldname settings for the id field
 						//in a class hierarchy
-						for ( String fieldName : rehashedTypeMetadata.fieldBridgeForIdFieldName.keySet() ) {
+						for ( String fieldName : extendedTypeMetadata.fieldBridgeForIdFieldName.keySet() ) {
 							if ( subRehashed.fieldBridgeForIdFieldName.containsKey( fieldName ) ) {
 								FieldBridge fbSub = subRehashed.fieldBridgeForIdFieldName.get( fieldName );
 								if ( !fbSub.getClass().equals(
-										rehashedTypeMetadata.fieldBridgeForIdFieldName.get(
+										extendedTypeMetadata.fieldBridgeForIdFieldName.get(
 												fieldName
 										).getClass()
 								) ) {
@@ -99,17 +99,17 @@ public final class MetadataRehasher {
 								}
 							}
 						}
-						rehashedTypeMetadata.fieldBridgeForIdFieldName.putAll( subRehashed.fieldBridgeForIdFieldName );
+						extendedTypeMetadata.fieldBridgeForIdFieldName.putAll( subRehashed.fieldBridgeForIdFieldName );
 
 						//this is fine without a test. The FieldBridge is different earlier than the DeletionType
-						rehashedTypeMetadata.singularTermDeletionQueryTypeForIdFieldName.putAll( subRehashed.singularTermDeletionQueryTypeForIdFieldName );
+						extendedTypeMetadata.singularTermDeletionQueryTypeForIdFieldName.putAll( subRehashed.singularTermDeletionQueryTypeForIdFieldName );
 					}
 				}
 			}
 		}
 
-		List<RehashedTypeMetadata> ret = new ArrayList<>();
-		for ( Map.Entry<Class<?>, RehashedTypeMetadata> entry : rehashedPerType.entrySet() ) {
+		List<ExtendedTypeMetadata> ret = new ArrayList<>();
+		for ( Map.Entry<Class<?>, ExtendedTypeMetadata> entry : rehashedPerType.entrySet() ) {
 			ret.add( entry.getValue() );
 		}
 		return ret;
@@ -128,10 +128,10 @@ public final class MetadataRehasher {
 		return ret;
 	}
 
-	private RehashedTypeMetadata rehash(
+	private ExtendedTypeMetadata rehash(
 			TypeMetadata original,
 			Collection<Class<?>> checkHierarchyFor) {
-		RehashedTypeMetadata rehashed = new RehashedTypeMetadata();
+		ExtendedTypeMetadata rehashed = new ExtendedTypeMetadata();
 		rehashed.originalTypeMetadata = original;
 
 		if ( !this.handlePropertyMetadata(
@@ -154,7 +154,7 @@ public final class MetadataRehasher {
 
 	private void rehashRec(
 			EmbeddedTypeMetadata original,
-			RehashedTypeMetadata rehashed,
+			ExtendedTypeMetadata rehashed,
 			Collection<Class<?>> checkHierarchyFor) {
 		// handle the current TypeMetadata
 		this.handleTypeMetadata( original, rehashed, checkHierarchyFor );
@@ -166,7 +166,7 @@ public final class MetadataRehasher {
 
 	private void handleTypeMetadata(
 			EmbeddedTypeMetadata original,
-			RehashedTypeMetadata rehashed,
+			ExtendedTypeMetadata rehashed,
 			Collection<Class<?>> checkHierarchyFor) {
 		for ( PropertyMetadata propertyMetadata : original.getAllPropertyMetadata() ) {
 			if ( this.handlePropertyMetadata(
@@ -183,7 +183,7 @@ public final class MetadataRehasher {
 
 	private boolean handlePropertyMetadata(
 			TypeMetadata original,
-			RehashedTypeMetadata rehashed,
+			ExtendedTypeMetadata rehashed,
 			PropertyMetadata propertyMetadata,
 			Collection<Class<?>> checkHierarchyFor) {
 		for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {

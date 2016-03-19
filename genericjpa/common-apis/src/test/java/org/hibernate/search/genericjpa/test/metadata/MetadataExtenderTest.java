@@ -21,9 +21,9 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.genericjpa.factory.StandaloneSearchConfiguration;
-import org.hibernate.search.genericjpa.metadata.impl.MetadataRehasher;
+import org.hibernate.search.genericjpa.metadata.impl.ExtendedTypeMetadata;
+import org.hibernate.search.genericjpa.metadata.impl.MetadataExtender;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataUtil;
-import org.hibernate.search.genericjpa.metadata.impl.RehashedTypeMetadata;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,22 +34,22 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Martin Braun
  */
-public class MetadataRehasherTest {
+public class MetadataExtenderTest {
 
 	private MetadataProvider metadataProvider;
-	private MetadataRehasher metadataRehasher;
+	private MetadataExtender metadataExtender;
 
 	@Before
 	public void setup() {
 		SearchConfiguration searchConfiguration = new StandaloneSearchConfiguration();
 		metadataProvider = MetadataUtil.getDummyMetadataProvider( searchConfiguration );
-		this.metadataRehasher = new MetadataRehasher();
+		this.metadataExtender = new MetadataExtender();
 	}
 
 	@Test
 	public void testBasic() {
 		TypeMetadata fromRoot = this.metadataProvider.getTypeMetadataFor( RootEntity.class );
-		RehashedTypeMetadata fromRootRehashed = this.metadataRehasher.rehash(
+		ExtendedTypeMetadata fromRootRehashed = this.metadataExtender.rehash(
 				Collections.singletonList( fromRoot ),
 				new HashSet<>()
 		).get( 0 );
@@ -96,7 +96,7 @@ public class MetadataRehasherTest {
 		}
 
 		TypeMetadata fromAnotherRoot = this.metadataProvider.getTypeMetadataFor( AnotherRootEntity.class );
-		RehashedTypeMetadata fromAnotherRootRehashed = this.metadataRehasher.rehash(
+		ExtendedTypeMetadata fromAnotherRootRehashed = this.metadataExtender.rehash(
 				Collections.singletonList(
 						fromAnotherRoot
 				),
@@ -147,7 +147,7 @@ public class MetadataRehasherTest {
 	@Test
 	public void testInheritanceIndexRelevancy() {
 		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
-		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash(
+		ExtendedTypeMetadata rehashed = this.metadataExtender.rehash(
 				Collections.singletonList( typeMetadata ),
 				new ArrayList<>( Collections.singletonList( Sub.class ) )
 		).get( 0 );
@@ -164,7 +164,7 @@ public class MetadataRehasherTest {
 	@Test
 	public void testInheritanceInIndex() {
 		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
-		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash(
+		ExtendedTypeMetadata rehashed = this.metadataExtender.rehash(
 				Collections.singletonList( typeMetadata ),
 				new ArrayList<>( Collections.singletonList( Sub.class ) )
 		).get( 0 );
@@ -181,7 +181,7 @@ public class MetadataRehasherTest {
 	@Test
 	public void testInheritanceCopyProperties() {
 		TypeMetadata typeMetadata = this.metadataProvider.getTypeMetadataFor( Root.class );
-		RehashedTypeMetadata rehashed = this.metadataRehasher.rehash(
+		ExtendedTypeMetadata rehashed = this.metadataExtender.rehash(
 				Collections.singletonList( typeMetadata ),
 				new ArrayList<>( Collections.singletonList( Sub.class ) )
 		).get( 0 );
@@ -202,7 +202,7 @@ public class MetadataRehasherTest {
 
 	@Test
 	public void testInheritanceRelevantSubclasses() {
-		Map<Class<?>, Set<Class<?>>> map = this.metadataRehasher.calculateRelevantSubclasses(
+		Map<Class<?>, Set<Class<?>>> map = this.metadataExtender.calculateRelevantSubclasses(
 				Arrays.asList(
 						Root.class,
 						Sub.class
@@ -235,7 +235,7 @@ public class MetadataRehasherTest {
 
 	}
 
-	private void assertStringDeletion(RehashedTypeMetadata rehashed, String fieldName) {
+	private void assertStringDeletion(ExtendedTypeMetadata rehashed, String fieldName) {
 		assertEquals(
 				SingularTermDeletionQuery.Type.STRING,
 				rehashed.getSingularTermDeletionQueryTypeForIdFieldName()

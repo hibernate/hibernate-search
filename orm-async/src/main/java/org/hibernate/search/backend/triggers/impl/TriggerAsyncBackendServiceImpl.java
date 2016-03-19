@@ -30,9 +30,9 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.factory.StandaloneSearchConfiguration;
-import org.hibernate.search.genericjpa.metadata.impl.MetadataRehasher;
+import org.hibernate.search.genericjpa.metadata.impl.ExtendedTypeMetadata;
+import org.hibernate.search.genericjpa.metadata.impl.MetadataExtender;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataUtil;
-import org.hibernate.search.genericjpa.metadata.impl.RehashedTypeMetadata;
 
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_DEFAULT_VALUE;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_KEY;
@@ -87,25 +87,25 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 			typeMetadatas.add( metadataProvider.getTypeMetadataFor( indexRootType ) );
 		}
 
-		MetadataRehasher rehasher = new MetadataRehasher();
-		Map<Class<?>, RehashedTypeMetadata> rehashedTypeMetadataPerIndexRoot = new HashMap<>();
+		MetadataExtender rehasher = new MetadataExtender();
+		Map<Class<?>, ExtendedTypeMetadata> rehashedTypeMetadataPerIndexRoot = new HashMap<>();
 
-		List<RehashedTypeMetadata> rehashedTypeMetadatas = rehasher.rehash(
+		List<ExtendedTypeMetadata> extendedTypeMetadatas = rehasher.rehash(
 				typeMetadatas,
 				entities
 		);
-		for ( RehashedTypeMetadata rehashedTypeMetadata : rehashedTypeMetadatas ) {
+		for ( ExtendedTypeMetadata extendedTypeMetadata : extendedTypeMetadatas ) {
 			rehashedTypeMetadataPerIndexRoot.put(
-					rehashedTypeMetadata.getOriginalTypeMetadata().getType(),
-					rehashedTypeMetadata
+					extendedTypeMetadata.getOriginalTypeMetadata().getType(),
+					extendedTypeMetadata
 			);
 		}
 
 		Map<Class<?>, Set<Class<?>>> containedInIndexOf = MetadataUtil.calculateInIndexOf(
-				rehashedTypeMetadatas,
+				extendedTypeMetadatas,
 				entities
 		);
-		Map<Class<?>, String> idProperties = MetadataUtil.calculateIdProperties( rehashedTypeMetadatas );
+		Map<Class<?>, String> idProperties = MetadataUtil.calculateIdProperties( extendedTypeMetadatas );
 
 		SQLJPAAsyncUpdateSourceProvider asyncUpdateSourceProvider;
 		{
@@ -150,7 +150,7 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 		);
 
 		Set<Class<?>> indexRelevantEntities = MetadataUtil.calculateIndexRelevantEntities(
-				rehashedTypeMetadatas,
+				extendedTypeMetadatas,
 				entities
 		);
 		EventModelParser eventModelParser = new ORMEventModelParser( sessionFactory, indexRelevantEntities );
