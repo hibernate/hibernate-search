@@ -71,11 +71,11 @@ public final class IndexUpdater {
 	}
 
 	public IndexUpdater(
-			Map<Class<?>, ExtendedTypeMetadata> metadataPerForIndexRoot,
+			Map<Class<?>, ExtendedTypeMetadata> metadataForIndexRoot,
 			Map<Class<?>, Set<Class<?>>> containedInIndexOf,
 			ReusableEntityProvider entityProvider,
 			ExtendedSearchIntegrator searchIntegrator) {
-		this( metadataPerForIndexRoot, containedInIndexOf, entityProvider, (IndexWrapper) null );
+		this( metadataForIndexRoot, containedInIndexOf, entityProvider, (IndexWrapper) null );
 		this.indexWrapper = new DefaultIndexWrapper( searchIntegrator );
 	}
 

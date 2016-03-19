@@ -276,6 +276,13 @@ public class ORMEventModelParser implements EventModelParser {
 			}
 			tableHandledColumns.get( originalTableName ).add( keyColumn );
 
+			//FIXME: get the actual column definition here
+			//and also support multivalued Ids here
+			//there is definitely a way to get the needed information
+			//column length is really important for STRING
+
+			//FIXME: hint CompositeType#assemble
+
 			Class<?> entityClass = updateClass;
 			String[] columnsInUpdateTable = new String[] {keyColumn + HSEARCH_UPDATES_SUFFIX};
 			String[] columnsInOriginal = new String[] {keyColumn};

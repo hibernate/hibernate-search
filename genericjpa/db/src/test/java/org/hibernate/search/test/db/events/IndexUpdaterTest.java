@@ -61,11 +61,11 @@ public class IndexUpdaterTest {
 		this.changed = false;
 		this.deletedSorcerer = false;
 		MetadataProvider metadataProvider = MetadataUtil.getDummyMetadataProvider( new StandaloneSearchConfiguration() );
-		MetadataExtender rehasher = new MetadataExtender();
+		MetadataExtender metadataExtender = new MetadataExtender();
 		List<ExtendedTypeMetadata> extendedTypeMetadatas = new ArrayList<>();
 		rehashedTypeMetadataPerIndexRoot = new HashMap<>();
 		for ( Class<?> indexRootType : Arrays.asList( Place.class ) ) {
-			ExtendedTypeMetadata rehashed = rehasher.rehash(
+			ExtendedTypeMetadata rehashed = metadataExtender.rehash(
 					Collections.singletonList( metadataProvider.getTypeMetadataFor( indexRootType ) ), Collections
 							.emptySet()
 			).get( 0 );
