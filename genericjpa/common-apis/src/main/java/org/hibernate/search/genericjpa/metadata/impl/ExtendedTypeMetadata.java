@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 
 /**
@@ -45,14 +43,6 @@ public final class ExtendedTypeMetadata {
 	Map<Class<?>, String> idPropertyNameForType = new HashMap<>();
 
 	Map<Class<?>, XProperty> idPropertyAccessorForType = new HashMap<>();
-
-	/**
-	 * this contains the DocumentFieldMetadata for each id-fieldname. This provides info about how each id is stored in
-	 * the index
-	 */
-	Map<String, FieldBridge> fieldBridgeForIdFieldName = new HashMap<>();
-
-	Map<String, SingularTermDeletionQuery.Type> singularTermDeletionQueryTypeForIdFieldName = new HashMap<>();
 
 	/**
 	 * @return the originalTypeMetadata
@@ -94,34 +84,6 @@ public final class ExtendedTypeMetadata {
 	 */
 	public void setIdPropertyNameForType(Map<Class<?>, String> idPropertyNameForType) {
 		this.idPropertyNameForType = idPropertyNameForType;
-	}
-
-	/**
-	 * @return the fieldBridgeForIdFieldName
-	 */
-	public Map<String, FieldBridge> getFieldBridgeForIdFieldName() {
-		return fieldBridgeForIdFieldName;
-	}
-
-	/**
-	 * @param fieldBridgeForIdFieldName the fieldBridgeForIdFieldName to set
-	 */
-	public void setFieldBridgeForIdFieldName(Map<String, FieldBridge> fieldBridgeForIdFieldName) {
-		this.fieldBridgeForIdFieldName = fieldBridgeForIdFieldName;
-	}
-
-	/**
-	 * @return the singularTermDeletionQueryTypeForIdFieldName
-	 */
-	public Map<String, SingularTermDeletionQuery.Type> getSingularTermDeletionQueryTypeForIdFieldName() {
-		return singularTermDeletionQueryTypeForIdFieldName;
-	}
-
-	/**
-	 * @param singularTermDeletionQueryTypeForIdFieldName the singularTermDeletionQueryTypeForIdFieldName to set
-	 */
-	public void setSingularTermDeletionQueryTypeForIdFieldName(Map<String, SingularTermDeletionQuery.Type> singularTermDeletionQueryTypeForIdFieldName) {
-		this.singularTermDeletionQueryTypeForIdFieldName = singularTermDeletionQueryTypeForIdFieldName;
 	}
 
 	public Map<Class<?>, XProperty> getIdPropertyAccessorForType() {

@@ -113,10 +113,10 @@ public class AnnotationEventModelParser implements EventModelParser {
 			updateTableNames.add( updateTableName );
 
 			String eventCaseColumn = info.updateTableEventTypeColumn().equals( "" ) ?
-					"eventcasehsearch" :
+					DEFAULT_EVENT_TYPE_COLUMN :
 					info.updateTableEventTypeColumn();
 			String updateIdColumn = info.updateTableIdColumn().equals( "" ) ?
-					"updateidhsearch" :
+					DEFAULT_UPDATE_ID_COLUMN :
 					info.updateTableIdColumn();
 
 			IdInfo[] annotationIdInfos = info.idInfos();
@@ -148,7 +148,7 @@ public class AnnotationEventModelParser implements EventModelParser {
 						updateTableColumns[i] = cur.updateTableColumn();
 					}
 					else {
-						updateTableColumns[i] = cur.column() + "fk";
+						updateTableColumns[i] = cur.column() + DEFAULT_HSEARCH_UPDATES_SUFFIX;
 					}
 					columnTypes[i] = cur.columnType();
 					if ( cur.columnType() == ColumnType.CUSTOM && cur.columnDefinition().equals( "" ) ) {

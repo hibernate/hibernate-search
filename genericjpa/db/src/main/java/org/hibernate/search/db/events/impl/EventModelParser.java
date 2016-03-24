@@ -21,6 +21,10 @@ import java.util.List;
  */
 public interface EventModelParser {
 
+	String DEFAULT_HSEARCH_UPDATES_SUFFIX = "hsearchupdates";
+	String DEFAULT_EVENT_TYPE_COLUMN = DEFAULT_HSEARCH_UPDATES_SUFFIX + "eventType" + DEFAULT_HSEARCH_UPDATES_SUFFIX;
+	String DEFAULT_UPDATE_ID_COLUMN = "hs" + "updateId" + DEFAULT_HSEARCH_UPDATES_SUFFIX;
+
 	List<EventModelInfo> parse(List<Class<?>> entities);
 
 }

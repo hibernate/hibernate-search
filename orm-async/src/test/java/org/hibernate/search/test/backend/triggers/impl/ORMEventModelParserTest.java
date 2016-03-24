@@ -23,6 +23,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.entities.Domain;
 import org.hibernate.search.test.entities.Embedded;
 import org.hibernate.search.test.entities.OverrideEntity;
+import org.hibernate.search.test.entities.OverrideEntityCustomType;
 import org.hibernate.search.test.entities.Place;
 import org.hibernate.search.test.entities.SecondaryTableEntity;
 import org.hibernate.search.test.entities.Sorcerer;
@@ -34,6 +35,7 @@ import org.hibernate.search.test.entities.TopLevel;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Martin Braun
@@ -170,6 +172,33 @@ public class ORMEventModelParserTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testOverrideEntityId() {
+		{
+			ORMEventModelParser parser = new ORMEventModelParser(
+					this.getSessionFactory(), set(
+					OverrideEntityCustomType.class
+			)
+			);
+			List<EventModelInfo> eventModelInfos = parser.parse(
+					Arrays.asList(
+							OverrideEntityCustomType.class
+					)
+			);
+			assertEquals( 1, eventModelInfos.size() );
+
+			Map<String, EventModelInfo> map = toMap( eventModelInfos );
+
+			this.assertInfos(
+					map,
+					OverrideEntityCustomType.class,
+					ColumnType.INTEGER,
+					"OverrideEntityCustomType",
+					"ID"
+			);
+		}
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
@@ -181,7 +210,8 @@ public class ORMEventModelParserTest extends SearchTestBase {
 				SecondaryTableEntity.class,
 				TablePerClass.class,
 				TablePerClassOne.class,
-				TablePerClassTwo.class
+				TablePerClassTwo.class,
+				OverrideEntityCustomType.class
 		};
 	}
 
@@ -199,17 +229,25 @@ public class ORMEventModelParserTest extends SearchTestBase {
 			String tableName,
 			String idColumnName) {
 		EventModelInfo evi = map.get( tableName );
-		assertEquals( ORMEventModelParser.EVENT_TYPE_COLUMN, evi.getEventTypeColumn() );
-		assertEquals( ORMEventModelParser.UPDATE_ID_COLUMN, evi.getUpdateIdColumn() );
+		assertEquals( ORMEventModelParser.DEFAULT_EVENT_TYPE_COLUMN, evi.getEventTypeColumn() );
+		assertEquals( ORMEventModelParser.DEFAULT_UPDATE_ID_COLUMN, evi.getUpdateIdColumn() );
 		assertEquals( tableName, evi.getOriginalTableName() );
-		assertEquals( tableName + ORMEventModelParser.HSEARCH_UPDATES_SUFFIX, evi.getUpdateTableName() );
+		assertEquals( tableName + ORMEventModelParser.DEFAULT_HSEARCH_UPDATES_SUFFIX, evi.getUpdateTableName() );
 
 		assertEquals( 1, evi.getIdInfos().size() );
 		EventModelInfo.IdInfo idInfo = evi.getIdInfos().get( 0 );
 		assertEquals( idColumnName, idInfo.getColumnsInOriginal()[0] );
-		assertEquals( idColumnName + ORMEventModelParser.HSEARCH_UPDATES_SUFFIX, idInfo.getColumnsInUpdateTable()[0] );
+		assertEquals(
+				idColumnName + ORMEventModelParser.DEFAULT_HSEARCH_UPDATES_SUFFIX,
+				idInfo.getColumnsInUpdateTable()[0]
+		);
 		assertEquals( entityClass, idInfo.getEntityClass() );
-		assertEquals( columnType, idInfo.getIdConverter() );
+		if ( columnType != ColumnType.CUSTOM && idInfo.getColumnTypes().length == 1 ) {
+			assertEquals( columnType, idInfo.getIdConverter() );
+		}
+		else {
+			assertNotNull( idInfo.getIdConverter() );
+		}
 		assertEquals( columnType, idInfo.getColumnTypes()[0] );
 		assertEquals( 0, idInfo.getHints().size() );
 		assertEquals( "", idInfo.getColumnDefinitions()[0] );

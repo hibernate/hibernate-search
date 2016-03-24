@@ -9,11 +9,13 @@ package org.hibernate.search.backend.triggers.impl;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -45,10 +47,6 @@ public class ORMEventModelParser implements EventModelParser {
 	//TODO: support for multivalued Ids, or do the support
 	//via the @UpdateInfo annotation?
 
-	public static final String HSEARCH_UPDATES_SUFFIX = "hsearchupdates";
-	public static final String EVENT_TYPE_COLUMN = HSEARCH_UPDATES_SUFFIX + "eventType" + HSEARCH_UPDATES_SUFFIX;
-	public static final String UPDATE_ID_COLUMN = "hs" + "updateId" + HSEARCH_UPDATES_SUFFIX;
-
 	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final EventModelParser manualParser;
@@ -79,6 +77,35 @@ public class ORMEventModelParser implements EventModelParser {
 
 		Map<String, EventModelInfo> tableEventModelInfos = new HashMap<>();
 		Map<String, Set<String>> tableHandledColumns = new HashMap<>();
+		Map<String, Set<Class<?>>> tableManuallyHandledEntities = new HashMap<>();
+
+		//we ignore all values that were unnecessarily set in the UpdateInfos
+		//as these can be specified on a whole different class, we filter them out
+		//after we parsed them with the manual parser
+		List<EventModelInfo> manuallySetValues = this.manualParser.parse( entities )
+				.stream()
+				.filter(
+						eventModelInfo1 -> !Collections.disjoint(
+								this.indexRelevantEntities, eventModelInfo1.getIdInfos()
+										.stream()
+										.map( EventModelInfo.IdInfo::getEntityClass )
+										.collect( Collectors.toSet() )
+						)
+				).collect( Collectors.toList() );
+
+		Map<String, EventModelInfo> manuallySetPerOriginal = new HashMap<>();
+		Map<String, EventModelInfo> manuallySetPerUpdate = new HashMap<>();
+		for ( EventModelInfo eventModelInfo : manuallySetValues ) {
+			manuallySetPerOriginal.put( eventModelInfo.getOriginalTableName(), eventModelInfo );
+			manuallySetPerUpdate.put( eventModelInfo.getUpdateTableName(), eventModelInfo );
+			for ( EventModelInfo.IdInfo idInfo : eventModelInfo.getIdInfos() ) {
+				tableManuallyHandledEntities.computeIfAbsent(
+						eventModelInfo.getOriginalTableName(),
+						(key) -> new HashSet<>()
+				)
+						.add( idInfo.getEntityClass() );
+			}
+		}
 
 		try {
 			Method getTableSpan = AbstractEntityPersister.class.getDeclaredMethod( "getTableSpan" );
@@ -116,18 +143,23 @@ public class ORMEventModelParser implements EventModelParser {
 							continue;
 						}
 
-						List<EventModelInfo.IdInfo> idInfos = this.getIdInfoList(
-								tableEventModelInfos,
-								originalTableName
-						);
+						if ( !tableManuallyHandledEntities.computeIfAbsent(
+								originalTableName,
+								(key) -> new HashSet<>()
+						).contains( updateClass ) ) {
+							List<EventModelInfo.IdInfo> idInfos = this.getIdInfoList(
+									tableEventModelInfos,
+									originalTableName
+							);
 
-						String[] keyColumns = (String[]) getKeyColumns.invoke( entityPersister, i );
-						this.addIdInfo(
-								keyColumns,
-								updateClass,
-								entityPersister.getIdentifierType().getReturnedClass(),
-								idInfos, originalTableName, tableHandledColumns
-						);
+							String[] keyColumns = (String[]) getKeyColumns.invoke( entityPersister, i );
+							this.addIdInfo(
+									keyColumns,
+									updateClass,
+									entityPersister.getIdentifierType().getReturnedClass(),
+									idInfos, originalTableName, tableHandledColumns
+							);
+						}
 					}
 
 					//Associations (only one side is needed if @ContainedIn is used and
@@ -181,29 +213,25 @@ public class ORMEventModelParser implements EventModelParser {
 								continue;
 							}
 
-							List<EventModelInfo.IdInfo> idInfos = this.getIdInfoList(
-									tableEventModelInfos,
-									joinable.getTableName()
-							);
+							if ( !tableManuallyHandledEntities.computeIfAbsent(
+									joinable.getTableName(),
+									(key) -> new HashSet<>()
+							).contains( associationEntityClass ) ) {
+								List<EventModelInfo.IdInfo> idInfos = this.getIdInfoList(
+										tableEventModelInfos,
+										joinable.getTableName()
+								);
 
-							this.addIdInfo(
-									keyColumns,
-									associationEntityClass,
-									persisterForOther.getIdentifierType().getReturnedClass(),
-									idInfos, joinable.getTableName(), tableHandledColumns
-							);
+								this.addIdInfo(
+										keyColumns,
+										associationEntityClass,
+										persisterForOther.getIdentifierType().getReturnedClass(),
+										idInfos, joinable.getTableName(), tableHandledColumns
+								);
+							}
 						}
 					}
 				}
-			}
-
-
-			List<EventModelInfo> manuallySetValues = this.manualParser.parse( entities );
-			Map<String, EventModelInfo> manuallySetPerOriginal = new HashMap<>();
-			Map<String, EventModelInfo> manuallySetPerUpdate = new HashMap<>();
-			for ( EventModelInfo eventModelInfo : manuallySetValues ) {
-				manuallySetPerOriginal.put( eventModelInfo.getOriginalTableName(), eventModelInfo );
-				manuallySetPerUpdate.put( eventModelInfo.getUpdateTableName(), eventModelInfo );
 			}
 
 			List<EventModelInfo> ret = new ArrayList<>( tableEventModelInfos.size() + manuallySetValues.size() );
@@ -223,6 +251,10 @@ public class ORMEventModelParser implements EventModelParser {
 					}
 					ret.add( evi );
 				}
+				else {
+					//we haven't generated any IdInfos that are overriden/already set in @UpdateInfos
+					manuallySetPerOriginal.get( tableName ).getIdInfos().addAll( evi.getIdInfos() );
+				}
 			}
 			return ret;
 		}
@@ -239,9 +271,9 @@ public class ORMEventModelParser implements EventModelParser {
 
 		List<EventModelInfo.IdInfo> idInfos;
 		if ( eventModelInfo == null ) {
-			String updateTableName = originalTableName + HSEARCH_UPDATES_SUFFIX;
-			String eventTypeColumn = EVENT_TYPE_COLUMN;
-			String updateIdColumn = UPDATE_ID_COLUMN;
+			String updateTableName = originalTableName + DEFAULT_HSEARCH_UPDATES_SUFFIX;
+			String eventTypeColumn = DEFAULT_EVENT_TYPE_COLUMN;
+			String updateIdColumn = DEFAULT_UPDATE_ID_COLUMN;
 			idInfos = new ArrayList<>();
 			eventModelInfo = new EventModelInfo(
 					updateTableName,
@@ -284,7 +316,7 @@ public class ORMEventModelParser implements EventModelParser {
 			//FIXME: hint CompositeType#assemble
 
 			Class<?> entityClass = updateClass;
-			String[] columnsInUpdateTable = new String[] {keyColumn + HSEARCH_UPDATES_SUFFIX};
+			String[] columnsInUpdateTable = new String[] {keyColumn + DEFAULT_HSEARCH_UPDATES_SUFFIX};
 			String[] columnsInOriginal = new String[] {keyColumn};
 			ColumnType[] columnTypes;
 			if ( identifierClass.equals( String.class ) ) {

@@ -15,16 +15,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.db.EventType;
 import org.hibernate.search.db.events.UpdateConsumer;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.entity.EntityProvider;
 import org.hibernate.search.genericjpa.entity.ReusableEntityProvider;
@@ -258,33 +254,6 @@ public final class IndexUpdater {
 				ExtendedTypeMetadata metadata = IndexUpdater.this.metadataForIndexRoot.get( indexClass );
 				Set<String> fields = metadata.getIdFieldNamesForType().get( entityClass );
 				for ( String field : fields ) {
-					SingularTermDeletionQuery.Type idType = metadata.getSingularTermDeletionQueryTypeForIdFieldName()
-							.get( field );
-					Object idValueForDeletion;
-					if ( idType == null ) {
-						throw new AssertionFailure( "idType was null for field " + field + " and class " + entityClass );
-					}
-					if ( idType == SingularTermDeletionQuery.Type.STRING ) {
-						FieldBridge fb = metadata.getFieldBridgeForIdFieldName()
-								.get(
-										field
-								);
-						if ( !(fb instanceof StringBridge) ) {
-							throw new IllegalArgumentException( "no StringBridge found for field: " + field );
-						}
-						try {
-							idValueForDeletion = ((StringBridge) fb).objectToString( id );
-						}
-						catch (Exception e) {
-							//the field and the bridge are not compatible
-							//but because of Inheritance this can be valid
-							continue;
-						}
-					}
-					else {
-						idValueForDeletion = id;
-					}
-
 					HSQuery hsQuery = this.searchIntegrator
 							.createHSQuery()
 							.targetedEntities( Collections.singletonList( indexClass ) )
@@ -294,7 +263,7 @@ public final class IndexUpdater {
 											.get()
 											.keyword()
 											.onField( field )
-											.matching( idValueForDeletion )
+											.matching( id )
 											.createQuery()
 							);
 					int count = hsQuery.queryResultSize();

@@ -16,7 +16,6 @@ import java.util.Set;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -88,11 +87,6 @@ public class MetadataExtenderTest {
 				assertEquals( "rootId", fromRootRehashed.getIdPropertyNameForType().get( RootEntity.class ) );
 				assertEquals( "subId", fromRootRehashed.getIdPropertyNameForType().get( SubEntity.class ) );
 			}
-
-			// THE DOCUMENT_FIELD_META_DATA
-			{
-				assertEquals( 5, fromRootRehashed.getFieldBridgeForIdFieldName().size() );
-			}
 		}
 
 		TypeMetadata fromAnotherRoot = this.metadataProvider.getTypeMetadataFor( AnotherRootEntity.class );
@@ -129,19 +123,6 @@ public class MetadataExtenderTest {
 		assertEquals( 2, inIndexOf.get( SubEntity.class ).size() );
 		assertTrue( inIndexOf.get( SubEntity.class ).contains( RootEntity.class ) );
 		assertTrue( inIndexOf.get( SubEntity.class ).contains( AnotherRootEntity.class ) );
-
-		this.assertStringDeletion( fromRootRehashed, "MAYBE_ROOT_NOT_NAMED_ID" );
-		this.assertStringDeletion( fromRootRehashed, "recursiveSelf.MAYBE_ROOT_NOT_NAMED_ID" );
-		this.assertStringDeletion( fromRootRehashed, "recursiveSelf.recursiveSelf.MAYBE_ROOT_NOT_NAMED_ID" );
-		this.assertStringDeletion( fromRootRehashed, "otherEntity.SUB_NOT_NAMED_ID" );
-		this.assertStringDeletion( fromRootRehashed, "recursiveSelf.otherEntity.SUB_NOT_NAMED_ID" );
-
-		//well, we don't have to check this, but we can do it at least for the root
-		//default id name is relevant as well
-		this.assertStringDeletion( fromAnotherRootRehashed, "id" );
-
-		// FIXME: unit-test the TermDeletion stuff for Numeric ids?
-		//... nvm. as of Hibernate Search 5.3.0.Beta1 all ids are Strings in the document
 	}
 
 	@Test
@@ -233,16 +214,6 @@ public class MetadataExtenderTest {
 
 	public static class Useless {
 
-	}
-
-	private void assertStringDeletion(ExtendedTypeMetadata rehashed, String fieldName) {
-		assertEquals(
-				SingularTermDeletionQuery.Type.STRING,
-				rehashed.getSingularTermDeletionQueryTypeForIdFieldName()
-						.get(
-								fieldName
-						)
-		);
 	}
 
 }

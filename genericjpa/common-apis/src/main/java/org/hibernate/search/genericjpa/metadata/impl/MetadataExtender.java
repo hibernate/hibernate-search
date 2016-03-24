@@ -14,14 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.spi.SingularTermDeletionQuery.Type;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -84,25 +80,6 @@ public final class MetadataExtender {
 								.equals( subRehashed.idPropertyAccessorForType.get( sub ).getName() ) ) {
 							throw log.overriddenIdSettings( parent, sub );
 						}
-
-						//we dont want users overriding the fieldname settings for the id field
-						//in a class hierarchy
-						for ( String fieldName : extendedTypeMetadata.fieldBridgeForIdFieldName.keySet() ) {
-							if ( subRehashed.fieldBridgeForIdFieldName.containsKey( fieldName ) ) {
-								FieldBridge fbSub = subRehashed.fieldBridgeForIdFieldName.get( fieldName );
-								if ( !fbSub.getClass().equals(
-										extendedTypeMetadata.fieldBridgeForIdFieldName.get(
-												fieldName
-										).getClass()
-								) ) {
-									throw log.overriddenIdSettings( parent, sub );
-								}
-							}
-						}
-						extendedTypeMetadata.fieldBridgeForIdFieldName.putAll( subRehashed.fieldBridgeForIdFieldName );
-
-						//this is fine without a test. The FieldBridge is different earlier than the DeletionType
-						extendedTypeMetadata.singularTermDeletionQueryTypeForIdFieldName.putAll( subRehashed.singularTermDeletionQueryTypeForIdFieldName );
 					}
 				}
 			}
@@ -205,45 +182,6 @@ public final class MetadataExtender {
 						rehashed.idPropertyAccessorForType.put( type, propertyMetadata.getPropertyAccessor() );
 					}
 				}
-
-				if ( rehashed.fieldBridgeForIdFieldName.containsKey( documentFieldMetadata.getName() ) ) {
-					throw new AssertionFailure( "field handled twice" + documentFieldMetadata.getName() );
-				}
-				rehashed.fieldBridgeForIdFieldName.put(
-						documentFieldMetadata.getName(),
-						documentFieldMetadata.getFieldBridge()
-				);
-				Type deletionQueryType;
-				if ( documentFieldMetadata.isNumeric() ) {
-					//as of Hibernate Search 5.3.0.Beta1 ids are always Strings, but just to make sure
-					NumericEncodingType numEncType = documentFieldMetadata.getNumericEncodingType();
-					switch ( numEncType ) {
-						case LONG:
-							deletionQueryType = Type.LONG;
-							break;
-						case INTEGER:
-							deletionQueryType = Type.INT;
-							break;
-						case DOUBLE:
-							deletionQueryType = Type.DOUBLE;
-							break;
-						case FLOAT:
-							deletionQueryType = Type.FLOAT;
-							break;
-						default:
-							throw new IllegalArgumentException(
-									"unexpected Numeric encoding type for id: " + numEncType
-											+ ". only the standard LONG, INTEGER, DOUBLE, FLOAT are allowed!"
-							);
-					}
-				}
-				else {
-					deletionQueryType = Type.STRING;
-				}
-				rehashed.singularTermDeletionQueryTypeForIdFieldName.put(
-						documentFieldMetadata.getName(),
-						deletionQueryType
-				);
 				return true;
 			}
 		}

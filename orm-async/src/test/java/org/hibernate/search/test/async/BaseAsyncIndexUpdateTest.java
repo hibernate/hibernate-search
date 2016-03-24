@@ -26,9 +26,11 @@ import org.hibernate.search.backend.triggers.impl.TriggerServiceConstants;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.util.Sleep;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.entities.CustomIdClass;
 import org.hibernate.search.test.entities.Domain;
 import org.hibernate.search.test.entities.Embedded;
 import org.hibernate.search.test.entities.OverrideEntity;
+import org.hibernate.search.test.entities.OverrideEntityCustomType;
 import org.hibernate.search.test.entities.Place;
 import org.hibernate.search.test.entities.SecondaryTableEntity;
 import org.hibernate.search.test.entities.SingleTable;
@@ -320,6 +322,62 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testCustomIdConverter() throws InterruptedException {
+		if ( this.isProfileTest && this.skipProfileTests ) {
+			System.out.println( "skipping this test for the selected profile" );
+			return;
+		}
+
+		{
+			this.session.getTransaction().begin();
+
+			OverrideEntityCustomType val = new OverrideEntityCustomType();
+			val.setId( 1 );
+			val.setId2( 2 );
+			val.setName( "somename" );
+			this.session.persist( val );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( OverrideEntityCustomType.class, 1, new MatchAllDocsQuery() );
+		}
+
+		{
+			this.session.getTransaction().begin();
+
+			OverrideEntityCustomType val = this.session.get(
+					OverrideEntityCustomType.class, new CustomIdClass(
+							1,
+							2
+					)
+			);
+			val.setName( "someothername" );
+			this.session.merge( val );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( OverrideEntityCustomType.class, 1, new TermQuery( new Term( "name", "someothername" ) ) );
+			this.assertCount( OverrideEntityCustomType.class, 0, new TermQuery( new Term( "name", "somename" ) ) );
+		}
+
+		{
+			this.session.getTransaction().begin();
+
+			OverrideEntityCustomType val = this.session.get(
+					OverrideEntityCustomType.class, new CustomIdClass(
+							1,
+							2
+					)
+			);
+			this.session.delete( val );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( OverrideEntityCustomType.class, 0, new MatchAllDocsQuery() );
+		}
+	}
+
 	private void assertCount(Class<?> entityClass, int count, Query query) throws InterruptedException {
 		int cnt[] = new int[1];
 		Sleep.sleep(
@@ -353,7 +411,8 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 				TablePerClassOne.class,
 				TablePerClassTwo.class,
 				SingleTable.class,
-				SingleTableOne.class
+				SingleTableOne.class,
+				OverrideEntityCustomType.class
 		};
 	}
 
