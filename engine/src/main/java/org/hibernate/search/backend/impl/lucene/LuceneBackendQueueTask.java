@@ -83,7 +83,7 @@ final class LuceneBackendQueueTask implements Runnable {
 			return;
 		}
 
-		boolean taskExecutionSuccessful = true;
+		boolean someFailureHappened = true;
 		LuceneWork currentOperation = null; // to nicely report errors
 		try {
 			for ( LuceneWork luceneWork : workList ) {
@@ -93,6 +93,7 @@ final class LuceneBackendQueueTask implements Runnable {
 			}
 			currentOperation = null;
 			workspace.optimizerPhase();
+			someFailureHappened = false;
 		}
 		catch (RuntimeException re) {
 			errorContextBuilder.errorThatOccurred( re );
@@ -102,7 +103,7 @@ final class LuceneBackendQueueTask implements Runnable {
 			resources.getErrorHandler().handle( errorContextBuilder.createErrorContext() );
 		}
 		finally {
-			workspace.afterTransactionApplied( !taskExecutionSuccessful, false );
+			workspace.afterTransactionApplied( someFailureHappened, false );
 		}
 	}
 
