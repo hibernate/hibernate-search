@@ -319,21 +319,24 @@ public class ORMEventModelParser implements EventModelParser {
 			String[] columnsInUpdateTable = new String[] {keyColumn + DEFAULT_HSEARCH_UPDATES_SUFFIX};
 			String[] columnsInOriginal = new String[] {keyColumn};
 			ColumnType[] columnTypes;
+			IdConverter idConverter;
 			if ( identifierClass.equals( String.class ) ) {
 				columnTypes = new ColumnType[] {ColumnType.STRING};
+				idConverter = ColumnType.STRING;
 			}
 			else if ( identifierClass.equals( Integer.class ) ) {
 				columnTypes = new ColumnType[] {ColumnType.INTEGER};
+				idConverter = ColumnType.INTEGER;
 			}
 			else if ( identifierClass.equals( Long.class ) ) {
 				columnTypes = new ColumnType[] {ColumnType.LONG};
+				idConverter = ColumnType.LONG;
 			}
 			else {
 				columnTypes = new ColumnType[] {ColumnType.CUSTOM};
 				throw new AssertionFailure( "only String, Integer, Long allowed for ids" );
 			}
 			String[] columnDefinitions = new String[] {""};
-			IdConverter idConverter = columnTypes[0];
 			Map<String, String> hints = new HashMap<>();
 
 			idInfos.add(

@@ -8,6 +8,7 @@ package org.hibernate.search.test.async;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.genericjpa.util.Sleep;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.entities.CustomIdClass;
+import org.hibernate.search.test.entities.DateAsStringEntity;
 import org.hibernate.search.test.entities.Domain;
 import org.hibernate.search.test.entities.Embedded;
 import org.hibernate.search.test.entities.OverrideEntity;
@@ -378,6 +380,29 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testDateAsString() throws InterruptedException {
+		if ( this.isProfileTest && this.skipProfileTests ) {
+			System.out.println( "skipping this test for the selected profile" );
+			return;
+		}
+
+		{
+			this.session.getTransaction().begin();
+
+			Date date = new Date( 123 );
+			DateAsStringEntity ent = new DateAsStringEntity();
+			ent.setDate( date );
+			ent.setSomeField( "someField" );
+
+			this.session.persist( ent );
+
+			this.session.getTransaction().commit();
+
+			this.assertCount( DateAsStringEntity.class, 1, new MatchAllDocsQuery() );
+		}
+	}
+
 	private void assertCount(Class<?> entityClass, int count, Query query) throws InterruptedException {
 		int cnt[] = new int[1];
 		Sleep.sleep(
@@ -412,7 +437,8 @@ public abstract class BaseAsyncIndexUpdateTest extends SearchTestBase {
 				TablePerClassTwo.class,
 				SingleTable.class,
 				SingleTableOne.class,
-				OverrideEntityCustomType.class
+				OverrideEntityCustomType.class,
+				DateAsStringEntity.class
 		};
 	}
 
