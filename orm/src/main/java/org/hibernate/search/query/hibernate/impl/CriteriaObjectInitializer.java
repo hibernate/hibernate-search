@@ -52,11 +52,11 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 	}
 
 	@Override
-	public void initializeObjects(EntityInfo[] entityInfos,
+	public void initializeObjects(List<EntityInfo> entityInfos,
 			LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap,
 			ObjectInitializationContext objectInitializationContext) {
 		// Do not call isTimeOut here as the caller might be the last biggie on the list.
-		final int maxResults = entityInfos.length;
+		final int maxResults = entityInfos.size();
 		if ( log.isTraceEnabled() ) {
 			log.tracef( "Load %d objects using criteria queries", maxResults );
 		}
@@ -116,7 +116,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 	 * will contain one criteria object for each id space used by the given infos. A single criteria will be returned in
 	 * case all the entity infos originate from the same id space.
 	 */
-	private List<Criteria> buildUpCriteria(EntityInfo[] entityInfos, ObjectInitializationContext objectInitializationContext) {
+	private List<Criteria> buildUpCriteria(List<EntityInfo> entityInfos, ObjectInitializationContext objectInitializationContext) {
 		Map<Class<?>, List<EntityInfo>> infosByIdSpace = groupInfosByIdSpace( entityInfos, objectInitializationContext );
 
 		// all entities from same id space -> single criteria
@@ -188,7 +188,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 	 *
 	 * @return The given entity infos, keyed by the root entity type of id spaces
 	 */
-	private Map<Class<?>, List<EntityInfo>> groupInfosByIdSpace(EntityInfo[] entityInfos, ObjectInitializationContext objectInitializationContext) {
+	private Map<Class<?>, List<EntityInfo>> groupInfosByIdSpace(List<EntityInfo> entityInfos, ObjectInitializationContext objectInitializationContext) {
 		ServiceManager serviceManager = objectInitializationContext.getExtendedSearchIntegrator().getServiceManager();
 		IdUniquenessResolver resolver = serviceManager.requestService( IdUniquenessResolver.class );
 		SessionFactoryImplementor sessionFactory = (SessionFactoryImplementor) objectInitializationContext.getSession().getSessionFactory();

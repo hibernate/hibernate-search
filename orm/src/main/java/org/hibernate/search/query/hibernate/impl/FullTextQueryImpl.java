@@ -199,7 +199,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		hSearchQuery.getTimeoutManager().start();
 		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
 		Loader loader = getLoader();
-		List list = loader.load( entityInfos.toArray( new EntityInfo[entityInfos.size()] ) );
+		List list = loader.load( entityInfos );
 		//no need to timeoutManager.isTimedOut from this point, we don't do anything intensive
 		if ( resultTransformer == null || loader instanceof ProjectionLoader ) {
 			//stay consistent with transformTuple which can only be executed during a projection
@@ -383,7 +383,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 
 		@Override
-		public List load(EntityInfo... entityInfos) {
+		public List load(List<EntityInfo> entityInfos) {
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
 

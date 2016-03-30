@@ -49,7 +49,7 @@ public abstract class AbstractLoader implements Loader {
 	public abstract Object executeLoad(EntityInfo entityInfo);
 
 	@Override
-	public List load(EntityInfo... entityInfos) {
+	public List load(List<EntityInfo> entityInfos) {
 		long startTime = 0;
 		if ( takeTimings ) {
 			startTime = System.nanoTime();
@@ -63,7 +63,7 @@ public abstract class AbstractLoader implements Loader {
 		return loadedObjects;
 	}
 
-	public abstract List executeLoad(EntityInfo... entityInfo);
+	public abstract List executeLoad(List<EntityInfo> entityInfo);
 }
 
 

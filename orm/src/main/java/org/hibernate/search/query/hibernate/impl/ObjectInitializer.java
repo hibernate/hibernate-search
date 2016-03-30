@@ -7,6 +7,7 @@
 package org.hibernate.search.query.hibernate.impl;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.hibernate.search.query.engine.spi.EntityInfo;
 
@@ -27,7 +28,7 @@ public interface ObjectInitializer {
 	 * @param idToObjectMap map keeping to store the loaded entities in
 	 * @param objectInitializationContext gives access to the resources needed in the context of entity initialization
 	 */
-	void initializeObjects(EntityInfo[] entityInfos,
+	void initializeObjects(List<EntityInfo> entityInfos,
 			LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap,
 			ObjectInitializationContext objectInitializationContext);
 }

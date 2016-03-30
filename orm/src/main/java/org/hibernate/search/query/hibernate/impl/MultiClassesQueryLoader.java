@@ -81,13 +81,13 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	}
 
 	@Override
-	public List executeLoad(EntityInfo... entityInfos) {
-		if ( entityInfos.length == 0 ) {
+	public List executeLoad(List<EntityInfo> entityInfos) {
+		if ( entityInfos.isEmpty() ) {
 			return Collections.EMPTY_LIST;
 		}
 
-		if ( entityInfos.length == 1 ) {
-			final Object entity = load( entityInfos[0] );
+		if ( entityInfos.size() == 1 ) {
+			final Object entity = load( entityInfos.get( 0 ) );
 			if ( entity == null ) {
 				return Collections.EMPTY_LIST;
 			}
@@ -96,7 +96,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			}
 		}
 
-		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.length / 0.75 ) + 1 );
+		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.size() / 0.75 ) + 1 );
 
 		// split EntityInfo per root entity
 		Map<RootEntityMetadata, List<EntityInfo>> entityInfoBuckets = new HashMap<>( entityMetadata.size() );
@@ -128,10 +128,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		for ( Map.Entry<RootEntityMetadata, List<EntityInfo>> entry : entityInfoBuckets.entrySet() ) {
 			final RootEntityMetadata key = entry.getKey();
 			final List<EntityInfo> value = entry.getValue();
-			final EntityInfo[] bucketEntityInfos = value.toArray( new EntityInfo[value.size()] );
 
 			objectInitializer.initializeObjects(
-					bucketEntityInfos, idToObjectMap, new ObjectInitializationContext(
+					value, idToObjectMap, new ObjectInitializationContext(
 							key.criteria,
 							key.rootEntity,
 							extendedIntegrator,

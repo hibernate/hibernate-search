@@ -80,14 +80,14 @@ public class ProjectionLoader implements Loader {
 	}
 
 	@Override
-	public List load(EntityInfo... entityInfos) {
+	public List load(List<EntityInfo> entityInfos) {
 		//no need to timeouManage here, the underlying loader is the real time consumer
-		List results = new ArrayList( entityInfos.length );
-		if ( entityInfos.length == 0 ) {
+		List results = new ArrayList( entityInfos.size() );
+		if ( entityInfos.isEmpty() ) {
 			return results;
 		}
 
-		if ( projectionEnabledOnThis( entityInfos[0] ) ) {
+		if ( projectionEnabledOnThis( entityInfos.get( 0 ) ) ) {
 			Loader objectLoader = getObjectLoader();
 			objectLoader.load( entityInfos ); // load by batch
 			for ( EntityInfo entityInfo : entityInfos ) {

@@ -30,11 +30,11 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 	}
 
 	@Override
-	public void initializeObjects(EntityInfo[] entityInfos,
+	public void initializeObjects(List<EntityInfo> entityInfos,
 			LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap,
 			ObjectInitializationContext objectInitializationContext) {
 		// Do not call isTimeOut here as the caller might be the last biggie on the list.
-		final int numberOfObjectsToInitialize = entityInfos.length;
+		final int numberOfObjectsToInitialize = entityInfos.size();
 
 		if ( numberOfObjectsToInitialize == 0 ) {
 			if ( log.isTraceEnabled() ) {
@@ -80,7 +80,7 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 
 		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(
-					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
+					remainingEntityInfos,
 					idToObjectMap,
 					objectInitializationContext
 			);

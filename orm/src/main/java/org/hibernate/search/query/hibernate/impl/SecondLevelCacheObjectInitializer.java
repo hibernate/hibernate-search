@@ -31,11 +31,11 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 	}
 
 	@Override
-	public void initializeObjects(EntityInfo[] entityInfos, LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap, ObjectInitializationContext objectInitializationContext) {
+	public void initializeObjects(List<EntityInfo> entityInfos, LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap, ObjectInitializationContext objectInitializationContext) {
 		boolean traceEnabled = log.isTraceEnabled();
 
 		// Do not call isTimeOut here as the caller might be the last biggie on the list.
-		final int maxResults = entityInfos.length;
+		final int maxResults = entityInfos.size();
 		if ( maxResults == 0 ) {
 			if ( traceEnabled ) {
 				log.tracef( "No object to initialize", maxResults );
@@ -44,7 +44,7 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 		}
 
 		// check the second-level cache
-		List<EntityInfo> remainingEntityInfos = new ArrayList<>( entityInfos.length );
+		List<EntityInfo> remainingEntityInfos = new ArrayList<>( entityInfos.size() );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, objectInitializationContext.getSession() ) ) {
 				final boolean isIn2LCache = objectInitializationContext.getSession()
@@ -82,7 +82,7 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 		}
 		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(
-					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
+					remainingEntityInfos,
 					idToObjectMap,
 					objectInitializationContext
 			);

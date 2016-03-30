@@ -60,7 +60,7 @@ public class QueryLoader extends AbstractLoader {
 	public final Object executeLoad(EntityInfo entityInfo) {
 		//if explicit criteria, make sure to use it to load the objects
 		if ( isExplicitCriteria ) {
-			load( new EntityInfo[] { entityInfo } );
+			load( Collections.singletonList( entityInfo ) );
 		}
 		final Object result = ObjectLoaderHelper.load( entityInfo, session );
 		timeoutManager.isTimedOut();
@@ -68,16 +68,16 @@ public class QueryLoader extends AbstractLoader {
 	}
 
 	@Override
-	public final List executeLoad(EntityInfo... entityInfos) {
+	public final List executeLoad(List<EntityInfo> entityInfos) {
 		if ( entityType == null ) {
 			throw new AssertionFailure( "EntityType not defined" );
 		}
 
-		if ( entityInfos.length == 0 ) {
+		if ( entityInfos.isEmpty() ) {
 			return Collections.EMPTY_LIST;
 		}
 
-		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.length / 0.75 ) + 1 );
+		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.size() / 0.75 ) + 1 );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			idToObjectMap.put(
 					new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() ),

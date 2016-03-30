@@ -112,7 +112,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		}
 		//preload efficiently by batches:
 		if ( sizeToLoad > 1 ) {
-			loader.load( entityInfosToLoad.toArray( new EntityInfo[sizeToLoad] ) );
+			loader.load( entityInfosToLoad );
 			//(no references stored at this point: they still need to be loaded one by one to inject null results)
 		}
 		return resultsContext[ current - first ];

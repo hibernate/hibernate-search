@@ -7,6 +7,7 @@
 package org.hibernate.search.query.hibernate.impl;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.logging.impl.Log;
@@ -33,11 +34,11 @@ public class LookupObjectInitializer implements ObjectInitializer {
 	}
 
 	@Override
-	public void initializeObjects(EntityInfo[] entityInfos, LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap, ObjectInitializationContext objectInitializationContext) {
+	public void initializeObjects(List<EntityInfo> entityInfos, LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap, ObjectInitializationContext objectInitializationContext) {
 		boolean traceEnabled = log.isTraceEnabled();
 
 		// Do not call isTimeOut here as the caller might be the last biggie on the list.
-		final int maxResults = entityInfos.length;
+		final int maxResults = entityInfos.size();
 		if ( maxResults == 0 ) {
 			if ( traceEnabled ) {
 				log.tracef( "No object to initialize", maxResults );

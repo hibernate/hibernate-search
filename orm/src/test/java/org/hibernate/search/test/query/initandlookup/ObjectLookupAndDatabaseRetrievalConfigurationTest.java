@@ -41,7 +41,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.CriteriaObjectInitializer",
-			targetMethod = "initializeObjects(org.hibernate.search.query.engine.spi.EntityInfo[], java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
+			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
 			helper = "org.hibernate.search.testsupport.BytemanHelper",
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
@@ -65,7 +65,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.PersistenceContextObjectInitializer",
-			targetMethod = "initializeObjects(org.hibernate.search.query.engine.spi.EntityInfo[], java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
+			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
 			helper = "org.hibernate.search.testsupport.BytemanHelper",
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
@@ -89,7 +89,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.PersistenceContextObjectInitializer",
-			targetMethod = "initializeObjects(org.hibernate.search.query.engine.spi.EntityInfo[], java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
+			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
 			helper = "org.hibernate.search.testsupport.BytemanHelper",
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
@@ -113,7 +113,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.LookupObjectInitializer",
-			targetMethod = "initializeObjects(org.hibernate.search.query.engine.spi.EntityInfo[], java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
+			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
 			helper = "org.hibernate.search.testsupport.BytemanHelper",
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
@@ -137,7 +137,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.LookupObjectInitializer",
-			targetMethod = "initializeObjects(org.hibernate.search.query.engine.spi.EntityInfo[], java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
+			targetMethod = "initializeObjects(java.util.List, java.util.LinkedHashMap, org.hibernate.search.query.hibernate.impl.ObjectInitializationContext)",
 			helper = "org.hibernate.search.testsupport.BytemanHelper",
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
