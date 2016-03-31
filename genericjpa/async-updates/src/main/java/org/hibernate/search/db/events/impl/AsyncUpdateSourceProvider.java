@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.db.events.impl;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -17,23 +18,13 @@ import org.hibernate.search.db.util.impl.EntityManagerFactoryWrapper;
  */
 public interface AsyncUpdateSourceProvider {
 
-	/**
-	 * this uses a {@link AnnotationEventModelParser as default}
-	 */
-	AsyncUpdateSource getUpdateSource(
-			long delay,
-			TimeUnit timeUnit,
-			int batchSizeForUpdates,
-			Properties properties,
-			EntityManagerFactoryWrapper emf);
-
 	AsyncUpdateSource getUpdateSource(
 			long delay,
 			TimeUnit timeUnit,
 			int batchSizeForUpdates,
 			Properties properties,
 			EntityManagerFactoryWrapper emf,
-			EventModelParser eventModelParser
+			List<EventModelInfo> eventModelInfos
 	);
 
 }

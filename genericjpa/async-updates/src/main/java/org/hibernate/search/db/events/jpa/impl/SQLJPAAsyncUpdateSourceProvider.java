@@ -6,19 +6,15 @@
  */
 package org.hibernate.search.db.events.jpa.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.db.EventType;
-import org.hibernate.search.db.events.impl.AnnotationEventModelParser;
 import org.hibernate.search.db.events.impl.AsyncUpdateSource;
-import org.hibernate.search.db.events.impl.EventModelInfo;
-import org.hibernate.search.db.events.impl.EventModelParser;
-import org.hibernate.search.db.events.triggers.TriggerSQLStringSource;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.db.events.impl.AsyncUpdateSourceProvider;
+import org.hibernate.search.db.events.impl.EventModelInfo;
+import org.hibernate.search.db.events.triggers.TriggerSQLStringSource;
 import org.hibernate.search.db.util.impl.EntityManagerFactoryWrapper;
 import org.hibernate.search.db.util.impl.EntityManagerWrapper;
 import org.hibernate.search.db.util.impl.TransactionWrapper;
@@ -45,16 +41,6 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 		this.triggerCreateStrategy = triggerCreateStrategy;
 	}
 
-	@Override
-	public AsyncUpdateSource getUpdateSource(
-			long delay,
-			TimeUnit timeUnit,
-			int batchSizeForUpdates,
-			Properties properties,
-			EntityManagerFactoryWrapper emf) {
-		EventModelParser eventModelParser = new AnnotationEventModelParser();
-		return this.getUpdateSource( delay, timeUnit, batchSizeForUpdates, properties, emf, eventModelParser );
-	}
 
 	@Override
 	public AsyncUpdateSource getUpdateSource(
@@ -63,9 +49,8 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 			int batchSizeForUpdates,
 			Properties properties,
 			EntityManagerFactoryWrapper emf,
-			EventModelParser eventModelParser) {
-		List<EventModelInfo> eventModelInfos = eventModelParser.parse( new ArrayList<>( this.entityClasses ) );
-		this.setupTriggers( emf, eventModelInfos, properties );
+			List<EventModelInfo> eventModelInfos) {
+		this.setupTriggers( emf, eventModelInfos );
 		JPAUpdateSource updateSource = new JPAUpdateSource(
 				eventModelInfos,
 				emf,
@@ -84,97 +69,91 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 
 	private void setupTriggers(
 			EntityManagerFactoryWrapper emf,
-			List<EventModelInfo> eventModelInfos,
-			Properties properties) {
-		if ( AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DONT_CREATE.equals( this.triggerCreateStrategy ) || (!AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE
-				.equals( this.triggerCreateStrategy ) && !AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DROP_CREATE.equals(
-				this.triggerCreateStrategy
-		)) ) {
-			return;
+			List<EventModelInfo> eventModelInfos) {
+		switch ( this.triggerCreateStrategy ) {
+			case AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DROP_CREATE:
+				this.dropDDL( emf, eventModelInfos );
+			case AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE_DROP:
+				//we drop at shutdown with this
+				//this has to be handled outside of this class
+			case AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE:
+				this.createDDL( emf, eventModelInfos );
+			case AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DONT_CREATE:
+			default:
+				return;
+		}
+	}
+
+	public void dropDDL(EntityManagerFactoryWrapper emf, List<EventModelInfo> eventModelInfos) {
+		//DROP EVERYTHING IN THE EXACTLY INVERSE ORDER WE CREATE IT
+		for ( EventModelInfo info : eventModelInfos ) {
+
+			for ( int eventType : EventType.values() ) {
+				String[] triggerDropStrings = this.triggerSource.getTriggerDropCode( info, eventType );
+				for ( String triggerDropString : triggerDropStrings ) {
+					log.triggerCreationSQL( triggerDropString );
+					this.doQueryOrLogException(
+							emf,
+							triggerDropString,
+							true
+					);
+				}
+			}
+
+			for ( String unSetupCode : this.triggerSource.getSpecificUnSetupCode( info ) ) {
+				log.triggerCreationSQL( unSetupCode );
+				this.doQueryOrLogException( emf, unSetupCode, true );
+			}
+
+			for ( String str : triggerSource.getUpdateTableDropCode( info ) ) {
+				log.triggerCreationSQL( str );
+				this.doQueryOrLogException( emf, str, true );
+			}
+
 		}
 
-		try {
-			try {
-				if ( AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DROP_CREATE.equals( this.triggerCreateStrategy ) ) {
-					//DROP EVERYTHING IN THE EXACTLY INVERSED ORDER WE CREATE IT
-					for ( EventModelInfo info : eventModelInfos ) {
+		for ( String str : triggerSource.getUnSetupCode() ) {
+			log.triggerCreationSQL( str );
+			this.doQueryOrLogException( emf, str, true );
+		}
 
-						for ( int eventType : EventType.values() ) {
-							String[] triggerDropStrings = this.triggerSource.getTriggerDropCode( info, eventType );
-							for ( String triggerDropString : triggerDropStrings ) {
-								log.triggerCreationSQL( triggerDropString );
-								this.doQueryOrLogException(
-										emf,
-										triggerDropString,
-										true
-								);
-							}
-						}
+		log.trace( "finished dropping triggers!" );
+	}
 
-						for ( String unSetupCode : this.triggerSource.getSpecificUnSetupCode( info ) ) {
-							log.triggerCreationSQL( unSetupCode );
-							this.doQueryOrLogException( emf, unSetupCode, true );
-						}
+	private void createDDL(EntityManagerFactoryWrapper emf, List<EventModelInfo> eventModelInfos) {
+		for ( String str : triggerSource.getSetupCode() ) {
+			log.triggerCreationSQL( str );
+			this.doQueryOrLogException( emf, str, false );
+		}
 
-						for ( String str : triggerSource.getUpdateTableDropCode( info ) ) {
-							log.triggerCreationSQL( str );
-							this.doQueryOrLogException( emf, str, true );
-						}
-
-					}
-
-					for ( String str : triggerSource.getUnSetupCode() ) {
-						log.triggerCreationSQL( str );
-						this.doQueryOrLogException( emf, str, true );
-					}
-				}
-
-				//CREATE EVERYTHING
-				try {
-					for ( String str : triggerSource.getSetupCode() ) {
-						log.triggerCreationSQL( str );
-						this.doQueryOrLogException( emf, str, false );
-					}
-
-					for ( EventModelInfo info : eventModelInfos ) {
-						for ( String str : triggerSource.getUpdateTableCreationCode( info ) ) {
-							log.triggerCreationSQL( str );
-							this.doQueryOrLogException( emf, str, false );
-						}
-
-						for ( String setupCode : this.triggerSource.getSpecificSetupCode( info ) ) {
-							log.triggerCreationSQL( setupCode );
-							this.doQueryOrLogException( emf, setupCode, false );
-						}
-
-						for ( int eventType : EventType.values() ) {
-							String[] triggerCreationStrings = this.triggerSource.getTriggerCreationCode(
-									info,
-									eventType
-							);
-							for ( String triggerCreationString : triggerCreationStrings ) {
-								log.triggerCreationSQL( triggerCreationString );
-								this.doQueryOrLogException(
-										emf,
-										triggerCreationString,
-										false
-								);
-							}
-						}
-					}
-				}
-				catch (Exception e) {
-					throw new SearchException( e );
-				}
-				log.trace( "finished setting up triggers!" );
+		for ( EventModelInfo info : eventModelInfos ) {
+			for ( String str : triggerSource.getUpdateTableCreationCode( info ) ) {
+				log.triggerCreationSQL( str );
+				this.doQueryOrLogException( emf, str, false );
 			}
-			finally {
 
+			for ( String setupCode : this.triggerSource.getSpecificSetupCode( info ) ) {
+				log.triggerCreationSQL( setupCode );
+				this.doQueryOrLogException( emf, setupCode, false );
+			}
+
+			for ( int eventType : EventType.values() ) {
+				String[] triggerCreationStrings = this.triggerSource.getTriggerCreationCode(
+						info,
+						eventType
+				);
+				for ( String triggerCreationString : triggerCreationStrings ) {
+					log.triggerCreationSQL( triggerCreationString );
+					this.doQueryOrLogException(
+							emf,
+							triggerCreationString,
+							false
+					);
+				}
 			}
 		}
-		catch (Exception e) {
-			throw new SearchException( e );
-		}
+
+		log.trace( "finished setting up triggers!" );
 	}
 
 	private void doQueryOrLogException(

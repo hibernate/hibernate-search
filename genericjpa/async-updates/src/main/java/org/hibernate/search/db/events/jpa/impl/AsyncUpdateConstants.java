@@ -29,6 +29,7 @@ public final class AsyncUpdateConstants {
 	public static final String TRIGGER_CREATION_STRATEGY_CREATE = "create";
 	public static final String TRIGGER_CREATION_STRATEGY_DROP_CREATE = "drop-create";
 	public static final String TRIGGER_CREATION_STRATEGY_DONT_CREATE = "dont-create";
+	public static final String TRIGGER_CREATION_STRATEGY_CREATE_DROP = "create-drop";
 	public static final String TRIGGER_CREATION_STRATEGY_DEFAULT_VALUE = TRIGGER_CREATION_STRATEGY_CREATE;
 
 }

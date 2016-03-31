@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.db.events.impl.AsyncUpdateSource;
+import org.hibernate.search.db.events.impl.EventModelInfo;
 import org.hibernate.search.db.events.impl.EventModelParser;
 import org.hibernate.search.db.events.index.impl.IndexUpdater;
 import org.hibernate.search.db.events.jpa.impl.SQLJPAAsyncUpdateSourceProvider;
@@ -37,7 +38,9 @@ import org.hibernate.search.genericjpa.metadata.impl.MetadataUtil;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_DEFAULT_VALUE;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_KEY;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE_DROP;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DEFAULT_VALUE;
+import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DONT_CREATE;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DROP_CREATE;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_KEY;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.TRIGGER_SOURCE_KEY;
@@ -52,6 +55,10 @@ import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.UPDAT
 public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendService {
 
 	private AsyncUpdateSource asyncUpdateSource;
+	private SQLJPAAsyncUpdateSourceProvider asyncUpdateSourceProvider;
+	private ORMEntityManagerFactoryWrapper entityManagerFactoryWrapper;
+	private String createTriggerStrategy;
+	private List<EventModelInfo> eventModelInfos;
 
 	@Override
 	public void start(
@@ -71,6 +78,8 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 		if ( this.asyncUpdateSource != null ) {
 			throw new AssertionFailure( "TriggerAsyncBackendServiceImpl was started twice" );
 		}
+
+		this.entityManagerFactoryWrapper = new ORMEntityManagerFactoryWrapper( sessionFactory );
 
 		List<Class<?>> entities = sessionFactory.getAllClassMetadata().entrySet().stream().map(
 				e -> (Class<?>) e.getValue().getMappedClass()
@@ -107,7 +116,6 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 		);
 		Map<Class<?>, String> idProperties = MetadataUtil.calculateIdProperties( extendedTypeMetadatas );
 
-		SQLJPAAsyncUpdateSourceProvider asyncUpdateSourceProvider;
 		{
 			String triggerSource = (String) properties.get( TRIGGER_SOURCE_KEY );
 			Class<?> triggerSourceClass;
@@ -116,12 +124,14 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 						"class specified in " + TRIGGER_SOURCE_KEY + " could not be found: " + triggerSource
 				);
 			}
-			String createTriggerStrategy = (String) properties.getOrDefault(
+			this.createTriggerStrategy = (String) properties.getOrDefault(
 					TRIGGER_CREATION_STRATEGY_KEY,
 					TRIGGER_CREATION_STRATEGY_DEFAULT_VALUE
 			);
-			if ( !TRIGGER_CREATION_STRATEGY_CREATE.equals( createTriggerStrategy ) && !TRIGGER_CREATION_STRATEGY_DROP_CREATE
-					.equals( createTriggerStrategy ) ) {
+			if ( !TRIGGER_CREATION_STRATEGY_CREATE.equals( createTriggerStrategy )
+					&& !TRIGGER_CREATION_STRATEGY_CREATE_DROP.equals( createTriggerStrategy )
+					&& !TRIGGER_CREATION_STRATEGY_DONT_CREATE.equals( createTriggerStrategy )
+					&& !TRIGGER_CREATION_STRATEGY_DROP_CREATE.equals( createTriggerStrategy ) ) {
 				throw new SearchException( "unrecognized " + TRIGGER_CREATION_STRATEGY_KEY + " specified: " + createTriggerStrategy );
 			}
 			try {
@@ -154,16 +164,16 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 				entities
 		);
 		EventModelParser eventModelParser = new ORMEventModelParser( sessionFactory, indexRelevantEntities );
+		this.eventModelInfos = eventModelParser.parse( new ArrayList<>( indexRelevantEntities ) );
 
 		this.asyncUpdateSource = asyncUpdateSourceProvider.getUpdateSource(
 				updateDelay,
 				TimeUnit.MILLISECONDS,
 				batchSizeForUpdates,
 				properties,
-				new ORMEntityManagerFactoryWrapper( sessionFactory ),
-				eventModelParser
+				this.entityManagerFactoryWrapper,
+				this.eventModelInfos
 		);
-
 
 		IndexUpdater indexUpdater = new IndexUpdater(
 				rehashedTypeMetadataPerIndexRoot,
@@ -182,7 +192,19 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 		if ( this.asyncUpdateSource != null ) {
 			this.asyncUpdateSource.stop();
 		}
+
+		//FIXME: we don't have a real callback for when Hibernate ORM is closed
+		//only after it has been closed.
+		/*
+		if ( asyncUpdateSourceProvider != null
+				&& TRIGGER_CREATION_STRATEGY_CREATE_DROP.equals( this.createTriggerStrategy ) ) {
+			this.asyncUpdateSourceProvider.dropDDL( this.entityManagerFactoryWrapper, this.eventModelInfos );
+		}*/
+
 		this.asyncUpdateSource = null;
+		this.asyncUpdateSourceProvider = null;
+		this.entityManagerFactoryWrapper = null;
+		this.eventModelInfos = null;
 	}
 
 }
