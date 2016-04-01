@@ -17,17 +17,18 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.hibernate.search.db.ColumnType;
+import org.hibernate.search.db.EventType;
 import org.hibernate.search.db.events.UpdateConsumer;
 import org.hibernate.search.db.events.impl.AsyncUpdateSource;
 import org.hibernate.search.db.events.impl.EventModelInfo;
-import org.hibernate.search.db.ColumnType;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.db.util.impl.EntityManagerFactoryWrapper;
 import org.hibernate.search.db.util.impl.EntityManagerWrapper;
 import org.hibernate.search.db.util.impl.MultiQueryAccess;
 import org.hibernate.search.db.util.impl.MultiQueryAccess.ObjectIdentifierWrapper;
 import org.hibernate.search.db.util.impl.QueryWrapper;
 import org.hibernate.search.db.util.impl.TransactionWrapper;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.util.NamingThreadFactory;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -213,7 +214,7 @@ public class JPAUpdateSource implements AsyncUpdateSource {
 												new UpdateConsumer.UpdateEventInfo(
 														info.getEntityClass(),
 														entityId,
-														eventType,
+														EventType.valueOf( eventType ),
 														(Map<String, Object>) hints
 												)
 										);

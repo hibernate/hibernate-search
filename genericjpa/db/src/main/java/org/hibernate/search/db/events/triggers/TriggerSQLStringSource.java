@@ -6,27 +6,27 @@
  */
 package org.hibernate.search.db.events.triggers;
 
-import org.hibernate.search.db.events.impl.EventModelInfo;
 import org.hibernate.search.db.EventType;
+import org.hibernate.search.db.events.impl.EventModelInfo;
 
 /**
  * Classes that implement this interface provide means to create the Triggers needed on the database to write C_UD
  * information about entities in the index into the specific Updates-Table.
- *
+ * <p/>
  * The order of execution during creation is:
  * <ol>
- *     <li>{@link #getSetupCode()}</li>
- *     <li>{@link #getUpdateTableCreationCode(EventModelInfo)}</li>
- *     <li>{@link #getSpecificSetupCode(EventModelInfo)}</li>
- *     <li>{@link #getTriggerCreationCode(EventModelInfo, int)}</li>
+ * <li>{@link #getSetupCode()}</li>
+ * <li>{@link #getUpdateTableCreationCode(EventModelInfo)}</li>
+ * <li>{@link #getSpecificSetupCode(EventModelInfo)}</li>
+ * <li>{@link #getTriggerCreationCode(EventModelInfo, EventType)}</li>
  * </ol>
- *
+ * <p/>
  * The order during deletion is:
  * <ol>
- *     <li>{@link #getTriggerDropCode(EventModelInfo, int)}</li>
- *     <li>{@link #getSpecificUnSetupCode(EventModelInfo)}</li>
- *     <li>{@link #getUpdateTableDropCode(EventModelInfo)}</li>
- *     <li>{@link #getUnSetupCode()}</li>
+ * <li>{@link #getTriggerDropCode(EventModelInfo, EventType)}</li>
+ * <li>{@link #getSpecificUnSetupCode(EventModelInfo)}</li>
+ * <li>{@link #getUpdateTableDropCode(EventModelInfo)}</li>
+ * <li>{@link #getUnSetupCode()}</li>
  * </ol>
  *
  * @author Martin Braun
@@ -63,15 +63,15 @@ public interface TriggerSQLStringSource {
 	 * @param eventModelInfo the EventModelInfo/columnTypes this corresponds to
 	 * @param eventType see {@link EventType}
 	 */
-	String[] getTriggerCreationCode(EventModelInfo eventModelInfo, int eventType);
+	String[] getTriggerCreationCode(EventModelInfo eventModelInfo, EventType eventType);
 
 	/**
-	 * this removes a specific trigger created by {@link #getTriggerCreationCode(EventModelInfo, int)}
+	 * this removes a specific trigger created by {@link #getTriggerCreationCode(EventModelInfo, EventType)}
 	 *
 	 * @param eventModelInfo the EventModelInfo/columnTypes this corresponds to
 	 * @param eventType see {@link EventType}
 	 */
-	String[] getTriggerDropCode(EventModelInfo eventModelInfo, int eventType);
+	String[] getTriggerDropCode(EventModelInfo eventModelInfo, EventType eventType);
 
 	/**
 	 * the code to create the Update tables with

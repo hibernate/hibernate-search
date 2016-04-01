@@ -75,7 +75,7 @@ public class PostgreSQLTriggerSQLStringSource implements TriggerSQLStringSource 
 	}
 
 	@Override
-	public String[] getTriggerCreationCode(EventModelInfo eventModelInfo, int eventType) {
+	public String[] getTriggerCreationCode(EventModelInfo eventModelInfo, EventType eventType) {
 		String originalTableName = eventModelInfo.getOriginalTableName();
 		String triggerName = this.getTriggerName( eventModelInfo.getOriginalTableName(), eventType );
 		String functionName = this.getFunctionName(
@@ -124,7 +124,7 @@ public class PostgreSQLTriggerSQLStringSource implements TriggerSQLStringSource 
 						(Locale) null,
 						CREATE_TRIGGER_FORMAT_SQL,
 						triggerName,
-						EventType.toString( eventType ),
+						eventType.toString(),
 						originalTableName,
 						functionName
 				)
@@ -132,7 +132,7 @@ public class PostgreSQLTriggerSQLStringSource implements TriggerSQLStringSource 
 	}
 
 	@Override
-	public String[] getTriggerDropCode(EventModelInfo eventModelInfo, int eventType) {
+	public String[] getTriggerDropCode(EventModelInfo eventModelInfo, EventType eventType) {
 		return new String[] {
 				String.format(
 						(Locale) null,
@@ -204,19 +204,15 @@ public class PostgreSQLTriggerSQLStringSource implements TriggerSQLStringSource 
 		return "\"";
 	}
 
-	private String getTriggerName(String originalTableName, int eventType) {
+	private String getTriggerName(String originalTableName, EventType eventType) {
 		return new StringBuilder().append( originalTableName ).append( "_updates_hsearch_" ).append(
-				EventType.toString(
-						eventType
-				)
+				eventType.toString()
 		).toString();
 	}
 
-	private String getFunctionName(String originalTableName, int eventType) {
+	private String getFunctionName(String originalTableName, EventType eventType) {
 		return new StringBuilder().append( originalTableName ).append( "_updates_hsearch_function_" ).append(
-				EventType.toString(
-						eventType
-				)
+				eventType.toString()
 		).toString();
 	}
 

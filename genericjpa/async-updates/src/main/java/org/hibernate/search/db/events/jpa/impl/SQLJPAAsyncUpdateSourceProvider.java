@@ -88,7 +88,7 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 		//DROP EVERYTHING IN THE EXACTLY INVERSE ORDER WE CREATE IT
 		for ( EventModelInfo info : eventModelInfos ) {
 
-			for ( int eventType : EventType.values() ) {
+			for ( EventType eventType : EventType.values() ) {
 				String[] triggerDropStrings = this.triggerSource.getTriggerDropCode( info, eventType );
 				for ( String triggerDropString : triggerDropStrings ) {
 					log.triggerCreationSQL( triggerDropString );
@@ -137,7 +137,7 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 				this.doQueryOrLogException( emf, setupCode, false );
 			}
 
-			for ( int eventType : EventType.values() ) {
+			for ( EventType eventType : EventType.values() ) {
 				String[] triggerCreationStrings = this.triggerSource.getTriggerCreationCode(
 						info,
 						eventType

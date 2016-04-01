@@ -77,7 +77,7 @@ public class HSQLDBTriggerSQLStringSource implements TriggerSQLStringSource {
 	}
 
 	@Override
-	public String[] getTriggerCreationCode(EventModelInfo eventModelInfo, int eventType) {
+	public String[] getTriggerCreationCode(EventModelInfo eventModelInfo, EventType eventType) {
 		String originalTableName = eventModelInfo.getOriginalTableName();
 		String triggerName = this.getTriggerName( eventModelInfo.getOriginalTableName(), eventType );
 		String tableName = eventModelInfo.getUpdateTableName();
@@ -113,7 +113,7 @@ public class HSQLDBTriggerSQLStringSource implements TriggerSQLStringSource {
 								TRIGGER_CREATION_FORMAT_DELETE :
 								TRIGGER_CREATION_FORMAT_INSERT_UPDATE,
 						triggerName,
-						EventType.toString( eventType ),
+						eventType.toString(),
 						originalTableName,
 						tableName,
 						eventModelInfo.getUpdateIdColumn(),
@@ -128,7 +128,7 @@ public class HSQLDBTriggerSQLStringSource implements TriggerSQLStringSource {
 	}
 
 	@Override
-	public String[] getTriggerDropCode(EventModelInfo eventModelInfo, int eventType) {
+	public String[] getTriggerDropCode(EventModelInfo eventModelInfo, EventType eventType) {
 		return new String[] {
 				String.format(
 						(Locale) null,
@@ -193,11 +193,9 @@ public class HSQLDBTriggerSQLStringSource implements TriggerSQLStringSource {
 		return "\"";
 	}
 
-	private String getTriggerName(String originalTableName, int eventType) {
+	private String getTriggerName(String originalTableName, EventType eventType) {
 		return new StringBuilder().append( originalTableName ).append( "_updates_hsearch_" ).append(
-				EventType.toString(
-						eventType
-				)
+				eventType.toString()
 		).toString();
 	}
 

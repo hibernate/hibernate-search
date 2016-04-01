@@ -7,6 +7,8 @@
 package org.hibernate.search.db;
 
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Contains constants that describe the different Database-Events that are relevant to the index
@@ -14,31 +16,33 @@ import org.hibernate.search.exception.AssertionFailure;
  * @author Martin Braun
  * @hsearch.experimental
  */
-public final class EventType {
+public enum EventType {
+	DELETE( -1 ),
+	UPDATE( -2 ),
+	INSERT( -3 );
 
-	public static final int DELETE = -1;
-	public static final int UPDATE = -2;
-	public static final int INSERT = -3;
-	private static final int[] VALUES = {DELETE, UPDATE, INSERT};
+	private final int identifier;
 
-	private EventType() {
-		throw new AssertionFailure( "can't touch this!" );
+	private static final Log log = LoggerFactory.make();
+
+	EventType(int identifier) {
+		this.identifier = identifier;
 	}
 
-	public static String toString(int eventType) {
-		switch ( eventType ) {
-			case DELETE:
-				return "DELETE";
-			case UPDATE:
-				return "UPDATE";
-			case INSERT:
-				return "INSERT";
+	public static EventType valueOf(Integer val) {
+		switch ( val ) {
+			case -1:
+				return DELETE;
+			case -2:
+				return UPDATE;
+			case -3:
+				return INSERT;
+			default:
+				throw new AssertionFailure( "unknown EventType identifier: " + val );
 		}
-		throw new IllegalArgumentException( "unrecognized eventType" );
 	}
 
-	public static int[] values() {
-		return VALUES;
+	public int getIdentifier() {
+		return identifier;
 	}
-
 }

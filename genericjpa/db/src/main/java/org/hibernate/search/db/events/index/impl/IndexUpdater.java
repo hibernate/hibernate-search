@@ -102,24 +102,24 @@ public final class IndexUpdater {
 									Map<String, Object> hints = Collections.unmodifiableMap( updateInfo.getHints() );
 									Set<Class<?>> inIndexOf = IndexUpdater.this.containedInIndexOf.get( entityClass );
 									if ( inIndexOf != null && inIndexOf.size() != 0 ) {
-										int eventType = updateInfo.getEventType();
+										EventType eventType = updateInfo.getEventType();
 										Object id = updateInfo.getId();
 										switch ( eventType ) {
-											case EventType.INSERT: {
+											case INSERT: {
 												Object obj = provider.get( entityClass, id, hints );
 												if ( obj != null ) {
 													IndexUpdater.this.indexWrapper.index( obj, tx );
 												}
 												break;
 											}
-											case EventType.UPDATE: {
+											case UPDATE: {
 												Object obj = provider.get( entityClass, id, hints );
 												if ( obj != null ) {
 													IndexUpdater.this.indexWrapper.update( obj, tx );
 												}
 												break;
 											}
-											case EventType.DELETE: {
+											case DELETE: {
 												IndexUpdater.this.indexWrapper.delete(
 														entityClass, inIndexOf, id, this.entityProvider,
 														tx
@@ -127,7 +127,7 @@ public final class IndexUpdater {
 												break;
 											}
 											default: {
-												log.unknownEventTypeFoundDuringIndexUpdating( eventType );
+												log.unknownEventTypeFoundDuringIndexUpdating( eventType.getIdentifier() );
 											}
 										}
 									}

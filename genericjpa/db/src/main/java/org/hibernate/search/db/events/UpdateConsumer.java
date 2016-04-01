@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.db.EventType;
+
 /**
  * @author Martin Braun
  * @hsearch.experimental
@@ -27,14 +29,14 @@ public interface UpdateConsumer {
 
 		private final Class<?> entityClass;
 		private final Object id;
-		private final int eventType;
+		private final EventType eventType;
 		private final Map<String, Object> hints;
 
-		public UpdateEventInfo(Class<?> entityClass, Object id, int eventType) {
+		public UpdateEventInfo(Class<?> entityClass, Object id, EventType eventType) {
 			this( entityClass, id, eventType, Collections.emptyMap() );
 		}
 
-		public UpdateEventInfo(Class<?> entityClass, Object id, int eventType, Map<String, Object> hints) {
+		public UpdateEventInfo(Class<?> entityClass, Object id, EventType eventType, Map<String, Object> hints) {
 			super();
 			this.entityClass = entityClass;
 			this.id = id;
@@ -52,7 +54,7 @@ public interface UpdateConsumer {
 		/**
 		 * @return the eventType
 		 */
-		public int getEventType() {
+		public EventType getEventType() {
 			return this.eventType;
 		}
 
@@ -95,7 +97,7 @@ public interface UpdateConsumer {
 		public int hashCode() {
 			int result = entityClass != null ? entityClass.hashCode() : 0;
 			result = 31 * result + (id != null ? id.hashCode() : 0);
-			result = 31 * result + eventType;
+			result = 31 * result + eventType.hashCode();
 			result = 31 * result + (hints != null ? hints.hashCode() : 0);
 			return result;
 		}

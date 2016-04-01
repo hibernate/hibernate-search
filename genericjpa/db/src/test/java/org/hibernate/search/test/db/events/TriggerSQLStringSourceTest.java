@@ -45,7 +45,7 @@ public class TriggerSQLStringSourceTest {
 		EventModelInfo info = parser.parse( Arrays.asList( Place.class ) ).get( 0 );
 		System.out.println( "UNSETUP CODE: " + Arrays.asList( triggerSource.getUnSetupCode() ) );
 		System.out.println( "SETUP CODE: " + Arrays.asList( triggerSource.getSetupCode() ) );
-		for ( int eventType : EventType.values() ) {
+		for ( EventType eventType : EventType.values() ) {
 			String[] updateTableCreationString = triggerSource.getUpdateTableCreationCode( info );
 			String[] updateTableDropString = triggerSource.getUpdateTableDropCode( info );
 			String[] triggerCreationString = triggerSource.getTriggerCreationCode( info, eventType );

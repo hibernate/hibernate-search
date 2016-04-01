@@ -109,7 +109,7 @@ public class MySQLTriggerSQLStringSource implements TriggerSQLStringSource {
 	}
 
 	@Override
-	public String[] getTriggerCreationCode(EventModelInfo eventModelInfo, int eventType) {
+	public String[] getTriggerCreationCode(EventModelInfo eventModelInfo, EventType eventType) {
 		String originalTableName = eventModelInfo.getOriginalTableName();
 		String triggerName = this.getTriggerName( eventModelInfo.getOriginalTableName(), eventType );
 		String tableName = eventModelInfo.getUpdateTableName();
@@ -143,7 +143,7 @@ public class MySQLTriggerSQLStringSource implements TriggerSQLStringSource {
 						(Locale) null,
 						CREATE_TRIGGER_ORIGINAL_TABLE_SQL_FORMAT,
 						triggerName,
-						EventType.toString( eventType ),
+						eventType.toString(),
 						originalTableName,
 						this.uniqueIdProcedureName,
 						tableName,
@@ -159,7 +159,7 @@ public class MySQLTriggerSQLStringSource implements TriggerSQLStringSource {
 	}
 
 	@Override
-	public String[] getTriggerDropCode(EventModelInfo eventModelInfo, int eventType) {
+	public String[] getTriggerDropCode(EventModelInfo eventModelInfo, EventType eventType) {
 		String triggerName = this.getTriggerName( eventModelInfo.getOriginalTableName(), eventType );
 		return new String[] {
 				String.format( (Locale) null, DROP_TRIGGER_SQL_FORMAT, triggerName )
@@ -167,11 +167,9 @@ public class MySQLTriggerSQLStringSource implements TriggerSQLStringSource {
 		};
 	}
 
-	private String getTriggerName(String originalTableName, int eventType) {
+	private String getTriggerName(String originalTableName, EventType eventType) {
 		return new StringBuilder().append( originalTableName ).append( "_updates_hsearch_" ).append(
-				EventType.toString(
-						eventType
-				)
+				eventType.toString()
 		).toString();
 	}
 
