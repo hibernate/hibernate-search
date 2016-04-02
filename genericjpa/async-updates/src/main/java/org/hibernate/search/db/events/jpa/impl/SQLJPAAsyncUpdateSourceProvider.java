@@ -30,12 +30,12 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 
 	private final TriggerSQLStringSource triggerSource;
 	private final List<Class<?>> entityClasses;
-	private final String triggerCreateStrategy;
+	private final TriggerCreationStrategy triggerCreateStrategy;
 
 	public SQLJPAAsyncUpdateSourceProvider(
 			TriggerSQLStringSource triggerSource,
 			List<Class<?>> entityClasses,
-			String triggerCreateStrategy) {
+			TriggerCreationStrategy triggerCreateStrategy) {
 		this.triggerSource = triggerSource;
 		this.entityClasses = entityClasses;
 		this.triggerCreateStrategy = triggerCreateStrategy;
@@ -71,14 +71,14 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 			EntityManagerFactoryWrapper emf,
 			List<EventModelInfo> eventModelInfos) {
 		switch ( this.triggerCreateStrategy ) {
-			case AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DROP_CREATE:
+			case DROP_CREATE:
 				this.dropDDL( emf, eventModelInfos );
-			case AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE_DROP:
+			case CREATE_DROP:
 				//we drop at shutdown with this
 				//this has to be handled outside of this class
-			case AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_CREATE:
+			case CREATE:
 				this.createDDL( emf, eventModelInfos );
-			case AsyncUpdateConstants.TRIGGER_CREATION_STRATEGY_DONT_CREATE:
+			case NONE:
 			default:
 				return;
 		}
