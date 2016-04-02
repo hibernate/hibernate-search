@@ -105,7 +105,7 @@ public class HSQLDBTriggerSQLStringSource implements TriggerSQLStringSource {
 		if ( addedVals == 0 ) {
 			throw new IllegalArgumentException( "eventModelInfo didn't contain any idInfos" );
 		}
-		String eventTypeValue = String.valueOf( eventType );
+		String eventTypeValue = String.valueOf( eventType.getIdentifier() );
 		String createTriggerOriginalTableSQL = new StringBuilder().append(
 				String.format(
 						(Locale) null,

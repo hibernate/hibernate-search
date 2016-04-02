@@ -75,6 +75,29 @@ public class ORMEventModelParser implements EventModelParser {
 	public List<EventModelInfo> parse(List<Class<?>> entities) {
 		SessionFactoryImplementor impl = (SessionFactoryImplementor) this.sessionFactory;
 
+		//we have to calculate the highest level of the Entity
+		//for the retrieval from the database because
+		//with SingleTable style polymorphism
+		//we might end up only using values
+		//for one of the sub-type and don't
+		//handle the stuff for the higher level entities
+		//(tables are only handled once)
+		Map<Class<?>, Class<?>> highestTopLevelClassForRetrieval = new HashMap<>();
+		for ( Class<?> clazz : entities ) {
+			//ignore non-Entity classes that have been passed here
+			if ( !this.indexRelevantEntities.contains( clazz ) || this.sessionFactory.getClassMetadata( clazz ) == null ) {
+				continue;
+			}
+			Class<?> highest = clazz;
+			while ( highest.getSuperclass() != null && this.sessionFactory.getClassMetadata( highest.getSuperclass() ) != null ) {
+				highest = highest.getSuperclass();
+			}
+			if ( this.sessionFactory.getClassMetadata( highest ) == null ) {
+				throw new AssertionFailure( highest + " is no entity type" );
+			}
+			highestTopLevelClassForRetrieval.put( clazz, highest );
+		}
+
 		Map<String, EventModelInfo> tableEventModelInfos = new HashMap<>();
 		Map<String, Set<String>> tableHandledColumns = new HashMap<>();
 		Map<String, Set<Class<?>>> tableManuallyHandledEntities = new HashMap<>();
@@ -102,8 +125,7 @@ public class ORMEventModelParser implements EventModelParser {
 				tableManuallyHandledEntities.computeIfAbsent(
 						eventModelInfo.getOriginalTableName(),
 						(key) -> new HashSet<>()
-				)
-						.add( idInfo.getEntityClass() );
+				).add( idInfo.getEntityClass() );
 			}
 		}
 
@@ -121,6 +143,10 @@ public class ORMEventModelParser implements EventModelParser {
 				}
 
 				ClassMetadata metadata = this.sessionFactory.getClassMetadata( updateClass );
+				if ( metadata == null ) {
+					continue;
+				}
+
 				if ( !(metadata instanceof AbstractEntityPersister) ) {
 					//attempt to get the info from @UpdateInfo annotations
 					//these get added automatically
@@ -155,7 +181,7 @@ public class ORMEventModelParser implements EventModelParser {
 							String[] keyColumns = (String[]) getKeyColumns.invoke( entityPersister, i );
 							this.addIdInfo(
 									keyColumns,
-									updateClass,
+									highestTopLevelClassForRetrieval.get( updateClass ),
 									entityPersister.getIdentifierType().getReturnedClass(),
 									idInfos, originalTableName, tableHandledColumns
 							);
@@ -224,7 +250,7 @@ public class ORMEventModelParser implements EventModelParser {
 
 								this.addIdInfo(
 										keyColumns,
-										associationEntityClass,
+										highestTopLevelClassForRetrieval.get( associationEntityClass ),
 										persisterForOther.getIdentifierType().getReturnedClass(),
 										idInfos, joinable.getTableName(), tableHandledColumns
 								);

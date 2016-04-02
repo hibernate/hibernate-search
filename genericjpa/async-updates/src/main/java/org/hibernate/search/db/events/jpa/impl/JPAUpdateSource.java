@@ -28,6 +28,7 @@ import org.hibernate.search.db.util.impl.MultiQueryAccess;
 import org.hibernate.search.db.util.impl.MultiQueryAccess.ObjectIdentifierWrapper;
 import org.hibernate.search.db.util.impl.QueryWrapper;
 import org.hibernate.search.db.util.impl.TransactionWrapper;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.genericjpa.util.NamingThreadFactory;
 import org.hibernate.search.util.logging.impl.Log;

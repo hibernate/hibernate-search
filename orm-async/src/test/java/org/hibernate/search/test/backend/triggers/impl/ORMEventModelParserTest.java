@@ -26,6 +26,8 @@ import org.hibernate.search.test.entities.OverrideEntity;
 import org.hibernate.search.test.entities.OverrideEntityCustomType;
 import org.hibernate.search.test.entities.Place;
 import org.hibernate.search.test.entities.SecondaryTableEntity;
+import org.hibernate.search.test.entities.SingleTable;
+import org.hibernate.search.test.entities.SingleTableOne;
 import org.hibernate.search.test.entities.Sorcerer;
 import org.hibernate.search.test.entities.TablePerClass;
 import org.hibernate.search.test.entities.TablePerClassOne;
@@ -50,6 +52,17 @@ public class ORMEventModelParserTest extends SearchTestBase {
 		Map<String, EventModelInfo> map = toMap( eventModelInfos );
 
 		this.assertInfos( map, Domain.class, ColumnType.INTEGER, "DOMAIN", "id" );
+
+		assertEquals( 1, eventModelInfos.size() );
+	}
+
+	@Test
+	public void testSingleTableInheritance() {
+		ORMEventModelParser parser = new ORMEventModelParser( this.getSessionFactory(), set( SingleTableOne.class ) );
+		List<EventModelInfo> eventModelInfos = parser.parse( Collections.singletonList( SingleTableOne.class ) );
+
+		Map<String, EventModelInfo> map = toMap( eventModelInfos );
+		this.assertInfos( map, SingleTable.class, ColumnType.INTEGER, "SingleTable", "id" );
 
 		assertEquals( 1, eventModelInfos.size() );
 	}
@@ -167,8 +180,8 @@ public class ORMEventModelParserTest extends SearchTestBase {
 			Map<String, EventModelInfo> map = toMap( eventModelInfos );
 
 			this.assertInfos( map, TablePerClass.class, ColumnType.INTEGER, "TablePerClass", "ID" );
-			this.assertInfos( map, TablePerClassOne.class, ColumnType.INTEGER, "TablePerClassOne", "ID" );
-			this.assertInfos( map, TablePerClassTwo.class, ColumnType.INTEGER, "TablePerClassTwo", "ID" );
+			this.assertInfos( map, TablePerClass.class, ColumnType.INTEGER, "TablePerClassOne", "ID" );
+			this.assertInfos( map, TablePerClass.class, ColumnType.INTEGER, "TablePerClassTwo", "ID" );
 		}
 	}
 
@@ -211,7 +224,10 @@ public class ORMEventModelParserTest extends SearchTestBase {
 				TablePerClass.class,
 				TablePerClassOne.class,
 				TablePerClassTwo.class,
-				OverrideEntityCustomType.class
+				OverrideEntity.class,
+				OverrideEntityCustomType.class,
+				SingleTable.class,
+				SingleTableOne.class
 		};
 	}
 

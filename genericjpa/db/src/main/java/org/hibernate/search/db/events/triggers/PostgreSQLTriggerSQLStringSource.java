@@ -107,7 +107,7 @@ public class PostgreSQLTriggerSQLStringSource implements TriggerSQLStringSource 
 		if ( addedVals == 0 ) {
 			throw new IllegalArgumentException( "eventModelInfo didn't contain any idInfos" );
 		}
-		String eventTypeValue = String.valueOf( eventType );
+		String eventTypeValue = String.valueOf( eventType.getIdentifier() );
 		return new String[] {
 				String.format(
 						(Locale) null,
