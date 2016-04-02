@@ -104,7 +104,7 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 
 		MetadataExtender metadataExtender = new MetadataExtender();
 
-		List<ExtendedTypeMetadata> extendedTypeMetadatas = metadataExtender.rehash(
+		return metadataExtender.rehash(
 				typeMetadatas,
 				entities
 		);
