@@ -376,7 +376,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 
 		/**
 		 * @return Return a file to the currently active source directory. Tests for the files "current1" and
-		 *         "current2" in order to determine which is the current directory. If there marker file does not exists
+		 *         "current2" in order to determine which is the current directory. If the marker file does not exist
 		 *         <code>null</code> is returned.
 		 */
 		private File determineCurrentSourceFile() {
