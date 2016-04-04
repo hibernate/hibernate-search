@@ -7,7 +7,6 @@
 package org.hibernate.search.query.engine.spi;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Wrapper class describing the loading of an element.
@@ -15,6 +14,16 @@ import java.util.List;
  * @author Emmanuel Bernard
  */
 public interface EntityInfo {
+
+	Object ENTITY_PLACEHOLDER = new Object() {
+
+		@Override
+		public String toString() {
+			return "HSearch: Entity placeholder";
+		}
+
+	};
+
 	Class<?> getClazz();
 
 	Serializable getId();
@@ -23,9 +32,7 @@ public interface EntityInfo {
 
 	Object[] getProjection();
 
-	List<Integer> getIndexesOfThis();
-
-	boolean isProjectThis();
+	Object getEntityInstance();
 
 	void populateWithEntityInstance(Object entity);
 }

@@ -25,7 +25,6 @@ import org.hibernate.transform.ResultTransformer;
  */
 public class ProjectionLoader implements Loader {
 	private Loader objectLoader;
-	private boolean projectThisIsInitialized = false;//guard for next variable
 	private boolean projectThis;
 	private ResultTransformer transformer;
 	private String[] aliases;
@@ -43,17 +42,19 @@ public class ProjectionLoader implements Loader {
 					ResultTransformer transformer,
 					ObjectLoaderBuilder loaderBuilder,
 					String[] aliases,
-					TimeoutManager timeoutManager) {
+					TimeoutManager timeoutManager,
+					boolean projectThis) {
 		init( session, extendedIntegrator, null, timeoutManager ); // TODO why do we call this method?
 		this.transformer = transformer;
 		this.aliases = aliases;
 		this.loaderBuilder = loaderBuilder;
+		this.projectThis = projectThis;
 	}
 
 	@Override
 	public Object load(EntityInfo entityInfo) {
 		//no need to timeouManage here, the underlying loader is the real time consumer
-		if ( projectionEnabledOnThis( entityInfo ) ) {
+		if ( projectThis ) {
 			Loader objectLoader = getObjectLoader();
 			final Object entityInstance = objectLoader.load( entityInfo );
 			entityInfo.populateWithEntityInstance( entityInstance );
@@ -71,14 +72,6 @@ public class ProjectionLoader implements Loader {
 		throw new AssertionFailure( "This method is not meant to be used on ProjectionLoader" );
 	}
 
-	private boolean projectionEnabledOnThis(final EntityInfo entityInfo) {
-		if ( projectThisIsInitialized == false ) {
-			projectThisIsInitialized = true;
-			projectThis = entityInfo.isProjectThis();
-		}
-		return projectThis;
-	}
-
 	@Override
 	public List load(List<EntityInfo> entityInfos) {
 		//no need to timeouManage here, the underlying loader is the real time consumer
@@ -87,7 +80,7 @@ public class ProjectionLoader implements Loader {
 			return results;
 		}
 
-		if ( projectionEnabledOnThis( entityInfos.get( 0 ) ) ) {
+		if ( projectThis ) {
 			Loader objectLoader = getObjectLoader();
 			objectLoader.load( entityInfos ); // load by batch
 			for ( EntityInfo entityInfo : entityInfos ) {

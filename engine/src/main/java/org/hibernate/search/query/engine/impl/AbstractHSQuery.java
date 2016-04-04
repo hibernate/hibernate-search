@@ -15,6 +15,7 @@ import java.util.Set;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilter;
@@ -52,6 +53,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	protected Sort sort;
 	protected String tenantId;
 	protected String[] projectedFields;
+	protected boolean hasThisProjection;
 	protected int firstResult;
 	protected Integer maxResults;
 	protected Coordinates spatialSearchCenter = null;
@@ -130,6 +132,14 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		}
 		else {
 			this.projectedFields = fields;
+			boolean hasThis = false;
+			for ( String field : fields ) {
+				if ( ProjectionConstants.THIS.equals( field ) ) {
+					hasThis = true;
+					break;
+				}
+			}
+			this.hasThisProjection = hasThis;
 		}
 		return this;
 	}
@@ -197,6 +207,11 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	@Override
 	public String[] getProjectedFields() {
 		return projectedFields;
+	}
+
+	@Override
+	public boolean hasThisProjection() {
+		return hasThisProjection;
 	}
 
 	@Override

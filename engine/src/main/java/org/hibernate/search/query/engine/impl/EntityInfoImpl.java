@@ -7,9 +7,8 @@
 package org.hibernate.search.query.engine.impl;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 
 /**
@@ -39,7 +38,19 @@ public class EntityInfoImpl implements EntityInfo {
 	 */
 	private final Object[] projection;
 
-	private final List<Integer> indexesOfThis = new LinkedList<Integer>();
+	/**
+	 * The entity instance returned in a search.
+	 *
+	 * @see ProjectionConstants#THIS
+	 */
+	private Object entityInstance;
+
+	public EntityInfoImpl(Class clazz, String idName, Serializable id, Object[] projection) {
+		this.clazz = clazz;
+		this.idName = idName;
+		this.id = id;
+		this.projection = projection;
+	}
 
 	@Override
 	public Class<?> getClazz() {
@@ -62,31 +73,17 @@ public class EntityInfoImpl implements EntityInfo {
 	}
 
 	@Override
-	public List<Integer> getIndexesOfThis() {
-		return indexesOfThis;
-	}
-
-	@Override
-	public boolean isProjectThis() {
-		return indexesOfThis.size() != 0;
+	public Object getEntityInstance() {
+		return entityInstance;
 	}
 
 	@Override
 	public void populateWithEntityInstance(Object entity) {
-		for ( int index : indexesOfThis ) {
-			projection[index] = entity;
-		}
-	}
-
-	public EntityInfoImpl(Class clazz, String idName, Serializable id, Object[] projection) {
-		this.clazz = clazz;
-		this.idName = idName;
-		this.id = id;
-		if ( projection != null ) {
-			this.projection = projection.clone();
-		}
-		else {
-			this.projection = null;
+		this.entityInstance = entity;
+		for ( int i = 0; i < projection.length; i++ ) {
+			if ( projection[i] == ENTITY_PLACEHOLDER ) {
+				projection[i] = entity;
+			}
 		}
 	}
 

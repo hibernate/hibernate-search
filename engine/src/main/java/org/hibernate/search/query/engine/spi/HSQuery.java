@@ -149,6 +149,12 @@ public interface HSQuery extends ProjectionConstants {
 	String[] getProjectedFields();
 
 	/**
+	 * @return {@code true} if the projected field names contain the
+	 * {@link org.hibernate.search.engine.ProjectionConstants#THIS} constant.
+	 */
+	boolean hasThisProjection();
+
+	/**
 	 * @return the timeout manager. Make sure to wrap your HSQuery usage around a {@code timeoutManager.start()} and  {@code timeoutManager.stop()}.
 	 */
 	TimeoutManager getTimeoutManager();
