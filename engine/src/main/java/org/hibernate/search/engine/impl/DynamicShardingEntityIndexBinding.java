@@ -104,7 +104,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 		return properties;
 	}
 
-	public ExtendedSearchIntegrator getSearchintegrator() {
+	public ExtendedSearchIntegrator getSearchIntegrator() {
 		return extendedIntegrator;
 	}
 

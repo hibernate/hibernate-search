@@ -12,7 +12,7 @@ import org.hibernate.service.Service;
 
 /**
  * This Service lives in the ServiceRegistry controlled by Hibernate ORM to
- * allow to lookup the ExtendedSearchintegrator from the context of ORM code (for example,
+ * allow to lookup the {@code ExtendedSearchIntegrator} from the context of ORM code (for example,
  * when a user wraps the current Session into a FullTextSession).
  *
  * @author Sanne Grinovero

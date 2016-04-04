@@ -209,7 +209,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 		if ( sessionFactory == null ) {
 			build();
 		}
-		return ImplementationFactory.createSearchFactory( ContextHelper.getSearchintegratorBySFI( sessionFactory ) );
+		return ImplementationFactory.createSearchFactory( ContextHelper.getSearchIntegratorBySFI( sessionFactory ) );
 	}
 
 	/**

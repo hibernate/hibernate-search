@@ -425,7 +425,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 				mbeanNameSuffix
 		);
 
-		// since the Searchintegrator is mutable we might have an already existing MBean which we have to unregister first
+		// since the SearchIntegrator is mutable we might have an already existing MBean which we have to unregister first
 		if ( JMXRegistrar.isNameRegistered( objectName ) ) {
 			JMXRegistrar.unRegisterMBean( objectName );
 		}

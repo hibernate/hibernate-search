@@ -361,7 +361,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private ExtendedSearchIntegrator getExtendedSearchIntegrator() {
-		return ContextHelper.getSearchintegratorBySessionImplementor( session );
+		return ContextHelper.getSearchIntegratorBySessionImplementor( session );
 	}
 
 	private static final Loader noLoader = new Loader() {

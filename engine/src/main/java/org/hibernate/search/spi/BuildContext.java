@@ -19,10 +19,10 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
  */
 public interface BuildContext {
 	/**
-	 * Returns the {@code ExtendedSearchintegrator} instance. Do not use until after the initialize and/or start method is
+	 * Returns the {@code ExtendedSearchIntegrator} instance. Do not use until after the initialize and/or start method is
 	 * fully executed.
 	 *
-	 * Implementations should not cache values provided by the {@code ExtendedSearchintegrator}, but rather access them
+	 * Implementations should not cache values provided by the {@code ExtendedSearchIntegrator}, but rather access them
 	 * each time, because the configuration can be dynamically updated and new changes made available.
 	 *
 	 * For example, prefer:

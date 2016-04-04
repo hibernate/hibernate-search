@@ -199,7 +199,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 
 	private ExtendedSearchIntegrator getSearchIntegrator() {
 		if ( searchFactory == null ) {
-			searchFactory = ContextHelper.getSearchintegrator( session );
+			searchFactory = ContextHelper.getSearchIntegrator( session );
 		}
 		return searchFactory;
 	}

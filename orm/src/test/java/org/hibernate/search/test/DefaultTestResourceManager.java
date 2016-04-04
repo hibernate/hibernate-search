@@ -163,7 +163,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public Directory getDirectory(Class<?> clazz) {
-		ExtendedSearchIntegrator integrator = ContextHelper.getSearchintegratorBySFI( sessionFactory );
+		ExtendedSearchIntegrator integrator = ContextHelper.getSearchIntegratorBySFI( sessionFactory );
 		IndexManager[] indexManagers = integrator.getIndexBinding( clazz ).getIndexManagers();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 		return indexManager.getDirectoryProvider().getDirectory();
@@ -188,7 +188,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
-		return ContextHelper.getSearchintegratorBySFI( sessionFactory );
+		return ContextHelper.getSearchIntegratorBySFI( sessionFactory );
 	}
 
 	@Override
