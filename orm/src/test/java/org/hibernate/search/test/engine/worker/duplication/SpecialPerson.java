@@ -48,9 +48,9 @@ public class SpecialPerson extends Person {
 	}
 
 	/**
-	 * This function add the provided emailAddress to the existing set.
+	 * This function adds the provided emailAddress to the existing set.
 	 *
-	 * @param emailAddress EmailAddress to add the the set
+	 * @param emailAddress EmailAddress to add to the set
 	 */
 	public void addEmailAddress(EmailAddress emailAddress) {
 		if ( emailAddress != null ) {

@@ -1725,7 +1725,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		parseContext.decrementLevel();
-		parseContext.setMaxLevel( oldMaxLevel ); //set back the the old max level
+		parseContext.setMaxLevel( oldMaxLevel ); //set back the old max level
 
 		if ( pathsCreatedAtThisLevel ) {
 			validateAllPathsEncountered( member, updatedPathsContext, indexedEmbeddedAnnotation );

@@ -66,7 +66,7 @@
       (which is needed in order to support multiple instances on the same machine).
       Use the value 0 to allow the system to select the first available port number.
       If the port number is non-zero and the port is in use then the value will be incremented until either a successful binding
-      to the loopback address is created or until the the maximum number of ports (specified by the
+      to the loopback address is created or until the maximum number of ports (specified by the
       CoreEnvironmentBean.socketProcessIdMaxPorts property) have been tried or until the port number
       reaches the maximum possible port number.
     -->

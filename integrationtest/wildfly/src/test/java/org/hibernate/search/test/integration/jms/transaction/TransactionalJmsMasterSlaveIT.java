@@ -27,7 +27,7 @@ import org.hibernate.search.test.integration.jms.DeploymentJmsMasterSlave;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 /**
- * Execute the tests in {@link SearchNewEntityJmsMasterSlave} adding the the dependencies as jars in the
+ * Execute the tests in {@link SearchNewEntityJmsMasterSlave} adding the dependencies as jars in the
  * deployments.
  *
  * @author Davide D'Alto

@@ -204,7 +204,7 @@ It is important to understand that Hibernate Search cannot know which shards alr
 application starts. When using `ShardIdentifierProviderTemplate` as base class of a
 `ShardIdentifierProvider` implementation, the initial set of shard identifiers must be returned by the
 `loadInitialShardNames()` method. How this is done will depend on the use case. However, a common case
-in combination with Hibernate ORM is that the initial shard set is defined by the the distinct
+in combination with Hibernate ORM is that the initial shard set is defined by the distinct
 values of a given database column. <<example-custom-shard-identifier-provider>> shows how to handle
 such a case. `AnimalShardIdentifierProvider` makes in its `loadInitialShardNames()` implementation use
 of a service called `HibernateSessionFactoryService` (see also <<section-services>>) which is

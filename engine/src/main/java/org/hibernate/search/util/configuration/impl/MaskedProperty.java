@@ -97,7 +97,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * Check if a given properties is set.
 	 *
 	 * @param key the property key
-	 * @return {@code true} if the the property is set, {@code false} otherwise
+	 * @return {@code true} if the property is set, {@code false} otherwise
 	 * @throws IllegalArgumentException if the key is not a String instance
 	 */
 	@Override

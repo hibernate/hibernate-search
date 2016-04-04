@@ -42,7 +42,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	private static final String JGROUPS_CONFIGURATION_SPACE = "jgroups";
 
 	/**
-	 * Configuration property specific the the backend instance. When enabled
+	 * Configuration property specific to the backend instance. When enabled
 	 * the invoker thread will use JGroups in synchronous mode waiting for the
 	 * ACK from the other parties; when disabled it is going to behave
 	 * as fire and forget: delegates reliability to the JGroups configuration and returns

@@ -438,7 +438,7 @@ public class QueryHits {
 	 *
 	 * Per default Lucene's native discrete faceting won't return values where
 	 * the count would be 0 for a given query. To still include these "zero count values"
-	 * we need to go the the index and find all potential values for a field and compare them
+	 * we need to go through the index and find all potential values for a field and compare them
 	 * against the values which had a count. This might potentially be expensive, so returning
 	 * zero count values is per default disabled.
 	 *

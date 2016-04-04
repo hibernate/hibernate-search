@@ -333,8 +333,8 @@ public abstract class AbstractDocumentBuilder {
 	}
 
 	/**
-	 * Hibernate entities might be dirty (their state has changed), but none of these changes would effect
-	 * the the index state. This method will return {@code true} if any of changed entity properties identified
+	 * Hibernate entities might be dirty (their state has changed), but none of these changes would affect
+	 * the index state. This method will return {@code true} if any of changed entity properties identified
 	 * by their names ({@code dirtyPropertyNames}) will effect the index state.
 	 *
 	 * @param dirtyPropertyNames array of property names for the changed entity properties, {@code null} in case the

@@ -46,7 +46,7 @@ public interface LuceneOptions {
 	 *
 	 * @param fieldName The field name
 	 * @param indexedString The value to index
-	 * @param document the document to which to add the the new field
+	 * @param document the document to which to add the new field
 	 */
 	void addFieldToDocument(String fieldName, String indexedString, Document document);
 
@@ -56,7 +56,7 @@ public interface LuceneOptions {
 	 *
 	 * @param fieldName The name of the field
 	 * @param numericValue The numeric value, either an Int, Long, Float or Double
-	 * @param document the document to which to add the the new field
+	 * @param document the document to which to add the new field
 	 */
 	void addNumericFieldToDocument(String fieldName, Object numericValue, Document document);
 
