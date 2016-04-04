@@ -63,6 +63,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	private final Loader loader;
 	private final DocumentExtractor documentExtractor;
 	private final SessionImplementor session;
+	private final boolean hasThisProjection;
 
 	/**
 	 * Caches result rows and EntityInfo from
@@ -73,12 +74,14 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	private int current;
 
 	public ScrollableResultsImpl(int fetchSize, DocumentExtractor extractor,
-			Loader loader, SessionImplementor sessionImplementor
+			Loader loader, SessionImplementor sessionImplementor,
+			boolean hasThisProjection
 	) {
 		this.loader = loader;
 		this.documentExtractor = extractor;
 		this.fetchSize = fetchSize;
 		this.session = sessionImplementor;
+		this.hasThisProjection = hasThisProjection;
 		this.first = extractor.getFirstIndex();
 		this.max = extractor.getMaxIndex();
 		int size = Math.max( max - first + 1, 0 );
@@ -491,12 +494,12 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		//check if all entities are session-managed and skip the check on projected values
 		org.hibernate.Session hibSession = (org.hibernate.Session) session;
 		if ( entityInfo.getProjection() != null ) {
-			// using projection: test only for entities
-			for ( int idx : entityInfo.getIndexesOfThis() ) {
-				Object o = objects[idx];
-				//TODO improve: is it useful to check for proxies and have them reassociated to persistence context?
-				if ( ! hibSession.contains( o ) ) {
-					return false;
+			if ( hasThisProjection ) {
+				// using projection: test only for entities
+				Object entity = entityInfo.getEntityInstance();
+				if ( entity != null ) {
+					//TODO improve: is it useful to check for proxies and have them reassociated to persistence context?
+					return hibSession.contains( entity );
 				}
 			}
 			return true;

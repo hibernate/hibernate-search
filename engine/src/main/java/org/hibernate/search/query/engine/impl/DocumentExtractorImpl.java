@@ -50,6 +50,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private ReusableDocumentStoredFieldVisitor fieldLoadingVisitor;
 	private boolean allowFieldSelection;
 	private boolean needId;
+	private boolean hasProjectionConstants;
 	private final Map<String, Class> targetedClasses;
 	private final int firstIndex;
 	private final int maxIndex;
@@ -74,16 +75,17 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 		this.queryHits = queryHits;
 		this.allowFieldSelection = allowFieldSelection;
-		this.targetedClasses = new HashMap<String, Class>( classesAndSubclasses.size() );
-		for ( Class<?> clazz : classesAndSubclasses ) {
-			//useful to reload classes from index without using reflection
-			targetedClasses.put( clazz.getName(), clazz );
-		}
 		if ( classesAndSubclasses.size() == 1 ) {
-			singleClassIfPossible = classesAndSubclasses.iterator().next();
+			this.singleClassIfPossible = classesAndSubclasses.iterator().next();
+			this.targetedClasses = null;
 		}
 		else {
-			singleClassIfPossible = null;
+			this.singleClassIfPossible = null;
+			this.targetedClasses = new HashMap<String, Class>( classesAndSubclasses.size() );
+			for ( Class<?> clazz : classesAndSubclasses ) {
+				//useful to reload classes from index without using reflection
+				targetedClasses.put( clazz.getName(), clazz );
+			}
 		}
 		this.searcher = searcher;
 		this.firstIndex = firstIndex;
@@ -106,30 +108,33 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				}
 				else if ( ProjectionConstants.THIS.equals( projectionName ) ) {
 					needId = true;
+					hasProjectionConstants = true;
 				}
 				else if ( ProjectionConstants.DOCUMENT.equals( projectionName ) ) {
 					// if we need to project DOCUMENT do not use fieldSelector as the user might want anything
 					allowFieldSelection = false;
 					needId = true;
+					hasProjectionConstants = true;
 					return;
 				}
 				else if ( ProjectionConstants.SCORE.equals( projectionName ) ) {
-					continue;
+					hasProjectionConstants = true;
 				}
 				else if ( ProjectionConstants.ID.equals( projectionName ) ) {
 					needId = true;
+					hasProjectionConstants = true;
 				}
 				else if ( ProjectionConstants.DOCUMENT_ID.equals( projectionName ) ) {
-					continue;
+					hasProjectionConstants = true;
 				}
 				else if ( ProjectionConstants.EXPLANATION.equals( projectionName ) ) {
-					continue;
+					hasProjectionConstants = true;
 				}
 				else if ( ProjectionConstants.OBJECT_CLASS.equals( projectionName ) ) {
-					continue;
+					hasProjectionConstants = true;
 				}
 				else if ( ProjectionConstants.SPATIAL_DISTANCE.equals( projectionName ) ) {
-					continue;
+					hasProjectionConstants = true;
 				}
 				else {
 					fields.add( projectionName );
@@ -150,20 +155,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		// else: this.fieldSelector = null; //We need no fields at all
 	}
 
-	private EntityInfo extractEntityInfo(int docId, Document document, ConversionContext exceptionWrap) throws IOException {
-		Class clazz = extractClass( docId, document );
-		String idName = DocumentBuilderHelper.getDocumentIdName( extendedIntegrator, clazz );
-		Serializable id = extractId( docId, document, clazz );
-		Object[] projected = null;
-		if ( projection != null && projection.length > 0 ) {
-			projected = DocumentBuilderHelper.getDocumentFields(
-					extendedIntegrator, clazz, document, projection, exceptionWrap
-			);
-		}
-		return new EntityInfoImpl( clazz, idName, id, projected );
-	}
-
-	private Serializable extractId(int docId, Document document, Class clazz) {
+	private Serializable extractId(Document document, Class clazz) {
 		if ( !needId ) {
 			return null;
 		}
@@ -172,7 +164,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 	}
 
-	private Class extractClass(int docId, Document document) throws IOException {
+	private Class extractClass(Document document) throws IOException {
 		//maybe we can avoid document extraction:
 		if ( singleClassIfPossible != null ) {
 			return singleClassIfPossible;
@@ -193,40 +185,48 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		int docId = queryHits.docId( scoreDocIndex );
 		Document document = extractDocument( scoreDocIndex );
 
-		EntityInfo entityInfo = extractEntityInfo( docId, document, exceptionWrap );
-		Object[] eip = entityInfo.getProjection();
-
-		if ( eip != null && eip.length > 0 ) {
-			for ( int x = 0; x < projection.length; x++ ) {
-				if ( ProjectionConstants.SCORE.equals( projection[x] ) ) {
-					eip[x] = queryHits.score( scoreDocIndex );
-				}
-				else if ( ProjectionConstants.ID.equals( projection[x] ) ) {
-					eip[x] = entityInfo.getId();
-				}
-				else if ( ProjectionConstants.DOCUMENT.equals( projection[x] ) ) {
-					eip[x] = document;
-				}
-				else if ( ProjectionConstants.DOCUMENT_ID.equals( projection[x] ) ) {
-					eip[x] = docId;
-				}
-				else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
-					eip[x] = queryHits.explain( scoreDocIndex );
-				}
-				else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
-					eip[x] = entityInfo.getClazz();
-				}
-				else if ( ProjectionConstants.SPATIAL_DISTANCE.equals( projection[x] ) ) {
-					eip[x] = queryHits.spatialDistance( scoreDocIndex );
-				}
-				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
-					//THIS could be projected more than once
-					//THIS loading delayed to the Loader phase
-					entityInfo.getIndexesOfThis().add( x );
+		Class clazz = extractClass( document );
+		String idName = DocumentBuilderHelper.getDocumentIdName( extendedIntegrator, clazz );
+		Serializable id = extractId( document, clazz );
+		Object[] projected = null;
+		if ( projection != null && projection.length > 0 ) {
+			projected = DocumentBuilderHelper.getDocumentFields(
+					extendedIntegrator, clazz, document, projection, exceptionWrap
+			);
+			if ( hasProjectionConstants ) {
+				for ( int x = 0; x < projection.length; x++ ) {
+					if ( ProjectionConstants.SCORE.equals( projection[x] ) ) {
+						projected[x] = queryHits.score( scoreDocIndex );
+					}
+					else if ( ProjectionConstants.ID.equals( projection[x] ) ) {
+						projected[x] = id;
+					}
+					else if ( ProjectionConstants.DOCUMENT.equals( projection[x] ) ) {
+						projected[x] = document;
+					}
+					else if ( ProjectionConstants.DOCUMENT_ID.equals( projection[x] ) ) {
+						projected[x] = docId;
+					}
+					else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
+						projected[x] = queryHits.explain( scoreDocIndex );
+					}
+					else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
+						projected[x] = clazz;
+					}
+					else if ( ProjectionConstants.SPATIAL_DISTANCE.equals( projection[x] ) ) {
+						projected[x] = queryHits.spatialDistance( scoreDocIndex );
+					}
+					else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
+						//THIS could be projected more than once
+						//THIS loading delayed to the Loader phase
+						// Use THIS as placeholder. It will be replaced
+						// when we populate the EntityInfo with the real entity.
+						projected[x] = ProjectionConstants.THIS;
+					}
 				}
 			}
 		}
-		return entityInfo;
+		return new EntityInfoImpl( clazz, idName, id, projected );
 	}
 
 	@Override

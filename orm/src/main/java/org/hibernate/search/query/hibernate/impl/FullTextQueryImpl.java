@@ -166,7 +166,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				resultTransformer,
 				loaderBuilder,
 				hSearchQuery.getProjectedFields(),
-				hSearchQuery.getTimeoutManager()
+				hSearchQuery.getTimeoutManager(),
+				hSearchQuery.hasThisProjection()
 		);
 		return loader;
 	}
@@ -184,7 +185,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				fetchSize,
 				documentExtractor,
 				loader,
-				this.session
+				this.session,
+				hSearchQuery.hasThisProjection()
 		);
 	}
 

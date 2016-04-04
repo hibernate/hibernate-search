@@ -501,14 +501,15 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( clazz );
 			Object id = getId( hit, binding );
 			Object[] projections = null;
-			List<Integer> indexesOfThis = null;
 
 			if ( projectedFields != null ) {
 				projections = new Object[projectedFields.length];
-				indexesOfThis = new ArrayList<>();
 
-				int i = 0;
-				for ( String field : projectedFields ) {
+				for ( int i = 0; i < projections.length; i++ ) {
+					String field = projectedFields[i];
+					if ( field == null ) {
+						continue;
+					}
 					switch ( field ) {
 						case ProjectionConstants.SOURCE:
 							projections[i] = hit.getAsJsonObject().get( "_source" ).toString();
@@ -540,23 +541,17 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							}
 							break;
 						case ProjectionConstants.THIS:
-							indexesOfThis.add( i );
+							// Use THIS as placeholder. It will be replaced
+							// when we populate the EntityInfo with the real entity.
+							projections[i] = ProjectionConstants.THIS;
 							break;
 						default:
 							projections[i] = getFieldValue( binding, hit, field );
 					}
-
-					i++;
 				}
 			}
 
-			EntityInfoImpl entityInfo = new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdentifierName(), (Serializable) id, projections );
-
-			if ( indexesOfThis != null ) {
-				entityInfo.getIndexesOfThis().addAll( indexesOfThis );
-			}
-
-			return entityInfo;
+			return new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdentifierName(), (Serializable) id, projections );
 		}
 
 		/**

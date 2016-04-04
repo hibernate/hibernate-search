@@ -7,7 +7,6 @@
 package org.hibernate.search.query.engine.spi;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Wrapper class describing the loading of an element.
@@ -23,9 +22,7 @@ public interface EntityInfo {
 
 	Object[] getProjection();
 
-	List<Integer> getIndexesOfThis();
-
-	boolean isProjectThis();
+	Object getEntityInstance();
 
 	void populateWithEntityInstance(Object entity);
 }
