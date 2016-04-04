@@ -101,7 +101,7 @@ public class FileHelperTest {
 		File destTestFile2 = new File( new File( dest, "subdir" ), "c" );
 		assertTrue( destTestFile2.exists() );
 
-		// create a new file in destination which does not exists in src. should be deleted after next sync
+		// create a new file in destination which does not exist in src. Should be deleted after next sync
 		File destTestFile3 = createFile( dest, "foo" );
 
 		// create a file in the src directory and write some data to it
