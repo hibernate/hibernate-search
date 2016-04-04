@@ -808,7 +808,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 267, value = "Unable to index date facet '%1$s' for field '%2$s', since the matching field is not using a numeric field bridge")
 	SearchException numericDateFacetForNonNumericField(String facetName, String fieldName);
 
-	@Message(id = 268, value = "Facet request '%1$s' tries to facet on  field '%2$s' which either does not exists or is not configured for faceting (via @Facet). Check your configuration.")
+	@Message(id = 268, value = "Facet request '%1$s' tries to facet on  field '%2$s' which either does not exist or is not configured for faceting (via @Facet). Check your configuration.")
 	SearchException unknownFieldNameForFaceting(String facetName, String facetFieldName);
 
 	@Message(id = 269, value = "'%1$s' is not a supported type for a range faceting request parameter. Supported types are: '%2$s'")
