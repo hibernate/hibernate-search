@@ -14,7 +14,7 @@ import org.hibernate.search.hcore.impl.SearchFactoryReference;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Static helper class to retrieve the instance of the current {@code Searchintegrator} / {@code ExtendedSearchintegrator}.
+ * Static helper class to retrieve the instance of the current {@code SearchIntegrator} / {@code ExtendedSearchIntegrator}.
  *
  * <p>
  * <b>Note</b>:<br>
@@ -29,15 +29,15 @@ public class ContextHelper {
 	private ContextHelper() {
 	}
 
-	public static ExtendedSearchIntegrator getSearchintegrator(Session session) {
-		return getSearchintegratorBySessionImplementor( (SessionImplementor) session );
+	public static ExtendedSearchIntegrator getSearchIntegrator(Session session) {
+		return getSearchIntegratorBySessionImplementor( (SessionImplementor) session );
 	}
 
-	public static ExtendedSearchIntegrator getSearchintegratorBySessionImplementor(SessionImplementor session) {
-		return getSearchintegratorBySFI( session.getFactory() );
+	public static ExtendedSearchIntegrator getSearchIntegratorBySessionImplementor(SessionImplementor session) {
+		return getSearchIntegratorBySFI( session.getFactory() );
 	}
 
-	public static ExtendedSearchIntegrator getSearchintegratorBySFI(SessionFactoryImplementor sfi) {
+	public static ExtendedSearchIntegrator getSearchIntegratorBySFI(SessionFactoryImplementor sfi) {
 		final SearchFactoryReference factoryReference = sfi.getServiceRegistry()
 			.getService( SearchFactoryReference.class );
 		if ( factoryReference != null ) {

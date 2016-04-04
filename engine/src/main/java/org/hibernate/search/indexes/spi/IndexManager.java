@@ -104,7 +104,7 @@ public interface IndexManager {
 	Analyzer getAnalyzer(String name);
 
 	/**
-	 * Connects this {@code IndexManager} to a new {@code ExtendedSearchintegrator}.
+	 * Connects this {@code IndexManager} to a new {@code ExtendedSearchIntegrator}.
 	 *
 	 * @param boundSearchIntegrator the existing search factory to which to associate this index manager with
 	 */

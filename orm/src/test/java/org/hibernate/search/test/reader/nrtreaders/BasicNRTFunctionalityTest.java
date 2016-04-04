@@ -92,7 +92,7 @@ public class BasicNRTFunctionalityTest extends SearchTestBase {
 
 	@Test
 	public void testMultipleEntitiesPerIndex() throws Exception {
-		ExtendedSearchIntegrator integrator = ContextHelper.getSearchintegratorBySFI( (SessionFactoryImplementor) getSessionFactory() );
+		ExtendedSearchIntegrator integrator = ContextHelper.getSearchIntegratorBySFI( (SessionFactoryImplementor) getSessionFactory() );
 		IndexManager documentsIndexManager = integrator.getIndexManagerHolder().getIndexManager( "Documents" );
 		Assert.assertNotNull( documentsIndexManager );
 		Assert.assertTrue( documentsIndexManager.getClass().equals( org.hibernate.search.indexes.impl.NRTIndexManager.class ) );

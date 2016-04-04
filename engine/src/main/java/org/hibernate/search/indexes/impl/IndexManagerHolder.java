@@ -144,7 +144,7 @@ public class IndexManagerHolder {
 			indexManager.addContainedEntity( entityIndexBinding.getDocumentBuilder().getBeanClass() );
 			return indexManager;
 		}
-		ExtendedSearchIntegrator searchFactory = entityIndexBinding.getSearchintegrator();
+		ExtendedSearchIntegrator searchFactory = entityIndexBinding.getSearchIntegrator();
 		WorkerBuildContext context;
 		//known implementations of SearchFactory passed are MutableSearchFactory and ImmutableSearchFactory
 		if ( WorkerBuildContext.class.isAssignableFrom( searchFactory.getClass() ) ) {
