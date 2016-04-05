@@ -14,6 +14,16 @@ import java.io.Serializable;
  * @author Emmanuel Bernard
  */
 public interface EntityInfo {
+
+	Object ENTITY_PLACEHOLDER = new Object() {
+
+		@Override
+		public String toString() {
+			return "HSearch: Entity placeholder";
+		}
+
+	};
+
 	Class<?> getClazz();
 
 	Serializable getId();

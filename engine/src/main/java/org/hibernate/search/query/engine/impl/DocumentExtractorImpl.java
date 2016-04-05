@@ -219,9 +219,10 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 					else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 						//THIS could be projected more than once
 						//THIS loading delayed to the Loader phase
-						// Use THIS as placeholder. It will be replaced
-						// when we populate the EntityInfo with the real entity.
-						projected[x] = ProjectionConstants.THIS;
+						// Use EntityInfo.ENTITY_PLACEHOLDER as placeholder.
+						// It will be replaced when we populate
+						// the EntityInfo with the real entity.
+						projected[x] = EntityInfo.ENTITY_PLACEHOLDER;
 					}
 				}
 			}

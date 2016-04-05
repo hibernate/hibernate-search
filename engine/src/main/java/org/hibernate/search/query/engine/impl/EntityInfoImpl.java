@@ -38,6 +38,13 @@ public class EntityInfoImpl implements EntityInfo {
 	 */
 	private final Object[] projection;
 
+	/**
+	 * The entity instance returned in a search.
+	 *
+	 * @see ProjectionConstants#THIS
+	 */
+	private Object entityInstance;
+
 	public EntityInfoImpl(Class clazz, String idName, Serializable id, Object[] projection) {
 		this.clazz = clazz;
 		this.idName = idName;
@@ -67,18 +74,14 @@ public class EntityInfoImpl implements EntityInfo {
 
 	@Override
 	public Object getEntityInstance() {
-		for ( Object obj : projection ) {
-			if ( clazz.isInstance( obj ) ) {
-				return obj;
-			}
-		}
-		return null;
+		return entityInstance;
 	}
 
 	@Override
 	public void populateWithEntityInstance(Object entity) {
+		this.entityInstance = entity;
 		for ( int i = 0; i < projection.length; i++ ) {
-			if ( projection[i] == ProjectionConstants.THIS ) {
+			if ( projection[i] == ENTITY_PLACEHOLDER) {
 				projection[i] = entity;
 			}
 		}

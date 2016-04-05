@@ -541,9 +541,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							}
 							break;
 						case ProjectionConstants.THIS:
-							// Use THIS as placeholder. It will be replaced
-							// when we populate the EntityInfo with the real entity.
-							projections[i] = ProjectionConstants.THIS;
+							// Use EntityInfo.ENTITY_PLACEHOLDER as placeholder.
+							// It will be replaced when we populate
+							// the EntityInfo with the real entity.
+							projections[i] = EntityInfo.ENTITY_PLACEHOLDER;
 							break;
 						default:
 							projections[i] = getFieldValue( binding, hit, field );
