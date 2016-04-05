@@ -91,7 +91,7 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 			for ( EventType eventType : EventType.values() ) {
 				String[] triggerDropStrings = this.triggerSource.getTriggerDropCode( info, eventType );
 				for ( String triggerDropString : triggerDropStrings ) {
-					log.triggerCreationSQL( triggerDropString );
+					log.triggerDropSQL( triggerDropString );
 					this.doQueryOrLogException(
 							emf,
 							triggerDropString,
@@ -101,19 +101,19 @@ public class SQLJPAAsyncUpdateSourceProvider implements AsyncUpdateSourceProvide
 			}
 
 			for ( String unSetupCode : this.triggerSource.getSpecificUnSetupCode( info ) ) {
-				log.triggerCreationSQL( unSetupCode );
+				log.triggerDropSQL( unSetupCode );
 				this.doQueryOrLogException( emf, unSetupCode, true );
 			}
 
 			for ( String str : triggerSource.getUpdateTableDropCode( info ) ) {
-				log.triggerCreationSQL( str );
+				log.triggerDropSQL( str );
 				this.doQueryOrLogException( emf, str, true );
 			}
 
 		}
 
 		for ( String str : triggerSource.getUnSetupCode() ) {
-			log.triggerCreationSQL( str );
+			log.triggerDropSQL( str );
 			this.doQueryOrLogException( emf, str, true );
 		}
 

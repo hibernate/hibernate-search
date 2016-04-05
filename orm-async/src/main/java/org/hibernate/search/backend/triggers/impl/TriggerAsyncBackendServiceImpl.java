@@ -35,6 +35,8 @@ import org.hibernate.search.genericjpa.factory.StandaloneSearchConfiguration;
 import org.hibernate.search.genericjpa.metadata.impl.ExtendedTypeMetadata;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataExtender;
 import org.hibernate.search.genericjpa.metadata.impl.MetadataUtil;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_DEFAULT_VALUE;
 import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.BATCH_SIZE_FOR_UPDATES_KEY;
@@ -50,6 +52,8 @@ import static org.hibernate.search.db.events.jpa.impl.AsyncUpdateConstants.UPDAT
  * @author Martin Braun
  */
 public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendService {
+
+	private static final Log log = LoggerFactory.make();
 
 	private AsyncUpdateSource asyncUpdateSource;
 	private SQLJPAAsyncUpdateSourceProvider asyncUpdateSourceProvider;
@@ -202,18 +206,20 @@ public class TriggerAsyncBackendServiceImpl implements TriggerAsyncBackendServic
 		}
 	}
 
+
 	@Override
 	public void stop() {
 		if ( this.asyncUpdateSource != null ) {
 			this.asyncUpdateSource.stop();
 		}
 
-		//FIXME: we don't have a real callback for when Hibernate ORM is closed
-		//only after it has been closed.
-		/*
-		if ( asyncUpdateSourceProvider != null
-				&& TRIGGER_CREATION_STRATEGY_CREATE_DROP.equals( this.createTriggerStrategy ) ) {
-			this.asyncUpdateSourceProvider.dropDDL( this.entityManagerFactoryWrapper, this.eventModelInfos );
+		/* FIXME: we need a better Hibernate ORM callback so this works:
+		if ( this.asyncUpdateSourceProvider != null
+				&& this.createTriggerStrategy == TriggerCreationStrategy.CREATE_DROP ) {
+			this.asyncUpdateSourceProvider.dropDDL(
+					this.entityManagerFactoryWrapper,
+					this.eventModelInfos
+			);
 		}*/
 
 		this.createTriggerStrategy = null;

@@ -964,4 +964,13 @@ public interface Log extends BasicLogger {
 	SearchException overriddenIdSettings(
 			@FormatWith(ClassFormatter.class) Class<?> root,
 			@FormatWith(ClassFormatter.class) Class<?> sub);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = 312, value = "SQL (Trigger Drop): %1$s")
+	void triggerDropSQL(String sql);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 313, value = "Exception occured during shutdown of the Async Backend")
+	void exceptionOccuredDuringShutdownOfAsync(@Cause Exception e);
+
 }
