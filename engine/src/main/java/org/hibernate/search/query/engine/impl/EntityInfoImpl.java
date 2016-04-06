@@ -81,7 +81,7 @@ public class EntityInfoImpl implements EntityInfo {
 	public void populateWithEntityInstance(Object entity) {
 		this.entityInstance = entity;
 		for ( int i = 0; i < projection.length; i++ ) {
-			if ( projection[i] == ENTITY_PLACEHOLDER) {
+			if ( projection[i] == ENTITY_PLACEHOLDER ) {
 				projection[i] = entity;
 			}
 		}
