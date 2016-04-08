@@ -8,7 +8,7 @@ package org.hibernate.search.test.util.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
@@ -43,10 +43,10 @@ public class ClassLoaderHelperTest {
 
 		//testing for subclasses:
 		Similarity sim = ClassLoaderHelper.instanceFromClass(
-				Similarity.class, DefaultSimilarity.class, "default similarity"
+				Similarity.class, ClassicSimilarity.class, "default similarity"
 		);
 		assertNotNull( sim );
-		assertTrue( sim.getClass().equals( DefaultSimilarity.class ) );
+		assertTrue( sim.getClass().equals( ClassicSimilarity.class ) );
 
 		//testing proper error messages:
 		wrappingTestFromClass(

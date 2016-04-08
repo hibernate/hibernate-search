@@ -422,7 +422,7 @@ Hibernate Search provides two ways to modify Lucene's similarity calculation.
 
 First you can set the default similarity by specifying the fully specified classname of your
 Similarity implementation using the property hibernate.search.similarity. The default value is
-org.apache.lucene.search.similarities.DefaultSimilarity.
+org.apache.lucene.search.similarities.ClassicSimilarity.
 
 Secondly, you can override the similarity used for a specific index by setting the `similarity`
 property for this index (see <<search-configuration-directory>> for more information about index

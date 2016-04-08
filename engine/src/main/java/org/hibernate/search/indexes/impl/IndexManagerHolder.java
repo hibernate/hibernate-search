@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -63,7 +63,7 @@ public class IndexManagerHolder {
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 	private static final String INDEX_SHARD_ID_SEPARATOR = ".";
 
-	private static final Similarity DEFAULT_SIMILARITY = new DefaultSimilarity();
+	private static final Similarity DEFAULT_SIMILARITY = new ClassicSimilarity();
 
 	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 

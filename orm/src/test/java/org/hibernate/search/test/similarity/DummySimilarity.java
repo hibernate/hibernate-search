@@ -7,14 +7,14 @@
 package org.hibernate.search.test.similarity;
 
 import org.apache.lucene.index.FieldInvertState;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.util.BytesRef;
 
 /**
  * @author Emmanuel Bernard
  */
 @SuppressWarnings("serial")
-public class DummySimilarity extends DefaultSimilarity {
+public class DummySimilarity extends ClassicSimilarity {
 
 	private float CONST = 1.0f;
 

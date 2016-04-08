@@ -8,7 +8,7 @@ package org.hibernate.search.testsupport.indexmanager;
 
 import java.util.Properties;
 
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.WorkerBuildContextForTest;
@@ -27,7 +27,7 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		ramIndexManager.initialize(
 				"testIndex",
 				properties,
-				new DefaultSimilarity(),
+				new ClassicSimilarity(),
 				new WorkerBuildContextForTest( new SearchConfigurationForTest() )
 		);
 		return ramIndexManager;
