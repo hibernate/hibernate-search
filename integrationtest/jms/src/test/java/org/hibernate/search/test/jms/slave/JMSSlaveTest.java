@@ -179,12 +179,12 @@ public class JMSSlaveTest extends SearchTestBase {
 		cfg.put( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
 		cfg.put( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_QUEUE, QUEUE_NAME );
 
-		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of jndi properties to create the InitialContext
+		// use the hibernate.jndi prefix to pass a whole bunch of jndi properties to create the InitialContext
 		// for the queue processor
-		cfg.put( "hibernate.search.default.worker.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory" );
-		cfg.put( "hibernate.search.default.worker.jndi.url", "vm://localhost" );
-		cfg.put( "hibernate.search.default.worker.jndi.connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
-		cfg.put( "hibernate.search.default.worker.jndi.queue.queue/searchtest", "searchQueue" );
+		cfg.put( "hibernate.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory" );
+		cfg.put( "hibernate.jndi.url", "vm://localhost" );
+		cfg.put( "hibernate.jndi.connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
+		cfg.put( "hibernate.jndi.queue.queue/searchtest", "searchQueue" );
 	}
 
 	@Override

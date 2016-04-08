@@ -12,10 +12,9 @@ import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
-import org.hibernate.search.util.impl.JNDIHelper;
+import org.hibernate.search.engine.service.named.spi.NamedResolver;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -26,27 +25,25 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private String jmsConnectionFactoryName;
-
 	@Override
 	protected QueueConnectionFactory initializeJMSQueueConnectionFactory(Properties properties) {
-		this.jmsConnectionFactoryName = properties.getProperty( JMS_CONNECTION_FACTORY );
-		final InitialContext initialContext = getJMSInitialContext( properties );
-		try {
-			return (QueueConnectionFactory) initialContext.lookup( jmsConnectionFactoryName );
+		final String jmsConnectionFactoryName = properties.getProperty( JMS_CONNECTION_FACTORY );
+		try ( ServiceReference<NamedResolver> requestReference = getServiceManager().requestReference( NamedResolver.class ) ) {
+			Object located = requestReference.get().locate( jmsConnectionFactoryName );
+			return (QueueConnectionFactory) located;
 		}
-		catch (NamingException e) {
+		catch (RuntimeException e) {
 			throw log.jmsQueueFactoryLookupException( jmsConnectionFactoryName, getIndexName(), e );
 		}
 	}
 
 	@Override
 	protected Queue initializeJMSQueue(QueueConnectionFactory factory, Properties properties) {
-		final InitialContext initialContext = getJMSInitialContext( properties );
-		try {
-			return (Queue) initialContext.lookup( getJmsQueueName() );
+		try ( ServiceReference<NamedResolver> requestReference = getServiceManager().requestReference( NamedResolver.class ) ) {
+			Object located = requestReference.get().locate( getJmsQueueName() );
+			return (Queue) located;
 		}
-		catch (NamingException e) {
+		catch (RuntimeException e) {
 			throw log.jmsQueueLookupException( getJmsQueueName(), getIndexName(), e );
 		}
 	}
@@ -68,12 +65,4 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 		}
 	}
 
-	private InitialContext getJMSInitialContext(final Properties properties) {
-		try {
-			return JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
-		}
-		catch (NamingException e) {
-			throw log.jmsInitialContextException( jmsConnectionFactoryName, getIndexName(), e );
-		}
-	}
 }

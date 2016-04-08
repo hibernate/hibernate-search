@@ -11,6 +11,7 @@ import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
@@ -44,6 +45,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private static final Log log = LoggerFactory.make();
 
 	private final ConfigurationService configurationService;
+	private final JndiService namingService;
 	private final ClassLoaderService classLoaderService;
 	private final FullTextIndexEventListener listener;
 	private final Metadata metadata;
@@ -56,11 +58,13 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			Metadata metadata,
 			ConfigurationService configurationService,
 			FullTextIndexEventListener listener,
-			ClassLoaderService classLoaderService) {
+			ClassLoaderService classLoaderService,
+			JndiService namingService) {
 		this.metadata = metadata;
 		this.configurationService = configurationService;
 		this.listener = listener;
 		this.classLoaderService = classLoaderService;
+		this.namingService = namingService;
 	}
 
 	@Override
@@ -71,7 +75,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			HibernateSessionFactoryService sessionService = new DefaultHibernateSessionFactoryService( factory );
 			if ( extendedIntegrator == null ) {
 				SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
-						.configuration( new SearchConfigurationFromHibernateCore( metadata, configurationService, classLoaderService, sessionService ) )
+						.configuration( new SearchConfigurationFromHibernateCore( metadata, configurationService, classLoaderService, sessionService, namingService ) )
 						.buildSearchIntegrator();
 				extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
 			}
@@ -79,7 +83,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			Boolean enableJMX = configurationService.getSetting( Environment.JMX_ENABLED, BOOLEAN, Boolean.FALSE );
 			if ( enableJMX.booleanValue() ) {
 				indexControlMBeanName =
-						enableIndexControlBean( configurationService, extendedIntegrator );
+						enableIndexControlBean( configurationService, extendedIntegrator, factory );
 			}
 			listener.initialize( extendedIntegrator );
 			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
@@ -103,7 +107,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		}
 	}
 
-	private static String enableIndexControlBean(ConfigurationService configurationService, ExtendedSearchIntegrator extendedIntegrator) {
+	private static String enableIndexControlBean(ConfigurationService configurationService, ExtendedSearchIntegrator extendedIntegrator, SessionFactory factory) {
 		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
 		if ( StringHelper.isEmpty( configurationService.getSetting( "hibernate.session_factory_name", STRING ) ) ) {
 			log.debug( "In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI" );
@@ -121,7 +125,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			JMXRegistrar.unRegisterMBean( objectName );
 		}
 
-		IndexControl indexCtrlBean = new IndexControl( configurationService, extendedIntegrator );
+		IndexControl indexCtrlBean = new IndexControl( extendedIntegrator, factory );
 		JMXRegistrar.registerMBean( indexCtrlBean, IndexControlMBean.class, objectName );
 		return objectName;
 	}

@@ -6,28 +6,18 @@
  */
 package org.hibernate.search.jmx.impl;
 
-import java.util.Properties;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.jmx.IndexControlMBean;
-import org.hibernate.search.util.impl.JNDIHelper;
-
-import static org.hibernate.engine.config.spi.StandardConverters.STRING;
 
 /**
  * Implementation of the {@code IndexControlMBean} JMX attributes and operations.
@@ -36,18 +26,16 @@ import static org.hibernate.engine.config.spi.StandardConverters.STRING;
  */
 public class IndexControl implements IndexControlMBean {
 
-	private final Properties jndiProperties;
-	private final String sessionFactoryJndiName;
-	private final ServiceManager serviceManager;
+	private final SessionFactory hibernateSessionFactory;
+	private final ExtendedSearchIntegrator extendedIntegrator;
 
 	private int batchSize = 25;
 	private int numberOfObjectLoadingThreads = 2;
 	private int numberOfFetchingThreads = 4;
 
-	public IndexControl(ConfigurationService configurationService, ExtendedSearchIntegrator extendedIntegrator) {
-		this.sessionFactoryJndiName = configurationService.getSetting( "hibernate.session_factory_name", STRING );
-		this.jndiProperties = JNDIHelper.getJndiProperties( extendedIntegrator.getConfigurationProperties(), JNDIHelper.HIBERNATE_JNDI_PREFIX );
-		this.serviceManager = extendedIntegrator.getServiceManager();
+	public IndexControl(ExtendedSearchIntegrator extendedIntegrator, SessionFactory factory) {
+		this.extendedIntegrator = extendedIntegrator;
+		this.hibernateSessionFactory = factory;
 	}
 
 	@Override
@@ -84,8 +72,7 @@ public class IndexControl implements IndexControlMBean {
 	public void index(String entity) {
 		Class<?> clazz = getEntityClass( entity );
 
-		SessionFactory factory = getSessionFactory();
-		try ( Session session = factory.openSession() ) {
+		try ( Session session = hibernateSessionFactory.openSession() ) {
 			FullTextSession fulltextSession = Search.getFullTextSession( session );
 			fulltextSession.createIndexer( clazz )
 					.batchSizeToLoadObjects( batchSize )
@@ -102,16 +89,13 @@ public class IndexControl implements IndexControlMBean {
 	@Override
 	public void optimize(String entity) {
 		Class<?> clazz = getEntityClass( entity );
-		SessionFactory factory = getSessionFactory();
-		ExtendedSearchIntegrator searchIntegrator = ContextHelper.getSearchIntegratorBySF( factory );
-		searchIntegrator.optimize( clazz );
+		extendedIntegrator.optimize( clazz );
 	}
 
 	@Override
 	public void purge(String entity) {
 		Class<?> clazz = getEntityClass( entity );
-		SessionFactory factory = getSessionFactory();
-		try ( Session session = factory.openSession() ) {
+		try ( Session session = hibernateSessionFactory.openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
 			Transaction transaction = ( (SessionImplementor) session ).accessTransaction();
 			final boolean controlTransactions = ! transaction.isActive();
@@ -131,7 +115,7 @@ public class IndexControl implements IndexControlMBean {
 
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
-		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
+		ClassLoaderService classLoaderService = extendedIntegrator.getServiceManager().getClassLoaderService();
 		try {
 			clazz = classLoaderService.classForName( entity );
 		}
@@ -141,21 +125,4 @@ public class IndexControl implements IndexControlMBean {
 		return clazz;
 	}
 
-	private SessionFactory getSessionFactory() {
-		try {
-			Context initialContext;
-			if ( jndiProperties.isEmpty() ) {
-				initialContext = new InitialContext();
-			}
-			else {
-				initialContext = new InitialContext( jndiProperties );
-			}
-			return (SessionFactory) initialContext.lookup( sessionFactoryJndiName );
-		}
-		catch (Exception e) {
-			throw new UnsupportedOperationException(
-					"In order for this operation to work the SessionFactory must be bound to JNDI"
-			);
-		}
-	}
 }

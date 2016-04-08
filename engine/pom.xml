@@ -238,7 +238,8 @@
                             org.hibernate.search.store.optimization;version="${project.version}",
                             org.hibernate.search.util;version="${project.version}",
                             org.hibernate.search.util.impl;version="${project.version}",
-                            org.hibernate.search.util.logging.impl;version="${project.version}"
+                            org.hibernate.search.util.logging.impl;version="${project.version}",
+                            org.hibernate.search.engine.service.named.spi;version="${project.version}"
                         </Export-Package>
                     </instructions>
                 </configuration>

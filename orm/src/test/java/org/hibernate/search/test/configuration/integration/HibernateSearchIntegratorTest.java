@@ -24,6 +24,7 @@ import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.engine.config.internal.ConfigurationServiceImpl;
 import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
@@ -64,6 +65,9 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 	@Mock
 	private SessionFactoryOptions mockSessionFactoryOptions;
+
+	@Mock
+	private JndiService jndiService;
 
 	@Mock
 	private Metadata mockMetadata;
@@ -196,6 +200,9 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 		ConfigurationService cfg = new ConfigurationServiceImpl( settings );
 		expect( mockSessionFactoryServiceRegistry.getService( ConfigurationService.class ) )
 			.andReturn( cfg )
+			.anyTimes();
+		expect( mockSessionFactoryServiceRegistry.getService( JndiService.class ) )
+			.andReturn( jndiService )
 			.anyTimes();
 	}
 }
