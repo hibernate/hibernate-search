@@ -19,6 +19,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -53,9 +54,11 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 
 	private Properties props = null;
 	private boolean isTransactional;
+	private ServiceManager serviceManager;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+		serviceManager = context.getServiceManager();
 		this.props = props;
 		this.isTransactional = context.enlistWorkerInTransaction();
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
@@ -78,18 +81,6 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 		else {
 			return jmsQueue;
 		}
-	}
-
-	public String getJmsQueueName() {
-		return jmsQueueName;
-	}
-
-	public String getIndexName() {
-		return indexName;
-	}
-
-	public SearchIntegrator getSearchIntegrator() {
-		return integrator;
 	}
 
 	@Override
@@ -136,10 +127,6 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 		}
 	}
 
-	public boolean isTransactional() {
-		return isTransactional;
-	}
-
 	@Override
 	public void close() {
 		try {
@@ -179,5 +166,25 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 	 * @param props a {@link java.util.Properties} object.
 	 */
 	protected abstract QueueConnection initializeJMSConnection(QueueConnectionFactory factory, Properties props);
+
+	public final String getJmsQueueName() {
+		return jmsQueueName;
+	}
+
+	public final String getIndexName() {
+		return indexName;
+	}
+
+	public final SearchIntegrator getSearchIntegrator() {
+		return integrator;
+	}
+
+	public final boolean isTransactional() {
+		return isTransactional;
+	}
+
+	public final ServiceManager getServiceManager() {
+		return serviceManager;
+	}
 
 }

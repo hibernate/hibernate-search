@@ -11,6 +11,8 @@ import java.util.Map;
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionProvider;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.impl.DefaultIndexManagerFactory;
+import org.hibernate.search.engine.service.named.impl.NoopNamedResolver;
+import org.hibernate.search.engine.service.named.spi.NamedResolver;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.util.impl.CollectionHelper;
 
@@ -291,8 +293,9 @@ public final class Environment {
 	public static final Map<Class<? extends Service>, String> DEFAULT_SERVICES_MAP;
 	// TODO for now we hard code the default services. This could/should be made configurable (HF)
 	static {
-		DEFAULT_SERVICES_MAP = CollectionHelper.newHashMap( 1 );
+		DEFAULT_SERVICES_MAP = CollectionHelper.newHashMap( 2 );
 		DEFAULT_SERVICES_MAP.put( IndexManagerFactory.class, DefaultIndexManagerFactory.class.getName() );
+		DEFAULT_SERVICES_MAP.put( NamedResolver.class, NoopNamedResolver.class.getName() );
 	}
 
 	private Environment() {

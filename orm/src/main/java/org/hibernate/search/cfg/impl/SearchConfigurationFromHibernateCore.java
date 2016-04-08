@@ -20,6 +20,7 @@ import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
@@ -27,6 +28,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.named.spi.NamedResolver;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.hcore.impl.HibernateSessionFactoryService;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -49,7 +51,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 	public SearchConfigurationFromHibernateCore(Metadata metadata, ConfigurationService configurationService,
 			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService,
-			HibernateSessionFactoryService sessionService) {
+			HibernateSessionFactoryService sessionService, JndiService namingService) {
 		this.metadata = metadata;
 		// hmm, not sure why we throw NullPointerExceptions from these sanity checks
 		// Shouldn't we use AssertionFailure or a log message + SearchException? (HF)
@@ -65,6 +67,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		Map<Class<? extends Service>, Object> providedServices = new HashMap<>( 1 );
 		providedServices.put( IdUniquenessResolver.class, new HibernateCoreIdUniquenessResolver( metadata ) );
 		providedServices.put( HibernateSessionFactoryService.class, sessionService );
+		providedServices.put( NamedResolver.class, new DelegatingNamedResolver( namingService ) );
 		this.providedServices = Collections.unmodifiableMap( providedServices );
 		this.legacyConfigurationProperties = extractProperties( configurationService );
 

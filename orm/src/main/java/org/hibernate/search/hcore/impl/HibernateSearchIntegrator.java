@@ -10,6 +10,7 @@ package org.hibernate.search.hcore.impl;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.DuplicationStrategy;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -36,6 +37,7 @@ public class HibernateSearchIntegrator implements Integrator {
 	@Override
 	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
+		JndiService namingService = serviceRegistry.getService( JndiService.class );
 
 		if ( ! hibernateSearchNeedsToBeEnabled( configurationService ) ) {
 			return;
@@ -49,7 +51,8 @@ public class HibernateSearchIntegrator implements Integrator {
 				metadata,
 				configurationService,
 				fullTextIndexEventListener,
-				hibernateClassLoaderService
+				hibernateClassLoaderService,
+				namingService
 		);
 		sessionFactory.addObserver( observer );
 	}
