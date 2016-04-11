@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.bridge.util.impl;
+package org.hibernate.search.test.bridge.util;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -31,24 +31,12 @@ import static org.junit.Assert.fail;
 public class NumericFieldUtilsTest {
 	@Test
 	public void testShouldRequireNumericRangeQuery() {
-		Object[] numericValues = {
-				10,
-				20L,
-				30.5f,
-				40.5d,
-				nowCalendar()
-		};
-
-		for ( Object val : numericValues ) {
+		for ( Object val : getNumericTestValues() ) {
 			assertTrue(
 					"Value of type " + val.getClass() + " should require numeric range query",
 					NumericFieldUtils.requiresNumericRangeQuery( val )
 			);
 		}
-	}
-
-	private Calendar nowCalendar() {
-		return GregorianCalendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
 	}
 
 	@Test
@@ -58,9 +46,7 @@ public class NumericFieldUtilsTest {
 				NumericFieldUtils.requiresNumericRangeQuery( null )
 		);
 
-		Object[] nonNumericValues = {"", new Date(), BigDecimal.ONE};
-
-		for ( Object val : nonNumericValues ) {
+		for ( Object val : getNonNumericTestValues() ) {
 			assertFalse(
 					"Value of type '" + val.getClass() + "' should not require numeric range query",
 					NumericFieldUtils.requiresNumericRangeQuery( val )
@@ -70,16 +56,7 @@ public class NumericFieldUtilsTest {
 
 	@Test
 	public void testShouldCreateExactMatchQuery() {
-		Object[] numericValues = {
-				10,
-				20L,
-				30.5f,
-				40.5d,
-				nowCalendar(),
-				new Date()
-		};
-
-		for ( Object val : numericValues ) {
+		for ( Object val : getNumericTestValues() ) {
 			try {
 				NumericFieldUtils.createExactMatchQuery( "numField", val );
 			}
@@ -101,9 +78,7 @@ public class NumericFieldUtilsTest {
 
 		assertNotNull( "Should not create exact match query for null value", nullEx );
 
-		Object[] nonNumericValues = {"", BigDecimal.ONE};
-
-		for ( Object val : nonNumericValues ) {
+		for ( Object val : getNonNumericTestValues() ) {
 			SearchException caught = null;
 			try {
 				NumericFieldUtils.createExactMatchQuery( "nonNumField", val );
@@ -114,5 +89,28 @@ public class NumericFieldUtilsTest {
 
 			assertNotNull( "Should not create exact match query for value of type " + val.getClass(), caught );
 		}
+	}
+
+	private Object[] getNumericTestValues() {
+		Object[] numericValues = {
+				40.5d,
+				Byte.valueOf("100"),
+				Short.valueOf((short) 4),
+				20L,
+				10,
+				30.5f,
+				new Date(),
+				nowCalendar()
+		};
+		return numericValues;
+	}
+
+	private Object[] getNonNumericTestValues() {
+		Object[] nonNumericValues = { "", BigDecimal.ONE };
+		return nonNumericValues;
+	}
+
+	private Calendar nowCalendar() {
+		return GregorianCalendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
 	}
 }
