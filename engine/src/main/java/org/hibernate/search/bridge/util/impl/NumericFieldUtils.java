@@ -123,9 +123,12 @@ public final class NumericFieldUtils {
 			return false;
 		}
 		return value instanceof Double ||
+				value instanceof Byte ||
+				value instanceof Short ||
 				value instanceof Long ||
 				value instanceof Integer ||
 				value instanceof Float ||
+				value instanceof Date ||
 				value instanceof Calendar ||
 				( JavaTimeBridgeProvider.isActive() && (
 						value instanceof java.time.Instant ||
