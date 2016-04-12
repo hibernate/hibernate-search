@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.StopFilterFactory;
 import org.apache.lucene.analysis.ngram.NGramFilterFactory;
@@ -49,6 +50,7 @@ import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.After;
@@ -143,6 +145,7 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class)
+	// The analyzer code is not yet complete
 	public void testTermQueryOnAnalyzer() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -486,6 +489,7 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class)
+	// The resolution is not yet supported for the date bridges
 	public void testRangeQueryFromToIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -551,6 +555,7 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class)
+	// The resolution is not yet supported for the date bridges
 	public void testRangeQueryBelowIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -632,6 +637,7 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class)
+	// The resolution is not yet supported for the date bridges
 	public void testRangeQueryAboveIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -747,6 +753,7 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class)
+	// The analyzer code is not yet complete
 	public void testPhraseQueryWithStopWords() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -768,6 +775,7 @@ public class DSLTest extends SearchTestBase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1074")
 	@Category(ElasticsearchSupportInProgress.class)
+	// The analyzer code is not yet complete
 	public void testPhraseQueryWithNoTermsAfterAnalyzerApplication() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -1038,6 +1046,44 @@ public class DSLTest extends SearchTestBase {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2199")
+	@Category(SkipOnElasticsearch.class)
+	// It tests the ability to define CharFilters programmatically so it does not make sense for Elasticsearch
+	public void testCharFilters() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		//regular query
+		Query query = monthQb.keyword().onField( "htmlDescription" ).matching( "strong" ).createQuery();
+		assertEquals( 2, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword().onField( "htmlDescription" ).matching( "em" ).createQuery();
+		assertEquals( 2, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		//using the HTMLStripCharFilter
+		query = monthQb.keyword().onField( "htmlDescription_htmlStrip" ).matching( "strong" ).createQuery();
+		assertEquals( 0, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword().onField( "htmlDescription_htmlStrip" ).matching( "em" ).createQuery();
+		assertEquals( 0, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword().onField( "htmlDescription_htmlStrip" ).matching( "month" ).createQuery();
+		assertEquals( 3, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword().onField( "htmlDescription_htmlStrip" ).matching( "spring" ).createQuery();
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword().onField( "htmlDescription_htmlStrip" ).matching( "fake" ).createQuery();
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword().onField( "htmlDescription_htmlStrip" ).matching( "escaped" ).createQuery();
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		transaction.commit();
+	}
+
 	private void outputQueryAndResults(boolean outputLogs, Coffee originalInstance, Query mltQuery, List<Object[]> results) {
 		// set to true to display results
 		if ( outputLogs ) {
@@ -1067,7 +1113,8 @@ public class DSLTest extends SearchTestBase {
 						"Historically colder than any other month in the northern hemisphere",
 						january,
 						0.231d,
-						"jan"
+						"jan",
+						"<escaped>Month</escaped> of <em>colder</em> and <strong>whitening</strong>"
 				)
 		);
 		calendar.set( 100 + 1900, 2, 12, 0, 0, 0 );
@@ -1080,7 +1127,8 @@ public class DSLTest extends SearchTestBase {
 						"Historically, the month where we make babies while watching the whitening landscape",
 						february,
 						0.435d,
-						"feb"
+						"feb",
+						"Month of <em>snowboarding</em>"
 				)
 		);
 		calendar.set( 1800, 2, 12, 0, 0, 0 );
@@ -1093,7 +1141,8 @@ public class DSLTest extends SearchTestBase {
 						"Historically, the month in which we actually find time to go snowboarding.",
 						march,
 						0.435d,
-						"-mar"
+						"-mar",
+						"Month of <strong>fake</strong> spring"
 				)
 		);
 
@@ -1157,7 +1206,11 @@ public class DSLTest extends SearchTestBase {
 					.filter( StopFilterFactory.class )
 					.filter( NGramFilterFactory.class )
 					.param( "minGramSize", "3" )
-					.param( "maxGramSize", "3" );
+					.param( "maxGramSize", "3" )
+					.analyzerDef( "htmlStrip", StandardTokenizerFactory.class )
+					.charFilter( HTMLStripCharFilterFactory.class )
+					.param( "escapedTags", "escaped" )
+					.filter( LowerCaseFilterFactory.class );
 			return mapping;
 		}
 	}
