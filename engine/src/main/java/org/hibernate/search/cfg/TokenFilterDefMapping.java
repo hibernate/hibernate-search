@@ -8,6 +8,7 @@ package org.hibernate.search.cfg;
 
 import java.util.Map;
 
+import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
@@ -46,6 +47,15 @@ public class TokenFilterDefMapping {
 	 */
 	public TokenFilterDefMapping filter(Class<? extends TokenFilterFactory> factory) {
 		return new TokenFilterDefMapping( factory, analyzerDef, mapping );
+	}
+
+	/**
+	 * {@code &#064;CharFilterDef(factory=factory) }
+	 * @param factory the {@link CharFilterFactory}
+	 * @return a new {@link CharFilterDefMapping}
+	 */
+	public CharFilterDefMapping charFilter(Class<? extends CharFilterFactory> factory) {
+		return new CharFilterDefMapping( factory, analyzerDef, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {

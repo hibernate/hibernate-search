@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.cfg;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.util.CharFilterFactory;
@@ -14,31 +13,28 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
 /**
- * @author Emmanuel Bernard
+ * @author Guillaume Smet
  */
-public class AnalyzerDefMapping {
-	private SearchMapping mapping;
+public class CharFilterDefMapping {
+	private Map<String, Object> charFilter;
 	private Map<String, Object> analyzerDef;
-	private Map<String, Object> tokenizer;
+	private SearchMapping mapping;
 
-	AnalyzerDefMapping(String name, Class<? extends TokenizerFactory> tokenizerFactory, SearchMapping mapping) {
+	CharFilterDefMapping(Class<? extends CharFilterFactory> factory, Map<String, Object> analyzerDef, SearchMapping mapping) {
 		this.mapping = mapping;
-		this.analyzerDef = new HashMap<String, Object>();
-		mapping.addAnalyzerDef( analyzerDef );
-		analyzerDef.put( "name", name );
-		tokenizer = new HashMap<String, Object>();
-		tokenizer.put( "factory", tokenizerFactory );
-		analyzerDef.put( "tokenizer", tokenizer );
+		this.analyzerDef = analyzerDef;
+		this.charFilter = SearchMapping.addElementToAnnotationArray( analyzerDef, "charFilters" );
+		charFilter.put( "factory", factory );
 	}
 
 	/**
-	 * {@code &#064;TokenizerDef(, ... params={&#064;Parameter(name="name", value="value"), ...}) }
-	 * @param name the name of the paramater
-	 * @param value the value of the paramater
-	 * @return {@code  this} for method chaining
+	 * {@code &#064;CharFilterDef(, ... params={&#064;Parameter(name="name", value="value"), ...} }
+	 * @param name the name of the parameter
+	 * @param value the value of the parameter
+	 * @return {@code this} for method chaining
 	 */
-	public AnalyzerDefMapping tokenizerParam(String name, String value) {
-		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( tokenizer, "params" );
+	public CharFilterDefMapping param(String name, String value) {
+		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( charFilter, "params" );
 		param.put( "name", name );
 		param.put( "value", value );
 		return this;
@@ -54,20 +50,24 @@ public class AnalyzerDefMapping {
 	}
 
 	/**
-	 * {@code &#064;TokenFilterDef(factory=factory) }
+	 * {@code &#064;TokenFilterDef(factory=factory)}
 	 * @param factory the {@link TokenFilterFactory}
-	 * @return a new {@link TokenFilterDefMapping}
+	 * @return a new {@link CharFilterDefMapping}
 	 */
 	public TokenFilterDefMapping filter(Class<? extends TokenFilterFactory> factory) {
 		return new TokenFilterDefMapping( factory, analyzerDef, mapping );
+	}
+
+	public EntityMapping entity(Class<?> entityType) {
+		return new EntityMapping(entityType, mapping);
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
-	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping( entityType, mapping );
+	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
+		return new FullTextFilterDefMapping( mapping, name, impl );
 	}
 
 }

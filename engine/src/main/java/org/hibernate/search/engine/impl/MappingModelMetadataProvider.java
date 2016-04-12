@@ -31,6 +31,7 @@ import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.CalendarBridge;
+import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
@@ -181,6 +182,12 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				);
 				analyzerDefAnnotation.setValue( "filters", filtersArray );
 			}
+			else if ( "charFilters".equals( entry.getKey() ) ) {
+				@SuppressWarnings("unchecked") CharFilterDef[] charFiltersArray = createCharFilters(
+						(List<Map<String, Object>>) entry.getValue()
+				);
+				analyzerDefAnnotation.setValue( "charFilters", charFiltersArray );
+			}
 			else {
 				analyzerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 			}
@@ -210,6 +217,25 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			index++;
 		}
 		return filtersArray;
+	}
+
+	private CharFilterDef[] createCharFilters(List<Map<String, Object>> charFilters) {
+		CharFilterDef[] charFiltersArray = new CharFilterDef[charFilters.size()];
+		int index = 0;
+		for ( Map<String, Object> charFilter : charFilters ) {
+			AnnotationDescriptor charFilterAnn = new AnnotationDescriptor( CharFilterDef.class );
+			for ( Map.Entry<String, Object> charFilterEntry : charFilter.entrySet() ) {
+				if ( "params".equals( charFilterEntry.getKey() ) ) {
+					addParamsToAnnotation( charFilterAnn, charFilterEntry );
+				}
+				else {
+					charFilterAnn.setValue( charFilterEntry.getKey(), charFilterEntry.getValue() );
+				}
+			}
+			charFiltersArray[index] = (CharFilterDef) createAnnotation( charFilterAnn );
+			index++;
+		}
+		return charFiltersArray;
 	}
 
 	private static Parameter[] createParams(List<Map<String, Object>> params) {

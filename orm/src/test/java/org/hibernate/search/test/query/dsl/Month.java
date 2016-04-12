@@ -43,10 +43,12 @@ public class Month {
 		this.monthValue = monthValue;
 	}
 
-	public Month(String name, int monthValue, String mythology, String history, Date estimatedCreation, double raindropInMm, String keyForOrdering) {
+	public Month(String name, int monthValue, String mythology, String history, Date estimatedCreation, double raindropInMm, String keyForOrdering,
+			String htmlDescription) {
 		this( name, monthValue, mythology, history, estimatedCreation );
 		this.raindropInMm = raindropInMm;
 		this.keyForOrdering = keyForOrdering;
+		this.htmlDescription = htmlDescription;
 	}
 
 	@Id
@@ -140,4 +142,19 @@ public class Month {
 	}
 
 	private String keyForOrdering;
+
+
+	@Fields({
+			@Field,
+			@Field(name = "htmlDescription_htmlStrip", analyzer = @Analyzer(definition = "htmlStrip"))
+	})
+	public String getHtmlDescription() {
+		return htmlDescription;
+	}
+
+	public void setHtmlDescription(String htmlDescription) {
+		this.htmlDescription = htmlDescription;
+	}
+
+	private String htmlDescription;
 }
