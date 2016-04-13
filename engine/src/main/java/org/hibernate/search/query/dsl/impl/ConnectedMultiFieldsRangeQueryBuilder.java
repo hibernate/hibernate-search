@@ -79,7 +79,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		final Query perFieldQuery;
 		final String fieldName = fieldContext.getField();
 
-		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
 		DocumentFieldMetadata fieldMetadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( fieldName );
 		if ( fieldMetadata != null ) {
 			if ( fieldMetadata.isNumeric() ) {
@@ -114,7 +114,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 
 	private static Query createKeywordRangeQuery(String fieldName, RangeQueryContext rangeContext, QueryBuildingContext queryContext, ConversionContext conversionContext, FieldContext fieldContext) {
 		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
-		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
 		final String fromString = rangeContext.hasFrom() ?
 				fieldContext.objectToString( documentBuilder, rangeContext.getFrom(), conversionContext ) :
 				null;

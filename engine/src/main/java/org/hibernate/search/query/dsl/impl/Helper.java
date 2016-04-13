@@ -16,9 +16,6 @@ import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 
@@ -89,13 +86,4 @@ final class Helper {
 		return terms;
 	}
 
-	static DocumentBuilderIndexedEntity getDocumentBuilder(QueryBuildingContext queryContext) {
-		final ExtendedSearchIntegrator factory = queryContext.getFactory();
-		final Class<?> type = queryContext.getEntityType();
-		EntityIndexBinding indexBinding = factory.getIndexBinding( type );
-		if ( indexBinding == null ) {
-			throw new AssertionFailure( "Class is not indexed: " + type );
-		}
-		return indexBinding.getDocumentBuilder();
-	}
 }

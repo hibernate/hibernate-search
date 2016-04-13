@@ -67,7 +67,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 	public Query createQuery() {
 		Query query;
 		final ExtendedSearchIntegrator searchIntegrator = queryContext.getFactory();
-		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
 		IndexReader indexReader = searchIntegrator.getIndexReaderAccessor().open( queryContext.getEntityType() );
 		// retrieving the docId and building the more like this query form the term vectors must be using the same index reader
 		try {

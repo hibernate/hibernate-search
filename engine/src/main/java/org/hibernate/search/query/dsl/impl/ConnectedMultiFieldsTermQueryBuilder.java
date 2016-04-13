@@ -77,7 +77,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 	private Query createQuery(FieldContext fieldContext, ConversionContext conversionContext) {
 		final Query perFieldQuery;
-		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
 		final boolean applyTokenization;
 
 		FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
