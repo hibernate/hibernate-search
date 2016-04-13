@@ -1,51 +1,76 @@
 == Integration with Elasticsearch
 
+// vim: set colorcolumn=100:
+
 === Status
 
 [CAUTION]
 ====
-This feature is in the process of being implemented.
+This feature is a work in progress.
 Read this section carefully!
 ====
 
-The integration with Elasticsearch is in early development and should be considered highly experimental.
-We would certainly not recommend using it in any production level software,
-yet we're happy to share the early state in case you are interested to participate in early testing or help
-us with development in any way.
+The integration with Elasticsearch is in development and should be considered experimental.
+We do think we have the basics covered and we are looking for feedback.
 
 Patches can be sent as pull requests to the https://github.com/hibernate/hibernate-search[Github repository],
 but also general feedback, suggestions and questions are very welcome.
-
 To get in touch or find other interesting links for contributors, see the http://hibernate.org/community/[Hibernate Community].
-
-Development is fast so by the time you will read this documentation, many more features will have been implemented in the current development branch.
 
 === Goal of the Elasticsearch integration
 
 The goal of integrating with Elasticsearch is to allow Hibernate Search users to benefit
-from the full-text capabilities integrated with Hibernate but replacing the local Lucene based index with a remote Elasticsearch service.
+from the full-text capabilities integrated with Hibernate ORM
+but replacing the local Lucene based index with a remote Elasticsearch service.
 
 There could be various reasons to prefer this over an "embedded Lucene" approach:
- 
- - wish to separate the service running your application from the Search service
- - integrate with an existing Elasticsearch instance
- - benefit from Elasticsearch's out of the box horizontal scalability features
- - explore the data updated by an Hibernate powered application using the Elasticsearch dashboard integrations such as Kibana
- 
-Unless the aim is to integrate with the other system, the benefits compared to a simple Lucene embedded approach
-have a couple of drawbacks to consider:
 
- - incur a performance penalty of remote RPCs both for index updates and to run queries
- - need to buy & manage additional servers 
- 
+* wish to separate the service running your application from the Search service
+* integrate with an existing Elasticsearch instance
+* benefit from Elasticsearch's out of the box horizontal scalability features
+* explore the data updated by an Hibernate powered application using the Elasticsearch dashboard integrations such as Kibana
+
+There are a couple drawbacks compared to the embedded Lucene approach though:
+
+* incur a performance penalty of remote RPCs both for index updates and to run queries
+* need to buy & manage additional servers
+
 Which solution is best will depend on the specific needs of your system.
- 
-=== Try the experimental Elasticsearch integration
 
-To experiment with the new Elasticsearch integration you will have to download Elasticsearch and run it:
+[NOTE]
+.Why not use Elasticsearch directly
+--
+The #1 reason is that Hibernate Search integrates perfectly with Hibernate ORM.
+All changes done to your objects will trigger the necessary index changes transparently.
+
+* it will honor the transaction boundary - i.e. not do the indexing work if the transaction ends up in rollback
+* changes to cascaded objects are handled
+* changes to nested object embedded in a root indexed entity are handled
+* changes will be sent in bulk - i.e. optimized systematically for you
+* etc.
+
+There is no more paradigm shift in your code.
+You are working on Hibernate ORM managed objects,
+doing your queries on object properties with a nice DSL,
+--
+
+=== Getting started and configuration
+
+To experiment with the Elasticsearch integration you will have to download Elasticsearch and run it:
 Hibernate Search connects to an Elasticsearch node but does not provide one.
 
-==== Dependencies
+One option is to use the link:https://hub.docker.com/r/library/elasticsearch/[Elasticsearch Docker image].
+
+[source, bash]
+.Start an Elasticsearch node via Docker
+--
+docker pull elasticsearch
+docker run -p 9200:9200 -d -v "$PWD/plugin_dir":/usr/share/elasticsearch/plugins \
+    -v "$PWD/config/elasticsearch.yml":/usr/share/elasticsearch/config/elasticsearch.yml \
+    elasticsearch
+--
+
+==== Dependencies in your Java application
 
 In addition to the usual dependencies like Hibernate ORM and Hibernate Search,
 you will need the new `hibernate-search-backend-elasticsearch` jar.
@@ -65,14 +90,15 @@ you will need the new `hibernate-search-backend-elasticsearch` jar.
 
 ==== Configuration
 
-Just a few new configuration properties have been introduced so far:
+Configuration is minimal.
+Add them to your `persistence.xml` or where you put the rest of your Hibernate Search configuration.
 
 Hostname and port for Elasticsearch:: `hibernate.search.elasticsearch.host \http://127.0.0.1:9200`
-Define which indexes should use it:: `hibernate.search.default.indexmanager elasticsearch`
-Decide who manages the index creation:: `hibernate.search.elasticsearch.index_management_strategy CREATE_DELETE`
-Timeout in ms when waiting for indexes to become available after creation:: `hibernate.search.elasticsearch.index_management_wait_timeout 10000`
+Select Elasticsearch as the backend:: `hibernate.search.default.indexmanager elasticsearch`
+Selects the index creation strategy:: `hibernate.search.elasticsearch.index_management_strategy CREATE_DELETE`
+Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.elasticsearch.index_management_wait_timeout 10000`
 
-Other options for the `hibernate.search.elasticsearch.index_management_strategy` property are:
+Let's see the options for the `hibernate.search.elasticsearch.index_management_strategy` property:
 
 [options="header"]
 |===============
@@ -83,17 +109,143 @@ Other options for the `hibernate.search.elasticsearch.index_management_strategy`
 |CREATE_DELETE|Similarly to 'CREATE' but will also delete the index at shutdown. Commonly used for tests.
 |===============
 
-==== Updating the indexes
+===== Elasticsearch configuration
 
-As with Lucene in embedded mode, the indexes are updated automatically when you create or update
-entities which are mapped to Hibernate Search using the same annotations already familiar from <<search-mapping>>.
+There is no specific configuration required on the Elasticsearch side.
 
-==== Running a query on an Elasticsearch mapped entity
+However there are a few features that would benefit from a few changes:
 
-In many cases the existing way (see <<search-query>>) of running queries should work:
-we do automatically translate the most common types of Apache Lucene queries and many of the queries generated by the Hibernate Search DSL.
+* analyzers should be defined in the Elasticsearch configuration, see <<elasticsearch-mapping-analyzer>>
+* if you want to retrieve the distance in a geolocation query, install and enable the `lang-groovy` plugin,
+  see <<elasticsearch-query-spatial>>
+* if you want to be able to use the purge all Hibernate Search command,
+  install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/2.0/plugins-delete-by-query.html[`delete-by-query`] plugin
 
-On top of translating Lucene queries, you can directly create Elasticsearch queries by using either its String format or a JSON format:
+=== Mapping and indexing
+
+Like in Lucene embedded mode, indexes are transparently updated when you create or update
+entities mapped to Hibernate Search.
+Simply use familiar annotations from <<search-mapping>>.
+
+The name of the index will be the lowercased name provided to `@Indexed` (non qualified class name by default).
+Hibernate Search will map the fully qualified class name to the Elasticsearch type.
+
+==== [[elasticsearch-mapping-analyzer]] Analyzers
+
+CAUTION: Analyzers are treated differently than in Lucene embedded mode.
+
+Analyzers should be defined (by name) in your Elasticsearch configuration
+instead of using `@AnalyzerDef`, we are looking into smoothing that experience.
+
+[source, yml]
+.Example of elasticsearch.yml defining custom analyzers
+--
+# Custom analyzer
+index.analysis:
+  analyzer.custom-analyzer:
+    type: custom
+    tokenizer: standard
+    filter: [custom-filter, lowercase]
+  filter.custom-filter:
+    type : stop
+    stopwords : [test1, close]
+--
+
+More information on Elasticsearch analyzers in particular the already defined ones can be found in link:https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html[their documentation].
+
+From there, you can use an analyzer by name in your entity mappings.
+
+[source,java]
+.Using analyzers
+--
+@Entity
+@Indexed(index = "tweet")
+public static class Tweet {
+
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    @Analyzer(definition = "english")
+    private String englishTweet;
+
+    @Field
+    @Analyzer(definition = "whitespace")
+    private String whitespaceTweet;
+
+    @Fields({
+            @Field(name = "tweetNotAnalyzed", analyze = Analyze.NO, store = Store.YES),
+            @Field(name = "tweetWithCustom", analyzer = @Analyzer(definition = "custom-analyzer") ) })
+    private String multipleTweets;
+}
+--
+
+==== Custom field bridges
+
+You can write custom field bridges and class bridges.
+For class bridges and field bridges creating multiple fields,
+make sure to make your bridge implementation also implement the `MetadataProvidingFieldBridge` contract.
+
+[source,java]
+--
+/**
+ * Used as class-level bridge for creating the "firstName" and "middleName" document and doc value fields.
+ */
+public static class FirstAndMiddleNamesFieldBridge implements MetadataProvidingFieldBridge {
+
+    @Override
+    public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+        Explorer explorer = (Explorer) value;
+
+        String firstName = explorer.getNameParts().get( "firstName" );
+        luceneOptions.addFieldToDocument( name + "_firstName", firstName, document );
+        document.add( new SortedDocValuesField( name + "_firstName", new BytesRef( firstName ) ) );
+
+        String middleName = explorer.getNameParts().get( "middleName" );
+        luceneOptions.addFieldToDocument( name + "_middleName", middleName, document );
+        document.add( new SortedDocValuesField( name + "_middleName", new BytesRef( middleName ) ) );
+    }
+
+    @Override
+    public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+        builder
+            .field( name + "_firstName", FieldType.STRING )
+                .sortable( true )
+            .field( name + "_middleName", FieldType.STRING )
+                .sortable( true );
+    }
+}
+--
+
+[NOTE]
+--
+This interface and `FieldBridge` in general are likely going to evolve in the next major version of Hibernate Search
+to remove its adherence to Lucene specific classes like `Document`.
+--
+
+=== Queries
+
+You can write queries like you usually do in Hibernate Search: native Lucene queries and DSL queries (see <<search-query>>).
+We do automatically translate the most common types of Apache Lucene queries and many of the queries generated by the Hibernate Search DSL.
+
+[NOTE]
+.Unsupported Query DSL features
+--
+Queries written via the DSL work.
+Open a JIRA otherwise.
+
+Notable exceptions are:
+
+* more like this queries (the advanced algorithm used by Hibernate Search is not ported yet)
+* overriding analyzers: you cannot override analyzers, the analyzers defined at indexing time will be used
+* overriding field bridges: only the field bridges used at indexing time will be used
+
+There are temporary limitations, if you need these features, contact us.
+--
+
+On top of translating Lucene queries,
+you can directly create Elasticsearch queries by using either its String format or a JSON format:
 
 .Creating an Elasticsearch native query from a string
 ====
@@ -116,7 +268,7 @@ List<?> result = session.createFullTextQuery(query, GolfPlayer.class).list();
 ----
 ====
 
-==== Spatial queries
+==== [[elasticsearch-query-spatial]]Spatial queries
 
 The Elasticsearch integration supports spatial queries by using either the DSL or native Elasticsearch queries.
 
@@ -130,23 +282,43 @@ you need to enable the Groovy plugin by adding the following snippet to your Ela
 script.engine.groovy.inline.search: on
 ----
 
-==== Limitations
+==== Projections
 
-Many features are not implemented yet: this preview is not very useful yet!
-On the other hand, implementing some of these is not very hard: this might be the perfect time to join the project.
+All fields are stored by Elasticsearch in the JSON document it indexes,
+there is no specific need to mark fields as stored when you want to project them.
+The downside is that to project a field, Elasticsearch needs to read the whole JSON document.
+If you want to avoid that, use the `Store.YES` marker.
+
+You can also retrieve the full JSON document by using `org.hibernate.search.backend.elasticsearch.ProjectionConstants.SOURCE`.
+
+[source,java]
+--
+query = ftem.createFullTextQuery(
+                    qb.keyword()
+                    .onField( "tags" )
+                    .matching( "round-based" )
+                    .createQuery(),
+                    VideoGame.class
+            )
+            .setProjection( ProjectionConstants.SCORE, ProjectionConstants.SOURCE );
+
+projection = (Object[]) query.getSingleResult();
+--
+
+=== Limitations
+
+Not everything is implemented yet.
+Here is a list of known limitations.
 
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
- - Analyzer support
- - Filters
- - Faceting
- - Optimisation
- - Timeouts
- - Delete by queries
- - Resolution for Date type mapping is ignored
- - Scrolling on large results
- - MoreLikeThis queries
- - Mixing Lucene based indexes and Elasticsearch based indexes
- 
-Any aspect related to performance and efficiency will also be looked at only at the end of basic feature development.
-
+* defining analyzers with `@AnalyzerDef`
+* Filters
+* Query timeouts
+* Resolution for Date type mapping is ignored
+* pagination is limited to the 10000 first documents (configurable in Elasticsearch)
+** better support through the scrolling API is planned
+* Scrolling on large results
+* MoreLikeThis queries
+* Mixing Lucene based indexes and Elasticsearch based indexes (partial support is here though)
+* MassIndexer is known to be inefficient (no bulk API usage)
