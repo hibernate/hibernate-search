@@ -6,14 +6,15 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -28,47 +29,79 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class DefaultIndexManagerFactory implements IndexManagerFactory, Startable {
 
 	private static final Log log = LoggerFactory.make();
 	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager";
 
+	private final Map<Class<?>, Class<? extends IndexManager>> indexManagersPerEntity =
+			new ConcurrentHashMap<Class<?>, Class<? extends IndexManager>>();
+
 	private ServiceManager serviceManager;
-
-	@Override
-	public IndexManager createDefaultIndexManager() {
-		return new DirectoryBasedIndexManager();
-	}
-
-	@Override
-	public IndexManager createIndexManagerByName(String indexManagerImplementationName) {
-		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
-			return createDefaultIndexManager();
-		}
-		else {
-			indexManagerImplementationName = indexManagerImplementationName.trim();
-			IndexManager indexManager = fromAlias( indexManagerImplementationName );
-			if ( indexManager == null ) {
-				indexManagerImplementationName = aliasToFQN( indexManagerImplementationName );
-				Class<?> indexManagerClass = ClassLoaderHelper.classForName(
-						indexManagerImplementationName,
-						serviceManager
-				);
-				indexManager = ClassLoaderHelper.instanceFromClass(
-						IndexManager.class,
-						indexManagerClass,
-						"index manager"
-				);
-			}
-			log.indexManagerAliasResolved( indexManagerImplementationName, indexManager.getClass() );
-			return indexManager;
-		}
-	}
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		this.serviceManager = context.getServiceManager();
+	}
+
+	@Override
+	public Class<? extends IndexManager> determineIndexManagerImpl(Class<?> mappedClass, String indexManagerImplementationName) {
+		if ( indexManagersPerEntity.containsKey( mappedClass ) ) {
+			return indexManagersPerEntity.get( mappedClass );
+		}
+
+		Class<? extends IndexManager> indexManagerImpl;
+		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
+			indexManagerImpl = getDefaultIndexManagerImpl();
+		}
+		else {
+			indexManagerImplementationName = indexManagerImplementationName.trim();
+			indexManagerImpl = fromAlias( indexManagerImplementationName );
+			if ( indexManagerImpl == null ) {
+				indexManagerImplementationName = aliasToFQN( indexManagerImplementationName );
+				indexManagerImpl = ClassLoaderHelper.classForName(
+						IndexManager.class,
+						indexManagerImplementationName,
+						"index manager",
+						serviceManager
+				);
+			}
+			log.indexManagerAliasResolved( indexManagerImplementationName, indexManagerImpl );
+		}
+		addMapping( mappedClass, indexManagerImpl );
+		return indexManagerImpl;
+	}
+
+	@Override
+	public IndexManager createIndexManager(Class<?> mappedClass, Class<? extends IndexManager> indexManagerImpl) {
+		IndexManager indexManager = ClassLoaderHelper.instanceFromClass(
+				IndexManager.class,
+				indexManagerImpl,
+				"index manager"
+		);
+
+		return indexManager;
+	}
+
+	/**
+	 * Returns the default {@code IndexManager} implementation to use.
+	 *
+	 * @return the default {@code IndexManager} impl
+	 */
+	protected Class<? extends IndexManager> getDefaultIndexManagerImpl() {
+		return DirectoryBasedIndexManager.class;
+	}
+
+	/**
+	 * Add a mapping between an entity type and the {@code IndexManager} managing this entity type.
+	 *
+	 * @param mappedClass the type of the entity
+	 * @param indexManager the {@code IndexManager} managing this entity
+	 */
+	protected void addMapping(Class<?> mappedClass, Class<? extends IndexManager> indexManager) {
+		indexManagersPerEntity.put( mappedClass, indexManager );
 	}
 
 	/**
@@ -91,25 +124,20 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 	 *
 	 * @param alias the requested alias
 	 *
-	 * @return return the index manager for the given alias or {@code null} if the alias is unknown.
+	 * @return return the index manager type for the given alias or {@code null} if the alias is unknown.
 	 */
-	protected IndexManager fromAlias(String alias) {
+	protected Class<? extends IndexManager> fromAlias(String alias) {
 		if ( "directory-based".equals( alias ) ) {
-			return new DirectoryBasedIndexManager();
+			return DirectoryBasedIndexManager.class;
 		}
 		if ( "near-real-time".equals( alias ) ) {
-			return new NRTIndexManager();
+			return NRTIndexManager.class;
 		}
 		// TODO HSEARCH-2115 Remove once generic alias resolver contribution scheme is implemented
 		else if ( "elasticsearch".equals( alias ) ) {
 			try ( ServiceReference<ClassLoaderService> classLoaderService = serviceManager.requestReference( ClassLoaderService.class ) ) {
 				Class<?> imType = classLoaderService.get().classForName( ES_INDEX_MANAGER );
-				try {
-					return (IndexManager) imType.newInstance();
-				}
-				catch (InstantiationException | IllegalAccessException e) {
-					throw new SearchException( "Could not instantiate Elasticsearch index manager", e );
-				}
+				return (Class<? extends IndexManager>) imType;
 			}
 		}
 		return null;

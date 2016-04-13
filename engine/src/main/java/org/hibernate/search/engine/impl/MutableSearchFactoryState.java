@@ -9,6 +9,7 @@ package org.hibernate.search.engine.impl;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
@@ -24,6 +25,7 @@ import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -41,7 +43,7 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 public class MutableSearchFactoryState implements SearchFactoryState {
 
 	private Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities;
-	private Map<Class<?>, EntityIndexBinding> indexBindingsPerEntity;
+	private Map<Class<?>, EntityIndexBinding> indexBindingForEntities;
 	private IndexingMode indexingMode;
 	private Worker worker;
 	private BackendQueueProcessor backendQueueProcessor;
@@ -68,7 +70,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingMode = oldFactoryState.getIndexingMode();
-		indexBindingsPerEntity = oldFactoryState.getIndexBindings();
+		indexBindingForEntities = oldFactoryState.getIndexBindings();
 		documentBuildersContainedEntities = oldFactoryState.getDocumentBuildersContainedEntities();
 		worker = oldFactoryState.getWorker();
 		filterDefinitions = oldFactoryState.getFilterDefinitions();
@@ -109,7 +111,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	@Override
 	public Map<Class<?>, EntityIndexBinding> getIndexBindings() {
-		return indexBindingsPerEntity;
+		return indexBindingForEntities;
 	}
 
 	@Override
@@ -161,7 +163,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities) {
-		this.indexBindingsPerEntity = documentBuildersIndexedEntities;
+		this.indexBindingForEntities = documentBuildersIndexedEntities;
 	}
 
 	public void setIndexingMode(IndexingMode indexingMode) {
@@ -322,6 +324,19 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setStatistics(Statistics statistics) {
 		this.statistics = statistics;
+	}
+
+	@Override
+	public boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerCandidate) {
+		Set<Class<?>> queriedEntityTypesWithSubTypes = indexHierarchy.getIndexedClasses( new Class<?>[]{ mappedClass } );
+
+		for ( Class<?> queriedEntityType : queriedEntityTypesWithSubTypes ) {
+			EntityIndexBinding binding = indexBindingForEntities.get( queriedEntityType );
+			if ( binding != null && binding.isManagedBy( indexManagerCandidate ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

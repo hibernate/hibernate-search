@@ -316,7 +316,7 @@ public class SearchIntegratorBuilder {
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
 		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
 		final org.hibernate.search.engine.metadata.impl.MetadataProvider metadataProvider =
-				new AnnotationMetadataProvider( searchConfiguration.getReflectionManager(), configContext );
+				new AnnotationMetadataProvider( searchConfiguration.getReflectionManager(), configContext, factoryState );
 
 		for ( Map.Entry<XClass, Class<?>> mapping : classMappings.entrySet() ) {
 			XClass mappedXClass = mapping.getKey();
@@ -335,7 +335,10 @@ public class SearchIntegratorBuilder {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
 
-				TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( mappedClass );
+				// For ContainedIn, we get partial metadata information as we can't build
+				// the FieldBridges. This is not a problem as these metadata information
+				// are only used to track dependencies.
+				TypeMetadata typeMetadata = metadataProvider.getTypeMetadataForContainedIn( mappedClass );
 				final DocumentBuilderContainedEntity documentBuilder = new DocumentBuilderContainedEntity(
 						mappedXClass,
 						typeMetadata,
@@ -361,6 +364,7 @@ public class SearchIntegratorBuilder {
 					searchConfiguration,
 					buildContext
 			);
+			documentBuildersIndexedEntities.put( mappedClass, entityIndexBinding );
 
 			// interceptor might use non indexed state
 			if ( entityIndexBinding.getEntityIndexingInterceptor() != null ) {
@@ -381,8 +385,6 @@ public class SearchIntegratorBuilder {
 							searchConfiguration.getInstanceInitializer()
 					);
 			entityIndexBinding.setDocumentBuilderIndexedEntity( documentBuilder );
-
-			documentBuildersIndexedEntities.put( mappedClass, entityIndexBinding );
 		}
 
 		disableBlackListedTypesOptimization(

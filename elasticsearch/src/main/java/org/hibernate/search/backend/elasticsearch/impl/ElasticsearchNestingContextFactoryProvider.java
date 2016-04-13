@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -23,8 +22,6 @@ import org.hibernate.search.engine.nesting.impl.NestingContextFactory;
 import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.engine.nesting.impl.NoOpNestingContext;
 import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 
@@ -64,20 +61,7 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 		}
 
 		private boolean isMappedToElasticsearch(Class<?> entityType) {
-			Set<Class<?>> queriedEntityTypesWithSubTypes = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
-
-			for ( Class<?> queriedEntityType : queriedEntityTypesWithSubTypes ) {
-				EntityIndexBinding binding = searchIntegrator.getIndexBinding( queriedEntityType );
-				IndexManager[] indexManagers = binding.getIndexManagers();
-
-				for ( IndexManager indexManager : indexManagers ) {
-					if ( indexManager instanceof ElasticsearchIndexManager ) {
-						return true;
-					}
-				}
-			}
-
-			return false;
+			return searchIntegrator.isManagedBy( entityType, ElasticsearchIndexManager.class );
 		}
 	}
 

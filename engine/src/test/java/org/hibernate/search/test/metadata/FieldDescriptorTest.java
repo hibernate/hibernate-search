@@ -7,8 +7,14 @@
 
 package org.hibernate.search.test.metadata;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
@@ -16,9 +22,6 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.impl.ConfigContext;
-import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
@@ -27,35 +30,14 @@ import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncod
 import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
-import org.hibernate.search.testsupport.setup.BuildContextForTest;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.junit.Before;
+import org.hibernate.search.testsupport.setup.AbstractAnnotationMetadataTest;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-436")
-public class FieldDescriptorTest {
-
-	private AnnotationMetadataProvider metadataProvider;
-
-	@Before
-	public void setUp() {
-		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
-		ConfigContext configContext = new ConfigContext(
-				searchConfiguration,
-				new BuildContextForTest( searchConfiguration )
-		);
-		metadataProvider = new AnnotationMetadataProvider( new JavaReflectionManager(), configContext );
-	}
+public class FieldDescriptorTest extends AbstractAnnotationMetadataTest {
 
 	@Test
 	public void testFieldDescriptorLuceneOptions() {

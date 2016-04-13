@@ -15,20 +15,27 @@ import org.hibernate.search.indexes.spi.IndexManager;
  * define new short-hand aliases, change the default implementation.
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
+ * @author Guillaume Smet
  */
 public interface IndexManagerFactory extends Service {
 
 	/**
-	 * @return a new instance of the default IndexManager
-	 */
-	IndexManager createDefaultIndexManager();
-
-	/**
-	 * @param indexManagerImplementationName how this is resolved to an IndexManager type
+	 * Determine the {@code IndexManager} implementation which will be used for this entity type.
+	 *
+	 * @param mappedClass the mapped entity class
+	 * @param indexManagerImplementationName how this is resolved to an {@code IndexManager} type
 	 * is left to the implementor.
 	 *
-	 * @return a new IndexManager instance of the chosen type
+	 * @return the type chosen
 	 */
-	IndexManager createIndexManagerByName(String indexManagerImplementationName);
+	Class<? extends IndexManager> determineIndexManagerImpl(Class<?> mappedClass, String indexManagerImplementationName);
+
+	/**
+	 * @param mappedClass the mapped entity class
+	 * @param indexManagerImpl a given {@code IndexManager} type
+	 *
+	 * @return a new {@code IndexManager} instance of the given type
+	 */
+	IndexManager createIndexManager(Class<?> mappedClass, Class<? extends IndexManager> indexManagerImpl);
 
 }

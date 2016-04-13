@@ -344,6 +344,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
+	public boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerCandidate) {
+		return delegate.isManagedBy( mappedClass, indexManagerCandidate );
+	}
+
+	@Override
 	public <T> T unwrap(Class<T> cls) {
 		if ( SearchIntegrator.class.equals( cls ) || ExtendedSearchIntegrator.class.equals( cls ) || MutableSearchFactory.class.equals( cls ) ) {
 			return (T) this;

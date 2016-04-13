@@ -9,6 +9,7 @@ package org.hibernate.search.test.id;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.annotations.common.reflection.Filter;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -18,15 +19,18 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
+import org.hibernate.search.engine.impl.MutableSearchFactoryState;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.spi.DefaultInstanceInitializer;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 /**
@@ -60,7 +64,12 @@ public class UnorderedIdScanTest {
 	private static void tryCreatingDocumentBuilder(XClass mappedXClass, ReflectionManager reflectionManager) {
 		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
 		ConfigContext context = new ConfigContext( searchConfiguration, new BuildContextForTest( searchConfiguration ) );
-		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, context );
+
+		MutableSearchFactoryState factoryState = new MutableSearchFactoryState();
+		factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
+		factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinding>() );
+
+		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, context, factoryState);
 		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( mappedXClass ));
 		new DocumentBuilderIndexedEntity( mappedXClass,
 				typeMetadata,

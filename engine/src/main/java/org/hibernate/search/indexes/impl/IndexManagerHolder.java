@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
-
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -21,10 +20,10 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.SearchException;
@@ -86,13 +85,26 @@ public class IndexManagerHolder {
 		Similarity similarity = createSimilarity( indexName, cfg, indexProperties[0], entity, buildContext );
 		boolean isDynamicSharding = isShardingDynamic( indexProperties[0], buildContext );
 
+		ServiceManager serviceManager = buildContext.getServiceManager();
+		IndexManagerFactory indexManagerFactory = serviceManager.requestService( IndexManagerFactory.class );
+		Class<? extends IndexManager> indexManagerImpl;
+		try {
+			// we consider that all the shards will share the same IndexManager impl
+			indexManagerImpl = indexManagerFactory.determineIndexManagerImpl( mappedClass,
+					indexProperties[0].getProperty( Environment.INDEX_MANAGER_IMPL_NAME ) );
+		}
+		finally {
+			serviceManager.releaseService( IndexManagerFactory.class );
+		}
+
 		IndexManager[] indexManagers = new IndexManager[0];
 		if ( !isDynamicSharding ) {
 			indexManagers = createIndexManagers(
 					indexName,
-					indexProperties,
-					similarity,
+					indexManagerImpl,
 					mappedClass,
+					similarity,
+					indexProperties,
 					buildContext
 			);
 		}
@@ -113,6 +125,7 @@ public class IndexManagerHolder {
 
 		return EntityIndexBindingFactory.buildEntityIndexBinding(
 				entity.getClass(),
+				indexManagerImpl,
 				indexManagers,
 				shardingStrategy,
 				shardIdentifierProvider,
@@ -161,6 +174,7 @@ public class IndexManagerHolder {
 
 		indexManager = createIndexManager(
 				indexName,
+				entityIndexBinding.getIndexManagerImpl(),
 				entityIndexBinding.getDocumentBuilder().getBeanClass(),
 				entityIndexBinding.getSimilarity(),
 				properties,
@@ -228,7 +242,9 @@ public class IndexManagerHolder {
 		return result;
 	}
 
-	private IndexManager createIndexManager(String indexName,
+	private IndexManager doCreateIndexManager(String indexName,
+			Class<? extends IndexManager> indexManagerImpl,
+			Class<?> mappedClass,
 			Similarity indexSimilarity,
 			Properties properties,
 			WorkerBuildContext workerBuildContext) {
@@ -237,15 +253,9 @@ public class IndexManagerHolder {
 		IndexManagerFactory indexManagerFactory = serviceManager.requestService( IndexManagerFactory.class );
 
 		// create IndexManager instance via the index manager factory
-		String indexManagerImplementationName = properties.getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
 		final IndexManager manager;
 		try {
-			if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
-				manager = indexManagerFactory.createDefaultIndexManager();
-			}
-			else {
-				manager = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName );
-			}
+			manager = indexManagerFactory.createIndexManager( mappedClass, indexManagerImpl );
 		}
 		finally {
 			serviceManager.releaseService( IndexManagerFactory.class );
@@ -465,9 +475,10 @@ public class IndexManagerHolder {
 	}
 
 	private IndexManager[] createIndexManagers(String indexBaseName,
-			Properties[] indexProperties,
-			Similarity similarity,
+			Class<? extends IndexManager> indexManagerImpl,
 			Class<?> mappedClass,
+			Similarity similarity,
+			Properties[] indexProperties,
 			WorkerBuildContext context) {
 		IndexManager[] indexManagers;
 		int nbrOfIndexManagers = indexProperties.length;
@@ -480,7 +491,7 @@ public class IndexManagerHolder {
 			IndexManager indexManager = indexManagersRegistry.get( indexManagerName );
 			if ( indexManager == null ) {
 				indexManager = createIndexManager(
-						indexManagerName, mappedClass, similarity, indexProp, context
+						indexManagerName, indexManagerImpl, mappedClass, similarity, indexProp, context
 				);
 			}
 			else {
@@ -504,14 +515,17 @@ public class IndexManagerHolder {
 	 * to avoid contention on this synchronized method during dynamic reconfiguration at runtime.
 	 */
 	private synchronized IndexManager createIndexManager(String indexManagerName,
+			Class<? extends IndexManager> indexManagerImpl,
 			Class<?> mappedClass,
 			Similarity similarity,
 			Properties indexProperties,
 			WorkerBuildContext context) {
 		IndexManager indexManager = indexManagersRegistry.get( indexManagerName );
 		if ( indexManager == null ) {
-			indexManager = createIndexManager(
+			indexManager = doCreateIndexManager(
 					indexManagerName,
+					indexManagerImpl,
+					mappedClass,
 					similarity,
 					indexProperties,
 					context
