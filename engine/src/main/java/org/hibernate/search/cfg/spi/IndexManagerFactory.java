@@ -28,14 +28,14 @@ public interface IndexManagerFactory extends Service {
 	 *
 	 * @return the type chosen
 	 */
-	Class<? extends IndexManager> determineIndexManagerImpl(Class<?> mappedClass, String indexManagerImplementationName);
+	Class<? extends IndexManager> determineIndexManagerType(Class<?> mappedClass, String indexManagerImplementationName);
 
 	/**
 	 * @param mappedClass the mapped entity class
-	 * @param indexManagerImpl a given {@code IndexManager} type
+	 * @param indexManagerType a given {@code IndexManager} type
 	 *
 	 * @return a new {@code IndexManager} instance of the given type
 	 */
-	IndexManager createIndexManager(Class<?> mappedClass, Class<? extends IndexManager> indexManagerImpl);
+	IndexManager createIndexManager(Class<?> mappedClass, Class<? extends IndexManager> indexManagerType);
 
 }

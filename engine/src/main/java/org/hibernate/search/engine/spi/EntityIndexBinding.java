@@ -52,14 +52,14 @@ public interface EntityIndexBinding {
 	/**
 	 * @return the {@code IndexManager} impl used by this entity type
 	 */
-	Class<? extends IndexManager> getIndexManagerImpl();
+	Class<? extends IndexManager> getIndexManagerType();
 
 	/**
-	 * @param indexManagerCandidate the tested {@code IndexManager} implementation
+	 * @param indexManagerTypeCandidate the tested {@code IndexManager} type
 	 *
-	 * @return whether this entity is managed by the given {@code IndexManager} impl
+	 * @return whether this entity is managed by the given {@code IndexManager} type
 	 */
-	boolean isManagedBy(Class<? extends IndexManager> indexManagerCandidate);
+	boolean isManagedBy(Class<? extends IndexManager> indexManagerTypeCandidate);
 
 	/**
 	 * @return the array of index managers

@@ -327,12 +327,12 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	@Override
-	public boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerCandidate) {
+	public boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerTypeCandidate) {
 		Set<Class<?>> queriedEntityTypesWithSubTypes = indexHierarchy.getIndexedClasses( new Class<?>[]{ mappedClass } );
 
 		for ( Class<?> queriedEntityType : queriedEntityTypesWithSubTypes ) {
 			EntityIndexBinding binding = indexBindingForEntities.get( queriedEntityType );
-			if ( binding != null && binding.isManagedBy( indexManagerCandidate ) ) {
+			if ( binding != null && binding.isManagedBy( indexManagerTypeCandidate ) ) {
 				return true;
 			}
 		}

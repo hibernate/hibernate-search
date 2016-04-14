@@ -47,38 +47,38 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 	}
 
 	@Override
-	public Class<? extends IndexManager> determineIndexManagerImpl(Class<?> mappedClass, String indexManagerImplementationName) {
+	public Class<? extends IndexManager> determineIndexManagerType(Class<?> mappedClass, String indexManagerImplementationName) {
 		if ( indexManagersPerEntity.containsKey( mappedClass ) ) {
 			return indexManagersPerEntity.get( mappedClass );
 		}
 
-		Class<? extends IndexManager> indexManagerImpl;
+		Class<? extends IndexManager> indexManagerType;
 		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
-			indexManagerImpl = getDefaultIndexManagerImpl();
+			indexManagerType = getDefaultIndexManagerType();
 		}
 		else {
 			indexManagerImplementationName = indexManagerImplementationName.trim();
-			indexManagerImpl = fromAlias( indexManagerImplementationName );
-			if ( indexManagerImpl == null ) {
+			indexManagerType = fromAlias( indexManagerImplementationName );
+			if ( indexManagerType == null ) {
 				indexManagerImplementationName = aliasToFQN( indexManagerImplementationName );
-				indexManagerImpl = ClassLoaderHelper.classForName(
+				indexManagerType = ClassLoaderHelper.classForName(
 						IndexManager.class,
 						indexManagerImplementationName,
 						"index manager",
 						serviceManager
 				);
 			}
-			log.indexManagerAliasResolved( indexManagerImplementationName, indexManagerImpl );
+			log.indexManagerAliasResolved( indexManagerImplementationName, indexManagerType );
 		}
-		addMapping( mappedClass, indexManagerImpl );
-		return indexManagerImpl;
+		addMapping( mappedClass, indexManagerType );
+		return indexManagerType;
 	}
 
 	@Override
-	public IndexManager createIndexManager(Class<?> mappedClass, Class<? extends IndexManager> indexManagerImpl) {
+	public IndexManager createIndexManager(Class<?> mappedClass, Class<? extends IndexManager> indexManagerType) {
 		IndexManager indexManager = ClassLoaderHelper.instanceFromClass(
 				IndexManager.class,
-				indexManagerImpl,
+				indexManagerType,
 				"index manager"
 		);
 
@@ -90,7 +90,7 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 	 *
 	 * @return the default {@code IndexManager} impl
 	 */
-	protected Class<? extends IndexManager> getDefaultIndexManagerImpl() {
+	protected Class<? extends IndexManager> getDefaultIndexManagerType() {
 		return DirectoryBasedIndexManager.class;
 	}
 

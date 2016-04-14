@@ -143,10 +143,10 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * Returns whether an entity is managed by a given {@code IndexManager}.
 	 *
 	 * @param mappedClass the entity type
-	 * @param indexManagerCandidate the tested {@code IndexManager} implementation
+	 * @param indexManagerTypeCandidate the tested {@code IndexManager} type
 	 *
 	 * @return returns whether an entity is managed by a given {@code IndexManager}.
 	 */
-	boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerCandidate);
+	boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerTypeCandidate);
 
 }

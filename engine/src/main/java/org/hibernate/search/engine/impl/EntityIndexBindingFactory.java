@@ -33,7 +33,7 @@ public final class EntityIndexBindingFactory {
 
 	@SuppressWarnings( "unchecked" )
 	public static MutableEntityIndexBinding buildEntityIndexBinding(Class<?> type,
-			Class<? extends IndexManager> indexManagerImpl,
+			Class<? extends IndexManager> indexManagerType,
 			IndexManager[] providers,
 			IndexShardingStrategy shardingStrategy,
 			ShardIdentifierProvider shardIdentifierProvider,
@@ -50,7 +50,7 @@ public final class EntityIndexBindingFactory {
 		EntityIndexingInterceptor safeInterceptor = interceptor;
 		if ( isDynamicSharding ) {
 			return new DynamicShardingEntityIndexBinding(
-					indexManagerImpl,
+					indexManagerType,
 					shardIdentifierProvider,
 					similarity,
 					safeInterceptor,
@@ -60,7 +60,7 @@ public final class EntityIndexBindingFactory {
 					rootDirectoryProviderName );
 		}
 		else {
-			return new DefaultMutableEntityIndexBinding( indexManagerImpl, shardingStrategy, similarity, providers, interceptor );
+			return new DefaultMutableEntityIndexBinding( indexManagerType, shardingStrategy, similarity, providers, interceptor );
 		}
 	}
 }

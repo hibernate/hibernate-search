@@ -82,5 +82,5 @@ public interface SearchFactoryState {
 
 	Statistics getStatistics();
 
-	boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerCandidate);
+	boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerTypeCandidate);
 }

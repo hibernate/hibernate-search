@@ -565,12 +565,12 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerCandidate) {
+	public boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerTypeCandidate) {
 		Set<Class<?>> queriedEntityTypesWithSubTypes = getIndexedTypesPolymorphic( new Class<?>[]{ mappedClass } );
 
 		for ( Class<?> queriedEntityType : queriedEntityTypesWithSubTypes ) {
 			EntityIndexBinding binding = getIndexBinding( queriedEntityType );
-			if ( binding.isManagedBy( indexManagerCandidate ) ) {
+			if ( binding.isManagedBy( indexManagerTypeCandidate ) ) {
 				return true;
 			}
 		}

@@ -24,7 +24,7 @@ import org.hibernate.search.store.ShardIdentifierProvider;
  */
 public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBinding {
 
-	private final Class<? extends IndexManager> indexManagerImpl;
+	private final Class<? extends IndexManager> indexManagerType;
 	private final DynamicShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
 	private final ShardIdentifierProvider shardIdentityProvider;
@@ -37,7 +37,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 	private IndexManagerFactory indexManagerFactory;
 
 	public DynamicShardingEntityIndexBinding(
-			Class<? extends IndexManager> indexManagerImpl,
+			Class<? extends IndexManager> indexManagerType,
 			ShardIdentifierProvider shardIdentityProvider,
 			Similarity similarityInstance,
 			EntityIndexingInterceptor entityIndexingInterceptor,
@@ -45,7 +45,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 			ExtendedSearchIntegrator extendedIntegrator,
 			IndexManagerHolder indexManagerHolder,
 			String rootDirectoryProviderName) {
-		this.indexManagerImpl = indexManagerImpl;
+		this.indexManagerType = indexManagerType;
 		this.shardIdentityProvider = shardIdentityProvider;
 		this.similarityInstance = similarityInstance;
 		this.entityIndexingInterceptor = entityIndexingInterceptor;
@@ -64,13 +64,13 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 	}
 
 	@Override
-	public Class<? extends IndexManager> getIndexManagerImpl() {
-		return indexManagerImpl;
+	public Class<? extends IndexManager> getIndexManagerType() {
+		return indexManagerType;
 	}
 
 	@Override
-	public boolean isManagedBy(Class<? extends IndexManager> indexManagerImplCandidate) {
-		return indexManagerImplCandidate.isAssignableFrom( indexManagerImpl );
+	public boolean isManagedBy(Class<? extends IndexManager> indexManagerTypeCandidate) {
+		return indexManagerTypeCandidate.isAssignableFrom( indexManagerType );
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 
 	public MutableEntityIndexBinding cloneWithSimilarity(Similarity entitySimilarity) {
 		return new DynamicShardingEntityIndexBinding(
-				indexManagerImpl,
+				indexManagerType,
 				shardIdentityProvider,
 				entitySimilarity,
 				entityIndexingInterceptor,

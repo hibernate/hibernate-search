@@ -87,10 +87,10 @@ public class IndexManagerHolder {
 
 		ServiceManager serviceManager = buildContext.getServiceManager();
 		IndexManagerFactory indexManagerFactory = serviceManager.requestService( IndexManagerFactory.class );
-		Class<? extends IndexManager> indexManagerImpl;
+		Class<? extends IndexManager> indexManagerType;
 		try {
 			// we consider that all the shards will share the same IndexManager impl
-			indexManagerImpl = indexManagerFactory.determineIndexManagerImpl( mappedClass,
+			indexManagerType = indexManagerFactory.determineIndexManagerType( mappedClass,
 					indexProperties[0].getProperty( Environment.INDEX_MANAGER_IMPL_NAME ) );
 		}
 		finally {
@@ -101,7 +101,7 @@ public class IndexManagerHolder {
 		if ( !isDynamicSharding ) {
 			indexManagers = createIndexManagers(
 					indexName,
-					indexManagerImpl,
+					indexManagerType,
 					mappedClass,
 					similarity,
 					indexProperties,
@@ -125,7 +125,7 @@ public class IndexManagerHolder {
 
 		return EntityIndexBindingFactory.buildEntityIndexBinding(
 				entity.getClass(),
-				indexManagerImpl,
+				indexManagerType,
 				indexManagers,
 				shardingStrategy,
 				shardIdentifierProvider,
@@ -174,7 +174,7 @@ public class IndexManagerHolder {
 
 		indexManager = createIndexManager(
 				indexName,
-				entityIndexBinding.getIndexManagerImpl(),
+				entityIndexBinding.getIndexManagerType(),
 				entityIndexBinding.getDocumentBuilder().getBeanClass(),
 				entityIndexBinding.getSimilarity(),
 				properties,
@@ -243,7 +243,7 @@ public class IndexManagerHolder {
 	}
 
 	private IndexManager doCreateIndexManager(String indexName,
-			Class<? extends IndexManager> indexManagerImpl,
+			Class<? extends IndexManager> indexManagerType,
 			Class<?> mappedClass,
 			Similarity indexSimilarity,
 			Properties properties,
@@ -255,7 +255,7 @@ public class IndexManagerHolder {
 		// create IndexManager instance via the index manager factory
 		final IndexManager manager;
 		try {
-			manager = indexManagerFactory.createIndexManager( mappedClass, indexManagerImpl );
+			manager = indexManagerFactory.createIndexManager( mappedClass, indexManagerType );
 		}
 		finally {
 			serviceManager.releaseService( IndexManagerFactory.class );
@@ -475,7 +475,7 @@ public class IndexManagerHolder {
 	}
 
 	private IndexManager[] createIndexManagers(String indexBaseName,
-			Class<? extends IndexManager> indexManagerImpl,
+			Class<? extends IndexManager> indexManagerType,
 			Class<?> mappedClass,
 			Similarity similarity,
 			Properties[] indexProperties,
@@ -491,7 +491,7 @@ public class IndexManagerHolder {
 			IndexManager indexManager = indexManagersRegistry.get( indexManagerName );
 			if ( indexManager == null ) {
 				indexManager = createIndexManager(
-						indexManagerName, indexManagerImpl, mappedClass, similarity, indexProp, context
+						indexManagerName, indexManagerType, mappedClass, similarity, indexProp, context
 				);
 			}
 			else {
@@ -515,7 +515,7 @@ public class IndexManagerHolder {
 	 * to avoid contention on this synchronized method during dynamic reconfiguration at runtime.
 	 */
 	private synchronized IndexManager createIndexManager(String indexManagerName,
-			Class<? extends IndexManager> indexManagerImpl,
+			Class<? extends IndexManager> indexManagerType,
 			Class<?> mappedClass,
 			Similarity similarity,
 			Properties indexProperties,
@@ -524,7 +524,7 @@ public class IndexManagerHolder {
 		if ( indexManager == null ) {
 			indexManager = doCreateIndexManager(
 					indexManagerName,
-					indexManagerImpl,
+					indexManagerType,
 					mappedClass,
 					similarity,
 					indexProperties,
