@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.engine.impl;
 
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
@@ -36,9 +34,6 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 	private static final Log log = LoggerFactory.make();
 	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager";
 
-	private final Map<Class<?>, Class<? extends IndexManager>> indexManagersPerEntity =
-			new ConcurrentHashMap<Class<?>, Class<? extends IndexManager>>();
-
 	private ServiceManager serviceManager;
 
 	@Override
@@ -47,11 +42,7 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 	}
 
 	@Override
-	public Class<? extends IndexManager> determineIndexManagerType(Class<?> mappedClass, String indexManagerImplementationName) {
-		if ( indexManagersPerEntity.containsKey( mappedClass ) ) {
-			return indexManagersPerEntity.get( mappedClass );
-		}
-
+	public Class<? extends IndexManager> determineIndexManagerType(String indexManagerImplementationName) {
 		Class<? extends IndexManager> indexManagerType;
 		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
 			indexManagerType = getDefaultIndexManagerType();
@@ -70,12 +61,11 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 			}
 			log.indexManagerAliasResolved( indexManagerImplementationName, indexManagerType );
 		}
-		addMapping( mappedClass, indexManagerType );
 		return indexManagerType;
 	}
 
 	@Override
-	public IndexManager createIndexManager(Class<?> mappedClass, Class<? extends IndexManager> indexManagerType) {
+	public IndexManager createIndexManager(Class<? extends IndexManager> indexManagerType) {
 		IndexManager indexManager = ClassLoaderHelper.instanceFromClass(
 				IndexManager.class,
 				indexManagerType,
@@ -88,20 +78,10 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 	/**
 	 * Returns the default {@code IndexManager} implementation to use.
 	 *
-	 * @return the default {@code IndexManager} impl
+	 * @return the default {@code IndexManager} type
 	 */
 	protected Class<? extends IndexManager> getDefaultIndexManagerType() {
 		return DirectoryBasedIndexManager.class;
-	}
-
-	/**
-	 * Add a mapping between an entity type and the {@code IndexManager} managing this entity type.
-	 *
-	 * @param mappedClass the type of the entity
-	 * @param indexManager the {@code IndexManager} managing this entity
-	 */
-	protected void addMapping(Class<?> mappedClass, Class<? extends IndexManager> indexManager) {
-		indexManagersPerEntity.put( mappedClass, indexManager );
 	}
 
 	/**
@@ -136,8 +116,8 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 		// TODO HSEARCH-2115 Remove once generic alias resolver contribution scheme is implemented
 		else if ( "elasticsearch".equals( alias ) ) {
 			try ( ServiceReference<ClassLoaderService> classLoaderService = serviceManager.requestReference( ClassLoaderService.class ) ) {
-				Class<?> imType = classLoaderService.get().classForName( ES_INDEX_MANAGER );
-				return (Class<? extends IndexManager>) imType;
+				Class<?> indexManagerType = classLoaderService.get().classForName( ES_INDEX_MANAGER );
+				return (Class<? extends IndexManager>) indexManagerType;
 			}
 		}
 		return null;

@@ -90,8 +90,7 @@ public class IndexManagerHolder {
 		Class<? extends IndexManager> indexManagerType;
 		try {
 			// we consider that all the shards will share the same IndexManager impl
-			indexManagerType = indexManagerFactory.determineIndexManagerType( mappedClass,
-					indexProperties[0].getProperty( Environment.INDEX_MANAGER_IMPL_NAME ) );
+			indexManagerType = indexManagerFactory.determineIndexManagerType( indexProperties[0].getProperty( Environment.INDEX_MANAGER_IMPL_NAME ) );
 		}
 		finally {
 			serviceManager.releaseService( IndexManagerFactory.class );
@@ -255,7 +254,7 @@ public class IndexManagerHolder {
 		// create IndexManager instance via the index manager factory
 		final IndexManager manager;
 		try {
-			manager = indexManagerFactory.createIndexManager( mappedClass, indexManagerType );
+			manager = indexManagerFactory.createIndexManager( indexManagerType );
 		}
 		finally {
 			serviceManager.releaseService( IndexManagerFactory.class );
