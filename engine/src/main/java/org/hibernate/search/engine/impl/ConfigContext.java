@@ -145,7 +145,7 @@ public final class ConfigContext {
 
 	/** Add a full-filter definition which was defined as annotation
 	 *
-	 * @param filterDef the filter defition annotation
+	 * @param filterDef the filter definition annotation
 	 * @param annotatedElement the annotated element it was defined on
 	 */
 	public void addFullTextFilterDef(FullTextFilterDef filterDef, XAnnotatedElement annotatedElement) {

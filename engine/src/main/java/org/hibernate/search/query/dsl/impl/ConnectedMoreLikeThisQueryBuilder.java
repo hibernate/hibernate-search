@@ -89,8 +89,8 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 		finally {
 			searchIntegrator.getIndexReaderAccessor().close( indexReader );
 		}
-		//TODO implement INPUT.READER
-		//TODO implement INOUT.STRING
+		//TODO implement INPUT_TYPE.READER
+		//TODO implement INPUT_TYPE.STRING
 		return queryCustomizer.setWrappedQuery( query ).createQuery();
 	}
 

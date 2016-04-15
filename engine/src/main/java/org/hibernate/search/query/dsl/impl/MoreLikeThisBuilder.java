@@ -156,7 +156,7 @@ public class MoreLikeThisBuilder<T> {
 			}
 		}
 		else {
-			throw new AssertionFailure( "We don't support no string and reader for MoreLikeThis" );
+			throw new AssertionFailure( "We don't support string and reader for MoreLikeThis" );
 		}
 		if ( id == null ) {
 			return null;
