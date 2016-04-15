@@ -21,6 +21,7 @@ import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
@@ -79,6 +80,10 @@ class FieldHelper {
 		return boolean.class.equals( propertyClass ) || Boolean.class.isAssignableFrom( propertyClass );
 	}
 
+	static boolean isBoolean(BridgeDefinedField field) {
+		return FieldType.BOOLEAN == field.getType();
+	}
+
 	static boolean isDate(EntityIndexBinding indexBinding, String fieldName) {
 		Class<?> propertyClass = getPropertyClass( indexBinding, fieldName );
 		if ( propertyClass == null ) {
@@ -95,6 +100,10 @@ class FieldHelper {
 		return Calendar.class.isAssignableFrom( propertyClass );
 	}
 
+	static boolean isDate(BridgeDefinedField field) {
+		return FieldType.DATE == field.getType();
+	}
+
 	static boolean isNumeric(DocumentFieldMetadata field) {
 		if ( field.isNumeric() ) {
 			return true;
@@ -107,6 +116,22 @@ class FieldHelper {
 		}
 
 		return false;
+	}
+
+	static boolean isNumeric(BridgeDefinedField field) {
+		switch ( field.getType() ) {
+			case LONG:
+			case INTEGER:
+			case FLOAT:
+			case DOUBLE:
+				return true;
+			case STRING:
+			case BOOLEAN:
+			case DATE:
+				return false;
+			default:
+				throw new AssertionFailure( "Type not recognized: " + field.getType() );
+		}
 	}
 
 	static String[] getFieldNameParts(String fieldName) {

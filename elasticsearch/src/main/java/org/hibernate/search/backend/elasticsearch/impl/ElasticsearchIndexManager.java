@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
@@ -345,11 +346,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		String index = getIndex( descriptor, fieldMetadata );
 		field.addProperty( "index", index );
 
-		if ( isAnalyzed( index ) && fieldMetadata.getAnalyzerReference() != null ) {
-			String analyzerName = analyzerName( descriptor.getDocumentBuilder().getBeanClass(), fieldMetadata );
-			if ( analyzerName != null ) {
-				field.addProperty( "analyzer", analyzerName );
-			}
+		String analyzerName = getAnalyzerName( descriptor, fieldMetadata, index );
+		if ( analyzerName != null ) {
+			field.addProperty( "analyzer", analyzerName );
 		}
 
 		if ( fieldMetadata.getBoost() != null ) {
@@ -372,6 +371,13 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
+	private String getAnalyzerName(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata, String index) {
+		if ( isAnalyzed( index ) && fieldMetadata.getAnalyzerReference() != null ) {
+			return analyzerName( descriptor.getDocumentBuilder().getBeanClass(), fieldMetadata );
+		}
+		return null;
+	}
+
 	private boolean isAnalyzed(String index) {
 		return ANALYZED.equals( index );
 	}
@@ -386,7 +392,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			JsonObject field = new JsonObject();
 
 			field.addProperty( "type", getFieldType( bridgeDefinedField ) );
-			field.addProperty( "index", ANALYZED );
+
+			String index = getIndex( bridgeDefinedField );
+			field.addProperty( "index", index );
 
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
@@ -443,7 +451,24 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			return "not_analyzed";
 		}
 
-		switch ( fieldMetadata.getIndex() ) {
+		return getIndexValue( fieldMetadata.getIndex() );
+	}
+
+	@SuppressWarnings("deprecation")
+	private String getIndex(BridgeDefinedField bridgeDefinedField) {
+		// Never analyze boolean
+		if ( FieldHelper.isBoolean( bridgeDefinedField )
+				|| FieldHelper.isNumeric( bridgeDefinedField )
+				|| FieldHelper.isDate( bridgeDefinedField ) ) {
+			return "not_analyzed";
+		}
+
+		Field.Index index = bridgeDefinedField.getIndex();
+		return getIndexValue( index );
+	}
+
+	private String getIndexValue(Field.Index index) {
+		switch ( index ) {
 			case ANALYZED:
 			case ANALYZED_NO_NORMS:
 				return ANALYZED;
@@ -453,7 +478,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			case NO:
 				return "no";
 			default:
-				throw new IllegalArgumentException( "Unexpected index type: " + fieldMetadata.getIndex() );
+				throw new IllegalArgumentException( "Unexpected index type: " + index );
 		}
 	}
 
