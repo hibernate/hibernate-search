@@ -316,7 +316,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public Query setMaxResults(int maxResults) {
+	public FullTextQuery setMaxResults(int maxResults) {
 		if ( maxResults < 0 ) {
 			throw new IllegalArgumentException(
 					"Negative ("
@@ -337,7 +337,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public Query setFirstResult(int firstResult) {
+	public FullTextQuery setFirstResult(int firstResult) {
 		if ( firstResult < 0 ) {
 			throw new IllegalArgumentException(
 					"Negative ("
@@ -383,7 +383,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public Query setHint(String hintName, Object value) {
+	public FullTextQuery setHint(String hintName, Object value) {
 		hints.put( hintName, value );
 		if ( "javax.persistence.query.timeout".equals( hintName ) ) {
 			if ( value == null ) {
@@ -496,7 +496,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public Query setFlushMode(FlushModeType flushMode) {
+	public FullTextQuery setFlushMode(FlushModeType flushMode) {
 		this.jpaFlushMode = flushMode;
 		if ( flushMode == FlushModeType.AUTO ) {
 			query.setFlushMode( FlushMode.AUTO );
