@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -31,6 +32,7 @@ import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.spi.BackendSpecificBridgeProvider;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -48,23 +50,17 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class BridgeFactory {
 
-	private static final String ELASTICSEARCH_BRIDGE_PROVIDER_CLASS = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBridgeProvider";
-
 	private static final Log LOG = LoggerFactory.make();
 
+	private final Map<Class<? extends IndexManager>, BridgeProvider> backendSpecificProviders = new HashMap<>();
 	private final List<BridgeProvider> annotationBasedProviders = new ArrayList<>( 6 );
 	private final Set<BridgeProvider> regularProviders = new HashSet<>();
 
 	public BridgeFactory(ServiceManager serviceManager) {
 		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 
-		// Register ES bridge provider if present; Add it first so it takes precedence over all others
-		try {
-			Class<? extends ExtendedBridgeProvider> esBridgeProviderType = classLoaderService.classForName( ELASTICSEARCH_BRIDGE_PROVIDER_CLASS );
-			annotationBasedProviders.add( esBridgeProviderType.newInstance() );
-		}
-		catch (Exception e) {
-			// ignore
+		for ( BackendSpecificBridgeProvider provider : classLoaderService.loadJavaServices( BackendSpecificBridgeProvider.class ) ) {
+			backendSpecificProviders.put( provider.getBackend(), provider );
 		}
 
 		annotationBasedProviders.add( new CalendarBridgeProvider() );
@@ -209,6 +205,21 @@ public final class BridgeFactory {
 				member, isId, isExplicitlyMarkedAsNumeric, reflectionManager, serviceManager
 		);
 		ContainerType containerType = getContainerType( member, reflectionManager );
+
+		// Backend specific providers are managed first so that they can override the standard
+		// bridges
+		for ( Entry<Class<? extends IndexManager>, BridgeProvider> providerEntry : backendSpecificProviders.entrySet() ) {
+			if ( providerEntry.getKey().isAssignableFrom( indexManagerType ) ) {
+				bridge = getFieldBridgeFromBridgeProvider(
+						providerEntry.getValue(),
+						context,
+						containerType );
+
+				if ( bridge != null ) {
+					return bridge;
+				}
+			}
+		}
 
 		// We do annotation based providers as Tika at least needs priority over
 		// default providers because it might override the type for String
