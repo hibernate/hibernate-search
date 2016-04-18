@@ -47,4 +47,14 @@ public final class LuceneAnalyzerReference implements AnalyzerReference {
 	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
 		return (T) this;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( "<" );
+		sb.append( analyzer.getClass().getName() );
+		sb.append( ">" );
+		return sb.toString();
+	}
 }

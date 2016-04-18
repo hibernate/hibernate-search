@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.backend.elasticsearch.client.impl.BulkRequestFailedException;
 import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
 import org.hibernate.search.exception.SearchException;
@@ -69,6 +70,6 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,
-			value = "'%1$s' is not a remote analyzer. It will be ignored")
-	void analyzerIsNotRemote(String name);
+			value = "Field '%2$s' in '%1$s' requires a remote analyzer reference (got '%3$s' instead). The analyzer will be ignored.")
+	void analyzerIsNotRemote(@FormatWith(ClassFormatter.class) Class<?> entityType, String fieldName, AnalyzerReference analyzerReference);
 }

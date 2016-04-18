@@ -133,4 +133,15 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 			return new ScopedAnalyzerReference( globalAnalyzer, analyzers );
 		}
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( "<" );
+		sb.append( "globalAnalyzer: " );
+		sb.append( globalAnalyzer );
+		sb.append( ">" );
+		return sb.toString();
+	}
 }
