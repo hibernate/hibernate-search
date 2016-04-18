@@ -67,10 +67,14 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			return queryCustomizer.setWrappedQuery( createQuery( fieldsContext.getFirst(), conversionContext ) ).createQuery();
 		}
 		else {
-			BooleanQuery aggregatedFieldsQuery = new BooleanQuery();
+			BooleanQuery.Builder aggregatedFieldsQueryBuilder = new BooleanQuery.Builder();
 			for ( FieldContext fieldContext : fieldsContext ) {
-				aggregatedFieldsQuery.add( createQuery( fieldContext, conversionContext ), BooleanClause.Occur.SHOULD );
+				aggregatedFieldsQueryBuilder.add(
+					createQuery( fieldContext, conversionContext ),
+					BooleanClause.Occur.SHOULD
+				);
 			}
+			BooleanQuery aggregatedFieldsQuery = aggregatedFieldsQueryBuilder.build();
 			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
 		}
 	}
@@ -118,12 +122,12 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				perFieldQuery = createTermQuery( fieldContext, terms.get( 0 ) );
 			}
 			else {
-				BooleanQuery booleanQuery = new BooleanQuery();
+				BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 				for ( String localTerm : terms ) {
 					Query termQuery = createTermQuery( fieldContext, localTerm );
-					booleanQuery.add( termQuery, BooleanClause.Occur.SHOULD );
+					booleanQueryBuilder.add( termQuery, BooleanClause.Occur.SHOULD );
 				}
-				perFieldQuery = booleanQuery;
+				perFieldQuery = booleanQueryBuilder.build();
 			}
 		}
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();

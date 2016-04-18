@@ -118,13 +118,15 @@ public class FieldNameCollectorTest {
 
 	@Test
 	public void testBooleanQuery() {
-		BooleanQuery booleanQuery = new BooleanQuery();
+		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 
 		TermQuery termQuery = new TermQuery( new Term( "stringField", "foobar" ) );
-		booleanQuery.add( termQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( termQuery, BooleanClause.Occur.MUST );
 
 		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newIntRange( "intField", 0, 0, true, true );
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.SHOULD );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.SHOULD );
+
+		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 
 		assertFieldNames( booleanQuery, FieldType.NUMBER, "intField" );
 		assertFieldNames( booleanQuery, FieldType.STRING, "stringField" );
@@ -132,15 +134,18 @@ public class FieldNameCollectorTest {
 
 	@Test
 	public void testNestedBooleanQuery() {
-		BooleanQuery booleanQuery = new BooleanQuery();
+		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 
 		TermQuery termQuery = new TermQuery( new Term( "stringField", "foobar" ) );
-		booleanQuery.add( termQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( termQuery, BooleanClause.Occur.MUST );
 
-		BooleanQuery nestedBooleanQuery = new BooleanQuery();
+		BooleanQuery.Builder nestedBuilder = new BooleanQuery.Builder();
 		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newIntRange( "intField", 0, 0, true, true );
-		nestedBooleanQuery.add( numericRangeQuery, BooleanClause.Occur.SHOULD );
-		booleanQuery.add( nestedBooleanQuery, BooleanClause.Occur.MUST );
+		nestedBuilder.add( numericRangeQuery, BooleanClause.Occur.SHOULD );
+		BooleanQuery nestedBooleanQuery = nestedBuilder.build();
+		booleanQueryBuilder.add( nestedBooleanQuery, BooleanClause.Occur.MUST );
+
+		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 
 		assertFieldNames( booleanQuery, FieldType.NUMBER, "intField" );
 		assertFieldNames( booleanQuery, FieldType.STRING, "stringField" );

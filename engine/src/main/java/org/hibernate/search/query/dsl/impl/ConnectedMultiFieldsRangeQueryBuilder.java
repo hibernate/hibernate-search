@@ -67,11 +67,11 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ), conversionContext ) ).createQuery();
 		}
 		else {
-			BooleanQuery aggregatedFieldsQuery = new BooleanQuery( );
+			BooleanQuery.Builder aggregatedFieldsQueryBuilder = new BooleanQuery.Builder();
 			for ( FieldContext fieldContext : fieldContexts ) {
-				aggregatedFieldsQuery.add( createQuery( fieldContext, conversionContext ), BooleanClause.Occur.SHOULD );
+				aggregatedFieldsQueryBuilder.add( createQuery( fieldContext, conversionContext ), BooleanClause.Occur.SHOULD );
 			}
-			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
+			return queryCustomizer.setWrappedQuery( aggregatedFieldsQueryBuilder.build() ).createQuery();
 		}
 	}
 

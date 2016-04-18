@@ -55,7 +55,7 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 			log.tracef( "Removing all %s matching Query: %s", entityType.toString(), query.toString() );
 		}
 
-		BooleanQuery entityDeletionQuery = new BooleanQuery();
+		BooleanQuery.Builder entityDeletionQueryBuilder = new BooleanQuery.Builder();
 
 		{
 			ScopedAnalyzerReference analyzer = this.workspace.getDocumentBuilder( entityType ).getAnalyzer();
@@ -63,17 +63,17 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 
 			Query queryToDelete = query.toLuceneQuery( scopeAnalyzer );
 
-			entityDeletionQuery.add( queryToDelete, BooleanClause.Occur.FILTER );
+			entityDeletionQueryBuilder.add( queryToDelete, BooleanClause.Occur.FILTER );
 		}
 
 		Term classNameQueryTerm = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
-		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.FILTER );
+		entityDeletionQueryBuilder.add( classNameQuery, BooleanClause.Occur.FILTER );
 
-		addTenantQueryTerm( work.getTenantId(), entityDeletionQuery );
+		addTenantQueryTerm( work.getTenantId(), entityDeletionQueryBuilder );
 
 		try {
-			delegate.deleteDocuments( entityDeletionQuery );
+			delegate.deleteDocuments( entityDeletionQueryBuilder.build() );
 		}
 		catch (IOException e) {
 			SearchException ex = log.unableToDeleteByQuery( entityType, query, e );
@@ -82,10 +82,11 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 		this.workspace.notifyWorkApplied( work );
 	}
 
-	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {
+	private void addTenantQueryTerm(final String tenantId, BooleanQuery.Builder entityDeletionQueryBuilder) {
+
 		if ( tenantId != null ) {
 			Term tenantTerm = new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
-			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.FILTER );
+			entityDeletionQueryBuilder.add( new TermQuery( tenantTerm ), BooleanClause.Occur.FILTER );
 		}
 	}
 }

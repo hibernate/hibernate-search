@@ -43,9 +43,10 @@ public class FieldBoostTest extends SearchTestBase {
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
-		BooleanQuery query = new BooleanQuery();
-		query.add( author, BooleanClause.Occur.SHOULD );
-		query.add( desc, BooleanClause.Occur.SHOULD );
+		BooleanQuery query = new BooleanQuery.Builder()
+				.add( author, BooleanClause.Occur.SHOULD )
+				.add( desc, BooleanClause.Occur.SHOULD )
+				.build();
 		log.debug( query.toString() );
 
 		org.hibernate.search.FullTextQuery hibQuery =
@@ -82,9 +83,10 @@ public class FieldBoostTest extends SearchTestBase {
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
-		BooleanQuery query = new BooleanQuery();
-		query.add( author, BooleanClause.Occur.SHOULD );
-		query.add( desc, BooleanClause.Occur.SHOULD );
+		BooleanQuery query = new BooleanQuery.Builder()
+				.add( author, BooleanClause.Occur.SHOULD )
+				.add( desc, BooleanClause.Occur.SHOULD )
+				.build();
 		log.debug( query.toString() );
 
 		org.hibernate.search.FullTextQuery hibQuery =
@@ -121,9 +123,10 @@ public class FieldBoostTest extends SearchTestBase {
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
-		BooleanQuery query = new BooleanQuery();
-		query.add( author, BooleanClause.Occur.SHOULD );
-		query.add( desc, BooleanClause.Occur.SHOULD );
+		BooleanQuery query = new BooleanQuery.Builder()
+				.add( author, BooleanClause.Occur.SHOULD )
+				.add( desc, BooleanClause.Occur.SHOULD )
+				.build();
 		log.debug( query.toString() );
 
 		org.hibernate.search.FullTextQuery hibQuery =
