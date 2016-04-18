@@ -934,4 +934,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 305, value = "Analyzer reference with name '%2$s' not initialized for field '%1$s' ")
 	SearchException analyzerReferenceNotInitialized(String fieldName, String name);
+
+	@Message(id = 306, value = "IndexManager type is required to build a FieldBridge for %2$s in %1$s")
+	SearchException indexManagerTypeRequiredToBuildFieldBridge(String className, String fieldName);
+
 }

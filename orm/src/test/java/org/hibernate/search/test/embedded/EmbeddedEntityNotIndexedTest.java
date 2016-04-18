@@ -20,6 +20,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -49,7 +50,7 @@ public class EmbeddedEntityNotIndexedTest {
 
 	@Test
 	public void testMultipleDocumentIdsCauseException() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( A.class );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( A.class, DirectoryBasedIndexManager.class );
 		assertNull( "The id of B should not be indexed ", typeMetadata.getDocumentFieldMetadataFor( "b.id" ) );
 	}
 
