@@ -127,25 +127,25 @@ public final class AnnotationProcessingHelper {
 		}
 	}
 
-	public static AnalyzerReference getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
+	public static AnalyzerReference getAnalyzerReference(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
 		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
 		if ( analyzerClass == void.class ) {
-			return analyzerFromDefinition( analyzerAnn, configContext );
+			return analyzerReferenceFromDefinition( analyzerAnn, configContext );
 		}
 		else {
-			return analyzerFromClass( configContext, analyzerClass );
+			return analyzerReferenceFromClass( configContext, analyzerClass );
 		}
 	}
 
-	private static AnalyzerReference analyzerFromDefinition(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
+	private static AnalyzerReference analyzerReferenceFromDefinition(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
 		String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
 		if ( StringHelper.isEmpty( definition ) ) {
 			return null;
 		}
-		return configContext.buildLazyAnalyzer( definition );
+		return configContext.buildLazyAnalyzerReference( definition );
 	}
 
-	private static AnalyzerReference analyzerFromClass(ConfigContext configContext, Class<?> analyzerClass) {
+	private static AnalyzerReference analyzerReferenceFromClass(ConfigContext configContext, Class<?> analyzerClass) {
 		try {
 			// For now only local analyzer can be created from a class
 			// this should be easy to extend to remote analyzer using a common interface/super-class

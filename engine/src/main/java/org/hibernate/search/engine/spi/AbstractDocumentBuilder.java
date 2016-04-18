@@ -121,8 +121,8 @@ public abstract class AbstractDocumentBuilder {
 		return typeMetadata;
 	}
 
-	public ScopedAnalyzerReference getAnalyzer() {
-		return typeMetadata.getDefaultAnalyzer();
+	public ScopedAnalyzerReference getAnalyzerReference() {
+		return typeMetadata.getDefaultAnalyzerReference();
 	}
 
 	public EntityState getEntityState() {
@@ -458,6 +458,6 @@ public abstract class AbstractDocumentBuilder {
 	 * Closes any resource
 	 */
 	public void close() {
-		typeMetadata.getDefaultAnalyzer().close();
+		typeMetadata.getDefaultAnalyzerReference().close();
 	}
 }

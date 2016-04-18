@@ -93,7 +93,7 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 
 		if ( this.getType() == Type.STRING ) {
 			try {
-				ScopedAnalyzer analyzerForEntity = (ScopedAnalyzer) documentBuilder.getAnalyzer().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+				ScopedAnalyzer analyzerForEntity = (ScopedAnalyzer) documentBuilder.getAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 				TokenStream tokenStream = analyzerForEntity.tokenStream( this.getFieldName(), stringValue );
 				tokenStream.reset();
 				try {

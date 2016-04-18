@@ -98,8 +98,8 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> getAnalyzers() {
-		return delegate.getAnalyzers();
+	public Map<String, AnalyzerReference> getAnalyzerReferences() {
+		return delegate.getAnalyzerReferences();
 	}
 
 	@Override

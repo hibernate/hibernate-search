@@ -87,7 +87,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
-	private final Map<String, AnalyzerReference> analyzers;
+	private final Map<String, AnalyzerReference> analyzerReferences;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
@@ -115,7 +115,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final boolean indexUninvertingAllowed;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
-		this.analyzers = state.getAnalyzers();
+		this.analyzerReferences = state.getAnalyzerReferences();
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
 		this.indexBindingForEntities = state.getIndexBindings();
@@ -234,7 +234,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 			serviceManager.releaseAllServices();
 
-			for ( AnalyzerReference an : this.analyzers.values() ) {
+			for ( AnalyzerReference an : this.analyzerReferences.values() ) {
 				an.close();
 			}
 			for ( AbstractDocumentBuilder documentBuilder : this.documentBuildersContainedEntities.values() ) {
@@ -305,7 +305,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	// This method is a bit convoluted but it is going to be removed
 	// At the moment we cannot change this API because it's public
 	public Analyzer getAnalyzer(String name) {
-		final AnalyzerReference reference = analyzers.get( name );
+		final AnalyzerReference reference = analyzerReferences.get( name );
 		if ( reference == null || !reference.is( LuceneAnalyzerReference.class ) ) {
 			throw new SearchException( "Unknown Analyzer definition: " + name );
 		}
@@ -318,18 +318,18 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 	@Override
 	public AnalyzerReference getAnalyzerReference(String name) {
-		final AnalyzerReference analyzer = analyzers.get( name );
-		if ( analyzer == null ) {
+		final AnalyzerReference analyzerReference = analyzerReferences.get( name );
+		if ( analyzerReference == null ) {
 			throw new SearchException( "Unknown Analyzer definition: " + name );
 		}
-		return analyzer;
+		return analyzerReference;
 	}
 
 	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
 		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( clazz );
 		DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
-		return builder.getAnalyzer().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+		return builder.getAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 	}
 
 	@Override
@@ -353,8 +353,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> getAnalyzers() {
-		return analyzers;
+	public Map<String, AnalyzerReference> getAnalyzerReferences() {
+		return analyzerReferences;
 	}
 
 	@Override
