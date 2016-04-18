@@ -22,11 +22,12 @@ import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.DefaultInstanceInitializer;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 /**
@@ -61,7 +62,8 @@ public class UnorderedIdScanTest {
 		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
 		ConfigContext context = new ConfigContext( searchConfiguration, new BuildContextForTest( searchConfiguration ) );
 		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, context );
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( mappedXClass ));
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( mappedXClass ),
+				DirectoryBasedIndexManager.class );
 		new DocumentBuilderIndexedEntity( mappedXClass,
 				typeMetadata,
 				context,

@@ -65,6 +65,10 @@ public class IndexManagerHolder {
 
 	private static final Similarity DEFAULT_SIMILARITY = new ClassicSimilarity();
 
+	private static final String DEFAULT_INDEX_MANAGER_KEY = "__DEFAULT__";
+
+	private final Map<String, Class<? extends IndexManager>> indexManagerImplementationsRegistry
+			= new ConcurrentHashMap<String, Class<? extends IndexManager>>();
 	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
 	// I currently think it's easier to not hide sharding implementations in a custom
@@ -546,5 +550,35 @@ public class IndexManagerHolder {
 		}
 
 		return isShardingDynamic;
+	}
+
+	public Class<? extends IndexManager> getIndexManagerType(XClass entity, SearchConfiguration cfg, WorkerBuildContext buildContext) {
+		ServiceManager serviceManager = buildContext.getServiceManager();
+		IndexManagerFactory indexManagerFactory = serviceManager.requestService( IndexManagerFactory.class );
+
+		String indexName = getIndexName( entity, cfg );
+		Properties[] indexProperties = getIndexProperties( cfg, indexName );
+		String indexManagerImplementationName = indexProperties[0].getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
+
+		String indexManagerImplementationKey = indexManagerImplementationName != null ?
+				indexManagerImplementationName : DEFAULT_INDEX_MANAGER_KEY;
+		if ( indexManagerImplementationsRegistry.containsKey( indexManagerImplementationKey ) ) {
+			return indexManagerImplementationsRegistry.get( indexManagerImplementationKey );
+		}
+
+		try {
+			Class<? extends IndexManager> indexManagerType;
+			if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
+				indexManagerType = indexManagerFactory.createDefaultIndexManager().getClass();
+			}
+			else {
+				indexManagerType = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName ).getClass();
+			}
+			indexManagerImplementationsRegistry.put( indexManagerImplementationKey, indexManagerType );
+			return indexManagerType;
+		}
+		finally {
+			serviceManager.releaseService( IndexManagerFactory.class );
+		}
 	}
 }

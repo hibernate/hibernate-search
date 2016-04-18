@@ -35,6 +35,7 @@ import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -177,19 +178,28 @@ public final class BridgeFactory {
 	public FieldBridge buildFieldBridge(XMember member,
 			boolean isId,
 			boolean isExplicitlyMarkedAsNumeric,
+			Class<? extends IndexManager> indexManagerType,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
-		return buildFieldBridge( null, member, isId, isExplicitlyMarkedAsNumeric, reflectionManager, serviceManager );
+		return buildFieldBridge( null, member, isId, isExplicitlyMarkedAsNumeric, indexManagerType,
+				reflectionManager, serviceManager );
 	}
 
 	public FieldBridge buildFieldBridge(Field field,
 			XMember member,
 			boolean isId,
 			boolean isExplicitlyMarkedAsNumeric,
+			Class<? extends IndexManager> indexManagerType,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
+		// if we don't know to which IndexManager the entity is rattached, we cannot build the right
+		// FieldBridge as it might depend on this information due to backend specific BridgeProviders.
+		if ( indexManagerType == null ) {
+			throw LOG.indexManagerTypeRequiredToBuildFieldBridge( member.getType().getName(), member.getName() );
+		}
+
 		FieldBridge bridge = findExplicitFieldBridge( field, member, reflectionManager );
 		if ( bridge != null ) {
 			return bridge;

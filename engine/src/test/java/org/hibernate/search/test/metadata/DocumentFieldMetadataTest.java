@@ -29,6 +29,7 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -104,7 +105,7 @@ public class DocumentFieldMetadataTest {
 	@Test
 	public void testAddingFacetToUnsupportedTypeThrowsException() {
 		try {
-			metadataProvider.getTypeMetadataFor( Bar.class );
+			metadataProvider.getTypeMetadataFor( Bar.class, DirectoryBasedIndexManager.class );
 			fail( "Invalid facet configuration should throw exception. URI type cannot be faceted" );
 		}
 		catch (SearchException e) {
@@ -115,7 +116,7 @@ public class DocumentFieldMetadataTest {
 	@Test
 	public void testAddingFacetToUnanalyzedFieldThrowsException() {
 		try {
-			metadataProvider.getTypeMetadataFor( Snafu.class );
+			metadataProvider.getTypeMetadataFor( Snafu.class, DirectoryBasedIndexManager.class );
 			fail( "Field targeted for faceting cannot be analyzed" );
 		}
 		catch (SearchException e) {
@@ -128,7 +129,8 @@ public class DocumentFieldMetadataTest {
 		expectedException.expect( SearchException.class );
 		expectedException.expectMessage( "HSEARCH000262" );
 
-		metadataProvider.getTypeMetadataFor( TypeWithNumericFieldReferringToNonExistantField.class );
+		metadataProvider.getTypeMetadataFor( TypeWithNumericFieldReferringToNonExistantField.class,
+				DirectoryBasedIndexManager.class );
 	}
 
 	@Test
@@ -136,7 +138,7 @@ public class DocumentFieldMetadataTest {
 		expectedException.expect( SearchException.class );
 		expectedException.expectMessage( "HSEARCH000262" );
 
-		metadataProvider.getTypeMetadataFor( TypeWithNumericFieldWithoutField.class );
+		metadataProvider.getTypeMetadataFor( TypeWithNumericFieldWithoutField.class, DirectoryBasedIndexManager.class );
 	}
 
 	@Test
@@ -144,11 +146,12 @@ public class DocumentFieldMetadataTest {
 		expectedException.expect( SearchException.class );
 		expectedException.expectMessage( "HSEARCH000300" );
 
-		metadataProvider.getTypeMetadataFor( TypeWithSeveralNumericFieldsReferringToSameField.class );
+		metadataProvider.getTypeMetadataFor( TypeWithSeveralNumericFieldsReferringToSameField.class,
+				DirectoryBasedIndexManager.class );
 	}
 
 	private FacetMetadata getSingleFacetMetadata(Class<?> type, String fieldName) {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( type );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( type, DirectoryBasedIndexManager.class );
 		DocumentFieldMetadata documentFieldMetadata = typeMetadata.getDocumentFieldMetadataFor( fieldName );
 
 		assertTrue( "The field should be enabled for faceting", documentFieldMetadata.hasFacets() );

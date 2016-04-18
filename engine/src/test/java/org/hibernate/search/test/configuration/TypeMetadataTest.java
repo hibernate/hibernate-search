@@ -25,6 +25,7 @@ import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Before;
@@ -54,7 +55,7 @@ public class TypeMetadataTest {
 	@Test
 	public void testMultipleDocumentIdsCauseException() {
 		try {
-			metadataProvider.getTypeMetadataFor( Foo.class );
+			metadataProvider.getTypeMetadataFor( Foo.class, DirectoryBasedIndexManager.class );
 			fail( "An exception should have been thrown" );
 		}
 		catch (SearchException e) { // getting a HibernateException here, because the listener registration fails
@@ -67,7 +68,7 @@ public class TypeMetadataTest {
 
 	@Test
 	public void testRetrievalOfSortableFieldMetadata() {
-		TypeMetadata metadata = metadataProvider.getTypeMetadataFor( Bar.class );
+		TypeMetadata metadata = metadataProvider.getTypeMetadataFor( Bar.class, DirectoryBasedIndexManager.class );
 
 		Set<SortableFieldMetadata> fieldMetadata = metadata.getPropertyMetadataForProperty( "name" ).getSortableFieldMetadata();
 		assertThat( fieldMetadata ).onProperty( "fieldName" ).containsOnly( "name" );

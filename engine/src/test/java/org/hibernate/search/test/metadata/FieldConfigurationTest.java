@@ -14,6 +14,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.PropertyDescriptor;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -45,7 +46,7 @@ public class FieldConfigurationTest {
 	@Test
 	public void testFieldAnnotationTargetingSameFieldAsDocumentIdIsNotAllowed() {
 		try {
-			metadataProvider.getTypeMetadataFor( Qux.class );
+			metadataProvider.getTypeMetadataFor( Qux.class, DirectoryBasedIndexManager.class );
 			fail( "Invalid configuration should have failed" );
 
 		}
