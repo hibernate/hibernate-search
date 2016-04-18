@@ -50,6 +50,18 @@ public interface EntityIndexBinding {
 	void postInitialize(Set<Class<?>> indexedClasses);
 
 	/**
+	 * @return the {@code IndexManager} impl used by this entity type
+	 */
+	Class<? extends IndexManager> getIndexManagerType();
+
+	/**
+	 * @param indexManagerTypeCandidate the tested {@code IndexManager} type
+	 *
+	 * @return whether this entity is managed by the given {@code IndexManager} type
+	 */
+	boolean isManagedBy(Class<? extends IndexManager> indexManagerTypeCandidate);
+
+	/**
 	 * @return the array of index managers
 	 */
 	IndexManager[] getIndexManagers();

@@ -87,6 +87,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.SpatialFieldBridge;
+import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -112,10 +113,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private final Class<? extends Annotation> jpaIdClass;
 	private final Class<? extends Annotation> jpaEmbeddedIdClass;
 
-	public AnnotationMetadataProvider(ReflectionManager reflectionManager, ConfigContext configContext) {
+	public AnnotationMetadataProvider(ReflectionManager reflectionManager, ConfigContext configContext, SearchFactoryState searchFactoryState) {
 		this.reflectionManager = reflectionManager;
 		this.configContext = configContext;
-		this.bridgeFactory = new BridgeFactory( configContext.getServiceManager() );
+		this.bridgeFactory = new BridgeFactory( configContext.getServiceManager(), searchFactoryState );
 
 		if ( configContext.isJpaPresent() ) {
 			this.jpaIdClass = loadAnnotationClass( "javax.persistence.Id", configContext );
@@ -139,18 +140,34 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	@Override
+	public TypeMetadata getTypeMetadataForContainedIn(Class<?> clazz) {
+		XClass xClass = reflectionManager.toXClass( clazz );
+
+		ParseContext parseContext = new ParseContext( xClass, ParseContext.SKIP_FIELD_BRIDGES );
+		parseContext.processingClass( xClass );
+		parseContext.setCurrentClass( xClass );
+
+		return doGetTypeMetadataFor( clazz, xClass, parseContext );
+	}
+
+	@Override
 	public TypeMetadata getTypeMetadataFor(Class<?> clazz) {
 		XClass xClass = reflectionManager.toXClass( clazz );
+
+		ParseContext parseContext = new ParseContext( xClass, ParseContext.INCLUDE_FIELD_BRIDGES );
+		parseContext.processingClass( xClass );
+		parseContext.setCurrentClass( xClass );
+
+		return doGetTypeMetadataFor( clazz, xClass, parseContext );
+	}
+
+	private TypeMetadata doGetTypeMetadataFor(Class<?> clazz, XClass xClass, ParseContext parseContext) {
 		TypeMetadata.Builder typeMetadataBuilder = new TypeMetadata.Builder( clazz, configContext )
 				.boost( getBoost( xClass ) )
 				.boostStrategy( AnnotationProcessingHelper.getDynamicBoost( xClass ) )
 				.analyzer( configContext.getDefaultAnalyzer() );
 
-		ParseContext parseContext = new ParseContext();
-		parseContext.processingClass( xClass );
-		parseContext.setCurrentClass( xClass );
-
-		inizializePackageLevelAnnotations( packageInfo( clazz ), configContext );
+		initializePackageLevelAnnotations( packageInfo( clazz ), configContext );
 
 		initializeClass(
 				typeMetadataBuilder,
@@ -220,7 +237,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( path ) ) {
-				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, configContext, unprefixedAttributeName, path );
+				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, configContext, parseContext, unprefixedAttributeName, path );
 			}
 		}
 
@@ -229,11 +246,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, PropertyMetadata.Builder propertyMetadataBuilder, NumericFieldsConfiguration numericFields, ConfigContext configContext, String unprefixedFieldName, String fieldName) {
+	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, PropertyMetadata.Builder propertyMetadataBuilder, NumericFieldsConfiguration numericFields, ConfigContext configContext, ParseContext parseContext, String unprefixedFieldName, String fieldName) {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 
 		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
+				parseContext.getMappedClass(),
 				member,
 				true,
 				numericFields.isNumericField( unprefixedFieldName ),
@@ -294,6 +312,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		FieldBridge idBridge = bridgeFactory.buildFieldBridge(
+				parseContext.getMappedClass(),
 				member,
 				true,
 				numericFieldAnnotation != null,
@@ -534,7 +553,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private void inizializePackageLevelAnnotations(XPackage xPackage, ConfigContext configContext) {
+	private void initializePackageLevelAnnotations(XPackage xPackage, ConfigContext configContext) {
 		if ( xPackage != null ) {
 			checkForAnalyzerDefs( xPackage, configContext );
 			checkForFullTextFilterDefs( xPackage, configContext );
@@ -677,6 +696,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		Field.TermVector termVector = Field.TermVector.NO;
 		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
+				parseContext.getMappedClass(),
 				member,
 				false,
 				false,
@@ -1139,14 +1159,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( unPrefixedFieldName );
 
-		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
-				fieldAnnotation,
-				member,
-				false,
-				numericFieldAnnotation != null,
-				reflectionManager,
-				configContext.getServiceManager()
-		);
+		FieldBridge fieldBridge = null;
+		if ( !parseContext.skipFieldBridges() ) {
+			fieldBridge = bridgeFactory.buildFieldBridge(
+					parseContext.getMappedClass(),
+					fieldAnnotation,
+					member,
+					false,
+					numericFieldAnnotation != null,
+					reflectionManager,
+					configContext.getServiceManager()
+			);
+		}
 
 		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
 			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;

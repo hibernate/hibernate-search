@@ -20,6 +20,7 @@ import org.hibernate.search.store.ShardIdentifierProvider;
  */
 public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBinding {
 
+	private final Class<? extends IndexManager> indexManagerType;
 	private final IndexShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
 	private DocumentBuilderIndexedEntity documentBuilder;
@@ -27,14 +28,26 @@ public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBindi
 	private final EntityIndexingInterceptor entityIndexingInterceptor;
 
 	public DefaultMutableEntityIndexBinding(
+			Class<? extends IndexManager> indexManagerType,
 			IndexShardingStrategy shardingStrategy,
 			Similarity similarityInstance,
 			IndexManager[] providers,
 			EntityIndexingInterceptor entityIndexingInterceptor) {
+				this.indexManagerType = indexManagerType;
 				this.shardingStrategy = shardingStrategy;
 				this.similarityInstance = similarityInstance;
 				this.indexManagers = providers;
 				this.entityIndexingInterceptor = entityIndexingInterceptor;
+	}
+
+	@Override
+	public Class<? extends IndexManager> getIndexManagerType() {
+		return indexManagerType;
+	}
+
+	@Override
+	public boolean isManagedBy(Class<? extends IndexManager> indexManager) {
+		return indexManager.isAssignableFrom( indexManagerType );
 	}
 
 	@Override

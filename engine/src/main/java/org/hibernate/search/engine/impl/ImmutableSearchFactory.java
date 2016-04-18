@@ -564,6 +564,19 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		return indexUninvertingAllowed;
 	}
 
+	@Override
+	public boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerTypeCandidate) {
+		Set<Class<?>> queriedEntityTypesWithSubTypes = getIndexedTypesPolymorphic( new Class<?>[]{ mappedClass } );
+
+		for ( Class<?> queriedEntityType : queriedEntityTypesWithSubTypes ) {
+			EntityIndexBinding binding = getIndexBinding( queriedEntityType );
+			if ( binding.isManagedBy( indexManagerTypeCandidate ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T unwrap(Class<T> cls) {

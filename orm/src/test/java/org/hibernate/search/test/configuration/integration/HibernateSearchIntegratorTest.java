@@ -20,6 +20,7 @@ import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
+import org.hibernate.search.bridge.spi.BackendSpecificBridgeProvider;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
@@ -41,8 +42,6 @@ import static org.easymock.EasyMock.startsWith;
  * @author Hardy Ferentschik
  */
 public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
-
-	private static final String ELASTICSEARCH_BRIDGE_PROVIDER_CLASS = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBridgeProvider";
 
 	private static final Boolean SEARCH_DISABLED = Boolean.FALSE;
 	private static final Boolean SEARCH_ENABLED = Boolean.TRUE;
@@ -146,15 +145,15 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 			.andReturn( Object.class )
 			.anyTimes();
 
+		expect( mockClassLoaderService.loadJavaServices( BackendSpecificBridgeProvider.class ) )
+			.andReturn( Collections.<BackendSpecificBridgeProvider>emptySet() );
+
 		expect( mockClassLoaderService.loadJavaServices( BridgeProvider.class ) )
 			.andReturn( Collections.<BridgeProvider>emptySet() );
 
 		expect( mockClassLoaderService.classForName( startsWith( "java.time" ) ) )
 			.andThrow( new ClassLoadingException( "Called by JavaTimeBridgeProvider; we assume the classes in java.time are not on the ORM class loader" ) )
 			.anyTimes();
-
-		expect( mockClassLoaderService.classForName( ELASTICSEARCH_BRIDGE_PROVIDER_CLASS ) )
-			.andReturn( null );
 
 		expect( mockMetadata.getEntityBindings() )
 			.andReturn( Collections.EMPTY_SET )

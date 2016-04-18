@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.test.bridge;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -17,35 +15,18 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.impl.ConfigContext;
-import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.test.metadata.DescriptorTestHelper;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.setup.BuildContextForTest;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-
-import static org.junit.Assert.assertTrue;
+import org.hibernate.search.testsupport.setup.AbstractAnnotationMetadataTest;
+import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-1756")
-public class DefaultStringBridgeTest {
-
-	private AnnotationMetadataProvider metadataProvider;
-
-	@Before
-	public void setUp() {
-		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
-		ConfigContext configContext = new ConfigContext(
-				searchConfiguration,
-				new BuildContextForTest( searchConfiguration )
-		);
-		metadataProvider = new AnnotationMetadataProvider( new JavaReflectionManager(), configContext );
-	}
+public class DefaultStringBridgeTest extends AbstractAnnotationMetadataTest {
 
 	@Test
 	public void testUsageOfDefaultStringBridgeInFieldBridgeAnnotation() throws Exception {

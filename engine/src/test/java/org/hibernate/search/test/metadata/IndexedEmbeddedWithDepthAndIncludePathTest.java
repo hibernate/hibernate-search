@@ -6,34 +6,16 @@
  */
 package org.hibernate.search.test.metadata;
 
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.testsupport.setup.BuildContextForTest;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.junit.Before;
-import org.junit.Test;
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.engine.impl.ConfigContext;
-import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import static org.junit.Assert.assertNotNull;
+
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.testsupport.TestForIssue;
-
-import static org.junit.Assert.assertNotNull;
+import org.hibernate.search.testsupport.setup.AbstractAnnotationMetadataTest;
+import org.junit.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-1442")
-public class IndexedEmbeddedWithDepthAndIncludePathTest {
-
-	private AnnotationMetadataProvider metadataProvider;
-
-	@Before
-	public void setUp() {
-		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
-		ConfigContext configContext = new ConfigContext(
-				searchConfiguration,
-				new BuildContextForTest( searchConfiguration )
-		);
-		metadataProvider = new AnnotationMetadataProvider( new JavaReflectionManager(), configContext );
-	}
+public class IndexedEmbeddedWithDepthAndIncludePathTest extends AbstractAnnotationMetadataTest {
 
 	@Test
 	public void testDepthIsProperlyHandled() {

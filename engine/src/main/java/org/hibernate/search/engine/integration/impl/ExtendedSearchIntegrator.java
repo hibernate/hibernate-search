@@ -17,6 +17,7 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -137,4 +138,15 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * @throws org.hibernate.search.exception.SearchException if the definition name is unknown
 	 */
 	AnalyzerReference getAnalyzerReference(String name);
+
+	/**
+	 * Returns whether an entity is managed by a given {@code IndexManager}.
+	 *
+	 * @param mappedClass the entity type
+	 * @param indexManagerTypeCandidate the tested {@code IndexManager} type
+	 *
+	 * @return returns whether an entity is managed by a given {@code IndexManager}.
+	 */
+	boolean isManagedBy(Class<?> mappedClass, Class<? extends IndexManager> indexManagerTypeCandidate);
+
 }

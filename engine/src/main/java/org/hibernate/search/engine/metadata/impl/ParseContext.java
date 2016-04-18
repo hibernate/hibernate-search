@@ -18,15 +18,33 @@ import org.hibernate.annotations.common.reflection.XClass;
  * @author Hardy Ferentschik
  */
 public class ParseContext {
+	public static final boolean SKIP_FIELD_BRIDGES = true;
+	public static final boolean INCLUDE_FIELD_BRIDGES = false;
+
 	private final Set<XClass> processedClasses = new HashSet<>();
 	private final Set<String> spatialNames = new TreeSet<>();
 	private final Set<String> unqualifiedCollectedCollectionRoles = new HashSet<>();
 
+	private XClass mappedClass;
+	private boolean skipFieldBridges;
 	private XClass currentClass;
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
 	private boolean explicitDocumentId = false;
 	private boolean includeEmbeddedObjectId = false;
+
+	public ParseContext(XClass mappedClass, boolean skipFieldBridges) {
+		this.mappedClass = mappedClass;
+		this.skipFieldBridges = skipFieldBridges;
+	}
+
+	public XClass getMappedClass() {
+		return mappedClass;
+	}
+
+	public boolean skipFieldBridges() {
+		return skipFieldBridges;
+	}
 
 	boolean hasBeenProcessed(XClass processedClass) {
 		return processedClasses.contains( processedClass );

@@ -13,7 +13,6 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -28,6 +27,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class DefaultIndexManagerFactory implements IndexManagerFactory, Startable {
 
@@ -37,38 +37,51 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 	private ServiceManager serviceManager;
 
 	@Override
-	public IndexManager createDefaultIndexManager() {
-		return new DirectoryBasedIndexManager();
+	public void start(Properties properties, BuildContext context) {
+		this.serviceManager = context.getServiceManager();
 	}
 
 	@Override
-	public IndexManager createIndexManagerByName(String indexManagerImplementationName) {
+	public Class<? extends IndexManager> determineIndexManagerType(String indexManagerImplementationName) {
+		Class<? extends IndexManager> indexManagerType;
 		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
-			return createDefaultIndexManager();
+			indexManagerType = getDefaultIndexManagerType();
 		}
 		else {
 			indexManagerImplementationName = indexManagerImplementationName.trim();
-			IndexManager indexManager = fromAlias( indexManagerImplementationName );
-			if ( indexManager == null ) {
+			indexManagerType = fromAlias( indexManagerImplementationName );
+			if ( indexManagerType == null ) {
 				indexManagerImplementationName = aliasToFQN( indexManagerImplementationName );
-				Class<?> indexManagerClass = ClassLoaderHelper.classForName(
+				indexManagerType = ClassLoaderHelper.classForName(
+						IndexManager.class,
 						indexManagerImplementationName,
+						"index manager",
 						serviceManager
 				);
-				indexManager = ClassLoaderHelper.instanceFromClass(
-						IndexManager.class,
-						indexManagerClass,
-						"index manager"
-				);
 			}
-			log.indexManagerAliasResolved( indexManagerImplementationName, indexManager.getClass() );
-			return indexManager;
+			log.indexManagerAliasResolved( indexManagerImplementationName, indexManagerType );
 		}
+		return indexManagerType;
 	}
 
 	@Override
-	public void start(Properties properties, BuildContext context) {
-		this.serviceManager = context.getServiceManager();
+	public IndexManager createIndexManager(Class<? extends IndexManager> indexManagerType) {
+		IndexManager indexManager = ClassLoaderHelper.instanceFromClass(
+				IndexManager.class,
+				indexManagerType,
+				"index manager"
+		);
+
+		return indexManager;
+	}
+
+	/**
+	 * Returns the default {@code IndexManager} implementation to use.
+	 *
+	 * @return the default {@code IndexManager} type
+	 */
+	protected Class<? extends IndexManager> getDefaultIndexManagerType() {
+		return DirectoryBasedIndexManager.class;
 	}
 
 	/**
@@ -91,25 +104,20 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 	 *
 	 * @param alias the requested alias
 	 *
-	 * @return return the index manager for the given alias or {@code null} if the alias is unknown.
+	 * @return return the index manager type for the given alias or {@code null} if the alias is unknown.
 	 */
-	protected IndexManager fromAlias(String alias) {
+	protected Class<? extends IndexManager> fromAlias(String alias) {
 		if ( "directory-based".equals( alias ) ) {
-			return new DirectoryBasedIndexManager();
+			return DirectoryBasedIndexManager.class;
 		}
 		if ( "near-real-time".equals( alias ) ) {
-			return new NRTIndexManager();
+			return NRTIndexManager.class;
 		}
 		// TODO HSEARCH-2115 Remove once generic alias resolver contribution scheme is implemented
 		else if ( "elasticsearch".equals( alias ) ) {
 			try ( ServiceReference<ClassLoaderService> classLoaderService = serviceManager.requestReference( ClassLoaderService.class ) ) {
-				Class<?> imType = classLoaderService.get().classForName( ES_INDEX_MANAGER );
-				try {
-					return (IndexManager) imType.newInstance();
-				}
-				catch (InstantiationException | IllegalAccessException e) {
-					throw new SearchException( "Could not instantiate Elasticsearch index manager", e );
-				}
+				Class<?> indexManagerType = classLoaderService.get().classForName( ES_INDEX_MANAGER );
+				return (Class<? extends IndexManager>) indexManagerType;
 			}
 		}
 		return null;

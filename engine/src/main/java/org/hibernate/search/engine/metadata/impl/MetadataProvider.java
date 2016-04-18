@@ -20,5 +20,21 @@ public interface MetadataProvider {
 	 */
 	TypeMetadata getTypeMetadataFor(Class<?> clazz);
 
+	/**
+	 * Returns the ContainedIn related metadata for the specified type.
+	 *
+	 * The metadata for ContainedIn are not comprehensive: they do not
+	 * contain the information about the FieldBridges. It's of no use
+	 * for ContainedIn resolution and we can't build these information
+	 * because classes only marked with {@code ContainedIn} are not tied
+	 * to an {@code IndexManager}.
+	 *
+	 * @param clazz The type of interest.
+	 *
+	 * @return the {@code ContainedInTypeMetadata} for the specified type
+	 */
+	TypeMetadata getTypeMetadataForContainedIn(Class<?> clazz);
+
 	boolean containsSearchMetadata(Class<?> clazz);
+
 }

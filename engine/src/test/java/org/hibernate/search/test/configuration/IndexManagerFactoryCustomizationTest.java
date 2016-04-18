@@ -137,8 +137,8 @@ public class IndexManagerFactoryCustomizationTest {
 
 	public static class NRTIndexManagerFactory extends DefaultIndexManagerFactory {
 		@Override
-		public IndexManager createDefaultIndexManager() {
-			return new NRTIndexManager();
+		public Class<? extends IndexManager> getDefaultIndexManagerType() {
+			return NRTIndexManager.class;
 		}
 	}
 
