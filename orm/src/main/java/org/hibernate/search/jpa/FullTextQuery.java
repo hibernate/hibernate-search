@@ -7,6 +7,8 @@
 package org.hibernate.search.jpa;
 
 import java.util.concurrent.TimeUnit;
+
+import javax.persistence.FlushModeType;
 import javax.persistence.Query;
 
 import org.apache.lucene.search.Explanation;
@@ -29,7 +31,6 @@ import org.hibernate.transform.ResultTransformer;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-//TODO return FullTextQuery rather than Query in useful chain methods
 public interface FullTextQuery extends Query, ProjectionConstants {
 
 	/**
@@ -195,4 +196,17 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod);
+
+	@Override
+	FullTextQuery setMaxResults(int maxResult);
+
+	@Override
+	FullTextQuery setFirstResult(int var1);
+
+	@Override
+	FullTextQuery setHint(String hintName, Object value);
+
+	@Override
+	FullTextQuery setFlushMode(FlushModeType flushMode);
+
 }
