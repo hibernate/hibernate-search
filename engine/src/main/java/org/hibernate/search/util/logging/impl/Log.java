@@ -932,7 +932,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 304, value = "Closing index writer for IndexManager '%1$s'")
 	void closingIndexWriter(String indexName);
 
-	@Message(id = 305, value = "Analyzer reference with name '%2$s' not initialized for field '%1$s' ")
+	@Message(id = 305, value = "Analyzer reference with name '%2$s' not initialized for field '%1$s'")
 	SearchException analyzerReferenceNotInitialized(String fieldName, String name);
 
 	@Message(id = 306, value = "Index manager type is required to build a field bridge for %2$s in %1$s")
