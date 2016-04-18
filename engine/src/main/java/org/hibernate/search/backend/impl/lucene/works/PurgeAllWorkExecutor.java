@@ -51,9 +51,10 @@ class PurgeAllWorkExecutor implements LuceneWorkExecutor {
 			else {
 				log.tracef( "purgeAll Lucene index using IndexWriter for type $1%s and tenant $2%s", entityType, tenantId );
 				Term tenantIdTerm = tenantId == null ? null : new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
-				BooleanQuery deleteDocumentsQuery = new BooleanQuery();
-				deleteDocumentsQuery.add( new TermQuery( entityTypeTerm ), Occur.FILTER );
-				deleteDocumentsQuery.add( new TermQuery( tenantIdTerm ), Occur.FILTER );
+				BooleanQuery deleteDocumentsQuery = new BooleanQuery.Builder()
+						.add( new TermQuery( entityTypeTerm ), Occur.FILTER )
+						.add( new TermQuery( tenantIdTerm ), Occur.FILTER )
+						.build();
 				delegate.deleteDocuments( deleteDocumentsQuery );
 			}
 		}

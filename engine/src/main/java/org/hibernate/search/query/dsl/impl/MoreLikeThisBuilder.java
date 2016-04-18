@@ -188,18 +188,11 @@ public class MoreLikeThisBuilder<T> {
 		// but at this stage we could have documents reordered and thus with a different id
 		// Maybe a Filter would be more efficient?
 		if ( excludeEntityCompared && documentNumber != null ) {
-			BooleanQuery booleanQuery;
-			if ( ! ( query instanceof BooleanQuery ) ) {
-				booleanQuery = new BooleanQuery();
-				booleanQuery.add( query, BooleanClause.Occur.MUST );
-			}
-			else {
-				booleanQuery = (BooleanQuery) query;
-			}
-			booleanQuery.add(
-					new ConstantScoreQuery( findById ),
-					BooleanClause.Occur.MUST_NOT );
-			return booleanQuery;
+			return new BooleanQuery.Builder()
+					.add( query, BooleanClause.Occur.MUST )
+					.add( new ConstantScoreQuery( findById ),
+							BooleanClause.Occur.MUST_NOT )
+					.build();
 		}
 		else {
 			return query;
@@ -220,18 +213,18 @@ public class MoreLikeThisBuilder<T> {
 			return createQuery( q.get( 0 ), fieldsContext.getFirst() );
 		}
 		else {
-			BooleanQuery query = new BooleanQuery();
+			BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
 			//the fieldsContext indexes are aligned with the priority queue's
 			Iterator<FieldContext> fieldsContextIterator = fieldsContext.iterator();
 			for ( PriorityQueue<Object[]> queue : q ) {
 				try {
-					query.add( createQuery( queue, fieldsContextIterator.next() ), BooleanClause.Occur.SHOULD );
+					queryBuilder.add( createQuery( queue, fieldsContextIterator.next() ), BooleanClause.Occur.SHOULD );
 				}
 				catch (BooleanQuery.TooManyClauses ignore) {
 					break;
 				}
 			}
-			return query;
+			return queryBuilder.build();
 		}
 	}
 

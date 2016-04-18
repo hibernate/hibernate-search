@@ -53,10 +53,11 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ) ) ).createQuery();
 		}
 		else {
-			BooleanQuery aggregatedFieldsQuery = new BooleanQuery( );
+			BooleanQuery.Builder aggregatedFieldsQueryBuilder = new BooleanQuery.Builder();
 			for ( FieldContext fieldContext : fieldContexts ) {
-				aggregatedFieldsQuery.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
+				aggregatedFieldsQueryBuilder.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
 			}
+			BooleanQuery aggregatedFieldsQuery = aggregatedFieldsQueryBuilder.build();
 			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
 		}
 	}
@@ -127,7 +128,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		 */
 		final int size = termsPerPosition.size();
 		if ( size == 0 ) {
-			perFieldQuery = new BooleanQuery( );
+			perFieldQuery = new BooleanQuery.Builder().build();
 		}
 		else if ( size <= 1 ) {
 			final List<Term> terms = termsPerPosition.values().iterator().next();
@@ -135,11 +136,11 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 				perFieldQuery = new TermQuery( terms.get( 0 ) );
 			}
 			else {
-				BooleanQuery query = new BooleanQuery( );
+				BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 				for ( Term term : terms ) {
-					query.add( new TermQuery(term), BooleanClause.Occur.SHOULD );
+					booleanQueryBuilder.add( new TermQuery(term), BooleanClause.Occur.SHOULD );
 				}
-				perFieldQuery = query;
+				perFieldQuery = booleanQueryBuilder.build();
 			}
 		}
 		else {

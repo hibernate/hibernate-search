@@ -172,16 +172,18 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 					boundingBox.getUpperRight().getLongitude(), true, true );
 		}
 		else {
-			longQuery = new BooleanQuery();
-			( (BooleanQuery) longQuery).add( NumericRangeQuery.newDoubleRange( longitudeFieldName, boundingBox.getLowerLeft().getLongitude(),
-					180.0, true, true ), BooleanClause.Occur.SHOULD );
-			( (BooleanQuery) longQuery).add( NumericRangeQuery.newDoubleRange( longitudeFieldName, -180.0,
-					boundingBox.getUpperRight().getLongitude(), true, true ), BooleanClause.Occur.SHOULD );
+			longQuery = new BooleanQuery.Builder()
+					.add( NumericRangeQuery.newDoubleRange( longitudeFieldName, boundingBox.getLowerLeft().getLongitude(),
+						180.0, true, true ), BooleanClause.Occur.SHOULD )
+					.add( NumericRangeQuery.newDoubleRange( longitudeFieldName, -180.0,
+						boundingBox.getUpperRight().getLongitude(), true, true ), BooleanClause.Occur.SHOULD )
+					.build();
 		}
 
-		BooleanQuery boxQuery = new BooleanQuery();
-		boxQuery.add( latQuery, BooleanClause.Occur.FILTER );
-		boxQuery.add( longQuery, BooleanClause.Occur.FILTER );
+		BooleanQuery boxQuery = new BooleanQuery.Builder()
+				.add( latQuery, BooleanClause.Occur.FILTER )
+				.add( longQuery, BooleanClause.Occur.FILTER )
+				.build();
 
 		return new FilteredQuery(
 				new MatchAllDocsQuery(),

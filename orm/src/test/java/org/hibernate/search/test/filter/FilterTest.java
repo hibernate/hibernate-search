@@ -387,10 +387,10 @@ public class FilterTest extends SearchTestBase {
 	}
 
 	private BooleanQuery createQuery() {
-		BooleanQuery query = new BooleanQuery();
-		query.add( new TermQuery( new Term( "teacher", "andre" ) ), BooleanClause.Occur.SHOULD );
-		query.add( new TermQuery( new Term( "teacher", "max" ) ), BooleanClause.Occur.SHOULD );
-		query.add( new TermQuery( new Term( "teacher", "aaron" ) ), BooleanClause.Occur.SHOULD );
-		return query;
+		return new BooleanQuery.Builder()
+				.add( new TermQuery( new Term( "teacher", "andre" ) ), BooleanClause.Occur.SHOULD )
+				.add( new TermQuery( new Term( "teacher", "max" ) ), BooleanClause.Occur.SHOULD )
+				.add( new TermQuery( new Term( "teacher", "aaron" ) ), BooleanClause.Occur.SHOULD )
+				.build();
 	}
 }

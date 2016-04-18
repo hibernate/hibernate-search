@@ -83,22 +83,25 @@ public class BridgeTest extends SearchTestBase {
 		Query query;
 		List result;
 
-		BooleanQuery booleanQuery = new BooleanQuery();
-		booleanQuery.add( NumericRangeQuery.newDoubleRange( "double2", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST );
-		booleanQuery.add( NumericRangeQuery.newFloatRange( "float2", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST );
-		booleanQuery.add( NumericRangeQuery.newIntRange( "integerv2", 2, 3, true, true ), BooleanClause.Occur.MUST );
-		booleanQuery.add( NumericRangeQuery.newLongRange( "long2", 2l, 3l, true, true ), BooleanClause.Occur.MUST );
-		booleanQuery.add( new TermQuery(new Term("type", "dog")), BooleanClause.Occur.MUST );
-		booleanQuery.add( new TermQuery(new Term("storm", "false")), BooleanClause.Occur.MUST );
+		BooleanQuery booleanQuery = new BooleanQuery.Builder()
+				.add( NumericRangeQuery.newDoubleRange( "double2", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
+				.add( NumericRangeQuery.newFloatRange( "float2", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
+				.add( NumericRangeQuery.newIntRange( "integerv2", 2, 3, true, true ), BooleanClause.Occur.MUST )
+				.add( NumericRangeQuery.newLongRange( "long2", 2l, 3l, true, true ), BooleanClause.Occur.MUST )
+				.add( new TermQuery(new Term("type", "dog")), BooleanClause.Occur.MUST )
+				.add( new TermQuery(new Term("storm", "false")), BooleanClause.Occur.MUST )
+				.build();
 
 		result = session.createFullTextQuery( booleanQuery ).list();
 		assertEquals( "find primitives and do not fail on null", 1, result.size() );
 
-		booleanQuery = new BooleanQuery();
-		booleanQuery.add( NumericRangeQuery.newDoubleRange( "double1", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST );
-		booleanQuery.add( NumericRangeQuery.newFloatRange( "float1", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST );
-		booleanQuery.add( NumericRangeQuery.newIntRange( "integerv1", 2, 3, true, true ), BooleanClause.Occur.MUST );
-		booleanQuery.add( NumericRangeQuery.newLongRange( "long1", 2l, 3l, true, true ), BooleanClause.Occur.MUST );
+		booleanQuery = new BooleanQuery.Builder()
+				.add( NumericRangeQuery.newDoubleRange( "double1", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
+				.add( NumericRangeQuery.newFloatRange( "float1", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
+				.add( NumericRangeQuery.newIntRange( "integerv1", 2, 3, true, true ), BooleanClause.Occur.MUST )
+				.add( NumericRangeQuery.newLongRange( "long1", 2l, 3l, true, true ), BooleanClause.Occur.MUST )
+				.build();
+
 		result = session.createFullTextQuery( booleanQuery ).list();
 		assertEquals( "null elements should not be stored", 0, result.size() ); //the query is dumb because restrictive
 
@@ -115,15 +118,17 @@ public class BridgeTest extends SearchTestBase {
 				( (Class) ( (Object[]) result.get( 0 ) )[0] ).getName()
 		);
 
-		BooleanQuery bQuery = new BooleanQuery();
-		bQuery.add( new TermQuery( new Term( "uri", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST );
-		bQuery.add( new TermQuery( new Term( "url", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST );
+		BooleanQuery bQuery = new BooleanQuery.Builder()
+				.add( new TermQuery( new Term( "uri", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST )
+				.add( new TermQuery( new Term( "url", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST )
+				.build();
 
 		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
 		assertEquals( "Clazz projection works", 1, result.size() );
 
-		bQuery = new BooleanQuery();
-		bQuery.add( new TermQuery( new Term( "uuid", "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) ), BooleanClause.Occur.MUST );
+		bQuery = new BooleanQuery.Builder()
+				.add( new TermQuery( new Term( "uuid", "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) ), BooleanClause.Occur.MUST )
+				.build();
 
 		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
 		assertEquals( "Clazz projection works", 1, result.size() );
@@ -200,56 +205,57 @@ public class BridgeTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
 
-		BooleanQuery booleanQuery = new BooleanQuery();
+		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 
 		Date myDate = DateTools.round( date, DateTools.Resolution.MILLISECOND );
 		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange(
 				"myDate", myDate.getTime(), myDate.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateDay = DateTools.round( date, DateTools.Resolution.DAY );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"dateDay", dateDay.getTime(), dateDay.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMonth = DateTools.round( date, DateTools.Resolution.MONTH );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"dateMonth", dateMonth.getTime(), dateMonth.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateYear = DateTools.round( date, DateTools.Resolution.YEAR );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"dateYear", dateYear.getTime(), dateYear.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateHour = DateTools.round( date, DateTools.Resolution.HOUR );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"dateHour", dateHour.getTime(), dateHour.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMinute = DateTools.round( date, DateTools.Resolution.MINUTE );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"dateMinute", dateMinute.getTime(), dateMinute.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateSecond = DateTools.round( date, DateTools.Resolution.SECOND );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"dateSecond", dateSecond.getTime(), dateSecond.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMillisecond = DateTools.round( date, DateTools.Resolution.MILLISECOND );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"dateMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
+		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 		List result = session.createFullTextQuery( booleanQuery ).list();
 		assertEquals( "Date not found or not property truncated", 1, result.size() );
 
@@ -284,55 +290,56 @@ public class BridgeTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 
 		Date date = calendar.getTime();
-		BooleanQuery booleanQuery = new BooleanQuery();
+		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 		Date myDate = DateTools.round( date, DateTools.Resolution.MILLISECOND );
 		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange(
 				"myCalendar", myDate.getTime(), myDate.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateDay = DateTools.round( date, DateTools.Resolution.DAY );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"calendarDay", dateDay.getTime(), dateDay.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMonth = DateTools.round( date, DateTools.Resolution.MONTH );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"calendarMonth", dateMonth.getTime(), dateMonth.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateYear = DateTools.round( date, DateTools.Resolution.YEAR );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"calendarYear", dateYear.getTime(), dateYear.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateHour = DateTools.round( date, DateTools.Resolution.HOUR );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"calendarHour", dateHour.getTime(), dateHour.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMinute = DateTools.round( date, DateTools.Resolution.MINUTE );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"calendarMinute", dateMinute.getTime(), dateMinute.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateSecond = DateTools.round( date, DateTools.Resolution.SECOND );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"calendarSecond", dateSecond.getTime(), dateSecond.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMillisecond = DateTools.round( date, DateTools.Resolution.MILLISECOND );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
 				"calendarMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime(), true, true
 		);
-		booleanQuery.add( numericRangeQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
+		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 		List result = session.createFullTextQuery( booleanQuery ).list();
 		assertEquals( "Calendar not found or not property truncated", 1, result.size() );
 
