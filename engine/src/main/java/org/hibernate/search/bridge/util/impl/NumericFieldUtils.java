@@ -114,6 +114,11 @@ public final class NumericFieldUtils {
 	/**
 	 * When the type of {@code RangeQuery} needs to be guessed among keyword based ranges or numeric based
 	 * range queries, the parameter type defines the strategy.
+	 *
+	 * Note that this is currently only used by the Infinispan backend as a fallback and it should be used with a lot
+	 * of caution as it does not take into account backend specific behaviors. For instance, for the
+	 * Elasticsearch backend, Dates require a keyword range query.
+	 *
 	 * This should match the default {@code FieldBridge} used for each type.
 	 * @param value on Object
 	 * @return true if the value argument is of any type which is by default indexed as a NumericField
