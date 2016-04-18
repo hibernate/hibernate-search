@@ -38,11 +38,11 @@ public class ConnectedAllContext implements AllContext {
 			query = clauses.get( 0 ).getQuery();
 		}
 		else {
-			BooleanQuery.Builder builder = new BooleanQuery.Builder();
+			BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 			for ( BooleanClause clause : clauses ) {
-				builder.add( clause );
+				booleanQueryBuilder.add( clause );
 			}
-			query = builder.build();
+			query = booleanQueryBuilder.build();
 		}
 		return queryCustomizer.setWrappedQuery( query ).createQuery();
 	}

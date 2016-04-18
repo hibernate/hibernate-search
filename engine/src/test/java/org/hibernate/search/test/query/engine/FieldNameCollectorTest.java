@@ -134,18 +134,18 @@ public class FieldNameCollectorTest {
 
 	@Test
 	public void testNestedBooleanQuery() {
-		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 
 		TermQuery termQuery = new TermQuery( new Term( "stringField", "foobar" ) );
-		builder.add( termQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( termQuery, BooleanClause.Occur.MUST );
 
 		BooleanQuery.Builder nestedBuilder = new BooleanQuery.Builder();
 		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newIntRange( "intField", 0, 0, true, true );
 		nestedBuilder.add( numericRangeQuery, BooleanClause.Occur.SHOULD );
 		BooleanQuery nestedBooleanQuery = nestedBuilder.build();
-		builder.add( nestedBooleanQuery, BooleanClause.Occur.MUST );
+		booleanQueryBuilder.add( nestedBooleanQuery, BooleanClause.Occur.MUST );
 
-		BooleanQuery booleanQuery = builder.build();
+		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 
 		assertFieldNames( booleanQuery, FieldType.NUMBER, "intField" );
 		assertFieldNames( booleanQuery, FieldType.STRING, "stringField" );

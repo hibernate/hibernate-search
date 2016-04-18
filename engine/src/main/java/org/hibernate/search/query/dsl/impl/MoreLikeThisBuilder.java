@@ -213,18 +213,18 @@ public class MoreLikeThisBuilder<T> {
 			return createQuery( q.get( 0 ), fieldsContext.getFirst() );
 		}
 		else {
-			BooleanQuery.Builder builder = new BooleanQuery.Builder();
+			BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
 			//the fieldsContext indexes are aligned with the priority queue's
 			Iterator<FieldContext> fieldsContextIterator = fieldsContext.iterator();
 			for ( PriorityQueue<Object[]> queue : q ) {
 				try {
-					builder.add( createQuery( queue, fieldsContextIterator.next() ), BooleanClause.Occur.SHOULD );
+					queryBuilder.add( createQuery( queue, fieldsContextIterator.next() ), BooleanClause.Occur.SHOULD );
 				}
 				catch (BooleanQuery.TooManyClauses ignore) {
 					break;
 				}
 			}
-			return builder.build();
+			return queryBuilder.build();
 		}
 	}
 

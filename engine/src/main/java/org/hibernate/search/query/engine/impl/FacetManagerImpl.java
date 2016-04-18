@@ -135,14 +135,14 @@ public class FacetManagerImpl implements FacetManager {
 
 	public Filter getFacetFilter() {
 		if ( facetFilter == null ) {
-			BooleanQuery.Builder builder = new BooleanQuery.Builder();
+			BooleanQuery.Builder boolQueryBuilder = new BooleanQuery.Builder();
 			for ( FacetSelectionImpl selection : facetSelection.values() ) {
 				if ( !selection.getFacetList().isEmpty() ) {
 					Query selectionGroupQuery = createSelectionGroupQuery( selection );
-					builder.add( selectionGroupQuery, BooleanClause.Occur.MUST );
+					boolQueryBuilder.add( selectionGroupQuery, BooleanClause.Occur.MUST );
 				}
 			}
-			BooleanQuery boolQuery = builder.build();
+			BooleanQuery boolQuery = boolQueryBuilder.build();
 			if ( boolQuery.getClauses().length > 0 ) {
 				this.facetFilter = new QueryWrapperFilter( boolQuery );
 			}

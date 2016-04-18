@@ -53,12 +53,11 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ) ) ).createQuery();
 		}
 		else {
-			// aggregated fields query builder
-			BooleanQuery.Builder builder = new BooleanQuery.Builder();
+			BooleanQuery.Builder aggregatedFieldsQueryBuilder = new BooleanQuery.Builder();
 			for ( FieldContext fieldContext : fieldContexts ) {
-				builder.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
+				aggregatedFieldsQueryBuilder.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
 			}
-			BooleanQuery aggregatedFieldsQuery = builder.build();
+			BooleanQuery aggregatedFieldsQuery = aggregatedFieldsQueryBuilder.build();
 			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
 		}
 	}
