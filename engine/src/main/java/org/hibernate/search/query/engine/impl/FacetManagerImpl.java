@@ -135,13 +135,14 @@ public class FacetManagerImpl implements FacetManager {
 
 	public Filter getFacetFilter() {
 		if ( facetFilter == null ) {
-			BooleanQuery boolQuery = new BooleanQuery();
+			BooleanQuery.Builder builder = new BooleanQuery.Builder();
 			for ( FacetSelectionImpl selection : facetSelection.values() ) {
 				if ( !selection.getFacetList().isEmpty() ) {
 					Query selectionGroupQuery = createSelectionGroupQuery( selection );
-					boolQuery.add( selectionGroupQuery, BooleanClause.Occur.MUST );
+					builder.add( selectionGroupQuery, BooleanClause.Occur.MUST );
 				}
 			}
+			BooleanQuery boolQuery = builder.build();
 			if ( boolQuery.getClauses().length > 0 ) {
 				this.facetFilter = new QueryWrapperFilter( boolQuery );
 			}
@@ -150,10 +151,11 @@ public class FacetManagerImpl implements FacetManager {
 	}
 
 	private Query createSelectionGroupQuery(FacetSelectionImpl selection) {
-		BooleanQuery boolQuery = new BooleanQuery();
+		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		for ( Facet facet : selection.getFacetList() ) {
-			boolQuery.add( facet.getFacetQuery(), selection.getOccurType() );
+			builder.add( facet.getFacetQuery(), selection.getOccurType() );
 		}
+		BooleanQuery boolQuery = builder.build();
 		return boolQuery;
 	}
 

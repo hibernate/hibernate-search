@@ -210,11 +210,11 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		IndexReader indexReader = extendedIntegrator.getIndexReaderAccessor().open( clazz );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
-			BooleanQuery boolQuery = new BooleanQuery();
-			boolQuery.add( new MatchAllDocsQuery(), BooleanClause.Occur.FILTER );
-			boolQuery.add(
-					new TermQuery( new Term( ProjectionConstants.OBJECT_CLASS, entity ) ), BooleanClause.Occur.FILTER
-			);
+			BooleanQuery boolQuery = new BooleanQuery.Builder()
+					.add( new MatchAllDocsQuery(), BooleanClause.Occur.FILTER )
+					.add( new TermQuery( new Term( ProjectionConstants.OBJECT_CLASS, entity ) ),
+							BooleanClause.Occur.FILTER)
+					.build();
 			try {
 				TopDocs topdocs = searcher.search( boolQuery, 1 );
 				return topdocs.totalHits;

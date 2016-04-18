@@ -91,12 +91,15 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 				TokenStream tokenStream = analyzerForEntity.tokenStream( this.getFieldName(), (String) this.getValue() );
 				tokenStream.reset();
 				try {
-					BooleanQuery booleanQuery = new BooleanQuery();
+					BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 					while ( tokenStream.incrementToken() ) {
 						String value = tokenStream.getAttribute( CharTermAttribute.class ).toString();
-						booleanQuery.add( new TermQuery( new Term( this.getFieldName(), value ) ), Occur.FILTER );
+						booleanQueryBuilder.add(
+								new TermQuery( new Term( this.getFieldName(), value ) ),
+								Occur.FILTER
+						);
 					}
-					return booleanQuery;
+					return booleanQueryBuilder.build(); // BooleanQuery
 				}
 				finally {
 					tokenStream.close();

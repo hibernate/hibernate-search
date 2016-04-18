@@ -55,7 +55,7 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 			log.tracef( "Removing all %s matching Query: %s", entityType.toString(), query.toString() );
 		}
 
-		BooleanQuery entityDeletionQuery = new BooleanQuery();
+		BooleanQuery.Builder entityDeletionBuilder = new BooleanQuery.Builder();
 
 		{
 			ScopedAnalyzerReference analyzer = this.workspace.getDocumentBuilder( entityType ).getAnalyzer();
@@ -63,16 +63,17 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 
 			Query queryToDelete = query.toLuceneQuery( scopeAnalyzer );
 
-			entityDeletionQuery.add( queryToDelete, BooleanClause.Occur.FILTER );
+			entityDeletionBuilder.add( queryToDelete, BooleanClause.Occur.FILTER );
 		}
 
 		Term classNameQueryTerm = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
-		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.FILTER );
+		entityDeletionBuilder.add( classNameQuery, BooleanClause.Occur.FILTER );
 
-		addTenantQueryTerm( work.getTenantId(), entityDeletionQuery );
+		addTenantQueryTerm( work.getTenantId(), entityDeletionBuilder );
 
 		try {
+			BooleanQuery entityDeletionQuery = entityDeletionBuilder.build();
 			delegate.deleteDocuments( entityDeletionQuery );
 		}
 		catch (IOException e) {
@@ -82,10 +83,11 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 		this.workspace.notifyWorkApplied( work );
 	}
 
-	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {
+	private void addTenantQueryTerm(final String tenantId, BooleanQuery.Builder queryBuilder) {
+
 		if ( tenantId != null ) {
 			Term tenantTerm = new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
-			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.FILTER );
+			queryBuilder.add( new TermQuery( tenantTerm ), BooleanClause.Occur.FILTER );
 		}
 	}
 }

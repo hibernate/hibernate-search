@@ -52,7 +52,7 @@ class DeleteWorkExecutor implements LuceneWorkExecutor {
 		log.tracef( "Removing %s#%s by query.", entityType, id );
 		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( entityType );
 
-		BooleanQuery entityDeletionQuery = new BooleanQuery();
+		BooleanQuery.Builder entityDeletionQueryBuilder = new BooleanQuery.Builder();
 
 		Query idQueryTerm;
 		if ( isIdNumeric( builder ) ) {
@@ -62,15 +62,16 @@ class DeleteWorkExecutor implements LuceneWorkExecutor {
 			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 			idQueryTerm = new TermQuery( idTerm );
 		}
-		entityDeletionQuery.add( idQueryTerm, BooleanClause.Occur.FILTER );
+		entityDeletionQueryBuilder.add( idQueryTerm, BooleanClause.Occur.FILTER );
 
 		Term classNameQueryTerm = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
-		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.FILTER );
+		entityDeletionQueryBuilder.add( classNameQuery, BooleanClause.Occur.FILTER );
 
-		addTenantQueryTerm( work.getTenantId(), entityDeletionQuery );
+		addTenantQueryTerm( work.getTenantId(), entityDeletionQueryBuilder );
 
 		try {
+			BooleanQuery entityDeletionQuery = entityDeletionQueryBuilder.build();
 			delegate.deleteDocuments( entityDeletionQuery );
 		}
 		catch (Exception e) {
@@ -80,10 +81,10 @@ class DeleteWorkExecutor implements LuceneWorkExecutor {
 		workspace.notifyWorkApplied( work );
 	}
 
-	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {
+	private void addTenantQueryTerm(final String tenantId, BooleanQuery.Builder queryBuilder) {
 		if ( tenantId != null ) {
 			Term tenantTerm = new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
-			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.FILTER );
+			queryBuilder.add( new TermQuery( tenantTerm ), BooleanClause.Occur.FILTER );
 		}
 	}
 

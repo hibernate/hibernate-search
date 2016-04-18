@@ -350,19 +350,19 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		tx = s.beginTransaction();
 
 		long searchTimeStamp = DateTools.round( date.getTime(), DateTools.Resolution.DAY );
-		BooleanQuery booleanQuery = new BooleanQuery();
-		booleanQuery.add(
+		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
+		booleanQueryBuilder.add(
 				NumericRangeQuery.newLongRange(
 						"date-created", searchTimeStamp, searchTimeStamp, true, true
 				), BooleanClause.Occur.SHOULD
 		);
-		booleanQuery.add(
+		booleanQueryBuilder.add(
 				NumericRangeQuery.newLongRange(
 						"blog-entry-created", searchTimeStamp, searchTimeStamp, true, true
 				), BooleanClause.Occur.SHOULD
 		);
 
-		FullTextQuery query = s.createFullTextQuery( booleanQuery )
+		FullTextQuery query = s.createFullTextQuery( booleanQueryBuilder.build() )
 				.setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 3 results", 3, query.getResultSize() );
 
