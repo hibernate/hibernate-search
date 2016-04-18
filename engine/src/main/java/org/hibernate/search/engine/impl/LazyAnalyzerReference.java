@@ -56,4 +56,18 @@ public final class LazyAnalyzerReference implements AnalyzerReference {
 			throw new SearchException( "Analyzer not initialized" );
 		}
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( "<" );
+		sb.append( name );
+		if ( delegate != null ) {
+			sb.append( ", delegate: " );
+			sb.append( delegate );
+		}
+		sb.append( ">" );
+		return sb.toString();
+	}
 }
