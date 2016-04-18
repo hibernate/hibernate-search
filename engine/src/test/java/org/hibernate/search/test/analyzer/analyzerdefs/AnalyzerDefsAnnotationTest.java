@@ -56,8 +56,8 @@ public class AnalyzerDefsAnnotationTest {
 
 	@Test
 	public void shouldContainOnlyTheDefinedAnalyzers() throws Exception {
-		Map<String, AnalyzerReference> analyzers = ( (SearchFactoryState) sfHolder.getSearchFactory() ).getAnalyzers();
-		assertThat( analyzers.keySet() ).containsOnly( "package-analyzer-1", "package-analyzer-2", "class-analyzer-1", "class-analyzer-2" );
+		Map<String, AnalyzerReference> analyzerReferences = ( (SearchFactoryState) sfHolder.getSearchFactory() ).getAnalyzerReferences();
+		assertThat( analyzerReferences.keySet() ).containsOnly( "package-analyzer-1", "package-analyzer-2", "class-analyzer-1", "class-analyzer-2" );
 	}
 
 	@Test

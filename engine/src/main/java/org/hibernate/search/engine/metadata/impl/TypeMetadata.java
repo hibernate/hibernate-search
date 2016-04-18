@@ -108,9 +108,9 @@ public class TypeMetadata {
 	private final Set<ContainedInMetadata> containedInMetadata;
 
 	/**
-	 * The scoped analyzer for this entity
+	 * The scoped analyzer reference for this entity
 	 */
-	private final ScopedAnalyzerReference scopedAnalyzer;
+	private final ScopedAnalyzerReference scopedAnalyzerReference;
 
 	/**
 	 * Whether we can optimize the indexing work by inspecting the changed fields
@@ -149,7 +149,7 @@ public class TypeMetadata {
 	protected TypeMetadata(Builder builder) {
 		this.indexedType = builder.indexedType;
 		this.boost = builder.boost;
-		this.scopedAnalyzer = builder.scopedAnalyzerBuilder.build();
+		this.scopedAnalyzerReference = builder.scopedAnalyzerReferenceBuilder.build();
 		this.discriminator = builder.discriminator;
 		this.discriminatorGetter = builder.discriminatorGetter;
 		this.classBoostStrategy = builder.classBoostStrategy;
@@ -306,8 +306,8 @@ public class TypeMetadata {
 		return boost * classBoostStrategy.defineBoost( value );
 	}
 
-	public ScopedAnalyzerReference getDefaultAnalyzer() {
-		return scopedAnalyzer;
+	public ScopedAnalyzerReference getDefaultAnalyzerReference() {
+		return scopedAnalyzerReference;
 	}
 
 	@Override
@@ -325,7 +325,7 @@ public class TypeMetadata {
 		sb.append( ", containedInMetadata=" ).append( containedInMetadata );
 		sb.append( ", optimizationBlackList=" ).append( optimizationBlackList );
 		sb.append( ", stateInspectionOptimizationsEnabled=" ).append( stateInspectionOptimizationsEnabled );
-		sb.append( ", scopedAnalyzer=" ).append( scopedAnalyzer );
+		sb.append( ", scopedAnalyzerReference=" ).append( scopedAnalyzerReference );
 		sb.append( ", collectionRoles=" ).append( collectionRoles );
 		sb.append( '}' );
 		return sb.toString();
@@ -405,12 +405,12 @@ public class TypeMetadata {
 
 	public static class Builder {
 		private final Class<?> indexedType;
-		private final ScopedAnalyzerReference.Builder scopedAnalyzerBuilder;
-		private final AnalyzerReference passThroughAnalyzer;
+		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
+		private final AnalyzerReference passThroughAnalyzerReference;
 
 		private float boost;
 		private BoostStrategy classBoostStrategy;
-		private AnalyzerReference analyzer;
+		private AnalyzerReference analyzerReference;
 		private Discriminator discriminator;
 		private XMember discriminatorGetter;
 		private boolean stateInspectionOptimizationsEnabled = true;
@@ -426,13 +426,13 @@ public class TypeMetadata {
 		private final Set<BridgeDefinedField> classBridgeDefinedFields = new HashSet<>();
 
 		public Builder(Class<?> indexedType, ConfigContext configContext) {
-			this( indexedType, new ScopedAnalyzerReference.Builder( configContext.getDefaultAnalyzer() ) );
+			this( indexedType, new ScopedAnalyzerReference.Builder( configContext.getDefaultLuceneAnalyzerReference() ) );
 		}
 
-		public Builder(Class<?> indexedType, ScopedAnalyzerReference.Builder scopedAnalyzerBuilder) {
+		public Builder(Class<?> indexedType, ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder) {
 			this.indexedType = indexedType;
-			this.scopedAnalyzerBuilder = scopedAnalyzerBuilder;
-			this.passThroughAnalyzer = LuceneAnalyzerReference.PASS_THROUGH;
+			this.scopedAnalyzerReferenceBuilder = scopedAnalyzerReferenceBuilder;
+			this.passThroughAnalyzerReference = LuceneAnalyzerReference.PASS_THROUGH;
 		}
 
 		public Builder idProperty(PropertyMetadata propertyMetadata) {
@@ -450,9 +450,9 @@ public class TypeMetadata {
 			return this;
 		}
 
-		public Builder analyzer(AnalyzerReference analyzer) {
-			this.analyzer = analyzer;
-			this.scopedAnalyzerBuilder.setGlobalAnalyzer( analyzer );
+		public Builder analyzerReference(AnalyzerReference analyzerReference) {
+			this.analyzerReference = analyzerReference;
+			this.scopedAnalyzerReferenceBuilder.setGlobalAnalyzerReference( analyzerReference );
 			return this;
 		}
 
@@ -512,21 +512,21 @@ public class TypeMetadata {
 		}
 
 		@SuppressWarnings( "deprecation" )
-		public AnalyzerReference addToScopedAnalyzer(String fieldName, AnalyzerReference analyzer, Field.Index index) {
-			if ( analyzer == null ) {
-				analyzer = this.getAnalyzer();
+		public AnalyzerReference addToScopedAnalyzerReference(String fieldName, AnalyzerReference analyzerReference, Field.Index index) {
+			if ( analyzerReference == null ) {
+				analyzerReference = this.getAnalyzerReference();
 			}
 
 			if ( Field.Index.ANALYZED.equals( index ) || Field.Index.ANALYZED_NO_NORMS.equals( index ) ) {
-				if ( analyzer != null ) {
-					scopedAnalyzerBuilder.addAnalyzer( fieldName, analyzer );
+				if ( analyzerReference != null ) {
+					scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldName, analyzerReference );
 				}
 			}
 			else {
 				// no analyzer is used, add a fake one for queries
-				scopedAnalyzerBuilder.addAnalyzer( fieldName, passThroughAnalyzer );
+				scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldName, passThroughAnalyzerReference );
 			}
-			return analyzer;
+			return analyzerReference;
 		}
 
 		public void blacklistForOptimization(XClass blackListClass) {
@@ -541,12 +541,12 @@ public class TypeMetadata {
 			return classBoostStrategy;
 		}
 
-		public AnalyzerReference getAnalyzer() {
-			return analyzer;
+		public AnalyzerReference getAnalyzerReference() {
+			return analyzerReference;
 		}
 
-		public ScopedAnalyzerReference.Builder getScopedAnalyzerBuilder() {
-			return scopedAnalyzerBuilder;
+		public ScopedAnalyzerReference.Builder getScopedAnalyzerReferenceBuilder() {
+			return scopedAnalyzerReferenceBuilder;
 		}
 
 		public boolean isStateInspectionOptimizationsEnabled() {

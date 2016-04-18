@@ -45,13 +45,13 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 		final Class<?> entityType = work.getEntityClass();
 		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
-		ScopedAnalyzerReference analyzer = documentBuilder.getAnalyzer();
-		analyzer = updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
+		ScopedAnalyzerReference analyzerReference = documentBuilder.getAnalyzerReference();
+		analyzerReference = updateAnalyzerMappings( workspace, analyzerReference, fieldToAnalyzerMap );
 		if ( log.isTraceEnabled() ) {
 			log.trace( "add to Lucene index: " + entityType + "#" + work.getId() + ":" + work.getDocument() );
 		}
 		try {
-			delegate.addDocument( work.getDocument(), analyzer );
+			delegate.addDocument( work.getDocument(), analyzerReference );
 			workspace.notifyWorkApplied( work );
 		}
 		catch (IOException e) {
@@ -69,7 +69,7 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 	 * Allows to override the otherwise static field to analyzer mapping in <code>scopedAnalyzer</code>.
 	 *
 	 * @param workspace The current work context
-	 * @param scopedAnalyzer The scoped analyzer created at startup time.
+	 * @param scopedAnalyzerReference The scoped analyzer reference created at startup time.
 	 * @param fieldToAnalyzerMap A map of <code>Document</code> field names for analyzer names. This map gets creates
 	 * when the Lucene <code>Document</code> gets created and uses the state of the entity to index to determine analyzers
 	 * dynamically at index time.
@@ -77,20 +77,21 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 	 * @return <code>scopedAnalyzer</code> in case <code>fieldToAnalyzerMap</code> is <code>null</code> or empty. Otherwise
 	 *         a clone of <code>scopedAnalyzer</code> is created where the analyzers get overriden according to <code>fieldToAnalyzerMap</code>.
 	 */
-	static ScopedAnalyzerReference updateAnalyzerMappings(Workspace workspace, ScopedAnalyzerReference scopedAnalyzer, Map<String, String> fieldToAnalyzerMap) {
+	static ScopedAnalyzerReference updateAnalyzerMappings(Workspace workspace, ScopedAnalyzerReference scopedAnalyzerReference,
+			Map<String, String> fieldToAnalyzerMap) {
 		// for backwards compatibility
 		if ( fieldToAnalyzerMap == null || fieldToAnalyzerMap.isEmpty() ) {
-			return scopedAnalyzer;
+			return scopedAnalyzerReference;
 		}
 
-		ScopedAnalyzerReference.Builder copyBuilder = new ScopedAnalyzerReference.Builder( scopedAnalyzer );
+		ScopedAnalyzerReference.Builder copyBuilder = new ScopedAnalyzerReference.Builder( scopedAnalyzerReference );
 		for ( Map.Entry<String, String> entry : fieldToAnalyzerMap.entrySet() ) {
 			Analyzer analyzer = workspace.getAnalyzer( entry.getValue() );
 			if ( analyzer == null ) {
 				log.unableToRetrieveNamedAnalyzer( entry.getValue() );
 			}
 			else {
-				copyBuilder.addAnalyzer( entry.getKey(), new LuceneAnalyzerReference( analyzer ) );
+				copyBuilder.addAnalyzerReference( entry.getKey(), new LuceneAnalyzerReference( analyzer ) );
 			}
 		}
 		return copyBuilder.build();

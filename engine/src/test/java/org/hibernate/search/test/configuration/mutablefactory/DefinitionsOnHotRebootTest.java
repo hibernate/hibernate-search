@@ -63,12 +63,12 @@ public class DefinitionsOnHotRebootTest {
 	}
 
 	private boolean analyzerExists(SearchIntegrator sf, String analyzerName) {
-		AnalyzerReference analyzer = sf.unwrap( SearchFactoryState.class ).getAnalyzers().get( analyzerName );
-		return analyzer != null && analyzer.unwrap( LuceneAnalyzerReference.class ).getAnalyzer() != null;
+		AnalyzerReference analyzerReference = sf.unwrap( SearchFactoryState.class ).getAnalyzerReferences().get( analyzerName );
+		return analyzerReference != null && analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer() != null;
 	}
 
 	private int countAnalyzers(SearchIntegrator sf) {
-		return sf.unwrap( SearchFactoryState.class ).getAnalyzers().size();
+		return sf.unwrap( SearchFactoryState.class ).getAnalyzerReferences().size();
 	}
 
 	private boolean filterExists(SearchIntegrator sf, String filterName) {

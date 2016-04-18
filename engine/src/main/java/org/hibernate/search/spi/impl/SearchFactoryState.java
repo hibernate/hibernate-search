@@ -45,7 +45,7 @@ public interface SearchFactoryState {
 
 	FilterCachingStrategy getFilterCachingStrategy();
 
-	Map<String, AnalyzerReference> getAnalyzers();
+	Map<String, AnalyzerReference> getAnalyzerReferences();
 
 	int getCacheBitResultsSize();
 

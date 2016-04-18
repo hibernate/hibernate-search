@@ -47,7 +47,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private BackendQueueProcessor backendQueueProcessor;
 	private Map<String, FilterDef> filterDefinitions = new ConcurrentHashMap<>();
 	private FilterCachingStrategy filterCachingStrategy;
-	private Map<String, AnalyzerReference> analyzers = new ConcurrentHashMap<>();
+	private Map<String, AnalyzerReference> analyzerReferences = new ConcurrentHashMap<>();
 	private int cacheBitResultsSize;
 	private Properties configurationProperties;
 	private PolymorphicIndexHierarchy indexHierarchy;
@@ -73,7 +73,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		worker = oldFactoryState.getWorker();
 		filterDefinitions = oldFactoryState.getFilterDefinitions();
 		filterCachingStrategy = oldFactoryState.getFilterCachingStrategy();
-		analyzers = oldFactoryState.getAnalyzers();
+		analyzerReferences = oldFactoryState.getAnalyzerReferences();
 		cacheBitResultsSize = oldFactoryState.getCacheBitResultsSize();
 		configurationProperties = oldFactoryState.getConfigurationProperties();
 		indexHierarchy = oldFactoryState.getIndexHierarchy();
@@ -137,8 +137,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> getAnalyzers() {
-		return analyzers;
+	public Map<String, AnalyzerReference> getAnalyzerReferences() {
+		return analyzerReferences;
 	}
 
 	@Override
@@ -184,8 +184,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.filterCachingStrategy = filterCachingStrategy;
 	}
 
-	public void addAnalyzers(Map<String, AnalyzerReference> analyzers) {
-		this.analyzers.putAll( analyzers );
+	public void addAnalyzerReferences(Map<String, AnalyzerReference> analyzerReferences) {
+		this.analyzerReferences.putAll( analyzerReferences );
 	}
 
 	public void setCacheBitResultsSize(int cacheBitResultsSize) {

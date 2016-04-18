@@ -56,8 +56,8 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 	}
 
 	private Analyzer initAnalyzer(DocumentFieldMetadata documentFieldMetadata) {
-		if ( documentFieldMetadata.getAnalyzer() != null && documentFieldMetadata.getAnalyzer().is( LuceneAnalyzerReference.class ) ) {
-			return documentFieldMetadata.getAnalyzer().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+		if ( documentFieldMetadata.getAnalyzerReference() != null && documentFieldMetadata.getAnalyzerReference().is( LuceneAnalyzerReference.class ) ) {
+			return documentFieldMetadata.getAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 		}
 		return null;
 	}

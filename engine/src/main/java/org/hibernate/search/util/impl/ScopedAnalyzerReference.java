@@ -22,12 +22,16 @@ import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
  */
 public final class ScopedAnalyzerReference implements AnalyzerReference {
 
-	private final Map<String, AnalyzerReference> analyzers;
-	private final AnalyzerReference globalAnalyzer;
+	private final Map<String, AnalyzerReference> analyzerReferences;
+	private final AnalyzerReference globalAnalyzerReference;
 
-	private ScopedAnalyzerReference(AnalyzerReference globalAnalyzer, Map<String, AnalyzerReference> analyzers) {
-		this.globalAnalyzer = globalAnalyzer;
-		this.analyzers = Collections.unmodifiableMap( analyzers );
+	public ScopedAnalyzerReference(AnalyzerReference globalAnalyzerReference) {
+		this( globalAnalyzerReference, Collections.<String, AnalyzerReference>emptyMap() );
+	}
+
+	private ScopedAnalyzerReference(AnalyzerReference globalAnalyzerReference, Map<String, AnalyzerReference> analyzerReferences) {
+		this.globalAnalyzerReference = globalAnalyzerReference;
+		this.analyzerReferences = Collections.unmodifiableMap( analyzerReferences );
 	}
 
 	private static Analyzer luceneAnalyzer(AnalyzerReference scopedAnalyzer) {
@@ -43,14 +47,14 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 	 * match, by reference.
 	 */
 	public boolean isCompositeOfSameInstances(ScopedAnalyzerReference other) {
-		if ( this.globalAnalyzer != other.globalAnalyzer ) {
+		if ( this.globalAnalyzerReference != other.globalAnalyzerReference ) {
 			return false;
 		}
-		if ( this.analyzers.size() != other.analyzers.size() ) {
+		if ( this.analyzerReferences.size() != other.analyzerReferences.size() ) {
 			return false;
 		}
-		for ( String fieldname : analyzers.keySet() ) {
-			if ( this.analyzers.get( fieldname ) != other.analyzers.get( fieldname ) ) {
+		for ( String fieldname : analyzerReferences.keySet() ) {
+			if ( this.analyzerReferences.get( fieldname ) != other.analyzerReferences.get( fieldname ) ) {
 				return false;
 			}
 		}
@@ -67,7 +71,7 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
 		if ( LuceneAnalyzerReference.class.isAssignableFrom( analyzerType ) ) {
 			// There are places where we still have to pass a ScopedAnalyzer
-			return (T) new LuceneAnalyzerReference( createScopedAnalyzer( globalAnalyzer, analyzers ) );
+			return (T) new LuceneAnalyzerReference( createScopedAnalyzer( globalAnalyzerReference, analyzerReferences ) );
 		}
 		return (T) this;
 	}
@@ -83,6 +87,7 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 	}
 
 	private static ScopedAnalyzer createScopedAnalyzer(AnalyzerReference globalAnalyzer) {
+		// XXX GSM: weird
 		final Analyzer analyzer = globalAnalyzer.is( LuceneAnalyzerReference.class )
 				? luceneAnalyzer( globalAnalyzer )
 				: null;
@@ -103,31 +108,31 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 	 */
 	public static class Builder {
 
-		private final Map<String, AnalyzerReference> analyzers;
-		private AnalyzerReference globalAnalyzer;
+		private final Map<String, AnalyzerReference> analyzerReferences;
+		private AnalyzerReference globalAnalyzerReference;
 
 		public Builder(ScopedAnalyzerReference original) {
-			this.analyzers = new HashMap<>( original.analyzers );
-			this.globalAnalyzer = original.globalAnalyzer;
+			this.analyzerReferences = new HashMap<>( original.analyzerReferences );
+			this.globalAnalyzerReference = original.globalAnalyzerReference;
 		}
 
-		public Builder(AnalyzerReference globalAnalyzer) {
-			analyzers = new HashMap<>();
-			this.globalAnalyzer = globalAnalyzer;
+		public Builder(AnalyzerReference globalAnalyzerReference) {
+			analyzerReferences = new HashMap<>();
+			this.globalAnalyzerReference = globalAnalyzerReference;
 		}
 
-		public Builder addAnalyzer(String scope, AnalyzerReference analyzer) {
-			analyzers.put( scope, analyzer );
+		public Builder addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
+			analyzerReferences.put( scope, analyzerReference );
 			return this;
 		}
 
-		public Builder setGlobalAnalyzer(AnalyzerReference globalAnalyzer) {
-			this.globalAnalyzer = globalAnalyzer;
+		public Builder setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference) {
+			this.globalAnalyzerReference = globalAnalyzerReference;
 			return this;
 		}
 
 		public ScopedAnalyzerReference build() {
-			return new ScopedAnalyzerReference( globalAnalyzer, analyzers );
+			return new ScopedAnalyzerReference( globalAnalyzerReference, analyzerReferences );
 		}
 	}
 
@@ -137,7 +142,7 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 		sb.append( getClass().getSimpleName() );
 		sb.append( "<" );
 		sb.append( "globalAnalyzer: " );
-		sb.append( globalAnalyzer );
+		sb.append( globalAnalyzerReference );
 		sb.append( ">" );
 		return sb.toString();
 	}

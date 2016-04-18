@@ -33,7 +33,7 @@ public class DocumentFieldMetadata {
 	private final Field.TermVector termVector;
 	private final FieldBridge fieldBridge;
 	private final Float boost;
-	private final AnalyzerReference analyzer;
+	private final AnalyzerReference analyzerReference;
 	private final boolean isId;
 	private final boolean isIdInEmbedded;
 	private final NullMarkerCodec nullMarkerCodec;
@@ -50,7 +50,7 @@ public class DocumentFieldMetadata {
 		this.termVector = builder.termVector;
 		this.fieldBridge = builder.fieldBridge;
 		this.boost = builder.boost;
-		this.analyzer = builder.analyzer;
+		this.analyzerReference = builder.analyzerReference;
 		this.isId = builder.isId;
 		this.isIdInEmbedded = builder.isIdInEmbedded;
 		this.nullMarkerCodec = builder.nullMarkerCodec;
@@ -93,8 +93,8 @@ public class DocumentFieldMetadata {
 		return boost;
 	}
 
-	public AnalyzerReference getAnalyzer() {
-		return analyzer;
+	public AnalyzerReference getAnalyzerReference() {
+		return analyzerReference;
 	}
 
 	public String indexNullAs() {
@@ -138,7 +138,7 @@ public class DocumentFieldMetadata {
 				", termVector=" + termVector +
 				", fieldBridge=" + fieldBridge +
 				", boost=" + boost +
-				", analyzer=" + analyzer +
+				", analyzer=" + analyzerReference +
 				", isId=" + isId +
 				", isIdInEmbedded=" + isIdInEmbedded +
 				", nullToken='" + nullMarkerCodec.nullRepresentedAsString() + '\'' +
@@ -160,7 +160,7 @@ public class DocumentFieldMetadata {
 		// optional parameters
 		private FieldBridge fieldBridge;
 		private Float boost;
-		private AnalyzerReference analyzer;
+		private AnalyzerReference analyzerReference;
 		private boolean isId;
 		private boolean isIdInEmbedded;
 		private boolean isNumeric;
@@ -192,8 +192,8 @@ public class DocumentFieldMetadata {
 			return this;
 		}
 
-		public Builder analyzer(AnalyzerReference analyzer) {
-			this.analyzer = analyzer;
+		public Builder analyzerReference(AnalyzerReference analyzerReference) {
+			this.analyzerReference = analyzerReference;
 			return this;
 		}
 

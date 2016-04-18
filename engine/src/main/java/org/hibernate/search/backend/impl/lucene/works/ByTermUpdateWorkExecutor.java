@@ -75,9 +75,9 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 				log.tracef( "Updating %s#%s by id using an IndexWriter#updateDocument.", managedType, id );
 				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 				Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
-				ScopedAnalyzerReference analyzer = builder.getAnalyzer();
-				analyzer = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
-				delegate.updateDocument( idTerm, work.getDocument(), analyzer );
+				ScopedAnalyzerReference analyzerReference = builder.getAnalyzerReference();
+				analyzerReference = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzerReference, fieldToAnalyzerMap );
+				delegate.updateDocument( idTerm, work.getDocument(), analyzerReference );
 			}
 			workspace.notifyWorkApplied( work );
 		}

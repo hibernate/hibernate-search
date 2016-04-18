@@ -400,7 +400,7 @@ public class SearchIntegratorBuilder {
 		);
 
 		factoryState.addFilterDefinitions( configContext.initFilters() );
-		factoryState.addAnalyzers( configContext.initLazyAnalyzers( indexesFactory ) );
+		factoryState.addAnalyzerReferences( configContext.initLazyAnalyzerReferences( indexesFactory ) );
 	}
 
 	/**

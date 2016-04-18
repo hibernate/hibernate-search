@@ -315,11 +315,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	private String analyzerName(Class<?> entityType, DocumentFieldMetadata fieldMetadata) {
-		AnalyzerReference analyzer = fieldMetadata.getAnalyzer();
-		if ( analyzer.is( RemoteAnalyzerReference.class ) ) {
-			return analyzer.unwrap( RemoteAnalyzerReference.class ).getName();
+		AnalyzerReference analyzerReference = fieldMetadata.getAnalyzerReference();
+		if ( analyzerReference.is( RemoteAnalyzerReference.class ) ) {
+			return analyzerReference.unwrap( RemoteAnalyzerReference.class ).getName();
 		}
-		LOG.analyzerIsNotRemote( entityType, fieldMetadata.getFieldName(), analyzer );
+		LOG.analyzerIsNotRemote( entityType, fieldMetadata.getFieldName(), analyzerReference );
 		return null;
 	}
 
@@ -342,7 +342,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		String index = getIndex( descriptor, fieldMetadata );
 		field.addProperty( "index", index );
 
-		if ( isAnalyzed( index ) && fieldMetadata.getAnalyzer() != null ) {
+		if ( isAnalyzed( index ) && fieldMetadata.getAnalyzerReference() != null ) {
 			String analyzerName = analyzerName( descriptor.getDocumentBuilder().getBeanClass(), fieldMetadata );
 			if ( analyzerName != null ) {
 				field.addProperty( "analyzer", analyzerName );

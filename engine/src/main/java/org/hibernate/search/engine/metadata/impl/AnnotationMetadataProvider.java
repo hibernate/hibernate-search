@@ -167,7 +167,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		TypeMetadata.Builder typeMetadataBuilder = new TypeMetadata.Builder( clazz, configContext )
 				.boost( getBoost( xClass ) )
 				.boostStrategy( AnnotationProcessingHelper.getDynamicBoost( xClass ) )
-				.analyzer( configContext.getDefaultAnalyzer() );
+				.analyzerReference( configContext.getDefaultLuceneAnalyzerReference() );
 
 		initializePackageLevelAnnotations( packageInfo( clazz ), configContext );
 
@@ -277,17 +277,17 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
 		// property > entity analyzer (no field analyzer)
-		AnalyzerReference analyzer = AnnotationProcessingHelper.getAnalyzer(
+		AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
 				member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
 				configContext
 		);
-		if ( analyzer == null ) {
-			analyzer = typeMetadataBuilder.getAnalyzer();
+		if ( analyzerReference == null ) {
+			analyzerReference = typeMetadataBuilder.getAnalyzerReference();
 		}
-		if ( analyzer == null ) {
+		if ( analyzerReference == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
 		}
-		typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
+		typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzerReference, index );
 	}
 
 	private void createIdPropertyMetadata(XProperty member,
@@ -588,12 +588,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		XClass clazz = parseContext.getCurrentClass();
 		// check for a class level specified analyzer
-		AnalyzerReference analyzer = AnnotationProcessingHelper.getAnalyzer(
+		AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
 				clazz.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
 				configContext
 		);
-		if ( analyzer != null ) {
-			typeMetadataBuilder.analyzer( analyzer );
+		if ( analyzerReference != null ) {
+			typeMetadataBuilder.analyzerReference( analyzerReference );
 		}
 
 		// check for AnalyzerDefs annotations
@@ -689,8 +689,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		contributeClassBridgeDefinedFields( typeMetadataBuilder, fieldName, fieldBridge );
 
-		AnalyzerReference analyzer = AnnotationProcessingHelper.getAnalyzer( classBridgeAnnotation.analyzer(), configContext );
-		typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
+		AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference( classBridgeAnnotation.analyzer(), configContext );
+		typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzerReference, index );
 	}
 
 	private void bindSpatialAnnotation(Spatial spatialAnnotation,
@@ -771,8 +771,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		contributeClassBridgeDefinedFields( typeMetadataBuilder, fieldName, spatialBridge );
 
-		AnalyzerReference analyzer = typeMetadataBuilder.getAnalyzer();
-		if ( analyzer == null ) {
+		AnalyzerReference analyzerReference = typeMetadataBuilder.getAnalyzerReference();
+		if ( analyzerReference == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
 		}
 	}
@@ -1210,12 +1210,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( nullTokenCodec != NotEncodingCodec.SINGLETON && fieldBridge instanceof TwoWayFieldBridge ) {
 			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
 		}
-		AnalyzerReference analyzer = determineAnalyzer( fieldAnnotation, member, configContext );
+		AnalyzerReference analyzerReference = determineAnalyzer( fieldAnnotation, member, configContext );
 
 		// adjust the type analyzer
-		analyzer = typeMetadataBuilder.addToScopedAnalyzer(
+		analyzerReference = typeMetadataBuilder.addToScopedAnalyzerReference(
 				fieldName,
-				analyzer,
+				analyzerReference,
 				index
 		);
 
@@ -1231,7 +1231,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					termVector
 			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
 					.fieldBridge( fieldBridge )
-					.analyzer( analyzer )
+					.analyzerReference( analyzerReference )
 					.indexNullAs( nullTokenCodec )
 					.numeric()
 					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) )
@@ -1245,7 +1245,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					termVector
 			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
 					.fieldBridge( fieldBridge )
-					.analyzer( analyzer )
+					.analyzerReference( analyzerReference )
 					.indexNullAs( nullTokenCodec );
 			if ( fieldBridge instanceof SpatialFieldBridge ) {
 				fieldMetadataBuilder.spatial();
@@ -1393,21 +1393,21 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private AnalyzerReference determineAnalyzer(org.hibernate.search.annotations.Field fieldAnnotation,
 			XProperty member,
 			ConfigContext context) {
-		AnalyzerReference analyzer = null;
+		AnalyzerReference analyzerReference = null;
 		// check for a nested @Analyzer annotation with @Field
 		if ( fieldAnnotation != null ) {
-			analyzer = AnnotationProcessingHelper.getAnalyzer( fieldAnnotation.analyzer(), context );
+			analyzerReference = AnnotationProcessingHelper.getAnalyzerReference( fieldAnnotation.analyzer(), context );
 		}
 
 		// if there was no analyzer specified as part of @Field, try a stand alone @Analyzer annotation
-		if ( analyzer == null ) {
-			analyzer = AnnotationProcessingHelper.getAnalyzer(
+		if ( analyzerReference == null ) {
+			analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
 					member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
 					context
 			);
 		}
 
-		return analyzer;
+		return analyzerReference;
 	}
 
 	private boolean isPropertyTransient(XProperty member, ConfigContext context) {
@@ -1702,20 +1702,20 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					new EmbeddedTypeMetadata.Builder(
 							reflectionManager.toClass( elementClass ),
 							member,
-							typeMetadataBuilder.getScopedAnalyzerBuilder()
+							typeMetadataBuilder.getScopedAnalyzerReferenceBuilder()
 					);
 
 			embeddedTypeMetadataBuilder.boost( AnnotationProcessingHelper.getBoost( member, null ) );
 			//property > entity analyzer
-			AnalyzerReference analyzer = AnnotationProcessingHelper.
-					getAnalyzer(
+			AnalyzerReference analyzerReference = AnnotationProcessingHelper.
+					getAnalyzerReference(
 							member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
 							configContext
 					);
-			if ( analyzer == null ) {
-				analyzer = typeMetadataBuilder.getAnalyzer();
+			if ( analyzerReference == null ) {
+				analyzerReference = typeMetadataBuilder.getAnalyzerReference();
 			}
-			embeddedTypeMetadataBuilder.analyzer( analyzer );
+			embeddedTypeMetadataBuilder.analyzerReference( analyzerReference );
 
 			if ( disableOptimizations ) {
 				typeMetadataBuilder.blacklistForOptimization( elementClass );
