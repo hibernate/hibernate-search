@@ -25,7 +25,7 @@ import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
-import org.hibernate.search.bridge.spi.BackendSpecificBridgeProvider;
+import org.hibernate.search.bridge.spi.IndexManagerTypeSpecificBridgeProvider;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
@@ -147,8 +147,8 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 			.andReturn( Object.class )
 			.anyTimes();
 
-		expect( mockClassLoaderService.loadJavaServices( BackendSpecificBridgeProvider.class ) )
-				.andReturn( Collections.<BackendSpecificBridgeProvider>emptySet() );
+		expect( mockClassLoaderService.loadJavaServices( IndexManagerTypeSpecificBridgeProvider.class ) )
+				.andReturn( Collections.<IndexManagerTypeSpecificBridgeProvider>emptySet() );
 
 		expect( mockClassLoaderService.loadJavaServices( BridgeProvider.class ) )
 			.andReturn( Collections.<BridgeProvider>emptySet() );
