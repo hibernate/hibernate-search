@@ -25,6 +25,8 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonElement;
+
 import io.searchbox.action.Action;
 import io.searchbox.action.BulkableAction;
 import io.searchbox.action.DocumentTargetedAction;
@@ -45,6 +47,8 @@ import io.searchbox.params.Parameters;
 public class JestClient implements Service, Startable, Stoppable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
+	private static final int TIME_OUT = 408;
 
 	private io.searchbox.client.JestClient client;
 
@@ -86,7 +90,12 @@ public class JestClient implements Service, Startable, Stoppable {
 
 			// The request failed with a status that's not ignore-able
 			if ( !result.isSucceeded() && !isIgnored( result.getResponseCode(), ignoredErrorStatuses ) ) {
-				throw LOG.elasticsearchRequestFailed( requestToString( request ), resultToString( result ), null );
+				if ( result.getResponseCode() == TIME_OUT ) {
+					throw LOG.elasticsearchRequestTimeout( requestToString( request ), resultToString( result ) );
+				}
+				else {
+					throw LOG.elasticsearchRequestFailed( requestToString( request ), resultToString( result ), null );
+				}
 			}
 
 			return result;
@@ -196,9 +205,11 @@ public class JestClient implements Service, Startable, Stoppable {
 
 	private String resultToString(JestResult result) {
 		StringBuilder sb = new StringBuilder();
-
 		sb.append( "Status: " ).append( result.getResponseCode() ).append( "\n" );
-		sb.append( "Error message: " ).append( result.getErrorMessage() ).append( "\n\n" );
+		sb.append( "Error message: " ).append( result.getErrorMessage() ).append( "\n" );
+		sb.append( "Cluster name: " ).append( property( result, "cluster_name" ) ).append( "\n" );
+		sb.append( "Cluster status: " ).append( property( result, "status" ) ).append( "\n" );
+		sb.append( "\n" );
 
 		if ( result instanceof BulkResult ) {
 			for ( BulkResultItem item : ( (BulkResult) result ).getItems() ) {
@@ -212,5 +223,16 @@ public class JestClient implements Service, Startable, Stoppable {
 		}
 
 		return sb.toString();
+	}
+
+	private String property(JestResult result, String name) {
+		if ( result.getJsonObject() == null ) {
+			return null;
+		}
+		JsonElement clusterName = result.getJsonObject().get( name );
+		if ( clusterName == null ) {
+			return null;
+		}
+		return clusterName.getAsString();
 	}
 }
