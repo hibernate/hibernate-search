@@ -71,4 +71,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,
 			value = "'%1$s' is not a remote analyzer. It will be ignored")
 	void analyzerIsNotRemote(String name);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 10,
+			value = "Elasticsearch connection time-out; check that the cluster status is at least `yellow`;\n Request:\n========\n%1$sResponse:\n=========\n%2$s" )
+	SearchException elasticsearchRequestTimeout(String request, String response);
 }
