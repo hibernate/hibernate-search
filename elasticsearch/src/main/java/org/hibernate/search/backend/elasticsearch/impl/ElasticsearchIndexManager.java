@@ -176,7 +176,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	private void waitForIndexCreation() {
 		Builder healthBuilder = new Health.Builder()
-				.setParameter( "wait_for_status", "green" )
+				.setParameter( "wait_for_status", "yellow" )
 				.setParameter( "timeout", indexManagementWaitTimeout );
 
 		Health health = new Health( healthBuilder ) {
@@ -190,6 +190,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 		if ( !result.isSucceeded() ) {
 			throw new SearchException( "Index " + actualIndexName + " wasn't created in time; Reason: " + result.getErrorMessage() );
+		}
+
+		String status = result.getJsonObject().get( "status" ).getAsString();
+
+		if ( ! "green".equals( status ) ) {
+			LOG.warnf( "Index '%s' is in state 'yellow'. Check the replica configuration in Elasticsearch if the status doesn't change to 'green' after a while.", actualIndexName );
 		}
 	}
 
