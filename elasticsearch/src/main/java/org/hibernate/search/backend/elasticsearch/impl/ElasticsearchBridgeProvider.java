@@ -18,7 +18,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.impl.ExtendedBridgeProvider;
-import org.hibernate.search.bridge.spi.BackendSpecificBridgeProvider;
+import org.hibernate.search.bridge.spi.IndexManagerTypeSpecificBridgeProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
@@ -27,10 +27,10 @@ import org.hibernate.search.indexes.spi.IndexManager;
  * @author Gunnar Morling
  */
 // TODO Handle Calendar
-public class ElasticsearchBridgeProvider extends ExtendedBridgeProvider implements BackendSpecificBridgeProvider {
+public class ElasticsearchBridgeProvider extends ExtendedBridgeProvider implements IndexManagerTypeSpecificBridgeProvider {
 
 	@Override
-	public Class<? extends IndexManager> getBackend() {
+	public Class<? extends IndexManager> getIndexManagerType() {
 		return ElasticsearchIndexManager.class;
 	}
 

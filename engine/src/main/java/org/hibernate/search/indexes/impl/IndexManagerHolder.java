@@ -7,13 +7,12 @@
 package org.hibernate.search.indexes.impl;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
-
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -21,10 +20,10 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.SearchException;
@@ -67,9 +66,9 @@ public class IndexManagerHolder {
 
 	private static final String DEFAULT_INDEX_MANAGER_KEY = "__DEFAULT__";
 
-	private final Map<String, Class<? extends IndexManager>> indexManagerImplementationsRegistry
+	private final ConcurrentMap<String, Class<? extends IndexManager>> indexManagerImplementationsRegistry
 			= new ConcurrentHashMap<String, Class<? extends IndexManager>>();
-	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
+	private final ConcurrentMap<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
 	// I currently think it's easier to not hide sharding implementations in a custom
 	// IndexManager to make it easier to explicitly a)detect duplicates b)start-stop
@@ -201,6 +200,7 @@ public class IndexManagerHolder {
 			indexManager.destroy();
 		}
 		indexManagersRegistry.clear();
+		indexManagerImplementationsRegistry.clear();
 	}
 
 	/**
@@ -560,8 +560,8 @@ public class IndexManagerHolder {
 		Properties[] indexProperties = getIndexProperties( cfg, indexName );
 		String indexManagerImplementationName = indexProperties[0].getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
 
-		String indexManagerImplementationKey = indexManagerImplementationName != null ?
-				indexManagerImplementationName : DEFAULT_INDEX_MANAGER_KEY;
+		String indexManagerImplementationKey = StringHelper.isEmpty( indexManagerImplementationName ) ?
+				DEFAULT_INDEX_MANAGER_KEY : indexManagerImplementationName;
 		if ( indexManagerImplementationsRegistry.containsKey( indexManagerImplementationKey ) ) {
 			return indexManagerImplementationsRegistry.get( indexManagerImplementationKey );
 		}

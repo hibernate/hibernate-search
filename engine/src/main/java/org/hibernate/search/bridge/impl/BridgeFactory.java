@@ -32,7 +32,7 @@ import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
-import org.hibernate.search.bridge.spi.BackendSpecificBridgeProvider;
+import org.hibernate.search.bridge.spi.IndexManagerTypeSpecificBridgeProvider;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -59,8 +59,8 @@ public final class BridgeFactory {
 	public BridgeFactory(ServiceManager serviceManager) {
 		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 
-		for ( BackendSpecificBridgeProvider provider : classLoaderService.loadJavaServices( BackendSpecificBridgeProvider.class ) ) {
-			backendSpecificProviders.put( provider.getBackend(), provider );
+		for ( IndexManagerTypeSpecificBridgeProvider provider : classLoaderService.loadJavaServices( IndexManagerTypeSpecificBridgeProvider.class ) ) {
+			backendSpecificProviders.put( provider.getIndexManagerType(), provider );
 		}
 
 		annotationBasedProviders.add( new CalendarBridgeProvider() );
@@ -190,8 +190,8 @@ public final class BridgeFactory {
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
-		// if we don't know to which IndexManager the entity is rattached, we cannot build the right
-		// FieldBridge as it might depend on this information due to backend specific BridgeProviders.
+		// if we don't know to which IndexManager the entity is attached, we cannot build the right
+		// FieldBridge as it might depend on this information due to {@code IndexManager} type specific BridgeProviders.
 		if ( indexManagerType == null ) {
 			throw LOG.indexManagerTypeRequiredToBuildFieldBridge( member.getType().getName(), member.getName() );
 		}
