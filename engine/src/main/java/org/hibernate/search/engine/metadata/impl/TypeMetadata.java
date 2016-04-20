@@ -22,12 +22,14 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
-import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -406,11 +408,9 @@ public class TypeMetadata {
 	public static class Builder {
 		private final Class<?> indexedType;
 		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
-		private final AnalyzerReference passThroughAnalyzerReference;
 
 		private float boost;
 		private BoostStrategy classBoostStrategy;
-		private AnalyzerReference analyzerReference;
 		private Discriminator discriminator;
 		private XMember discriminatorGetter;
 		private boolean stateInspectionOptimizationsEnabled = true;
@@ -425,14 +425,13 @@ public class TypeMetadata {
 		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new HashSet<>();
 		private final Set<BridgeDefinedField> classBridgeDefinedFields = new HashSet<>();
 
-		public Builder(Class<?> indexedType, ConfigContext configContext) {
-			this( indexedType, new ScopedAnalyzerReference.Builder( configContext.getDefaultLuceneAnalyzerReference() ) );
+		public Builder(Class<?> indexedType, Class<? extends IndexManager> indexManagerType, ConfigContext configContext) {
+			this( indexedType, buildScopedAnalyzerReferenceBuilder( indexManagerType, configContext ) );
 		}
 
 		public Builder(Class<?> indexedType, ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder) {
 			this.indexedType = indexedType;
 			this.scopedAnalyzerReferenceBuilder = scopedAnalyzerReferenceBuilder;
-			this.passThroughAnalyzerReference = LuceneAnalyzerReference.PASS_THROUGH;
 		}
 
 		public Builder idProperty(PropertyMetadata propertyMetadata) {
@@ -451,7 +450,6 @@ public class TypeMetadata {
 		}
 
 		public Builder analyzerReference(AnalyzerReference analyzerReference) {
-			this.analyzerReference = analyzerReference;
 			this.scopedAnalyzerReferenceBuilder.setGlobalAnalyzerReference( analyzerReference );
 			return this;
 		}
@@ -514,7 +512,7 @@ public class TypeMetadata {
 		@SuppressWarnings( "deprecation" )
 		public AnalyzerReference addToScopedAnalyzerReference(String fieldName, AnalyzerReference analyzerReference, Field.Index index) {
 			if ( analyzerReference == null ) {
-				analyzerReference = this.getAnalyzerReference();
+				analyzerReference = scopedAnalyzerReferenceBuilder.getGlobalAnalyzerReference();
 			}
 
 			if ( Field.Index.ANALYZED.equals( index ) || Field.Index.ANALYZED_NO_NORMS.equals( index ) ) {
@@ -524,7 +522,7 @@ public class TypeMetadata {
 			}
 			else {
 				// no analyzer is used, add a fake one for queries
-				scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldName, passThroughAnalyzerReference );
+				scopedAnalyzerReferenceBuilder.addPassThroughAnalyzerReference( fieldName );
 			}
 			return analyzerReference;
 		}
@@ -542,7 +540,7 @@ public class TypeMetadata {
 		}
 
 		public AnalyzerReference getAnalyzerReference() {
-			return analyzerReference;
+			return scopedAnalyzerReferenceBuilder.getGlobalAnalyzerReference();
 		}
 
 		public ScopedAnalyzerReference.Builder getScopedAnalyzerReferenceBuilder() {
@@ -580,6 +578,18 @@ public class TypeMetadata {
 			for ( BridgeDefinedField field : bridgeDefinedFields ) {
 				classBridgeDefinedFields.add( field );
 			}
+		}
+
+		private static ScopedAnalyzerReference.Builder buildScopedAnalyzerReferenceBuilder(
+				Class<? extends IndexManager> indexManagerType, ConfigContext configContext) {
+			AnalyzerReference defaultAnalyzerReference;
+			if ( indexManagerType != null && RemoteAnalyzerProvider.class.isAssignableFrom( indexManagerType ) ) {
+				defaultAnalyzerReference = RemoteAnalyzerReference.DEFAULT;
+			}
+			else {
+				defaultAnalyzerReference = configContext.getDefaultLuceneAnalyzerReference();
+			}
+			return new ScopedAnalyzerReference.Builder( defaultAnalyzerReference );
 		}
 	}
 }

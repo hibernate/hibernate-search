@@ -29,6 +29,8 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A helper classes dealing with the processing of annotation. It is there to share some annotation processing
@@ -38,6 +40,8 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Hardy Ferentschik
  */
 public final class AnnotationProcessingHelper {
+
+	private static final Log log = LoggerFactory.make();
 
 	private AnnotationProcessingHelper() {
 		//not allowed
@@ -127,25 +131,41 @@ public final class AnnotationProcessingHelper {
 		}
 	}
 
-	public static AnalyzerReference getAnalyzerReference(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
+	public static AnalyzerReference getAnalyzerReference(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext,
+			boolean isRemote) {
 		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
-		if ( analyzerClass == void.class ) {
-			return analyzerReferenceFromDefinition( analyzerAnn, configContext );
+		if ( isRemote ) {
+			return remoteAnalyzerReferenceFromDefinition( analyzerAnn, configContext );
 		}
 		else {
-			return analyzerReferenceFromClass( configContext, analyzerClass );
+			if ( analyzerClass == void.class ) {
+				return luceneAnalyzerReferenceFromDefinition( analyzerAnn, configContext );
+			}
+			else {
+				return luceneAnalyzerReferenceFromClass( configContext, analyzerClass );
+			}
 		}
 	}
 
-	private static AnalyzerReference analyzerReferenceFromDefinition(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
+	private static AnalyzerReference remoteAnalyzerReferenceFromDefinition(org.hibernate.search.annotations.Analyzer analyzerAnn,
+			ConfigContext configContext) {
 		String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
 		if ( StringHelper.isEmpty( definition ) ) {
 			return null;
 		}
-		return configContext.buildLazyAnalyzerReference( definition );
+		return configContext.buildRemoteAnalyzerReference( definition );
 	}
 
-	private static AnalyzerReference analyzerReferenceFromClass(ConfigContext configContext, Class<?> analyzerClass) {
+	private static AnalyzerReference luceneAnalyzerReferenceFromDefinition(org.hibernate.search.annotations.Analyzer analyzerAnn,
+			ConfigContext configContext) {
+		String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
+		if ( StringHelper.isEmpty( definition ) ) {
+			return null;
+		}
+		return configContext.buildLazyLuceneAnalyzerReference( definition );
+	}
+
+	private static AnalyzerReference luceneAnalyzerReferenceFromClass(ConfigContext configContext, Class<?> analyzerClass) {
 		try {
 			// For now only local analyzer can be created from a class
 			// this should be easy to extend to remote analyzer using a common interface/super-class

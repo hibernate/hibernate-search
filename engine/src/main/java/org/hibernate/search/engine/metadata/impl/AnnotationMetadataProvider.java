@@ -164,10 +164,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private TypeMetadata doGetTypeMetadataFor(Class<?> clazz, XClass xClass, ParseContext parseContext) {
-		TypeMetadata.Builder typeMetadataBuilder = new TypeMetadata.Builder( clazz, configContext )
+		TypeMetadata.Builder typeMetadataBuilder = new TypeMetadata.Builder( clazz, parseContext.getIndexManagerType(), configContext )
 				.boost( getBoost( xClass ) )
-				.boostStrategy( AnnotationProcessingHelper.getDynamicBoost( xClass ) )
-				.analyzerReference( configContext.getDefaultLuceneAnalyzerReference() );
+				.boostStrategy( AnnotationProcessingHelper.getDynamicBoost( xClass ) );
 
 		initializePackageLevelAnnotations( packageInfo( clazz ), configContext );
 
@@ -277,17 +276,20 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
 		// property > entity analyzer (no field analyzer)
-		AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
-				member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
-				configContext
-		);
-		if ( analyzerReference == null ) {
-			analyzerReference = typeMetadataBuilder.getAnalyzerReference();
+		if ( !parseContext.skipAnalyzers() ) {
+			AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
+					member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
+					configContext,
+					parseContext.isAnalyzerRemote()
+			);
+			if ( analyzerReference == null ) {
+				analyzerReference = typeMetadataBuilder.getAnalyzerReference();
+			}
+			if ( analyzerReference == null ) {
+				throw new AssertionFailure( "Analyzer should not be undefined" );
+			}
+			typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzerReference, index );
 		}
-		if ( analyzerReference == null ) {
-			throw new AssertionFailure( "Analyzer should not be undefined" );
-		}
-		typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzerReference, index );
 	}
 
 	private void createIdPropertyMetadata(XProperty member,
@@ -495,7 +497,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 			parseContext.setCurrentClass( currentClass );
 			initializeClassLevelAnnotations( typeMetadataBuilder, prefix, configContext, parseContext );
-			initializeClassBridgeInstances( typeMetadataBuilder, prefix, configContext, currentClass );
+			initializeClassBridgeInstances( typeMetadataBuilder, prefix, configContext, currentClass, parseContext );
 		}
 
 		boolean isProvidedId = false;
@@ -588,12 +590,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		XClass clazz = parseContext.getCurrentClass();
 		// check for a class level specified analyzer
-		AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
-				clazz.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
-				configContext
-		);
-		if ( analyzerReference != null ) {
-			typeMetadataBuilder.analyzerReference( analyzerReference );
+		if ( !parseContext.skipAnalyzers() ) {
+			AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
+					clazz.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
+					configContext,
+					parseContext.isAnalyzerRemote()
+			);
+			if ( analyzerReference != null ) {
+				typeMetadataBuilder.analyzerReference( analyzerReference );
+			}
 		}
 
 		// check for AnalyzerDefs annotations
@@ -607,14 +612,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( classBridgesAnnotation != null ) {
 			ClassBridge[] classBridges = classBridgesAnnotation.value();
 			for ( ClassBridge cb : classBridges ) {
-				bindClassBridgeAnnotation( prefix, typeMetadataBuilder, cb, clazz, configContext );
+				bindClassBridgeAnnotation( prefix, typeMetadataBuilder, cb, clazz, configContext, parseContext );
 			}
 		}
 
 		// Check for any ClassBridge style of annotations.
 		ClassBridge classBridgeAnnotation = clazz.getAnnotation( ClassBridge.class );
 		if ( classBridgeAnnotation != null ) {
-			bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, clazz, configContext );
+			bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, clazz, configContext,
+					parseContext);
 		}
 
 		//Check for Spatial annotation on class level
@@ -639,7 +645,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void initializeClassBridgeInstances(TypeMetadata.Builder typeMetadataBuilder,
 			String prefix,
 			ConfigContext configContext,
-			XClass clazz) {
+			XClass clazz,
+			ParseContext parseContext) {
 
 		Map<FieldBridge, ClassBridge> classBridgeInstances = configContext.getClassBridgeInstances(
 				reflectionManager.toClass(
@@ -651,7 +658,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			FieldBridge instance = classBridge.getKey();
 			ClassBridge configuration = classBridge.getValue();
 
-			bindClassBridgeAnnotation( prefix, typeMetadataBuilder, configuration, instance, configContext );
+			bindClassBridgeAnnotation( prefix, typeMetadataBuilder, configuration, instance, configContext, parseContext );
 		}
 	}
 
@@ -659,16 +666,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			TypeMetadata.Builder typeMetadataBuilder,
 			ClassBridge classBridgeAnnotation,
 			XClass clazz,
-			ConfigContext configContext) {
+			ConfigContext configContext,
+			ParseContext parseContext) {
 		FieldBridge fieldBridge = bridgeFactory.extractType( classBridgeAnnotation, reflectionManager.toClass( clazz ) );
-		bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, fieldBridge, configContext );
+		bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, fieldBridge, configContext, parseContext );
 	}
 
 	private void bindClassBridgeAnnotation(String prefix,
 			TypeMetadata.Builder typeMetadataBuilder,
 			ClassBridge classBridgeAnnotation,
 			FieldBridge fieldBridge,
-			ConfigContext configContext) {
+			ConfigContext configContext,
+			ParseContext parseContext) {
 		bridgeFactory.injectParameters( classBridgeAnnotation, fieldBridge );
 
 		String fieldName = prefix + classBridgeAnnotation.name();
@@ -689,8 +698,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		contributeClassBridgeDefinedFields( typeMetadataBuilder, fieldName, fieldBridge );
 
-		AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference( classBridgeAnnotation.analyzer(), configContext );
-		typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzerReference, index );
+		if ( !parseContext.skipAnalyzers() ) {
+			AnalyzerReference analyzer = AnnotationProcessingHelper.getAnalyzerReference(
+					classBridgeAnnotation.analyzer(),
+					configContext,
+					parseContext.isAnalyzerRemote() );
+			typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzer, index );
+		}
 	}
 
 	private void bindSpatialAnnotation(Spatial spatialAnnotation,
@@ -1210,7 +1224,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( nullTokenCodec != NotEncodingCodec.SINGLETON && fieldBridge instanceof TwoWayFieldBridge ) {
 			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
 		}
-		AnalyzerReference analyzerReference = determineAnalyzer( fieldAnnotation, member, configContext );
+		AnalyzerReference analyzerReference = determineAnalyzer( fieldAnnotation, member, configContext, parseContext );
 
 		// adjust the type analyzer
 		analyzerReference = typeMetadataBuilder.addToScopedAnalyzerReference(
@@ -1392,19 +1406,27 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private AnalyzerReference determineAnalyzer(org.hibernate.search.annotations.Field fieldAnnotation,
 			XProperty member,
-			ConfigContext context) {
+			ConfigContext context,
+			ParseContext parseContext) {
 		AnalyzerReference analyzerReference = null;
-		// check for a nested @Analyzer annotation with @Field
-		if ( fieldAnnotation != null ) {
-			analyzerReference = AnnotationProcessingHelper.getAnalyzerReference( fieldAnnotation.analyzer(), context );
-		}
 
-		// if there was no analyzer specified as part of @Field, try a stand alone @Analyzer annotation
-		if ( analyzerReference == null ) {
-			analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
-					member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
-					context
-			);
+		if ( !parseContext.skipAnalyzers() ) {
+			// check for a nested @Analyzer annotation with @Field
+			if ( fieldAnnotation != null ) {
+				analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
+						fieldAnnotation.analyzer(),
+						context,
+						parseContext.isAnalyzerRemote() );
+			}
+
+			// if there was no analyzer specified as part of @Field, try a stand alone @Analyzer annotation
+			if ( analyzerReference == null ) {
+				analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
+						member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
+						context,
+						parseContext.isAnalyzerRemote()
+				);
+			}
 		}
 
 		return analyzerReference;
@@ -1707,15 +1729,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 			embeddedTypeMetadataBuilder.boost( AnnotationProcessingHelper.getBoost( member, null ) );
 			//property > entity analyzer
-			AnalyzerReference analyzerReference = AnnotationProcessingHelper.
-					getAnalyzerReference(
-							member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
-							configContext
-					);
-			if ( analyzerReference == null ) {
-				analyzerReference = typeMetadataBuilder.getAnalyzerReference();
+			if ( !parseContext.skipAnalyzers() ) {
+				AnalyzerReference analyzerReference = AnnotationProcessingHelper.
+						getAnalyzerReference(
+								member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
+								configContext,
+								parseContext.isAnalyzerRemote()
+						);
+				if ( analyzerReference == null ) {
+					analyzerReference = typeMetadataBuilder.getAnalyzerReference();
+				}
+				embeddedTypeMetadataBuilder.analyzerReference( analyzerReference );
 			}
-			embeddedTypeMetadataBuilder.analyzerReference( analyzerReference );
 
 			if ( disableOptimizations ) {
 				typeMetadataBuilder.blacklistForOptimization( elementClass );
