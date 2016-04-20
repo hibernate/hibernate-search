@@ -17,7 +17,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.impl.lucene.analysis.ConcurrentlyMutableAnalyzer;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
 import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 
 /**
@@ -57,7 +57,7 @@ public final class IndexWriterDelegate {
 
 	public void updateDocument(final Term idTerm, final Document document, final ScopedAnalyzerReference analyzer) throws IOException {
 		// Try being optimistic first:
-		ScopedAnalyzer scopedAnalyzer = (ScopedAnalyzer) analyzer.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+		ScopedLuceneAnalyzer scopedAnalyzer = (ScopedLuceneAnalyzer) analyzer.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 		final boolean applyWithinReadLock;
 		readLock.lock();
 		try {

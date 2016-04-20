@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
 
 /**
  * An Analyzer implementation which can dynamically be reconfigured. We use this as temporary solution to workaround
@@ -21,15 +21,15 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  */
 public final class ConcurrentlyMutableAnalyzer extends DelegatingAnalyzerWrapper {
 
-	private final AtomicReference<ScopedAnalyzer> current = new AtomicReference<>();
+	private final AtomicReference<ScopedLuceneAnalyzer> current = new AtomicReference<>();
 
 	public ConcurrentlyMutableAnalyzer(Analyzer initialAnalyzer) {
 		super( new ResettableReuseStrategy() );
-		if ( initialAnalyzer instanceof ScopedAnalyzer ) {
-			current.set( (ScopedAnalyzer) initialAnalyzer );
+		if ( initialAnalyzer instanceof ScopedLuceneAnalyzer ) {
+			current.set( (ScopedLuceneAnalyzer) initialAnalyzer );
 		}
 		else {
-			current.set( new ScopedAnalyzer( initialAnalyzer ) );
+			current.set( new ScopedLuceneAnalyzer( initialAnalyzer ) );
 		}
 	}
 
@@ -43,19 +43,19 @@ public final class ConcurrentlyMutableAnalyzer extends DelegatingAnalyzerWrapper
 	 * proposed one, in which case there is no need for
 	 * replacements or locking.
 	 * Correct concurrency control requires external locking!
-	 * @param analyzer the {@link ScopedAnalyzer} to use for comparison
+	 * @param analyzer the {@link ScopedLuceneAnalyzer} to use for comparison
 	 * @return true if there is no need to replace the current Analyzer
 	 */
-	public boolean isCompatibleWith(ScopedAnalyzer analyzer) {
-		ScopedAnalyzer currentAnalyzer = current.get();
+	public boolean isCompatibleWith(ScopedLuceneAnalyzer analyzer) {
+		ScopedLuceneAnalyzer currentAnalyzer = current.get();
 		return currentAnalyzer.isCompositeOfSameInstances( analyzer );
 	}
 
 	/**
 	 * Correct concurrency control requires external locking!
-	 * @param analyzer the {@link ScopedAnalyzer} to use for locking
+	 * @param analyzer the {@link ScopedLuceneAnalyzer} to use for locking
 	 */
-	public void updateAnalyzer(ScopedAnalyzer analyzer) {
+	public void updateAnalyzer(ScopedLuceneAnalyzer analyzer) {
 		current.set( analyzer );
 	}
 

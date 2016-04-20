@@ -14,6 +14,7 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.annotations.Store;
@@ -317,7 +318,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private String analyzerName(Class<?> entityType, DocumentFieldMetadata fieldMetadata) {
 		AnalyzerReference analyzerReference = fieldMetadata.getAnalyzerReference();
 		if ( analyzerReference.is( RemoteAnalyzerReference.class ) ) {
-			return analyzerReference.unwrap( RemoteAnalyzerReference.class ).getName();
+			return analyzerReference.unwrap( RemoteAnalyzerReference.class ).getAnalyzer().getName( fieldMetadata.getFieldName() );
 		}
 		LOG.analyzerIsNotRemote( entityType, fieldMetadata.getFieldName(), analyzerReference );
 		return null;
@@ -674,7 +675,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	@Override
-	public AnalyzerReference getRemoteAnalyzer(String name) {
-		return new RemoteAnalyzerReference( name );
+	public RemoteAnalyzer getRemoteAnalyzer(String name) {
+		return new RemoteAnalyzer( name );
 	}
 }

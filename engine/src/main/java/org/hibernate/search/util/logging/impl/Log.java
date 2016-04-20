@@ -7,6 +7,12 @@
 
 package org.hibernate.search.util.logging.impl;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.TRACE;
+import static org.jboss.logging.Logger.Level.WARN;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,6 +24,11 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.LazyLuceneAnalyzer;
+import org.hibernate.search.analyzer.impl.LazyRemoteAnalyzer;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
+import org.hibernate.search.analyzer.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
@@ -33,12 +44,6 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
-
-import static org.jboss.logging.Logger.Level.DEBUG;
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.TRACE;
-import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -940,4 +945,29 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 307, value = "Sort type %1$s is not compatible with %2$s type of field '%3$s'.")
 	SearchException sortTypeDoesNotMatchFieldType(String sortType, String fieldType, String fieldName);
+
+	@Message(id = 308, value = "Analyzer reference %1$s is not a remote analyzer reference.")
+	SearchException analyzerReferenceIsNotRemote(AnalyzerReference analyzerReference);
+
+	@Message(id = 309, value = "Analyzer reference %1$s is not a Lucene analyzer reference.")
+	SearchException analyzerReferenceIsNotLucene(AnalyzerReference analyzerReference);
+
+	@Message(id = 310, value = "Analyzer %1$s is not a scoped remote analyzer.")
+	SearchException scopedAnalyzerIsNotRemote(ScopedAnalyzer analyzer);
+
+	@Message(id = 311, value = "Analyzer %1$s is not a scoped Lucene analyzer.")
+	SearchException scopedAnalyzerIsNotLucene(ScopedAnalyzer analyzer);
+
+	@Message(id = 312, value = "Lazy Lucene analyzer %1$s is not initialized.")
+	SearchException lazyLuceneAnalyzerNotInitialized(LazyLuceneAnalyzer analyzer);
+
+	@Message(id = 313, value = "Remote analyzer reference %1$s is not initialized.")
+	SearchException remoteAnalyzerNotInitialized(RemoteAnalyzerReference analyzerReference);
+
+	@Message(id = 314, value = "Remote analyzer %1$s already defined as a Lucene analyzer.")
+	SearchException remoteAnalyzerAlreadyDefinedAsLuceneAnalyzer(String name);
+
+	@Message(id = 315, value = "Lazy remote analyzer %1$s is not initialized.")
+	SearchException lazyRemoteAnalyzerNotInitialized(LazyRemoteAnalyzer analyzer);
+
 }

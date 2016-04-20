@@ -14,7 +14,7 @@ import org.hibernate.search.util.impl.PassThroughAnalyzer;
  *
  * @author Davide D'Alto
  */
-public final class LuceneAnalyzerReference implements AnalyzerReference {
+public class LuceneAnalyzerReference implements AnalyzerReference {
 
 	/**
 	 * Analyzer that applies no operation whatsoever to the flux.
@@ -53,7 +53,7 @@ public final class LuceneAnalyzerReference implements AnalyzerReference {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() );
 		sb.append( "<" );
-		sb.append( analyzer.getClass().getName() );
+		sb.append( analyzer );
 		sb.append( ">" );
 		return sb.toString();
 	}

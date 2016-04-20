@@ -7,24 +7,31 @@
 package org.hibernate.search.analyzer.impl;
 
 /**
- * An analyzer defined on the backend.
+ * A reference to a {@code RemoteAnalyzer}.
  *
  * @author Davide D'Alto
+ * @author Guillaume Smet
  */
 public final class RemoteAnalyzerReference implements AnalyzerReference {
 
-	private final String name;
+	public static final RemoteAnalyzerReference DEFAULT = new RemoteAnalyzerReference( new LazyRemoteAnalyzer( "default" ) );
+	public static final RemoteAnalyzerReference PASS_THROUGH = new RemoteAnalyzerReference( new LazyRemoteAnalyzer( "keyword" ) );
 
-	public RemoteAnalyzerReference(String name) {
-		this.name = name;
+	private RemoteAnalyzer analyzer;
+
+	public RemoteAnalyzerReference(RemoteAnalyzer analyzer) {
+		this.analyzer = analyzer;
 	}
 
-	public String getName() {
-		return name;
+	public RemoteAnalyzer getAnalyzer() {
+		return analyzer;
 	}
 
 	@Override
 	public void close() {
+		if ( analyzer != null ) {
+			analyzer.close();
+		}
 	}
 
 	@Override
@@ -33,6 +40,7 @@ public final class RemoteAnalyzerReference implements AnalyzerReference {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
 		return (T) this;
 	}
@@ -42,7 +50,9 @@ public final class RemoteAnalyzerReference implements AnalyzerReference {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() );
 		sb.append( "<" );
-		sb.append( name );
+		if ( analyzer != null ) {
+			sb.append( analyzer );
+		}
 		sb.append( ">" );
 		return sb.toString();
 	}

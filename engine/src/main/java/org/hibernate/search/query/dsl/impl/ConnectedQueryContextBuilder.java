@@ -13,7 +13,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 	}
 
 	public final class HSearchEntityContext implements EntityContext {
-		private final ScopedAnalyzer queryAnalyzer;
+		private final ScopedLuceneAnalyzer queryAnalyzer;
 		private final QueryBuildingContext context;
 
 		public HSearchEntityContext(Class<?> entityType, ExtendedSearchIntegrator factory) {
@@ -51,7 +51,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 				throw log.cantQueryUnindexedType( entityType.getCanonicalName() );
 			}
 
-			queryAnalyzer = new ScopedAnalyzer( factory.getAnalyzer( indexBoundType ) );
+			queryAnalyzer = new ScopedLuceneAnalyzer( factory.getAnalyzer( indexBoundType ) );
 			context = new QueryBuildingContext( factory, queryAnalyzer, indexBoundType );
 		}
 

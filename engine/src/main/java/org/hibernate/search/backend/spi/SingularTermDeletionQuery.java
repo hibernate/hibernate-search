@@ -21,7 +21,7 @@ import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
 
 /**
  * DeleteByQuery equivalent to {@link org.apache.lucene.search.TermQuery}
@@ -93,7 +93,7 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 
 		if ( this.getType() == Type.STRING ) {
 			try {
-				ScopedAnalyzer analyzerForEntity = (ScopedAnalyzer) documentBuilder.getAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+				ScopedLuceneAnalyzer analyzerForEntity = (ScopedLuceneAnalyzer) documentBuilder.getAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 				TokenStream tokenStream = analyzerForEntity.tokenStream( this.getFieldName(), stringValue );
 				tokenStream.reset();
 				try {

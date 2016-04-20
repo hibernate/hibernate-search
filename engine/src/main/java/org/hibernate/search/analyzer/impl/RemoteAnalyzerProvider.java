@@ -21,5 +21,5 @@ public interface RemoteAnalyzerProvider {
 	 * @param name the name of the remote analyzer
 	 * @return an instance of the required analyzer.
 	 */
-	AnalyzerReference getRemoteAnalyzer(String name);
+	RemoteAnalyzer getRemoteAnalyzer(String name);
 }
