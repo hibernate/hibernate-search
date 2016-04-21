@@ -93,12 +93,12 @@ you will need the new `hibernate-search-backend-elasticsearch` jar.
 Configuration is minimal.
 Add them to your `persistence.xml` or where you put the rest of your Hibernate Search configuration.
 
-Hostname and port for Elasticsearch:: `hibernate.search.elasticsearch.host \http://127.0.0.1:9200`
 Select Elasticsearch as the backend:: `hibernate.search.default.indexmanager elasticsearch`
-Selects the index creation strategy:: `hibernate.search.elasticsearch.index_management_strategy CREATE_DELETE`
-Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.elasticsearch.index_management_wait_timeout 10000`
+Hostname and port for Elasticsearch:: `hibernate.search.default.elasticsearch.host \http://127.0.0.1:9200`
+Selects the index creation strategy:: `hibernate.search.default.elasticsearch.index_management_strategy CREATE_DELETE`
+Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000`
 
-Let's see the options for the `hibernate.search.elasticsearch.index_management_strategy` property:
+Let's see the options for the `index_management_strategy` property:
 
 [options="header"]
 |===============
@@ -108,6 +108,9 @@ Let's see the options for the `hibernate.search.elasticsearch.index_management_s
 |CREATE|Indexed will be deleted if existing and then created. This will delete all content from the index!
 |CREATE_DELETE|Similarly to 'CREATE' but will also delete the index at shutdown. Commonly used for tests.
 |===============
+
+Note that all properties besides `host` can be given globally as shown above and/or be given for specific indexes:
+`hibernate.search.someindex.elasticsearch.index_management_strategy MERGE`.
 
 ===== Elasticsearch configuration
 

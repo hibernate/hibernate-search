@@ -91,12 +91,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	@Override
 	public void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context) {
 		this.serviceManager = context.getServiceManager();
+
 		this.indexName = getIndexName( indexName, properties );
-		try ( ServiceReference<ConfigurationPropertiesProvider> propertiesProvider = serviceManager.requestReference( ConfigurationPropertiesProvider.class ) ) {
-			this.indexManagementStrategy = getIndexManagementStrategy( propertiesProvider.get().getProperties() );
-			this.indexManagementWaitTimeout = getIndexManagementWaitTimeout( propertiesProvider.get().getProperties() );
-		}
+		this.indexManagementStrategy = getIndexManagementStrategy( properties );
+		this.indexManagementWaitTimeout = getIndexManagementWaitTimeout( properties );
 		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
+
 		this.similarity = similarity;
 		this.backend = BackendFactory.createBackend( this, context, properties );
 	}
