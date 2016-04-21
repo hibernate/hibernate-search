@@ -20,6 +20,7 @@ public final class ElasticsearchEnvironment {
 		public static final String SERVER_URI = "http://localhost:9200";
 		public static final IndexManagementStrategy INDEX_MANAGEMENT_STRATEGY = IndexManagementStrategy.NONE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
+		public static final String REQUIRED_INDEX_STATUS = "green";
 	}
 
 	/**
@@ -49,6 +50,18 @@ public final class ElasticsearchEnvironment {
 	 * Defaults to {@link Defaults#INDEX_MANAGEMENT_WAIT_TIMEOUT} ms.
 	 */
 	public static final String INDEX_MANAGEMENT_WAIT_TIMEOUT = "hibernate.search.elasticsearch.index_management_wait_timeout";
+
+	/**
+	 * Property for specifying the status an index must at least have in order for Hibernate Search to work with it.
+	 * <p>
+	 * One of 'green', 'yellow' or 'red' is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#REQUIRED_INDEX_STATUS}.
+	 * <p>
+	 * Can be given globally (e.g. {@code hibernate.search.default.elasticsearch.required_index_status=green}) or for
+	 * specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.required_index_status=yellow}).
+	 */
+	public static final String REQUIRED_INDEX_STATUS = "elasticsearch.required_index_status";
 
 	private ElasticsearchEnvironment() {
 	}

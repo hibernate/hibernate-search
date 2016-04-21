@@ -74,9 +74,15 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private String actualIndexName;
 	private IndexManagementStrategy indexManagementStrategy;
 	private String indexManagementWaitTimeout;
+
+	/**
+	 * Status the index needs to be at least in, otherwise we'll fail starting up.
+	 */
+	private IndexStatus requiredIndexStatus;
+
 	private Similarity similarity;
 
-	ExtendedSearchIntegrator searchIntegrator;
+	private ExtendedSearchIntegrator searchIntegrator;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
 
 	private ServiceReference<JestClient> clientReference;
@@ -86,12 +92,41 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private SerializationProvider serializationProvider;
 	private ServiceManager serviceManager;
 
+	private enum IndexStatus {
+
+		GREEN("green"),
+		YELLOW("yellow"),
+		RED("red");
+
+		private final String elasticsearchString;
+
+		private IndexStatus(String elasticsearchString) {
+			this.elasticsearchString = elasticsearchString;
+		}
+
+		public String getElasticsearchString() {
+			return elasticsearchString;
+		}
+
+		static IndexStatus fromString(String status) {
+			for ( IndexStatus indexStatus : IndexStatus.values() ) {
+				if ( indexStatus.getElasticsearchString().equalsIgnoreCase( status ) ) {
+					return indexStatus;
+				}
+			}
+
+			throw new SearchException( "Unexpected index status: " + status + ". Specify one of 'green', 'yellow' or 'red'." );
+		}
+	}
+
 	// Lifecycle
 
 	@Override
 	public void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context) {
 		this.serviceManager = context.getServiceManager();
 		this.indexName = getIndexName( indexName, properties );
+		this.requiredIndexStatus = getRequiredIndexStatus( properties );
+
 		try ( ServiceReference<ConfigurationPropertiesProvider> propertiesProvider = serviceManager.requestReference( ConfigurationPropertiesProvider.class ) ) {
 			this.indexManagementStrategy = getIndexManagementStrategy( propertiesProvider.get().getProperties() );
 			this.indexManagementWaitTimeout = getIndexManagementWaitTimeout( propertiesProvider.get().getProperties() );
@@ -123,6 +158,16 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 
 		return timeout + "ms";
+	}
+
+	private IndexStatus getRequiredIndexStatus(Properties properties) {
+		String status = ConfigurationParseHelper.getString(
+				properties,
+				ElasticsearchEnvironment.REQUIRED_INDEX_STATUS,
+				ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS
+		);
+
+		return IndexStatus.fromString( status );
 	}
 
 	@Override
@@ -176,7 +221,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	private void waitForIndexCreation() {
 		Builder healthBuilder = new Health.Builder()
-				.setParameter( "wait_for_status", "green" )
+				.setParameter( "wait_for_status", requiredIndexStatus.getElasticsearchString() )
 				.setParameter( "timeout", indexManagementWaitTimeout );
 
 		Health health = new Health( healthBuilder ) {
@@ -186,10 +231,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			}
 		};
 
-		JestResult result = clientReference.get().executeRequest( health );
-
+		JestResult result = clientReference.get().executeRequest( health, 408 );
 		if ( !result.isSucceeded() ) {
-			throw new SearchException( "Index " + actualIndexName + " wasn't created in time; Reason: " + result.getErrorMessage() );
+			String status = result.getJsonObject().get( "status" ).getAsString();
+			throw new SearchException( "Index '" + actualIndexName + "' has status '" + status + "', but it is expected to be '"
+					+ requiredIndexStatus.getElasticsearchString() + "'." );
 		}
 	}
 
