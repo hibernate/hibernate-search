@@ -79,7 +79,7 @@ public class ElasticsearchModuleMemberRegistrationIT {
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
 					.createProperty().name( "hibernate.search.default.indexmanager" ).value( "elasticsearch" ).up()
 					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
-					.createProperty().name( "hibernate.search.elasticsearch.index_management_strategy" ).value( "CREATE_DELETE" ).up()
+					.createProperty().name( "hibernate.search.default.elasticsearch.index_management_strategy" ).value( "CREATE_DELETE" ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );
