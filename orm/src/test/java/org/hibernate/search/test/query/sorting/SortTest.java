@@ -115,7 +115,7 @@ public class SortTest extends SearchTestBase {
 
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "id_forIntegerSort", SortField.Type.LONG, false ) );
+		Sort sort = new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, false ) );
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
