@@ -456,7 +456,7 @@ public class ElasticsearchIT extends SearchTestBase {
 
 		// By id, descending
 		result = session.createFullTextQuery( query, ScientificArticle.class )
-				.setSort( new Sort( new SortField( "_uid", SortField.Type.STRING, true ) ) )
+				.setSort( new Sort( new SortField( "id", SortField.Type.STRING, true ) ) )
 				.list();
 
 		assertThat( result ).onProperty( "id" ).containsExactly(

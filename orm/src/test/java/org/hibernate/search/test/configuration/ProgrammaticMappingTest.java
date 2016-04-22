@@ -164,7 +164,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 		Query q = s.getSearchFactory().buildQueryBuilder().forEntity( Item.class ).get().all().createQuery();
 		FullTextQuery query = s.createFullTextQuery( q, Item.class );
-		query.setSort( new Sort( new SortField( "price", SortField.Type.DOUBLE ) ) );
+		query.setSort( new Sort( new SortField( "price", SortField.Type.INT ) ) );
 
 		List<?> results = query.list();
 		assertThat( results ).onProperty( "price" )
