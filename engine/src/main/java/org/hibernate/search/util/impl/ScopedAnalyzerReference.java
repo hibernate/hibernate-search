@@ -91,12 +91,9 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 
 	@Override
 	public void close() {
-		if ( globalAnalyzer != null ) {
-			globalAnalyzer.close();
-		}
-		for ( AnalyzerReference entry : analyzers.values() ) {
-			entry.close();
-		}
+		// we don't close the underlying {@code AnalyzerReference}s as they might be used by other
+		// {@code ScopedAnalyzerReference}. It is especially true for the reference to the
+		// PassThroughAnalyzer which is shared statically.
 	}
 
 	/**
