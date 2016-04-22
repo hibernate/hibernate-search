@@ -108,7 +108,7 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 	@Test
 	public void testSortingOnSortableFieldNotIncludedByIndexEmbeddedException() {
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000301" );
+		thrown.expectMessage( "HSEARCH000283" );
 
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );

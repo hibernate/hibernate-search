@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.query.engine.impl;
 
+import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +17,19 @@ import java.util.Set;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
+import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
-import org.hibernate.search.metadata.FieldDescriptor;
-import org.hibernate.search.metadata.IndexedTypeDescriptor;
-import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spatial.Coordinates;
@@ -31,8 +38,6 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 /**
  * Base class for {@link HSQuery} implementations, exposing basic state needed by all implementations.
@@ -231,31 +236,169 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	protected void validateSortFields(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities) {
 		SortField[] sortFields = sort.getSort();
 		for ( SortField sortField : sortFields ) {
-			if ( sortField instanceof DistanceSortField ) {
-				validateDistanceSortField( extendedIntegrator, targetedEntities, sortField );
+			validateSortField( extendedIntegrator, targetedEntities, sortField );
+		}
+	}
+
+	private void validateSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
+		if ( sortField instanceof DistanceSortField ) {
+			validateDistanceSortField( extendedIntegrator, targetedEntities, sortField );
+		}
+		else if ( sortField.getType() != SortField.Type.CUSTOM ) {
+			if ( sortField.getField() == null ) {
+				validateNullSortField( sortField );
+			}
+			else {
+				validateCommonSortField( extendedIntegrator, targetedEntities, sortField );
 			}
 		}
 	}
 
-	private void validateDistanceSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities,
-			SortField sortField) {
-		boolean indexedField = false;
-		String field = sortField.getField();
-		if ( field != null ) {
-			for ( Class<?> clazz : targetedEntities ) {
-				IndexedTypeDescriptor indexedTypeDescriptor = extendedIntegrator.getIndexedTypeDescriptor( clazz );
-				FieldDescriptor fieldDescriptor = indexedTypeDescriptor.getIndexedField( field );
-				if ( fieldDescriptor != null ) {
-					indexedField = true;
-					if ( fieldDescriptor.getType() != Type.SPATIAL ) {
-						throw LOG.distanceSortRequiresSpatialField( field );
+	private void validateNullSortField(SortField sortField) {
+		if ( sortField.getType() != SortField.Type.DOC && sortField.getType() != SortField.Type.SCORE ) {
+			throw LOG.sortRequiresIndexedField( sortField.getClass(), sortField.getField() );
+		}
+	}
+
+	private void validateDistanceSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
+		DocumentFieldMetadata documentFieldMetadata = findFieldMetadata( extendedIntegrator, targetedEntities, sortField.getField() );
+		if ( documentFieldMetadata == null ) {
+			throw LOG.sortRequiresIndexedField( sortField.getClass(), sortField.getField() );
+		}
+		if ( !documentFieldMetadata.isSpatial() ) {
+			throw LOG.distanceSortRequiresSpatialField( sortField.getField() );
+		}
+	}
+
+	private void validateCommonSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
+		DocumentFieldMetadata metadata = findFieldMetadata( extendedIntegrator, targetedEntities, sortField.getField() );
+		if ( metadata != null ) {
+			validateSortField( sortField, metadata );
+		}
+		else {
+			BridgeDefinedField bridgeDefinedField = findBridgeDefinedField( extendedIntegrator, targetedEntities, sortField.getField() );
+			if ( bridgeDefinedField != null ) {
+				validateSortField( sortField, bridgeDefinedField );
+			}
+			else {
+				throw LOG.sortRequiresIndexedField( sortField.getClass(), sortField.getField() );
+			}
+		}
+	}
+
+	private void validateSortField(SortField sortField, BridgeDefinedField bridgeDefinedField) {
+		switch ( sortField.getType() ) {
+			case INT:
+				assertType( sortField, bridgeDefinedField.getType(), FieldType.INTEGER );
+				break;
+			case LONG:
+				assertType( sortField, bridgeDefinedField.getType(), FieldType.LONG );
+				break;
+			case DOUBLE:
+				assertType( sortField, bridgeDefinedField.getType(), FieldType.DOUBLE );
+				break;
+			case FLOAT:
+				assertType( sortField, bridgeDefinedField.getType(), FieldType.FLOAT );
+				break;
+			case STRING:
+			case STRING_VAL:
+				assertType( sortField, bridgeDefinedField.getType(), FieldType.STRING );
+				break;
+			default:
+				throw LOG.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), String.valueOf( bridgeDefinedField.getType() ), sortField.getField() );
+		}
+	}
+
+	private void assertType(SortField sortField, FieldType actual, FieldType expected) {
+		if ( actual != expected ) {
+			throw LOG.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), String.valueOf( actual ), sortField.getField() );
+		}
+	}
+
+	private BridgeDefinedField findBridgeDefinedField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String field) {
+		if ( field == null ) {
+			return null;
+		}
+		for ( Class<?> clazz : targetedEntities ) {
+			EntityIndexBinding indexBinding = extendedIntegrator.getIndexBinding( clazz );
+			TypeMetadata typeMetadata = indexBinding.getDocumentBuilder().getTypeMetadata();
+			Set<BridgeDefinedField> classBridgeDefinedFields = typeMetadata.getClassBridgeDefinedFields();
+			for ( BridgeDefinedField definedField : classBridgeDefinedFields ) {
+				if ( definedField.getName().equals( field ) ) {
+					return definedField;
+				}
+			}
+			List<EmbeddedTypeMetadata> embeddedTypeMetadatas = typeMetadata.getEmbeddedTypeMetadata();
+			for ( EmbeddedTypeMetadata embeddedMetadata : embeddedTypeMetadatas ) {
+				Set<BridgeDefinedField> embeddedBridgeDefinedFields = embeddedMetadata.getClassBridgeDefinedFields();
+				for ( BridgeDefinedField bridgeDefinedField : embeddedBridgeDefinedFields ) {
+					if ( bridgeDefinedField.getName().equals( field ) ) {
+						return bridgeDefinedField;
 					}
-					break;
+				}
+			}
+			Set<PropertyMetadata> allPropertyMetadata = typeMetadata.getAllPropertyMetadata();
+			for ( PropertyMetadata propertyMetadata : allPropertyMetadata ) {
+				Map<String, BridgeDefinedField> bridgeDefinedFields = propertyMetadata.getBridgeDefinedFields();
+				for ( BridgeDefinedField bridgeDefinedField : bridgeDefinedFields.values() ) {
+					if ( bridgeDefinedField.getName().equals( field ) ) {
+						return bridgeDefinedField;
+					}
 				}
 			}
 		}
-		if ( !indexedField ) {
-			throw LOG.sortRequiresIndexedField( sortField.getClass(), field );
+		return null;
+	}
+
+	private DocumentFieldMetadata findFieldMetadata(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String field) {
+		if ( field == null ) {
+			return null;
+		}
+		for ( Class<?> clazz : targetedEntities ) {
+			EntityIndexBinding indexBinding = extendedIntegrator.getIndexBinding( clazz );
+			DocumentFieldMetadata metadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field );
+			if ( metadata != null ) {
+				return metadata;
+			}
+		}
+		return null;
+	}
+
+	private void validateSortField(SortField sortField, DocumentFieldMetadata fieldMetadata) {
+			if ( fieldMetadata.isNumeric() ) {
+				NumericEncodingType numericEncodingType = fieldMetadata.getNumericEncodingType();
+				validateNumericSortField( sortField, numericEncodingType );
+			}
+			else {
+				if ( sortField.getType() != SortField.Type.STRING && sortField.getType() != SortField.Type.STRING_VAL ) {
+					throw LOG.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), "string", sortField.getField() );
+				}
+			}
+	}
+
+	private void validateNumericSortField(SortField sortField, NumericEncodingType numericEncodingType) {
+		switch ( sortField.getType() ) {
+			case BYTES:
+			case INT:
+				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.INTEGER );
+				break;
+			case LONG:
+				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.LONG );
+				break;
+			case DOUBLE:
+				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.DOUBLE );
+				break;
+			case FLOAT:
+				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.FLOAT );
+				break;
+			default:
+				throw LOG.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), String.valueOf( numericEncodingType ), sortField.getField() );
+		}
+	}
+
+	private void validateNumericEncodingType(SortField sortField, NumericEncodingType actualType, NumericEncodingType validType) {
+		if ( actualType != validType ) {
+			throw LOG.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), String.valueOf( actualType ), sortField.getField() );
 		}
 	}
 

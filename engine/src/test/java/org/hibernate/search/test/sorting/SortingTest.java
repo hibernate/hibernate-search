@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.test.sorting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +30,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -35,9 +39,7 @@ import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test to verify we apply the right sorting strategy for non-trivial mapped entities
@@ -46,8 +48,13 @@ import static org.junit.Assert.assertNotNull;
  */
 public class SortingTest {
 
+	private static final String SORT_TYPE_ERROR_CODE = "HSEARCH000307";
+
 	@Rule
-	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Person.class );
+	public final ExpectedException thrown = ExpectedException.none();
+
+	@Rule
+	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Person.class, UnsortableToy.class );
 
 	@Test
 	public void testSortingOnNumericInt() {
@@ -137,6 +144,7 @@ public class SortingTest {
 		assertSortedResults( query, sortAsString, 1, 0 );
 	}
 
+	@Test
 	public void testSortOnNullableNumericField() throws Exception {
 		storeTestingData(
 				new Person( 1, 25, "name1" ),
@@ -149,6 +157,72 @@ public class SortingTest {
 
 		HSQuery ageQuery = queryForValueNullAndSorting( "ageForNullChecks", SortField.Type.INT );
 		assertEquals( ageQuery.queryEntityInfos().size(), 1 );
+	}
+
+	@Test
+	public void testExceptionSortingStringFieldAsNumeric() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
+
+		storeTestingData( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
+		Class<?> entityType = UnsortableToy.class;
+
+		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
+		Query query = queryBuilder
+				.keyword()
+				.onField( "description" )
+				.matching( "Teddy Bear" )
+				.createQuery();
+
+		Sort sort = new Sort( new SortField( "description", SortField.Type.DOUBLE ) );
+		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
+		hsQuery.targetedEntities( Arrays.<Class<?>>asList( entityType ) ).sort( sort );
+		hsQuery.queryEntityInfos().size();
+	}
+
+	@Test
+	public void testExceptionSortingNumericFieldWithStringType() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
+
+		storeTestingData( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
+		Class<?> entityType = UnsortableToy.class;
+
+		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
+		Query query = queryBuilder
+				.keyword()
+				.onField( "description" )
+				.matching( "Teddy Bear" )
+				.createQuery();
+
+		Sort sort = new Sort( new SortField( "longValue", SortField.Type.STRING ) );
+		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
+		hsQuery.targetedEntities( Arrays.<Class<?>>asList( entityType ) ).sort( sort );
+		hsQuery.queryEntityInfos().size();
+	}
+
+	@Test
+	public void testExceptionSortingNumericFieldWithWrontType() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
+
+		storeTestingData( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
+		Class<?> entityType = UnsortableToy.class;
+
+		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
+		Query query = queryBuilder
+				.keyword()
+				.onField( "description" )
+				.matching( "Teddy Bear" )
+				.createQuery();
+
+		Sort sort = new Sort( new SortField( "longValue", SortField.Type.INT ) );
+		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
+		hsQuery.targetedEntities( Arrays.<Class<?>>asList( entityType ) ).sort( sort );
+		hsQuery.queryEntityInfos().size();
 	}
 
 	@Test
@@ -191,6 +265,16 @@ public class SortingTest {
 		for ( int i = 0; i < testData.length; i++ ) {
 			Person p = testData[i];
 			worker.performWork( new Work( p, p.id, WorkType.INDEX ), tc);
+		}
+		tc.end();
+	}
+
+	private void storeTestingData(UnsortableToy... testData) {
+		Worker worker = factoryHolder.getSearchFactory().getWorker();
+		TransactionContextForTest tc = new TransactionContextForTest();
+		for ( int i = 0; i < testData.length; i++ ) {
+			UnsortableToy toy = testData[i];
+			worker.performWork( new Work( toy, toy.id, WorkType.INDEX ), tc);
 		}
 		tc.end();
 	}
@@ -302,6 +386,32 @@ public class SortingTest {
 
 		public CuddlyToy(String type) {
 			this.type = type;
+		}
+	}
+
+	@Indexed
+	private class UnsortableToy {
+
+		@DocumentId
+		String id;
+
+		@org.hibernate.search.annotations.SortableField
+		@Field(store = Store.YES, analyze = Analyze.YES)
+		String description;
+
+		@org.hibernate.search.annotations.SortableField
+		@Field(store = Store.YES, analyze = Analyze.NO)
+		Long longValue;
+
+		@org.hibernate.search.annotations.SortableField
+		@Field(store = Store.YES, analyze = Analyze.NO)
+		Integer integerValue;
+
+		public UnsortableToy(String id, String description, Long longValue, Integer integerValue) {
+			this.id = id;
+			this.description = description;
+			this.longValue = longValue;
+			this.integerValue = integerValue;
 		}
 	}
 }

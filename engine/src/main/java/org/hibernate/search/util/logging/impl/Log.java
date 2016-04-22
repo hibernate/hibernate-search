@@ -938,4 +938,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 306, value = "Index manager type is required to build a field bridge for %2$s in %1$s")
 	SearchException indexManagerTypeRequiredToBuildFieldBridge(String className, String fieldName);
 
+	@Message(id = 307, value = "Sort type %1$s is not compatible with %2$s type of field '%3$s'.")
+	SearchException sortTypeDoesNotMatchFieldType(String sortType, String fieldType, String fieldName);
 }
