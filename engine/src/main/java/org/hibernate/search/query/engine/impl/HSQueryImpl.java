@@ -31,6 +31,7 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -48,9 +49,7 @@ import org.hibernate.search.filter.impl.ChainedFilter;
 import org.hibernate.search.filter.impl.DefaultFilterKey;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.metadata.FieldDescriptor;
-import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
-import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -731,33 +730,100 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		}
 	}
 
-	private void validateSortFields(ExtendedSearchIntegrator extendedIntegrator) {
+	protected void validateSortFields(ExtendedSearchIntegrator extendedIntegrator) {
 		SortField[] sortFields = sort.getSort();
 		for ( SortField sortField : sortFields ) {
-			if ( sortField instanceof DistanceSortField ) {
-				validateDistanceSortField( extendedIntegrator, sortField );
+			validateSortField( extendedIntegrator, classesAndSubclasses, sortField );
+		}
+	}
+
+	private void validateSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
+		if ( sortField instanceof DistanceSortField ) {
+			validateDistanceSortField( extendedIntegrator, targetedEntities, sortField );
+		}
+		else if ( sortField.getType() != SortField.Type.CUSTOM ) {
+			if ( sortField.getField() == null ) {
+				validateNullSortField( sortField );
+			}
+			else {
+				validateCommonSortField( extendedIntegrator, targetedEntities, sortField );
 			}
 		}
 	}
 
-	private void validateDistanceSortField(ExtendedSearchIntegrator extendedIntegrator, SortField sortField) {
-		boolean indexedField = false;
-		String field = sortField.getField();
-		if ( field != null ) {
-			for ( Class<?> clazz : classesAndSubclasses ) {
-				IndexedTypeDescriptor indexedTypeDescriptor = extendedIntegrator.getIndexedTypeDescriptor( clazz );
-				FieldDescriptor fieldDescriptor = indexedTypeDescriptor.getIndexedField( field );
-				if ( fieldDescriptor != null ) {
-					indexedField = true;
-					if ( fieldDescriptor.getType() != Type.SPATIAL ) {
-						throw log.distanceSortRequiresSpatialField( field );
-					}
-					break;
-				}
+	private void validateNullSortField(SortField sortField) {
+		if ( sortField.getType() != SortField.Type.DOC && sortField.getType() != SortField.Type.SCORE ) {
+			throw log.sortRequiresIndexedField( sortField.getClass(), sortField.getField() );
+		}
+	}
+
+	private void validateDistanceSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
+		DocumentFieldMetadata documentFieldMetadata = findFieldMetadata( extendedIntegrator, targetedEntities, sortField.getField() );
+		if ( documentFieldMetadata == null ) {
+			throw log.sortRequiresIndexedField( sortField.getClass(), sortField.getField() );
+		}
+		if ( !documentFieldMetadata.isSpatial() ) {
+			throw log.distanceSortRequiresSpatialField( sortField.getField() );
+		}
+	}
+
+	private DocumentFieldMetadata findFieldMetadata(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String field) {
+		if ( field == null ) {
+			return null;
+		}
+		for ( Class<?> clazz : targetedEntities ) {
+			EntityIndexBinding indexBinding = extendedIntegrator.getIndexBinding( clazz );
+			DocumentFieldMetadata metadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field );
+			if ( metadata != null ) {
+				return metadata;
 			}
 		}
-		if ( !indexedField ) {
-			throw log.sortRequiresIndexedField( sortField.getClass(), field );
+		return null;
+	}
+
+	private void validateCommonSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
+		DocumentFieldMetadata metadata = findFieldMetadata( extendedIntegrator, targetedEntities, sortField.getField() );
+		if ( metadata != null ) {
+			validateSortField( sortField, metadata );
+		}
+		//else the field is not known. Custom fieldbridge? Not throwing an exception to improve backwards compatibility
+	}
+
+	private void validateSortField(SortField sortField, DocumentFieldMetadata fieldMetadata) {
+		if ( fieldMetadata.isNumeric() ) {
+			NumericEncodingType numericEncodingType = fieldMetadata.getNumericEncodingType();
+			validateNumericSortField( sortField, numericEncodingType );
+		}
+		else {
+			if ( sortField.getType() != SortField.Type.STRING && sortField.getType() != SortField.Type.STRING_VAL ) {
+				throw log.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), "string", sortField.getField() );
+			}
+		}
+	}
+
+	private void validateNumericSortField(SortField sortField, NumericEncodingType numericEncodingType) {
+		switch ( sortField.getType() ) {
+			case BYTES:
+			case INT:
+				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.INTEGER );
+				break;
+			case LONG:
+				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.LONG );
+				break;
+			case DOUBLE:
+				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.DOUBLE );
+				break;
+			case FLOAT:
+				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.FLOAT );
+				break;
+			default:
+				throw log.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), String.valueOf( numericEncodingType ), sortField.getField() );
+		}
+	}
+
+	private void validateNumericEncodingType(SortField sortField, NumericEncodingType actualType, NumericEncodingType validType) {
+		if ( actualType != validType ) {
+			throw log.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), String.valueOf( actualType ), sortField.getField() );
 		}
 	}
 
@@ -771,7 +837,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 							.getName() + " & " + entitySimilarity.getClass().getName() + ")"
 			);
 		}
-
 		return similarity;
 	}
 

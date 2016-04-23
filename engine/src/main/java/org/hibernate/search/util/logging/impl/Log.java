@@ -927,4 +927,11 @@ public interface Log extends BasicLogger {
 			+ "indexing backend for index '%s'. Some pending index writes might have been lost.")
 	void timedOutWaitingShutdown(String indexName);
 
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 304, value = "Closing index writer for IndexManager '%1$s'")
+	void closingIndexWriter(String indexName);
+
+	@Message(id = 307, value = "Sort type %1$s is not compatible with %2$s type of field '%3$s'.")
+	SearchException sortTypeDoesNotMatchFieldType(String sortType, String fieldType, String fieldName);
+
 }
