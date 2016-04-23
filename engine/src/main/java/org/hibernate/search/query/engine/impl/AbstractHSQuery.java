@@ -280,9 +280,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 			if ( bridgeDefinedField != null ) {
 				validateSortField( sortField, bridgeDefinedField );
 			}
-			else {
-				throw LOG.sortRequiresIndexedField( sortField.getClass(), sortField.getField() );
-			}
+			//else the field is not known. Custom fieldbridge? Not throwing an exception to improve backwards compatibility
 		}
 	}
 
