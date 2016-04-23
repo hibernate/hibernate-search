@@ -138,7 +138,16 @@ public class StandardServiceManager implements ServiceManager {
 		return Collections.unmodifiableMap( tmpServices );
 	}
 
-	private <S extends Service> ServiceWrapper<S> createAndCacheWrapper(Class<S> serviceRole) {
+	/**
+	 * The 'synchronized' is necessary to avoid loading the same service in parallel: enumerating service
+	 * implementations is not threadsafe when delegating to Hibernate ORM's org.hibernate.boot.registry.classloading.spi.ClassLoaderService
+	 */
+	private synchronized <S extends Service> ServiceWrapper<S> createAndCacheWrapper(Class<S> serviceRole) {
+		//Check again, for concurrent usage:
+		ServiceWrapper<S> existingWrapper = (ServiceWrapper<S>) cachedServices.get( serviceRole );
+		if ( existingWrapper != null ) {
+			return existingWrapper;
+		}
 		Set<S> services = new HashSet<>();
 		for ( S service : requestService( ClassLoaderService.class ).loadJavaServices( serviceRole ) ) {
 			services.add( service );
