@@ -46,10 +46,12 @@ public final class LazyQueryState implements Closeable {
 	private final boolean fieldSortDoMaxScore;
 	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final Set<Class<?>> targetedTypes;
+	private final QueryFilters facetingFilters;
 
 	private Query rewrittenQuery;
 
 	public LazyQueryState(Query userQuery,
+			QueryFilters facetingFilters,
 			IndexReader reader,
 			Similarity searcherSimilarity,
 			ExtendedSearchIntegrator extendedIntegrator,
@@ -57,6 +59,7 @@ public final class LazyQueryState implements Closeable {
 			boolean fieldSortDoTrackScores,
 			boolean fieldSortDoMaxScore) {
 		this.userQuery = userQuery;
+		this.facetingFilters = facetingFilters;
 		this.fieldSortDoTrackScores = fieldSortDoTrackScores;
 		this.fieldSortDoMaxScore = fieldSortDoMaxScore;
 		this.searcher = new IndexSearcher( reader );
@@ -184,7 +187,9 @@ public final class LazyQueryState implements Closeable {
 
 	private Query rewrittenQuery() throws IOException {
 		if ( rewrittenQuery == null ) {
-			rewrittenQuery = userQuery.rewrite( searcher.getIndexReader() );
+			//Apply faceting filters:
+			final Query effectiveQuery = facetingFilters.filterOrPassthrough( userQuery );
+			rewrittenQuery = effectiveQuery.rewrite( searcher.getIndexReader() );
 		}
 		return rewrittenQuery;
 	}

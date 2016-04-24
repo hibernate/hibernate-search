@@ -363,9 +363,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			filters.add( ToElasticsearch.condition( "should", typeFilters ) );
 
 			// facet filters
-			Filter facetFilter = getFacetManager().getFacetFilter();
-			if ( facetFilter != null ) {
-				filters.add( ToElasticsearch.fromLuceneFilter( getFacetManager().getFacetFilter() ) );
+			for ( Query query : getFacetManager().getFacetFilters().getFilterQueries() ) {
+				filters.add( ToElasticsearch.fromLuceneQuery( query ) );
 			}
 
 			// wrap filters into must if there is more than one

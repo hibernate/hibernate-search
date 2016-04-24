@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.query.engine.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -13,9 +14,7 @@ import java.util.Map;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
@@ -49,9 +48,9 @@ public class FacetManagerImpl implements FacetManager {
 	private Map<String, List<Facet>> facetResults;
 
 	/**
-	 * The combined filter for all selected facets which needs to be applied on the current query
+	 * The set of boolean clause filters for all selected facets which needs to be applied on the current query
 	 */
-	private Filter facetFilter;
+	private QueryFilters facetFilterset;
 
 	/**
 	 * The query from which this manager was retrieved
@@ -128,26 +127,34 @@ public class FacetManagerImpl implements FacetManager {
 	}
 
 	void queryHasChanged() {
-		facetFilter = null;
+		facetFilterset = null;
 		this.facetResults = null;
 		query.clearCachedResults();
 	}
 
-	public Filter getFacetFilter() {
-		if ( facetFilter == null ) {
-			BooleanQuery.Builder boolQueryBuilder = new BooleanQuery.Builder();
-			for ( FacetSelectionImpl selection : facetSelection.values() ) {
-				if ( !selection.getFacetList().isEmpty() ) {
-					Query selectionGroupQuery = createSelectionGroupQuery( selection );
-					boolQueryBuilder.add( selectionGroupQuery, BooleanClause.Occur.MUST );
+	public QueryFilters getFacetFilters() {
+		if ( facetFilterset == null ) {
+			int size = facetSelection.values().size();
+			if ( size != 0 ) {
+				List<Query> filterQueries = new ArrayList<>( size );
+				for ( FacetSelectionImpl selection : facetSelection.values() ) {
+					if ( !selection.getFacetList().isEmpty() ) {
+						Query selectionGroupQuery = createSelectionGroupQuery( selection );
+						filterQueries.add( selectionGroupQuery );
+					}
+				}
+				if ( filterQueries.size() != 0 ) {
+					this.facetFilterset = new QueryFilters( filterQueries );
+				}
+				else {
+					facetFilterset = QueryFilters.EMPTY_FILTERSET;
 				}
 			}
-			BooleanQuery boolQuery = boolQueryBuilder.build();
-			if ( boolQuery.getClauses().length > 0 ) {
-				this.facetFilter = new QueryWrapperFilter( boolQuery );
+			else {
+				facetFilterset = QueryFilters.EMPTY_FILTERSET;
 			}
 		}
-		return facetFilter;
+		return facetFilterset;
 	}
 
 	private Query createSelectionGroupQuery(FacetSelectionImpl selection) {
