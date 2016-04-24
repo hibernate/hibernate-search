@@ -45,13 +45,17 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery setSort(Sort sort);
 
 	/**
-	 * Allows to use lucene filters.
-	 * Semi-deprecated? a preferred way is to use the @FullTextFilterDef approach
+	 * Allows to set a single Lucene filter.
+	 * @deprecated: use the {@link org.hibernate.search.annotations.FullTextFilterDef} approach,
+	 *     or use a {@link org.apache.lucene.search.BooleanQuery} and add a clause using
+	 *     {@link org.apache.lucene.search.BooleanClause.Occur#FILTER}.
 	 *
-	 * @param filter The lucene filter.
+	 * @param filter The Lucene filter.
 	 *
-	 * @return {@code this} for method chaining
+	 * @return this for method chaining
+	 * @see org.apache.lucene.search.Filter
 	 */
+	@Deprecated
 	FullTextQuery setFilter(Filter filter);
 
 	/**
