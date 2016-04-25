@@ -1,6 +1,36 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.5.3.Final (25-04-2016)
+------------------------
+
+** Bug
+    * [HSEARCH-1917] - Cannot index null or empty values for faceted fields
+    * [HSEARCH-2082] - Documentation refers to @SortField when it should be @SortableField
+    * [HSEARCH-2085] - Typo in hibernate-search-engine logger
+    * [HSEARCH-2086] - Long and Date range faceting doesn't honor hasZeroCountsIncluded
+    * [HSEARCH-2179] - Hanging during shutdown of SyncWorkProcessor
+    * [HSEARCH-2193] - LuceneBackendQueueTask does not release the Directory lock on update failures
+    * [HSEARCH-2200] - Typo in log message
+    * [HSEARCH-2240] - Parallel service lookup might fail to find the service
+
+** New Feature
+    * [HSEARCH-2199] - Allows the use of CharFilter in the programmatic API of SearchMapping
+
+** Task
+    * [HSEARCH-2084] - Upgrade to WildFly 10.0.0.Final
+    * [HSEARCH-2089] - Ensure the performance tests do not use the WildFly embedded version of Search
+
+** Improvement
+    * [HSEARCH-1951] - Improve resulting error message when applying the wrong Sort Type
+
+** Patch
+    * [HSEARCH-2090] - Using the wrong header in the distribution/pom.xml
+
+** Deprecation
+    * [HSEARCH-2241] - Clarify deprecation of setFilter() method on FullTextQuery
+
+
 Version 5.5.2.Final (24-12-2015)
 ------------------------
 
