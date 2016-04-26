@@ -57,7 +57,7 @@ public final class BridgeFactory {
 	private final Set<BridgeProvider> regularProviders = new HashSet<>();
 
 	public BridgeFactory(ServiceManager serviceManager) {
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
 
 		for ( IndexManagerTypeSpecificBridgeProvider provider : classLoaderService.loadJavaServices( IndexManagerTypeSpecificBridgeProvider.class ) ) {
 			backendSpecificProviders.put( provider.getIndexManagerType(), provider );
@@ -73,13 +73,8 @@ public final class BridgeFactory {
 			annotationBasedProviders.add( new JavaTimeBridgeProvider() );
 		}
 
-		try {
-			for ( BridgeProvider provider : classLoaderService.loadJavaServices( BridgeProvider.class ) ) {
-				regularProviders.add( provider );
-			}
-		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
+		for ( BridgeProvider provider : classLoaderService.loadJavaServices( BridgeProvider.class ) ) {
+			regularProviders.add( provider );
 		}
 		regularProviders.add( new EnumBridgeProvider() );
 		regularProviders.add( new BasicJDKTypesBridgeProvider( serviceManager ) );

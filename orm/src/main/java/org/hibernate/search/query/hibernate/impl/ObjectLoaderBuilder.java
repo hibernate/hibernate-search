@@ -95,14 +95,11 @@ public class ObjectLoaderBuilder {
 			if ( entityType == null ) {
 				ServiceManager serviceManager = extendedIntegrator.getServiceManager();
 				try {
-					ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+					ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
 					entityType = classLoaderService.classForName( targetEntity );
 				}
 				catch (ClassLoadingException e) {
 					throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
-				}
-				finally {
-					serviceManager.releaseService( ClassLoaderService.class );
 				}
 			}
 			else {

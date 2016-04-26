@@ -269,7 +269,7 @@ public class ClassLoaderHelper {
 
 	public static Class<?> classForName(String classNameToLoad, String componentDescription, ServiceManager serviceManager) {
 		Class<?> clazz;
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
 		try {
 			clazz = classLoaderService.classForName( classNameToLoad );
 		}
@@ -278,9 +278,6 @@ public class ClassLoaderHelper {
 					"Unable to find " + componentDescription +
 							" implementation class: " + classNameToLoad, e
 			);
-		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
 		}
 		return clazz;
 	}
@@ -315,13 +312,7 @@ public class ClassLoaderHelper {
 	 * @throws ClassLoadingException From {@link Class#forName(String, boolean, ClassLoader)}.
 	 */
 	public static Class classForName(String classNameToLoad, ServiceManager serviceManager) {
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
-		try {
-			return classLoaderService.classForName( classNameToLoad );
-		}
-
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
-		}
+		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
+		return classLoaderService.classForName( classNameToLoad );
 	}
 }

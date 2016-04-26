@@ -32,14 +32,8 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 
 	@Override
 	public InputStream openResource(String resource) throws IOException {
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
-		InputStream inputStream;
-		try {
-			inputStream = classLoaderService.locateResourceStream( resource );
-		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
-		}
+		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
+		InputStream inputStream = classLoaderService.locateResourceStream( resource );
 
 		if ( inputStream == null ) {
 			throw log.unableToLoadResource( resource );

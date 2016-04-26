@@ -126,15 +126,12 @@ public class IndexControl implements IndexControlMBean {
 
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
 		try {
 			clazz = classLoaderService.classForName( entity );
 		}
 		catch (ClassLoadingException e) {
 			throw new IllegalArgumentException( entity + " not a indexed entity" );
-		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
 		}
 		return clazz;
 	}
