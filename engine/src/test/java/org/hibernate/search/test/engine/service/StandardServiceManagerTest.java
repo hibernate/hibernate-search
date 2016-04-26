@@ -153,40 +153,6 @@ public class StandardServiceManagerTest {
 		serviceManagerUnderTest.requestService( SimpleService.class );
 	}
 
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1547")
-	public void testProvidedServicesCannotImplementStartable() {
-		searchConfiguration = new SearchConfigurationForTest();
-
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000210" ) );
-		searchConfiguration.addProvidedService(
-				StartableProvidedService.class,
-				new StartableProvidedServiceImpl()
-		);
-		serviceManagerUnderTest = new StandardServiceManager(
-				searchConfiguration,
-				new DummyBuildContext()
-		);
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1547")
-	public void testProvidedServicesCannotImplementStoppable() {
-		searchConfiguration = new SearchConfigurationForTest();
-
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000210" ) );
-		searchConfiguration.addProvidedService(
-				StoppableProvidedService.class,
-				new StoppableProvidedServiceImpl()
-		);
-		serviceManagerUnderTest = new StandardServiceManager(
-				searchConfiguration,
-				new DummyBuildContext()
-		);
-	}
-
 	// actual impl is not relevant for testing the service manager
 	// build context is passed through to services which might need it for initialization
 	private class DummyBuildContext implements BuildContext {

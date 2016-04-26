@@ -112,27 +112,9 @@ public class StandardServiceManager implements ServiceManager {
 	}
 
 	private Map<Class<? extends Service>, Object> createProvidedServices(SearchConfiguration searchConfiguration) {
-		Map<Class<? extends Service>, Object> tmpServices = new HashMap<Class<? extends Service>, Object>();
-
-		for ( Map.Entry<Class<? extends Service>, Object> entry : searchConfiguration.getProvidedServices()
-				.entrySet() ) {
-			Object service = entry.getValue();
-			if ( service instanceof Startable ) {
-				throw log.providedServicesCannotImplementStartableOrStoppable(
-						service.getClass().getName(),
-						Startable.class.getName()
+		Map<Class<? extends Service>, Object> tmpServices = new HashMap<Class<? extends Service>, Object>(
+				searchConfiguration.getProvidedServices()
 				);
-			}
-			else if ( service instanceof Stoppable ) {
-				throw log.providedServicesCannotImplementStartableOrStoppable(
-						service.getClass().getName(),
-						Stoppable.class.getName()
-				);
-			}
-			else {
-				tmpServices.put( entry.getKey(), entry.getValue() );
-			}
-		}
 
 		if ( tmpServices.containsKey( ClassLoaderService.class ) ) {
 			throw log.classLoaderServiceContainedInProvidedServicesException();

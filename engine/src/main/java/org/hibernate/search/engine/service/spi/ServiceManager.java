@@ -12,13 +12,13 @@ package org.hibernate.search.engine.service.spi;
  * <p>
  * Services are divided into discovered services (via {@link java.util.ServiceLoader} and provided services. The latter occurs
  * via {@link org.hibernate.search.cfg.spi.SearchConfiguration#getProvidedServices()} and
- * {@link org.hibernate.search.cfg.spi.SearchConfiguration#getClassLoaderService()}. Provided services are also treated
- * special in the sense that they are not allowed to implemented {@link org.hibernate.search.engine.service.spi.Startable} or
- * {@link org.hibernate.search.engine.service.spi.Stoppable} (an exception is thrown if they do so).
- * It is the responsibility of the provider of these services to manage their life cycle. This also prevents circular
- * dependencies where a service where a service during bootstrapping could request other (uninitialized) services via
- * the {@link org.hibernate.search.engine.service.spi.Startable#start(java.util.Properties, org.hibernate.search.spi.BuildContext)}
- * callback.
+ * {@link org.hibernate.search.cfg.spi.SearchConfiguration#getClassLoaderService()}.
+ * </p>
+ * <p>
+ * It is the responsibility of the provider of these services to manage their life cycle: even if they implement
+ * {@link org.hibernate.search.engine.service.spi.Startable} or {@link org.hibernate.search.engine.service.spi.Stoppable},
+ * they will not be started or stopped automatically, while the methods on these interfaces will be invoked for
+ * the services discovered via the serviceloader.
  * </p>
  * <p>
  * Any service requested should be released using {@link #releaseService(Class)} when it's not needed anymore.
