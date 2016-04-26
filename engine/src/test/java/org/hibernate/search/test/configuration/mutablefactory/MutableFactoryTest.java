@@ -284,16 +284,10 @@ public class MutableFactoryTest {
 	}
 
 	private static Class<?> getClassByNumber(int i, ServiceManager serviceManager) throws ClassNotFoundException {
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
-		Class<?> clazz;
-		try {
-			clazz = classLoaderService.classForName(
+		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
+		Class<?> clazz = classLoaderService.classForName(
 					Generated.A0.class.getName().replace( "A0", "A" + i )
 			);
-		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
-		}
 		return clazz;
 	}
 

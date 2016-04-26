@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.service.spi;
 
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+
 /**
  * The {@code ServiceManager} is used to manage services in and runtime discovery of service implementations in the scope
  * of a single {@code SearchFactory}.
@@ -71,4 +73,12 @@ public interface ServiceManager {
 	 * {@code IllegalStateException} will be thrown in this case.
 	 */
 	void releaseAllServices();
+
+	/**
+	 * Provides direct access to the {@link ClassLoaderService}.
+	 * This service lookup is treated as a special case both for convenience and performance reasons.
+	 * @return the {@link ClassLoaderService}
+	 */
+	ClassLoaderService getClassLoaderService();
+
 }

@@ -42,6 +42,7 @@ public class StandardServiceManager implements ServiceManager {
 	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices = new ConcurrentHashMap<Class<?>, ServiceWrapper<?>>();
 	private final Map<Class<? extends Service>, Object> providedServices;
 	private final Map<Class<? extends Service>, String> defaultServices;
+	private final ClassLoaderService classloaderService;
 
 	private volatile boolean allServicesReleased = false;
 
@@ -56,6 +57,7 @@ public class StandardServiceManager implements ServiceManager {
 		this.properties = searchConfiguration.getProperties();
 		this.providedServices = createProvidedServices( searchConfiguration );
 		this.defaultServices = defaultServices;
+		this.classloaderService = searchConfiguration.getClassLoaderService();
 	}
 
 	@Override
@@ -283,4 +285,13 @@ public class StandardServiceManager implements ServiceManager {
 	private enum ServiceStatus {
 		RUNNING, STOPPED, STARTING, STOPPING
 	}
+
+	/* (non-Javadoc)
+	 * @see org.hibernate.search.engine.service.spi.ServiceManager#getClassLoaderService()
+	 */
+	@Override
+	public ClassLoaderService getClassLoaderService() {
+		return classloaderService;
+	}
+
 }
