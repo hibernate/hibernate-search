@@ -1956,16 +1956,15 @@ will be raised.
 .What is a calling context
 ====
 
-A calling context is represented by the BridgeContext object and represents the environment for
-which we are looking for a bridge. BridgeContext gives access to the return type of the indexed
+A calling context is represented by the BridgeProviderContext object and represents the environment for
+which we are looking for a bridge. BridgeProviderContext gives access to the return type of the indexed
 property as well as the ServiceManager which gives access to the ClassLoaderService for everything
 class loader related.
 
 [source, JAVA]
 ----
-ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
-//use the classLoaderService
-serviceManager.releaseService( ClassLoaderService.class );
+ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
+CustomBridge cb = classLoaderService.classForName( "com.package.CustomBridge" );
 ----
 ====
 
