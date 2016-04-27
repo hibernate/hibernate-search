@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -70,13 +72,27 @@ class FieldHelper {
 	}
 
 	static boolean isBoolean(EntityIndexBinding indexBinding, String fieldName) {
-		String propertyTypeName = getPropertyTypeName( indexBinding, fieldName );
-		return "boolean".equals( propertyTypeName ) || "java.lang.Boolean".equals( propertyTypeName );
+		Class<?> propertyClass = getPropertyClass( indexBinding, fieldName );
+		if ( propertyClass == null ) {
+			return false;
+		}
+		return boolean.class.equals( propertyClass ) || Boolean.class.isAssignableFrom( propertyClass );
 	}
 
 	static boolean isDate(EntityIndexBinding indexBinding, String fieldName) {
-		String propertyTypeName = getPropertyTypeName( indexBinding, fieldName );
-		return "java.util.Date".equals( propertyTypeName );
+		Class<?> propertyClass = getPropertyClass( indexBinding, fieldName );
+		if ( propertyClass == null ) {
+			return false;
+		}
+		return Date.class.isAssignableFrom( propertyClass );
+	}
+
+	static boolean isCalendar(EntityIndexBinding indexBinding, String fieldName) {
+		Class<?> propertyClass = getPropertyClass( indexBinding, fieldName );
+		if ( propertyClass == null ) {
+			return false;
+		}
+		return Calendar.class.isAssignableFrom( propertyClass );
 	}
 
 	static boolean isNumeric(DocumentFieldMetadata field) {
@@ -98,9 +114,9 @@ class FieldHelper {
 		return isEmbeddedField ? DOT.split( fieldName ) : new String[]{ fieldName };
 	}
 
-	private static String getPropertyTypeName(EntityIndexBinding indexBinding, String fieldName) {
+	private static Class<?> getPropertyClass(EntityIndexBinding indexBinding, String fieldName) {
 		PropertyMetadata propertyMetadata = getPropertyMetadata( indexBinding, fieldName );
-		return propertyMetadata != null ? propertyMetadata.getPropertyAccessor().getType().getName() : null;
+		return propertyMetadata != null ? propertyMetadata.getPropertyClass() : null;
 	}
 
 	private static PropertyMetadata getPropertyMetadata(EntityIndexBinding indexBinding, String fieldName) {
