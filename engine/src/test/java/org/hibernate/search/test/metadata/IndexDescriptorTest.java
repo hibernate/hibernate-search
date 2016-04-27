@@ -14,7 +14,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
@@ -57,7 +57,7 @@ public class IndexDescriptorTest {
 
 	@Test
 	public void testSharedIndexInformation() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class, DirectoryBasedIndexManager.class );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class, LuceneEmbeddedIndexManagerType.INSTANCE );
 		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
 				typeMetadata,
 				DescriptorTestHelper.getDummyShardedIndexManager()

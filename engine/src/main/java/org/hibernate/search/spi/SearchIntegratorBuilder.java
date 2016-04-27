@@ -63,7 +63,7 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
@@ -371,7 +371,7 @@ public class SearchIntegratorBuilder {
 				optimizationBlackListedTypes.add( mappedXClass );
 			}
 
-			Class<? extends IndexManager> indexManagerType = indexesFactory.getIndexManagerType(
+			IndexManagerType indexManagerType = indexesFactory.getIndexManagerType(
 					mappedXClass, searchConfiguration, buildContext );
 
 			// Create all DocumentBuilderIndexedEntity

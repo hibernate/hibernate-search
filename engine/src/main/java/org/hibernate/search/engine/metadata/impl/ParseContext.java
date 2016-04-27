@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 
 /**
  * Collects context information needed during the processing of the annotations.
@@ -23,18 +23,18 @@ public class ParseContext {
 	private final Set<String> spatialNames = new TreeSet<>();
 	private final Set<String> unqualifiedCollectedCollectionRoles = new HashSet<>();
 
-	private Class<? extends IndexManager> indexManagerType;
+	private IndexManagerType indexManagerType;
 	private XClass currentClass;
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
 	private boolean explicitDocumentId = false;
 	private boolean includeEmbeddedObjectId = false;
 
-	public Class<? extends IndexManager> getIndexManagerType() {
+	public IndexManagerType getIndexManagerType() {
 		return indexManagerType;
 	}
 
-	void setIndexManagerType(Class<? extends IndexManager> indexManagerType) {
+	void setIndexManagerType(IndexManagerType indexManagerType) {
 		this.indexManagerType = indexManagerType;
 	}
 

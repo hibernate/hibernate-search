@@ -29,6 +29,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -66,8 +67,7 @@ public class IndexManagerHolder {
 
 	private static final String DEFAULT_INDEX_MANAGER_KEY = "__DEFAULT__";
 
-	private final ConcurrentMap<String, Class<? extends IndexManager>> indexManagerImplementationsRegistry
-			= new ConcurrentHashMap<String, Class<? extends IndexManager>>();
+	private final ConcurrentMap<String, IndexManagerType> indexManagerImplementationsRegistry = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
 	// I currently think it's easier to not hide sharding implementations in a custom
@@ -552,12 +552,14 @@ public class IndexManagerHolder {
 		return isShardingDynamic;
 	}
 
-	public Class<? extends IndexManager> getIndexManagerType(XClass entity, SearchConfiguration cfg, WorkerBuildContext buildContext) {
+	public synchronized IndexManagerType getIndexManagerType(XClass entity, SearchConfiguration cfg, WorkerBuildContext buildContext) {
 		ServiceManager serviceManager = buildContext.getServiceManager();
 		IndexManagerFactory indexManagerFactory = serviceManager.requestService( IndexManagerFactory.class );
 
 		String indexName = getIndexName( entity, cfg );
 		Properties[] indexProperties = getIndexProperties( cfg, indexName );
+		//TODO the following code assumes that all shards use the same type;
+		//we decided to commit on this limitation by design, yet it's not being validated at this point.
 		String indexManagerImplementationName = indexProperties[0].getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
 
 		String indexManagerImplementationKey = StringHelper.isEmpty( indexManagerImplementationName ) ?
@@ -566,19 +568,14 @@ public class IndexManagerHolder {
 			return indexManagerImplementationsRegistry.get( indexManagerImplementationKey );
 		}
 
+		final IndexManagerType indexManagerType;
 		try {
-			Class<? extends IndexManager> indexManagerType;
-			if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
-				indexManagerType = indexManagerFactory.createDefaultIndexManager().getClass();
-			}
-			else {
-				indexManagerType = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName ).getClass();
-			}
-			indexManagerImplementationsRegistry.put( indexManagerImplementationKey, indexManagerType );
-			return indexManagerType;
+			indexManagerType = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName ).getIndexManagerType();
 		}
 		finally {
 			serviceManager.releaseService( IndexManagerFactory.class );
 		}
+		indexManagerImplementationsRegistry.put( indexManagerImplementationKey, indexManagerType );
+		return indexManagerType;
 	}
 }
