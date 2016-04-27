@@ -19,6 +19,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 
 /**
  * Bridge a {@code java.util.Date} truncated to the specified resolution to a numerically indexed {@code long}.
@@ -37,7 +38,7 @@ import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class NumericEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge {
+public class NumericEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
 
 	public static final TwoWayFieldBridge DATE_YEAR = new NumericEncodingDateBridge( Resolution.YEAR );
 	public static final TwoWayFieldBridge DATE_MONTH = new NumericEncodingDateBridge( Resolution.MONTH );

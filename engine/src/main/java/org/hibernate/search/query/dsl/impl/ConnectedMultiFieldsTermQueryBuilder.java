@@ -22,6 +22,7 @@ import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -101,7 +102,9 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		validateNullValueIsSearchable( fieldContext );
 		final String searchTerm = buildSearchTerm( fieldContext, documentBuilder, conversionContext );
 
-		if ( !applyTokenization ) {
+		if ( !applyTokenization || fieldBridge instanceof IgnoreAnalyzerBridge ||
+				(fieldBridge instanceof NullEncodingTwoWayFieldBridge
+						&& ((NullEncodingTwoWayFieldBridge) fieldBridge).unwrap() instanceof IgnoreAnalyzerBridge ) ) {
 			perFieldQuery = createTermQuery( fieldContext, searchTerm );
 		}
 		else {

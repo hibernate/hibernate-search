@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.bridge.builtin.time.impl;
 
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
@@ -13,7 +14,7 @@ import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncod
  *
  * @author Davide D'Alto
  */
-public interface NumericTimeBridge {
+public interface NumericTimeBridge extends IgnoreAnalyzerBridge {
 
 	/**
 	 * Define the numeric encoding to use for the brdige.
