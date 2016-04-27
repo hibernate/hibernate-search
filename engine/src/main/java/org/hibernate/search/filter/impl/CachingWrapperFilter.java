@@ -108,6 +108,10 @@ public class CachingWrapperFilter extends Filter {
 		}
 	}
 
+	public Filter getCachedFilter() {
+		return filter;
+	}
+
 	@Override
 	public String toString(String field) {
 		return "CachingWrapperFilter(" + filter.toString( field ) + ")";

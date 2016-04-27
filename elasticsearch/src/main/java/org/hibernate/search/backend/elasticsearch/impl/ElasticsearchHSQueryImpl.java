@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -31,19 +32,22 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
+import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.backend.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.filter.FullTextFilter;
+import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
@@ -200,24 +204,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	@Override
-	public HSQuery filter(Filter filter) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not yet implemented" );
-	}
-
-	@Override
-	public FullTextFilter enableFullTextFilter(String name) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not yet implemented" );
-	}
-
-	@Override
-	public void disableFullTextFilter(String name) {
-		// TODO implement
-		throw new UnsupportedOperationException( "Not yet implemented" );
-	}
-
-	@Override
 	protected void clearCachedResults() {
 		searchResult = null;
 		resultSize = null;
@@ -365,6 +351,20 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			// facet filters
 			for ( Query query : getFacetManager().getFacetFilters().getFilterQueries() ) {
 				filters.add( ToElasticsearch.fromLuceneQuery( query ) );
+			}
+
+			// user filter
+			if ( userFilter != null ) {
+				filters.add( ToElasticsearch.fromLuceneFilter( userFilter ) );
+			}
+
+			if ( !filterDefinitions.isEmpty() ) {
+				for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
+					JsonObject filter = buildFullTextFilter( fullTextFilter );
+					if ( filter != null ) {
+						filters.add( filter );
+					}
+				}
 			}
 
 			// wrap filters into must if there is more than one
@@ -737,6 +737,70 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					bucket.getAsJsonObject().get( "doc_count" ).getAsInt() ) );
 		}
 		return facets;
+	}
+
+	private JsonObject buildFullTextFilter(FullTextFilterImpl fullTextFilter) {
+
+		/*
+		 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
+		 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
+		 */
+		FilterDef def = extendedIntegrator.getFilterDefinition( fullTextFilter.getName() );
+		//def can never be null, it's guarded by enableFullTextFilter(String)
+
+		if ( isPreQueryFilterOnly( def ) ) {
+			return null;
+		}
+
+		Object filterOrFactory = createFilterInstance( fullTextFilter, def );
+		return createFullTextFilter( def, filterOrFactory );
+	}
+
+	protected JsonObject createFullTextFilter(FilterDef def, Object filterOrFactory) {
+		JsonObject jsonFilter;
+		if ( def.getFactoryMethod() != null ) {
+			try {
+				Object candidateFilter = def.getFactoryMethod().invoke( filterOrFactory );
+				if ( candidateFilter instanceof Filter ) {
+					jsonFilter = ToElasticsearch.fromLuceneFilter( (Filter) candidateFilter );
+				}
+				else if ( candidateFilter instanceof ElasticsearchFilter ) {
+					jsonFilter = GsonHolder.PARSER.parse( ( (ElasticsearchFilter) candidateFilter ).getJsonFilter() ).getAsJsonObject();
+				}
+				else {
+					throw new SearchException(
+							"Factory method does not return a Filter class or an ElasticsearchFilter class: "
+									+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+				}
+			}
+			catch (IllegalAccessException | InvocationTargetException e) {
+				throw new SearchException(
+						"Unable to access @Factory method: "
+								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(),
+						e );
+			}
+		}
+		else {
+			if ( filterOrFactory instanceof Filter ) {
+				jsonFilter = ToElasticsearch.fromLuceneFilter( (Filter) filterOrFactory );
+			}
+			else if ( filterOrFactory instanceof ElasticsearchFilter ) {
+				jsonFilter = GsonHolder.PARSER.parse( ( (ElasticsearchFilter) filterOrFactory ).getJsonFilter() ).getAsJsonObject();
+			}
+			else {
+				throw new SearchException(
+						"Filter implementation does not implement the Filter interface or does not extend ElasticsearchFilter: "
+								+ def.getImpl().getName() + ". "
+								+ ( def.getFactoryMethod() != null ? def.getFactoryMethod().getName() : "" ) );
+			}
+		}
+
+		if ( jsonFilter != null &&
+				( FilterCacheModeType.NONE.equals( def.getCacheMode() ) || FilterCacheModeType.INSTANCE_ONLY.equals( def.getCacheMode() ) ) ) {
+			jsonFilter.entrySet().iterator().next().getValue().getAsJsonObject().addProperty( "_cache", false );
+		}
+
+		return jsonFilter;
 	}
 
 	private boolean isNested(DiscreteFacetRequest facetRequest) {

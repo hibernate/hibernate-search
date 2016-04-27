@@ -25,6 +25,7 @@ import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
@@ -436,6 +437,9 @@ public class ToElasticsearch {
 		}
 		else if ( luceneFilter instanceof SpatialHashFilter ) {
 			return convertSpatialHashFilter( (SpatialHashFilter) luceneFilter );
+		}
+		else if ( luceneFilter instanceof CachingWrapperFilter ) {
+			return fromLuceneFilter( ( (CachingWrapperFilter) luceneFilter ).getCachedFilter() );
 		}
 		throw LOG.cannotTransformLuceneFilterIntoEsQuery( luceneFilter );
 	}

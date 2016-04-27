@@ -229,7 +229,6 @@
                                 <exclude>**/UpdateOperationsTest.java</exclude>
                                 <exclude>**/TransactionTest.java</exclude>
                                 <exclude>**/SearchAndEnversIntegrationTest.java</exclude>
-                                <exclude>**/FilterTest.java</exclude>
                                 <exclude>**/IndexingActionInterceptorTest.java</exclude>
                                 <exclude>**/IndexControlMBeanTest.java</exclude>
                                 <exclude>**/ToStringTest.java</exclude>

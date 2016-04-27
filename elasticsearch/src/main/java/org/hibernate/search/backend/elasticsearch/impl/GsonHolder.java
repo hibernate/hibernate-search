@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 
 import io.searchbox.client.AbstractJestClient;
 
@@ -25,4 +26,7 @@ public class GsonHolder {
 			.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT )
 			.serializeNulls()
 			.create();
+
+	public static final JsonParser PARSER = new JsonParser();
+
 }
