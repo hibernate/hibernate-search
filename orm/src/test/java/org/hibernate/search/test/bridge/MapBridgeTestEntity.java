@@ -36,9 +36,9 @@ import org.hibernate.search.annotations.Store;
 public class MapBridgeTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
-	static final String NULL_NUMERIC_TOKEN = "-1";
+	static final String NULL_NUMERIC_TOKEN = "-7777";
 	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
-	static final String NULL_EMBEDDED_NUMERIC = "-1";
+	static final String NULL_EMBEDDED_NUMERIC = "-4444";
 
 	private Long id;
 	private String name;
@@ -94,6 +94,7 @@ public class MapBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	// The attribute prefix should be ignored; It does not make much sense in the context of a collection
 	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")

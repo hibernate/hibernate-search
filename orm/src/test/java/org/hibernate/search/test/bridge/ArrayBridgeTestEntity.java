@@ -35,10 +35,10 @@ import org.hibernate.search.annotations.Store;
 public class ArrayBridgeTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
-	static final String NULL_NUMERIC_TOKEN = "-1";
+	static final String NULL_NUMERIC_TOKEN = "-555";
 	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
 
-	static final String NULL_EMBEDDED_NUMERIC = "-1";
+	static final String NULL_EMBEDDED_NUMERIC = "-666";
 
 	private Long id;
 	private String name;
@@ -90,6 +90,7 @@ public class ArrayBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	// The attribute prefix should be ignored; It does not make much sense in the context of a collection
 	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@OrderColumn
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "array_id"))
