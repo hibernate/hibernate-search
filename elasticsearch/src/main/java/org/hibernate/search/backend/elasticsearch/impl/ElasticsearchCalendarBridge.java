@@ -18,6 +18,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 
 /**
  * Bridge a {@code java.util.Calendar} to a {@code String} using the ISO 8601 standard which is the default date format
@@ -27,7 +28,7 @@ import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
  *
  * @author Guillaume Smet
  */
-public class ElasticsearchCalendarBridge implements TwoWayFieldBridge, ParameterizedBridge {
+public class ElasticsearchCalendarBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
 
 	public static final ElasticsearchCalendarBridge DATE_YEAR = new ElasticsearchCalendarBridge( Resolution.YEAR );
 	public static final ElasticsearchCalendarBridge DATE_MONTH = new ElasticsearchCalendarBridge( Resolution.MONTH );

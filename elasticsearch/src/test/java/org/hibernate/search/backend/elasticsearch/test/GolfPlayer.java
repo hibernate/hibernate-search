@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.test;
 
 import java.math.BigInteger;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,11 +22,13 @@ import javax.persistence.SequenceGenerator;
 
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.builtin.DoubleBridge;
 
 /**
@@ -59,7 +62,12 @@ public class GolfPlayer {
 	private Boolean active;
 
 	@Field(indexNullAs = "1970-01-01")
+	@DateBridge(resolution = Resolution.DAY)
 	private Date dateOfBirth;
+
+	@Field(indexNullAs = "1970-01-01")
+	@DateBridge(resolution = Resolution.DAY)
+	private Calendar subscriptionEndDate;
 
 	@Field
 	private double handicap;
@@ -125,6 +133,15 @@ public class GolfPlayer {
 		this.dateOfBirth = dateOfBirth;
 	}
 
+
+	public Calendar getSubscriptionEndDate() {
+		return subscriptionEndDate;
+	}
+
+	public void setSubscriptionEndDate(Calendar subscriptionEndDate) {
+		this.subscriptionEndDate = subscriptionEndDate;
+	}
+
 	public double getHandicap() {
 		return handicap;
 	}
@@ -179,6 +196,7 @@ public class GolfPlayer {
 		private String lastName;
 		private boolean active;
 		private Date dateOfBirth;
+		private Calendar subscriptionEndDate;
 		private double handicap;
 		private double puttingStrength;
 		private Integer driveWidth;
@@ -203,6 +221,11 @@ public class GolfPlayer {
 
 		public Builder dateOfBirth(Date dateOfBirth) {
 			this.dateOfBirth = dateOfBirth;
+			return this;
+		}
+
+		public Builder subscriptionEndDate(Calendar subscriptionEndDate) {
+			this.subscriptionEndDate = subscriptionEndDate;
 			return this;
 		}
 
@@ -246,6 +269,7 @@ public class GolfPlayer {
 			player.setLastName( lastName );
 			player.setActive( active );
 			player.setDateOfBirth( dateOfBirth );
+			player.setSubscriptionEndDate( subscriptionEndDate );
 			player.setHandicap( handicap );
 			player.setPuttingStrength( puttingStrength );
 			player.setDriveWidth( driveWidth );
