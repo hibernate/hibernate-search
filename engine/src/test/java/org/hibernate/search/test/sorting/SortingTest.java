@@ -204,7 +204,7 @@ public class SortingTest {
 	}
 
 	@Test
-	public void testExceptionSortingNumericFieldWithWrontType() throws Exception {
+	public void testExceptionSortingNumericFieldWithWrongType() throws Exception {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
 
