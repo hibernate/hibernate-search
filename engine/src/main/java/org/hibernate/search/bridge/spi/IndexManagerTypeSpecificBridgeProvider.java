@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.bridge.spi;
 
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 
 /**
  * Bridge provider specific to a given {@code IndexManager} type.
@@ -18,10 +18,10 @@ import org.hibernate.search.indexes.spi.IndexManager;
 public interface IndexManagerTypeSpecificBridgeProvider extends BridgeProvider {
 
 	/**
-	 * Returns the {@code IndexManager} type for which we register the bridge
+	 * Returns the {@code IndexManagerType} for which we register the bridge
 	 *
-	 * @return the {@code IndexManager} type for which we register the bridge
+	 * @return the {@code IndexManagerType} type for which we register the bridge
 	 */
-	Class<? extends IndexManager> getIndexManagerType();
+	IndexManagerType getIndexManagerType();
 
 }
