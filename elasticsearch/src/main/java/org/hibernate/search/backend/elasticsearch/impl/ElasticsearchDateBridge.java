@@ -14,6 +14,7 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchDateHelper;
+import org.hibernate.search.bridge.IgnoreAnalyzerBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -27,7 +28,7 @@ import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
  *
  * @author Guillaume Smet
  */
-public class ElasticsearchDateBridge implements TwoWayFieldBridge, ParameterizedBridge {
+public class ElasticsearchDateBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
 
 	public static final ElasticsearchDateBridge DATE_YEAR = new ElasticsearchDateBridge( Resolution.YEAR );
 	public static final ElasticsearchDateBridge DATE_MONTH = new ElasticsearchDateBridge( Resolution.MONTH );
