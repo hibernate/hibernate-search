@@ -113,7 +113,7 @@ public class IterableBridgeTest extends SearchTestBase {
 	@Test
 	public void testSearchNullNumericEmbedded() throws Exception {
 		List<IterableBridgeTestEntity> results =
-				findEmbeddedNullResults( "embeddedNum", IterableBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
+				findEmbeddedNullResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );

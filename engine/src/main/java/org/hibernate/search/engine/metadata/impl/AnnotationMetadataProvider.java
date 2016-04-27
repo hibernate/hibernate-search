@@ -102,6 +102,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 @SuppressWarnings( "deprecation" )
 public class AnnotationMetadataProvider implements MetadataProvider {
+	private static final int INFINITE_DEPTH = Integer.MAX_VALUE;
+
 	private static final Log log = LoggerFactory.make();
 	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = DefaultStringBridge.INSTANCE;
 	private static final String UNKNOWN_MAPPED_BY_ROLE = "";
@@ -999,7 +1001,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private void updateContainedInMetadata(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty propertyWithContainedIn, String accessType) {
-		XClass memberReturnedType = propertyWithContainedIn.getElementClass();
+		XClass memberReturnedType = returnedType( propertyWithContainedIn );
 		String mappedBy = mappedBy( propertyWithContainedIn );
 		List<XProperty> returnedTypeProperties = memberReturnedType.getDeclaredProperties( accessType );
 		for ( XProperty property : returnedTypeProperties ) {
@@ -1298,7 +1300,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return facetEncodingType; // encoding type explicitly set
 		}
 
-		Class<?> indexedType = reflectionManager.toClass( member.getElementClass() );
+		Class<?> indexedType = reflectionManager.toClass( returnedType( member ) );
 		if ( ReflectionHelper.isIntegerType( indexedType ) ) {
 			facetEncodingType = FacetEncodingType.LONG;
 		}
@@ -1672,40 +1674,35 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
+		boolean elementCollection = isElementCollection( member );
+		if ( elementCollection ) {
+			// @IndexEmbedded used with @ElementCollection
+			logWarnings( member, indexedEmbeddedAnnotation );
+		}
+
 		parseContext.collectUnqualifiedCollectionRole( member.getName() );
 
 		int oldMaxLevel = parseContext.getMaxLevel();
-		int potentialLevel = depth( indexedEmbeddedAnnotation ) + parseContext.getLevel();
-		// This is really catching a possible int overflow. depth() can return Integer.MAX_VALUE, which then can
-		// overflow in case level > 0. Really this code should be rewritten (HF)
-		if ( potentialLevel < 0 ) {
-			potentialLevel = Integer.MAX_VALUE;
-		}
-		// HSEARCH-1442 recreating the behavior prior to PropertiesMetadata refactoring
+		int potentialLevel = elementCollection ? INFINITE_DEPTH : potentialLevel( parseContext, indexedEmbeddedAnnotation, member );
+		// HSEARCH-1442 recreating the behaviour prior to PropertiesMetadata refactoring
 		// not sure whether this is algorithmically correct though. @IndexedEmbedded processing should be refactored (HF)
 		if ( potentialLevel < oldMaxLevel ) {
 			parseContext.setMaxLevel( potentialLevel );
 		}
 		parseContext.incrementLevel();
 
-		XClass elementClass;
-		if ( void.class == indexedEmbeddedAnnotation.targetElement() ) {
-			elementClass = member.getElementClass();
-		}
-		else {
-			elementClass = reflectionManager.toXClass( indexedEmbeddedAnnotation.targetElement() );
-		}
+		XClass elementClass = elementCollection ? returnedType( member ) : elementClass( member, indexedEmbeddedAnnotation );
+		String localPrefix = elementCollection ? defaultPrefix( member ) : buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member );
+		boolean includeEmbeddedObjectId = elementCollection ? false : indexedEmbeddedAnnotation.includeEmbeddedObjectId();
 
-		if ( parseContext.getMaxLevel() == Integer.MAX_VALUE //infinite
+		if ( parseContext.getMaxLevel() == INFINITE_DEPTH
 				&& parseContext.hasBeenProcessed( elementClass ) ) {
 			throw log.detectInfiniteTypeLoopInIndexedEmbedded(
 					elementClass.getName(),
 					typeMetadataBuilder.getIndexedType().getName(),
-					buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member )
-			);
+					localPrefix );
 		}
 
-		String localPrefix = buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member );
 		PathsContext updatedPathsContext = updatePaths( localPrefix, pathsContext, indexedEmbeddedAnnotation );
 
 		boolean pathsCreatedAtThisLevel = false;
@@ -1752,7 +1749,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			XClass previousClass = parseContext.getCurrentClass();
 			parseContext.setCurrentClass( elementClass );
 			boolean previousIncludeEmbeddedObjectId = parseContext.includeEmbeddedObjectId();
-			parseContext.setIncludeEmbeddedObjectId( indexedEmbeddedAnnotation.includeEmbeddedObjectId() );
+			parseContext.setIncludeEmbeddedObjectId( includeEmbeddedObjectId );
 			initializeClass(
 					embeddedTypeMetadataBuilder,
 					false,
@@ -1797,15 +1794,65 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
+	private void logWarnings(XProperty member, IndexedEmbedded indexedEmbeddedAnnotation) {
+		if ( isDepthSet( indexedEmbeddedAnnotation ) ) {
+			log.indexEmbeddedValueIgnored( member.getName(), "depth" );
+		}
+		if ( void.class != indexedEmbeddedAnnotation.targetElement() ) {
+			log.indexEmbeddedValueIgnored( member.getName(), "targetElement" );
+		}
+		if ( !isDefaultPrefix( indexedEmbeddedAnnotation ) ) {
+			log.indexEmbeddedValueIgnored( member.getName(), "prefix" );
+		}
+		if ( indexedEmbeddedAnnotation.includeEmbeddedObjectId() ) {
+			log.indexEmbeddedValueIgnored( member.getName(), "includeEmbeddedObjectId" );
+		}
+	}
+
+	private int potentialLevel(ParseContext parseContext, IndexedEmbedded indexedEmbeddedAnnotation, XProperty member) {
+		int potentialLevel = depth( indexedEmbeddedAnnotation ) + parseContext.getLevel();
+		// This is really catching a possible int overflow. depth() can return Integer.MAX_VALUE, which then can
+		// overflow in case level > 0. Really this code should be rewritten (HF)
+		if ( potentialLevel < 0 ) {
+			potentialLevel = INFINITE_DEPTH;
+		}
+		return potentialLevel;
+	}
+
+	private XClass elementClass(XProperty member, IndexedEmbedded indexedEmbeddedAnnotation) {
+		if ( void.class == indexedEmbeddedAnnotation.targetElement() ) {
+			return returnedType( member );
+		}
+		else {
+			return reflectionManager.toXClass( indexedEmbeddedAnnotation.targetElement() );
+		}
+	}
+
+	private XClass returnedType(XProperty member) {
+		return member.getElementClass();
+	}
+
+	private boolean isElementCollection(XProperty member) {
+		Annotation[] annotations = member.getAnnotations();
+		for ( Annotation annotation : annotations ) {
+			String type = annotation.annotationType().getName();
+			// Using String because the annotation class might not be on the classpath
+			if ( "javax.persistence.ElementCollection".equals( type ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private int depth(IndexedEmbedded embeddedAnn) {
-		if ( isDepthNotSet( embeddedAnn ) && embeddedAnn.includePaths().length > 0 ) {
+		if ( !isDepthSet( embeddedAnn ) && embeddedAnn.includePaths().length > 0 ) {
 			return 0;
 		}
 		return embeddedAnn.depth();
 	}
 
-	private boolean isDepthNotSet(IndexedEmbedded embeddedAnn) {
-		return Integer.MAX_VALUE == embeddedAnn.depth();
+	private boolean isDepthSet(IndexedEmbedded embeddedAnn) {
+		return INFINITE_DEPTH != embeddedAnn.depth();
 	}
 
 	private boolean isInPath(String localPrefix, PathsContext pathsContext, IndexedEmbedded embeddedAnn) {
@@ -1839,12 +1886,16 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		String localPrefix = prefix;
 		if ( isDefaultPrefix( indexedEmbeddedAnnotation ) ) {
 			//default to property name
-			localPrefix += member.getName() + '.';
+			localPrefix += defaultPrefix( member );
 		}
 		else {
 			localPrefix += indexedEmbeddedAnnotation.prefix();
 		}
 		return localPrefix;
+	}
+
+	private String defaultPrefix(XProperty member) {
+		return member.getName() + '.';
 	}
 
 	private boolean isDefaultPrefix(IndexedEmbedded indexedEmbeddedAnnotation) {

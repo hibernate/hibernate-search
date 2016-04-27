@@ -104,11 +104,11 @@ public class ArrayBridgeTest extends SearchTestBase {
 	@Test
 	public void testSearchNullNumericEmbedded() throws Exception {
 		List<ArrayBridgeTestEntity> results =
-				findEmbeddedNullResults( "embeddedNum", ArrayBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
+				findEmbeddedNullResults( "numericNullIndexed", ArrayBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEmbedded.getName(), results.get( 0 ).getName() );
+		assertEquals( "Wrong result returned looking for a null collection", withNullEmbedded.getName(), results.get( 0 ).getName() );
 	}
 
 	@Test
