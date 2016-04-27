@@ -1032,6 +1032,9 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1791")
+	@Category(SkipOnElasticsearch.class)
+	// In the Elasticsearch case, we end up with a RemoteMatchQuery which is perfectly fine
+	// as soon as the analyzer is a conservative one (keyword).
 	public void testUseMatchQueryOnEmbeddedNumericIdCreatesTermQuery() throws Exception {
 		QueryBuilder coffeeQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Coffee.class ).get();

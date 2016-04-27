@@ -42,6 +42,7 @@ import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.PriorityQueue;
 import org.apache.lucene.util.UnicodeUtil;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
@@ -471,7 +472,7 @@ public class MoreLikeThisBuilder<T> {
 	private void addTermFrequencies(Reader r, Map<String, Int> termFreqMap, FieldContext fieldContext)
 			throws IOException {
 		String fieldName = fieldContext.getField();
-		Analyzer analyzer = queryContext.getQueryAnalyzer();
+		Analyzer analyzer = queryContext.getQueryAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 		if ( !fieldContext.applyAnalyzer() ) {
 			// essentially does the Reader to String conversion for us
 			analyzer = PassThroughAnalyzer.INSTANCE;

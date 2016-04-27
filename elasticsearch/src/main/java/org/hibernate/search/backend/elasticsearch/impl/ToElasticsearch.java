@@ -27,10 +27,13 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
+import org.hibernate.search.query.dsl.impl.RemoteMatchQuery;
+import org.hibernate.search.query.dsl.impl.RemotePhraseQuery;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.impl.DistanceFilter;
 import org.hibernate.search.spatial.impl.SpatialHashFilter;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -147,8 +150,11 @@ public class ToElasticsearch {
 		else if ( query instanceof FuzzyQuery ) {
 			return convertFuzzyQuery( (FuzzyQuery) query );
 		}
-		else if ( query instanceof PhraseQuery ) {
-			return convertPhraseQuery( (PhraseQuery) query );
+		else if ( query instanceof RemotePhraseQuery ) {
+			return convertRemotePhraseQuery( (RemotePhraseQuery) query );
+		}
+		else if ( query instanceof RemoteMatchQuery ) {
+			return convertRemoteMatchQuery( (RemoteMatchQuery) query );
 		}
 		else if ( query instanceof ConstantScoreQuery ) {
 			return convertConstantScoreQuery( (ConstantScoreQuery) query );
@@ -158,6 +164,9 @@ public class ToElasticsearch {
 		}
 		else if ( query instanceof Filter ) {
 			return fromLuceneFilter( (Filter) query );
+		}
+		else if ( query instanceof PhraseQuery ) {
+			return convertPhraseQuery( (PhraseQuery) query );
 		}
 
 		throw LOG.cannotTransformLuceneQueryIntoEsQuery( query );
@@ -276,6 +285,11 @@ public class ToElasticsearch {
 		return wrapQueryForNestedIfRequired( field, fuzzyQuery );
 	}
 
+	/**
+	 * This is best effort only: the PhraseQuery may contain multiple terms at the same position
+	 * (think synonyms) or gaps (think stopwords) and it's in this case impossible to translate
+	 * it into a correct ElasticsearchQuery.
+	 */
 	private static JsonObject convertPhraseQuery(PhraseQuery query) {
 		Term[] terms = query.getTerms();
 
@@ -300,6 +314,40 @@ public class ToElasticsearch {
 				).build();
 
 		return wrapQueryForNestedIfRequired( field, phraseQuery );
+	}
+
+	private static JsonObject convertRemotePhraseQuery(RemotePhraseQuery query) {
+		if ( StringHelper.isEmpty( query.getPhrase() ) ) {
+			throw LOG.cannotQueryOnEmptyPhraseQuery();
+		}
+
+		JsonObject phraseQuery = JsonBuilder.object()
+				.add( "match_phrase",
+						JsonBuilder.object().add( query.getField(),
+								JsonBuilder.object()
+										.addProperty( "query", query.getPhrase().trim() )
+										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzer().getName( query.getField() ) )
+										.addProperty( "slop", query.getSlop() )
+										.addProperty( "boost", query.getBoost() )
+						)
+				).build();
+
+		return wrapQueryForNestedIfRequired( query.getField(), phraseQuery );
+	}
+
+	private static JsonObject convertRemoteMatchQuery(RemoteMatchQuery query) {
+		JsonObject matchQuery = JsonBuilder.object()
+				.add( "match",
+						JsonBuilder.object().add( query.getField(),
+								JsonBuilder.object()
+										.addProperty( "query", query.getSearchTerms() )
+										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzer().getName( query.getField() ) )
+										.addProperty( "fuzziness", query.getMaxEditDistance() )
+										.addProperty( "boost", query.getBoost() )
+						)
+				).build();
+
+		return wrapQueryForNestedIfRequired( query.getField(), matchQuery );
 	}
 
 	private static JsonObject convertTermRangeQuery(TermRangeQuery query) {

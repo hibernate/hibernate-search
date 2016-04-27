@@ -15,7 +15,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * A reference to a {@code ScopedAnalyzer}.
+ * A reference to a {@code ScopedAnalyzer} - either a Lucene one or a remote one.
  *
  * @author Davide D'Alto
  * @author Guillaume Smet
@@ -80,18 +80,20 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 		private AnalyzerReference globalAnalyzerReference;
 		private final ScopedAnalyzer scopedAnalyzer;
 
-		public Builder(ScopedAnalyzerReference original) {
-			this.globalAnalyzerReference = original.globalAnalyzerReference;
-			this.scopedAnalyzer = original.scopedAnalyzer.clone();
-		}
-
 		public Builder(AnalyzerReference globalAnalyzerReference) {
-			this.globalAnalyzerReference = globalAnalyzerReference;
-			if ( globalAnalyzerReference instanceof RemoteAnalyzerReference ) {
-				this.scopedAnalyzer = new ScopedRemoteAnalyzer( globalAnalyzerReference );
+			if ( globalAnalyzerReference instanceof ScopedAnalyzerReference ) {
+				ScopedAnalyzerReference original = (ScopedAnalyzerReference) globalAnalyzerReference;
+				this.globalAnalyzerReference = original.globalAnalyzerReference;
+				this.scopedAnalyzer = original.scopedAnalyzer.clone();
 			}
 			else {
-				this.scopedAnalyzer = new ScopedLuceneAnalyzer( globalAnalyzerReference );
+				this.globalAnalyzerReference = globalAnalyzerReference;
+				if ( globalAnalyzerReference instanceof RemoteAnalyzerReference ) {
+					this.scopedAnalyzer = new ScopedRemoteAnalyzer( globalAnalyzerReference );
+				}
+				else {
+					this.scopedAnalyzer = new ScopedLuceneAnalyzer( globalAnalyzerReference );
+				}
 			}
 		}
 

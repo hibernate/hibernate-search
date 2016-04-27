@@ -137,4 +137,16 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * @throws org.hibernate.search.exception.SearchException if the definition name is unknown
 	 */
 	AnalyzerReference getAnalyzerReference(String name);
+
+	/**
+	 * Retrieve the scoped analyzer reference for a given class.
+	 *
+	 * @param clazz The class for which to retrieve the analyzer.
+	 *
+	 * @return The scoped analyzer for the specified class.
+	 *
+	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
+	 * class is not an indexed entity.
+	 */
+	AnalyzerReference getAnalyzerReference(Class<?> clazz);
 }

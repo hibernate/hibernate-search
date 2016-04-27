@@ -7,11 +7,11 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 
 /**
  * Keep the query builder contextual information
@@ -21,12 +21,12 @@ import org.hibernate.search.exception.AssertionFailure;
 public class QueryBuildingContext {
 	private final ExtendedSearchIntegrator factory;
 	private final DocumentBuilderIndexedEntity documentBuilder;
-	private final Analyzer queryAnalyzer;
+	private final ScopedAnalyzerReference queryAnalyzerReference;
 	private final Class<?> entityType;
 
-	public QueryBuildingContext(ExtendedSearchIntegrator factory, Analyzer queryAnalyzer, Class<?> entityType) {
+	public QueryBuildingContext(ExtendedSearchIntegrator factory, ScopedAnalyzerReference queryAnalyzerReference, Class<?> entityType) {
 		this.factory = factory;
-		this.queryAnalyzer = queryAnalyzer;
+		this.queryAnalyzerReference = queryAnalyzerReference;
 		this.entityType = entityType;
 
 		EntityIndexBinding indexBinding = factory.getIndexBinding( entityType );
@@ -44,8 +44,8 @@ public class QueryBuildingContext {
 		return documentBuilder;
 	}
 
-	public Analyzer getQueryAnalyzer() {
-		return queryAnalyzer;
+	public ScopedAnalyzerReference getQueryAnalyzerReference() {
+		return queryAnalyzerReference;
 	}
 
 	public Class<?> getEntityType() {
