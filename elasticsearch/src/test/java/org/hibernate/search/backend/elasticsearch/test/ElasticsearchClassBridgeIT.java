@@ -83,11 +83,11 @@ public class ElasticsearchClassBridgeIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "fullName:\"Klaus Hergesheimer\"" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Class-brigde provided string field" ).containsOnly( 1L );
+		assertThat( result ).onProperty( "id" ).describedAs( "Class-bridge provided string field" ).containsOnly( 1L );
 
 		query = ElasticsearchQueries.fromQueryString( "age:34" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).onProperty( "id" ).describedAs( "Class-brigde provided numeric field" ).containsOnly( 1L );
+		assertThat( result ).onProperty( "id" ).describedAs( "Class-bridge provided numeric field" ).containsOnly( 1L );
 
 		tx.commit();
 		s.close();
