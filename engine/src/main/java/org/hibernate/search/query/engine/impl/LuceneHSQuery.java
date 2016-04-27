@@ -40,7 +40,6 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.ChainedFilter;
@@ -52,7 +51,6 @@ import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -711,10 +709,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		return filter;
 	}
 
-	private boolean isPreQueryFilterOnly(FilterDef def) {
-		return def.getImpl().equals( ShardSensitiveOnlyFilter.class );
-	}
-
 	private Filter createFilter(FilterDef def, Object filterOrFactory) {
 		Filter filter;
 		if ( def.getFactoryMethod() != null ) {
@@ -803,14 +797,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		}
 
 		return key;
-	}
-
-	private Object createFilterInstance(FullTextFilterImpl fullTextFilter, FilterDef def) {
-		final Object instance = ClassLoaderHelper.instanceFromClass( Object.class, def.getImpl(), "@FullTextFilterDef" );
-		for ( Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet() ) {
-			def.invoke( entry.getKey(), instance, entry.getValue() );
-		}
-		return instance;
 	}
 
 	private org.apache.lucene.search.Query filterQueryByClasses(org.apache.lucene.search.Query luceneQuery) {

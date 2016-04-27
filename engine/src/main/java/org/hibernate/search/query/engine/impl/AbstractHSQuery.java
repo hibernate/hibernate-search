@@ -28,6 +28,7 @@ import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.FullTextFilter;
+import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -36,6 +37,7 @@ import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -198,6 +200,18 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	public void disableFullTextFilter(String name) {
 		clearCachedResults();
 		filterDefinitions.remove( name );
+	}
+
+	protected Object createFilterInstance(FullTextFilterImpl fullTextFilter, FilterDef def) {
+		final Object instance = ClassLoaderHelper.instanceFromClass( Object.class, def.getImpl(), "@FullTextFilterDef" );
+		for ( Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet() ) {
+			def.invoke( entry.getKey(), instance, entry.getValue() );
+		}
+		return instance;
+	}
+
+	protected boolean isPreQueryFilterOnly(FilterDef def) {
+		return def.getImpl().equals( ShardSensitiveOnlyFilter.class );
 	}
 
 	// getters
