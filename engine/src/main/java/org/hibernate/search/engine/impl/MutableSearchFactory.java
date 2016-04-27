@@ -214,6 +214,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
+	public AnalyzerReference getAnalyzerReference(Class<?> clazz) {
+		return delegate.getAnalyzerReference( clazz );
+	}
+
+	@Override
 	public QueryContextBuilder buildQueryBuilder() {
 		return delegate.buildQueryBuilder();
 	}

@@ -55,13 +55,14 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			Query query = queryBuilder
 					.phrase()
+						.withSlop( 2 )
 						.onField( "message" )
 						.sentence( "A very important matter" )
 					.createQuery();
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'match_phrase':{'message':{'query':'very important matter','slop':0,'boost':1.0}}}}", queryString );
+			assertJsonEquals( "{'query':{'match_phrase':{'message':{'query':'A very important matter','analyzer':'english','slop':2,'boost':1.0}}}}", queryString );
 		}
 	}
 
@@ -98,11 +99,25 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
-			assertJsonEquals( "{'query':{'bool':{'should':["
-					+ "{'term':{'message':{'value':'very','boost':1.0}}},"
-					+ "{'term':{'message':{'value':'important','boost':1.0}}},"
-					+ "{'term':{'message':{'value':'matter','boost':1.0}}}"
-					+ "]}}}", queryString );
+			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','analyzer':'english','fuzziness':0,'boost':1.0}}}}", queryString );
+		}
+	}
+
+	@Test
+	public void testDSLPhraseQueryWithoutAnalyzer() {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+
+			Query query = queryBuilder
+					.phrase()
+						.onField( "signature" )
+						.sentence( "Gunnar Morling" )
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'match_phrase':{'signature':{'query':'Gunnar Morling','analyzer':'default','slop':0,'boost':1.0}}}}", queryString );
 		}
 	}
 
@@ -129,6 +144,9 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 		@Analyzer(definition = "english")
 		private String message;
 
+		@Field
+		private String signature;
+
 		public Integer getId() {
 			return id;
 		}
@@ -143,6 +161,14 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 
 		public void setMessage(String message) {
 			this.message = message;
+		}
+
+		public String getSignature() {
+			return signature;
+		}
+
+		public void setSignature(String signature) {
+			this.signature = signature;
 		}
 	}
 }

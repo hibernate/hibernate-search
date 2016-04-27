@@ -327,9 +327,14 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
+		return getAnalyzerReference( clazz ).unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+	}
+
+	@Override
+	public AnalyzerReference getAnalyzerReference(Class<?> clazz) {
 		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( clazz );
 		DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
-		return builder.getAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+		return builder.getAnalyzerReference();
 	}
 
 	@Override

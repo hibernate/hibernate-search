@@ -13,7 +13,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
-import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
+import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -38,21 +38,20 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 	}
 
 	public final class HSearchEntityContext implements EntityContext {
-		private final ScopedLuceneAnalyzer queryAnalyzer;
-		private final QueryBuildingContext context;
+		private final Class<?> indexBoundType;
+		private final ScopedAnalyzerReference.Builder queryAnalyzerReferenceBuilder;
 
 		public HSearchEntityContext(Class<?> entityType, ExtendedSearchIntegrator factory) {
 			// get a type for meta-data retrieval; if the given type itself is not indexed, one indexed sub-type will
 			// be used; note that this allows to e.g. query for fields not present on the given type but on one of its
 			// sub-types, but we accept this for now
-			Class<?> indexBoundType = getIndexBoundType( entityType, factory );
+			indexBoundType = getIndexBoundType( entityType, factory );
 
 			if ( indexBoundType == null ) {
 				throw log.cantQueryUnindexedType( entityType.getCanonicalName() );
 			}
 
-			queryAnalyzer = new ScopedLuceneAnalyzer( factory.getAnalyzer( indexBoundType ) );
-			context = new QueryBuildingContext( factory, queryAnalyzer, indexBoundType );
+			queryAnalyzerReferenceBuilder = new ScopedAnalyzerReference.Builder( factory.getAnalyzerReference( indexBoundType ) );
 		}
 
 		/**
@@ -79,13 +78,13 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 		@Override
 		public EntityContext overridesForField(String field, String analyzerName) {
-			queryAnalyzer.addScopedAnalyzer( field, factory.getAnalyzer( analyzerName ) );
+			queryAnalyzerReferenceBuilder.addAnalyzerReference( field, factory.getAnalyzerReference( analyzerName ) );
 			return this;
 		}
 
 		@Override
 		public QueryBuilder get() {
-			return new ConnectedQueryBuilder(context);
+			return new ConnectedQueryBuilder( new QueryBuildingContext( factory, queryAnalyzerReferenceBuilder.build(), indexBoundType ) );
 		}
 	}
 }

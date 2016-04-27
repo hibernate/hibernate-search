@@ -50,14 +50,14 @@ public final class IndexWriterDelegate {
 		indexWriter.deleteDocuments( idTerm );
 	}
 
-	public void addDocument(final Document document, final ScopedAnalyzerReference analyzer) throws IOException {
+	public void addDocument(final Document document, final ScopedAnalyzerReference analyzerReference) throws IOException {
 		//This is now equivalent to the old "addDocument" method:
-		updateDocument( null, document, analyzer );
+		updateDocument( null, document, analyzerReference );
 	}
 
-	public void updateDocument(final Term idTerm, final Document document, final ScopedAnalyzerReference analyzer) throws IOException {
+	public void updateDocument(final Term idTerm, final Document document, final ScopedAnalyzerReference analyzerReference) throws IOException {
 		// Try being optimistic first:
-		ScopedLuceneAnalyzer scopedAnalyzer = (ScopedLuceneAnalyzer) analyzer.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+		ScopedLuceneAnalyzer scopedAnalyzer = (ScopedLuceneAnalyzer) analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 		final boolean applyWithinReadLock;
 		readLock.lock();
 		try {

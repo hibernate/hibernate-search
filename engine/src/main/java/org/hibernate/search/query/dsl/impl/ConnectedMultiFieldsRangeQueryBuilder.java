@@ -14,12 +14,15 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**
@@ -113,21 +116,34 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	}
 
 	private static Query createKeywordRangeQuery(String fieldName, RangeQueryContext rangeContext, QueryBuildingContext queryContext, ConversionContext conversionContext, FieldContext fieldContext) {
-		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
+		final AnalyzerReference analyzerReference = queryContext.getQueryAnalyzerReference();
+
 		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
+
 		final String fromString = rangeContext.hasFrom() ?
 				fieldContext.objectToString( documentBuilder, rangeContext.getFrom(), conversionContext ) :
 				null;
-		final String lowerTerm = fromString == null ?
-				null :
-				Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
-
 		final String toString = rangeContext.hasTo() ?
 				fieldContext.objectToString( documentBuilder, rangeContext.getTo(), conversionContext ) :
 				null;
-		final String upperTerm = toString == null ?
-				null :
-				Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
+
+		String lowerTerm;
+		String upperTerm;
+		if ( queryContext.getFactory().getIndexBinding( queryContext.getEntityType() ).getIndexManagers()[0] instanceof RemoteAnalyzerProvider ) {
+			lowerTerm = fromString == null ? null : fromString;
+			upperTerm = toString == null ? null : toString;
+		}
+		else {
+			final Analyzer queryAnalyzer = analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+
+			lowerTerm = fromString == null ?
+					null :
+					Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
+
+			upperTerm = toString == null ?
+					null :
+					Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
+		}
 
 		return TermRangeQuery.newStringRange( fieldName, lowerTerm, upperTerm, !rangeContext.isExcludeFrom(), !rangeContext.isExcludeTo() );
 	}

@@ -15,7 +15,9 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
@@ -89,11 +91,17 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 
 	@Override
 	public Query toLuceneQuery(DocumentBuilderIndexedEntity documentBuilder) {
+		AnalyzerReference analyzerReferenceForEntity = documentBuilder.getAnalyzerReference();
 		String stringValue = documentBuilder.objectToString( fieldName, this.getValue(), new ContextualExceptionBridgeHelper() );
 
 		if ( this.getType() == Type.STRING ) {
 			try {
-				ScopedLuceneAnalyzer analyzerForEntity = (ScopedLuceneAnalyzer) documentBuilder.getAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+				if ( analyzerReferenceForEntity.is( RemoteAnalyzerReference.class ) ) {
+					// no need to take into account the analyzer here as it will be dealt with remotely
+					return new TermQuery( new Term( this.getFieldName(), stringValue ) );
+				}
+
+				ScopedLuceneAnalyzer analyzerForEntity = (ScopedLuceneAnalyzer) analyzerReferenceForEntity.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
 				TokenStream tokenStream = analyzerForEntity.tokenStream( this.getFieldName(), stringValue );
 				tokenStream.reset();
 				try {

@@ -19,6 +19,8 @@ import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
@@ -105,23 +107,13 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			perFieldQuery = createTermQuery( fieldContext, searchTerm );
 		}
 		else {
-			List<String> terms = getAllTermsFromText(
-					fieldContext.getField(), searchTerm, queryContext.getQueryAnalyzer()
-			);
-
-			if ( terms.size() == 0 ) {
-				throw log.queryWithNoTermsAfterAnalysis( fieldContext.getField(), searchTerm );
-			}
-			else if ( terms.size() == 1 ) {
-				perFieldQuery = createTermQuery( fieldContext, terms.get( 0 ) );
+			// we need to build differentiated queries depending of if the search terms should be analyzed
+			// locally or not
+			if ( queryContext.getQueryAnalyzerReference().is( RemoteAnalyzerReference.class ) ) {
+				perFieldQuery = createRemoteQuery( fieldContext, searchTerm );
 			}
 			else {
-				BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
-				for ( String localTerm : terms ) {
-					Query termQuery = createTermQuery( fieldContext, localTerm );
-					booleanQueryBuilder.add( termQuery, BooleanClause.Occur.SHOULD );
-				}
-				perFieldQuery = booleanQueryBuilder.build();
+				perFieldQuery = createLuceneQuery( fieldContext, searchTerm );
 			}
 		}
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
@@ -162,14 +154,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				query = new WildcardQuery( new Term( fieldName, term ) );
 				break;
 			case FUZZY:
-				int maxEditDistance;
-				if ( termContext.getThreshold() != null ) {
-					//support legacy withThreshold setting
-					maxEditDistance = FuzzyQuery.floatToEdits( termContext.getThreshold(), term.length() );
-				}
-				else {
-					maxEditDistance = termContext.getMaxEditDistance();
-				}
+				int maxEditDistance = getMaxEditDistance( term );
 				query = new FuzzyQuery(
 						new Term( fieldName, term ),
 						maxEditDistance,
@@ -180,6 +165,69 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				throw new AssertionFailure( "Unknown approximation: " + termContext.getApproximation() );
 		}
 		return query;
+	}
+
+	private int getMaxEditDistance(String term) {
+		int maxEditDistance;
+		if ( termContext.getThreshold() != null ) {
+			//support legacy withThreshold setting
+			maxEditDistance = FuzzyQuery.floatToEdits( termContext.getThreshold(), term.length() );
+		}
+		else {
+			maxEditDistance = termContext.getMaxEditDistance();
+		}
+		return maxEditDistance;
+	}
+
+	private Query createLuceneQuery(FieldContext fieldContext, String searchTerm) {
+		Query query;
+		List<String> terms = getAllTermsFromText(
+				fieldContext.getField(),
+				searchTerm,
+				queryContext.getQueryAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer()
+		);
+
+		if ( terms.size() == 0 ) {
+			throw log.queryWithNoTermsAfterAnalysis( fieldContext.getField(), searchTerm );
+		}
+		else if ( terms.size() == 1 ) {
+			query = createTermQuery( fieldContext, terms.get( 0 ) );
+		}
+		else {
+			BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
+			for ( String localTerm : terms ) {
+				Query termQuery = createTermQuery( fieldContext, localTerm );
+				booleanQueryBuilder.add( termQuery, BooleanClause.Occur.SHOULD );
+			}
+			query = booleanQueryBuilder.build();
+		}
+		return query;
+	}
+
+	private Query createRemoteQuery(FieldContext fieldContext, String searchTerm) {
+		// in the case of wildcard, we just return a WildcardQuery
+		if ( termContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {
+			return new WildcardQuery( new Term( fieldContext.getField(), searchTerm ) );
+		}
+
+		RemoteMatchQuery.Builder queryBuilder = new RemoteMatchQuery.Builder();
+		queryBuilder
+				.field( fieldContext.getField() )
+				.searchTerms( searchTerm );
+
+		RemoteAnalyzerReference analyzerReference = queryContext.getQueryAnalyzerReference().unwrap( RemoteAnalyzerReference.class );
+		if ( analyzerReference != null ) {
+			queryBuilder.analyzerReference( analyzerReference );
+		}
+
+		if ( termContext.getApproximation() == TermQueryContext.Approximation.FUZZY ) {
+			// TODO: remove the threshold method as it's deprecated and not accurate
+			// the max edit distance based on the total searchTerm length which is wrong
+			// It might be a good time to consider removing the deprecated threshold method
+			queryBuilder.maxEditDistance( getMaxEditDistance( searchTerm ) );
+		}
+
+		return queryBuilder.build();
 	}
 
 	private List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) {
