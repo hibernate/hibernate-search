@@ -144,8 +144,6 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class)
-	// The analyzer code is not yet complete
 	public void testTermQueryOnAnalyzer() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -752,8 +750,6 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class)
-	// The analyzer code is not yet complete
 	public void testPhraseQueryWithStopWords() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -774,16 +770,15 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1074")
-	@Category(ElasticsearchSupportInProgress.class)
-	// The analyzer code is not yet complete
 	public void testPhraseQueryWithNoTermsAfterAnalyzerApplication() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
+		// we use mythology_stem here as the default analyzer for Elasticsearch does not include a stopwords filter
 		Query query = monthQb.
 				phrase()
-				.onField( "mythology" )
+				.onField( "mythology_stem" )
 				.sentence( "and" )
 				.createQuery();
 
@@ -1051,8 +1046,6 @@ public class DSLTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2199")
-	@Category(SkipOnElasticsearch.class)
-	// It tests the ability to define CharFilters programmatically so it does not make sense for Elasticsearch
 	public void testCharFilters() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
