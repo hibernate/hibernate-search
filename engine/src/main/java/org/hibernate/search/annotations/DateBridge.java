@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * Defines the temporal resolution and encoding type of a {@code java.util.Date} field.
  *
  * <p>
- * <b>Note:</b> Dates are encoded in the GMT timezone.
+ * <b>Note:</b> Dates are encoded in the GMT/UTC time zone.
  *
  * @author Emmanuel Bernard
  */

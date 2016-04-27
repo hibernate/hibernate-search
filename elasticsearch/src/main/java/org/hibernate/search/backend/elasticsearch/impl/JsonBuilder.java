@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.Calendar;
 import java.util.Date;
+
+import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchDateHelper;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -116,12 +119,10 @@ public class JsonBuilder {
 				jsonObject.addProperty( property, (Character) value );
 			}
 			else if (value instanceof Date) {
-				// we use this Gson formatter to be sure the date format is in sync with the JestClient configuration
-				jsonObject.addProperty( property, GsonHolder.GSON.toJson( value ).replace( "\"", "" ) );
+				jsonObject.addProperty( property, ElasticsearchDateHelper.dateToString( (Date) value ) );
 			}
-			// TODO GSM: see if we have to support Calendar here as Gson serializes Calendar in a weird fashion
-			else {
-				jsonObject.addProperty( property, value.toString() );
+			else if ( value instanceof Calendar ) {
+				jsonObject.addProperty( property, ElasticsearchDateHelper.calendarToString( (Calendar) value ) );
 			}
 			return this;
 		}
