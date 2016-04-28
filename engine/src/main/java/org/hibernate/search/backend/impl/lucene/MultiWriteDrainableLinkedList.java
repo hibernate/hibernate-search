@@ -8,7 +8,6 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -25,12 +24,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 final class MultiWriteDrainableLinkedList<T> {
 
-	private final ReentrantLock lock = new ReentrantLock();
-
-	//Guarded by lock
+	//Guarded by synchronization on this
 	private Node<T> first = null;
 
-	//Guarded by lock
+	//Guarded by synchronization on this
 	private Node<T> last = null;
 
 	/**
@@ -38,20 +35,17 @@ final class MultiWriteDrainableLinkedList<T> {
 	 */
 	void add(T element) {
 		final Node<T> newnode = new Node<T>( element );
-		final ReentrantLock lock = this.lock;
-		lock.lock();
-		try {
-			if ( first == null ) {
-				first = newnode;
-				last = newnode;
-			}
-			else {
-				last.next = newnode;
-				last = newnode;
-			}
+		addNode( newnode );
+	}
+
+	private synchronized void addNode(Node<T> newnode) {
+		if ( first == null ) {
+			first = newnode;
+			last = newnode;
 		}
-		finally {
-			lock.unlock();
+		else {
+			last.next = newnode;
+			last = newnode;
 		}
 	}
 
@@ -63,17 +57,7 @@ final class MultiWriteDrainableLinkedList<T> {
 	 * @return an Iterable, or null if there is no data.
 	 */
 	Iterable<T> drainToDetachedIterable() {
-		final Node<T> head;
-		final ReentrantLock lock = this.lock;
-		lock.lock();
-		try {
-			head = first;
-			first = null;
-			last = null;
-		}
-		finally {
-			lock.unlock();
-		}
+		final Node<T> head = drainHead();
 		if ( head != null ) {
 			return new DetachedNodeIterable<T>( head );
 		}
@@ -83,6 +67,13 @@ final class MultiWriteDrainableLinkedList<T> {
 			//need a different level of lock granularity.
 			return null;
 		}
+	}
+
+	private synchronized Node<T> drainHead() {
+		final Node<T> head = first;
+		first = null;
+		last = null;
+		return head;
 	}
 
 	static final class Node<T> {
