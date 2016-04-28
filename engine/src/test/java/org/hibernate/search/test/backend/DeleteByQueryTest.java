@@ -39,7 +39,7 @@ import org.junit.Test;
 public class DeleteByQueryTest {
 
 	@Rule
-	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Book.class );
+	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Book.class, Movie.class );
 
 	@Test
 	public void testStringSerialization() {
@@ -91,21 +91,81 @@ public class DeleteByQueryTest {
 			}
 			tc.end();
 		}
-		this.assertCount( 2, integrator );
+		this.assertCount( Book.class, 2, integrator );
+
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "url", "lordoftherings" ) ), tc );
+			tc.end();
+		}
+		this.assertCount( Book.class, 1, integrator );
+
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "url", "thehobbit" ) ), tc );
+			tc.end();
+		}
+		this.assertCount( Book.class, 0, integrator );
+		// this should stay empty now!
+	}
+
+	@Test
+	public void testStringIdTermQuery() {
+		ExtendedSearchIntegrator integrator = this.factoryHolder.getSearchFactory();
+		Worker worker = integrator.getWorker();
+
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			for ( Work work : this.makeBooksForSingularTermQuery() ) {
+				worker.performWork( work, tc );
+			}
+			tc.end();
+		}
+		this.assertCount( Book.class, 2, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
 			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "id", String.valueOf( 5 ) ) ), tc );
 			tc.end();
 		}
-		this.assertCount( 1, integrator );
+		this.assertCount( Book.class, 1, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
 			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "id", String.valueOf( 6 ) ) ), tc );
 			tc.end();
 		}
-		this.assertCount( 0, integrator );
+		this.assertCount( Book.class, 0, integrator );
+		// this should stay empty now!
+	}
+
+	@Test
+	public void testNumericIdTermQuery() {
+		ExtendedSearchIntegrator integrator = this.factoryHolder.getSearchFactory();
+		Worker worker = integrator.getWorker();
+
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			for ( Work work : this.makeMoviesForNumericIdTermQuery() ) {
+				worker.performWork( work, tc );
+			}
+			tc.end();
+		}
+		this.assertCount( Movie.class, 2, integrator );
+
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			worker.performWork( new DeleteByQueryWork( Movie.class, new SingularTermDeletionQuery( "id", 3 ) ), tc );
+			tc.end();
+		}
+		this.assertCount( Movie.class, 1, integrator );
+
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			worker.performWork( new DeleteByQueryWork( Movie.class, new SingularTermDeletionQuery( "id", 4 ) ), tc );
+			tc.end();
+		}
+		this.assertCount( Movie.class, 0, integrator );
 		// this should stay empty now!
 	}
 
@@ -119,7 +179,7 @@ public class DeleteByQueryTest {
 
 		for ( int i = 0; i < numQueries.size(); ++i ) {
 			try {
-				this.testForQuery( integrator, numQueries.get( i ), expectedCount.get( i ) );
+				this.testForQuery( Book.class, integrator, numQueries.get( i ), expectedCount.get( i ) );
 			}
 			catch (Throwable e) {
 				System.out.println( "ERROR: " + numQueries.get( i ) + ". expected was: " + expectedCount.get( i ) );
@@ -128,7 +188,7 @@ public class DeleteByQueryTest {
 		}
 	}
 
-	private void testForQuery(ExtendedSearchIntegrator integrator, DeletionQuery query, int expectedCount) {
+	private void testForQuery(Class<?> entityType, ExtendedSearchIntegrator integrator, DeletionQuery query, int expectedCount) {
 		Worker worker = integrator.getWorker();
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
@@ -137,29 +197,29 @@ public class DeleteByQueryTest {
 			}
 			tc.end();
 		}
-		this.assertCount( 2, integrator );
+		this.assertCount( entityType, 2, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
 			worker.performWork( new DeleteByQueryWork( Book.class, query ), tc );
 			tc.end();
 		}
-		this.assertCount( expectedCount, integrator );
+		this.assertCount( entityType, expectedCount, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
 			worker.performWork( new Work( Book.class, null, WorkType.PURGE_ALL ), tc );
 			tc.end();
 		}
-		this.assertCount( 0, integrator );
+		this.assertCount( entityType, 0, integrator );
 	}
 
-	private void assertCount(int count, ExtendedSearchIntegrator integrator) {
+	private void assertCount(Class<?> entityType, int count, ExtendedSearchIntegrator integrator) {
 		{
 			Query query = integrator.buildQueryBuilder().forEntity( Book.class ).get().all().createQuery();
 			HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
 			List<Class<?>> l = new ArrayList<>();
-			l.add( Book.class );
+			l.add( entityType );
 			hsQuery.targetedEntities( l );
 			assertEquals( count, hsQuery.queryResultSize() );
 		}
@@ -175,16 +235,24 @@ public class DeleteByQueryTest {
 	private List<Work> makeBooksForSingularTermQuery() {
 		List<Work> list = new LinkedList<>();
 		// just some random data:
-		list.add( new Work( new Book( String.valueOf( 5 ), "Lord of The Rings" ), WorkType.ADD ) );
-		list.add( new Work( new Book( String.valueOf( 6 ), "The Hobbit" ), WorkType.ADD ) );
+		list.add( new Work( new Book( String.valueOf( 5 ), "Lord of The Rings", "lordoftherings" ), WorkType.ADD ) );
+		list.add( new Work( new Book( String.valueOf( 6 ), "The Hobbit", "thehobbit" ), WorkType.ADD ) );
+		return list;
+	}
+
+	private List<Work> makeMoviesForNumericIdTermQuery() {
+		List<Work> list = new LinkedList<>();
+		// just some random data:
+		list.add( new Work( new Movie( 3, "Cashback" ), WorkType.ADD ) );
+		list.add( new Work( new Movie( 4, "Garden state" ), WorkType.ADD ) );
 		return list;
 	}
 
 	private List<Work> makeBooksForNumRangeQuery() {
 		List<Work> list = new LinkedList<>();
 		// just some random data:
-		list.add( new Work( new Book( String.valueOf( 5 ), 1, 1L, 1F, 1D, "Lord of The Rings" ), WorkType.ADD ) );
-		list.add( new Work( new Book( String.valueOf( 6 ), 2, 2L, 2F, 2D, "The Hobbit" ), WorkType.ADD ) );
+		list.add( new Work( new Book( String.valueOf( 5 ), 1, 1L, 1F, 1D, "Lord of The Rings", "lordoftherings" ), WorkType.ADD ) );
+		list.add( new Work( new Book( String.valueOf( 6 ), 2, 2L, 2F, 2D, "The Hobbit", "thehobbit" ), WorkType.ADD ) );
 		return list;
 	}
 
@@ -203,20 +271,37 @@ public class DeleteByQueryTest {
 		Double doubleField;
 		@Field
 		String title;
+		@Field
+		String url;
 
-		public Book(String id, String title) {
-			super();
+		public Book(String id, String title, String url) {
 			this.id = id;
 			this.title = title;
+			this.url = url;
 		}
 
-		public Book(String id, Integer intField, Long longField, Float floatField, Double doubleField, String title) {
-			super();
+		public Book(String id, Integer intField, Long longField, Float floatField, Double doubleField, String title, String url) {
 			this.id = id;
 			this.intField = intField;
 			this.longField = longField;
 			this.floatField = floatField;
 			this.doubleField = doubleField;
+			this.title = title;
+			this.url = url;
+		}
+
+	}
+
+	@Indexed(index = "movies")
+	private static class Movie {
+		@DocumentId
+		Integer id;
+
+		@Field
+		String title;
+
+		public Movie(Integer id, String title) {
+			this.id = id;
 			this.title = title;
 		}
 

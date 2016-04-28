@@ -13,7 +13,6 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
@@ -23,8 +22,6 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.store.Workspace;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
-import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -58,10 +55,7 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 		BooleanQuery.Builder entityDeletionQueryBuilder = new BooleanQuery.Builder();
 
 		{
-			ScopedAnalyzerReference analyzer = this.workspace.getDocumentBuilder( entityType ).getAnalyzer();
-			ScopedAnalyzer scopeAnalyzer = (ScopedAnalyzer) analyzer.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
-
-			Query queryToDelete = query.toLuceneQuery( scopeAnalyzer );
+			Query queryToDelete = query.toLuceneQuery( this.workspace.getDocumentBuilder( entityType ) );
 
 			entityDeletionQueryBuilder.add( queryToDelete, BooleanClause.Occur.FILTER );
 		}

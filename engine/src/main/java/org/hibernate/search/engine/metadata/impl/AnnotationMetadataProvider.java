@@ -74,6 +74,7 @@ import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.time.impl.NumericTimeBridge;
 import org.hibernate.search.bridge.impl.BridgeFactory;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.ConfigContext;
@@ -1314,10 +1315,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
 		// field bridge
-		return numericFieldAnnotation != null
-				|| fieldBridge instanceof NumericFieldBridge
-				|| fieldBridge instanceof NumericEncodingDateBridge
-				|| fieldBridge instanceof NumericTimeBridge;
+		return numericFieldAnnotation != null || NumericFieldUtils.isNumericFieldBridge( fieldBridge );
 	}
 
 	private NumericEncodingType determineNumericFieldEncoding(FieldBridge fieldBridge) {

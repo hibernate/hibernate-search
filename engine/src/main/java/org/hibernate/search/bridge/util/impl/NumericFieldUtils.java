@@ -11,6 +11,11 @@ import java.util.Date;
 
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.time.impl.NumericTimeBridge;
 import org.hibernate.search.bridge.impl.JavaTimeBridgeProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -127,5 +132,20 @@ public final class NumericFieldUtils {
 						value instanceof java.time.Year ||
 						value instanceof java.time.Duration
 					));
+	}
+
+	/**
+	 * Indicates whether the considered {@code FieldBridge} is a numeric one.
+	 *
+	 * @param fieldBridge the considered {@code FieldBridge}
+	 * @return true if the considered {@code FieldBridge} is a numeric {@code FieldBridge}
+	 */
+	public static boolean isNumericFieldBridge(FieldBridge fieldBridge) {
+		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
+			fieldBridge = ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap();
+		}
+		return fieldBridge instanceof NumericFieldBridge
+				|| fieldBridge instanceof NumericTimeBridge
+				|| fieldBridge instanceof NumericEncodingDateBridge;
 	}
 }

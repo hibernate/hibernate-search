@@ -11,13 +11,15 @@ import java.io.IOException;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.NumericUtils;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 
@@ -27,6 +29,7 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  * @hsearch.experimental
  *
  * @author Martin Braun
+ * @author Guillaume Smet
  */
 public final class SingularTermDeletionQuery implements DeletionQuery {
 
@@ -85,17 +88,20 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 	}
 
 	@Override
-	public Query toLuceneQuery(ScopedAnalyzer analyzerForEntity) {
+	public Query toLuceneQuery(DocumentBuilderIndexedEntity documentBuilder) {
+		String stringValue = documentBuilder.objectToString( fieldName, this.getValue(), new ContextualExceptionBridgeHelper() );
+
 		if ( this.getType() == Type.STRING ) {
 			try {
-				TokenStream tokenStream = analyzerForEntity.tokenStream( this.getFieldName(), (String) this.getValue() );
+				ScopedAnalyzer analyzerForEntity = (ScopedAnalyzer) documentBuilder.getAnalyzer().unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+				TokenStream tokenStream = analyzerForEntity.tokenStream( this.getFieldName(), stringValue );
 				tokenStream.reset();
 				try {
 					BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 					while ( tokenStream.incrementToken() ) {
-						String value = tokenStream.getAttribute( CharTermAttribute.class ).toString();
+						String term = tokenStream.getAttribute( CharTermAttribute.class ).toString();
 						booleanQueryBuilder.add(
-								new TermQuery( new Term( this.getFieldName(), value ) ),
+								new TermQuery( new Term( this.getFieldName(), term ) ),
 								Occur.FILTER
 						);
 					}
@@ -106,45 +112,17 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 				}
 			}
 			catch (IOException e) {
-				throw new AssertionFailure( "no IOException can occur while using a TokenStream that is generated via String" );
+				throw new AssertionFailure( "No IOException can occur while using a TokenStream that is generated via String" );
 			}
 		}
 		else {
-			Type type = this.getType();
-			BytesRef valueAsBytes;
-			switch ( type ) {
-				case INT:
-				case FLOAT: {
-					int value;
-					if ( type == Type.FLOAT ) {
-						value = NumericUtils.floatToSortableInt( (Float) this.getValue() );
-					}
-					else {
-						value = (Integer) this.getValue();
-					}
-					BytesRefBuilder builder = new BytesRefBuilder();
-					NumericUtils.intToPrefixCoded( value, 0, builder );
-					valueAsBytes = builder.get();
-					break;
-				}
-				case LONG:
-				case DOUBLE: {
-					long value;
-					if ( type == Type.DOUBLE ) {
-						value = NumericUtils.doubleToSortableLong( (Double) this.getValue() );
-					}
-					else {
-						value = (Long) this.getValue();
-					}
-					BytesRefBuilder builder = new BytesRefBuilder();
-					NumericUtils.longToPrefixCoded( value, 0, builder );
-					valueAsBytes = builder.get();
-					break;
-				}
-				default:
-					throw new AssertionFailure( "has to be a Numeric Type at this point!" );
+			FieldBridge fieldBridge = documentBuilder.getBridge( fieldName );
+			if ( NumericFieldUtils.isNumericFieldBridge( fieldBridge ) ) {
+				return NumericFieldUtils.createExactMatchQuery( fieldName, this.getValue() );
 			}
-			return new TermQuery( new Term( this.getFieldName(), valueAsBytes ) );
+			else {
+				return new TermQuery( new Term( this.getFieldName(), stringValue ) );
+			}
 		}
 	}
 
@@ -155,7 +133,8 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 
 	public static SingularTermDeletionQuery fromString(String[] string) {
 		if ( string.length != 3 ) {
-			throw new IllegalArgumentException( "for a TermQuery to work there have to be " + "exactly 3 Arguments (type & fieldName & value" );
+			throw new IllegalArgumentException( "To instantiate a SingularTermDeletionQuery, an array of size 3 is required"
+					+ " (type, fieldName, value). Got an array of size " + string.length );
 		}
 		Type type = Type.valueOf( string[0] );
 		switch ( type ) {
@@ -170,14 +149,10 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 			case DOUBLE:
 				return new SingularTermDeletionQuery( string[1], Double.parseDouble( string[2] ) );
 			default:
-				throw new AssertionFailure( "wrong Type!" );
+				throw new AssertionFailure( "Unsupported value type: " + type );
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -188,10 +163,6 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if ( this == obj ) {
