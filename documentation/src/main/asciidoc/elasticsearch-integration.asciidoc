@@ -123,7 +123,7 @@ However there are a few features that would benefit from a few changes:
 * if you want to retrieve the distance in a geolocation query, install and enable the `lang-groovy` plugin,
   see <<elasticsearch-query-spatial>>
 * if you want to be able to use the purge all Hibernate Search command,
-  install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/2.0/plugins-delete-by-query.html[`delete-by-query`] plugin
+  install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query`] plugin
 
 === Mapping and indexing
 
@@ -316,11 +316,11 @@ Here is a list of known limitations.
 
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
-* defining analyzers with `@AnalyzerDef`
+* Defining analyzers with `@AnalyzerDef`
 * Filters
 * Query timeouts
 * Resolution for Date type mapping is ignored
-* pagination is limited to the 10000 first documents (configurable in Elasticsearch)
+* Pagination is limited to the 10000 first documents (configurable in Elasticsearch)
 ** better support through the scrolling API is planned
 * Scrolling on large results
 * MoreLikeThis queries
