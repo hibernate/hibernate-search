@@ -16,6 +16,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.IgnoreAnalyzerBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -38,7 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class StringEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge {
+public class StringEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
 	private static final Log log = LoggerFactory.make();
 
 	public static final TwoWayFieldBridge DATE_YEAR = new StringEncodingDateBridge( Resolution.YEAR );
