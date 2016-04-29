@@ -74,6 +74,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final String ANALYZED = "analyzed";
+	private static final String NOT_ANALYZED = "not_analyzed";
 
 	private String indexName;
 	private String actualIndexName;
@@ -284,7 +285,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			// TODO HSEARCH-2256 Should we make this configurable?
 			JsonObject field = new JsonObject();
 			field.addProperty( "type", "string" );
-			field.addProperty( "index", "not_analyzed" );
+			field.addProperty( "index", NOT_ANALYZED );
 			properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
 
 			// normal document fields
@@ -421,7 +422,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				// the fields potentially created for the spatial hash queries
 				JsonObject field = new JsonObject();
 				field.addProperty( "type", "string" );
-				field.addProperty( "index", "not_analyzed" );
+				field.addProperty( "index", NOT_ANALYZED );
 
 				getOrCreateProperties( payload, fieldName ).add( fieldName, field );
 			}
@@ -435,7 +436,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		JsonObject field = new JsonObject();
 		field.addProperty( "type", getFieldType( facetMetadata ) );
 		field.addProperty( "store", false );
-		field.addProperty( "index", "not_analyzed" );
+		field.addProperty( "index", NOT_ANALYZED );
 
 		getOrCreateProperties( payload, fullFieldName).add( simpleFieldName, field );
 		return field;
@@ -448,7 +449,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				FieldHelper.isDate( binding, fieldMetadata.getName() ) ||
 				FieldHelper.isCalendar( binding, fieldMetadata.getName() ) ||
 				FieldHelper.isNumeric(fieldMetadata) ) {
-			return "not_analyzed";
+			return NOT_ANALYZED;
 		}
 
 		return getIndexValue( fieldMetadata.getIndex() );
@@ -460,7 +461,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		if ( FieldHelper.isBoolean( bridgeDefinedField )
 				|| FieldHelper.isNumeric( bridgeDefinedField )
 				|| FieldHelper.isDate( bridgeDefinedField ) ) {
-			return "not_analyzed";
+			return NOT_ANALYZED;
 		}
 
 		Field.Index index = bridgeDefinedField.getIndex();
@@ -474,7 +475,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				return ANALYZED;
 			case NOT_ANALYZED:
 			case NOT_ANALYZED_NO_NORMS:
-				return "not_analyzed";
+				return NOT_ANALYZED;
 			case NO:
 				return "no";
 			default:
