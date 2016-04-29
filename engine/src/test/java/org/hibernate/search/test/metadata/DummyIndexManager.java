@@ -18,6 +18,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 
@@ -99,6 +101,11 @@ class DummyIndexManager implements IndexManager {
 	@Override
 	public void flushAndReleaseResources() {
 		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
+	}
+
+	@Override
+	public IndexManagerType getIndexManagerType() {
+		return LuceneEmbeddedIndexManagerType.INSTANCE;
 	}
 }
 

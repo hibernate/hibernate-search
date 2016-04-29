@@ -12,8 +12,8 @@ import java.util.List;
 
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
 
@@ -30,7 +30,7 @@ public final class DescriptorTestHelper {
 	}
 
 	public static IndexedTypeDescriptor getTypeDescriptor(AnnotationMetadataProvider metadataProvider, Class<?> clazz) {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( clazz, DirectoryBasedIndexManager.class );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( clazz, LuceneEmbeddedIndexManagerType.INSTANCE );
 		return new IndexedTypeDescriptorImpl(
 				typeMetadata,
 				getDummyUnShardedIndexManager()

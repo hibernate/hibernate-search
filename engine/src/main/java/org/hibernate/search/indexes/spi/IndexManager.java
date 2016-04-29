@@ -131,4 +131,9 @@ public interface IndexManager {
 	 */
 	void flushAndReleaseResources();
 
+	/**
+	 * @return the {@code IndexManagerType} of this implementation.
+	 */
+	IndexManagerType getIndexManagerType();
+
 }

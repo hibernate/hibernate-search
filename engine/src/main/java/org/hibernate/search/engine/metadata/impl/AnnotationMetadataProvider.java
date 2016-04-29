@@ -85,7 +85,7 @@ import org.hibernate.search.engine.impl.nullencoding.NullMarkerCodec;
 import org.hibernate.search.engine.impl.nullencoding.NumericNullEncodersHelper;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.SpatialFieldBridge;
@@ -152,7 +152,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	@Override
-	public TypeMetadata getTypeMetadataFor(Class<?> clazz, Class<? extends IndexManager> indexManagerType) {
+	public TypeMetadata getTypeMetadataFor(Class<?> clazz, IndexManagerType indexManagerType) {
 		XClass xClass = reflectionManager.toXClass( clazz );
 
 		ParseContext parseContext = new ParseContext();

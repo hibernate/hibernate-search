@@ -16,7 +16,7 @@ import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.testsupport.TestForIssue;
 
 import static org.junit.Assert.assertNotNull;
@@ -39,7 +39,7 @@ public class IndexedEmbeddedWithDepthAndIncludePathTest {
 	@Test
 	public void testDepthIsProperlyHandled() {
 		TypeMetadata rootTypeMetadata = metadataProvider
-				.getTypeMetadataFor( IndexedEmbeddedTestEntity.class, DirectoryBasedIndexManager.class );
+				.getTypeMetadataFor( IndexedEmbeddedTestEntity.class, LuceneEmbeddedIndexManagerType.INSTANCE );
 
 		EmbeddedTypeMetadata embeddedWithDepthTypeMetadata = null;
 		for ( EmbeddedTypeMetadata typeMetadata : rootTypeMetadata.getEmbeddedTypeMetadata() ) {
