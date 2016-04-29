@@ -337,7 +337,7 @@ public class SearchIntegratorBuilder {
 				//XClass unfortunately is not (yet) genericized: TODO?
 
 				// For ContainedIn, we get partial metadata information as we can't build
-				// the FieldBridges. This is not a problem as these metadata information
+				// the FieldBridges and the analyzers. This is not a problem as these metadata information
 				// are only used to track dependencies.
 				TypeMetadata typeMetadata = metadataProvider.getTypeMetadataForContainedIn( mappedClass );
 				final DocumentBuilderContainedEntity documentBuilder = new DocumentBuilderContainedEntity(

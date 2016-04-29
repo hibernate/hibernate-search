@@ -24,13 +24,13 @@ public interface MetadataProvider {
 	TypeMetadata getTypeMetadataFor(Class<?> clazz, Class<? extends IndexManager> indexManagerType);
 
 	/**
-	 * Returns the ContainedIn related metadata for the specified type.
+	 * Returns the {@code ContainedIn} related metadata for the specified type.
 	 *
-	 * The metadata for ContainedIn are not comprehensive: they do not
-	 * contain the information about the FieldBridges. It's of no use
-	 * for ContainedIn resolution and we can't build these information
-	 * because classes only marked with {@code ContainedIn} are not tied
-	 * to an {@code IndexManager}.
+	 * The metadata for {@code ContainedIn} are not comprehensive: they do not
+	 * contain the information about the FieldBridges and the analyzers.
+	 * We can't build these information because classes only marked with
+	 * {@code ContainedIn} are not tied to an {@code IndexManager}.
+	 * It's of no use for {@code ContainedIn} resolution anyway.
 	 *
 	 * @param clazz The type of interest.
 	 *
