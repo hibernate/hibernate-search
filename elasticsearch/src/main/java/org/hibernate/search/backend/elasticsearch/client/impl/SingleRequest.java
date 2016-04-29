@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import java.util.Collections;
 
-import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 
@@ -16,9 +15,11 @@ import io.searchbox.core.DeleteByQuery;
 import io.searchbox.indices.Refresh;
 
 /**
- * A "group" just comprising a single, non-bulkable request.
+ * A single, non-bulkable request.
+ *
+ * @author Gunnar Morling
  */
-public class SingleRequest implements BackendRequestGroup {
+public class SingleRequest implements ExecutableRequest {
 
 	private final JestClient jestClient;
 	private final ErrorHandler errorHandler;

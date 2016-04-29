@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 /**
- * Represents a group of backend requests, which may either be backed by an actual bulk request or by a single
- * request "pseudo group". Allows for uniform handling of these two cases.
+ * A request which is executed against the Elasticsarch backend. May either be backed by a bulk request or by a single
+ * request. Allows for uniform handling of these two cases.
  */
-public interface BackendRequestGroup {
+public interface ExecutableRequest {
 	void execute();
 	void ensureRefreshed();
 	int getSize();

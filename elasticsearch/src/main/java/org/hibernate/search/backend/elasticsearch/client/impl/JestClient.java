@@ -15,7 +15,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
 import org.hibernate.search.backend.elasticsearch.impl.GsonHolder;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.service.spi.Service;

@@ -14,6 +14,7 @@ import java.util.concurrent.locks.Lock;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.backend.elasticsearch.client.impl.BackendRequestProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;

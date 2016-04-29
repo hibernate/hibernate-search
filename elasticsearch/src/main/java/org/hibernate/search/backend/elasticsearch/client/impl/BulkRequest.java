@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 
@@ -20,7 +19,7 @@ import io.searchbox.indices.Refresh;
 /**
  * A request group backed by an actual bulk request.
  */
-public class BackendRequestBulk implements BackendRequestGroup {
+public class BulkRequest implements ExecutableRequest {
 
 	private final JestClient jestClient;
 	private final ErrorHandler errorHandler;
@@ -28,7 +27,7 @@ public class BackendRequestBulk implements BackendRequestGroup {
 	private final boolean refresh;
 	private final Set<String> indexNames;
 
-	public BackendRequestBulk(JestClient jestClient, ErrorHandler errorHandler, List<BackendRequest<?>> requests, Set<String> indexNames, boolean refresh) {
+	public BulkRequest(JestClient jestClient, ErrorHandler errorHandler, List<BackendRequest<?>> requests, Set<String> indexNames, boolean refresh) {
 		this.jestClient = jestClient;
 		this.errorHandler = errorHandler;
 		this.requests = requests;
