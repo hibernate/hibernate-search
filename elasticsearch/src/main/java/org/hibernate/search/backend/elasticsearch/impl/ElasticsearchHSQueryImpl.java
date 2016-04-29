@@ -296,9 +296,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 						);
 					}
 
-					// TODO will this be a problem when querying multiple entity types, with one using a field as id
-					// field and the other not; is that possible?
+					// TODO HSEARCH-2253 the id field name is used to detect if we should sort using the internal Elasticsearch id field
+					// as it's currently the only field in which we store the id of the entity.
+					// Thus the id fields must be consistent accross all the entity types when querying multiple ones.
 					idFieldName = binding.getDocumentBuilder().getIdentifierName();
+
 					ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
 					indexNames.add( esIndexManager.getActualIndexName() );
 				}
@@ -307,7 +309,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 
 			// Query filters; always a type filter, possibly a tenant id filter;
-			// TODO feed in user-provided filters
 			JsonObject effectiveFilter = getEffectiveFilter( typeFilters );
 
 			JsonBuilder.Object completeQuery = JsonBuilder.object();
@@ -341,7 +342,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			// given, I take as much as possible, as by default only 10 rows would be returned
 			search.setParameter( "size", maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult );
 
-			// TODO: embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
+			// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
 			if ( sort != null ) {
 				validateSortFields( extendedIntegrator, queriedEntityTypes );
 				for ( SortField sortField : sort.getSort() ) {
@@ -620,7 +621,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 			// Should only be the case for custom bridges
 			else {
-				// TODO: should we do it?
+				// TODO: HSEARCH-2255 should we do it?
 				if ( !value.isJsonPrimitive() ) {
 					throw new SearchException( "Projection of non-JSON-primitive field values is not supported: " + value );
 				}
@@ -631,7 +632,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					return primitive.getAsBoolean();
 				}
 				else if ( primitive.isNumber() ) {
-					// TODO this will expose a Gson-specific Number implementation; Can we somehow return an Integer,
+					// TODO HSEARCH-2255 this will expose a Gson-specific Number implementation; Can we somehow return an Integer,
 					// Long... etc. instead?
 					return primitive.getAsNumber();
 				}
@@ -639,7 +640,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					return primitive.getAsString();
 				}
 				else {
-					// TODO Better raise an exception?
+					// TODO HSEARCH-2255 Better raise an exception?
 					return primitive.toString();
 				}
 			}
@@ -740,7 +741,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	private boolean isNested(DiscreteFacetRequest facetRequest) {
-		//TODO Drive through meta-data
+		//TODO HSEARCH-2097 Drive through meta-data
 //		return FieldHelper.isEmbeddedField( facetRequest.getFieldName() );
 		return false;
 	}
@@ -757,7 +758,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		return false;
 	}
 
-	// TODO: Investigate scrolling API:
+	// TODO: HSEARCH-2189  Investigate scrolling API:
 	// https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
 	private class ElasticsearchDocumentExtractor implements DocumentExtractor {
 

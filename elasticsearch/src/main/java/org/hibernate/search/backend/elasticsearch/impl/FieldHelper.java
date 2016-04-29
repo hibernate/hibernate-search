@@ -37,7 +37,7 @@ class FieldHelper {
 	private FieldHelper() {
 	}
 
-	// TODO make it work with fields embedded types
+	// TODO HSEARCH-2259 make it work with fields embedded types
 	static NumericEncodingType getNumericEncodingType(EntityIndexBinding indexBinding, DocumentFieldMetadata field) {
 		NumericEncodingType numericEncodingType = field.getNumericEncodingType();
 

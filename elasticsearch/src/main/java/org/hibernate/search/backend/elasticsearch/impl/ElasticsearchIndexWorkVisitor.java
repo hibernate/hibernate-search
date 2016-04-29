@@ -95,15 +95,13 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 
 	@Override
 	public BackendRequest<?> visitOptimizeWork(OptimizeLuceneWork work, Boolean refresh) {
-		// TODO implement
+		// TODO HSEARCH-2092 implement
 		LOG.warn( "Optimize work is not yet supported for Elasticsearch backend, ignoring it" );
 		return null;
 	}
 
 	@Override
 	public BackendRequest<?> visitPurgeAllWork(PurgeAllLuceneWork work, Boolean refresh) {
-		// TODO This requires the delete-by-query plug-in on ES 2.0 and beyond; Alternatively
-		// the type mappings could be deleted, think about implications for concurrent access
 		String query = work.getTenantId() != null ?
 				String.format( Locale.ENGLISH, DELETE_ALL_FOR_TENANT_QUERY, work.getTenantId() ) :
 				DELETE_ALL_QUERY;
@@ -266,7 +264,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 					addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
 							value != null ? new JsonPrimitive( value ) : null );
 				}
-				// TODO falling back for now to checking actual Field type to cover numeric fields created by custom
+				// TODO HSEARCH-2261 falling back for now to checking actual Field type to cover numeric fields created by custom
 				// bridges
 				else if ( FieldHelper.isNumeric( documentFieldMetadata ) || isNumeric( field ) ) {
 					// Explicitly propagate null in case value is not given and let ES handle the default token set

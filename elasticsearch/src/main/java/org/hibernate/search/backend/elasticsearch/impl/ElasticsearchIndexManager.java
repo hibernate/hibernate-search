@@ -21,6 +21,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
@@ -264,7 +265,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
-	// TODO
+	// TODO HSEARCH-2260
 	// What happens if mappings already exist? We need an option similar to hbm2ddl
 	// What happens if several nodes in a cluster try to create the mappings?
 	private void createIndexMappings() {
@@ -276,9 +277,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			JsonObject properties = new JsonObject();
 			payload.add( "properties", properties );
 
-			// Add field for tenant id
-			// TODO At this point we don't know yet whether it's actually going to be needed
-			// Should we make this configurable?
+			// Add field for tenant id though we don't know at this point if it's actually going to be needed.
+			// TODO HSEARCH-2256 Should we make this configurable?
 			JsonObject field = new JsonObject();
 			field.addProperty( "type", "string" );
 			field.addProperty( "index", "not_analyzed" );
@@ -355,7 +355,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 
 		if ( fieldMetadata.indexNullAs() != null ) {
-			// TODO Validate the type; Supported types are converted transparently by ES
+			// TODO HSEARCH-2262 Validate the type; Supported types are converted transparently by ES
 			field.addProperty( "null_value", fieldMetadata.indexNullAs() );
 		}
 
@@ -552,7 +552,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			if ( property == null ) {
 				property = new JsonObject();
 
-				// TODO enable nested mapping as needed:
+				// TODO HSEARCH-2263 enable nested mapping as needed:
 				// * only needed for embedded *-to-many with more than one field
 				// * for these, the user should be able to opt out (nested would be the safe default mapping in this
 				// case, but they could want to opt out when only ever querying on single fields of the embeddable)
@@ -666,7 +666,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	@Override
 	public void optimize() {
-		// TODO Is there such thing for ES?
+		performStreamOperation( OptimizeLuceneWork.INSTANCE, null, false );
 	}
 
 	@Override

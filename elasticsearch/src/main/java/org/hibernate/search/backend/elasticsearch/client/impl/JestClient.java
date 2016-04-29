@@ -121,7 +121,7 @@ public class JestClient implements Service, Startable, Stoppable {
 		try {
 			BulkResult response = client.execute( request );
 
-			// TODO: Ideally I could just check on the status of the bulk, but for some reason the ES response is not
+			// Ideally I could just check on the status of the bulk, but for some reason the ES response is not
 			// always set to erroneous also if there is an erroneous item; I suppose that's a bug in ES? For now we are
 			// examining the result items and check if there is any erroneous
 			List<BackendRequest<?>> erroneousItems = getErroneousItems( actions, response );
