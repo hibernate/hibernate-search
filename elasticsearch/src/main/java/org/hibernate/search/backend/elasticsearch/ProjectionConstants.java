@@ -18,5 +18,5 @@ public interface ProjectionConstants extends org.hibernate.search.engine.Project
 	 */
 	String SOURCE = "__HSearch_Source";
 
-	// TODO "Took" etc.?
+	// TODO HSEARCH-2257 add "took" etc.?
 }
