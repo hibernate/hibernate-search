@@ -17,7 +17,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
 import org.hibernate.search.engine.service.spi.Service;
@@ -91,9 +90,9 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	 * registered - will be invoked with the items of that bulk.
 	 */
 	private void doExecute(Iterable<BackendRequest<?>> requests) {
-		BackendRequestGroup nextBulk = null;
+		ExecutableRequest nextBulk = null;
 
-		for ( BackendRequestGroup backendRequestGroup : createRequestGroups( requests ) ) {
+		for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests ) ) {
 			nextBulk = backendRequestGroup;
 
 			if ( LOG.isTraceEnabled() ) {
@@ -113,10 +112,10 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	}
 
 	/**
-	 * Organizes the given work list into {@link BackendRequestGroup}s to be executed.
+	 * Organizes the given work list into {@link ExecutableRequest}s to be executed.
 	 */
-	private List<BackendRequestGroup> createRequestGroups(Iterable<BackendRequest<?>> requests) {
-		List<BackendRequestGroup> groups = new ArrayList<>();
+	private List<ExecutableRequest> createRequestGroups(Iterable<BackendRequest<?>> requests) {
+		List<ExecutableRequest> groups = new ArrayList<>();
 		List<BackendRequest<?>> currentBulk = new ArrayList<>();
 		Set<String> currentIndexNames = new HashSet<>();
 
@@ -129,7 +128,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 			// ... or finish up current bulk and add single request for non-bulkable request
 			else {
 				if ( !currentBulk.isEmpty() ) {
-					groups.add( new BackendRequestBulk( jestClient, errorHandler, currentBulk, currentIndexNames, false ) );
+					groups.add( new BulkRequest( jestClient, errorHandler, currentBulk, currentIndexNames, false ) );
 					currentBulk.clear();
 					currentIndexNames.clear();
 				}
@@ -139,7 +138,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		// finish up last bulk
 		if ( !currentBulk.isEmpty() ) {
-			groups.add( new BackendRequestBulk( jestClient, errorHandler, currentBulk, currentIndexNames, true ) );
+			groups.add( new BulkRequest( jestClient, errorHandler, currentBulk, currentIndexNames, true ) );
 		}
 
 		return groups;

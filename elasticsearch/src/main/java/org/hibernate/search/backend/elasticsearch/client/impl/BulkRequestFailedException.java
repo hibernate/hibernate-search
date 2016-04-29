@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
 import org.hibernate.search.exception.SearchException;
 
 import io.searchbox.client.JestResult;
