@@ -63,7 +63,7 @@ public class EmbeddedIdTest extends SearchTestBase {
 	}
 
 	/**
-	 * HSEARCH-HSEARCH-306, HSEARCH-248
+	 * HSEARCH-306, HSEARCH-248
 	 *
 	 * @throws Exception throws exception in case the test fails.
 	 */
