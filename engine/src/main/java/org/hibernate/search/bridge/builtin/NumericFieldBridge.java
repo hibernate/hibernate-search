@@ -9,6 +9,7 @@ package org.hibernate.search.bridge.builtin;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.IgnoreAnalyzerBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
@@ -18,7 +19,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  * @author Sanne Grinovero
  * @author Gunnar Morling
  */
-public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
+public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, IgnoreAnalyzerBridge {
 
 	/**
 	 * Persists byte properties in int index fields. Takes care of all the required conversion.

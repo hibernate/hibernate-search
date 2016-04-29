@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.test;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -38,11 +39,15 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 		dob.set( 1958, 3, 7, 0, 0, 0 );
 		dob.set( Calendar.MILLISECOND, 0 );
 
+		Calendar subscriptionEndDate = GregorianCalendar.getInstance( TimeZone.getTimeZone( "Europe/Paris" ), Locale.FRENCH );
+		subscriptionEndDate.set( 2016, 5, 7, 4, 4, 4 );
+
 		GolfPlayer hergesheimer = new GolfPlayer.Builder()
 			.firstName( "Klaus" )
 			.lastName( "Hergesheimer" )
 			.active( true )
 			.dateOfBirth( dob.getTime() )
+			.subscriptionEndDate( subscriptionEndDate )
 			.handicap( 3.4 )
 			.puttingStrength( 2.5 )
 			.driveWidth( 285 )
@@ -126,6 +131,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 				"{" +
 					"\"active\": true," +
 					"\"dateOfBirth\": \"1958-04-07T00:00:00Z\"," +
+					"\"subscriptionEndDate\": \"2016-06-07T00:00:00Z\"," +
 					"\"driveWidth\": 285," +
 					"\"firstName\": \"Klaus\"," +
 					"\"handicap\": 3.4," +
@@ -254,6 +260,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 				"{" +
 					"\"active\": null," +
 					"\"dateOfBirth\": null," +
+					"\"subscriptionEndDate\":null," +
 					"\"driveWidth\": null," +
 					"\"firstName\": null," +
 					"\"handicap\": 0.0," + // not nullable

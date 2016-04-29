@@ -436,6 +436,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		// Never analyze boolean, date or numeric
 		if ( FieldHelper.isBoolean( binding, fieldMetadata.getName() ) ||
 				FieldHelper.isDate( binding, fieldMetadata.getName() ) ||
+				FieldHelper.isCalendar( binding, fieldMetadata.getName() ) ||
 				FieldHelper.isNumeric(fieldMetadata) ) {
 			return "not_analyzed";
 		}
@@ -460,8 +461,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		if ( FieldHelper.isBoolean( descriptor, fieldMetadata.getName() ) ) {
 			type = "boolean";
 		}
-		// TODO Calendar
-		else if ( FieldHelper.isDate( descriptor, fieldMetadata.getName() ) ) {
+		else if ( FieldHelper.isDate( descriptor, fieldMetadata.getName() ) ||
+				FieldHelper.isCalendar( descriptor, fieldMetadata.getName() ) ) {
 			type = "date";
 		}
 		else if ( FieldHelper.isNumeric( fieldMetadata ) ) {

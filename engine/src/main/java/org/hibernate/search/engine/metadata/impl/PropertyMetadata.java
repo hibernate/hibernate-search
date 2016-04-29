@@ -28,6 +28,7 @@ import org.hibernate.search.util.impl.ReflectionHelper;
  */
 public class PropertyMetadata {
 	private final XProperty propertyAccessor;
+	private final Class<?> propertyClass;
 	private final Map<String, DocumentFieldMetadata> documentFieldMetadataMap;
 	private final Set<DocumentFieldMetadata> documentFieldMetadataList;
 	private final Set<SortableFieldMetadata> sortableFieldMetadata;
@@ -44,6 +45,7 @@ public class PropertyMetadata {
 
 	private PropertyMetadata(Builder builder) {
 		this.propertyAccessor = builder.propertyAccessor;
+		this.propertyClass = builder.propertyClass;
 		this.documentFieldMetadataList = Collections.unmodifiableSet( builder.fieldMetadataSet );
 		this.documentFieldMetadataMap = createDocumentFieldMetadataMap( builder.fieldMetadataSet );
 		this.sortableFieldMetadata = Collections.unmodifiableSet( builder.sortableFieldMetadata );
@@ -67,6 +69,10 @@ public class PropertyMetadata {
 
 	public XProperty getPropertyAccessor() {
 		return propertyAccessor;
+	}
+
+	public Class<?> getPropertyClass() {
+		return propertyClass;
 	}
 
 	public String getPropertyAccessorName() {
@@ -109,6 +115,7 @@ public class PropertyMetadata {
 	public static class Builder {
 		// required parameters
 		private final XProperty propertyAccessor;
+		private final Class<?> propertyClass;
 		private final Set<DocumentFieldMetadata> fieldMetadataSet;
 		private final Set<SortableFieldMetadata> sortableFieldMetadata;
 		private final Map<String, BridgeDefinedField> bridgeDefinedFields;
@@ -116,11 +123,12 @@ public class PropertyMetadata {
 		// optional parameters
 		private BoostStrategy dynamicBoostStrategy;
 
-		public Builder(XProperty propertyAccessor) {
+		public Builder(XProperty propertyAccessor, Class<?> propertyClass) {
 			if ( propertyAccessor != null ) {
 				ReflectionHelper.setAccessible( propertyAccessor );
 			}
 			this.propertyAccessor = propertyAccessor;
+			this.propertyClass = propertyClass;
 			this.fieldMetadataSet = new HashSet<>();
 			this.sortableFieldMetadata = new HashSet<>();
 			this.bridgeDefinedFields = new HashMap<>();

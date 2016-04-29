@@ -359,7 +359,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			idMetadataBuilder.numericEncodingType( numericEncodingType );
 		}
 		DocumentFieldMetadata fieldMetadata = idMetadataBuilder.build();
-		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member );
+		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member,
+				reflectionManager.toClass( member.getType() ));
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 		checkForSortableField( member, typeMetadataBuilder, propertyMetadataBuilder, "", true, null, parseContext );
 		checkForSortableFields( member, typeMetadataBuilder, propertyMetadataBuilder, "", true, null, parseContext );
@@ -439,7 +440,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						.fieldBridge( providedIdFieldBridge )
 						.boost( 1.0f )
 						.build();
-		propertyMetadata = new PropertyMetadata.Builder( null )
+		propertyMetadata = new PropertyMetadata.Builder( null, null )
 				.addDocumentField( fieldMetadata )
 				.build();
 		typeMetadataBuilder.idProperty( propertyMetadata );
@@ -942,7 +943,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ParseContext parseContext,
 			boolean hasExplicitDocumentId) {
 
-		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
+		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member,
+				reflectionManager.toClass( member.getType() ))
 			.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
 		NumericFieldsConfiguration numericFields = buildNumericFieldsConfiguration( typeMetadataBuilder.getIndexedType(), member, prefix, pathsContext, parseContext );
