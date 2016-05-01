@@ -79,7 +79,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 	@Override
 	public BackendRequest<?> visitAddWork(AddLuceneWork work, Boolean refresh) {
 		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
-		return new BackendRequest<>( index, work );
+		return new BackendRequest<>( index, work, indexName );
 	}
 
 	@Override
@@ -90,7 +90,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 			.refresh( refresh )
 			.build();
 
-		return new BackendRequest<DocumentResult>( delete, work, 404 );
+		return new BackendRequest<DocumentResult>( delete, work, indexName, 404 );
 	}
 
 	@Override
@@ -115,13 +115,13 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 			builder.addType( typeToDelete.getName() );
 		}
 
-		return new BackendRequest<>( builder.build(), work );
+		return new BackendRequest<>( builder.build(), work, indexName );
 	}
 
 	@Override
 	public BackendRequest<?> visitUpdateWork(UpdateLuceneWork work, Boolean refresh) {
 		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
-		return new BackendRequest<>( index, work );
+		return new BackendRequest<>( index, work, indexName );
 	}
 
 	@Override
@@ -167,7 +167,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 			.refresh( refresh )
 			.build();
 
-		return new BackendRequest<>( deleteByQuery, work );
+		return new BackendRequest<>( deleteByQuery, work, indexName );
 	}
 
 	private Action<?> indexDocument(String id, Document document, Class<?> entityType, boolean refresh) {

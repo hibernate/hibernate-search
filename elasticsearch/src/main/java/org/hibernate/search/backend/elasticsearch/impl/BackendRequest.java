@@ -24,13 +24,15 @@ import io.searchbox.client.JestResult;
  */
 public class BackendRequest<T extends JestResult> {
 
-	private Action<T> action;
-	private Set<Integer> ignoredErrorStatuses;
-	private LuceneWork luceneWork;
+	private final Action<T> action;
+	private final Set<Integer> ignoredErrorStatuses;
+	private final LuceneWork luceneWork;
+	private final String indexName;
 
-	public BackendRequest(Action<T> action, LuceneWork luceneWork, int... ignoredErrorStatuses) {
+	public BackendRequest(Action<T> action, LuceneWork luceneWork, String indexName, int... ignoredErrorStatuses) {
 		this.action = action;
 		this.luceneWork = luceneWork;
+		this.indexName = indexName;
 		this.ignoredErrorStatuses = asSet( ignoredErrorStatuses );
 	}
 
@@ -61,6 +63,10 @@ public class BackendRequest<T extends JestResult> {
 
 	public Action<T> getAction() {
 		return action;
+	}
+
+	public String getIndexName() {
+		return indexName;
 	}
 
 	public Set<Integer> getIgnoredErrorStatuses() {
