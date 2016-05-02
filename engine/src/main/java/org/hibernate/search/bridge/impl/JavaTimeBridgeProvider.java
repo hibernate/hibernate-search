@@ -48,7 +48,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * {@link BridgeProvider} for the classes in java.time.*
  * <p>
- * Note that the bridges are created only if the specific the package java.time exists on the classpath
+ * Note that the bridges are created only if the specific package java.time exists on the classpath
  *
  * @author Davide D'Alto
  */
