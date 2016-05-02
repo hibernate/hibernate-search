@@ -57,4 +57,9 @@ public class SingleRequest implements BackendRequestGroup {
 			jestClient.executeRequest( refresh );
 		}
 	}
+
+	@Override
+	public int getSize() {
+		return 1;
+	}
 }

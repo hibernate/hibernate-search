@@ -81,6 +81,11 @@ public class BackendRequestBulk implements BackendRequestGroup {
 	}
 
 	@Override
+	public int getSize() {
+		return requests.size();
+	}
+
+	@Override
 	public String toString() {
 		return "BulkRequest [size=" + requests.size() + ", refresh=" + refresh + ", indexNames=" + indexNames + "]";
 	}

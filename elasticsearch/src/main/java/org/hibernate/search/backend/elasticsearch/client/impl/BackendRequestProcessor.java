@@ -11,25 +11,45 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.backend.elasticsearch.impl.BackendRequest;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import io.searchbox.action.BulkableAction;
 
 /**
  * Executes single or multiple {@link BackendRequest}s against the Elasticsearch server. When processing multiple
  * requests, bulk requests will be formed and executed as far as possible.
+ * <p>
+ * Requests can be processed synchronously or asynchronously. In the latter case, incoming requests are added to a queue
+ * via {@link AsyncBackendRequestProcessor} from where a worker runnable will process them in bulks.
  *
  * @author Gunnar Morling
  */
-public class BackendRequestProcessor implements Service, Startable {
+public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
+	private static final Log LOG = LoggerFactory.make( Log.class );
+
+	private final AsyncBackendRequestProcessor asyncProcessor;
 	private ErrorHandler errorHandler;
 	private JestClient jestClient;
+
+	public BackendRequestProcessor() {
+		asyncProcessor = new AsyncBackendRequestProcessor();
+	}
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
@@ -37,15 +57,49 @@ public class BackendRequestProcessor implements Service, Startable {
 		this.jestClient = context.getServiceManager().requestService( JestClient.class );
 	}
 
+	@Override
+	public void stop() {
+		awaitAsyncProcessingCompletion();
+	}
+
+	public void executeSync(Iterable<BackendRequest<?>> requests) {
+		doExecute( requests );
+	}
+
+	public void executeSync(BackendRequest<?> request) {
+		SingleRequest executableRequest = new SingleRequest( jestClient, errorHandler, request );
+
+		if ( request != null ) {
+			executableRequest.execute();
+			executableRequest.ensureRefreshed();
+		}
+	}
+
+	public void executeAsync(BackendRequest<?> request) {
+		asyncProcessor.submitRequest( request );
+	}
+
+	/**
+	 * Blocks until the queue of requests scheduled for asynchronous processing has been fully processed.
+	 */
+	public void awaitAsyncProcessingCompletion() {
+		asyncProcessor.awaitCompletion();
+	}
+
 	/**
 	 * Groups the given work list into executable bulks and executes them. For each bulk, the error handler - if
 	 * registered - will be invoked with the items of that bulk.
 	 */
-	public void executeSync(Iterable<BackendRequest<?>> requests) {
+	private void doExecute(Iterable<BackendRequest<?>> requests) {
 		BackendRequestGroup nextBulk = null;
 
 		for ( BackendRequestGroup backendRequestGroup : createRequestGroups( requests ) ) {
 			nextBulk = backendRequestGroup;
+
+			if ( LOG.isTraceEnabled() ) {
+				LOG.tracef( "Processing bulk of %s items", nextBulk.getSize() );
+			}
+
 			nextBulk.execute();
 		}
 
@@ -91,13 +145,82 @@ public class BackendRequestProcessor implements Service, Startable {
 		return groups;
 	}
 
+	/**
+	 * Processes requests asynchronously.
+	 * <p>
+	 * Incoming messages are submitted to a queue. A worker runnable takes all messages in the queue at a given time and
+	 * processes them as a bulk as far as possible. The worker is started upon first message arrival after the queue has
+	 * been emptied and remains active until the queue is empty again.
+	 *
+	 * @author Gunnar Morling
+	 */
+	private class AsyncBackendRequestProcessor {
 
-	public void executeSync(BackendRequest<?> request) {
-		SingleRequest executableRequest = new SingleRequest( jestClient, errorHandler, request );
+		private final ScheduledExecutorService scheduler;
+		private final MultiWriteDrainableLinkedList<BackendRequest<?>> asyncRequestQueue;
 
-		if ( request != null ) {
-			executableRequest.execute();
-			executableRequest.ensureRefreshed();
+		private final AtomicBoolean asyncWorkInProcessing = new AtomicBoolean( false );
+		private volatile CountDownLatch asyncWorkLatch;
+
+		private AsyncBackendRequestProcessor() {
+			asyncRequestQueue = new MultiWriteDrainableLinkedList<>();
+			scheduler = Executors.newScheduledThreadPool( 1 );
+		}
+
+		public void submitRequest(BackendRequest<?> request) {
+			asyncRequestQueue.add( request );
+
+			// Set up worker if needed
+			if ( !asyncWorkInProcessing.get() ) {
+				synchronized ( this ) {
+					if ( !asyncWorkInProcessing.get() ) {
+						asyncWorkInProcessing.set( true );
+						asyncWorkLatch = new CountDownLatch( 1 );
+						scheduler.schedule( new RequestProcessingRunnable( this ), 100, TimeUnit.MILLISECONDS );
+					}
+				}
+			}
+		}
+
+		public void awaitCompletion() {
+			if ( asyncWorkLatch != null ) {
+				try {
+					asyncWorkLatch.await();
+				}
+				catch (InterruptedException e) {
+					throw new SearchException( e );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Takes requests from the queue and processes them.
+	 */
+	private class RequestProcessingRunnable implements Runnable {
+
+		private final AsyncBackendRequestProcessor asyncProcessor;
+
+		public RequestProcessingRunnable(AsyncBackendRequestProcessor asyncProcessor) {
+			this.asyncProcessor = asyncProcessor;
+		}
+
+		@Override
+		public void run() {
+			while ( true ) {
+				synchronized ( BackendRequestProcessor.this ) {
+					Iterable<BackendRequest<?>> requests = asyncProcessor.asyncRequestQueue.drainToDetachedIterable();
+
+					// Nothing more to do, allow processor to shut down if requested
+					if ( requests == null ) {
+						asyncProcessor.asyncWorkInProcessing.set( false );
+						asyncProcessor.asyncWorkLatch.countDown();
+						return;
+					}
+
+					doExecute( requests );
+				}
+			}
 		}
 	}
 }

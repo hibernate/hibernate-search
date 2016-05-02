@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
  * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  * @since 5.0
  */
-final class MultiWriteDrainableLinkedList<T> {
+public final class MultiWriteDrainableLinkedList<T> {
 
 	//Guarded by synchronization on this
 	private Node<T> first = null;
@@ -33,7 +33,7 @@ final class MultiWriteDrainableLinkedList<T> {
 	/**
 	 * Adds a new entry to this list.
 	 */
-	void add(T element) {
+	public void add(T element) {
 		final Node<T> newnode = new Node<T>( element );
 		addNode( newnode );
 	}
@@ -56,7 +56,7 @@ final class MultiWriteDrainableLinkedList<T> {
 	 * read the previously appended data.
 	 * @return an Iterable, or null if there is no data.
 	 */
-	Iterable<T> drainToDetachedIterable() {
+	public Iterable<T> drainToDetachedIterable() {
 		final Node<T> head = drainHead();
 		if ( head != null ) {
 			return new DetachedNodeIterable<T>( head );

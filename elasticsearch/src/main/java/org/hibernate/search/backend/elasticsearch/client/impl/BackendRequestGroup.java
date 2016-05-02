@@ -13,4 +13,5 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 public interface BackendRequestGroup {
 	void execute();
 	void ensureRefreshed();
+	int getSize();
 }
