@@ -239,4 +239,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		}
 	}
 
+	@Override
+	public IndexManagerType getIndexManagerType() {
+		return LuceneEmbeddedIndexManagerType.INSTANCE;
+	}
+
 }

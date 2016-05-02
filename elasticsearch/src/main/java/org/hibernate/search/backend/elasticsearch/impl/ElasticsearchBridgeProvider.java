@@ -14,12 +14,13 @@ import java.util.TimeZone;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.backend.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.impl.ExtendedBridgeProvider;
 import org.hibernate.search.bridge.spi.IndexManagerTypeSpecificBridgeProvider;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 
 /**
  * Creates bridges specific to ES.
@@ -30,8 +31,8 @@ import org.hibernate.search.indexes.spi.IndexManager;
 public class ElasticsearchBridgeProvider extends ExtendedBridgeProvider implements IndexManagerTypeSpecificBridgeProvider {
 
 	@Override
-	public Class<? extends IndexManager> getIndexManagerType() {
-		return ElasticsearchIndexManager.class;
+	public IndexManagerType getIndexManagerType() {
+		return ElasticsearchIndexManagerType.INSTANCE;
 	}
 
 	@Override

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -51,7 +51,7 @@ public class EmbeddedObjectIdInclusionTest {
 
 	@Test
 	public void testIncludeEmbeddedObjectId() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( A1.class, DirectoryBasedIndexManager.class );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( A1.class, LuceneEmbeddedIndexManagerType.INSTANCE );
 		assertTrue(
 				"There should be only one embedded metadata instance",
 				typeMetadata.getEmbeddedTypeMetadata().size() == 1
@@ -63,7 +63,7 @@ public class EmbeddedObjectIdInclusionTest {
 
 	@Test
 	public void testExcludeEmbeddedObjectId() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( A2.class, DirectoryBasedIndexManager.class );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( A2.class, LuceneEmbeddedIndexManagerType.INSTANCE );
 		assertTrue(
 				"There should be only one embedded metadata instance",
 				typeMetadata.getEmbeddedTypeMetadata().size() == 1

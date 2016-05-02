@@ -37,7 +37,7 @@ import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -52,7 +52,7 @@ public final class BridgeFactory {
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private final Map<Class<? extends IndexManager>, BridgeProvider> backendSpecificProviders = new HashMap<>();
+	private final Map<IndexManagerType, BridgeProvider> backendSpecificProviders = new HashMap<>();
 	private final List<BridgeProvider> annotationBasedProviders = new ArrayList<>( 6 );
 	private final Set<BridgeProvider> regularProviders = new HashSet<>();
 
@@ -169,7 +169,7 @@ public final class BridgeFactory {
 	public FieldBridge buildFieldBridge(XMember member,
 			boolean isId,
 			boolean isExplicitlyMarkedAsNumeric,
-			Class<? extends IndexManager> indexManagerType,
+			IndexManagerType indexManagerType,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
@@ -181,7 +181,7 @@ public final class BridgeFactory {
 			XMember member,
 			boolean isId,
 			boolean isExplicitlyMarkedAsNumeric,
-			Class<? extends IndexManager> indexManagerType,
+			IndexManagerType indexManagerType,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
@@ -203,8 +203,8 @@ public final class BridgeFactory {
 
 		// Backend specific providers are managed first so that they can override the standard
 		// bridges
-		for ( Entry<Class<? extends IndexManager>, BridgeProvider> providerEntry : backendSpecificProviders.entrySet() ) {
-			if ( providerEntry.getKey().isAssignableFrom( indexManagerType ) ) {
+		for ( Entry<IndexManagerType, BridgeProvider> providerEntry : backendSpecificProviders.entrySet() ) {
+			if ( providerEntry.getKey().equals( indexManagerType ) ) {
 				bridge = getFieldBridgeFromBridgeProvider(
 						providerEntry.getValue(),
 						context,

@@ -26,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -44,6 +45,7 @@ import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spatial.impl.SpatialHelper;
@@ -678,4 +680,10 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	public RemoteAnalyzer getRemoteAnalyzer(String name) {
 		return new RemoteAnalyzer( name );
 	}
+
+	@Override
+	public IndexManagerType getIndexManagerType() {
+		return ElasticsearchIndexManagerType.INSTANCE;
+	}
+
 }
