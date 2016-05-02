@@ -77,7 +77,7 @@ final class MultiWriteDrainableLinkedList<T> {
 	}
 
 	static final class Node<T> {
-		T value;
+		final T value;
 		Node<T> next;
 		Node(T x) {
 			value = x;
@@ -86,7 +86,7 @@ final class MultiWriteDrainableLinkedList<T> {
 
 	static final class DetachedNodeIterable<T> implements Iterable<T> {
 
-		private Node<T> head;
+		private final Node<T> head;
 
 		public DetachedNodeIterable(Node<T> head) {
 			this.head = head;
@@ -102,7 +102,7 @@ final class MultiWriteDrainableLinkedList<T> {
 
 		private Node<T> current;
 
-		DetachedNodeIterator(Node head) {
+		DetachedNodeIterator(Node<T> head) {
 			this.current = head;
 		}
 
