@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.impl;
+package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,13 +24,15 @@ import io.searchbox.client.JestResult;
  */
 public class BackendRequest<T extends JestResult> {
 
-	private Action<T> action;
-	private Set<Integer> ignoredErrorStatuses;
-	private LuceneWork luceneWork;
+	private final Action<T> action;
+	private final Set<Integer> ignoredErrorStatuses;
+	private final LuceneWork luceneWork;
+	private final String indexName;
 
-	public BackendRequest(Action<T> action, LuceneWork luceneWork, int... ignoredErrorStatuses) {
+	public BackendRequest(Action<T> action, LuceneWork luceneWork, String indexName, int... ignoredErrorStatuses) {
 		this.action = action;
 		this.luceneWork = luceneWork;
+		this.indexName = indexName;
 		this.ignoredErrorStatuses = asSet( ignoredErrorStatuses );
 	}
 
@@ -61,6 +63,10 @@ public class BackendRequest<T extends JestResult> {
 
 	public Action<T> getAction() {
 		return action;
+	}
+
+	public String getIndexName() {
+		return indexName;
 	}
 
 	public Set<Integer> getIgnoredErrorStatuses() {

@@ -29,6 +29,7 @@ import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.backend.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -58,7 +59,7 @@ import io.searchbox.core.Index;
 /**
  * @author Gunnar Morling
  */
-class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, BackendRequest<?>> {
+class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendRequest<?>> {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -77,37 +78,35 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 	}
 
 	@Override
-	public BackendRequest<?> visitAddWork(AddLuceneWork work, Boolean refresh) {
-		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
-		return new BackendRequest<>( index, work );
+	public BackendRequest<?> visitAddWork(AddLuceneWork work, Void p) {
+		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
+		return new BackendRequest<>( index, work, indexName );
 	}
 
 	@Override
-	public BackendRequest<?> visitDeleteWork(DeleteLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitDeleteWork(DeleteLuceneWork work, Void p) {
 		Delete delete = new Delete.Builder( DocumentIdHelper.getDocumentId( work ) )
 			.index( indexName )
 			.type( work.getEntityClass().getName() )
-			.refresh( refresh )
 			.build();
 
-		return new BackendRequest<DocumentResult>( delete, work, 404 );
+		return new BackendRequest<DocumentResult>( delete, work, indexName, 404 );
 	}
 
 	@Override
-	public BackendRequest<?> visitOptimizeWork(OptimizeLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitOptimizeWork(OptimizeLuceneWork work, Void p) {
 		// TODO HSEARCH-2092 implement
 		LOG.warn( "Optimize work is not yet supported for Elasticsearch backend, ignoring it" );
 		return null;
 	}
 
 	@Override
-	public BackendRequest<?> visitPurgeAllWork(PurgeAllLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitPurgeAllWork(PurgeAllLuceneWork work, Void p) {
 		String query = work.getTenantId() != null ?
 				String.format( Locale.ENGLISH, DELETE_ALL_FOR_TENANT_QUERY, work.getTenantId() ) :
 				DELETE_ALL_QUERY;
 
 		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( query )
-			.refresh( refresh )
 			.addIndex( indexName );
 
 		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
@@ -115,23 +114,23 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 			builder.addType( typeToDelete.getName() );
 		}
 
-		return new BackendRequest<>( builder.build(), work );
+		return new BackendRequest<>( builder.build(), work, indexName );
 	}
 
 	@Override
-	public BackendRequest<?> visitUpdateWork(UpdateLuceneWork work, Boolean refresh) {
-		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass(), refresh );
-		return new BackendRequest<>( index, work );
+	public BackendRequest<?> visitUpdateWork(UpdateLuceneWork work, Void p) {
+		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
+		return new BackendRequest<>( index, work, indexName );
 	}
 
 	@Override
-	public BackendRequest<?> visitFlushWork(FlushLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitFlushWork(FlushLuceneWork work, Void p) {
 		// Nothing to do
 		return null;
 	}
 
 	@Override
-	public BackendRequest<?> visitDeleteByQueryWork(DeleteByQueryLuceneWork work, Boolean refresh) {
+	public BackendRequest<?> visitDeleteByQueryWork(DeleteByQueryLuceneWork work, Void p) {
 		JsonObject convertedQuery = ToElasticsearch.fromDeletionQuery(
 				searchIntegrator.getIndexBinding( work.getEntityClass() ).getDocumentBuilder(),
 				work.getDeletionQuery()
@@ -164,13 +163,12 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 		DeleteByQuery deleteByQuery = new DeleteByQuery.Builder( query.toString() )
 			.addIndex( indexName )
 			.addType( type )
-			.refresh( refresh )
 			.build();
 
-		return new BackendRequest<>( deleteByQuery, work );
+		return new BackendRequest<>( deleteByQuery, work, indexName );
 	}
 
-	private Action<?> indexDocument(String id, Document document, Class<?> entityType, boolean refresh) {
+	private Action<?> indexDocument(String id, Document document, Class<?> entityType) {
 		JsonObject source = convertToJson( document, entityType );
 		String type = entityType.getName();
 
@@ -178,7 +176,6 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Boolean, Backend
 			.index( indexName )
 			.type( type )
 			.id( id )
-			.refresh( refresh )
 			.build();
 
 		return index;

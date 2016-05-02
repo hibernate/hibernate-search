@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Sanne Grinovero (C) 2014 Red Hat Inc.
  * @since 5.0
  */
-final class MultiWriteDrainableLinkedList<T> {
+public final class MultiWriteDrainableLinkedList<T> {
 
 	private final ReentrantLock lock = new ReentrantLock();
 
@@ -36,7 +36,7 @@ final class MultiWriteDrainableLinkedList<T> {
 	/**
 	 * Adds a new entry to this list.
 	 */
-	void add(T element) {
+	public void add(T element) {
 		final Node<T> newnode = new Node<T>( element );
 		final ReentrantLock lock = this.lock;
 		lock.lock();
@@ -62,7 +62,7 @@ final class MultiWriteDrainableLinkedList<T> {
 	 * read the previously appended data.
 	 * @return an Iterable, or null if there is no data.
 	 */
-	Iterable<T> drainToDetachedIterable() {
+	public Iterable<T> drainToDetachedIterable() {
 		final Node<T> head;
 		final ReentrantLock lock = this.lock;
 		lock.lock();
@@ -95,7 +95,7 @@ final class MultiWriteDrainableLinkedList<T> {
 
 	static final class DetachedNodeIterable<T> implements Iterable<T> {
 
-		private Node<T> head;
+		private final Node<T> head;
 
 		public DetachedNodeIterable(Node<T> head) {
 			this.head = head;
