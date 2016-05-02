@@ -14,4 +14,8 @@ public final class LuceneEmbeddedIndexManagerType implements IndexManagerType {
 		//use the INSTANCE singleton
 	}
 
+	@Override
+	public AnalyzerExecutionStrategy getAnalyzerExecutionStrategy() {
+		return AnalyzerExecutionStrategy.EMBEDDED;
+	}
 }

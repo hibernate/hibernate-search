@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.spi;
 
+import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 
 public final class ElasticsearchIndexManagerType implements IndexManagerType {
@@ -16,4 +17,8 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType {
 		//use the INSTANCE singleton
 	}
 
+	@Override
+	public AnalyzerExecutionStrategy getAnalyzerExecutionStrategy() {
+		return AnalyzerExecutionStrategy.REMOTE;
+	}
 }

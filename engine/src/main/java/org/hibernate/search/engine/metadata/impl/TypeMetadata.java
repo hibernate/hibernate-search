@@ -22,14 +22,14 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -425,7 +425,7 @@ public class TypeMetadata {
 		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new HashSet<>();
 		private final Set<BridgeDefinedField> classBridgeDefinedFields = new HashSet<>();
 
-		public Builder(Class<?> indexedType, Class<? extends IndexManager> indexManagerType, ConfigContext configContext) {
+		public Builder(Class<?> indexedType, IndexManagerType indexManagerType, ConfigContext configContext) {
 			this( indexedType, buildScopedAnalyzerReferenceBuilder( indexManagerType, configContext ) );
 		}
 
@@ -581,9 +581,9 @@ public class TypeMetadata {
 		}
 
 		private static ScopedAnalyzerReference.Builder buildScopedAnalyzerReferenceBuilder(
-				Class<? extends IndexManager> indexManagerType, ConfigContext configContext) {
+				IndexManagerType indexManagerType, ConfigContext configContext) {
 			AnalyzerReference defaultAnalyzerReference;
-			if ( indexManagerType != null && RemoteAnalyzerProvider.class.isAssignableFrom( indexManagerType ) ) {
+			if ( indexManagerType != null && indexManagerType.getAnalyzerExecutionStrategy() == AnalyzerExecutionStrategy.REMOTE ) {
 				defaultAnalyzerReference = RemoteAnalyzerReference.DEFAULT;
 			}
 			else {
