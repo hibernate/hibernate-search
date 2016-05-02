@@ -430,6 +430,12 @@ public class Essay {
 specification. The `grade` field is annotated as Numeric with a slightly larger precisionStep than
 the default.
 
+[NOTE]
+====
+It is not recommended to sort on the id field as it will lead to erratic behaviors. If you want to sort on your
+document id, it is recommended to declare another field specifically for sorting using the `@Field` annotation.
+====
+
 [[fields-annotation]]
 ==== Mapping properties multiple times
 

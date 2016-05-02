@@ -428,6 +428,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 				else {
 					if ( sortField.getField().equals( idFieldName ) ) {
+						// It is not possible to sort on the _id field as this field is not indexed by Elasticsearch and there
+						// is no way to make it indexed in recent Elasticsearch versions.
+						// Thus, we use _uid which is stored as type#id even if it is not very satisfactory when
+						// we query multiple types.
+						// It is not recommended to sort by the @DocumentId field anyway.
 						sortFieldName = "_uid";
 					}
 					else {
