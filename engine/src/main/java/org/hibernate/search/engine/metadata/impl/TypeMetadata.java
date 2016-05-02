@@ -217,7 +217,7 @@ public class TypeMetadata {
 	 * Return all {@link DocumentFieldMetadata}.
 	 * Instances are not duplicated in the collection. We use {@code Collection} instead of {@code Set} for
 	 * implementation reasons.
-	 * @return a all {@link DocumentFieldMetadata}
+	 * @return all {@link DocumentFieldMetadata}
 	 */
 	public Collection<DocumentFieldMetadata> getAllDocumentFieldMetadata() {
 		if ( embeddedTypeMetadata.isEmpty() ) {
