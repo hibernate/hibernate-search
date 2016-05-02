@@ -7,12 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
-
-import io.searchbox.core.DeleteByQuery;
-import io.searchbox.indices.Refresh;
 
 /**
  * A single, non-bulkable request.
@@ -48,15 +46,13 @@ public class SingleRequest implements ExecutableRequest {
 	}
 
 	@Override
-	public void ensureRefreshed() {
-		// DBQ ignores the refresh parameter for some reason, so doing it explicitly
-		if ( request.getAction() instanceof DeleteByQuery ) {
-			Refresh refresh = new Refresh.Builder()
-				.addIndex( request.getIndexName() )
-				.build();
+	public Set<String> getTouchedIndexes() {
+		return Collections.singleton( request.getIndexName() );
+	}
 
-			jestClient.executeRequest( refresh );
-		}
+	@Override
+	public Set<String> getRefreshedIndexes() {
+		return Collections.emptySet();
 	}
 
 	@Override

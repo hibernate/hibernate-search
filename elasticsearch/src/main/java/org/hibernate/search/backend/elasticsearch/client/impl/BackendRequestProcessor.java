@@ -28,6 +28,7 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import io.searchbox.action.BulkableAction;
+import io.searchbox.indices.Refresh;
 
 /**
  * Executes single or multiple {@link BackendRequest}s against the Elasticsearch server. When processing multiple
@@ -65,15 +66,6 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		doExecute( requests );
 	}
 
-	public void executeSync(BackendRequest<?> request) {
-		SingleRequest executableRequest = new SingleRequest( jestClient, errorHandler, request );
-
-		if ( request != null ) {
-			executableRequest.execute();
-			executableRequest.ensureRefreshed();
-		}
-	}
-
 	public void executeAsync(BackendRequest<?> request) {
 		asyncProcessor.submitRequest( request );
 	}
@@ -91,6 +83,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	 */
 	private void doExecute(Iterable<BackendRequest<?>> requests) {
 		ExecutableRequest nextBulk = null;
+		Set<String> indexesNeedingRefresh = new HashSet<>();
 
 		for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests ) ) {
 			nextBulk = backendRequestGroup;
@@ -100,15 +93,11 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 			}
 
 			nextBulk.execute();
+			indexesNeedingRefresh.addAll( backendRequestGroup.getTouchedIndexes() );
+			indexesNeedingRefresh.removeAll( backendRequestGroup.getRefreshedIndexes() );
 		}
 
-		// Make sure a final refresh has been issued
-		try {
-			nextBulk.ensureRefreshed();
-		}
-		catch (BulkRequestFailedException brfe) {
-			errorHandler.handleException( "Refresh failed", brfe );
-		}
+		refresh( indexesNeedingRefresh );
 	}
 
 	/**
@@ -142,6 +131,32 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		}
 
 		return groups;
+	}
+
+	/**
+	 * Performs an explicit refresh of the given index(es).
+	 */
+	private void refresh(Set<String> indexesNeedingRefresh) {
+		if ( indexesNeedingRefresh.isEmpty() ) {
+			return;
+		}
+
+		if ( LOG.isTraceEnabled() ) {
+			LOG.tracef( "Refreshing index(es) %s", indexesNeedingRefresh );
+		}
+
+		Refresh.Builder refreshBuilder = new Refresh.Builder();
+
+		for ( String index : indexesNeedingRefresh ) {
+			refreshBuilder.addIndex( index );
+		}
+
+		try {
+			jestClient.executeRequest( refreshBuilder.build() );
+		}
+		catch (BulkRequestFailedException brfe) {
+			errorHandler.handleException( "Refresh failed", brfe );
+		}
 	}
 
 	/**

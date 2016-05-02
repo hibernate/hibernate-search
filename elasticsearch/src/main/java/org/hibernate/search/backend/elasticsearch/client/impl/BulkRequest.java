@@ -7,14 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
-
-import io.searchbox.indices.Refresh;
 
 /**
  * A request group backed by an actual bulk request.
@@ -67,15 +66,17 @@ public class BulkRequest implements ExecutableRequest {
 	}
 
 	@Override
-	public void ensureRefreshed() {
-		if ( !refresh ) {
-			Refresh.Builder refreshBuilder = new Refresh.Builder();
+	public Set<String> getTouchedIndexes() {
+		return indexNames;
+	}
 
-			for ( String index : indexNames ) {
-				refreshBuilder.addIndex( index );
-			}
-
-			jestClient.executeRequest( refreshBuilder.build() );
+	@Override
+	public Set<String> getRefreshedIndexes() {
+		if ( refresh ) {
+			return indexNames;
+		}
+		else {
+			return Collections.emptySet();
 		}
 	}
 
