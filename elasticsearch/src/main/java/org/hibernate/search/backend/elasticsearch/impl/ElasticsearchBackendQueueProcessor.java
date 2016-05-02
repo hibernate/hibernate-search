@@ -50,22 +50,9 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
-		// Run single action, with refresh
-		if ( workList.size() == 1 ) {
-			LuceneWork singleWork = workList.iterator().next();
-			BackendRequest<?> request = singleWork.acceptIndexWorkVisitor( visitor, true );
-			requestProcessor.executeSync( request );
-		}
-		// Create bulk action
-		else {
-			doApplyListOfWork( workList );
-		}
-	}
-
-	private void doApplyListOfWork(List<LuceneWork> workList) {
 		List<BackendRequest<?>> requests = new ArrayList<>( workList.size() );
 		for ( LuceneWork luceneWork : workList ) {
-			requests.add( luceneWork.acceptIndexWorkVisitor( visitor, false ) );
+			requests.add( luceneWork.acceptIndexWorkVisitor( visitor, null ) );
 		}
 
 		requestProcessor.executeSync( requests );
@@ -77,7 +64,7 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 			requestProcessor.awaitAsyncProcessingCompletion();
 		}
 		else {
-			BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, true );
+			BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, null );
 
 			if ( request != null ) {
 				requestProcessor.executeAsync( request );
