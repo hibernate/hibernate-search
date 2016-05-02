@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.elasticsearch.client.impl.BackendRequestProcessor;
@@ -50,7 +51,9 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		// Run single action, with refresh
 		if ( workList.size() == 1 ) {
-			doApplySingleWork( workList.iterator().next() );
+			LuceneWork singleWork = workList.iterator().next();
+			BackendRequest<?> request = singleWork.acceptIndexWorkVisitor( visitor, true );
+			requestProcessor.executeSync( request );
 		}
 		// Create bulk action
 		else {
@@ -69,12 +72,16 @@ public class ElasticsearchBackendQueueProcessor implements BackendQueueProcessor
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-		doApplySingleWork( singleOperation );
-	}
+		if ( singleOperation == FlushLuceneWork.INSTANCE ) {
+			requestProcessor.awaitAsyncProcessingCompletion();
+		}
+		else {
+			BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, true );
 
-	private void doApplySingleWork(LuceneWork work) {
-		BackendRequest<?> request = work.acceptIndexWorkVisitor( visitor, true );
-		requestProcessor.executeSync( request );
+			if ( request != null ) {
+				requestProcessor.executeAsync( request );
+			}
+		}
 	}
 
 	@Override
