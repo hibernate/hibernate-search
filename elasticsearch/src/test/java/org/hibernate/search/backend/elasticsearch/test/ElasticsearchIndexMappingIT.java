@@ -17,7 +17,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
-import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.testutil.JsonHelper;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
@@ -122,7 +122,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Hergesheimer' } } }" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.SOURCE )
+				.setProjection( ElasticsearchProjectionConstants.SOURCE )
 				.list();
 
 		String source = (String) ( (Object[]) result.iterator().next() )[0];
@@ -155,7 +155,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Galore' } } }" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.SOURCE )
+				.setProjection( ElasticsearchProjectionConstants.SOURCE )
 				.list();
 
 		String source = (String) ( (Object[]) result.iterator().next() )[0];
@@ -182,7 +182,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Hergesheimer' } } }" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.SOURCE )
+				.setProjection( ElasticsearchProjectionConstants.SOURCE )
 				.list();
 
 		String source = (String) ( (Object[]) result.iterator().next() )[0];
@@ -209,7 +209,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Brand' } } }" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-						.setProjection( ProjectionConstants.SOURCE )
+						.setProjection( ElasticsearchProjectionConstants.SOURCE )
 						.list();
 
 		String source = (String) ( (Object[]) result.iterator().next() )[0];
@@ -251,7 +251,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "lastName:Kidd" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.SOURCE )
+				.setProjection( ElasticsearchProjectionConstants.SOURCE )
 				.list();
 
 		String source = (String) ( (Object[]) result.iterator().next() )[0];

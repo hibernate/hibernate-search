@@ -53,6 +53,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -64,6 +65,19 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 	static final Log log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
+
+	private static final Set<String> SUPPORTED_PROJECTION_CONSTANTS = Collections.unmodifiableSet(
+			CollectionHelper.asSet(
+					ProjectionConstants.DOCUMENT,
+					ProjectionConstants.DOCUMENT_ID,
+					ProjectionConstants.EXPLANATION,
+					ProjectionConstants.ID,
+					ProjectionConstants.OBJECT_CLASS,
+					ProjectionConstants.SCORE,
+					ProjectionConstants.SPATIAL_DISTANCE,
+					ProjectionConstants.THIS
+			)
+	);
 
 	private Query luceneQuery;
 
@@ -265,6 +279,11 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	protected void extractFacetResults() {
 		DocumentExtractor queryDocumentExtractor = queryDocumentExtractor();
 		queryDocumentExtractor.close();
+	}
+
+	@Override
+	protected Set<String> getSupportedProjectionConstants() {
+		return SUPPORTED_PROJECTION_CONSTANTS;
 	}
 
 	/**
