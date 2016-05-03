@@ -442,7 +442,6 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return field;
 	}
 
-	@SuppressWarnings("deprecation")
 	private String getIndex(EntityIndexBinding binding, DocumentFieldMetadata fieldMetadata) {
 		// Never analyze boolean, date or numeric
 		if ( FieldHelper.isBoolean( binding, fieldMetadata.getName() ) ||
