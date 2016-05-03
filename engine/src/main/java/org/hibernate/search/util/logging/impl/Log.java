@@ -973,4 +973,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.WARN)
 	@Message(id = 316, value = "The value for @IndexEmbedded#%2$s() on the property `%1$s` is ignored when the annotation is used with @ElementCollection")
 	void indexEmbeddedValueIgnored(String propertyName, String indexEmbeddedAttribute);
+
+	@Message(id = 317, value = "Projection constant '%s' is not supported for this query.")
+	SearchException unexpectedProjectionConstant(String constantName);
 }

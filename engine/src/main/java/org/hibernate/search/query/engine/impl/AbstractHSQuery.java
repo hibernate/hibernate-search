@@ -48,6 +48,11 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	private static final Log LOG = LoggerFactory.make();
 
+	/**
+	 * Common prefix shared by all defined projection constants.
+	 */
+	public static final String HSEARCH_PROJECTION_FIELD_PREFIX = "__HSearch_";
+
 	protected transient ExtendedSearchIntegrator extendedIntegrator;
 	protected transient TimeoutExceptionFactory timeoutExceptionFactory;
 	protected transient TimeoutManagerImpl timeoutManager;
@@ -138,10 +143,14 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		else {
 			this.projectedFields = fields;
 			boolean hasThis = false;
+			Set<String> supportedProjectionConstants = getSupportedProjectionConstants();
+
 			for ( String field : fields ) {
 				if ( ProjectionConstants.THIS.equals( field ) ) {
 					hasThis = true;
-					break;
+				}
+				if ( field != null && field.startsWith( HSEARCH_PROJECTION_FIELD_PREFIX ) && !supportedProjectionConstants.contains( field ) ) {
+					throw LOG.unexpectedProjectionConstant( field );
 				}
 			}
 			this.hasThisProjection = hasThis;
@@ -232,6 +241,13 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
 		return extendedIntegrator;
 	}
+
+	/**
+	 * Returns the names of the projection constants supported by a specific implementation in addition to projecting
+	 * actual field values. If a given projection name begins with {@link #HSEARCH_PROJECTION_FIELD_PREFIX} and is not
+	 * part of the set of constants returned by an implementation, an exception will be raised.
+	 */
+	protected abstract Set<String> getSupportedProjectionConstants();
 
 	protected void validateSortFields(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities) {
 		SortField[] sortFields = sort.getSort();

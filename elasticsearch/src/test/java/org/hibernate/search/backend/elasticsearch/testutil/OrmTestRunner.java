@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
  * @author Gunnar Morling
  */
 @RunWith(ClasspathSuite.class)
-@ClasspathSuite.ClassnameFilters({ ".*FieldAccessTest" })
+@ClasspathSuite.ClassnameFilters({ ".*ProjectionQueryTest" })
 // @ClasspathSuite.ClassnameFilters({ "org.hibernate.search.test.*" })
 public class OrmTestRunner {
 }

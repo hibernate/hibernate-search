@@ -25,8 +25,8 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
-import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.test.model.Address;
 import org.hibernate.search.backend.elasticsearch.test.model.Country;
 import org.hibernate.search.backend.elasticsearch.test.model.Owner;
@@ -542,10 +542,10 @@ public class ElasticsearchIT extends SearchTestBase {
 		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "lastName:Hergesheimer" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
 				.setProjection(
-						ProjectionConstants.ID,
-						ProjectionConstants.OBJECT_CLASS,
-						ProjectionConstants.SCORE,
-						ProjectionConstants.THIS,
+						ElasticsearchProjectionConstants.ID,
+						ElasticsearchProjectionConstants.OBJECT_CLASS,
+						ElasticsearchProjectionConstants.SCORE,
+						ElasticsearchProjectionConstants.THIS,
 						"firstName",
 						"lastName",
 						"active",
@@ -623,7 +623,7 @@ public class ElasticsearchIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'puttingStrength' : '2.5' } } }" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.ID, "puttingStrength" )
+				.setProjection( ElasticsearchProjectionConstants.ID, "puttingStrength" )
 				.list();
 
 		assertThat( result ).hasSize( 1 );

@@ -6,6 +6,16 @@
  */
 package org.hibernate.search.test.query;
 
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -35,18 +45,9 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
 import org.junit.Test;
-
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Tests several aspects of projection queries.
@@ -597,6 +598,27 @@ public class ProjectionQueryTest extends SearchTestBase {
 
 		tx.commit();
 		s.close();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2106")
+	public void testUnexpectedProjectionConstant() {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+
+		try {
+			Query query = NumericFieldUtils.createNumericRangeQuery( "debtInMillions", 600d, 800d, true, true );
+
+			FullTextQuery hibQuery = s.createFullTextQuery( query, FootballTeam.class );
+			hibQuery.setProjection( "__HSearch_xyz" );
+
+			fail();
+		}
+		catch (SearchException se) {
+			assertTrue( "Unexpected message: " + se.getMessage(), se.getMessage().startsWith( "HSEARCH000317" ) );
+		}
+		finally {
+			s.close();
+		}
 	}
 
 	private void prepEmployeeIndex(FullTextSession s) {
