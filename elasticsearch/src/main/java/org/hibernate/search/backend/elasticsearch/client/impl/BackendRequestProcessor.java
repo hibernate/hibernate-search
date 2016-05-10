@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.ErrorHandler;
@@ -50,6 +51,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 	private final AsyncBackendRequestProcessor asyncProcessor;
 	private ErrorHandler errorHandler;
+	private ServiceManager serviceManager;
 	private JestClient jestClient;
 
 	public BackendRequestProcessor() {
@@ -59,12 +61,14 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		this.errorHandler = context.getErrorHandler();
-		this.jestClient = context.getServiceManager().requestService( JestClient.class );
+		this.serviceManager = context.getServiceManager();
+		this.jestClient = serviceManager.requestService( JestClient.class );
 	}
 
 	@Override
 	public void stop() {
 		awaitAsyncProcessingCompletion();
+		serviceManager.releaseService( JestClient.class );
 	}
 
 	public void executeSync(Iterable<BackendRequest<?>> requests) {
