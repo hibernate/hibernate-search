@@ -8,6 +8,9 @@ package org.hibernate.search.engine;
 
 /**
  * Defined projection constants.
+ * <p>
+ * Implementator's note: When adding new constants, be sure to add them to
+ * {@code LuceneHSQuery#SUPPORTED_PROJECTION_CONSTANTS}, too.
  *
  * @author Emmanuel Bernard
  */
@@ -60,5 +63,6 @@ public interface ProjectionConstants {
 	/**
 	 * Represents the distance between an entity and the center of the search radius in case of a spatial query
 	 */
+	// TODO HSEARCH-2268: Make it start with "__"
 	String SPATIAL_DISTANCE = "_HSearch_SpatialDistance";
 }

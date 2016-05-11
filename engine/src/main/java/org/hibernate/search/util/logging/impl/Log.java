@@ -970,4 +970,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 315, value = "Lazy remote analyzer %1$s is not initialized.")
 	SearchException lazyRemoteAnalyzerNotInitialized(LazyRemoteAnalyzer analyzer);
 
+	@Message(id = 316, value = "Projection constant '%s' is not supported for this query.")
+	SearchException unexpectedProjectionConstant(String constantName);
 }

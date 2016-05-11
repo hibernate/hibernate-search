@@ -11,7 +11,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchQueries;
-import org.hibernate.search.backend.elasticsearch.ProjectionConstants;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.backend.elasticsearch.testutil.JsonHelper;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
@@ -67,7 +67,7 @@ public class ElasticsearchJpaIT extends JPATestCase {
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Hergesheimer' } } }" );
 
 		Object[] result = (Object[]) ftem.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( ProjectionConstants.SOURCE )
+				.setProjection( ElasticsearchProjectionConstants.SOURCE )
 				.getSingleResult();
 
 		String source = (String) result[0];
