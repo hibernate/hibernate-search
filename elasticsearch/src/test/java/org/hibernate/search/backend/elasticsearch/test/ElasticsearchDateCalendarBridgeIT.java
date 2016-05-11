@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -108,6 +109,7 @@ public class ElasticsearchDateCalendarBridgeIT extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		Calendar subscriptionEndDate = GregorianCalendar.getInstance( TimeZone.getTimeZone( "Europe/Paris" ), Locale.FRENCH );
+		// Expecting to match as resolution is DAY
 		subscriptionEndDate.set( 2016, 5, 7, 7, 7, 7 );
 
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -115,6 +117,34 @@ public class ElasticsearchDateCalendarBridgeIT extends SearchTestBase {
 
 		Query query = monthQb.keyword().onField( "subscriptionEndDate" ).matching( subscriptionEndDate ).createQuery();
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, GolfPlayer.class ).getResultSize() );
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testProjectionOfCalendarValueRetrievesCorrectTimeZoneOffset() {
+		Session s = openSession();
+		FullTextSession fullTextSession = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		Calendar subscriptionEndDate = GregorianCalendar.getInstance( TimeZone.getTimeZone( "Europe/Paris" ), Locale.FRENCH );
+		// Expecting to match as resolution is DAY
+		subscriptionEndDate.set( 2016, 5, 7, 7, 7, 7 );
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( GolfPlayer.class ).get();
+
+		Query query = monthQb.keyword().onField( "subscriptionEndDate" ).matching( subscriptionEndDate ).createQuery();
+
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = fullTextSession.createFullTextQuery( query, GolfPlayer.class ).setProjection( "subscriptionEndDate" ).list();
+		assertEquals( 1, results.size() );
+
+		Date now = new Date();
+		assertEquals(
+				TimeZone.getTimeZone( "Europe/Paris" ).getOffset( now.getTime() ),
+				( (Calendar) results.iterator().next()[0] ).getTimeZone().getOffset( now.getTime() )
+		);
 
 		tx.commit();
 		s.close();
