@@ -8,6 +8,9 @@ package org.hibernate.search.backend.elasticsearch;
 
 /**
  * Projection constants specific to the Elasticsearch backend.
+ * <p>
+ * Implementator's note: When adding new constants, be sure to add them to
+ * {@code ElasticsearchHSQueryImpl#SUPPORTED_PROJECTION_CONSTANTS}, too.
  *
  * @author Gunnar Morling
  */
@@ -37,6 +40,7 @@ public interface ElasticsearchProjectionConstants {
 	/**
 	 * Represents the distance between an entity and the center of the search radius in case of a spatial query
 	 */
+	// TODO HSEARCH-2268: Make it start with "__"
 	String SPATIAL_DISTANCE = "_HSearch_SpatialDistance";
 
 	/**
