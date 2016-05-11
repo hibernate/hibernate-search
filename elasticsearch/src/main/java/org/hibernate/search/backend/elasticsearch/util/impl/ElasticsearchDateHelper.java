@@ -40,12 +40,6 @@ public final class ElasticsearchDateHelper {
 		return DatatypeConverter.printDateTime( c );
 	}
 
-	public static Calendar dateToCalendar(Date date) {
-		Calendar calendar = Calendar.getInstance( ENCODING_TIME_ZONE, Locale.ENGLISH );
-		calendar.setTime( date );
-		return calendar;
-	}
-
 	public static String calendarToString(Calendar calendar) {
 		return DatatypeConverter.printDateTime( calendar );
 	}
@@ -58,7 +52,7 @@ public final class ElasticsearchDateHelper {
 	 * Limit a calendar resolution.
 	 *
 	 * @param resolution The desired resolution of the date to be returned
-	 * @return the calendar with all values more precise than <code>resolution</code> set to 0 or 1
+	 * @return the calendar with all values more precise than {@code resolution} set to 0 or 1
 	 *
 	 * @see DateTools#round(Date, Resolution)
 	 */

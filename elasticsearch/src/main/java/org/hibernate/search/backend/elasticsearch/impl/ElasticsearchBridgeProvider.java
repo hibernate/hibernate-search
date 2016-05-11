@@ -37,28 +37,25 @@ public class ElasticsearchBridgeProvider extends ExtendedBridgeProvider implemen
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
-		if ( Date.class.isAssignableFrom( context.getReturnType() ) ) {
-			if ( annotatedElement.isAnnotationPresent( DateBridge.class ) ) {
-				DateBridge dateBridgeAnnotation = annotatedElement.getAnnotation( DateBridge.class );
 
-				return getDateFieldBridge( dateBridgeAnnotation.resolution() );
-			}
-			else {
-				return getDateFieldBridge( Resolution.MILLISECOND );
-			}
+		if ( Date.class.isAssignableFrom( context.getReturnType() ) ) {
+			Resolution resolution = getResolution( annotatedElement );
+			return getDateFieldBridge( resolution );
 		}
 		else if ( Calendar.class.isAssignableFrom( context.getReturnType() ) ) {
-			if ( annotatedElement.isAnnotationPresent( DateBridge.class ) ) {
-				DateBridge dateBridgeAnnotation = annotatedElement.getAnnotation( DateBridge.class );
-
-				return getCalendarFieldBridge( dateBridgeAnnotation.resolution() );
-			}
-			else {
-				return getCalendarFieldBridge( Resolution.MILLISECOND );
-			}
+			Resolution resolution = getResolution( annotatedElement );
+			return getCalendarFieldBridge( resolution );
 		}
 
 		return null;
+	}
+
+	private Resolution getResolution(AnnotatedElement annotatedElement) {
+		if ( annotatedElement.isAnnotationPresent( DateBridge.class ) ) {
+			return annotatedElement.getAnnotation( DateBridge.class ).resolution();
+		}
+
+		return Resolution.MILLISECOND;
 	}
 
 	private FieldBridge getDateFieldBridge(Resolution resolution) {
