@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.test.filter;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -18,6 +22,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.NumericRangeFilter;
+import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
@@ -28,13 +33,12 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.filter.Employee.Role;
 import org.hibernate.search.test.filter.FieldConstraintFilterFactoryWithoutKeyMethod.BuildFilterInvocation;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Emmanuel Bernard
@@ -69,6 +73,10 @@ public class FilterTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class)
+	// For now, the Elasticsearch backend does not support caching of the Filter instances as the caching API is based
+	// on Lucene filters.
+	// Moreover the Elasticsearch backend does not support custom Lucene filters.
 	public void testCache() {
 		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 ); // SearchFactory tests filter construction once
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
@@ -106,6 +114,10 @@ public class FilterTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-295")
+	@Category(SkipOnElasticsearch.class)
+	// For now, the Elasticsearch backend does not support caching of the Filter instances as the caching API is based
+	// on Lucene filters.
+	// Moreover the Elasticsearch backend does not support custom Lucene filters.
 	public void testFiltersCreatedByFactoryWithoutKeyMethodShouldBeCachedByAllParameterNamesAndValues() {
 		assertEquals( 0, FieldConstraintFilterFactoryWithoutKeyMethod.getBuiltFilters().size() );
 
@@ -160,6 +172,8 @@ public class FilterTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-295")
+	@Category(SkipOnElasticsearch.class)
+	// The Elasticsearch backend does not support custom Lucene filters.
 	public void testFiltersWithoutKeyMethodShouldBeCachedByAllParameterNamesAndValues() {
 		// Discarding all instantiations stemming from SF bootstrap
 		FieldConstraintFilterWithoutKeyMethod.getInstances().clear();
@@ -217,22 +231,13 @@ public class FilterTest extends SearchTestBase {
 	public void testStraightFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
-		Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
-		calendar.set( Calendar.YEAR, 2001 );
-		long from = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
-		calendar.set( Calendar.YEAR, 2005 );
-		long to = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
-		Filter dateFilter = NumericRangeFilter.newLongRange( "delivery", from, to, true, true );
-		ftQuery.setFilter( dateFilter );
+		TermQuery termQuery = new TermQuery( new Term( "name", "liz" ) );
+		Filter termFilter = new QueryWrapperFilter( termQuery );
+		ftQuery.setFilter( termFilter );
 		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
 
 		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "bestDriver" );
-		ftQuery.enableFullTextFilter( "empty" );
-		assertEquals( "two filters, one is empty, should not match anything", 0, ftQuery.getResultSize() );
-
-		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
-		ftQuery.setFilter( dateFilter );
+		ftQuery.setFilter( termFilter );
 		ftQuery.enableFullTextFilter( "bestDriver" );
 		ftQuery.enableFullTextFilter( "security" ).setParameter( "login", "andre" );
 		ftQuery.disableFullTextFilter( "security" );
@@ -241,8 +246,27 @@ public class FilterTest extends SearchTestBase {
 		assertEquals( "Should not filter anymore", 3, ftQuery.getResultSize() );
 	}
 
+	@Test
+	@Category(SkipOnElasticsearch.class)
+	// The Elasticsearch backend does not support custom Lucene filters.
+	public void testEmptyFilters() {
+		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "bestDriver" );
+		TermQuery termQuery = new TermQuery( new Term( "name", "liz" ) );
+		Filter termFilter = new QueryWrapperFilter( termQuery );
+		ftQuery.setFilter( termFilter );
+		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
+
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "bestDriver" );
+		ftQuery.enableFullTextFilter( "empty" );
+		assertEquals( "two filters, one is empty, should not match anything", 0, ftQuery.getResultSize() );
+	}
+
 	@TestForIssue(jiraKey = "HSEARCH-1513")
 	@Test
+	@Category(SkipOnElasticsearch.class)
+	// The Elasticsearch backend does not support custom Lucene filters.
 	public void testCachedEmptyFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
