@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
@@ -73,6 +74,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final String ANALYZED = "analyzed";
+	private static final String NOT_ANALYZED = "not_analyzed";
 
 	private String indexName;
 	private String actualIndexName;
@@ -283,7 +285,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			// TODO HSEARCH-2256 Should we make this configurable?
 			JsonObject field = new JsonObject();
 			field.addProperty( "type", "string" );
-			field.addProperty( "index", "not_analyzed" );
+			field.addProperty( "index", NOT_ANALYZED );
 			properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
 
 			// normal document fields
@@ -345,11 +347,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		String index = getIndex( descriptor, fieldMetadata );
 		field.addProperty( "index", index );
 
-		if ( isAnalyzed( index ) && fieldMetadata.getAnalyzerReference() != null ) {
-			String analyzerName = analyzerName( descriptor.getDocumentBuilder().getBeanClass(), fieldMetadata );
-			if ( analyzerName != null ) {
-				field.addProperty( "analyzer", analyzerName );
-			}
+		String analyzerName = getAnalyzerName( descriptor, fieldMetadata, index );
+		if ( analyzerName != null ) {
+			field.addProperty( "analyzer", analyzerName );
 		}
 
 		if ( fieldMetadata.getBoost() != null ) {
@@ -372,6 +372,13 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
+	private String getAnalyzerName(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata, String index) {
+		if ( isAnalyzed( index ) && fieldMetadata.getAnalyzerReference() != null ) {
+			return analyzerName( descriptor.getDocumentBuilder().getBeanClass(), fieldMetadata );
+		}
+		return null;
+	}
+
 	private boolean isAnalyzed(String index) {
 		return ANALYZED.equals( index );
 	}
@@ -386,7 +393,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			JsonObject field = new JsonObject();
 
 			field.addProperty( "type", getFieldType( bridgeDefinedField ) );
-			field.addProperty( "index", ANALYZED );
+
+			String index = getIndex( bridgeDefinedField );
+			field.addProperty( "index", index );
 
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
@@ -413,7 +422,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				// the fields potentially created for the spatial hash queries
 				JsonObject field = new JsonObject();
 				field.addProperty( "type", "string" );
-				field.addProperty( "index", "not_analyzed" );
+				field.addProperty( "index", NOT_ANALYZED );
 
 				getOrCreateProperties( payload, fieldName ).add( fieldName, field );
 			}
@@ -427,33 +436,49 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		JsonObject field = new JsonObject();
 		field.addProperty( "type", getFieldType( facetMetadata ) );
 		field.addProperty( "store", false );
-		field.addProperty( "index", "not_analyzed" );
+		field.addProperty( "index", NOT_ANALYZED );
 
 		getOrCreateProperties( payload, fullFieldName).add( simpleFieldName, field );
 		return field;
 	}
 
-	@SuppressWarnings("deprecation")
 	private String getIndex(EntityIndexBinding binding, DocumentFieldMetadata fieldMetadata) {
 		// Never analyze boolean, date or numeric
 		if ( FieldHelper.isBoolean( binding, fieldMetadata.getName() ) ||
 				FieldHelper.isDate( binding, fieldMetadata.getName() ) ||
 				FieldHelper.isCalendar( binding, fieldMetadata.getName() ) ||
 				FieldHelper.isNumeric(fieldMetadata) ) {
-			return "not_analyzed";
+			return NOT_ANALYZED;
 		}
 
-		switch ( fieldMetadata.getIndex() ) {
+		return getIndexValue( fieldMetadata.getIndex() );
+	}
+
+	@SuppressWarnings("deprecation")
+	private String getIndex(BridgeDefinedField bridgeDefinedField) {
+		// Never analyze boolean
+		if ( FieldHelper.isBoolean( bridgeDefinedField )
+				|| FieldHelper.isNumeric( bridgeDefinedField )
+				|| FieldHelper.isDate( bridgeDefinedField ) ) {
+			return NOT_ANALYZED;
+		}
+
+		Field.Index index = bridgeDefinedField.getIndex();
+		return getIndexValue( index );
+	}
+
+	private String getIndexValue(Field.Index index) {
+		switch ( index ) {
 			case ANALYZED:
 			case ANALYZED_NO_NORMS:
 				return ANALYZED;
 			case NOT_ANALYZED:
 			case NOT_ANALYZED_NO_NORMS:
-				return "not_analyzed";
+				return NOT_ANALYZED;
 			case NO:
 				return "no";
 			default:
-				throw new IllegalArgumentException( "Unexpected index type: " + fieldMetadata.getIndex() );
+				throw new IllegalArgumentException( "Unexpected index type: " + index );
 		}
 	}
 

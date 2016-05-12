@@ -22,6 +22,11 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
 	private final Set<String> sortableFields = new HashSet<>();
 	private final Set<BridgeDefinedField> fields = new HashSet<>();
+	private final DocumentFieldMetadata fieldMetadata;
+
+	public FieldMetadataBuilderImpl(DocumentFieldMetadata fieldMetadata) {
+		this.fieldMetadata = fieldMetadata;
+	}
 
 	@Override
 	public FieldMetadataCreationContext field(String name, FieldType type) {
@@ -43,7 +48,7 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
 		public FieldMetadataCreationContextImpl(String name, FieldType type) {
 			this.fieldName = name;
-			fields.add( new BridgeDefinedField( name, type ) );
+			fields.add( new BridgeDefinedField( name, type, fieldMetadata.getIndex() ) );
 		}
 
 		@Override

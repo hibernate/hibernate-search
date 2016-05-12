@@ -38,7 +38,9 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -273,14 +275,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		searchResult = searcher.runSearch();
 		resultSize = searchResult.getTotal();
-	}
-
-	private Object getId(JsonObject hit, EntityIndexBinding binding) {
-		Document tmp = new Document();
-		tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO) );
-		Object id = binding.getDocumentBuilder().getIdBridge().get( "id", tmp );
-
-		return id;
 	}
 
 	/**
@@ -571,6 +565,25 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdentifierName(), (Serializable) id, projections );
 		}
 
+		private Object getId(JsonObject hit, EntityIndexBinding binding) {
+			Document tmp = new Document();
+			tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO) );
+
+			addIdBridgeDefinedFields( hit, binding, tmp );
+
+			return binding.getDocumentBuilder().getIdBridge().get( "id", tmp );
+		}
+
+		// Add to the document the additional fields created when indexing the id
+		private void addIdBridgeDefinedFields(JsonObject hit, EntityIndexBinding binding, Document tmp) {
+			Set<BridgeDefinedField> allBridgeDefinedFields = new HashSet<>();
+			allBridgeDefinedFields.addAll( binding.getDocumentBuilder().getMetadata().getIdPropertyMetadata().getBridgeDefinedFields().values() );
+			for ( BridgeDefinedField bridgeDefinedField : allBridgeDefinedFields ) {
+				Object fieldValue = getFieldValue( binding, hit, bridgeDefinedField.getName() );
+				tmp.add( new StringField( bridgeDefinedField.getName(), String.valueOf( fieldValue ), Store.NO ) );
+			}
+		}
+
 		/**
 		 * Returns the value of the given field as retrieved from the ES result and converted using the corresponding
 		 * field bridge. In case this bridge is not a 2-way bridge, the unconverted value will be returned.
@@ -579,13 +592,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			DocumentFieldMetadata field = FieldHelper.getFieldMetadata( binding, projectedField );
 
 			if ( field == null ) {
-				throw new IllegalArgumentException( "Unknown field " + projectedField + " for entity "
+				// We check if it is a field created by a field bridge
+				if ( !isBridgeDefinedField( binding, projectedField ) ) {
+					throw new IllegalArgumentException( "Unknown field " + projectedField + " for entity "
 						+ binding.getDocumentBuilder().getMetadata().getType().getName() );
+				}
 			}
 
 			JsonElement value;
 
-			if ( field.isId() ) {
+			if ( field != null && field.isId() ) {
 				value = hit.get( "_id" );
 			}
 			else {
@@ -596,7 +612,27 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				return null;
 			}
 
-			return convertFieldValue( binding, field, value );
+			if ( field != null ) {
+				return convertFieldValue( binding, field, value );
+			}
+			else {
+				return convertPrimitiveValue( value );
+			}
+		}
+
+		private boolean isBridgeDefinedField(EntityIndexBinding binding, String projectedField) {
+			BridgeDefinedField bridgeDefinedField = binding.getDocumentBuilder().getMetadata().getIdPropertyMetadata().getBridgeDefinedFields().get( projectedField );
+			if ( bridgeDefinedField != null ) {
+				return true;
+			}
+			Set<PropertyMetadata> allPropertyMetadata = binding.getDocumentBuilder().getMetadata().getAllPropertyMetadata();
+			for ( PropertyMetadata propertyMetadata : allPropertyMetadata ) {
+				bridgeDefinedField = propertyMetadata.getBridgeDefinedFields().get( projectedField );
+				if ( bridgeDefinedField != null && bridgeDefinedField.getName().equals( projectedField ) ) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private Object convertFieldValue(EntityIndexBinding binding, DocumentFieldMetadata field, JsonElement value) {
@@ -637,28 +673,32 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 			// Should only be the case for custom bridges
 			else {
-				// TODO: HSEARCH-2255 should we do it?
-				if ( !value.isJsonPrimitive() ) {
-					throw new SearchException( "Projection of non-JSON-primitive field values is not supported: " + value );
-				}
+				return convertPrimitiveValue( value );
+			}
+		}
 
-				JsonPrimitive primitive = value.getAsJsonPrimitive();
+		private Object convertPrimitiveValue(JsonElement value) {
+			// TODO: HSEARCH-2255 should we do it?
+			if ( !value.isJsonPrimitive() ) {
+				throw LOG.unsupportedProjectionOfNonJsonPrimitiveFields( value );
+			}
 
-				if ( primitive.isBoolean() ) {
-					return primitive.getAsBoolean();
-				}
-				else if ( primitive.isNumber() ) {
-					// TODO HSEARCH-2255 this will expose a Gson-specific Number implementation; Can we somehow return an Integer,
-					// Long... etc. instead?
-					return primitive.getAsNumber();
-				}
-				else if ( primitive.isString() ) {
-					return primitive.getAsString();
-				}
-				else {
-					// TODO HSEARCH-2255 Better raise an exception?
-					return primitive.toString();
-				}
+			JsonPrimitive primitive = value.getAsJsonPrimitive();
+
+			if ( primitive.isBoolean() ) {
+				return primitive.getAsBoolean();
+			}
+			else if ( primitive.isNumber() ) {
+				// TODO HSEARCH-2255 this will expose a Gson-specific Number implementation; Can we somehow return an Integer,
+				// Long... etc. instead?
+				return primitive.getAsNumber();
+			}
+			else if ( primitive.isString() ) {
+				return primitive.getAsString();
+			}
+			else {
+				// TODO HSEARCH-2255 Better raise an exception?
+				return primitive.toString();
 			}
 		}
 

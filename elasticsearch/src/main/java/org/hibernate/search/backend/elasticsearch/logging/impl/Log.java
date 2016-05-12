@@ -24,6 +24,8 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 
+import com.google.gson.JsonElement;
+
 import io.searchbox.client.JestResult;
 
 /**
@@ -77,4 +79,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green';\n Request:\n========\n%1$sResponse:\n=========\n%2$s" )
 	SearchException elasticsearchRequestTimeout(String request, String response);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 11,
+			value = "Projection of non-JSON-primitive field values is not supported: '%1$s'")
+	SearchException unsupportedProjectionOfNonJsonPrimitiveFields(JsonElement value);
 }
