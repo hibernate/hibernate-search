@@ -214,6 +214,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 					asyncWorkLatch.await();
 				}
 				catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
 					throw new SearchException( e );
 				}
 			}
