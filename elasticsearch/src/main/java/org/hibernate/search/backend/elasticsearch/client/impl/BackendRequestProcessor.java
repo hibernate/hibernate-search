@@ -94,7 +94,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		ExecutableRequest nextBulk = null;
 		Set<String> indexesNeedingRefresh = new HashSet<>();
 
-		for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests ) ) {
+		for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests, true ) ) {
 			nextBulk = backendRequestGroup;
 
 			if ( LOG.isTraceEnabled() ) {
@@ -112,7 +112,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	/**
 	 * Organizes the given work list into {@link ExecutableRequest}s to be executed.
 	 */
-	private List<ExecutableRequest> createRequestGroups(Iterable<BackendRequest<?>> requests) {
+	private List<ExecutableRequest> createRequestGroups(Iterable<BackendRequest<?>> requests, boolean refreshAtEnd) {
 		List<ExecutableRequest> groups = new ArrayList<>();
 		BulkRequestBuilder bulkBuilder = new BulkRequestBuilder();
 
@@ -138,7 +138,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		// finish up last bulk
 		if ( !bulkBuilder.isEmpty() ) {
-			groups.add( bulkBuilder.build( true ) );
+			groups.add( bulkBuilder.build( refreshAtEnd ) );
 		}
 
 		return groups;
@@ -232,18 +232,22 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		@Override
 		public void run() {
+			Set<String> indexesNeedingFlush = new HashSet<>();
 			while ( true ) {
 				synchronized ( BackendRequestProcessor.this ) {
 					Iterable<BackendRequest<?>> requests = asyncProcessor.asyncRequestQueue.drainToDetachedIterable();
 
-					// Nothing more to do, allow processor to shut down if requested
+					// Nothing more to do, flush and allow processor to shut down if requested
 					if ( requests == null ) {
+						refresh( indexesNeedingFlush );
 						asyncProcessor.asyncWorkInProcessing.set( false );
 						asyncProcessor.asyncWorkLatch.countDown();
 						return;
 					}
-
-					doExecute( requests );
+					for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests, false ) ) {
+						backendRequestGroup.execute();
+						indexesNeedingFlush.addAll( backendRequestGroup.getTouchedIndexes() );
+					}
 				}
 			}
 		}
