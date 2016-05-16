@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,6 +25,7 @@ import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import io.searchbox.action.BulkableAction;
@@ -190,7 +190,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		private AsyncBackendRequestProcessor() {
 			asyncRequestQueue = new MultiWriteDrainableLinkedList<>();
-			scheduler = Executors.newScheduledThreadPool( 1 );
+			scheduler = Executors.newScheduledThreadPool( "Elasticsearch AsyncBackendRequestProcessor" );
 		}
 
 		public void submitRequest(BackendRequest<?> request) {
