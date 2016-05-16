@@ -68,6 +68,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	@Override
 	public void stop() {
 		awaitAsyncProcessingCompletion();
+		asyncProcessor.shutdown();
 		serviceManager.releaseService( JestClient.class );
 	}
 
@@ -215,6 +216,16 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 				catch (InterruptedException e) {
 					throw new SearchException( e );
 				}
+			}
+		}
+
+		public void shutdown() {
+			scheduler.shutdown();
+			try {
+				scheduler.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
+			}
+			catch (InterruptedException e) {
+				LOG.interruptedWhileWaitingForIndexActivity( e );
 			}
 		}
 	}
