@@ -10,6 +10,7 @@ package org.hibernate.search.test.batchindexing;
 import java.util.List;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
@@ -46,6 +47,45 @@ public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 
 		verifyMatchExistsWithName( "lazyEntity.name", TEST_NAME_CONTENT );
 		verifyMatchExistsWithName( "lazyEntity2.name", TEST_NAME_CONTENT );
+	}
+
+	@Test
+	public void testMassIndexerRepeatedInvocation() throws InterruptedException {
+		//Test that the MassIndexer can be started multiple times
+		prepareEntities();
+
+		verifyMatchExistsWithName( "lazyEntity.name", TEST_NAME_CONTENT );
+		verifyMatchExistsWithName( "lazyEntity2.name", TEST_NAME_CONTENT );
+
+		for ( int i = 0; i < 4; i++ ) {
+			try ( FullTextSession fullTextSession = Search.getFullTextSession( openSession() ) ) {
+				Transaction tx = fullTextSession.beginTransaction();
+				fullTextSession.purgeAll( IndexedEmbeddedProxyRootEntity.class );
+				tx.commit();
+			}
+			verifyIndexIsEmpty();
+
+			try ( FullTextSession fullTextSession = Search.getFullTextSession( openSession() ) ) {
+				MassIndexer massIndexer = fullTextSession.createIndexer( IndexedEmbeddedProxyRootEntity.class );
+				massIndexer.startAndWait();
+			}
+			verifyMatchExistsWithName( "lazyEntity.name", TEST_NAME_CONTENT );
+			verifyMatchExistsWithName( "lazyEntity2.name", TEST_NAME_CONTENT );
+		}
+	}
+
+	private void verifyIndexIsEmpty() {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		try {
+			Query q = new MatchAllDocsQuery();
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q );
+			int resultSize = fullTextQuery.getResultSize();
+			List list = fullTextQuery.list();
+			assertEquals( 0, resultSize );
+		}
+		finally {
+			fullTextSession.close();
+		}
 	}
 
 	private void prepareEntities() {
