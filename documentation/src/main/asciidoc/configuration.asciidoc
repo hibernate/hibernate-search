@@ -516,7 +516,7 @@ configured differently for each index.
 
 |===============
 |*Property*|*Description*
-|hibernate.search.<indexName>.worker.backend|`lucene`: The default backend which runs index updates in the same VM. Also used when the property is undefined or empty.
+|hibernate.search.<indexName>.worker.backend|`local`: The default backend which runs index updates in the same JVM. Also used when the property is undefined or empty.
 
 `jms`: JMS backend. Index updates are send to a JMS queue to be processed by an indexing master. See <<table-jms-backend-configuration>> for additional configuration options and <<jms-backend>> for a more detailed description of this setup.
 
@@ -658,7 +658,7 @@ hibernate.search.default.refresh = 1800
 hibernate.search.default.directory_provider = filesystem-master
 
 ## Backend configuration
-#Backend is the default lucene one
+#The backend is not set: use the default one which is 'local'
 ----
 ====
 
@@ -1191,13 +1191,14 @@ from the writes to the index. To achieve this set the `blackhole` as worker back
 indexing routines. This backend does not disable Hibernate Search: it will still generate the needed
 changesets to the index, but will discard them instead of flushing them to the index. In contrast to
 setting the `hibernate.search.indexing_strategy` to `manual`, using `blackhole` will possibly
-load more data from the database. because associated entities are re-indexed as well.
+load more data from the database because associated entities are re-indexed as well.
 
 ----
 hibernate.search.[default|<indexname>].worker.backend blackhole
 ----
 
-The recommended approach is to focus first on optimizing the object loading, and then use the timings you achieve as a baseline to tune the indexing process.
+The recommended approach is to focus first on optimizing the object loading by enabling the `blackhole` backend,
+and then use the timings you achieve as a baseline to tune the indexing process.
 ====
 
 
