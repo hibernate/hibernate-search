@@ -23,6 +23,7 @@ import org.hibernate.search.cfg.spi.DirectoryProviderService;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -48,6 +49,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters indexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
+	private LuceneWorkSerializer serializer;
 	private ExtendedSearchIntegrator boundSearchIntegrator = null;
 	private DirectoryBasedReaderProvider readers = null;
 	private ServiceManager serviceManager;
@@ -67,6 +69,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		readers.stop();
 		workspaceHolder.close();
 		directoryProvider.stop();
+		if ( serializer != null ) {
+			serviceManager.releaseService( LuceneWorkSerializer.class );
+		}
 	}
 
 	@Override
@@ -136,12 +141,25 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public LuceneWorkSerializer getSerializer() {
-		return null;
+		if ( serializer == null ) {
+			serializer = requestSerializer();
+			log.indexManagerUsesSerializationService( this.indexName, this.serializer.describeSerializer() );
+		}
+		return serializer;
 	}
 
 	@Override
 	public void flushAndReleaseResources() {
 		workspaceHolder.closeIndexWriter();
+	}
+
+	private LuceneWorkSerializer requestSerializer() {
+		try {
+			return serviceManager.requestService( LuceneWorkSerializer.class );
+		}
+		catch (SearchException se) {
+			throw log.serializationProviderNotFoundException( se );
+		}
 	}
 
 	//Not exposed on the IndexManager interface
