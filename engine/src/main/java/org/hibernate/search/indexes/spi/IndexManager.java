@@ -12,7 +12,6 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
-
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -121,8 +120,10 @@ public interface IndexManager {
 	void optimize();
 
 	/**
-	 * @return the Serializer implementation used for this IndexManager
+	 * @deprecated This method is scheduled for removal. It is not invoked by Hibernate Search any more, implementations
+	 * may make this a no-op and safely return null.
 	 */
+	@Deprecated
 	LuceneWorkSerializer getSerializer();
 
 	/**
@@ -135,5 +136,4 @@ public interface IndexManager {
 	 * @return the {@code IndexManagerType} of this implementation.
 	 */
 	IndexManagerType getIndexManagerType();
-
 }

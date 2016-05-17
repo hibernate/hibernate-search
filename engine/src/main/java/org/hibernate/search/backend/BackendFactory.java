@@ -9,16 +9,16 @@ package org.hibernate.search.backend;
 import java.lang.reflect.Constructor;
 import java.util.Properties;
 
+import org.hibernate.search.backend.impl.LocalBackendQueueProcessor;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -41,9 +41,6 @@ public final class BackendFactory {
 	private static final String JGROUPS_AUTO_SELECTOR = "org.hibernate.search.backend.jgroups.impl.AutoNodeSelector";
 	private static final String JGROUPS_SELECTOR_BASE_TYPE = "org.hibernate.search.backend.jgroups.impl.NodeSelectorStrategy";
 
-	private static final String ES_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendQueueProcessor";
-	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager";
-
 	private BackendFactory() {
 		//not allowed
 	}
@@ -59,26 +56,12 @@ public final class BackendFactory {
 			Properties properties) {
 		final BackendQueueProcessor backendQueueProcessor;
 
-		if ( StringHelper.isEmpty( backend ) ) {
-			if ( indexManager.getClass().getName().equals( ES_INDEX_MANAGER ) ) {
-				backendQueueProcessor = ClassLoaderHelper.instanceFromName(
-						BackendQueueProcessor.class,
-						ES_BACKEND_QUEUE_PROCESSOR,
-						"Elasticsearch backend",
-						buildContext.getServiceManager()
-				);
-			}
-			else {
-				backendQueueProcessor = new LuceneBackendQueueProcessor();
-			}
+		if ( StringHelper.isEmpty( backend ) || "local".equalsIgnoreCase( backend ) ) {
+			backendQueueProcessor = new LocalBackendQueueProcessor();
 		}
 		else if ( "lucene".equalsIgnoreCase( backend ) ) {
-			if ( indexManager.getClass().getName().equals( ES_INDEX_MANAGER ) ) {
-				throw new SearchException( "Cannot use Lucene backend together with Elasticsearch index manager" );
-			}
-			else {
-				backendQueueProcessor = new LuceneBackendQueueProcessor();
-			}
+			log.deprecatedBackendName();
+			backendQueueProcessor = new LocalBackendQueueProcessor();
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
@@ -124,6 +107,20 @@ public final class BackendFactory {
 					serviceManager
 			);
 		}
+
+		boolean enlistInTransaction = ConfigurationParseHelper.getBooleanValue(
+				properties,
+				Environment.WORKER_ENLIST_IN_TRANSACTION,
+				false
+		);
+		if ( enlistInTransaction && ! ( backendQueueProcessor instanceof BackendQueueProcessor.Transactional ) ) {
+			// We are expecting to use a transactional worker but the backend is not
+			// this is war!
+			backend = StringHelper.isEmpty( backend ) ? "lucene" : backend;
+			throw log.backendNonTransactional( indexManager.getIndexName(), backend );
+
+		}
+
 		backendQueueProcessor.initialize( properties, buildContext, indexManager );
 		return backendQueueProcessor;
 	}

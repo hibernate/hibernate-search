@@ -8,7 +8,6 @@ package org.hibernate.search.backend.spi;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -60,27 +59,9 @@ public interface BackendQueueProcessor {
 	void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor);
 
 	/**
-	 * @return a Lock instance which will block index modifications when acquired
-	 */
-	Lock getExclusiveWriteLock();
-
-	/**
-	 * Used to notify the backend that the number or type of indexed entities being indexed
-	 * in this backend changed. This could trigger some needed reconfiguration.
-	 */
-	void indexMappingChanged();
-
-	/**
 	 * Marker interface describing a backend processor that is transactional
 	 */
 	interface Transactional {
 
 	}
-
-	/**
-	 * Flushes any pending write operations and closes underlying resources, for example
-	 * release the index locks if this implementation uses a Lucene IndexWriter.
-	 */
-	void flushAndReleaseResources();
-
 }

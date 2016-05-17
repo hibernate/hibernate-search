@@ -11,7 +11,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.junit.Rule;
@@ -40,8 +40,7 @@ public class SerializationProviderMissingTest {
 		thrown.expectMessage( "hibernate-search-serialization-avro" );
 
 		ExtendedSearchIntegrator searchFactory = factoryHolder.getSearchFactory();
-		IndexManager indexManager = searchFactory.getIndexManagerHolder().getIndexManager( "books" );
-		indexManager.getSerializer();
+		searchFactory.getServiceManager().requestService( LuceneWorkSerializer.class );
 	}
 
 	@Indexed(index = "books")

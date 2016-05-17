@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -19,16 +20,17 @@ import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.backend.elasticsearch.cfg.IndexManagementStrategy;
+import org.hibernate.search.backend.elasticsearch.client.impl.BackendRequest;
+import org.hibernate.search.backend.elasticsearch.client.impl.BackendRequestProcessor;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.spi.ElasticsearchIndexManagerType;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
@@ -37,14 +39,11 @@ import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.ReaderProvider;
@@ -91,12 +90,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private ExtendedSearchIntegrator searchIntegrator;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
 
-	private ServiceReference<JestClient> clientReference;
-	private BackendQueueProcessor backend;
-
-	private LuceneWorkSerializer serializer;
-	private SerializationProvider serializationProvider;
 	private ServiceManager serviceManager;
+
+	private ElasticsearchIndexWorkVisitor visitor;
+	private JestClient jestClient;
+	private BackendRequestProcessor requestProcessor;
 
 	private enum IndexStatus {
 
@@ -138,7 +136,10 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
 
 		this.similarity = similarity;
-		this.backend = BackendFactory.createBackend( this, context, properties );
+
+		this.jestClient = serviceManager.requestService( JestClient.class );
+		this.visitor = new ElasticsearchIndexWorkVisitor( this.actualIndexName, context.getUninitializedSearchIntegrator() );
+		this.requestProcessor = context.getServiceManager().requestService( BackendRequestProcessor.class );
 	}
 
 	private String getIndexName(String indexName, Properties properties) {
@@ -181,15 +182,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			deleteIndexIfExisting();
 		}
 
-		backend.close();
-		clientReference.close();
+		searchIntegrator.getServiceManager().releaseService( JestClient.class );
 	}
 
 	@Override
 	public void setSearchFactory(ExtendedSearchIntegrator boundSearchIntegrator) {
 		this.searchIntegrator = boundSearchIntegrator;
-		this.clientReference = searchIntegrator.getServiceManager().requestReference( JestClient.class );
-
 		initializeIndex();
 	}
 
@@ -219,7 +217,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		CreateIndex createIndex = new CreateIndex.Builder( actualIndexName )
 				.build();
 
-		clientReference.get().executeRequest( createIndex );
+		jestClient.executeRequest( createIndex );
 
 		waitForIndexCreation();
 	}
@@ -236,7 +234,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			}
 		};
 
-		JestResult result = clientReference.get().executeRequest( health, 408 );
+		JestResult result = jestClient.executeRequest( health, 408 );
+
 		if ( !result.isSucceeded() ) {
 			String status = result.getJsonObject().get( "status" ).getAsString();
 			throw new SearchException( "Index '" + actualIndexName + "' has status '" + status + "', but it is expected to be '"
@@ -245,21 +244,21 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	private void createIndexIfNotYetExisting() {
-		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 200 ) {
+		if ( jestClient.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 200 ) {
 			return;
 		}
 
-		clientReference.get().executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
+		jestClient.executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
 	}
 
 	private void deleteIndexIfExisting() {
 		// Not actually needed, but do it to avoid cluttering the ES log
-		if ( clientReference.get().executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 404 ) {
+		if ( jestClient.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 404 ) {
 			return;
 		}
 
 		try {
-			clientReference.get().executeRequest( new DeleteIndex.Builder( actualIndexName ).build() );
+			jestClient.executeRequest( new DeleteIndex.Builder( actualIndexName ).build() );
 		}
 		catch (SearchException e) {
 			// ignoring deletion of non-existing index
@@ -311,7 +310,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			.build();
 
 			try {
-				clientReference.get().executeRequest( putMapping );
+				jestClient.executeRequest( putMapping );
 			}
 			catch (Exception e) {
 				throw new SearchException( "Could not create mapping for entity type " + entityType.getName(), e );
@@ -654,26 +653,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	@Override
 	public LuceneWorkSerializer getSerializer() {
-		if ( serializer == null ) {
-			serializationProvider = requestSerializationProvider();
-			serializer = new LuceneWorkSerializerImpl( serializationProvider, searchIntegrator );
-			LOG.indexManagerUsesSerializationService( this.indexName, this.serializer.describeSerializer() );
-		}
-		return serializer;
+		return null;
 	}
 
 	@Override
 	public void flushAndReleaseResources() {
 		// no-op
-	}
-
-	private SerializationProvider requestSerializationProvider() {
-		try {
-			return serviceManager.requestService( SerializationProvider.class );
-		}
-		catch (SearchException se) {
-			throw LOG.serializationProviderNotFoundException( se );
-		}
 	}
 
 	public String getActualIndexName() {
@@ -683,13 +668,27 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	// Runtime ops
 
 	@Override
-	public void performOperations(List<LuceneWork> queue, IndexingMonitor monitor) {
-		backend.applyWork( queue, monitor );
+	public void performOperations(List<LuceneWork> workList, IndexingMonitor monitor) {
+		List<BackendRequest<?>> requests = new ArrayList<>( workList.size() );
+		for ( LuceneWork luceneWork : workList ) {
+			requests.add( luceneWork.acceptIndexWorkVisitor( visitor, null ) );
+		}
+
+		requestProcessor.executeSync( requests );
 	}
 
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
-		backend.applyStreamWork( singleOperation, monitor );
+		if ( singleOperation == FlushLuceneWork.INSTANCE ) {
+			requestProcessor.awaitAsyncProcessingCompletion();
+		}
+		else {
+			BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, null );
+
+			if ( request != null ) {
+				requestProcessor.executeAsync( request );
+			}
+		}
 	}
 
 	@Override

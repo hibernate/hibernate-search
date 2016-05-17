@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.test.embedded.depth;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -18,17 +21,15 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
-import org.hibernate.search.testsupport.backend.LeakingBackendQueueProcessor;
+import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Verify the engine respects the depth parameter {@link IndexedEmbedded#depth()} without indexing larger graphs than
@@ -50,17 +51,17 @@ public class RecursiveGraphTest extends SearchTestBase {
 		verifyMatchExistsWithName( 2L, "parents.parents.name", "Fulk V of Anjou" );
 		verifyNoMatchExists( "parents.parents.parents.name", "Fulk V of Anjou" );
 
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		renamePerson( 1L, "John Lackland" );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
 		assertEquals( 0, countWorksDoneOnPerson( 2L ) );
 
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		renamePerson( 2L, "Henry II of New England" );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 2L ) );
 
-		LeakingBackendQueueProcessor.reset();
+		LeakingLocalBackend.reset();
 		renamePerson( 16L, "Fulk 4th of Anjou" );
 		assertEquals( 1, countWorksDoneOnPerson( 16L ) );
 		assertEquals( 0, countWorksDoneOnPerson( 17L ) );
@@ -90,7 +91,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction transaction = fullTextSession.beginTransaction();
-			Person kingJohn = (Person) fullTextSession.load( Person.class, id );
+			Person kingJohn = fullTextSession.load( Person.class, id );
 			kingJohn.setName( newName );
 			transaction.commit();
 		}
@@ -179,7 +180,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 	}
 
 	private int countWorksDoneOnPerson(Long pk) {
-		List<LuceneWork> processedQueue = LeakingBackendQueueProcessor.getLastProcessedQueue();
+		List<LuceneWork> processedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		int count = 0;
 		for ( LuceneWork luceneWork : processedQueue ) {
 			Serializable id = luceneWork.getId();
@@ -197,7 +198,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.worker.backend", LeakingBackendQueueProcessor.class.getName() );
+		cfg.put( "hibernate.search.default.worker.backend", LeakingLocalBackend.class.getName() );
 	}
 
 }

@@ -20,9 +20,9 @@ import org.hibernate.search.backend.impl.TransactionalOperationExecutorSelector;
 import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -35,10 +35,10 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class DefaultBatchBackend implements BatchBackend {
 
-	private final SearchIntegrator integrator;
+	private final ExtendedSearchIntegrator integrator;
 	private final MassIndexerProgressMonitor progressMonitor;
 
-	public DefaultBatchBackend(SearchIntegrator integrator, MassIndexerProgressMonitor progressMonitor) {
+	public DefaultBatchBackend(ExtendedSearchIntegrator integrator, MassIndexerProgressMonitor progressMonitor) {
 		this.integrator = integrator;
 		this.progressMonitor = progressMonitor;
 	}
@@ -63,7 +63,7 @@ public class DefaultBatchBackend implements BatchBackend {
 		}
 		else {
 			WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
-			TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( TransactionalOperationExecutorSelector.INSTANCE, null );
+			TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( new TransactionalOperationExecutorSelector( integrator.getIndexManagerHolder() ), null );
 			executor.performOperation( work, shardingStrategy, workContext );
 			workContext.commitOperations( progressMonitor ); //FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
 		}

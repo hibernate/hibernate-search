@@ -12,7 +12,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -28,7 +28,7 @@ public class BaseConfigurationTest {
 	protected static AbstractWorkspaceImpl extractWorkspace(MutableSearchFactory sf, Class<?> type) {
 		EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( type );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
-		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
+		WorkspaceHolder backend = (WorkspaceHolder) indexManager.getWorkspaceHolder();
 		return backend.getIndexResources().getWorkspace();
 	}
 

@@ -17,6 +17,8 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
@@ -69,6 +71,7 @@ public class IndexManagerHolder {
 
 	private final ConcurrentMap<String, IndexManagerType> indexManagerImplementationsRegistry = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
+	private final ConcurrentMap<String, BackendQueueProcessor> backendQueueProcessorRegistry = new ConcurrentHashMap<>();
 
 	// I currently think it's easier to not hide sharding implementations in a custom
 	// IndexManager to make it easier to explicitly a)detect duplicates b)start-stop
@@ -127,11 +130,6 @@ public class IndexManagerHolder {
 				buildContext,
 				this
 		);
-	}
-
-	public IndexManager getOrCreateIndexManager(String indexBaseName,
-			DynamicShardingEntityIndexBinding entityIndexBinding) {
-		return this.getOrCreateIndexManager( indexBaseName, null, entityIndexBinding );
 	}
 
 	public IndexManager getOrCreateIndexManager(String indexBaseName,
@@ -201,6 +199,11 @@ public class IndexManagerHolder {
 		}
 		indexManagersRegistry.clear();
 		indexManagerImplementationsRegistry.clear();
+
+		for ( BackendQueueProcessor backendQueueProcessor : backendQueueProcessorRegistry.values() ) {
+			backendQueueProcessor.close();
+		}
+		backendQueueProcessorRegistry.clear();
 	}
 
 	/**
@@ -213,6 +216,14 @@ public class IndexManagerHolder {
 			throw log.nullIsInvalidIndexName();
 		}
 		return indexManagersRegistry.get( targetIndexName );
+	}
+
+	public BackendQueueProcessor getBackendQueueProcessor(String indexName) {
+		if ( indexName == null ) {
+			throw log.nullIsInvalidIndexName();
+		}
+
+		return backendQueueProcessorRegistry.get( indexName );
 	}
 
 	private Class<? extends EntityIndexingInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
@@ -521,6 +532,7 @@ public class IndexManagerHolder {
 					context
 			);
 			indexManagersRegistry.put( indexManagerName, indexManager );
+			backendQueueProcessorRegistry.put( indexManagerName, BackendFactory.createBackend( indexManager, context, indexProperties ) );
 		}
 		indexManager.addContainedEntity( mappedClass );
 		return indexManager;

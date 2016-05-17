@@ -16,6 +16,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexReaderAccessor;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
@@ -200,4 +201,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	IndexingMode getIndexingMode();
 
 	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
+
+	LuceneWorkSerializer getWorkSerializer();
 }

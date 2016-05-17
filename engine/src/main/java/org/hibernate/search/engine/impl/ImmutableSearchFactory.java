@@ -38,6 +38,7 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
@@ -113,6 +114,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final DatabaseRetrievalMethod defaultDatabaseRetrievalMethod;
 	private final boolean enlistWorkerInTransaction;
 	private final boolean indexUninvertingAllowed;
+	private volatile LuceneWorkSerializer workSerializer;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzerReferences = state.getAnalyzerReferences();
@@ -579,6 +581,15 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		else {
 			throw new SearchException( "Can not unwrap an ImmutableSearchFactory into a '" + cls + "'" );
 		}
+	}
+
+	@Override
+	public LuceneWorkSerializer getWorkSerializer() {
+		if ( workSerializer == null ) {
+			workSerializer = serviceManager.requestService( LuceneWorkSerializer.class );
+		}
+
+		return workSerializer;
 	}
 
 }

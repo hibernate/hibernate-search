@@ -18,12 +18,11 @@ import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -38,14 +37,14 @@ public class JmsBackendQueueTask implements Runnable {
 	private final Collection<LuceneWork> queue;
 	private final JmsBackendQueueProcessor processor;
 	private final String indexName;
-	private final IndexManager indexManager;
+	private final LuceneWorkSerializer luceneWorkSerializer;
 
-	public JmsBackendQueueTask(String indexName, Collection<LuceneWork> queue, IndexManager indexManager,
-					JmsBackendQueueProcessor jmsBackendQueueProcessor) {
+	public JmsBackendQueueTask(String indexName, Collection<LuceneWork> queue,
+			JmsBackendQueueProcessor jmsBackendQueueProcessor, LuceneWorkSerializer luceneWorkSerializer) {
 		this.indexName = indexName;
 		this.queue = queue;
-		this.indexManager = indexManager;
 		this.processor = jmsBackendQueueProcessor;
+		this.luceneWorkSerializer = luceneWorkSerializer;
 	}
 
 	@Override
@@ -60,8 +59,7 @@ public class JmsBackendQueueTask implements Runnable {
 		if ( filteredQueue.size() == 0 ) {
 			return;
 		}
-		LuceneWorkSerializer serializer = indexManager.getSerializer();
-		byte[] data = serializer.toSerializedModel( filteredQueue );
+		byte[] data = luceneWorkSerializer.toSerializedModel( filteredQueue );
 		QueueSender sender;
 		QueueSession session = null;
 		QueueConnection connection = null;
