@@ -13,8 +13,9 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 
 /**
@@ -46,17 +47,15 @@ public class SearchQueueChecker implements MessageListener {
 
 		List<LuceneWork> queue;
 		try {
-			LuceneWorkSerializer serializer = searchIntegrator.getServiceManager().requestService( LuceneWorkSerializer.class );
-			queue = serializer.toLuceneWorks( (byte[]) objectMessage.getObject() );
+			String indexName = objectMessage.getStringProperty( Environment.INDEX_NAME_JMS_PROPERTY );
+			IndexManager indexManager = searchIntegrator.getIndexManager( indexName );
+			queue = indexManager.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
 		}
 		catch (JMSException e) {
 			return;
 		}
 		catch (ClassCastException e) {
 			return;
-		}
-		finally {
-			searchIntegrator.getServiceManager().releaseService( LuceneWorkSerializer.class );
 		}
 		queues++;
 		works += queue.size();
