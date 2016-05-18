@@ -33,7 +33,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchProjectionConstants;
-import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.backend.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.backend.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.backend.elasticsearch.filter.ElasticsearchFilter;
@@ -850,11 +849,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 								+ def.getImpl().getName() + ". "
 								+ ( def.getFactoryMethod() != null ? def.getFactoryMethod().getName() : "" ) );
 			}
-		}
-
-		if ( jsonFilter != null &&
-				( FilterCacheModeType.NONE.equals( def.getCacheMode() ) || FilterCacheModeType.INSTANCE_ONLY.equals( def.getCacheMode() ) ) ) {
-			jsonFilter.entrySet().iterator().next().getValue().getAsJsonObject().addProperty( "_cache", false );
 		}
 
 		return jsonFilter;
