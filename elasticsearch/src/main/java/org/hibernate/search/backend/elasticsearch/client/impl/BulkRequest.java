@@ -23,14 +23,27 @@ public class BulkRequest implements ExecutableRequest {
 	private final JestClient jestClient;
 	private final ErrorHandler errorHandler;
 	private final List<BackendRequest<?>> requests;
+
+	/**
+	 * Whether to perform a refresh in the course of executing this bulk or not. Note that this will refresh all indexes
+	 * touched by this bulk, not only those given via {@link #indexesNeedingRefresh}. That's acceptable.
+	 * <p>
+	 * If {@code true}, no explicit refresh of the concerned indexes is needed afterwards.
+	 */
 	private final boolean refresh;
 	private final Set<String> indexNames;
 
-	public BulkRequest(JestClient jestClient, ErrorHandler errorHandler, List<BackendRequest<?>> requests, Set<String> indexNames, boolean refresh) {
+	/**
+	 * Names of those indexes to be refreshed after executing this bulk
+	 */
+	private final Set<String> indexesNeedingRefresh;
+
+	public BulkRequest(JestClient jestClient, ErrorHandler errorHandler, List<BackendRequest<?>> requests, Set<String> indexNames, Set<String> indexesNeedingRefresh, boolean refresh) {
 		this.jestClient = jestClient;
 		this.errorHandler = errorHandler;
 		this.requests = requests;
 		this.indexNames = indexNames;
+		this.indexesNeedingRefresh = indexesNeedingRefresh;
 		this.refresh = refresh;
 	}
 
@@ -71,12 +84,12 @@ public class BulkRequest implements ExecutableRequest {
 	}
 
 	@Override
-	public Set<String> getRefreshedIndexes() {
+	public Set<String> getIndexesNeedingRefresh() {
 		if ( refresh ) {
-			return indexNames;
+			return Collections.emptySet();
 		}
 		else {
-			return Collections.emptySet();
+			return indexesNeedingRefresh;
 		}
 	}
 
@@ -87,6 +100,7 @@ public class BulkRequest implements ExecutableRequest {
 
 	@Override
 	public String toString() {
-		return "BulkRequest [size=" + requests.size() + ", refresh=" + refresh + ", indexNames=" + indexNames + "]";
+		return "BulkRequest [size=" + requests.size() + ", refresh=" + refresh + ", indexNames=" + indexNames + ", indexesNeedingRefresh=" + indexesNeedingRefresh
+				+ "]";
 	}
 }

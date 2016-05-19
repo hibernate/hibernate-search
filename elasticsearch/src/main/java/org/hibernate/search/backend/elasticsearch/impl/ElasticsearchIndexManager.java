@@ -77,6 +77,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	private String indexName;
 	private String actualIndexName;
+	private boolean refreshAfterWrite;
 	private IndexManagementStrategy indexManagementStrategy;
 	private String indexManagementWaitTimeout;
 
@@ -134,25 +135,30 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		this.indexManagementStrategy = getIndexManagementStrategy( properties );
 		this.indexManagementWaitTimeout = getIndexManagementWaitTimeout( properties );
 		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
+		this.refreshAfterWrite = getRefreshAfterWrite( properties );
 
 		this.similarity = similarity;
 
 		this.jestClient = serviceManager.requestService( JestClient.class );
-		this.visitor = new ElasticsearchIndexWorkVisitor( this.actualIndexName, context.getUninitializedSearchIntegrator() );
+		this.visitor = new ElasticsearchIndexWorkVisitor(
+				this.actualIndexName,
+				this.refreshAfterWrite,
+				context.getUninitializedSearchIntegrator()
+		);
 		this.requestProcessor = context.getServiceManager().requestService( BackendRequestProcessor.class );
 	}
 
-	private String getIndexName(String indexName, Properties properties) {
+	private static String getIndexName(String indexName, Properties properties) {
 		String name = properties.getProperty( Environment.INDEX_NAME_PROP_NAME );
 		return name != null ? name : indexName;
 	}
 
-	private IndexManagementStrategy getIndexManagementStrategy(Properties properties) {
+	private static IndexManagementStrategy getIndexManagementStrategy(Properties properties) {
 		String strategy = properties.getProperty( ElasticsearchEnvironment.INDEX_MANAGEMENT_STRATEGY );
 		return strategy != null ? IndexManagementStrategy.valueOf( strategy ) : ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_STRATEGY;
 	}
 
-	private String getIndexManagementWaitTimeout(Properties properties) {
+	private static String getIndexManagementWaitTimeout(Properties properties) {
 		int timeout = ConfigurationParseHelper.getIntValue(
 				properties,
 				ElasticsearchEnvironment.INDEX_MANAGEMENT_WAIT_TIMEOUT,
@@ -166,7 +172,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return timeout + "ms";
 	}
 
-	private IndexStatus getRequiredIndexStatus(Properties properties) {
+	private static IndexStatus getRequiredIndexStatus(Properties properties) {
 		String status = ConfigurationParseHelper.getString(
 				properties,
 				ElasticsearchEnvironment.REQUIRED_INDEX_STATUS,
@@ -174,6 +180,14 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		);
 
 		return IndexStatus.fromString( status );
+	}
+
+	private static boolean getRefreshAfterWrite(Properties properties) {
+		return ConfigurationParseHelper.getBooleanValue(
+				properties,
+				ElasticsearchEnvironment.REFRESH_AFTER_WRITE,
+				ElasticsearchEnvironment.Defaults.REFRESH_AFTER_WRITE
+		);
 	}
 
 	@Override
@@ -663,6 +677,10 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	public String getActualIndexName() {
 		return actualIndexName;
+	}
+
+	public boolean needsRefreshAfterWrite() {
+		return refreshAfterWrite;
 	}
 
 	// Runtime ops
