@@ -47,7 +47,17 @@ public class JestClient implements Service, Startable, Stoppable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
+	/**
+	 * HTTP response code for a request timed out.
+	 */
 	private static final int TIME_OUT = 408;
+
+	/**
+	 * Prefix for accessing the {@link ElasticsearchEnvironment#SERVER_URI} variable. That's currently needed as we
+	 * don't access this one in the context of a specific index manager. The prefix is used to have the property name
+	 * inline with the other index-related property names, it cannot be overridden per moment, though.
+	 */
+	private static final String SERVER_URI_PROP_PREFIX = "hibernate.search.default.";
 
 	private io.searchbox.client.JestClient client;
 
@@ -57,7 +67,7 @@ public class JestClient implements Service, Startable, Stoppable {
 
 		String serverUri = ConfigurationParseHelper.getString(
 				properties,
-				ElasticsearchEnvironment.SERVER_URI,
+				SERVER_URI_PROP_PREFIX + ElasticsearchEnvironment.SERVER_URI,
 				ElasticsearchEnvironment.Defaults.SERVER_URI
 		);
 
