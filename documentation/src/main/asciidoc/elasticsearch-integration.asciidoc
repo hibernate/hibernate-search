@@ -33,7 +33,7 @@ There could be various reasons to prefer this over an "embedded Lucene" approach
 There are a couple drawbacks compared to the embedded Lucene approach though:
 
 * incur a performance penalty of remote RPCs both for index updates and to run queries
-* need to buy & manage additional servers
+* need to buy and manage additional servers
 
 Which solution is best will depend on the specific needs of your system.
 
@@ -73,7 +73,7 @@ docker run -p 9200:9200 -d -v "$PWD/plugin_dir":/usr/share/elasticsearch/plugins
 ==== Dependencies in your Java application
 
 In addition to the usual dependencies like Hibernate ORM and Hibernate Search,
-you will need the new `hibernate-search-backend-elasticsearch` jar.
+you will need the new `hibernate-search-elasticsearch` jar.
 
 .Maven dependencies for Hibernate Search with Elasticsearch
 ====
@@ -82,7 +82,7 @@ you will need the new `hibernate-search-backend-elasticsearch` jar.
 ----
 <dependency>
    <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+   <artifactId>hibernate-search-elasticsearch</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
@@ -253,10 +253,8 @@ Open a JIRA otherwise.
 Notable exceptions are:
 
 * more like this queries (the advanced algorithm used by Hibernate Search is not ported yet)
-* overriding analyzers: you cannot override analyzers, the analyzers defined at indexing time will be used
-* overriding field bridges: only the field bridges used at indexing time will be used
 
-There are temporary limitations, if you need these features, contact us.
+These are temporary limitations, if you need these features, contact us.
 --
 
 On top of translating Lucene queries,
@@ -264,7 +262,7 @@ you can directly create Elasticsearch queries by using either its String format 
 
 .Creating an Elasticsearch native query from a string
 ====
-[source, JAVA]
+[source,java]
 ----
 FullTextSession fullTextSession = Search.getFullTextSession(session);
 QueryDescriptor query = ElasticsearchQueries.fromQueryString("title:tales");
@@ -274,7 +272,7 @@ List<?> result = fullTextSession.createFullTextQuery(query, ComicBook.class).lis
 
 .Creating an Elasticsearch native query from JSON
 ====
-[source, JAVA]
+[source,java]
 ----
 FullTextSession fullTextSession = Search.getFullTextSession(session);
 QueryDescriptor query = ElasticsearchQueries.fromJson(
@@ -304,7 +302,7 @@ there is no specific need to mark fields as stored when you want to project them
 The downside is that to project a field, Elasticsearch needs to read the whole JSON document.
 If you want to avoid that, use the `Store.YES` marker.
 
-You can also retrieve the full JSON document by using `org.hibernate.search.backend.elasticsearch.ProjectionConstants.SOURCE`.
+You can also retrieve the full JSON document by using `org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants.SOURCE`.
 
 [source,java]
 --
@@ -315,10 +313,68 @@ query = ftem.createFullTextQuery(
                     .createQuery(),
                     VideoGame.class
             )
-            .setProjection( ProjectionConstants.SCORE, ProjectionConstants.SOURCE );
+            .setProjection( ElasticsearchProjectionConstants.SCORE, ElasticsearchProjectionConstants.SOURCE );
 
 projection = (Object[]) query.getSingleResult();
 --
+
+==== Filters
+
+The Elasticsearch integration supports the definition of full text filters.
+
+Your filters need to implement the `ElasticsearchFilter` interface.
+
+[source,java]
+--
+public class DriversMatchingNameElasticsearchFilter implements ElasticsearchFilter {
+
+    private String name;
+
+    public DriversMatchingNameElasticsearchFilter() {
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getJsonFilter() {
+        return "{ 'term': { 'name': '" + name + "' } }";
+    }
+
+}
+--
+
+You can then declare the filter in your entity.
+
+[source,java]
+--
+@Entity
+@Indexed
+@FullTextFilterDefs({
+        @FullTextFilterDef(name = "namedDriver",
+                impl = DriversMatchingNameElasticsearchFilter.class)
+})
+public class Driver {
+    @Id
+    @DocumentId
+    private int id;
+
+    @Field(analyze = Analyze.YES)
+    private String name;
+
+    ...
+}
+--
+
+From then you can use it as usual.
+
+[source,java]
+--
+ftQuery.enableFullTextFilter( "namedDriver" ).setParameter( "name", "liz" );
+--
+
+For static filters, you can simply extend the `SimpleElasticsearchFilter` and provide an Elasticsearch filter in JSON form.
 
 === Limitations
 
@@ -327,13 +383,11 @@ Here is a list of known limitations.
 
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
-* Defining analyzers with `@AnalyzerDef`
-* Filters
+* Defining analyzers with `@AnalyzerDef`, analyzers have to be defined in the Elasticsearch configuration
 * Query timeouts
-* Resolution for Date type mapping is ignored
 * Pagination is limited to the 10000 first documents (configurable in Elasticsearch)
 ** better support through the scrolling API is planned
 * Scrolling on large results
 * MoreLikeThis queries
 * Mixing Lucene based indexes and Elasticsearch based indexes (partial support is here though)
-* MassIndexer is known to be inefficient (no bulk API usage)
+* There is room for improvements in the performances of the MassIndexer implementation
