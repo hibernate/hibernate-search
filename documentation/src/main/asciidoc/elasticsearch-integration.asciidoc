@@ -120,7 +120,7 @@ There is no specific configuration required on the Elasticsearch side.
 
 However there are a few features that would benefit from a few changes:
 
-* analyzers should be defined in the Elasticsearch configuration, see <<elasticsearch-mapping-analyzer>>
+* you can only refer analyzers the are already registered on Elasticsearch, see <<elasticsearch-mapping-analyzer>>
 * if you want to retrieve the distance in a geolocation query, install and enable the `lang-groovy` plugin,
   see <<elasticsearch-query-spatial>>
 * if you want to be able to use the purge all Hibernate Search command,
@@ -139,11 +139,19 @@ Hibernate Search will map the fully qualified class name to the Elasticsearch ty
 
 CAUTION: Analyzers are treated differently than in Lucene embedded mode.
 
-Analyzers should be defined (by name) in your Elasticsearch configuration
-instead of using `@AnalyzerDef`, we are looking into smoothing that experience.
+Using the `definition` attribute in the `@Analyzer` annotation, you can refer to the name of the
+built-in or custom analyzers registerd on your Elasticsearch instances.
+
+This will work as long as there is not a local analyzer defined with the same name.
+If that's the case, Hibernate Search will ignore the analyzer when Elasticsearch
+is used as backend and log a warning.
+This might sound complicated but we are looking for ways to ease the experience.
+
+More information on analyzers, in particular the already defined ones, can be found
+in link:https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html[the Elasticsearch documentation].
 
 [source, yml]
-.Example of elasticsearch.yml defining custom analyzers
+.Example of custom analyzers defined in the elasticsearch.yml
 --
 # Custom analyzer
 index.analysis:
@@ -156,12 +164,10 @@ index.analysis:
     stopwords : [test1, close]
 --
 
-More information on Elasticsearch analyzers in particular the already defined ones can be found in link:https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html[their documentation].
-
-From there, you can use an analyzer by name in your entity mappings.
+From there, you can use the custom analyzers by name in your entity mappings.
 
 [source,java]
-.Using analyzers
+.Example of mapping that refers to custom and built-in analyzers on Elasticsearch
 --
 @Entity
 @Indexed(index = "tweet")
@@ -172,16 +178,20 @@ public static class Tweet {
     private Integer id;
 
     @Field
-    @Analyzer(definition = "english")
+    @Analyzer(definition = "english") // Elasticsearch built-in analyzer
     private String englishTweet;
 
     @Field
-    @Analyzer(definition = "whitespace")
+    @Analyzer(definition = "whitespace") // Elasticsearch built-in analyzer
     private String whitespaceTweet;
 
     @Fields({
-            @Field(name = "tweetNotAnalyzed", analyze = Analyze.NO, store = Store.YES),
-            @Field(name = "tweetWithCustom", analyzer = @Analyzer(definition = "custom-analyzer") ) })
+        @Field(name = "tweetNotAnalyzed", analyzer = Analyze.NO, store = Store.YES),
+
+        // Custom analyzer
+        @Field(
+			name = "tweetWithCustom",
+			analyzer = @Analyzer(definition = "custom-analyzer"))})
     private String multipleTweets;
 }
 --
