@@ -22,6 +22,7 @@ public final class ElasticsearchEnvironment {
 		public static final IndexManagementStrategy INDEX_MANAGEMENT_STRATEGY = IndexManagementStrategy.NONE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final String REQUIRED_INDEX_STATUS = "green";
+		public static final boolean REFRESH_AFTER_WRITE = false;
 	}
 
 	/**
@@ -73,6 +74,19 @@ public final class ElasticsearchEnvironment {
 	 * specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.required_index_status=yellow}).
 	 */
 	public static final String REQUIRED_INDEX_STATUS = "elasticsearch.required_index_status";
+
+	/**
+	 * Property for specifying whether an explicit index refresh should be issued after a set of operations targeting a
+	 * given index has been executed or not.
+	 * <p>
+	 * A boolean value (true, false) is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#REFRESH_AFTER_WRITE}.
+	 * <p>
+	 * Can be given globally (e.g. {@code hibernate.search.default.elasticsearch.refresh_after_write=false}) or for
+	 * specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.refresh_after_write=true}).
+	 */
+	public static final String REFRESH_AFTER_WRITE = "elasticsearch.refresh_after_write";
 
 	private ElasticsearchEnvironment() {
 	}

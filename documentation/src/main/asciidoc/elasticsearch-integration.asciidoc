@@ -98,6 +98,7 @@ Hostname and port for Elasticsearch:: `hibernate.search.default.elasticsearch.ho
 Selects the index creation strategy:: `hibernate.search.default.elasticsearch.index_management_strategy CREATE_DELETE`
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000`
 Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red"):: `hibernate.search.default.elasticsearch.required_index_status green`
+Whether to perform an explicit refresh after a set of operations has been executed against a specific index (`true` or `false`):: `hibernate.search.default.elasticsearch.refresh_after_write false`
 
 Let's see the options for the `index_management_strategy` property:
 

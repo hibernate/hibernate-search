@@ -103,8 +103,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 			}
 
 			nextBulk.execute();
-			indexesNeedingRefresh.addAll( backendRequestGroup.getTouchedIndexes() );
-			indexesNeedingRefresh.removeAll( backendRequestGroup.getRefreshedIndexes() );
+			indexesNeedingRefresh.addAll( backendRequestGroup.getIndexesNeedingRefresh() );
 		}
 
 		refresh( indexesNeedingRefresh );
@@ -258,7 +257,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 					}
 					for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests, false ) ) {
 						backendRequestGroup.execute();
-						indexesNeedingFlush.addAll( backendRequestGroup.getTouchedIndexes() );
+						indexesNeedingFlush.addAll( backendRequestGroup.getIndexesNeedingRefresh() );
 					}
 				}
 			}
@@ -269,11 +268,15 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		private final List<BackendRequest<?>> bulk = new ArrayList<>();
 		private final Set<String> indexNames = new HashSet<>();
+		private final Set<String> indexesNeedingRefresh = new HashSet<>();
 		private int size = 0;
 
 		private void add(BackendRequest<?> request) {
 			bulk.add( request );
 			indexNames.add( request.getIndexName() );
+			if ( request.needsRefreshAfterWrite() ) {
+				indexesNeedingRefresh.add( request.getIndexName() );
+			}
 			size++;
 		}
 		private boolean canAddMore() {
@@ -286,7 +289,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		private ExecutableRequest build(boolean refresh) {
 			if ( size > 1 ) {
-				return new BulkRequest( jestClient, errorHandler, bulk, indexNames, refresh );
+				return new BulkRequest( jestClient, errorHandler, bulk, indexNames, indexesNeedingRefresh, refresh );
 			}
 			else {
 				return new SingleRequest( jestClient, errorHandler, bulk.iterator().next() );

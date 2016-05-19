@@ -22,7 +22,7 @@ public interface ExecutableRequest {
 	Set<String> getTouchedIndexes();
 
 	/**
-	 * Returns the names of the indexes which got refreshed during executing this request, i.e. no subsequent refresh is needed.
+	 * Returns the names of the indexes which need refreshing after executing this request.
 	 */
-	Set<String> getRefreshedIndexes();
+	Set<String> getIndexesNeedingRefresh();
 }

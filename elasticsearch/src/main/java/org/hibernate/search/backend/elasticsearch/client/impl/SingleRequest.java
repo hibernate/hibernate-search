@@ -51,8 +51,8 @@ public class SingleRequest implements ExecutableRequest {
 	}
 
 	@Override
-	public Set<String> getRefreshedIndexes() {
-		return Collections.emptySet();
+	public Set<String> getIndexesNeedingRefresh() {
+		return request.needsRefreshAfterWrite() ? Collections.singleton( request.getIndexName() ) : Collections.<String>emptySet();
 	}
 
 	@Override

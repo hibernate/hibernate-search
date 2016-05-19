@@ -28,11 +28,13 @@ public class BackendRequest<T extends JestResult> {
 	private final Set<Integer> ignoredErrorStatuses;
 	private final LuceneWork luceneWork;
 	private final String indexName;
+	private final boolean refreshAfterWrite;
 
-	public BackendRequest(Action<T> action, LuceneWork luceneWork, String indexName, int... ignoredErrorStatuses) {
+	public BackendRequest(Action<T> action, LuceneWork luceneWork, String indexName, boolean refreshAfterWrite, int... ignoredErrorStatuses) {
 		this.action = action;
 		this.luceneWork = luceneWork;
 		this.indexName = indexName;
+		this.refreshAfterWrite = refreshAfterWrite;
 		this.ignoredErrorStatuses = asSet( ignoredErrorStatuses );
 	}
 
@@ -67,6 +69,13 @@ public class BackendRequest<T extends JestResult> {
 
 	public String getIndexName() {
 		return indexName;
+	}
+
+	/**
+	 * Whether performing an explicit index refresh after executing this action is needed or not.
+	 */
+	public boolean needsRefreshAfterWrite() {
+		return refreshAfterWrite;
 	}
 
 	public Set<Integer> getIgnoredErrorStatuses() {

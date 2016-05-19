@@ -26,6 +26,7 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexWorkVisitor;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
@@ -57,6 +58,9 @@ import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
 
 /**
+ * Converts {@link LuceneWork}s into corresponding {@link BackendRequest}s. Instances are specific
+ * to one index.
+ *
  * @author Gunnar Morling
  */
 class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendRequest<?>> {
@@ -70,17 +74,19 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
 
 	private final String indexName;
+	private final boolean refreshAfterWrite;
 	private final ExtendedSearchIntegrator searchIntegrator;
 
-	public ElasticsearchIndexWorkVisitor(String indexName, ExtendedSearchIntegrator searchIntegrator) {
+	public ElasticsearchIndexWorkVisitor(String indexName, boolean refreshAfterWrite, ExtendedSearchIntegrator searchIntegrator) {
 		this.indexName = indexName;
+		this.refreshAfterWrite = refreshAfterWrite;
 		this.searchIntegrator = searchIntegrator;
 	}
 
 	@Override
 	public BackendRequest<?> visitAddWork(AddLuceneWork work, Void p) {
 		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
-		return new BackendRequest<>( index, work, indexName );
+		return new BackendRequest<>( index, work, indexName, refreshAfterWrite );
 	}
 
 	@Override
@@ -90,7 +96,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 			.type( work.getEntityClass().getName() )
 			.build();
 
-		return new BackendRequest<DocumentResult>( delete, work, indexName, 404 );
+		return new BackendRequest<DocumentResult>( delete, work, indexName, refreshAfterWrite, 404 );
 	}
 
 	@Override
@@ -114,13 +120,13 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 			builder.addType( typeToDelete.getName() );
 		}
 
-		return new BackendRequest<>( builder.build(), work, indexName );
+		return new BackendRequest<>( builder.build(), work, indexName, refreshAfterWrite );
 	}
 
 	@Override
 	public BackendRequest<?> visitUpdateWork(UpdateLuceneWork work, Void p) {
 		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
-		return new BackendRequest<>( index, work, indexName );
+		return new BackendRequest<>( index, work, indexName, refreshAfterWrite );
 	}
 
 	@Override
@@ -165,7 +171,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 			.addType( type )
 			.build();
 
-		return new BackendRequest<>( deleteByQuery, work, indexName );
+		return new BackendRequest<>( deleteByQuery, work, indexName, refreshAfterWrite );
 	}
 
 	private Action<?> indexDocument(String id, Document document, Class<?> entityType) {
