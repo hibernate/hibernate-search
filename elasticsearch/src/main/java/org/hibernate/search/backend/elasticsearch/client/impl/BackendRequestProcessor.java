@@ -82,6 +82,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 	/**
 	 * Blocks until the queue of requests scheduled for asynchronous processing has been fully processed.
+	 * N.B. if more work is added to the queue in the meantime, this might delay the wait.
 	 */
 	public void awaitAsyncProcessingCompletion() {
 		asyncProcessor.awaitCompletion();
@@ -183,34 +184,48 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		private final ScheduledExecutorService scheduler;
 		private final MultiWriteDrainableLinkedList<BackendRequest<?>> asyncRequestQueue;
+		private final AtomicBoolean asyncWorkerWasStarted;
 
-		private final AtomicBoolean asyncWorkInProcessing = new AtomicBoolean( false );
-		private volatile CountDownLatch asyncWorkLatch;
+		private volatile CountDownLatch lastAsyncWorkLatch;
 
 		private AsyncBackendRequestProcessor() {
 			asyncRequestQueue = new MultiWriteDrainableLinkedList<>();
 			scheduler = Executors.newScheduledThreadPool( "Elasticsearch AsyncBackendRequestProcessor" );
+			asyncWorkerWasStarted = new AtomicBoolean( false );
 		}
 
 		public void submitRequest(BackendRequest<?> request) {
 			asyncRequestQueue.add( request );
 
 			// Set up worker if needed
-			if ( !asyncWorkInProcessing.get() ) {
-				synchronized ( this ) {
-					if ( !asyncWorkInProcessing.get() ) {
-						asyncWorkInProcessing.set( true );
-						asyncWorkLatch = new CountDownLatch( 1 );
-						scheduler.schedule( new RequestProcessingRunnable( this ), 100, TimeUnit.MILLISECONDS );
+			if ( !asyncWorkerWasStarted.get() ) {
+				synchronized ( AsyncBackendRequestProcessor.this ) {
+					if ( asyncWorkerWasStarted.compareAndSet( false, true ) ) {
+						try {
+							RequestProcessingRunnable runnable = new RequestProcessingRunnable( this );
+							scheduler.schedule( runnable, 100, TimeUnit.MILLISECONDS );
+							//only assign this when the job was successfully scheduled:
+							lastAsyncWorkLatch = runnable.latch;
+						}
+						catch (Exception e) {
+							// Make sure a failure to setup the worker doesn't leave other threads waiting indefinitely:
+							asyncWorkerWasStarted.set( false );
+							final CountDownLatch latch = lastAsyncWorkLatch;
+							if ( latch != null ) {
+								latch.countDown();
+							}
+							throw e;
+						}
 					}
 				}
 			}
 		}
 
 		public void awaitCompletion() {
-			if ( asyncWorkLatch != null ) {
+			final CountDownLatch localLatch = lastAsyncWorkLatch;
+			if ( localLatch != null ) {
 				try {
-					asyncWorkLatch.await();
+					localLatch.await();
 				}
 				catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
@@ -227,6 +242,14 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 			catch (InterruptedException e) {
 				LOG.interruptedWhileWaitingForIndexActivity( e );
 			}
+			finally {
+				final CountDownLatch localLatch = lastAsyncWorkLatch;
+				if ( localLatch != null ) {
+					//It's possible that a task was successfully scheduled but had no chance to run,
+					//so we need to release waiting threads:
+					localLatch.countDown();
+				}
+			}
 		}
 	}
 
@@ -236,6 +259,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	private class RequestProcessingRunnable implements Runnable {
 
 		private final AsyncBackendRequestProcessor asyncProcessor;
+		private final CountDownLatch latch = new CountDownLatch( 1 );
 
 		public RequestProcessingRunnable(AsyncBackendRequestProcessor asyncProcessor) {
 			this.asyncProcessor = asyncProcessor;
@@ -243,16 +267,24 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		@Override
 		public void run() {
-			Set<String> indexesNeedingFlush = new HashSet<>();
-			while ( true ) {
-				synchronized ( BackendRequestProcessor.this ) {
-					Iterable<BackendRequest<?>> requests = asyncProcessor.asyncRequestQueue.drainToDetachedIterable();
+			try {
+				processAsyncWork();
+			}
+			finally {
+				latch.countDown();
+			}
+		}
 
-					// Nothing more to do, flush and allow processor to shut down if requested
+		private void processAsyncWork() {
+			Set<String> indexesNeedingFlush = new HashSet<>();
+			synchronized ( asyncProcessor ) {
+				while ( true ) {
+					Iterable<BackendRequest<?>> requests = asyncProcessor.asyncRequestQueue.drainToDetachedIterable();
 					if ( requests == null ) {
+						// Allow other async processors to be setup already as we're on our way to termination:
+						asyncProcessor.asyncWorkerWasStarted.set( false );
+						// Nothing more to do, flush and terminate:
 						refresh( indexesNeedingFlush );
-						asyncProcessor.asyncWorkInProcessing.set( false );
-						asyncProcessor.asyncWorkLatch.countDown();
 						return;
 					}
 					for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests, false ) ) {
