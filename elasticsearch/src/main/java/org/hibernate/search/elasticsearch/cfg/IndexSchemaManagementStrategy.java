@@ -14,7 +14,7 @@ package org.hibernate.search.elasticsearch.cfg;
 public enum IndexSchemaManagementStrategy {
 
 	/**
-	 * Indexes will never be created or deleted.
+	 * Indexes will never be created or deleted. The index schema is not managed by Hibernate Search.
 	 */
 	NONE,
 
@@ -31,7 +31,7 @@ public enum IndexSchemaManagementStrategy {
 
 	/**
 	 * The same as {@link #CREATE}, but indexes - and all their contents - will be deleted upon session factory
-	 * shut-down.
+	 * shut-down as well.
 	 */
 	CREATE_DELETE;
 }
