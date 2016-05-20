@@ -15,7 +15,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-jgroups</artifactId>
+    <artifactId>hibernate-search-backend-jgroups</artifactId>
 
     <name>Hibernate Search JGroups Backend</name>
     <description>Hibernate Search JGroup based backend</description>
