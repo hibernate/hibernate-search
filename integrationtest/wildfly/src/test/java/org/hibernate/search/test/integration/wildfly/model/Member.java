@@ -7,6 +7,7 @@
 package org.hibernate.search.test.integration.wildfly.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +41,11 @@ public class Member implements Serializable {
 
 	@Column(name = "phone_number")
 	private String phoneNumber;
+
+	//This implicitly tests the capability to index Date types on Elasticsearch;
+	//see also HSEARCH-2234:
+	@Field
+	private Date timestamp = new Date();
 
 	public Long getId() {
 		return id;
