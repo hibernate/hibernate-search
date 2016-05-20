@@ -71,6 +71,11 @@
             <artifactId>hibernate-search-backend-jms</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Take the JGroups testing configuration files from our base tests -->
         <dependency>

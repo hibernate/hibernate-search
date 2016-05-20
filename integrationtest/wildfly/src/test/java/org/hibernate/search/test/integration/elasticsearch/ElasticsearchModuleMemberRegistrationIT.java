@@ -17,6 +17,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
@@ -79,7 +80,7 @@ public class ElasticsearchModuleMemberRegistrationIT {
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
 					.createProperty().name( "hibernate.search.default.indexmanager" ).value( "elasticsearch" ).up()
 					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
-					.createProperty().name( "hibernate.search.default.elasticsearch.index_management_strategy" ).value( "CREATE_DELETE" ).up()
+					.createProperty().name( "hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY ).value( "CREATE_DELETE" ).up()
 					.createProperty().name( "hibernate.search.default.elasticsearch.refresh_after_write" ).value( "true" ).up()
 				.up().up()
 			.exportAsString();

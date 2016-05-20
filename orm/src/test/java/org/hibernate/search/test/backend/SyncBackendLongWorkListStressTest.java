@@ -70,7 +70,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.put( "hibernate.search.default.max_queue_length", "5" );
 		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		cfg.put( "hibernate.search.default.elasticsearch.index_management_strategy", "MERGE" );
+		cfg.put( "hibernate.search.default.elasticsearch.index_schema_management_strategy", "MERGE" );
 	}
 
 }

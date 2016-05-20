@@ -19,7 +19,7 @@ public final class ElasticsearchEnvironment {
 	public static final class Defaults {
 
 		public static final String SERVER_URI = "http://localhost:9200";
-		public static final IndexSchemaManagementStrategy INDEX_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.NONE;
+		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.NONE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final String REQUIRED_INDEX_STATUS = "green";
 		public static final boolean REFRESH_AFTER_WRITE = false;
@@ -46,10 +46,10 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * The name of one of the {@link IndexSchemaManagementStrategy} constants is expected, e.g. MERGE.
 	 * <p>
-	 * Can be given globally (e.g. {@code hibernate.search.default.elasticsearch.index_management_strategy=MERGE}) or
-	 * for specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.index_management_strategy=CREATE}).
+	 * Can be given globally (e.g. {@code hibernate.search.default.elasticsearch.index_schema_management_strategy=MERGE}) or
+	 * for specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.index_schema_management_strategy=CREATE}).
 	 */
-	public static final String INDEX_MANAGEMENT_STRATEGY = "elasticsearch.index_management_strategy";
+	public static final String INDEX_SCHEMA_MANAGEMENT_STRATEGY = "elasticsearch.index_schema_management_strategy";
 
 	/**
 	 * Property for specifying the timeout for index management operations (index creation etc.) in milli-seconds.

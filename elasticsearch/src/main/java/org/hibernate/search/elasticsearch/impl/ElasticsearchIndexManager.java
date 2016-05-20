@@ -154,8 +154,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	private static IndexSchemaManagementStrategy getIndexManagementStrategy(Properties properties) {
-		String strategy = properties.getProperty( ElasticsearchEnvironment.INDEX_MANAGEMENT_STRATEGY );
-		return strategy != null ? IndexSchemaManagementStrategy.valueOf( strategy ) : ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_STRATEGY;
+		String strategy = properties.getProperty( ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY );
+		return strategy != null ? IndexSchemaManagementStrategy.valueOf( strategy ) : ElasticsearchEnvironment.Defaults.INDEX_SCHEMA_MANAGEMENT_STRATEGY;
 	}
 
 	private static String getIndexManagementWaitTimeout(Properties properties) {

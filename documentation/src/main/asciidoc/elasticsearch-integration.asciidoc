@@ -95,12 +95,12 @@ Add them to your `persistence.xml` or where you put the rest of your Hibernate S
 
 Select Elasticsearch as the backend:: `hibernate.search.default.indexmanager elasticsearch`
 Hostname and port for Elasticsearch:: `hibernate.search.default.elasticsearch.host \http://127.0.0.1:9200`
-Selects the index creation strategy:: `hibernate.search.default.elasticsearch.index_management_strategy CREATE_DELETE`
+Selects the index creation strategy:: `hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE_DELETE`
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000`
 Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red"):: `hibernate.search.default.elasticsearch.required_index_status green`
 Whether to perform an explicit refresh after a set of operations has been executed against a specific index (`true` or `false`):: `hibernate.search.default.elasticsearch.refresh_after_write false`
 
-Let's see the options for the `index_management_strategy` property:
+Let's see the options for the `index_schema_management_strategy` property:
 
 [options="header"]
 |===============
@@ -112,7 +112,7 @@ Let's see the options for the `index_management_strategy` property:
 |===============
 
 Note that all properties besides `host` can be given globally as shown above and/or be given for specific indexes:
-`hibernate.search.someindex.elasticsearch.index_management_strategy MERGE`.
+`hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`.
 
 ===== Elasticsearch configuration
 
