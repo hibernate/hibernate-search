@@ -7,7 +7,7 @@
   -->
 <module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.elasticsearch" slot="${hibernate.search.version}">
     <resources>
-        <resource-root path="hibernate-search-backend-elasticsearch-${hibernate.search.version}.jar" />
+        <resource-root path="hibernate-search-elasticsearch-${hibernate.search.version}.jar" />
         <resource-root path="jest-${elasticsearchJestVersion}.jar" />
         <resource-root path="jest-common-${elasticsearchJestVersion}.jar" />
         <resource-root path="commons-lang3-${elasticsearchCommonsLang3Version}.jar" />

@@ -15,7 +15,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-backend-jgroups</artifactId>
+    <artifactId>hibernate-search-jgroups</artifactId>
 
     <name>Hibernate Search JGroups Backend</name>
     <description>Hibernate Search JGroup based backend</description>
@@ -53,7 +53,7 @@
         <!-- For testing with the ES index manager -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+            <artifactId>hibernate-search-elasticsearch</artifactId>
         </dependency>
 
         <dependency>

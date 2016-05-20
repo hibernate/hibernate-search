@@ -114,7 +114,7 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.hibernate:hibernate-search-backend-elasticsearch</include>
+                <include>org.hibernate:hibernate-search-elasticsearch</include>
             </includes>
         </dependencySet>
 

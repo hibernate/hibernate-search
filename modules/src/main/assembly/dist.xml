@@ -138,7 +138,7 @@
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>org.hibernate:hibernate-search-backend-elasticsearch</include>
+                <include>org.hibernate:hibernate-search-elasticsearch</include>
                 <include>com.google.code.gson:gson</include>
                 <include>io.searchbox:jest</include>
                 <include>io.searchbox:jest-common</include>
