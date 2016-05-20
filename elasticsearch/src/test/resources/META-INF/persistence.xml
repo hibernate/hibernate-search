@@ -48,9 +48,9 @@
     </persistence-unit>
 
     <persistence-unit name="ElasticsearchJpaITPU" transaction-type="RESOURCE_LOCAL">
-        <class>org.hibernate.search.backend.elasticsearch.test.GolfPlayer</class>
-        <class>org.hibernate.search.backend.elasticsearch.test.GolfCourse</class>
-        <class>org.hibernate.search.backend.elasticsearch.test.Hole</class>
+        <class>org.hibernate.search.elasticsearch.test.GolfPlayer</class>
+        <class>org.hibernate.search.elasticsearch.test.GolfCourse</class>
+        <class>org.hibernate.search.elasticsearch.test.Hole</class>
         <exclude-unlisted-classes />
     </persistence-unit>
 

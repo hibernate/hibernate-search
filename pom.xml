@@ -480,7 +480,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+                <artifactId>hibernate-search-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

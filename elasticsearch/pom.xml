@@ -15,7 +15,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+    <artifactId>hibernate-search-elasticsearch</artifactId>
 
     <name>Hibernate Search Elasticsearch Backend</name>
     <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>

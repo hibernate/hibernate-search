@@ -1,1 +1,1 @@
-org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBridgeProvider
+org.hibernate.search.elasticsearch.impl.ElasticsearchBridgeProvider

@@ -31,7 +31,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class DefaultIndexManagerFactory implements IndexManagerFactory, Startable {
 
 	private static final Log log = LoggerFactory.make();
-	private static final String ES_INDEX_MANAGER = "org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexManager";
+	private static final String ES_INDEX_MANAGER = "org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager";
 
 	private ServiceManager serviceManager;
 

@@ -61,8 +61,8 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${module.xml.basedir}/search/backend-elasticsearch/module.xml</source>
-            <outputDirectory>/org/hibernate/search/backend-elasticsearch/${hibernate.search.version}</outputDirectory>
+            <source>${module.xml.basedir}/search/elasticsearch/module.xml</source>
+            <outputDirectory>/org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -134,11 +134,11 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/backend-elasticsearch/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>org.hibernate:hibernate-search-backend-elasticsearch</include>
+                <include>org.hibernate:hibernate-search-elasticsearch</include>
                 <include>com.google.code.gson:gson</include>
                 <include>io.searchbox:jest</include>
                 <include>io.searchbox:jest-common</include>
