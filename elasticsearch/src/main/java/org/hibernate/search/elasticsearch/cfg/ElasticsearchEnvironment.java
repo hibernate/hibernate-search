@@ -7,7 +7,7 @@
 package org.hibernate.search.elasticsearch.cfg;
 
 /**
- * Configuration properties of the ES backend.
+ * Configuration properties for Elasticsearch,
  *
  * @author Gunnar Morling
  */

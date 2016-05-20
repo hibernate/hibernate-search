@@ -7,7 +7,7 @@
 package org.hibernate.search.elasticsearch;
 
 /**
- * Projection constants specific to the Elasticsearch backend.
+ * Projection constants specific to Elasticsearch.
  * <p>
  * Implementator's note: When adding new constants, be sure to add them to
  * {@code ElasticsearchHSQueryImpl#SUPPORTED_PROJECTION_CONSTANTS}, too.

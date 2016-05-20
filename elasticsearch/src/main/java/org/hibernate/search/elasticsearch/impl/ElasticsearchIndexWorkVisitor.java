@@ -102,7 +102,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 	@Override
 	public BackendRequest<?> visitOptimizeWork(OptimizeLuceneWork work, Void p) {
 		// TODO HSEARCH-2092 implement
-		LOG.warn( "Optimize work is not yet supported for Elasticsearch backend, ignoring it" );
+		LOG.warn( "Optimize work is not yet supported for Elasticsearch, ignoring it" );
 		return null;
 	}
 

@@ -10,7 +10,7 @@ package org.hibernate.search.indexes.spi;
  * A strategy for applying analyzers.
  *
  * @author Gunnar Morling
- * @hsearch.experimental This type is under active development as part of the addition of the Elasticsearch backend. You
+ * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You
  * should be prepared for incompatible changes in future releases.
  */
 public enum AnalyzerExecutionStrategy {

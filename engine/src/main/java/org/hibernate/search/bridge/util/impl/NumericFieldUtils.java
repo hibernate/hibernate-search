@@ -116,8 +116,8 @@ public final class NumericFieldUtils {
 	 * range queries, the parameter type defines the strategy.
 	 *
 	 * Note that this is currently only used by the Infinispan backend as a fallback and it should be used with a lot
-	 * of caution as it does not take into account backend specific behaviors. For instance, for the
-	 * Elasticsearch backend, Dates require a keyword range query.
+	 * of caution as it does not take into account backend specific behaviors.
+	 * For instance, when indexing on Elasticsearch, Dates require a keyword range query.
 	 *
 	 * This should match the default {@code FieldBridge} used for each type.
 	 * @param value on Object

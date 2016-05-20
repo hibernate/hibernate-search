@@ -17,7 +17,7 @@
 
     <artifactId>hibernate-search-elasticsearch</artifactId>
 
-    <name>Hibernate Search Elasticsearch Backend</name>
+    <name>Hibernate Search Elasticsearch</name>
     <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>
 
     <dependencies>

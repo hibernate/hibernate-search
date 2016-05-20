@@ -22,9 +22,8 @@ package org.hibernate.search.indexes.spi;
  *
  * @author Sanne Grinovero
  * @author Gunnar Morling
- * @hsearch.experimental This type is under active development as part of the addition of
- * the Elasticsearch backend. You should be prepared for incompatible changes in future
- * releases.
+ * @hsearch.experimental This type is under active development as part of the Elasticsearch integration.
+ *    You should be prepared for incompatible changes in future releases.
  * @since 5.6
  */
 public interface IndexManagerType {

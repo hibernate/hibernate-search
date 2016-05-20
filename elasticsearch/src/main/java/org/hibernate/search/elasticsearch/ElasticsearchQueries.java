@@ -12,7 +12,7 @@ import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 
 /**
- * Creates queries to be used with the Elasticsearch backend.
+ * Creates queries to be used with Elasticsearch.
  *
  * @author Gunnar Morling
  */

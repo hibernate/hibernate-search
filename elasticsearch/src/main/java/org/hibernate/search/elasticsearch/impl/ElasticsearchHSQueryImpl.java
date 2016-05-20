@@ -912,7 +912,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		@Override
 		public TopDocs getTopDocs() {
-			throw new UnsupportedOperationException( "TopDocs not available with Elasticsearch backend" );
+			throw new UnsupportedOperationException( "TopDocs not available when using Elasticsearch" );
 		}
 
 		private void runSearch() {

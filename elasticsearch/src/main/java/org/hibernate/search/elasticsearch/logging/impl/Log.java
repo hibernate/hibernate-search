@@ -29,7 +29,7 @@ import com.google.gson.JsonElement;
 import io.searchbox.client.JestResult;
 
 /**
- * Hibernate Search Elasticsearch backend log abstraction.
+ * Hibernate Search log abstraction for the Elasticsearch integration.
  *
  * @author Gunnar Morling
  */
@@ -37,7 +37,7 @@ import io.searchbox.client.JestResult;
 public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 1,
-			value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is indexed through a non-Elasticsearch backend")
+			value = "Cannot execute query '%2$s', as targeted entity type '%1$s' is not mapped to an Elasticsearch index")
 	SearchException cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(@FormatWith(ClassFormatter.class) Class<?> entityType, String query);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 2,
@@ -49,7 +49,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException cannotTransformLuceneFilterIntoEsQuery(Filter filter);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 4,
-			value = "The sort order RANGE_DEFINITION_ORDER should not be sent to the Elasticsearch backend" )
+			value = "The sort order RANGE_DEFINITION_ORDER cant not be sent used with Elasticsearch" )
 	SearchException cannotSendRangeDefinitionOrderToElasticsearchBackend();
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 5,
