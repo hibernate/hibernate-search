@@ -26,7 +26,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.cfg.IndexManagementStrategy;
+import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequestProcessor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
@@ -78,7 +78,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private String indexName;
 	private String actualIndexName;
 	private boolean refreshAfterWrite;
-	private IndexManagementStrategy indexManagementStrategy;
+	private IndexSchemaManagementStrategy indexManagementStrategy;
 	private String indexManagementWaitTimeout;
 
 	/**
@@ -153,9 +153,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return name != null ? name : indexName;
 	}
 
-	private static IndexManagementStrategy getIndexManagementStrategy(Properties properties) {
+	private static IndexSchemaManagementStrategy getIndexManagementStrategy(Properties properties) {
 		String strategy = properties.getProperty( ElasticsearchEnvironment.INDEX_MANAGEMENT_STRATEGY );
-		return strategy != null ? IndexManagementStrategy.valueOf( strategy ) : ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_STRATEGY;
+		return strategy != null ? IndexSchemaManagementStrategy.valueOf( strategy ) : ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_STRATEGY;
 	}
 
 	private static String getIndexManagementWaitTimeout(Properties properties) {
@@ -192,7 +192,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	@Override
 	public void destroy() {
-		if ( indexManagementStrategy == IndexManagementStrategy.CREATE_DELETE ) {
+		if ( indexManagementStrategy == IndexSchemaManagementStrategy.CREATE_DELETE ) {
 			deleteIndexIfExisting();
 		}
 
@@ -206,17 +206,17 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	private void initializeIndex() {
-		if ( indexManagementStrategy == IndexManagementStrategy.NONE ) {
+		if ( indexManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
 			return;
 		}
-		else if ( indexManagementStrategy == IndexManagementStrategy.CREATE ||
-				indexManagementStrategy == IndexManagementStrategy.CREATE_DELETE ) {
+		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.CREATE ||
+				indexManagementStrategy == IndexSchemaManagementStrategy.CREATE_DELETE ) {
 
 			deleteIndexIfExisting();
 			createIndex();
 			createIndexMappings();
 		}
-		else if ( indexManagementStrategy == IndexManagementStrategy.MERGE ) {
+		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.MERGE ) {
 			createIndexIfNotYetExisting();
 			createIndexMappings();
 		}

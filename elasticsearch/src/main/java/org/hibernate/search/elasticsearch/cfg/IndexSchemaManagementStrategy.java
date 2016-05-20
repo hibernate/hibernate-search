@@ -11,7 +11,7 @@ package org.hibernate.search.elasticsearch.cfg;
  *
  * @author Gunnar Morling
  */
-public enum IndexManagementStrategy {
+public enum IndexSchemaManagementStrategy {
 
 	/**
 	 * Indexes will never be created or deleted.
