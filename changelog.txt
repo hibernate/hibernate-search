@@ -1,6 +1,84 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.6.0.Beta1 (22-5-2016)
+------------------------
+
+** Bug
+    * [HSEARCH-2011] - HSEARCH000268 : Field does not exist or not configured for faceting
+    * [HSEARCH-2046] - Three fields are added to the index for an indexed element collection with two elements
+    * [HSEARCH-2120] - EdgeCaseFacetTest is unreliable on Elasticsearch
+    * [HSEARCH-2193] - LuceneBackendQueueTask does not release the Directory lock on update failures
+    * [HSEARCH-2200] - Typo in log message
+    * [HSEARCH-2210] - Missing types in NumericFieldUtils#requiresNumericRangeQuery
+    * [HSEARCH-2222] - The new AnalyzerReference infrastructure is not used in the DSL
+    * [HSEARCH-2226] - FullTextQuery does not override some returned Query types to allow method chaining
+    * [HSEARCH-2227] - elasticsearch.ProjectionConstants exposes Lucene constructs
+    * [HSEARCH-2233] - Elasticsearch - Dates and numerics should never be analyzed
+    * [HSEARCH-2237] - ScopedAnalyzerReference shouldn't close the underlying analyzer references
+    * [HSEARCH-2240] - Parallel service lookup might fail to find the service
+    * [HSEARCH-2251] - In the DSL, don't analyze string encoded dates
+    * [HSEARCH-2252] - Document that it's not recommended to sort on the id field
+    * [HSEARCH-2274] - Property "elasticsearch.host" isn't accessed correctly
+    * [HSEARCH-2275] - Elasticsearch massindexer does not guarantee a proper shutdown
+    * [HSEARCH-2280] - The JGroups backend module should not depend on the Elasticsearch module
+
+** New Feature
+    * [HSEARCH-2064] - Implement filters in Elasticsearch backend
+    * [HSEARCH-2110] - Upgrade ES documentation before Beta1 release
+    * [HSEARCH-2199] - Allows the use of CharFilter in the programmatic API of SearchMapping
+    * [HSEARCH-2234] - Add dependency to "xml.bind" to ES JBoss Modules module.xml
+
+** Task
+    * [HSEARCH-2061] - Review package naming in the new ElasticSearch integration module
+    * [HSEARCH-2063] - Review the pending TODOs in the new Elasticsearch backend
+    * [HSEARCH-2067] - Rework ElasticSearchBridgeProvider integration to not affect non-ES indexing
+    * [HSEARCH-2071] - Support embedded ids with ES backend
+    * [HSEARCH-2106] - Discuss unique ProjectionConstants API
+    * [HSEARCH-2138] - Elasticsearch async: do not request reader refresh operations after each write
+    * [HSEARCH-2156] - Document requiring the bulk deletion Elasticsearch plugin
+    * [HSEARCH-2164] - Make Elasticsearch configuration properties index-scoped where feasible
+    * [HSEARCH-2187] - Documentation: Explain how to use the analyzers configured in ES
+    * [HSEARCH-2198] - Avoid using maven-injection-plugin to retrieve project Version
+    * [HSEARCH-2205] - Upgrade to Elasticsearch 2.3.1: Java9 compatibility and Lucene aligned to 5.5
+    * [HSEARCH-2211] - Upgrade Arquillian infrastructure
+    * [HSEARCH-2217] - Move Travis build to Trusty infrastructure and use Maven wrapper
+    * [HSEARCH-2229] - Improve error message in ElasticsearchIndexManager#analyzerName
+    * [HSEARCH-2238] - Upgrade to Byteman 3.0.5
+    * [HSEARCH-2242] - Convert FacetManager implementation to no longer use Filters
+    * [HSEARCH-2245] - Handle Calendar and resolution in the Elasticsearch specific BridgeProvider
+    * [HSEARCH-2246] - Using DSL with Elasticsearch and dates is broken
+    * [HSEARCH-2264] - Add additional comments on building metadata with/without IndexManager type
+
+** Sub-task
+    * [HSEARCH-2209] - Switch to ClassicSimilarity as default Similarity implementation
+
+** Improvement
+    * [HSEARCH-1724] - Simplify access to ClassLoaderService
+    * [HSEARCH-1951] - Improve resulting error message when applying the wrong Sort Type
+    * [HSEARCH-1970] - Untangle relationship of (DirectoryBased)IndexManager and BackendQueueProvider
+    * [HSEARCH-2093] - Clarify meaning of constant names on IndexSchemaManagementStrategy
+    * [HSEARCH-2100] - CPU hotspot in query.dsl.impl.Helper.getDocumentBuilder(QueryBuildingContext)
+    * [HSEARCH-2125] - Elasticsearch - support for MultiPhraseQuery
+    * [HSEARCH-2167] - Rename IndexManagementStrategy
+    * [HSEARCH-2178] - Send bulked index changes to ES when using the mass indexer
+    * [HSEARCH-2197] - Loading of search results produces useless garbage.
+    * [HSEARCH-2201] - Fix assorted typos in comments
+    * [HSEARCH-2202] - Fix SearchIntegrator camel casing throughout the codebase
+    * [HSEARCH-2203] - Reduce memory consumption of EntityInfoImpl objects.
+    * [HSEARCH-2212] - Improve Elasticsearch integration documentation
+    * [HSEARCH-2213] - Cryptic error when cluster is not green during index creation
+    * [HSEARCH-2214] - Provide an option to wait for Elasticsearch status yellow rather than green
+    * [HSEARCH-2243] - Allow provided services to implement Startable or Stoppable
+    * [HSEARCH-2244] - Unify the way TermQuery for numerics are handled
+    * [HSEARCH-2247] - Represent the kind of underlying technology with an explicit type
+    * [HSEARCH-2250] - Improve readability and efficiency of MultiWriteDrainableLinkedList
+    * [HSEARCH-2270] - Upgrade to Apache Lucene 5.5.1.Final
+
+** Deprecation
+    * [HSEARCH-2241] - Clarify deprecation of setFilter() method on FullTextQuery
+
+
 Version 5.6.0.Alpha3 (16-3-2016)
 ------------------------
 
