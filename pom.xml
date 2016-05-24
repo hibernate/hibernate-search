@@ -905,6 +905,7 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                         </systemPropertyVariables>
+                        <argLine>${additionalRuntimeArgLine}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
@@ -1365,6 +1366,17 @@
             <modules>
                 <module>documentation</module>
             </modules>
+        </profile>
+
+        <profile>
+            <id>jigsaw</id>
+            <activation>
+                <!-- Java 9 doesn't identify itself as "1.9" but "9": -->
+                <jdk>9</jdk>
+            </activation>
+            <properties>
+                <additionalRuntimeArgLine>-addmods java.xml.bind</additionalRuntimeArgLine>
+            </properties>
         </profile>
 
         <profile>
