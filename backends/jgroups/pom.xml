@@ -175,6 +175,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <argLine>${additionalRuntimeArgLine}</argLine>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         </configuration>
                     </execution>
