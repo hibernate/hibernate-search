@@ -120,6 +120,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	@Override
 	public HSQuery sort(Sort sort) {
+		clearCachedResults();
 		this.sort = sort;
 		return this;
 	}

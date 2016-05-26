@@ -51,6 +51,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.After;
 import org.junit.Before;
@@ -302,6 +303,26 @@ public class SortTest extends SearchTestBase {
 
 		assertThat( result ).onProperty( "name" )
 			.containsExactly( "Barny the brick layer", "Bart the brick layer", "Barny the brick layer", "Bill the brick layer" );
+
+		tx.commit();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2287")
+	public void testChangingSortOrder() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Query query = queryParser.parse( "summary:lucene" );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
+
+		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, false ) ) );
+		List<Book> result = hibQuery.list();
+		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3, 10 );
+
+		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, true ) ) );
+		result = hibQuery.list();
+		assertThat( result ).onProperty( "id" ).containsExactly( 10, 3, 2, 1 );
 
 		tx.commit();
 	}
