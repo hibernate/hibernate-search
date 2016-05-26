@@ -24,12 +24,20 @@ public class DistanceSortField extends SortField {
 	private Coordinates center;
 
 	public DistanceSortField(Coordinates center, String fieldName) {
-		super( fieldName, new DistanceComparatorSource( center ) );
-		this.center = center;
+		this( center, fieldName, false );
 	}
 
 	public DistanceSortField(double latitude, double longitude, String fieldName) {
-		this( Point.fromDegrees( latitude, longitude ), fieldName );
+		this( latitude, longitude, fieldName, false );
+	}
+
+	public DistanceSortField(Coordinates center, String fieldName, boolean reverse) {
+		super( fieldName, new DistanceComparatorSource( center ), reverse );
+		this.center = center;
+	}
+
+	public DistanceSortField(double latitude, double longitude, String fieldName, boolean reverse) {
+		this( Point.fromDegrees( latitude, longitude ), fieldName, reverse );
 		this.center = Point.fromDegrees( latitude, longitude );
 	}
 
