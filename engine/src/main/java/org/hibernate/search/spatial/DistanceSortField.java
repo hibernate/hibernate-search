@@ -7,7 +7,6 @@
 package org.hibernate.search.spatial;
 
 import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.spatial.impl.DistanceComparatorSource;
 import org.hibernate.search.spatial.impl.Point;
 
@@ -21,11 +20,27 @@ import org.hibernate.search.spatial.impl.Point;
  */
 public class DistanceSortField extends SortField {
 
+	private Coordinates center;
+
 	public DistanceSortField(Coordinates center, String fieldName) {
-		super( fieldName, new DistanceComparatorSource( center ) );
+		this( center, fieldName, false );
 	}
 
 	public DistanceSortField(double latitude, double longitude, String fieldName) {
-		this( Point.fromDegrees( latitude, longitude ), fieldName );
+		this( latitude, longitude, fieldName, false );
+	}
+
+	public DistanceSortField(Coordinates center, String fieldName, boolean reverse) {
+		super( fieldName, new DistanceComparatorSource( center ), reverse );
+		this.center = center;
+	}
+
+	public DistanceSortField(double latitude, double longitude, String fieldName, boolean reverse) {
+		this( Point.fromDegrees( latitude, longitude ), fieldName, reverse );
+		this.center = Point.fromDegrees( latitude, longitude );
+	}
+
+	public Coordinates getCenter() {
+		return center;
 	}
 }

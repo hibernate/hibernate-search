@@ -139,6 +139,22 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( 22.239, (Double) fifthResult[1], 0.001 );
 		Assert.assertEquals( 24.446, (Double) sixthResult[1], 0.001 );
 
+		distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
+		hibQuery.setSort( distanceSort );
+		results = hibQuery.getResultList();
+		firstResult = (Object[]) results.get( 0 );
+		secondResult = (Object[]) results.get( 1 );
+		thirdResult = (Object[]) results.get( 2 );
+		fourthResult = (Object[]) results.get( 3 );
+		fifthResult = (Object[]) results.get( 4 );
+		sixthResult = (Object[]) results.get( 5 );
+		Assert.assertEquals( 24.446, (Double) firstResult[1], 0.02 );
+		Assert.assertEquals( 22.239, (Double) secondResult[1], 0.02 );
+		Assert.assertEquals( 15.0636, (Double) thirdResult[1], 0.01 );
+		Assert.assertEquals( 11.1195, (Double) fourthResult[1], 0.01 );
+		Assert.assertEquals( 10.1582, (Double) fifthResult[1], 0.01 );
+		Assert.assertEquals( 0.0, (Double) sixthResult[1], 0.01 );
+
 		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
 		for ( Object entity : pois ) {
 			em.remove( entity );
