@@ -17,6 +17,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.batchindexing.spi.IdentifierCriteriaProvider;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.ErrorHandler;
@@ -62,6 +63,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private final Integer transactionTimeout;
 
 	private final String tenantId;
+	private final IdentifierCriteriaProvider criteriaProvider;
 
 	private final List<Future<?>> tasks = new ArrayList<>();
 
@@ -77,12 +79,14 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 								long objectsLimit,
 								int idFetchSize,
 								Integer transactionTimeout,
-								String tenantId) {
+								String tenantId,
+								IdentifierCriteriaProvider criteriaProvider) {
 		super( extendedIntegrator );
 		this.indexedType = entityType;
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
+		this.criteriaProvider = criteriaProvider;
 		this.idNameOfIndexedType = extendedIntegrator.getIndexBinding( entityType )
 				.getDocumentBuilder()
 				.getIdentifierName();
@@ -148,7 +152,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 						primaryKeyStream, sessionFactory,
 						objectLoadingBatchSize, indexedType, monitor,
 						objectsLimit, errorHandler, idFetchSize,
-						tenantId
+						tenantId, criteriaProvider
 				),
 				transactionTimeout,
 				tenantId);

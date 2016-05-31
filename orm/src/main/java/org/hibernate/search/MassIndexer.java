@@ -10,6 +10,7 @@ import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.batchindexing.spi.IdentifierCriteriaProvider;
 
 /**
  * A MassIndexer is useful to rebuild the indexes from the
@@ -144,4 +145,19 @@ public interface MassIndexer {
 	 * @return {@code this} for method chaining
 	 */
 	MassIndexer transactionTimeout(int timeoutInSeconds);
+
+	/**
+	 * Registers an {@link IdentifierCriteriaProvider} instance for the given entity index type.
+	 *
+	 * The criteria provider allows user-code to provide additional criterion that are to be applied
+	 * to the identifier production process, allowing the mass indexing of a subset of entity rows.
+	 *
+	 * IMPL NOTE: Make sure that other mass indexing operations are set appropriately not to purge the
+	 * index when using this option as only a subset of rows will be indexed.
+	 *
+	 * @param indexType the entity class type to apply the filter criteria for.
+	 * @param provider the identifier criteria provider instance.
+	 * @return {@code this for method chaining}
+	 */
+	MassIndexer registerCriteriaProvider(Class<?> indexType, IdentifierCriteriaProvider provider);
 }

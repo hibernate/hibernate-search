@@ -8,6 +8,7 @@ package org.hibernate.search.batchindexing.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -19,6 +20,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.batchindexing.spi.IdentifierCriteriaProvider;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.Executors;
@@ -52,6 +54,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final Integer transactionTimeout;
 	private final String tenantId;
 	private final List<Future<?>> indexingTasks = new ArrayList<>();
+	private final Map<Class<?>, IdentifierCriteriaProvider> criteriaProviders;
 
 	public BatchCoordinator(Set<Class<?>> rootEntities,
 							ExtendedSearchIntegrator extendedIntegrator,
@@ -67,7 +70,8 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 							MassIndexerProgressMonitor monitor,
 							int idFetchSize,
 							Integer transactionTimeout,
-							String tenantId) {
+							String tenantId,
+							Map<Class<?>, IdentifierCriteriaProvider> criteriaProviders) {
 		super( extendedIntegrator );
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
@@ -84,6 +88,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 		this.endAllSignal = new CountDownLatch( rootEntities.size() );
+		this.criteriaProviders = criteriaProviders;
 	}
 
 	@Override
@@ -128,8 +133,9 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private void doBatchWork(BatchBackend backend) throws InterruptedException, ExecutionException {
 		ExecutorService executor = Executors.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
+			final IdentifierCriteriaProvider criteriaProvider = criteriaProviders.get( type );
 			indexingTasks.add( executor.submit( new BatchIndexingWorkspace( extendedIntegrator, sessionFactory, type, documentBuilderThreads, cacheMode,
-					objectLoadingBatchSize, endAllSignal, monitor, backend, objectsLimit, idFetchSize, transactionTimeout, tenantId ) ) );
+					objectLoadingBatchSize, endAllSignal, monitor, backend, objectsLimit, idFetchSize, transactionTimeout, tenantId, criteriaProvider ) ) );
 
 		}
 		executor.shutdown();

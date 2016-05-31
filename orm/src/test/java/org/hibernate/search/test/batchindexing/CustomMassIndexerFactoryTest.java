@@ -17,6 +17,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.batchindexing.spi.IdentifierCriteriaProvider;
 import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
@@ -155,6 +156,11 @@ public class CustomMassIndexerFactoryTest extends SearchTestBase {
 
 		@Override
 		public MassIndexer transactionTimeout(int timeoutInSeconds) {
+			return null;
+		}
+
+		@Override
+		public MassIndexer registerCriteriaProvider(Class<?> indexType, IdentifierCriteriaProvider provider) {
 			return null;
 		}
 	}

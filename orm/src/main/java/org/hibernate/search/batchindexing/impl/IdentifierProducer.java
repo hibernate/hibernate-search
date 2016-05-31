@@ -16,9 +16,11 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.batchindexing.spi.IdentifierCriteriaProvider;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -48,6 +50,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final int idFetchSize;
 	private final ErrorHandler errorHandler;
 	private final String tenantId;
+	private final IdentifierCriteriaProvider criteriaProvider;
 
 	/**
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
@@ -59,13 +62,15 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	 * @param errorHandler how to handle unexpected errors
 	 * @param idFetchSize the fetch size
 	 * @param tenantId the tenant identifier
+	 * @param criteriaProvider the identifier criteria provider.
 	 */
 	public IdentifierProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
 			Class<?> indexedType, MassIndexerProgressMonitor monitor,
-			long objectsLimit, ErrorHandler errorHandler, int idFetchSize, String tenantId) {
+			long objectsLimit, ErrorHandler errorHandler, int idFetchSize, String tenantId,
+			IdentifierCriteriaProvider criteriaProvider) {
 				this.destination = fromIdentifierListToEntities;
 				this.sessionFactory = sessionFactory;
 				this.batchSize = objectLoadingBatchSize;
@@ -75,6 +80,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 				this.errorHandler = errorHandler;
 				this.idFetchSize = idFetchSize;
 				this.tenantId = tenantId;
+				this.criteriaProvider = criteriaProvider;
 				log.trace( "created" );
 	}
 
@@ -121,12 +127,13 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	}
 
 	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
-		Number countAsNumber = (Number) session
-			.createCriteria( indexedType )
-			.setProjection( Projections.rowCount() )
-			.setCacheable( false )
-			.uniqueResult();
-		long totalCount = countAsNumber.longValue();
+		final Criteria countCriteria = applyUserCriteria( session
+				.createCriteria( indexedType )
+				.setProjection( Projections.rowCount() )
+				.setCacheable( false )
+		);
+
+		long totalCount = ( (Number) countCriteria.uniqueResult() ).longValue();
 		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
 			totalCount = objectsLimit;
 		}
@@ -135,11 +142,12 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		}
 		monitor.addToTotalCount( totalCount );
 
-		Criteria criteria = session
-			.createCriteria( indexedType )
-			.setProjection( Projections.id() )
-			.setCacheable( false )
-			.setFetchSize( idFetchSize );
+		Criteria criteria = applyUserCriteria( session
+				.createCriteria( indexedType )
+				.setProjection( Projections.id() )
+				.setCacheable( false )
+				.setFetchSize( idFetchSize )
+		);
 
 		ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY );
 		ArrayList<Serializable> destinationList = new ArrayList<Serializable>( batchSize );
@@ -177,4 +185,13 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		}
 	}
 
+	private Criteria applyUserCriteria(Criteria criteria) {
+		if ( criteriaProvider != null ) {
+			final Criterion userCriterion = criteriaProvider.getIdentifierCriteria( indexedType );
+			if ( userCriterion != null ) {
+				criteria.add( userCriterion );
+			}
+		}
+		return criteria;
+	}
 }

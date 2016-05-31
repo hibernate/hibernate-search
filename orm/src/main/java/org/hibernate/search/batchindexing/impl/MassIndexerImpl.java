@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.batchindexing.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -15,6 +17,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.batchindexing.spi.IdentifierCriteriaProvider;
 import org.hibernate.search.batchindexing.spi.MassIndexerWithTenant;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
@@ -39,6 +42,7 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	private final SessionFactoryImplementor sessionFactory;
 
 	protected Set<Class<?>> rootEntities = new HashSet<Class<?>>();
+	protected Map<Class<?>, IdentifierCriteriaProvider> criteriaProviders = new HashMap<Class<?>, IdentifierCriteriaProvider>();
 
 	// default settings defined here:
 	private int typesToIndexInParallel = 1;
@@ -223,7 +227,7 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
 				monitor, idFetchSize, idLoadingTransactionTimeout,
-				tenantIdentifier
+				tenantIdentifier, criteriaProviders
 		);
 	}
 
@@ -238,6 +242,15 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 		// don't check for positive/zero values as it's actually used by some databases
 		// as special values which might be useful.
 		this.idFetchSize = idFetchSize;
+		return this;
+	}
+
+	@Override
+	public MassIndexer registerCriteriaProvider(Class<?> indexType, IdentifierCriteriaProvider provider) {
+		if ( !rootEntities.contains( indexType ) ) {
+			throw new IllegalArgumentException( "Specified index type is not an indexed root entity." );
+		}
+		criteriaProviders.put( indexType, provider );
 		return this;
 	}
 }
