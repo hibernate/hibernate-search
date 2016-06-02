@@ -189,6 +189,7 @@
                         </goals>
                         <configuration>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                            <argLine>${additionalRuntimeArgLine}</argLine>
                             <dependenciesToScan>
                                 <dependency>org.hibernate:hibernate-search-orm</dependency>
                             </dependenciesToScan>

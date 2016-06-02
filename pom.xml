@@ -35,8 +35,6 @@
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
-        <module>integrationtest/wildfly</module>
-        <module>integrationtest/performance</module>
         <module>integrationtest/osgi/karaf-features</module>
         <module>integrationtest/sandbox</module>
         <module>integrationtest/engine-performance</module>
@@ -905,6 +903,7 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                         </systemPropertyVariables>
+                        <argLine>${additionalRuntimeArgLine}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
@@ -1357,25 +1356,28 @@
         </profile>
 
         <profile>
-            <id>docs</id>
+            <id>non-jigsaw</id>
             <activation>
-                <!-- asciidoctor won't work on JDK9  -->
+                <!-- Asciidoctor, Karaf and WildFly won't work on JDK9 yet  -->
                 <jdk>[1.7,1.8]</jdk>
             </activation>
             <modules>
                 <module>documentation</module>
+                <module>integrationtest/wildfly</module>
+                <module>integrationtest/osgi/karaf-it</module>
+                <module>integrationtest/performance</module>
             </modules>
         </profile>
 
         <profile>
-            <id>integration-karaf</id>
+            <id>jigsaw</id>
             <activation>
-                <!-- Karaf won't work on JDK9  -->
-                <jdk>[1.7,1.8]</jdk>
+                <!-- Java 9 doesn't identify itself as "1.9" but "9": -->
+                <jdk>9</jdk>
             </activation>
-            <modules>
-                <module>integrationtest/osgi/karaf-it</module>
-            </modules>
+            <properties>
+                <additionalRuntimeArgLine>-addmods java.xml.bind</additionalRuntimeArgLine>
+            </properties>
         </profile>
 
         <profile>
