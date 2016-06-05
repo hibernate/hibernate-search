@@ -177,7 +177,7 @@
         <commonsIoVersion>2.1</commonsIoVersion>
         <jbossTransactionApiVersion>1.0.0.Final</jbossTransactionApiVersion>
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
-        <activeMQVersion>5.8.0</activeMQVersion>
+        <activeMQVersion>5.13.3</activeMQVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
 
         <!-- Elasticsearch -->
