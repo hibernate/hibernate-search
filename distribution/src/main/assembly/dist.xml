@@ -54,20 +54,6 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional/jpa</outputDirectory>
-            <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-entitymanager</include>
-            </includes>
-            <excludes>
-                <exclude>dom4j:*</exclude>
-                <exclude>javassist:javassist</exclude>
-            </excludes>
-        </dependencySet>
-
-        <dependencySet>
             <outputDirectory>dist/lib/optional/analyzers</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>

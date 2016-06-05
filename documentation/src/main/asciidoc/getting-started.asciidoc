@@ -68,12 +68,6 @@ All you have to add to your pom.xml is:
 ====
 [source, XML]
 [subs="verbatim,attributes"]
-<!-- If using JPA, add: -->
-<dependency>
-   <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-entitymanager</artifactId>
-   <version>{hibernateVersion}</version>
-</dependency>
 <!-- Infinispan integration: -->
 <dependency>
    <groupId>org.infinispan</groupId>
@@ -82,8 +76,8 @@ All you have to add to your pom.xml is:
 </dependency>
 ====
 
-Only the _hibernate-search-orm_ dependency is mandatory. _hibernate-entitymanager_ is only required
-if you want to use Hibernate Search in conjunction with JPA.
+Only the _hibernate-search-orm_ dependency is mandatory. _infinispan-directory-provider_ is only required
+if you want to use Infinispan to store the Lucene indexes.
 
 ==== Manual library management
 

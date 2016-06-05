@@ -46,10 +46,6 @@
 
         <!-- Need to list out optional/provided dependencies here again in order to include them via assembly dependency set -->
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
         </dependency>

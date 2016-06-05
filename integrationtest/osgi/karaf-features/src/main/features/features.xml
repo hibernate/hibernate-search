@@ -63,7 +63,6 @@
 
         <!-- Hibernate ORM -->
         <bundle>mvn:org.hibernate/hibernate-core/${hibernateVersion}</bundle>
-        <bundle>mvn:org.hibernate/hibernate-entitymanager/${hibernateVersion}</bundle>
         <bundle>mvn:org.hibernate/hibernate-osgi/${hibernateVersion}</bundle>
     </feature>
 </features>
