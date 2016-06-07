@@ -179,7 +179,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 					throw new SearchException( "Unable to create the directory marker file: " + indexName );
 				}
 			}
-			log.debugf( "Current directory: %d", currentToBe );
+			log.debugf( "Current directory: %d", (Integer) currentToBe );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );

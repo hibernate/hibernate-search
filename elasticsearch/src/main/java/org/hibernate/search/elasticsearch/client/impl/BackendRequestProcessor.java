@@ -100,7 +100,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 			nextBulk = backendRequestGroup;
 
 			if ( LOG.isTraceEnabled() ) {
-				LOG.tracef( "Processing bulk of %s items on index(es) %s", nextBulk.getSize(), nextBulk.getTouchedIndexes() );
+				LOG.tracef( "Processing bulk of %s items on index(es) %s", (Integer) nextBulk.getSize(), nextBulk.getTouchedIndexes() );
 			}
 
 			nextBulk.execute();

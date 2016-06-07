@@ -74,7 +74,7 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 		if ( log.isTraceEnabled() ) {
 			log.tracef(
 					"Initialized %d objects out of %d in the persistence context",
-					numberOfObjectsToInitialize - remainingSize, numberOfObjectsToInitialize
+					(Integer) (numberOfObjectsToInitialize - remainingSize), (Integer) numberOfObjectsToInitialize
 			);
 		}
 
