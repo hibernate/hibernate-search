@@ -69,7 +69,7 @@ public class CachingWrapperFilter extends Filter {
 		this.filter = filter;
 		final int softRefSize = size * HARD_TO_SOFT_RATIO;
 		if ( log.isDebugEnabled() ) {
-			log.debugf( "Initialising SoftLimitMRUCache with hard ref size of %d and a soft ref of %d", size, softRefSize );
+			log.debugf( "Initialising SoftLimitMRUCache with hard ref size of %d and a soft ref of %d", (Integer)size, (Integer)softRefSize );
 		}
 		this.cache = new SoftLimitMRUCache( size, softRefSize );
 	}

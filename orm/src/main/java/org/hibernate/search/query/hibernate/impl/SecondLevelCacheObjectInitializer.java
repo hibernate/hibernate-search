@@ -78,7 +78,7 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 		final int remainingSize = remainingEntityInfos.size();
 
 		if ( traceEnabled ) {
-			log.tracef( "Initialized %d objects out of %d in the second level cache", maxResults - remainingSize, maxResults );
+			log.tracef( "Initialized %d objects out of %d in the second level cache", (Integer)(maxResults - remainingSize), (Integer)maxResults );
 		}
 		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(

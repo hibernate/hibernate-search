@@ -107,7 +107,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			new File( sourceDir, CURRENT2 ).delete();
 			//TODO small hole, no file can be found here
 			new File( sourceDir, CURRENT_DIR_NAME[currentLocal] ).createNewFile();
-			log.debugf( "Current directory: %d", currentLocal );
+			log.debugf( "Current directory: %d", (Integer)currentLocal );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
