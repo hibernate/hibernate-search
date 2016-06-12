@@ -10,10 +10,10 @@ import java.io.Serializable;
 import java.util.Properties;
 import java.util.Set;
 
-import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.EventSource;
+import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextSharedSessionBuilder;
@@ -54,7 +54,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	private final TransactionContext transactionContext;
 
 	public FullTextSessionImpl(org.hibernate.Session session) {
-		super( (SessionImplementor) session, session );
+		super( (SessionImplementor) session );
 		if ( session == null ) {
 			throw log.getNullSessionPassedToFullTextSessionCreationException();
 		}
@@ -78,8 +78,8 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		return new FullTextQueryImpl(
 				queryDescriptor,
 				entities,
-				sessionImplementor,
-				new ParameterMetadata( null, null )
+				delegate,
+				new ParameterMetadataImpl( null, null )
 		);
 	}
 
@@ -121,7 +121,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	}
 
 	private void createAndPerformWork(Class<?> clazz, Serializable id, WorkType workType) {
-		Work work = new Work( sessionImplementor.getTenantIdentifier(), clazz, id, workType );
+		Work work = new Work( delegate.getTenantIdentifier(), clazz, id, workType );
 		getSearchIntegrator().getWorker().performWork( work, transactionContext );
 	}
 
@@ -147,7 +147,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
 			throw new IllegalArgumentException( msg );
 		}
-		Serializable id = session.getIdentifier( entity );
+		Serializable id = delegate.getIdentifier( entity );
 		String tenantIdentifier = getTenantIdentifier();
 
 		Work work = new Work( tenantIdentifier, entity, id, WorkType.INDEX );
@@ -183,7 +183,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 
 	private ExtendedSearchIntegrator getSearchIntegrator() {
 		if ( searchFactory == null ) {
-			searchFactory = ContextHelper.getSearchIntegrator( session );
+			searchFactory = ContextHelper.getSearchIntegrator( delegate );
 		}
 		return searchFactory;
 	}

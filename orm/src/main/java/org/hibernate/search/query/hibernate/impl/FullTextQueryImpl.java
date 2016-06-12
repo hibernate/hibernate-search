@@ -23,7 +23,7 @@ import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.engine.query.spi.ParameterMetadata;
+import org.hibernate.query.ParameterMetadata;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.internal.QueryImpl;
 import org.hibernate.query.spi.QueryImplementor;
