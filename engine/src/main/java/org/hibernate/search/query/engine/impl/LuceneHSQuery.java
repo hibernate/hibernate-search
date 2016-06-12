@@ -846,4 +846,10 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					totalHits - 1;
 		}
 	}
+
+	@Override
+	public String getQueryString() {
+		return String.valueOf( luceneQuery );
+	}
+
 }

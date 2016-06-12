@@ -426,6 +426,15 @@ public class ScrollableResultsImpl implements ScrollableResults, ScrollableResul
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	@Override
+	public int getNumberOfTypes() {
+		throw new UnsupportedOperationException( "Not implemented for Lucene query results" );
+	}
+
 	@Override
 	public int getRowNumber() {
 		if ( max < first ) {
