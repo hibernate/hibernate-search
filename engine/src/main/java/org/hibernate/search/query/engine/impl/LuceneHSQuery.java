@@ -134,11 +134,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	}
 
 	@Override
-	public String getQueryString() {
-		return getLuceneQuery().toString();
-	}
-
-	@Override
 	public List<EntityInfo> queryEntityInfos() {
 		LazyQueryState searcher = buildSearcher();
 		if ( searcher == null ) {
@@ -851,4 +846,10 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					totalHits - 1;
 		}
 	}
+
+	@Override
+	public String getQueryString() {
+		return String.valueOf( luceneQuery );
+	}
+
 }

@@ -530,7 +530,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 	public <T> T unwrap(Class<T> type) {
 		//I've purposely decided not to return the underlying Hibernate FullTextQuery
 		//as I see this as an implementation detail that should not be exposed.
-		return query.unwrap( type );
+		return (T) query.unwrap( type );
 	}
 
 }

@@ -20,11 +20,10 @@ import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.query.ParameterMetadata;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.query.internal.QueryImpl;
+import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.FullTextQuery;
@@ -44,6 +43,7 @@ import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
+import org.hibernate.type.Type;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}.
@@ -51,7 +51,7 @@ import org.hibernate.transform.ResultTransformer;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class FullTextQueryImpl extends QueryImpl implements FullTextQuery {
+public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements FullTextQuery<R> {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -76,7 +76,7 @@ public class FullTextQueryImpl extends QueryImpl implements FullTextQuery {
 			SessionImplementor session,
 			ParameterMetadata parameterMetadata) {
 		//TODO handle flushMode
-		super( hSearchQuery.getQueryString(), null, session, parameterMetadata );
+		super( session, parameterMetadata );
 		this.session = session;
 		ExtendedSearchIntegrator extendedIntegrator = getExtendedSearchIntegrator();
 		this.objectLookupMethod = extendedIntegrator.getDefaultObjectLookupMethod();
@@ -98,6 +98,11 @@ public class FullTextQueryImpl extends QueryImpl implements FullTextQuery {
 	public FullTextQuery setFilter(Filter filter) {
 		hSearchQuery.filter( filter );
 		return this;
+	}
+
+	@Override
+	public List<R> getResultList() {
+		return list();
 	}
 
 	/**
@@ -171,7 +176,7 @@ public class FullTextQueryImpl extends QueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public ScrollableResultsImplementor scroll() {
+	public ScrollableResultsImpl scroll() {
 		//keep the searcher open until the resultset is closed
 
 		hSearchQuery.getTimeoutManager().start();
@@ -362,6 +367,41 @@ public class FullTextQueryImpl extends QueryImpl implements FullTextQuery {
 
 	private ExtendedSearchIntegrator getExtendedSearchIntegrator() {
 		return ContextHelper.getSearchIntegratorBySessionImplementor( session );
+	}
+
+	@Override
+	public String getQueryString() {
+		return hSearchQuery.getQueryString();
+	}
+
+	@Override
+	protected boolean isNativeQuery() {
+		return false;
+	}
+
+	@Override
+	public Type[] getReturnTypes() {
+		throw new UnsupportedOperationException( "getReturnTypes() is not implemented in Hibernate Search queries" );
+	}
+
+	@Override
+	public String[] getReturnAliases() {
+		throw new UnsupportedOperationException( "getReturnAliases() is not implemented in Hibernate Search queries" );
+	}
+
+	@Override
+	public Query setEntity(int position, Object val) {
+		throw new UnsupportedOperationException( "setEntity(int,Object) is not implemented in Hibernate Search queries" );
+	}
+
+	@Override
+	public Query setEntity(String name, Object val) {
+		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
+	}
+
+	@Override
+	public String toString() {
+		return "FullTextQueryImpl(" + getQueryString() + ")";
 	}
 
 	private static final Loader noLoader = new Loader() {
