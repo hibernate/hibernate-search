@@ -24,7 +24,9 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.AbstractQueryImpl;
+import org.hibernate.query.internal.QueryImpl;
+import org.hibernate.query.spi.QueryImplementor;
+import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilter;
@@ -49,7 +51,7 @@ import org.hibernate.transform.ResultTransformer;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
+public class FullTextQueryImpl extends QueryImpl implements FullTextQuery {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -60,6 +62,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private ResultTransformer resultTransformer;
 	private int fetchSize = 1;
 	private final HSQuery hSearchQuery;
+	private final SessionImplementor session;
 
 
 	/**
@@ -74,7 +77,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			ParameterMetadata parameterMetadata) {
 		//TODO handle flushMode
 		super( hSearchQuery.getQueryString(), null, session, parameterMetadata );
-
+		this.session = session;
 		ExtendedSearchIntegrator extendedIntegrator = getExtendedSearchIntegrator();
 		this.objectLookupMethod = extendedIntegrator.getDefaultObjectLookupMethod();
 		this.databaseRetrievalMethod = extendedIntegrator.getDefaultDatabaseRetrievalMethod();
@@ -168,7 +171,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public ScrollableResults scroll() {
+	public ScrollableResultsImplementor scroll() {
 		//keep the searcher open until the resultset is closed
 
 		hSearchQuery.getTimeoutManager().start();
@@ -186,7 +189,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public ScrollableResults scroll(ScrollMode scrollMode) {
+	public ScrollableResultsImplementor scroll(ScrollMode scrollMode) {
 		//TODO think about this scrollmode
 		return scroll();
 	}
@@ -271,7 +274,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public Query setLockOptions(LockOptions lockOptions) {
+	public QueryImplementor setLockOptions(LockOptions lockOptions) {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
@@ -302,7 +305,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public Query setLockMode(String alias, LockMode lockMode) {
+	public QueryImplementor setLockMode(String alias, LockMode lockMode) {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
