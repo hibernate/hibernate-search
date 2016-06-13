@@ -945,11 +945,6 @@
                     <version>2.5</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.jboss.maven.plugins</groupId>
-                    <artifactId>maven-injection-plugin</artifactId>
-                    <version>1.0.2</version>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.9.1</version>
@@ -1185,19 +1180,6 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                     <configuration>
                         <lifecycleMappingMetadata>
                             <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.jboss.maven.plugins</groupId>
-                                        <artifactId>maven-injection-plugin</artifactId>
-                                        <versionRange>[1.0.2,)</versionRange>
-                                        <goals>
-                                            <goal>bytecode</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
                                         <groupId>org.apache.maven.plugins</groupId>
