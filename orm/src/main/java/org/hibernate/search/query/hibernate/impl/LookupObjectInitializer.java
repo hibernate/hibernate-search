@@ -41,7 +41,7 @@ public class LookupObjectInitializer implements ObjectInitializer {
 		final int maxResults = entityInfos.size();
 		if ( maxResults == 0 ) {
 			if ( traceEnabled ) {
-				log.tracef( "No object to initialize", maxResults );
+				log.tracef( "No object to initialize" );
 			}
 			return;
 		}
@@ -54,7 +54,7 @@ public class LookupObjectInitializer implements ObjectInitializer {
 			}
 		}
 		if ( traceEnabled ) {
-			log.tracef( "Initialized %d objects by lookup method.", maxResults );
+			log.tracef( "Initialized %d objects by lookup method.", (Integer) maxResults );
 		}
 	}
 }

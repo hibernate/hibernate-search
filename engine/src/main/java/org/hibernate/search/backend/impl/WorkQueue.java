@@ -50,7 +50,7 @@ public class WorkQueue {
 
 	public WorkQueue splitQueue() {
 		if ( log.isTraceEnabled() ) {
-			log.tracef( "Splitting work queue with %d works", plan.size() );
+			log.tracef( "Splitting work queue with %d works", (Integer) plan.size() );
 		}
 		WorkQueue subQueue = new WorkQueue( extendedIntegrator, plan );
 		this.plan = new WorkPlan( extendedIntegrator );
