@@ -38,7 +38,7 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 
 		if ( numberOfObjectsToInitialize == 0 ) {
 			if ( log.isTraceEnabled() ) {
-				log.tracef( "No object to initialize", numberOfObjectsToInitialize );
+				log.tracef( "No object to initialize" );
 			}
 			return;
 		}

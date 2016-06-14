@@ -49,7 +49,7 @@ public class JGroupsBackendQueueTask {
 		boolean trace = log.isTraceEnabled();
 		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>( queue );
 		if ( trace ) {
-			log.tracef( "Preparing %d Lucene works to be sent to master node.", filteredQueue.size() );
+			log.tracef( "Preparing %d Lucene works to be sent to master node.", (Integer) filteredQueue.size() );
 		}
 
 		for ( LuceneWork work : queue ) {
@@ -62,7 +62,7 @@ public class JGroupsBackendQueueTask {
 		if ( trace ) {
 			log.tracef(
 				"Filtering: optimized Lucene works are not going to be sent to master node. There is %d Lucene works after filtering.",
-				filteredQueue.size()
+				(Integer) filteredQueue.size()
 			);
 		}
 		if ( filteredQueue.isEmpty() ) {

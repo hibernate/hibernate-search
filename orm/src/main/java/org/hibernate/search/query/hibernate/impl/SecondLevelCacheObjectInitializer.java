@@ -38,7 +38,7 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 		final int maxResults = entityInfos.size();
 		if ( maxResults == 0 ) {
 			if ( traceEnabled ) {
-				log.tracef( "No object to initialize", maxResults );
+				log.tracef( "No object to initialize" );
 			}
 			return;
 		}

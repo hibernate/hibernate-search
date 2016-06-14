@@ -1037,6 +1037,7 @@
                                      <failOnMissingClasses>false</failOnMissingClasses>
                                      <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
                                      <signatures>
+org.jboss.logging.BasicLogger#tracef(java.lang.String, int)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int ,int)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int, java.lang.Object)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int, int, int)
