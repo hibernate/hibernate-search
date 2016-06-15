@@ -31,9 +31,6 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 	private int topSpatialHashLevel = DEFAULT_TOP_SPATIAL_HASH_LEVEL;
 	private int bottomSpatialHashLevel = DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL;
 
-	private boolean spatialHashIndex = true;
-	private boolean numericFieldsIndex = true;
-
 	private String[] hashIndexedFieldNames;
 
 	public SpatialFieldBridgeByHash() {
@@ -54,19 +51,16 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 	@Override
 	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
 		super.configureFieldMetadata( name, builder );
-		if ( spatialHashIndex ) {
-			hashIndexedFieldNames = new String[bottomSpatialHashLevel + 1];
+		hashIndexedFieldNames = new String[bottomSpatialHashLevel + 1];
 
-			for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
-				String fieldName = SpatialHelper.formatFieldName( i, name );
-				hashIndexedFieldNames[i] = fieldName;
-				builder.field( fieldName, FieldType.STRING );
-			}
+		for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
+			String fieldName = SpatialHelper.formatFieldName( i, name );
+			hashIndexedFieldNames[i] = fieldName;
+			builder.field( fieldName, FieldType.STRING );
 		}
-		if ( numericFieldsIndex ) {
-			builder.field( latitudeIndexedFieldName, FieldType.DOUBLE );
-			builder.field( longitudeIndexedFieldName, FieldType.DOUBLE );
-		}
+
+		builder.field( latitudeIndexedFieldName, FieldType.DOUBLE );
+		builder.field( longitudeIndexedFieldName, FieldType.DOUBLE );
 	}
 
 	/**
@@ -85,34 +79,29 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 			Double longitude = getLongitude( value );
 
 			if ( ( latitude != null ) && ( longitude != null ) ) {
+				Point point = Point.fromDegrees( latitude, longitude );
 
-				if ( spatialHashIndex ) {
-					Point point = Point.fromDegrees( latitude, longitude );
-
-					for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
-						luceneOptions.addFieldToDocument( hashIndexedFieldNames[i], SpatialHelper.getSpatialHashCellId( point, i ), document );
-					}
+				for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
+					luceneOptions.addFieldToDocument( hashIndexedFieldNames[i], SpatialHelper.getSpatialHashCellId( point, i ), document );
 				}
 
-				if ( numericFieldsIndex ) {
-					luceneOptions.addNumericFieldToDocument(
-							latitudeIndexedFieldName,
-							latitude,
-							document
-					);
+				luceneOptions.addNumericFieldToDocument(
+						latitudeIndexedFieldName,
+						latitude,
+						document
+				);
 
-					luceneOptions.addNumericFieldToDocument(
-							longitudeIndexedFieldName,
-							longitude,
-							document
-					);
+				luceneOptions.addNumericFieldToDocument(
+						longitudeIndexedFieldName,
+						longitude,
+						document
+				);
 
-					Field latitudeDocValuesField = new SpatialNumericDocValueField( latitudeIndexedFieldName, latitude );
-					document.add( latitudeDocValuesField );
+				Field latitudeDocValuesField = new SpatialNumericDocValueField( latitudeIndexedFieldName, latitude );
+				document.add( latitudeDocValuesField );
 
-					Field longitudeDocValuesField = new SpatialNumericDocValueField( longitudeIndexedFieldName, longitude );
-					document.add( longitudeDocValuesField );
-				}
+				Field longitudeDocValuesField = new SpatialNumericDocValueField( longitudeIndexedFieldName, longitude );
+				document.add( longitudeDocValuesField );
 			}
 		}
 	}
@@ -131,14 +120,6 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 		Object bottomSpatialHashLevel = parameters.get( "bottomSpatialHashLevel" );
 		if ( bottomSpatialHashLevel instanceof Integer ) {
 			this.bottomSpatialHashLevel = (Integer) bottomSpatialHashLevel;
-		}
-		Object spatialHashIndex = parameters.get( "spatialHashIndex" );
-		if ( spatialHashIndex instanceof Boolean ) {
-			this.spatialHashIndex = (Boolean) spatialHashIndex;
-		}
-		Object numericFieldsIndex = parameters.get( "numericFieldsIndex" );
-		if ( numericFieldsIndex instanceof Boolean ) {
-			this.numericFieldsIndex = (Boolean) numericFieldsIndex;
 		}
 	}
 }
