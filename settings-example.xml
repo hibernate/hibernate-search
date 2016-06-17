@@ -255,6 +255,16 @@ under the License.
         <profile>
             <id>jboss-public-repository</id>
             <repositories>
+                <!-- Use Central first -->
+                <repository>
+                    <id>central</id>
+                    <name>Maven Central</name>
+                    <url>http://repo.maven.apache.org/maven2/</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
                 <repository>
                     <id>jboss-public-repository-group</id>
                     <name>JBoss Public Maven Repository Group</name>
@@ -271,6 +281,16 @@ under the License.
                 </repository>
             </repositories>
             <pluginRepositories>
+                <!-- Use Central first -->
+                <pluginRepository>
+                    <id>central</id>
+                    <name>Maven Central</name>
+                    <url>http://repo.maven.apache.org/maven2/</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
                 <pluginRepository>
                     <id>jboss-public-repository-group</id>
                     <name>JBoss Public Maven Repository Group</name>
