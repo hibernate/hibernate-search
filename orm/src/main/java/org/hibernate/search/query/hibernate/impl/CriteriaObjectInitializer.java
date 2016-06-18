@@ -39,6 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class CriteriaObjectInitializer implements ObjectInitializer {
 
@@ -84,7 +85,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 				if ( documentBuilder == null ) {
 					// the query result can contain entities which are not indexed. This can for example happen if
 					// the targeted entity type is a superclass with indexed and un-indexed sub classes
-					// entities which don't have an document builder can be ignores (HF)
+					// entities which don't have a document builder can be ignored (HF)
 					continue;
 				}
 				XMember idProperty = documentBuilder.getIdGetter();
@@ -117,18 +118,20 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 	 * case all the entity infos originate from the same id space.
 	 */
 	private List<Criteria> buildUpCriteria(EntityInfo[] entityInfos, ObjectInitializationContext objectInitializationContext) {
-		Map<Class<?>, List<EntityInfo>> infosByIdSpace = groupInfosByIdSpace( entityInfos, objectInitializationContext );
+		Map<Class<?>, EntityInfoIdSpace> infosByIdSpace = groupInfosByIdSpace( entityInfos, objectInitializationContext );
 
 		// all entities from same id space -> single criteria
 		if ( infosByIdSpace.size() == 1 ) {
+			EntityInfoIdSpace idSpace = infosByIdSpace.values().iterator().next();
+
 			// no explicitly user specified criteria query, define one
 			Criteria criteria = objectInitializationContext.getCriteria();
 
 			if ( criteria == null ) {
-				criteria = objectInitializationContext.getSession().createCriteria( infosByIdSpace.keySet().iterator().next() );
+				criteria = objectInitializationContext.getSession().createCriteria( idSpace.getMostSpecificEntityType() );
 			}
 
-			criteria.add( getIdListCriterion( infosByIdSpace.values().iterator().next(), objectInitializationContext ) );
+			criteria.add( getIdListCriterion( idSpace.getEntityInfos(), objectInitializationContext ) );
 
 			return Collections.singletonList( criteria );
 		}
@@ -141,9 +144,11 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 
 			List<Criteria> criterias = new ArrayList<>( infosByIdSpace.size() );
 
-			for ( Entry<Class<?>, List<EntityInfo>> infosOfIdSpace : infosByIdSpace.entrySet() ) {
-				Criteria criteria = objectInitializationContext.getSession().createCriteria( infosOfIdSpace.getKey() );
-				criteria.add( getIdListCriterion( infosOfIdSpace.getValue(), objectInitializationContext ) );
+			for ( Entry<Class<?>, EntityInfoIdSpace> infosOfIdSpace : infosByIdSpace.entrySet() ) {
+				EntityInfoIdSpace idSpace = infosOfIdSpace.getValue();
+
+				Criteria criteria = objectInitializationContext.getSession().createCriteria( idSpace.getMostSpecificEntityType() );
+				criteria.add( getIdListCriterion( idSpace.getEntityInfos(), objectInitializationContext ) );
 				criterias.add( criteria );
 			}
 
@@ -188,13 +193,13 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 	 *
 	 * @return The given entity infos, keyed by the root entity type of id spaces
 	 */
-	private Map<Class<?>, List<EntityInfo>> groupInfosByIdSpace(EntityInfo[] entityInfos, ObjectInitializationContext objectInitializationContext) {
+	private Map<Class<?>, EntityInfoIdSpace> groupInfosByIdSpace(EntityInfo[] entityInfos, ObjectInitializationContext objectInitializationContext) {
 		ServiceManager serviceManager = objectInitializationContext.getExtendedSearchIntegrator().getServiceManager();
 		IdUniquenessResolver resolver = serviceManager.requestService( IdUniquenessResolver.class );
 		SessionFactoryImplementor sessionFactory = (SessionFactoryImplementor) objectInitializationContext.getSession().getSessionFactory();
 
 		try {
-			Map<Class<?>, List<EntityInfo>> idSpaces = new HashMap<>();
+			Map<Class<?>, EntityInfoIdSpace> idSpaces = new HashMap<>();
 
 			for ( EntityInfo entityInfo : entityInfos ) {
 				addToIdSpace( idSpaces, entityInfo, resolver, sessionFactory );
@@ -214,9 +219,9 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 		return sessionFactory.getEntityPersister( rootEntityName ).getMappedClass();
 	}
 
-	private void addToIdSpace(Map<Class<?>, List<EntityInfo>> idSpaces, EntityInfo entityInfo, IdUniquenessResolver resolver, SessionFactoryImplementor sessionFactory) {
+	private void addToIdSpace(Map<Class<?>, EntityInfoIdSpace> idSpaces, EntityInfo entityInfo, IdUniquenessResolver resolver, SessionFactoryImplementor sessionFactory) {
 		// add to existing id space if possible
-		for ( Entry<Class<?>, List<EntityInfo>> idSpace : idSpaces.entrySet() ) {
+		for ( Entry<Class<?>, EntityInfoIdSpace> idSpace : idSpaces.entrySet() ) {
 			if ( resolver.areIdsUniqueForClasses( entityInfo.getClazz(), idSpace.getKey() ) ) {
 				idSpace.getValue().add( entityInfo );
 				return;
@@ -224,8 +229,8 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 		}
 
 		// otherwise create a new id space, using the root entity as key
-		List<EntityInfo> idSpace = new ArrayList<>();
-		idSpace.add( entityInfo );
+		Class<?> rootType = getRootEntityType( sessionFactory, entityInfo.getClazz() );
+		EntityInfoIdSpace idSpace = new EntityInfoIdSpace( rootType, entityInfo );
 		idSpaces.put( getRootEntityType( sessionFactory, entityInfo.getClazz() ), idSpace );
 	}
 
@@ -240,4 +245,58 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 			return null;
 		}
 	}
+
+	/**
+	 * Container used to store all the {@code EntityInfo}s for entities which share the same id space (typically all the
+	 * subtypes of the same root type).
+	 *
+	 * Determines the most specific entity type we can use to build a Criteria to get the entities associated with these
+	 * {@code EntityInfo}s.
+	 */
+	private static class EntityInfoIdSpace {
+		private final Class<?> rootType;
+
+		private Class<?> mostSpecificEntityType;
+
+		private List<EntityInfo> entityInfos = new ArrayList<>();
+
+		private EntityInfoIdSpace(Class<?> rootType, EntityInfo entityInfo) {
+			this.rootType = rootType;
+			this.entityInfos.add( entityInfo );
+			this.mostSpecificEntityType = entityInfo.getClazz();
+		}
+
+		private void add(EntityInfo entityInfo) {
+			entityInfos.add( entityInfo );
+			mostSpecificEntityType = getMostSpecificCommonSuperClass( mostSpecificEntityType, entityInfo.getClazz() );
+		}
+
+		private Class<?> getMostSpecificCommonSuperClass(Class<?> class1, Class<?> class2) {
+			if ( rootType.equals( class1 ) || rootType.equals( class2 ) ) {
+				return rootType;
+			}
+			Class<?> superClass = class1;
+			while ( !superClass.isAssignableFrom( class2 ) ) {
+				superClass = superClass.getSuperclass();
+			}
+			return superClass;
+		}
+
+		private List<EntityInfo> getEntityInfos() {
+			return entityInfos;
+		}
+
+		/**
+		 * Returns the most specific possible type to build the criteria with. In case of a hierarchy using a join inheritance,
+		 * it makes a huge difference if we are targeting only one subtype as we will avoid the joins on all the subtypes
+		 * of the root entity type.
+		 *
+		 * @return the most specific entity type we can use for the Criteria
+		 */
+		private Class<?> getMostSpecificEntityType() {
+			return mostSpecificEntityType;
+		}
+
+	}
+
 }
