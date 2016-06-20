@@ -94,13 +94,13 @@ final class FullTextEntityManagerImpl implements FullTextEntityManager, Serializ
 	@Override
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
 		FullTextSession ftSession = getFullTextSession();
-		return new FullTextQueryImpl( ftSession.createFullTextQuery( luceneQuery, entities ), ftSession );
+		return new FullTextQueryImpl( ftSession.createFullTextQuery( luceneQuery, entities ), ftSession, em );
 	}
 
 	@Override
 	public FullTextQuery createFullTextQuery(QueryDescriptor descriptor, Class<?>... entities) {
 		FullTextSession ftSession = getFullTextSession();
-		return new FullTextQueryImpl( ftSession.createFullTextQuery( descriptor, entities ), ftSession );
+		return new FullTextQueryImpl( ftSession.createFullTextQuery( descriptor, entities ), ftSession, em );
 	}
 
 	@Override
