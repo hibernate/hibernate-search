@@ -20,6 +20,7 @@ import org.hibernate.event.spi.EventSource;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -77,6 +78,7 @@ public class SessionTest extends SearchTestBase {
 		final Session session = getSessionFactory().getCurrentSession();
 		try {
 			FullTextSession fts = Search.getFullTextSession( session );
+			Assert.assertNotNull( fts );
 			//success
 		}
 		finally {

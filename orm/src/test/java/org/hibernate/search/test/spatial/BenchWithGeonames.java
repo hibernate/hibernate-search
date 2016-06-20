@@ -396,7 +396,7 @@ public final class BenchWithGeonames {
 
 			Integer size = hibQuery.getResultSize();
 
-			List list = hibQuery.list();
+			hibQuery.list();
 
 			List<Facet> facets = facetManager.getFacets( "typeFacet" );
 

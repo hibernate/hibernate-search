@@ -120,7 +120,7 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 			Query q = queryBuilder.keyword().onField( "villain.name" ).matching( LEX ).createQuery();
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q, Hero.class );
 			fullTextQuery.setSort( sort );
-			List list = fullTextQuery.list();
+			fullTextQuery.list();
 			transaction.commit();
 		}
 	}

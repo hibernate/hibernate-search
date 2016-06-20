@@ -16,8 +16,6 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.hibernate.Session;
-import org.hibernate.boot.registry.BootstrapServiceRegistry;
-import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.AvailableSettings;
@@ -196,10 +194,6 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 		Configuration configuration = new Configuration();
 		configuration.setProperty( AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "true" ); //As in ORM testsuite
 		return configuration;
-	}
-
-	private BootstrapServiceRegistry buildBootstrapServiceRegistry() {
-		return new BootstrapServiceRegistryBuilder().build();
 	}
 
 	/**

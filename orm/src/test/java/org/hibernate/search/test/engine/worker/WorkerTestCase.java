@@ -199,7 +199,6 @@ public class WorkerTestCase extends SearchTestBase {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Employee.class,
