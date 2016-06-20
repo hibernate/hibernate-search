@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityExistsException;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
@@ -69,15 +70,18 @@ final class FullTextQueryImpl implements FullTextQuery {
 
 	private final org.hibernate.search.FullTextQuery query;
 	private final Session session;
+	private final EntityManager em;
+
 	private Integer firstResult;
 	private Integer maxResults;
 	//initialized at 0 since we don't expect to use hints at this stage
 	private final Map<String, Object> hints = new HashMap<String, Object>( 0 );
 	private FlushModeType jpaFlushMode;
 
-	public FullTextQueryImpl(org.hibernate.search.FullTextQuery query, Session session) {
+	public FullTextQueryImpl(org.hibernate.search.FullTextQuery query, Session session, EntityManager em) {
 		this.query = query;
 		this.session = session;
+		this.em = em;
 	}
 
 	@Override
@@ -512,16 +516,7 @@ final class FullTextQueryImpl implements FullTextQuery {
 		if ( jpaFlushMode != null ) {
 			return jpaFlushMode;
 		}
-		final FlushMode hibernateFlushMode = session.getFlushMode();
-		if ( FlushMode.AUTO == hibernateFlushMode ) {
-			return FlushModeType.AUTO;
-		}
-		else if ( FlushMode.COMMIT == hibernateFlushMode ) {
-			return FlushModeType.COMMIT;
-		}
-		else {
-			return null; //incompatible flush mode
-		}
+		return em.getFlushMode();
 	}
 
 	@Override
