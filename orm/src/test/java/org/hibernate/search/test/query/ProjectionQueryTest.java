@@ -313,7 +313,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		final CounterCallsProjectionToMapResultTransformer counters = new CounterCallsProjectionToMapResultTransformer();
 		hibQuery.setResultTransformer( counters );
 
-		List transforms = hibQuery.list();
+		hibQuery.list();
 		assertEquals( counters.getTransformListCounter(), 1);
 
 		//cleanup

@@ -54,7 +54,6 @@ public class OptimizeTest extends SearchTestBase {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Email.class,

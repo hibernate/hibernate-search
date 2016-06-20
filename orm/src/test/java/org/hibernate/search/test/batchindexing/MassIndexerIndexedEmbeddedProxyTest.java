@@ -27,6 +27,7 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @TestForIssue(jiraKey = "HSEARCH-1240")
 public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
@@ -82,6 +83,7 @@ public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 			int resultSize = fullTextQuery.getResultSize();
 			List list = fullTextQuery.list();
 			assertEquals( 0, resultSize );
+			assertTrue( list.isEmpty() );
 		}
 		finally {
 			fullTextSession.close();

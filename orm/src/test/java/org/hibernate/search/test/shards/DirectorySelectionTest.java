@@ -165,7 +165,6 @@ public class DirectorySelectionTest extends SearchTestBase {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Product.class

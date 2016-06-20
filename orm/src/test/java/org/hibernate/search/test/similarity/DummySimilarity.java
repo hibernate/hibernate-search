@@ -13,7 +13,6 @@ import org.apache.lucene.util.BytesRef;
 /**
  * @author Emmanuel Bernard
  */
-@SuppressWarnings("serial")
 public class DummySimilarity extends ClassicSimilarity {
 
 	private float CONST = 1.0f;

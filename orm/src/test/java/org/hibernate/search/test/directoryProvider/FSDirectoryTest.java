@@ -115,6 +115,7 @@ public class FSDirectoryTest extends SearchTestBase {
 		return projection;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testBoost() throws Exception {
 		try ( Session s = getSessionFactory().openSession() ) {

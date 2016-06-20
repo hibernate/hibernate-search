@@ -51,7 +51,7 @@ public class UnorderedIdScanTest {
 
 	@Test
 	public void invertedSortAnnotationsRead() {
-		JavaReflectionManager reflectionManager = new TrickedJavaReflectionManager( PersonWithBrokenSocialSecurityNumber.class );
+		JavaReflectionManager reflectionManager = new TrickedJavaReflectionManager<PersonWithBrokenSocialSecurityNumber>( PersonWithBrokenSocialSecurityNumber.class );
 		XClass mappedXClass = reflectionManager.toXClass( PersonWithBrokenSocialSecurityNumber.class );
 		XClass reverted = new DeclaredMethodsReverter( mappedXClass );
 		tryCreatingDocumentBuilder( reverted, reflectionManager );

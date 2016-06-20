@@ -43,8 +43,6 @@ import org.unitils.easymock.annotation.Mock;
  */
 public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
-	private static final String ELASTICSEARCH_BRIDGE_PROVIDER_CLASS = "org.hibernate.search.elasticsearch.impl.ElasticsearchBridgeProvider";
-
 	private static final Boolean SEARCH_DISABLED = Boolean.FALSE;
 	private static final Boolean SEARCH_ENABLED = Boolean.TRUE;
 	private static final Boolean SEARCH_IMPLICITLY_ENABLED = null;

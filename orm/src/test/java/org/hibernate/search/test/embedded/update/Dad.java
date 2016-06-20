@@ -40,7 +40,7 @@ public class Dad {
 		return id;
 	}
 
-	private void setId(Long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -73,7 +73,7 @@ public class Dad {
 		return sons;
 	}
 
-	private void setSons(Set<Son> sons) {
+	public void setSons(Set<Son> sons) {
 		this.sons = sons;
 	}
 
