@@ -21,6 +21,8 @@ import javax.persistence.Table;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
@@ -111,6 +113,24 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 		// here, we have 2 Criterias returned: we only test the first one
 		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isIn( AAA.class.getName(), BA.class.getName() );
 
+		results = getResultsFiltered( session, new MatchAllDocsQuery(), A.class );
+		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( A.class.getName() );
+
+		// and finally we verify that if the full-text query is narrowing results to a subset of types,
+		// only these are being targeted by the loading criteria.
+		// First the simple case, narrowing down to a single type:
+		final TermQuery termQueryAAA = new TermQuery( new Term( "name", "aaa" ) );
+		results = getResultsFiltered( session, termQueryAAA, A.class );
+		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( AAA.class.getName() );
+
+		// And then when it narrows down to two types, use a Join Criteria on the first upper shared type:
+		BooleanQuery.Builder bqb = new BooleanQuery.Builder();
+		final TermQuery termQueryAAB = new TermQuery( new Term( "name", "aab" ) );
+		bqb.add( termQueryAAA, Occur.SHOULD );
+		bqb.add( termQueryAAB, Occur.SHOULD );
+		results = getResultsFiltered( session, bqb.build(), A.class );
+		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( AA.class.getName() );
+
 		s.close();
 	}
 
@@ -127,7 +147,11 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 		for ( Class<? extends BaseEntity> clazz : classes ) {
 			bqb.add( new TermQuery( new Term( "name", clazz.getSimpleName().toLowerCase( Locale.ENGLISH ) ) ), Occur.SHOULD );
 		}
-		return session.createFullTextQuery( bqb.build(), BaseEntity.class )
+		return getResultsFiltered( session, bqb.build(), BaseEntity.class );
+	}
+
+	private List<?> getResultsFiltered(FullTextSession session, Query query, Class<? extends BaseEntity>... classes) {
+		return session.createFullTextQuery( query, classes )
 				.setSort( new Sort( new SortField( "idSort", SortField.Type.INT ) ) )
 				.list();
 	}
