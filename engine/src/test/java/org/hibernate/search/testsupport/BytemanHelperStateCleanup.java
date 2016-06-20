@@ -15,6 +15,7 @@ import org.junit.rules.ExternalResource;
  */
 public class BytemanHelperStateCleanup extends ExternalResource {
 
+	@Override
 	protected void after() {
 		BytemanHelper.resetEventStack();
 		BytemanHelper.getAndResetInvocationCount();

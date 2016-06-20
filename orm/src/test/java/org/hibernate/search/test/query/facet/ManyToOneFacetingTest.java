@@ -53,6 +53,7 @@ public class ManyToOneFacetingTest extends AbstractFacetTest {
 		return query;
 	}
 
+	@Override
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
 
@@ -72,6 +73,7 @@ public class ManyToOneFacetingTest extends AbstractFacetTest {
 		session.clear();
 	}
 
+	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Company.class, CompanyFacility.class };
 	}

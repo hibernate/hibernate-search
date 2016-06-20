@@ -37,6 +37,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 	private Query luceneQuery;
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		try ( Session session = openSession() ) {

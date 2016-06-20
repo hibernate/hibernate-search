@@ -37,6 +37,7 @@ public class QueryValidationTest extends SearchTestBase {
 	private FullTextSession fullTextSession;
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -49,6 +50,7 @@ public class QueryValidationTest extends SearchTestBase {
 	}
 
 	@After
+	@Override
 	public void tearDown() throws Exception {
 		fullTextSession.close();
 		super.tearDown();

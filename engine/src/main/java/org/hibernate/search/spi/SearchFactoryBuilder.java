@@ -16,6 +16,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 @Deprecated
 public class SearchFactoryBuilder extends SearchIntegratorBuilder {
 
+	@Override
 	public SearchFactoryBuilder configuration(SearchConfiguration configuration) {
 		super.configuration( configuration );
 		return this;
@@ -26,6 +27,7 @@ public class SearchFactoryBuilder extends SearchIntegratorBuilder {
 		return this;
 	}
 
+	@Override
 	public SearchFactoryBuilder addClass(Class<?> clazz) {
 		super.addClass( clazz );
 		return this;

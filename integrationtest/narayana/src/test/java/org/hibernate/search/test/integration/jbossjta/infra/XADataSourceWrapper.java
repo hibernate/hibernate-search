@@ -188,6 +188,7 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 		return _theXADataSource.getLoginTimeout();
 	}
 
+	@Override
 	public Logger getParentLogger() {
 		// getParentLogger() was introduced in Java 7:
 		// don't use @Override nor invoke super.getParenLogger() or it breaks on Java 6

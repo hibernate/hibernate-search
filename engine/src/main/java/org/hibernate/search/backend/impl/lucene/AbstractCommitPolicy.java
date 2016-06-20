@@ -23,6 +23,7 @@ public abstract class AbstractCommitPolicy implements CommitPolicy {
 		this.indexWriterHolder = indexWriterHolder;
 	}
 
+	@Override
 	public IndexWriter getIndexWriter() {
 		return indexWriterHolder.getIndexWriter();
 	}

@@ -34,12 +34,14 @@ public class EventBasedEmbeddableCollectionUpdateTest extends JPATestCase {
 	private EntityManager entityManager;
 
 	@Before
+	@Override
 	public void setUp() {
 		super.setUp();
 		entityManager = factory.createEntityManager();
 	}
 
 	@After
+	@Override
 	public void tearDown() {
 		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
 		fullTextEntityManager.purgeAll( Book.class );

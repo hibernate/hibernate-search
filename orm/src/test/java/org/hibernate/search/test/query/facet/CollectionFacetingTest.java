@@ -105,6 +105,7 @@ public class CollectionFacetingTest extends SearchTestBase {
 		fullTextSession.close();
 	}
 
+	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Author.class, Book.class

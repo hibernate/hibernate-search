@@ -26,6 +26,7 @@ public class EntityManagerTest extends JPATestCase {
 	private Bretzel bretzel;
 
 	@Before
+	@Override
 	public void setUp() {
 		super.setUp();
 

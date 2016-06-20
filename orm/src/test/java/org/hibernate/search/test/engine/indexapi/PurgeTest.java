@@ -32,6 +32,7 @@ import static org.junit.Assert.assertEquals;
 public class PurgeTest extends SearchTestBase {
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		indexTestData();

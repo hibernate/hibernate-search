@@ -32,6 +32,7 @@ public interface DocumentExtractor extends Closeable {
 
 	int getMaxIndex();
 
+	@Override
 	void close();
 
 	/**
