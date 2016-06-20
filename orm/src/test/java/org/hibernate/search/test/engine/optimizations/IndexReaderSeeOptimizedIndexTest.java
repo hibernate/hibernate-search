@@ -34,6 +34,7 @@ public class IndexReaderSeeOptimizedIndexTest extends SearchTestBase {
 	private String indexBasePath;
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		try ( Session session = openSession() ) {

@@ -79,6 +79,7 @@ public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderPro
 		assertTrue( fieldVisitor == null || fieldVisitor instanceof DocumentStoredFieldVisitor );
 	}
 
+	@Override
 	public DirectoryReader openIndexReader() {
 		DirectoryReader originalReader = super.openIndexReader();
 		try {

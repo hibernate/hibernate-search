@@ -152,6 +152,7 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 	}
 
 	private static final class DenyingFieldAcceptor implements FieldAcceptor {
+		@Override
 		public Status acceptField(final String fieldName) {
 			return Status.NO;
 		}
@@ -164,6 +165,7 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 			this.next = next;
 			this.acceptedFieldName = acceptedFieldName;
 		}
+		@Override
 		public Status acceptField(final String fieldName) {
 			if ( acceptedFieldName.equals( fieldName ) ) {
 				return Status.YES;

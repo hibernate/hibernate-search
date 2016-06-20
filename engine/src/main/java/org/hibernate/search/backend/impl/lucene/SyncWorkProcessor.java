@@ -72,6 +72,7 @@ final class SyncWorkProcessor implements WorkProcessor {
 	 * @param workList list of work
 	 * @param monitor for statistics collection
 	 */
+	@Override
 	public void submit(List<LuceneWork> workList, IndexingMonitor monitor) {
 		//avoid empty work lists as workaround for HSEARCH-1769
 		if ( workList.isEmpty() ) {
@@ -110,6 +111,7 @@ final class SyncWorkProcessor implements WorkProcessor {
 	/**
 	 * Dispose resources
 	 */
+	@Override
 	public void shutdown() {
 		stop = true;
 		LockSupport.unpark( consumerThread );
@@ -125,6 +127,7 @@ final class SyncWorkProcessor implements WorkProcessor {
 	 * Handle on the fly rebuilds
 	 * @param resources new instance of {@link org.hibernate.search.backend.impl.lucene.LuceneBackendResources}
 	 */
+	@Override
 	public void updateResources(LuceneBackendResources resources) {
 		this.resources = resources;
 	}

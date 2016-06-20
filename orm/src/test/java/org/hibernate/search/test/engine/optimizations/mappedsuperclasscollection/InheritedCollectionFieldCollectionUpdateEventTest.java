@@ -36,6 +36,7 @@ public class InheritedCollectionFieldCollectionUpdateEventTest extends SearchTes
 	private FullTextSession fullTextSession;
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -43,6 +44,7 @@ public class InheritedCollectionFieldCollectionUpdateEventTest extends SearchTes
 	}
 
 	@After
+	@Override
 	public void tearDown() throws Exception {
 		fullTextSession.close();
 		super.tearDown();

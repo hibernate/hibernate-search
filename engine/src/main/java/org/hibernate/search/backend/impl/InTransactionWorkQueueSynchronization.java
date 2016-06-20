@@ -53,10 +53,12 @@ public class InTransactionWorkQueueSynchronization implements WorkQueueSynchroni
 		queue = new WorkQueue( extendedIntegrator );
 	}
 
+	@Override
 	public void add(Work work) {
 		queueingProcessor.add( work, queue );
 	}
 
+	@Override
 	public boolean isConsumed() {
 		return consumed;
 	}
@@ -96,6 +98,7 @@ public class InTransactionWorkQueueSynchronization implements WorkQueueSynchroni
 		// nothing to do, everything was done in beforeCompletion
 	}
 
+	@Override
 	public void flushWorks() {
 		WorkQueue subQueue = queue.splitQueue();
 		queueingProcessor.prepareWorks( subQueue );

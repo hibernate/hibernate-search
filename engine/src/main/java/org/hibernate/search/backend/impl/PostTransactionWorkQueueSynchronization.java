@@ -46,10 +46,12 @@ public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchro
 		queue = new WorkQueue( extendedIntegrator );
 	}
 
+	@Override
 	public void add(Work work) {
 		queueingProcessor.add( work, queue );
 	}
 
+	@Override
 	public boolean isConsumed() {
 		return consumed;
 	}
@@ -92,6 +94,7 @@ public class PostTransactionWorkQueueSynchronization implements WorkQueueSynchro
 		}
 	}
 
+	@Override
 	public void flushWorks() {
 		WorkQueue subQueue = queue.splitQueue();
 		queueingProcessor.prepareWorks( subQueue );

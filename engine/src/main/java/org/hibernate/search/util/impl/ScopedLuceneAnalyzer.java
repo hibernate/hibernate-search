@@ -50,6 +50,7 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 		}
 	}
 
+	@Override
 	public void setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference) {
 		this.globalAnalyzer = getLuceneAnalyzer( globalAnalyzerReference );
 	}

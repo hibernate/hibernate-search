@@ -215,6 +215,7 @@ public class FacetManagerImpl implements FacetManager {
 			queryHasChanged();
 		}
 
+		@Override
 		public BooleanClause.Occur getOccurType() {
 			return occurType;
 		}
