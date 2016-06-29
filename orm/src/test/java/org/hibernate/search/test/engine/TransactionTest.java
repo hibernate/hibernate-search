@@ -9,6 +9,7 @@ package org.hibernate.search.test.engine;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -91,4 +92,10 @@ public class TransactionTest extends SearchTestBase {
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class };
 	}
+
+	@Override
+	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.allow_update_outside_transaction", "true" );
+	}
+
 }
