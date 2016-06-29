@@ -151,6 +151,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 	// Test setup options - SessionFactory Properties
 	@Override
 	public void configure(Map<String,Object> cfg) {
+		cfg.put( "hibernate.allow_update_outside_transaction", "true" );
 		cfg.put( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
 		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
