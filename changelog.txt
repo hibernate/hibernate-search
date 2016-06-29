@@ -1,6 +1,22 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.5.4.Final (29-06-2016)
+------------------------
+
+** Bug
+    * [HSEARCH-2307] - Documentation shouldn't suggest need for @Indexed of embedded association fields
+
+** New Feature
+    * [HSEARCH-2286] - DistanceSortField should support reverse sorting
+
+** Task
+    * [HSEARCH-2306] - Upgrade 5.5.x to Hibernate ORM 5.0.9
+
+** Improvement
+    * [HSEARCH-2301] - CriteriaObjectInitializer is suboptimal when we query only one subtype of a hierarchy
+
+
 Version 5.5.3.Final (25-04-2016)
 ------------------------
 
