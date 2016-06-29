@@ -232,8 +232,8 @@ This leaves us with `@IndexedEmbedded`. This annotation is used to index associa
 This is needed since a Lucene index document is a flat data structure which does not know anything
 about object relations.
 To ensure that the author names will be searchable you have to make sure that the names are indexed
-as part of the book itself. On top of `@IndexedEmbedded` you will also have to mark all fields of
-the associated entity you want to have included in the index with `@Indexed`.
+as part of the book itself. On top of `@IndexedEmbedded` you will also have to mark the fields of
+the associated entity you want to have included in the index with `@Field`.
 For more details see <<search-mapping-associated>>.
 
 These settings should be sufficient for now. For more details on entity mapping refer to
