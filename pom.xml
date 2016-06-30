@@ -146,7 +146,7 @@
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>5.5.2</luceneVersion>
         <infinispanVersion>8.1.0.Final</infinispanVersion>
-        <jgroupsVersion>3.6.8.Final</jgroupsVersion>
+        <jgroupsVersion>3.6.10.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
         <hibernateVersion>5.1.0.Final</hibernateVersion>
