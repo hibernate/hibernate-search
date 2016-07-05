@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hsearch-jsr352-parent</artifactId>
+    <version>5.6.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>hsearch-jsr352-integrationtest-javase</artifactId>
+  <name>GSoC JSR352 - Integration Tests in Java SE</name>
+  
+  <properties>
+    <org.hibernate.hibernate-entitymanager>5.1.0.Final</org.hibernate.hibernate-entitymanager>
+  </properties>
+  
+  <dependencies>
+    <!-- This integration test refers to classes in his parent -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hsearch-jsr352-core</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <version>${org.hibernate.hibernate-entitymanager}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- JBeret minimal application dependencies -->
+    <!-- https://jberet.gitbooks.io/jberet-user-guide/content/set_up_jberet/#minimal-application-dependencies -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.batch</groupId>
+      <artifactId>jboss-batch-api_1.0_spec</artifactId>
+      <version>1.0.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.spec.javax.transaction</groupId>
+      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+      <version>1.0.1.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jberet</groupId>
+      <artifactId>jberet-core</artifactId>
+      <version>${org.jberet}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.marshalling</groupId>
+      <artifactId>jboss-marshalling</artifactId>
+      <version>1.4.11.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+      <version>3.3.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-core</artifactId>
+      <version>2.3.4.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-security-manager</artifactId>
+      <version>1.1.2.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>19.0</version>
+    </dependency>
+    <!-- Additional dependencies for Java SE batch applications -->
+    <!-- https://jberet.gitbooks.io/jberet-user-guide/content/set_up_jberet/#additional-dependencies-for-java-se-batch-applications -->
+    <dependency>
+      <groupId>org.jberet</groupId>
+      <artifactId>jberet-se</artifactId>
+      <version>${org.jberet}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.weld.se</groupId>
+      <artifactId>weld-se</artifactId>
+      <version>2.3.4.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${com.h2database}</version>
+    </dependency>
+    <!-- a zip file containing the following content, and provides a 
+               good start to write and run batch applications with JBeret in 
+               Java SE. 
+               *  All libraries required to run batch applications in 
+                  Java SE environment
+               *  default configuration file, jberet.properties for 
+                  configuring JBeret batch runtime in Java SE environment 
+               *  jberet-support library and its common transitive 
+                  dependencies 
+           -->
+    <dependency>
+      <groupId>org.jberet</groupId>
+      <artifactId>jberet-distribution</artifactId>
+      <version>${org.jberet}</version>
+      <type>pom</type>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jberet</groupId>
+      <artifactId>jberet-support</artifactId>
+      <version>${org.jberet}</version>
+    </dependency>
+    <!-- jberet-support includes common reusable batch ItemReader &
+    ItemWriter classes for various data formats such as CSV, XML,
+    JSON, Fixed length, Excel, MongoDB, JDBC, JMS, HornetQ, PDF, etc.
+    The application should further provide appropriate transitive
+    dependencies from jberet-support, depending on its usage.
+    -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.ejb</groupId>
+      <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+      <version>1.0.0.Final</version>
+    </dependency>
+    <!-- For Weld 2.2.2.Final or later, Jandex is required -->
+    <dependency>
+      <groupId>org.jboss</groupId>
+      <artifactId>jandex</artifactId>
+      <version>2.0.2.Final</version>
+    </dependency>
+    
+    <!-- You can choose to replace Java built-in StAX provider with
+         aalto-xml or woodstox (woodstox dependencies not shown here)
+    -->
+    <dependency>
+      <groupId>com.fasterxml</groupId>
+      <artifactId>aalto-xml</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>stax2-api</artifactId>
+      <version>4.0.0</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>hibernate-search-integrationtest-javase</finalName>
+    <testResources>
+      <testResource>
+        <filtering>true</filtering>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>META-INF/persistence.xml</include>
+        </includes>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.17</version>
+        <!-- enable execution to run an integration test -->
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <systemPropertyVariables>
+            <jberet.tmp.dir>${project.build.directory}${file.separator}tmp</jberet.tmp.dir>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
