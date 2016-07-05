@@ -20,7 +20,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hsearch-jsr352-core</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -34,17 +33,14 @@
     <dependency>
       <groupId>org.jboss.spec.javax.batch</groupId>
       <artifactId>jboss-batch-api_1.0_spec</artifactId>
-      <version>1.0.0.Final</version>
     </dependency>
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
-      <version>1</version>
     </dependency>
     <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
-      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -98,58 +94,11 @@
       <artifactId>h2</artifactId>
       <version>${com.h2database}</version>
     </dependency>
-    <!-- a zip file containing the following content, and provides a 
-               good start to write and run batch applications with JBeret in 
-               Java SE. 
-               *  All libraries required to run batch applications in 
-                  Java SE environment
-               *  default configuration file, jberet.properties for 
-                  configuring JBeret batch runtime in Java SE environment 
-               *  jberet-support library and its common transitive 
-                  dependencies 
-           -->
+
     <dependency>
-      <groupId>org.jberet</groupId>
-      <artifactId>jberet-distribution</artifactId>
-      <version>${org.jberet}</version>
-      <type>pom</type>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.jberet</groupId>
-      <artifactId>jberet-support</artifactId>
-      <version>${org.jberet}</version>
-    </dependency>
-    <!-- jberet-support includes common reusable batch ItemReader &
-    ItemWriter classes for various data formats such as CSV, XML,
-    JSON, Fixed length, Excel, MongoDB, JDBC, JMS, HornetQ, PDF, etc.
-    The application should further provide appropriate transitive
-    dependencies from jberet-support, depending on its usage.
-    -->
-    <dependency>
-      <groupId>org.jboss.spec.javax.ejb</groupId>
-      <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-      <version>1.0.0.Final</version>
-    </dependency>
-    <!-- For Weld 2.2.2.Final or later, Jandex is required -->
-    <dependency>
-      <groupId>org.jboss</groupId>
-      <artifactId>jandex</artifactId>
-      <version>2.0.2.Final</version>
-    </dependency>
-    
-    <!-- You can choose to replace Java built-in StAX provider with
-         aalto-xml or woodstox (woodstox dependencies not shown here)
-    -->
-    <dependency>
-      <groupId>com.fasterxml</groupId>
-      <artifactId>aalto-xml</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.woodstox</groupId>
-      <artifactId>stax2-api</artifactId>
-      <version>4.0.0</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

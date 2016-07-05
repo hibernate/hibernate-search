@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
@@ -25,46 +26,44 @@ public class MassIndexerImpl implements MassIndexer {
     private int partitionCapacity = 250;
     private int partitions = 1;
     private int threads = 1;
-    private Set<Class<?>> rootEntities = new HashSet<>();
+    private final Set<Class<?>> rootEntities = new HashSet<>();
     private EntityManager entityManager;
     private JobOperator jobOperator;
-    
+
     private final String JOB_NAME = "mass-index";
-    
+
     public MassIndexerImpl() {
-        
+
     }
-    
+
     /**
      * Mass index the Address entity's.
      * <p>Here're an example with parameters and expected results:
      * <ul>
      * <li><b>array capacity</b> = 500
-     * 
+     *
      * <li><b>partition capacity</b> = 250
-     * 
+     *
      * <li><b>max results</b> = 200 * 1000
-     * 
+     *
      * <li><b>queue size</b>
      *      = Math.ceil(max results / array capacity)
      *      = Math.ceil(200 * 1000 / 500)
      *      = Math.ceil(400)
      *      = 400
-     * 
+     *
      * <li><b>number of partitions</b>
      *      = Math.ceil(queue size / partition capacity)
      *      = Math.ceil(400 / 250)
      *      = Math.ceil(1.6)
      *      = 2
-     * 
+     *
      * </ul>
      */
     @Override
     public long start() {
-        
-        registrerRootEntities(rootEntities);
         registrerEntityManager(entityManager);
-        
+
         Properties jobParams = new Properties();
         jobParams.setProperty("fetchSize", String.valueOf(fetchSize));
         jobParams.setProperty("arrayCapacity", String.valueOf(arrayCapacity));
@@ -75,7 +74,7 @@ public class MassIndexerImpl implements MassIndexer {
         jobParams.setProperty("purgeAtStart", String.valueOf(purgeAtStart));
         jobParams.setProperty("optimizeAfterPurge", String.valueOf(optimizeAfterPurge));
         jobParams.setProperty("optimizeAtEnd", String.valueOf(optimizeAtEnd));
-        jobParams.setProperty("rootEntities", String.valueOf(rootEntities));
+        jobParams.put( "rootEntities", getEntitiesToIndexAsString() );
 //      JobOperator jobOperator = BatchRuntime.getJobOperator();
         Long executionId = jobOperator.start(JOB_NAME, jobParams);
         return executionId;
@@ -169,7 +168,7 @@ public class MassIndexerImpl implements MassIndexer {
         this.rootEntities.addAll(rootEntities);
         return this;
     }
-    
+
     @Override
     public MassIndexer addRootEntities(Class<?>... rootEntities) {
         this.rootEntities.addAll(Arrays.asList(rootEntities));
@@ -181,7 +180,7 @@ public class MassIndexerImpl implements MassIndexer {
         this.entityManager = entityManager;
         return this;
     }
-    
+
     @Override
     public MassIndexer jobOperator(JobOperator jobOperator) {
         this.jobOperator = jobOperator;
@@ -193,35 +192,43 @@ public class MassIndexerImpl implements MassIndexer {
         return optimizeAfterPurge;
     }
 
-    public boolean isOptimizeAtEnd() {
+    @Override
+	public boolean isOptimizeAtEnd() {
         return optimizeAtEnd;
     }
 
-    public boolean isPurgeAtStart() {
+    @Override
+	public boolean isPurgeAtStart() {
         return purgeAtStart;
     }
 
-    public int getArrayCapacity() {
+    @Override
+	public int getArrayCapacity() {
         return arrayCapacity;
     }
 
-    public int getFetchSize() {
+    @Override
+	public int getFetchSize() {
         return fetchSize;
     }
 
-    public int getMaxResults() {
+    @Override
+	public int getMaxResults() {
         return maxResults;
     }
 
-    public int getPartitionCapacity() {
+    @Override
+	public int getPartitionCapacity() {
         return partitionCapacity;
     }
 
-    public int getPartitions() {
+    @Override
+	public int getPartitions() {
         return partitions;
     }
 
-    public int getThreads() {
+    @Override
+	public int getThreads() {
         return threads;
     }
 
@@ -229,29 +236,17 @@ public class MassIndexerImpl implements MassIndexer {
         return JOB_NAME;
     }
 
-    public Set<Class<?>> getRootEntities() {
+    @Override
+	public Set<Class<?>> getRootEntities() {
         return rootEntities;
     }
-    
-    @SuppressWarnings("unchecked")
-    public void registrerRootEntities(Set<Class<?>> rootEntities) {
-        if (rootEntities == null) {
-            throw new NullPointerException("rootEntities cannot be NULL.");
-        } else if (rootEntities.isEmpty()) {
-            throw new NullPointerException("rootEntities must have at least 1 element.");
-        }
-        int s = rootEntities.size();
-        
-        BeanManager bm = CDI.current().getBeanManager();
-        Bean<IndexingContext> bean = (Bean<IndexingContext>) bm
-                .resolve(bm.getBeans(IndexingContext.class));
-        IndexingContext indexingContext = bm
-                .getContext(bean.getScope())
-                .get(bean, bm.createCreationalContext(bean));
-        Class<?>[] r = rootEntities.toArray(new Class<?>[s]);
-        indexingContext.setRootEntities(r);
-    }
-    
+
+	private String getEntitiesToIndexAsString() {
+		return rootEntities.stream()
+			.map( (e) -> e.getName() )
+			.collect( Collectors.joining( ", " ) );
+	}
+
     @SuppressWarnings("unchecked")
     private void registrerEntityManager(EntityManager entityManager) {
         BeanManager bm = CDI.current().getBeanManager();
@@ -267,7 +262,7 @@ public class MassIndexerImpl implements MassIndexer {
     public EntityManager getEntityManager() {
         return entityManager;
     }
-    
+
     @Override
     public JobOperator getJobOperator() {
         return jobOperator;

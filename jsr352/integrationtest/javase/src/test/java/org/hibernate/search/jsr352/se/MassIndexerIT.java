@@ -16,7 +16,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.apache.lucene.search.Query;
-import org.hibernate.CacheMode;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.MassIndexer;
@@ -31,9 +30,9 @@ public class MassIndexerIT {
 
     private EntityManagerFactory emf;
     private EntityManager em;
-    
+
     private JobOperator jobOperator;
-    
+
     // mass indexer configuration values
     private final boolean OPTIMIZE_AFTER_PURGE = true;
     private final boolean OPTIMIZE_AT_END = true;
@@ -44,40 +43,40 @@ public class MassIndexerIT {
     private final int PARTITION_CAPACITY = 250;
     private final int PARTITIONS = 1;
     private final int THREADS = 1;
-    
+
     // example dataset
     private final long DB_COMP_ROWS = 3;
     private final long DB_COMP_ROWS_LOADED = 3;
     private final Company COMPANY_1 = new Company("Google");
     private final Company COMPANY_2 = new Company("Red Hat");
     private final Company COMPANY_3 = new Company("Microsoft");
-    
+
     private static final int JOB_MAX_TRIES = 240;       // 240 second
     private static final int JOB_THREAD_SLEEP = 1000;
-    
+
     private static final Logger logger = Logger.getLogger(MassIndexerIT.class);
-    
+
     @Before
     public void setup() {
-        
+
         jobOperator = JobFactory.getJobOperator();
         emf = Persistence.createEntityManagerFactory("h2");
         em = emf.createEntityManager();
-        
+
         em.getTransaction().begin();
         em.persist(COMPANY_1);
         em.persist(COMPANY_2);
         em.persist(COMPANY_3);
         em.getTransaction().commit();
     }
-    
+
     @Test
     public void testMassIndexer() throws InterruptedException {
-        
+
         logger.infof("finding company called %s ...", "google");
         List<Company> companies = findCompanyByName("google");
         assertEquals(0, companies.size());
-        
+
         long executionId = indexCompany();
         JobExecution jobExecution = jobOperator.getJobExecution(executionId);
         jobExecution = keepTestAlive(jobExecution);
@@ -85,13 +84,11 @@ public class MassIndexerIT {
         for (StepExecution stepExecution: stepExecutions) {
             logger.infof("step %s executed.", stepExecution.getStepName());
         }
-        
+
         companies = findCompanyByName("google");
-//      issue #78 - Cannot find indexed results after mass index
-//      assertEquals(1, companies.size());
-        assertEquals(0, companies.size());
+        assertEquals(1, companies.size());
     }
-    
+
     private List<Company> findCompanyByName(String name) {
         FullTextEntityManager ftem = Search.getFullTextEntityManager(em);
         Query luceneQuery = ftem.getSearchFactory().buildQueryBuilder()
@@ -110,7 +107,7 @@ public class MassIndexerIT {
                 .entityManager(em)
                 .jobOperator(jobOperator);
         long executionId = massIndexer.start();
-        
+
         logger.infof("job execution id = %d", executionId);
         return executionId;
 //        try {
@@ -140,56 +137,56 @@ public class MassIndexerIT {
         }
         return jobExecution;
     }
-    
+
     private void testBatchStatus(StepExecution stepExecution) {
         BatchStatus batchStatus = stepExecution.getBatchStatus();
         switch (stepExecution.getStepName()) {
-            
+
             case "loadId":
                 long expectedEntityCount = DB_COMP_ROWS;
 //              assertEquals(expectedEntityCount, indexingContext.getEntityCount());
                 assertEquals(BatchStatus.COMPLETED, batchStatus);
                 break;
-            
+
             case "purgeDecision":
                 assertEquals(BatchStatus.COMPLETED, batchStatus);
                 break;
-            
+
             case "purgeIndex":
                 if (PURGE_AT_START) {
                     assertEquals(BatchStatus.COMPLETED, batchStatus);
                 }
                 break;
-                
+
             case "afterPurgeDecision":
                 assertEquals(BatchStatus.COMPLETED, batchStatus);
                 break;
-                
+
             case "optimizeAfterPurge":
                 if (OPTIMIZE_AFTER_PURGE) {
                     assertEquals(BatchStatus.COMPLETED, batchStatus);
                 }
                 break;
-            
+
             case "produceLuceneDoc":
                 Metric[] metrics = stepExecution.getMetrics();
                 testChunk(getMetricsMap(metrics));
                 assertEquals(BatchStatus.COMPLETED, batchStatus);
                 break;
-            
+
             case "afterIndexDecision":
                 assertEquals(BatchStatus.COMPLETED, batchStatus);
                 break;
-            
+
             case "optimizeAfterIndex":
                 assertEquals(BatchStatus.COMPLETED, batchStatus);
                 break;
-                
+
             default:
                 break;
         }
     }
-    
+
     private void testChunk(Map<Metric.MetricType, Long> metricsMap) {
         long companyCount = (long) Math.ceil((double) DB_COMP_ROWS_LOADED / ARRAY_CAPACITY);
         // The read count.
@@ -203,7 +200,7 @@ public class MassIndexerIT {
     }
 
     /**
-     * Convert the Metric array contained in StepExecution to a key-value map 
+     * Convert the Metric array contained in StepExecution to a key-value map
      * for easy access to Metric parameters.
      *
      * @param metrics
@@ -218,7 +215,7 @@ public class MassIndexerIT {
         }
         return metricsMap;
     }
-    
+
     @After
     public void shutdownJPA() {
         em.close();
