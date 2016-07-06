@@ -14,15 +14,15 @@ import java.lang.annotation.Target;
 
 /**
  * Objects whose identifier is provided externally and not part of the object state
- * should be marked with this annotation
- * <p>
- * This annotation should not be used in conjunction with {@link org.hibernate.search.annotations.DocumentId}
- *
- * @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
+ * should be marked with this annotation.
+ * This is only meaningful when Hibernate Search is used to index Infinispan objects,
+ * and should not be used to index JPA/Hibernate entities stored via Hibernate.
+ * @deprecated with no replacement: this annotation will be removed.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
+@Deprecated
 public @interface ProvidedId {
 
 	String defaultFieldName = "providedId";
