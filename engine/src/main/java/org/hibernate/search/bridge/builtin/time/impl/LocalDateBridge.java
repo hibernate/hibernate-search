@@ -30,7 +30,7 @@ public class LocalDateBridge extends TemporalAccessorStringBridge<LocalDate> {
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( YEAR, 9, 9, SignStyle.ALWAYS )
 			.appendValue( MONTH_OF_YEAR, 2 )
-			.appendValue( DAY_OF_MONTH, 2)
+			.appendValue( DAY_OF_MONTH, 2 )
 			.toFormatter();
 
 	public static final LocalDateBridge INSTANCE = new LocalDateBridge();
