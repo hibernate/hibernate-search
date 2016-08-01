@@ -77,7 +77,12 @@ public class BytemanHelper extends Helper {
 	 * @return the first
 	 */
 	public static String consumeNextRecordedEvent() {
-		return concurrentStack.removeFirst();
+		try {
+			return concurrentStack.removeFirst();
+		}
+		catch (java.util.NoSuchElementException nse) {
+			throw new IllegalStateException( "Attempted to consume an event, while no events are left on the stack. If it is the first call to this method, check if the Byteman rules are actually being triggered?" );
+		}
 	}
 
 	public static boolean isEventStackEmpty() {
