@@ -184,8 +184,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return typeMetadataBuilder.build();
 	}
 
-	private XPackage packageInfo(Class<?> clazz) {
-		String packageName = clazz.getPackage().getName();
+	private XPackage packageInfo(final Class<?> clazz) {
+		if ( clazz == null ) {
+			return null;
+		}
+		final Package packageClazz = clazz.getPackage();
+		if ( packageClazz == null ) {
+			return null;
+		}
+		final String packageName = packageClazz.getName();
 		try {
 			return reflectionManager.packageForName( packageName );
 		}
