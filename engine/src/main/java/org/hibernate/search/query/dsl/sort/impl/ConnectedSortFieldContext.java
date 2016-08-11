@@ -6,12 +6,8 @@
  */
 package org.hibernate.search.query.dsl.sort.impl;
 
-import java.util.Comparator;
-
 import org.apache.lucene.search.Sort;
-
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
-import org.hibernate.search.query.dsl.sort.SortComparatorContext;
 import org.hibernate.search.query.dsl.sort.SortDistanceContext;
 import org.hibernate.search.query.dsl.sort.SortFieldContext;
 import org.hibernate.search.query.dsl.sort.SortLatLongContext;
@@ -59,12 +55,6 @@ public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldC
 	public SortDistanceContext andLongitude(double longitude) {
 		getStates().setCurrentLongitude(longitude);
 		return new ConnectedSortDistanceContext( getQueryContext(), getStates() );
-	}
-
-	@Override
-	public SortComparatorContext withComparator(Comparator<?> comparator) {
-		// TODO we won't implement it for now most likely
-		return null;
 	}
 
 	@Override

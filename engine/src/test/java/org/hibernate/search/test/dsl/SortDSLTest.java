@@ -539,14 +539,6 @@ public class SortDSLTest {
 		Assert.fail( "Missing API for chaining chain a field sort after a score sort." );
 	}
 
-	@Test
-	public void withComparator() throws Exception {
-		// TODO YR code this test OR remove this test and remove "withComparator" methods from the API.
-		Assert.fail( "API to be removed? withComparator()" );
-		builder().sort().byField( "foo" ).withComparator( null ).createSort();
-	}
-
-
 	private Matcher<List<EntityInfo>> returnsIDsInOrder(Integer ... idsInOrder) {
 		final List<Integer> idsInOrderList = Arrays.asList( idsInOrder );
 		return new TypeSafeMatcher<List<EntityInfo>>() {

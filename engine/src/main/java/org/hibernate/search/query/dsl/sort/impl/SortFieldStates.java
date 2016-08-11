@@ -40,7 +40,6 @@ public class SortFieldStates {
 	private SortField.Type currentType;
 	private String currentName;
 	private Boolean currentReverse;
-	private Comparator<?> currentComparator;
 	private Object currentMissingValue;
 	private SortField currentSortField;
 	private Coordinates coordinates;
@@ -58,10 +57,6 @@ public class SortFieldStates {
 
 	public void setCurrentName(String currentName) {
 		this.currentName = currentName;
-	}
-
-	public void setCurrentComparator(Comparator<?> currentComparator) {
-		this.currentComparator = currentComparator;
 	}
 
 	public void setCurrentMissingValue(Object currentMissingValue) {
@@ -256,7 +251,6 @@ public class SortFieldStates {
 		this.currentType = null;
 		this.currentName = null;
 		this.currentReverse = null;
-		this.currentComparator = null;
 		this.currentMissingValue = null;
 		this.currentSortField = null;
 		this.coordinates = null;
