@@ -11,10 +11,8 @@ import static org.junit.Assert.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hamcrest.Description;
@@ -22,21 +20,16 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.StringBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.sort.DistanceMethod;
-import org.hibernate.search.query.dsl.sort.MultiValuedMode;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spatial.Coordinates;
@@ -71,7 +64,6 @@ public class SortDSLTest {
 				 * - to (24,32) with plane method: 11.12km (exact same as entry 1)
 				 */
 				.setLocation( 24.0d, 31.9d )
-				.setMultiValued( 444, -1, 200 )
 		);
 		storeData(
 				new IndexedEntry(1)
@@ -85,7 +77,6 @@ public class SortDSLTest {
 				 * - to (24,32) with plane method: 11.12km (exact same as entry 0)
 				 */
 				.setLocation( 23.9d, 32.0d )
-				.setMultiValued( 4242, 23, 23 )
 		);
 		storeData(
 				new IndexedEntry(2)
@@ -103,7 +94,6 @@ public class SortDSLTest {
 				 * - to (24,32) with plane method: 15.73km
 				 */
 				.setLocation( 23.9d, 32.1d )
-				.setMultiValued( 700, 799, 750 )
 		);
 	}
 
@@ -348,176 +338,6 @@ public class SortDSLTest {
 		assertThat(
 				query( query, sort ),
 				returnsIDsInOrder( 3, 0, 2, 1 )
-		);
-	}
-
-	@Test
-	public void multiValuedField_min() throws Exception {
-		Query query = builder().all().createQuery();
-
-		Sort sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MIN )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 2, 1, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MIN )
-						.asc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 2, 1, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MIN )
-						.desc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 1, 2, 0 )
-		);
-	}
-
-	@Test
-	public void multiValuedField_max() throws Exception {
-		Query query = builder().all().createQuery();
-
-		Sort sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MAX )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 0, 3, 1 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MAX )
-						.asc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 0, 3, 1 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MAX )
-						.desc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 3, 0, 2 )
-		);
-	}
-
-	@Test
-	public void multiValuedField_avg() throws Exception {
-		Query query = builder().all().createQuery();
-
-		Sort sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.AVG )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 0, 3, 1 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.AVG )
-						.asc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 0, 3, 1 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.AVG )
-						.desc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 3, 0, 2 )
-		);
-	}
-
-	@Test
-	public void multiValuedField_median() throws Exception {
-		Query query = builder().all().createQuery();
-
-		Sort sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MEDIAN )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MEDIAN )
-						.asc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 1, 0, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.MEDIAN )
-						.desc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 1, 2 )
-		);
-	}
-
-	@Test
-	public void multiValuedField_sum() throws Exception {
-		Query query = builder().all().createQuery();
-
-		Sort sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.SUM )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 0, 3, 1 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.SUM )
-						.asc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 0, 3, 1 )
-		);
-
-		sort = builder().sort()
-				.byField( "multiValuedField" )
-						.treatMultiValuedAs( MultiValuedMode.SUM )
-						.desc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 3, 0, 2 )
 		);
 	}
 
@@ -773,30 +593,6 @@ public class SortDSLTest {
 		tc.end();
 	}
 
-	public static class CollectionOfIntegersFieldBridge
-			implements org.hibernate.search.bridge.FieldBridge, StringBridge {
-		private final NumericFieldBridge delegate = NumericFieldBridge.INT_FIELD_BRIDGE;
-
-		@Override
-		public String objectToString(Object object) {
-			return delegate.objectToString( object );
-		}
-		@Override
-		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			if ( value == null ) {
-				return;
-			}
-			if ( !( value instanceof Collection ) ) {
-				throw new IllegalArgumentException( "This FieldBridge only supports collections." );
-			}
-			Collection<?> objects = (Collection<?>) value;
-
-			for ( Object object : objects ) {
-				delegate.set( name, object, document, luceneOptions );
-			}
-		}
-	}
-
 	@Indexed
 	@Spatial(name = "location_hash", spatialMode = SpatialMode.HASH)
 	public static class IndexedEntry implements Coordinates {
@@ -816,10 +612,6 @@ public class SortDSLTest {
 		@Field
 		@SortableField
 		Double uniqueNumericField;
-
-		@Field(bridge = @FieldBridge(impl = CollectionOfIntegersFieldBridge.class))
-		@SortableField
-		Collection<Integer> multiValuedField;
 
 		Double latitude;
 
@@ -853,11 +645,6 @@ public class SortDSLTest {
 		public IndexedEntry setLocation(Double latitude, Double longitude) {
 			this.latitude = latitude;
 			this.longitude = longitude;
-			return this;
-		}
-
-		public IndexedEntry setMultiValued(Integer ... integers) {
-			this.multiValuedField = Arrays.asList( integers );
 			return this;
 		}
 	}

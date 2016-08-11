@@ -47,11 +47,4 @@ public interface SortFieldContext extends SortAdditionalSortFieldContext, SortOr
 	 */
 	SortMissingValueContext<SortFieldContext> onMissingValue();
 
-
-	/**
-	 * Describe how multi-valued fields are processed
-	 * @return
-	 */
-	SortFieldContext treatMultiValuedAs(MultiValuedMode mode);
-
 }

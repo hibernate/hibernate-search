@@ -11,7 +11,6 @@ import java.util.Comparator;
 import org.apache.lucene.search.Sort;
 
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
-import org.hibernate.search.query.dsl.sort.MultiValuedMode;
 import org.hibernate.search.query.dsl.sort.SortComparatorContext;
 import org.hibernate.search.query.dsl.sort.SortDistanceContext;
 import org.hibernate.search.query.dsl.sort.SortFieldContext;
@@ -71,12 +70,6 @@ public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldC
 	@Override
 	public SortMissingValueContext<SortFieldContext> onMissingValue() {
 		return new ConnectedSortMissingValueContext<SortFieldContext>( getQueryContext(), getStates(), this );
-	}
-
-	@Override
-	public SortFieldContext treatMultiValuedAs(MultiValuedMode mode) {
-		// TODO we won't implement it for now most likely
-		return null;
 	}
 
 }
