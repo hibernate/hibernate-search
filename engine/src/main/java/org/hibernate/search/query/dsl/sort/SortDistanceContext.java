@@ -22,8 +22,4 @@ public interface SortDistanceContext extends SortOrder<SortDistanceContext>, Sor
 	 * Hint for the backend to use a specific distance algorithm
 	 */
 	SortDistanceContext withComputeMethod(DistanceMethod distanceMethod);
-
-	// parametrization
-
-	SortMissingValueContext<SortDistanceContext> onMissingValue();
 }

@@ -7,12 +7,10 @@
 package org.hibernate.search.query.dsl.sort.impl;
 
 import org.apache.lucene.search.Sort;
-
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.query.dsl.sort.DistanceMethod;
 import org.hibernate.search.query.dsl.sort.SortDistanceContext;
-import org.hibernate.search.query.dsl.sort.SortMissingValueContext;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
@@ -48,12 +46,6 @@ public class ConnectedSortDistanceContext extends ConnectedSortAdditionalSortFie
 	@Override
 	public SortDistanceContext withComputeMethod(DistanceMethod distanceMethod) {
 		// TODO not implemented for now
-		return null;
-	}
-
-	@Override
-	public SortMissingValueContext<SortDistanceContext> onMissingValue() {
-		// TODO not implemented for now since it requires new support from the distance code
 		return null;
 	}
 }
