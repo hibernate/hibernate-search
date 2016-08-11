@@ -17,9 +17,4 @@ public interface SortDistanceContext extends SortOrder<SortDistanceContext>, Sor
 	 * Hint for the backend to return data in the appropriate unit.
 	 */
 	SortDistanceContext in(Unit unit);
-
-	/**
-	 * Hint for the backend to use a specific distance algorithm
-	 */
-	SortDistanceContext withComputeMethod(DistanceMethod distanceMethod);
 }
