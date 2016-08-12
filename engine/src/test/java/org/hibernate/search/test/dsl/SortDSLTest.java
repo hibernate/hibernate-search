@@ -484,7 +484,7 @@ public class SortDSLTest {
 				.createSort();
 		assertThat(
 				query( query, sort ),
-				returnsIDsInOrder( 1, 3, 0, 2 )
+				returnsIDsInOrder( 1, 3, 0 )
 		);
 	}
 
