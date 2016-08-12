@@ -36,9 +36,9 @@ public class POI {
 	@Field(store = Store.YES, index = Index.YES)
 	String type;
 
-	double latitude;
+	Double latitude;
 
-	double longitude;
+	Double longitude;
 
 	@Field(store = Store.YES, index = Index.YES, analyze = Analyze.NO)
 	@FieldBridge(impl = SpatialFieldBridgeByHash.class)
@@ -57,7 +57,7 @@ public class POI {
 		};
 	}
 
-	public POI(Integer id, String name, double latitude, double longitude, String type) {
+	public POI(Integer id, String name, Double latitude, Double longitude, String type) {
 		this.id = id;
 		this.name = name;
 		this.latitude = latitude;

@@ -19,6 +19,7 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.spatial.DoubleIndexedPOI;
 import org.hibernate.search.test.spatial.POI;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -216,6 +217,61 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 			Assert.assertThat( message, ( (Double) result[1] ).doubleValue(), is( not( 0.0 ) ) );
 		}
+
+		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
+		for ( Object entity : pois ) {
+			em.remove( entity );
+		}
+		em.getTransaction().commit();
+		em.close();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2322")
+	public void testDistanceSortMissingCoordinatesWholeSegment() throws Exception {
+		POI poi = new POI( 0, "Distance to 24,32 : 10.16km", 24.0d, 31.9d, "" );
+		POI poi2 = new POI( 1, "Distance to 24,32 : unknown, 4361.00km if interpreted as 0,0", null, null, "" );
+
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+
+		em.getTransaction().begin();
+		em.persist( poi );
+		em.getTransaction().commit();
+
+		/*
+		 * Create the POI with a missing value in a separate transaction, so that
+		 * the document will be alone in one segment (or so it seems...?)
+		 */
+		em.getTransaction().begin();
+		em.persist( poi2 );
+		em.getTransaction().commit();
+
+		em.getTransaction().begin();
+		double centerLatitude = 24.0d;
+		double centerLongitude = 32.0d;
+
+		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
+
+		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
+		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+		hibQuery.setSort( distanceSort );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		List results = hibQuery.getResultList();
+		Object[] firstResult = (Object[]) results.get( 0 );
+		Object[] secondResult = (Object[]) results.get( 1 );
+		Assert.assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
+		Assert.assertEquals( 4361.00, (Double) secondResult[1], 0.01 );
+
+		distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
+		hibQuery.setSort( distanceSort );
+		results = hibQuery.getResultList();
+		firstResult = (Object[]) results.get( 0 );
+		secondResult = (Object[]) results.get( 1 );
+		Assert.assertEquals( 4361.00, (Double) firstResult[1], 0.01 );
+		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
 
 		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
 		for ( Object entity : pois ) {
