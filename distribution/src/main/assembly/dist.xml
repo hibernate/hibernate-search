@@ -150,6 +150,10 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>../CONTRIBUTING.md</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
             <source>../lgpl.txt</source>
             <outputDirectory>/</outputDirectory>
         </file>
@@ -175,7 +179,20 @@
             <outputDirectory>project</outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
+                <!-- we already have these files at the top level of the distribution -->
+                <exclude>README.md</exclude>
+                <exclude>CONTRIBUTING.md</exclude>
+                <exclude>changelog.txt</exclude>
+                <exclude>copyright.txt</exclude>
+                <exclude>lgpl.txt</exclude>
+
+                <!-- only needed for documentation and helper scripts, no need to include them -->
+                <exclude>hibernate-noorm-release-scripts/**</exclude>
+
+                <!-- actual files which should be ignored -->
                 <exclude>.git</exclude>
+                <exclude>.travis.yml</exclude>
+                <exclude>travis/**</exclude>
                 <exclude>*.log</exclude>
                 <exclude>*.sh</exclude>
                 <exclude>**/.gitignore</exclude>
