@@ -11,6 +11,7 @@ import static org.hibernate.search.spatial.impl.CoordinateHelper.coordinate;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -134,8 +135,8 @@ public class DistanceCollector implements Collector {
 
 		DistanceLeafCollector(LeafReaderContext context) throws IOException {
 			final LeafReader atomicReader = context.reader();
-			this.latitudeValues = atomicReader.getNumericDocValues( latitudeField );
-			this.longitudeValues = atomicReader.getNumericDocValues( longitudeField );
+			this.latitudeValues = DocValues.getNumeric( atomicReader, latitudeField );
+			this.longitudeValues = DocValues.getNumeric( atomicReader, longitudeField );
 			this.docBase = context.docBase;
 		}
 

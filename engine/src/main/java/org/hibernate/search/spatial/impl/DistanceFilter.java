@@ -10,6 +10,7 @@ import static org.hibernate.search.spatial.impl.CoordinateHelper.coordinate;
 
 import java.io.IOException;
 
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -105,8 +106,8 @@ public final class DistanceFilter extends Filter {
 			return null;
 		}
 
-		final NumericDocValues latitudeValues = atomicReader.getNumericDocValues( getLatitudeField() );
-		final NumericDocValues longitudeValues = atomicReader.getNumericDocValues( getLongitudeField() );
+		final NumericDocValues latitudeValues = DocValues.getNumeric( atomicReader, getLatitudeField() );
+		final NumericDocValues longitudeValues = DocValues.getNumeric( atomicReader, getLongitudeField() );
 
 		return new FilteredDocIdSet( docs ) {
 			@Override
