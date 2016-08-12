@@ -7,13 +7,14 @@
 package org.hibernate.search.query.dsl.sort.impl;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
+import org.apache.lucene.search.SortField.Type;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.FieldDescriptor;
@@ -35,11 +36,30 @@ public class SortFieldStates {
 	private static final Object MISSING_VALUE_LAST = new Object();
 	private static final Object MISSING_VALUE_FIRST = new Object();
 
+	private static final Map<SortField.Type, Object> MINIMUMS = new EnumMap<>(SortField.Type.class);
+	private static final Map<SortField.Type, Object> MAXIMUMS = new EnumMap<>(SortField.Type.class);
+	static {
+		initMinMax( SortField.Type.DOUBLE, Double.MIN_VALUE, Double.MAX_VALUE );
+		initMinMax( SortField.Type.FLOAT, Float.MIN_VALUE, Float.MAX_VALUE );
+		initMinMax( SortField.Type.LONG, Long.MIN_VALUE, Long.MAX_VALUE );
+		initMinMax( SortField.Type.INT, Integer.MIN_VALUE, Integer.MAX_VALUE );
+	}
+
+	private static void initMinMax(Type type, double minValue, double maxValue) {
+		MINIMUMS.put( type, minValue );
+		MAXIMUMS.put( type, maxValue );
+	}
+
+	private static enum SortOrder {
+		ASC,
+		DESC;
+	}
+
 	private final QueryBuildingContext queryContext;
 
 	private SortField.Type currentType;
 	private String currentName;
-	private Boolean currentReverse;
+	private SortOrder currentOrder;
 	private Object currentMissingValue;
 	private SortField currentSortField;
 	private Coordinates coordinates;
@@ -72,27 +92,19 @@ public class SortFieldStates {
 	}
 
 	public void setAsc() {
-		if ( currentType == SortField.Type.SCORE ) {
-			currentReverse = Boolean.TRUE;
-		}
-		else if ( coordinates != null || currentLatitude != null ) {
-			currentReverse = Boolean.TRUE;
-		}
-		else {
-			currentReverse = Boolean.FALSE;
-		}
+		this.currentOrder = SortOrder.ASC;
+	}
+
+	public boolean isAsc() {
+		return SortOrder.ASC.equals( currentOrder );
 	}
 
 	public void setDesc() {
-		if ( currentType == SortField.Type.SCORE ) {
-			currentReverse = Boolean.FALSE;
-		}
-		else if ( coordinates != null || currentLatitude != null ) {
-			currentReverse = Boolean.FALSE;
-		}
-		else {
-			currentReverse = Boolean.TRUE;
-		}
+		this.currentOrder = SortOrder.DESC;
+	}
+
+	public boolean isDesc() {
+		return SortOrder.DESC.equals( currentOrder );
 	}
 
 	public List<SortField> sortFields = new ArrayList<>( 3 );
@@ -107,29 +119,19 @@ public class SortFieldStates {
 			sortField = currentSortField;
 		}
 		else if ( currentType == SortField.Type.SCORE ) {
-			sortField = Boolean.TRUE == currentReverse ? new SortField( null, SortField.Type.SCORE, true ) : SortField.FIELD_SCORE;
+			sortField = new SortField( null, SortField.Type.SCORE, isAsc() );
 		}
 		else if ( currentType == SortField.Type.DOC ) {
-			sortField = Boolean.TRUE == currentReverse ? new SortField( null, SortField.Type.DOC, true ) : SortField.FIELD_DOC;
+			sortField = new SortField( null, SortField.Type.DOC, isDesc() );
 		}
 		else if ( coordinates != null ) {
-			if ( currentReverse == Boolean.TRUE ) {
-				sortField = new DistanceSortField( coordinates, currentName, true );
-			}
-			else {
-				sortField = new DistanceSortField( coordinates, currentName );
-			}
+			sortField = new DistanceSortField( coordinates, currentName, isAsc() );
 			if ( hasMissingValue() ) {
 				throw new AssertionFailure( "Missing values are not supported for distance sorting yet" );
 			}
 		}
 		else if ( currentLatitude != null ) {
-			if ( currentReverse == Boolean.TRUE ) {
-				sortField = new DistanceSortField( currentLatitude, currentLongitude, currentName, true );
-			}
-			else {
-				sortField = new DistanceSortField( currentLatitude, currentLongitude, currentName );
-			}
+			sortField = new DistanceSortField( currentLatitude, currentLongitude, currentName, isAsc() );
 			if ( hasMissingValue() ) {
 				throw new AssertionFailure( "Missing values are not supported for distance sorting yet" );
 			}
@@ -137,7 +139,7 @@ public class SortFieldStates {
 		else {
 			// handle non spatial, non score and non doc id sorting
 			processSortFieldType();
-			sortField = new SortField( currentName, currentType, currentReverse );
+			sortField = new SortField( currentName, currentType, isDesc() );
 		}
 		processMissingValue( sortField );
 		sortFields.add( sortField );
@@ -180,8 +182,8 @@ public class SortFieldStates {
 	}
 
 	private void processMissingValue(SortField sortField) {
-		if ( currentMissingValue != null && currentType != null ) {
-			if ( currentType == SortField.Type.STRING || currentType == SortField.Type.STRING_VAL ) {
+		if ( currentMissingValue != null && sortField.getType() != null ) {
+			if ( sortField.getType() == SortField.Type.STRING || sortField.getType() == SortField.Type.STRING_VAL ) {
 				if ( currentMissingValue == MISSING_VALUE_LAST ) {
 					sortField.setMissingValue( SortField.STRING_LAST );
 				}
@@ -192,47 +194,28 @@ public class SortFieldStates {
 					sortField.setMissingValue( currentMissingValue );
 				}
 			}
-			else if ( currentType == SortField.Type.DOUBLE ) {
-				if ( currentMissingValue == MISSING_VALUE_LAST ) {
-					sortField.setMissingValue( Double.MAX_VALUE );
+			else {
+				boolean reverse = sortField.getReverse();
+				if ( currentMissingValue == MISSING_VALUE_FIRST && !reverse
+						|| currentMissingValue == MISSING_VALUE_LAST && reverse ) {
+					Object min = MINIMUMS.get( sortField.getType() );
+					if (min != null) {
+						sortField.setMissingValue( min );
+					}
+					else {
+						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType );
+					}
 				}
-				else if ( currentMissingValue == MISSING_VALUE_FIRST ) {
-					sortField.setMissingValue( Double.MIN_VALUE );
-				}
-				else {
-					sortField.setMissingValue( currentMissingValue );
-				}
-			}
-			else if ( currentType == SortField.Type.FLOAT ) {
-				if ( currentMissingValue == MISSING_VALUE_LAST ) {
-					sortField.setMissingValue( Float.MAX_VALUE );
-				}
-				else if ( currentMissingValue == MISSING_VALUE_FIRST ) {
-					sortField.setMissingValue( Float.MIN_VALUE );
-				}
-				else {
-					sortField.setMissingValue( currentMissingValue );
-				}
-			}
-			else if ( currentType == SortField.Type.INT ) {
-				if ( currentMissingValue == MISSING_VALUE_LAST ) {
-					sortField.setMissingValue( Integer.MAX_VALUE );
-				}
-				else if ( currentMissingValue == MISSING_VALUE_FIRST ) {
-					sortField.setMissingValue( Integer.MIN_VALUE );
-				}
-				else {
-					sortField.setMissingValue( currentMissingValue );
-				}
-			}
-			else if ( currentType == SortField.Type.LONG ) {
-				if ( currentMissingValue == MISSING_VALUE_LAST ) {
-					sortField.setMissingValue( Long.MAX_VALUE );
-				}
-				else if ( currentMissingValue == MISSING_VALUE_FIRST ) {
-					sortField.setMissingValue( Long.MIN_VALUE );
-				}
-				else {
+				else if ( currentMissingValue == MISSING_VALUE_LAST && !reverse
+						|| currentMissingValue == MISSING_VALUE_FIRST && reverse ) {
+					Object max = MAXIMUMS.get( sortField.getType() );
+					if (max != null) {
+						sortField.setMissingValue( max );
+					}
+					else {
+						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType );
+					}
+				} else {
 					sortField.setMissingValue( currentMissingValue );
 				}
 			}
@@ -250,7 +233,7 @@ public class SortFieldStates {
 	private void reset() {
 		this.currentType = null;
 		this.currentName = null;
-		this.currentReverse = null;
+		this.currentOrder = null;
 		this.currentMissingValue = null;
 		this.currentSortField = null;
 		this.coordinates = null;
