@@ -15,6 +15,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.FieldDescriptor;
@@ -36,21 +39,21 @@ public class SortFieldStates {
 	private static final Object MISSING_VALUE_LAST = new Object();
 	private static final Object MISSING_VALUE_FIRST = new Object();
 
-	private static final Map<SortField.Type, Object> MINIMUMS = new EnumMap<>(SortField.Type.class);
-	private static final Map<SortField.Type, Object> MAXIMUMS = new EnumMap<>(SortField.Type.class);
+	private static final Map<SortField.Type, Object> SCALAR_MINIMUMS = new EnumMap<>( SortField.Type.class );
+	private static final Map<SortField.Type, Object> SCALAR_MAXIMUMS = new EnumMap<>( SortField.Type.class );
 	static {
-		initMinMax( SortField.Type.DOUBLE, Double.MIN_VALUE, Double.MAX_VALUE );
-		initMinMax( SortField.Type.FLOAT, Float.MIN_VALUE, Float.MAX_VALUE );
-		initMinMax( SortField.Type.LONG, Long.MIN_VALUE, Long.MAX_VALUE );
-		initMinMax( SortField.Type.INT, Integer.MIN_VALUE, Integer.MAX_VALUE );
+		initScalarMinMax( SortField.Type.DOUBLE, Double.MIN_VALUE, Double.MAX_VALUE );
+		initScalarMinMax( SortField.Type.FLOAT, Float.MIN_VALUE, Float.MAX_VALUE );
+		initScalarMinMax( SortField.Type.LONG, Long.MIN_VALUE, Long.MAX_VALUE );
+		initScalarMinMax( SortField.Type.INT, Integer.MIN_VALUE, Integer.MAX_VALUE );
 	}
 
-	private static void initMinMax(Type type, double minValue, double maxValue) {
-		MINIMUMS.put( type, minValue );
-		MAXIMUMS.put( type, maxValue );
+	private static void initScalarMinMax(Type type, double minValue, double maxValue) {
+		SCALAR_MINIMUMS.put( type, minValue );
+		SCALAR_MAXIMUMS.put( type, maxValue );
 	}
 
-	private static enum SortOrder {
+	private enum SortOrder {
 		ASC,
 		DESC;
 	}
@@ -75,8 +78,8 @@ public class SortFieldStates {
 		this.currentType = currentType;
 	}
 
-	public void setCurrentName(String currentName) {
-		this.currentName = currentName;
+	public void setCurrentName(String fieldName) {
+		this.currentName = fieldName;
 	}
 
 	public void setCurrentMissingValue(Object currentMissingValue) {
@@ -137,8 +140,6 @@ public class SortFieldStates {
 			}
 		}
 		else {
-			// handle non spatial, non score and non doc id sorting
-			processSortFieldType();
 			sortField = new SortField( currentName, currentType, isDesc() );
 		}
 		processMissingValue( sortField );
@@ -146,7 +147,7 @@ public class SortFieldStates {
 		reset();
 	}
 
-	private void processSortFieldType() {
+	public void guessCurrentSortFieldType() {
 		FieldDescriptor fieldDescriptor = queryContext.getFactory()
 				.getIndexedTypeDescriptor( queryContext.getEntityType() )
 				.getIndexedField( currentName );
@@ -191,15 +192,15 @@ public class SortFieldStates {
 					sortField.setMissingValue( SortField.STRING_FIRST );
 				}
 				else {
-					sortField.setMissingValue( currentMissingValue );
+					sortField.setMissingValue( useFieldBridgeIfNecessary( currentMissingValue ) );
 				}
 			}
 			else {
 				boolean reverse = sortField.getReverse();
 				if ( currentMissingValue == MISSING_VALUE_FIRST && !reverse
 						|| currentMissingValue == MISSING_VALUE_LAST && reverse ) {
-					Object min = MINIMUMS.get( sortField.getType() );
-					if (min != null) {
+					Object min = SCALAR_MINIMUMS.get( sortField.getType() );
+					if ( min != null ) {
 						sortField.setMissingValue( min );
 					}
 					else {
@@ -208,17 +209,29 @@ public class SortFieldStates {
 				}
 				else if ( currentMissingValue == MISSING_VALUE_LAST && !reverse
 						|| currentMissingValue == MISSING_VALUE_FIRST && reverse ) {
-					Object max = MAXIMUMS.get( sortField.getType() );
-					if (max != null) {
+					Object max = SCALAR_MAXIMUMS.get( sortField.getType() );
+					if ( max != null ) {
 						sortField.setMissingValue( max );
 					}
 					else {
 						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType );
 					}
-				} else {
-					sortField.setMissingValue( currentMissingValue );
+				}
+				else {
+					sortField.setMissingValue( useFieldBridgeIfNecessary( currentMissingValue ) );
 				}
 			}
+		}
+	}
+
+	private Object useFieldBridgeIfNecessary(Object value) {
+		if ( Boolean.TRUE.equals( currentIgnoreFieldBridge ) ) {
+			return value;
+		}
+		else {
+			final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
+			final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
+			return documentBuilder.objectToString( currentName, value, conversionContext );
 		}
 	}
 

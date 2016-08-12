@@ -9,7 +9,7 @@ package org.hibernate.search.query.dsl.sort;
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SortMissingValueContext<T> {
+public interface SortMissingValueContext<T, U extends SortMissingValueContext.ValueTreatmentContext<?>> {
 
 	// TODO YR Use the terms "highest" / "lowest" instead of last/first, which are dependent on the actual order (asc/desc)?
 
@@ -26,7 +26,7 @@ public interface SortMissingValueContext<T> {
 	/**
 	 * Value to replace a missing value with during sorting.
 	 */
-	ValueTreatmentContext<T> use(Object value);
+	U use(Object value);
 
 	interface ValueTreatmentContext<T> {
 

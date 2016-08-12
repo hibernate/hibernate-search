@@ -8,16 +8,16 @@ package org.hibernate.search.query.dsl.sort.impl;
 
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
-import org.hibernate.search.query.dsl.sort.SortDistanceContext;
 import org.hibernate.search.query.dsl.sort.SortFieldContext;
-import org.hibernate.search.query.dsl.sort.SortLatLongContext;
+import org.hibernate.search.query.dsl.sort.SortFieldContext.SortFieldMissingValueTreatmentContext;
 import org.hibernate.search.query.dsl.sort.SortMissingValueContext;
-import org.hibernate.search.spatial.Coordinates;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldContext implements SortFieldContext, SortLatLongContext {
+public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldContext
+		implements SortFieldContext, SortMissingValueContext<SortFieldContext, SortFieldMissingValueTreatmentContext>,
+				SortFieldMissingValueTreatmentContext {
 
 	public ConnectedSortFieldContext(QueryBuildingContext queryContext, SortFieldStates states) {
 		super( queryContext, states );
@@ -41,26 +41,32 @@ public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldC
 	}
 
 	@Override
-	public SortDistanceContext fromCoordinates(Coordinates coordinates) {
-		getStates().setCoordinates(coordinates);
-		return new ConnectedSortDistanceContext( getQueryContext(), getStates() );
-	}
-
-	@Override
-	public SortLatLongContext fromLatitude(double latitude) {
-		getStates().setCurrentLatitude(latitude);
+	public SortMissingValueContext<SortFieldContext, SortFieldMissingValueTreatmentContext> onMissingValue() {
 		return this;
 	}
 
 	@Override
-	public SortDistanceContext andLongitude(double longitude) {
-		getStates().setCurrentLongitude(longitude);
-		return new ConnectedSortDistanceContext( getQueryContext(), getStates() );
+	public SortFieldContext sortLast() {
+		getStates().setCurrentMissingValueLast();
+		return this;
 	}
 
 	@Override
-	public SortMissingValueContext<SortFieldContext> onMissingValue() {
-		return new ConnectedSortMissingValueContext<SortFieldContext>( getQueryContext(), getStates(), this );
+	public SortFieldContext sortFirst() {
+		getStates().setCurrentMissingValueFirst();
+		return this;
+	}
+
+	@Override
+	public SortFieldMissingValueTreatmentContext use(Object value) {
+		getStates().setCurrentMissingValue( value );
+		return this;
+	}
+
+	@Override
+	public SortFieldContext ignoreFieldBridge() {
+		getStates().setCurrentIgnoreFieldBridge();
+		return this;
 	}
 
 }

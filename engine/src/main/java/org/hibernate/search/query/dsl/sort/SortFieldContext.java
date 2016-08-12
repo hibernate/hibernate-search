@@ -6,30 +6,20 @@
  */
 package org.hibernate.search.query.dsl.sort;
 
-import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.query.dsl.sort.SortMissingValueContext.ValueTreatmentContext;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface SortFieldContext extends SortAdditionalSortFieldContext, SortOrder<SortFieldContext>, SortTermination {
 
-	// Geospatial sorting
-
-	/**
-	 * Order elements by their distance from {@code coordinates}.
-	 */
-	SortDistanceContext fromCoordinates(Coordinates coordinates);
-
-	/**
-	 * Latitude in degree
-	 */
-	SortLatLongContext fromLatitude(double latitude);
-
-	// parametrization
-
 	/**
 	 * Describe how to treat missing values when doing the sorting.
 	 */
-	SortMissingValueContext<SortFieldContext> onMissingValue();
+	SortMissingValueContext<SortFieldContext, SortFieldMissingValueTreatmentContext> onMissingValue();
+
+	interface SortFieldMissingValueTreatmentContext extends ValueTreatmentContext<SortFieldContext>, SortFieldContext {
+
+	}
 
 }

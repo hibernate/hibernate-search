@@ -15,13 +15,10 @@ import org.hibernate.search.query.dsl.sort.SortTermination;
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public class ConnectedSortOrderTermination implements SortOrderTermination {
-	private final QueryBuildingContext queryContext;
-	private final SortFieldStates states;
+public class ConnectedSortOrderTermination extends AbstractConnectedSortContext implements SortOrderTermination {
 
 	public ConnectedSortOrderTermination(QueryBuildingContext queryContext, SortFieldStates states) {
-		this.queryContext = queryContext;
-		this.states = states;
+		super( queryContext, states );
 	}
 
 	@Override

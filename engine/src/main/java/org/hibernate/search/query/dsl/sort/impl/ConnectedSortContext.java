@@ -12,6 +12,7 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.query.dsl.sort.SortContext;
 import org.hibernate.search.query.dsl.sort.SortDistanceContext;
+import org.hibernate.search.query.dsl.sort.SortDistanceFromContext;
 import org.hibernate.search.query.dsl.sort.SortFieldContext;
 import org.hibernate.search.query.dsl.sort.SortNativeContext;
 import org.hibernate.search.query.dsl.sort.SortOrderTermination;
@@ -19,13 +20,10 @@ import org.hibernate.search.query.dsl.sort.SortOrderTermination;
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public class ConnectedSortContext implements SortContext {
-	private final QueryBuildingContext queryContext;
-	private final SortFieldStates states;
+public class ConnectedSortContext extends AbstractConnectedSortContext implements SortContext {
 
 	public ConnectedSortContext(QueryBuildingContext queryContext) {
-		this.queryContext = queryContext;
-		this.states = new SortFieldStates(queryContext);
+		super( queryContext, new SortFieldStates( queryContext ) );
 	}
 
 	@Override
@@ -43,7 +41,21 @@ public class ConnectedSortContext implements SortContext {
 	@Override
 	public SortFieldContext byField(String field) {
 		states.setCurrentName( field );
+		states.guessCurrentSortFieldType();
 		return new ConnectedSortFieldContext( queryContext, states );
+	}
+
+	@Override
+	public SortFieldContext byField(String field, SortField.Type sortFieldType) {
+		states.setCurrentName( field );
+		states.setCurrentType( sortFieldType );
+		return new ConnectedSortFieldContext( queryContext, states );
+	}
+
+	@Override
+	public SortDistanceFromContext byDistance(String field) {
+		states.setCurrentName( field );
+		return new ConnectedSortDistanceFromContext( queryContext, states );
 	}
 
 	@Override
