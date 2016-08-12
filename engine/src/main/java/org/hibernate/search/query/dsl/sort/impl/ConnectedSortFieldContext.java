@@ -36,6 +36,7 @@ public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldC
 
 	@Override
 	public Sort createSort() {
+		getStates().closeSortField();
 		return getStates().createSort();
 	}
 

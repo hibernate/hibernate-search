@@ -33,6 +33,7 @@ public class ConnectedSortDistanceContext extends ConnectedSortAdditionalSortFie
 
 	@Override
 	public Sort createSort() {
+		getStates().closeSortField();
 		return getStates().createSort();
 	}
 
