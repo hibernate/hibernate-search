@@ -263,14 +263,24 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
 		Assert.assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
-		Assert.assertEquals( 4361.00, (Double) secondResult[1], 0.01 );
+		/*
+		 * ElasticSearch returns a distance of Double.MAX_VALUE while Lucene just
+		 * returns the distance to (0,0).
+		 * See HSEARCH-2324
+		 */
+		Assert.assertTrue( "Expected a great distance", ((Double)secondResult[1]) > 4000.0 );
 
 		distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
 		hibQuery.setSort( distanceSort );
 		results = hibQuery.getResultList();
 		firstResult = (Object[]) results.get( 0 );
 		secondResult = (Object[]) results.get( 1 );
-		Assert.assertEquals( 4361.00, (Double) firstResult[1], 0.01 );
+		/*
+		 * ElasticSearch returns a distance of Double.MAX_VALUE while Lucene just
+		 * returns the distance to (0,0).
+		 * See HSEARCH-2324
+		 */
+		Assert.assertTrue( "Expected a great distance", ((Double)firstResult[1]) > 4000.0 );
 		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
 
 		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
