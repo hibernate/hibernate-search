@@ -15,9 +15,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
-import org.hibernate.search.bridge.spi.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.FieldDescriptor;
@@ -68,7 +65,6 @@ public class SortFieldStates {
 	private Coordinates coordinates;
 	private Double currentLatitude;
 	private Double currentLongitude;
-	private Boolean currentIgnoreFieldBridge;
 
 	public SortFieldStates(QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
@@ -192,7 +188,8 @@ public class SortFieldStates {
 					sortField.setMissingValue( SortField.STRING_FIRST );
 				}
 				else {
-					sortField.setMissingValue( useFieldBridgeIfNecessary( currentMissingValue ) );
+					throw new SearchException( "Unsupported 'use(Object)' for the field type: " + currentType + "."
+							+ " Only 'sortFirst()' and 'sortLast()' are supported." );
 				}
 			}
 			else {
@@ -204,7 +201,8 @@ public class SortFieldStates {
 						sortField.setMissingValue( min );
 					}
 					else {
-						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType );
+						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType + "."
+								+ " Only 'use(Object)' is supported.");
 					}
 				}
 				else if ( currentMissingValue == MISSING_VALUE_LAST && !reverse
@@ -214,24 +212,20 @@ public class SortFieldStates {
 						sortField.setMissingValue( max );
 					}
 					else {
-						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType );
+						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType + "."
+								+ " Only 'use(Object)' is supported.");
 					}
 				}
 				else {
-					sortField.setMissingValue( useFieldBridgeIfNecessary( currentMissingValue ) );
+					/*
+					 * Field bridge cannot be used for non-string sort values, since the field bridge
+					 * only provides a String and the SortField only accepts a value of the
+					 * actual sort type (Long, Double, ...).
+					 * That's why we don't call useFieldBridgeIfNecessary() here.
+					 */
+					sortField.setMissingValue( currentMissingValue );
 				}
 			}
-		}
-	}
-
-	private Object useFieldBridgeIfNecessary(Object value) {
-		if ( Boolean.TRUE.equals( currentIgnoreFieldBridge ) ) {
-			return value;
-		}
-		else {
-			final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
-			final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
-			return documentBuilder.objectToString( currentName, value, conversionContext );
 		}
 	}
 
@@ -252,7 +246,6 @@ public class SortFieldStates {
 		this.coordinates = null;
 		this.currentLatitude = null;
 		this.currentLongitude = null;
-		this.currentIgnoreFieldBridge = null;
 	}
 
 	public void setCoordinates(Coordinates coordinates) {
@@ -278,9 +271,5 @@ public class SortFieldStates {
 		// - extract the coordinates or lat/long from the DistanceFilter
 		// - see ConnectedSpatialQueryBuilder
 		throw new AssertionFailure( "byDistanceFromSpatialQuery not implemented yet" );
-	}
-
-	public void setCurrentIgnoreFieldBridge() {
-		this.currentIgnoreFieldBridge = Boolean.TRUE;
 	}
 }

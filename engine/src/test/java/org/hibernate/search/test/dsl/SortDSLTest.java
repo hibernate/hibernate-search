@@ -238,7 +238,7 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField_fieldBridge() throws Exception {
+	public void singleField_stringFieldBridge() throws Exception {
 		Query query = builder().all().createQuery();
 
 		// Missing value is not provided; the missing values should be considered as 0
@@ -270,72 +270,12 @@ public class SortDSLTest {
 		);
 	}
 
-	@Test
-	public void singleField_fieldBridge_missingValue_use() throws Exception {
-		Query query = builder().all().createQuery();
-
-		Sort sort = builder().sort()
+	@Test(expected = SearchException.class)
+	public void singleField_stringFieldBridge_missingValue_use() throws Exception {
+		builder().sort()
 				.byField( "fieldBridgedStringField" )
-						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
+						.onMissingValue().use( "1.5" )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "fieldBridgedStringField" )
-						.asc()
-						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "fieldBridgedStringField" )
-						.desc()
-						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 2, 1 )
-		);
-	}
-
-	@Test
-	public void singleField_fieldBridge_missingValue_useIgnoreFieldBridge() throws Exception {
-		Query query = builder().all().createQuery();
-
-		Sort sort = builder().sort()
-				.byField( "fieldBridgedStringField" )
-						.onMissingValue().use( 1.5d ).ignoreFieldBridge()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "fieldBridgedStringField" )
-						.asc()
-						.onMissingValue().use( 1.5d ).ignoreFieldBridge()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "fieldBridgedStringField" )
-						.desc()
-						.onMissingValue().use( 1.5d ).ignoreFieldBridge()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 2, 1 )
-		);
 	}
 
 	@Test
@@ -377,7 +317,7 @@ public class SortDSLTest {
 
 		Sort sort = builder().sort()
 				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
-						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
+						.onMissingValue().use( 1.5d )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -387,7 +327,7 @@ public class SortDSLTest {
 		sort = builder().sort()
 				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
 						.asc()
-						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
+						.onMissingValue().use( 1.5d )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -397,7 +337,7 @@ public class SortDSLTest {
 		sort = builder().sort()
 				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
 						.desc()
-						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
+						.onMissingValue().use( 1.5d )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -405,38 +345,15 @@ public class SortDSLTest {
 		);
 	}
 
-	@Test
-	public void singleField_numericFieldBridge_missingValue_useIgnoreFieldBridge() throws Exception {
+	@Test(expected = ClassCastException.class)
+	public void singleField_numericFieldBridge_missingValue_use_nonRaw() throws Exception {
 		Query query = builder().all().createQuery();
 
 		Sort sort = builder().sort()
 				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
-						.onMissingValue().use( 1.5d ).ignoreFieldBridge()
+						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
 				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
-						.asc()
-						.onMissingValue().use( 1.5d ).ignoreFieldBridge()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 1, 2, 0, 3 )
-		);
-
-		sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
-						.desc()
-						.onMissingValue().use( 1.5d ).ignoreFieldBridge()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 0, 2, 1 )
-		);
+		query( query, sort );
 	}
 
 	@Test

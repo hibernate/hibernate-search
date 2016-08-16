@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.query.dsl.sort;
 
-import org.hibernate.search.query.dsl.sort.SortMissingValueContext.ValueTreatmentContext;
-
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
@@ -16,10 +14,6 @@ public interface SortFieldContext extends SortAdditionalSortFieldContext, SortOr
 	/**
 	 * Describe how to treat missing values when doing the sorting.
 	 */
-	SortMissingValueContext<SortFieldContext, SortFieldMissingValueTreatmentContext> onMissingValue();
-
-	interface SortFieldMissingValueTreatmentContext extends ValueTreatmentContext<SortFieldContext>, SortFieldContext {
-
-	}
+	SortMissingValueContext<SortFieldContext> onMissingValue();
 
 }

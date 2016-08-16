@@ -9,15 +9,13 @@ package org.hibernate.search.query.dsl.sort.impl;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.query.dsl.sort.SortFieldContext;
-import org.hibernate.search.query.dsl.sort.SortFieldContext.SortFieldMissingValueTreatmentContext;
 import org.hibernate.search.query.dsl.sort.SortMissingValueContext;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldContext
-		implements SortFieldContext, SortMissingValueContext<SortFieldContext, SortFieldMissingValueTreatmentContext>,
-				SortFieldMissingValueTreatmentContext {
+		implements SortFieldContext, SortMissingValueContext<SortFieldContext> {
 
 	public ConnectedSortFieldContext(QueryBuildingContext queryContext, SortFieldStates states) {
 		super( queryContext, states );
@@ -41,7 +39,7 @@ public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldC
 	}
 
 	@Override
-	public SortMissingValueContext<SortFieldContext, SortFieldMissingValueTreatmentContext> onMissingValue() {
+	public SortMissingValueContext<SortFieldContext> onMissingValue() {
 		return this;
 	}
 
@@ -58,14 +56,8 @@ public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldC
 	}
 
 	@Override
-	public SortFieldMissingValueTreatmentContext use(Object value) {
+	public SortFieldContext use(Object value) {
 		getStates().setCurrentMissingValue( value );
-		return this;
-	}
-
-	@Override
-	public SortFieldContext ignoreFieldBridge() {
-		getStates().setCurrentIgnoreFieldBridge();
 		return this;
 	}
 

@@ -9,7 +9,7 @@ package org.hibernate.search.query.dsl.sort;
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SortMissingValueContext<T, U extends SortMissingValueContext.ValueTreatmentContext<?>> {
+public interface SortMissingValueContext<T> {
 
 	// TODO YR Use the terms "highest" / "lowest" instead of last/first, which are dependent on the actual order (asc/desc)?
 
@@ -25,15 +25,8 @@ public interface SortMissingValueContext<T, U extends SortMissingValueContext.Va
 
 	/**
 	 * Value to replace a missing value with during sorting.
+	 * <p>This is only available for numeric sorts fields.
+	 * <p>Field bridges, if any, will be ignored. Thus the actual numeric value must be provided.
 	 */
-	U use(Object value);
-
-	interface ValueTreatmentContext<T> {
-
-		/**
-		 * Do not try and find the field bridge nor apply the object / string conversion
-		 * matching objects should be of type String in this case.
-		 */
-		T ignoreFieldBridge();
-	}
+	T use(Object value);
 }
