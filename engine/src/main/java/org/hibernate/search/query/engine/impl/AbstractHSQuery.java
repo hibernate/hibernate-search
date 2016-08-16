@@ -405,29 +405,45 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 			}
 	}
 
-	private void validateNumericSortField(SortField sortField, NumericEncodingType numericEncodingType) {
+	private void validateNumericSortField(SortField sortField, NumericEncodingType indexNumericEncodingType) {
+		final NumericEncodingType sortNumericEncodingType;
 		switch ( sortField.getType() ) {
 			case BYTES:
 			case INT:
-				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.INTEGER );
+				sortNumericEncodingType = NumericEncodingType.INTEGER;
 				break;
 			case LONG:
-				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.LONG );
+				sortNumericEncodingType = NumericEncodingType.LONG;
 				break;
 			case DOUBLE:
-				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.DOUBLE );
+				sortNumericEncodingType = NumericEncodingType.DOUBLE;
 				break;
 			case FLOAT:
-				validateNumericEncodingType( sortField, numericEncodingType, NumericEncodingType.FLOAT );
+				sortNumericEncodingType = NumericEncodingType.FLOAT;
 				break;
 			default:
-				throw LOG.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), String.valueOf( numericEncodingType ), sortField.getField() );
+				throw LOG.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ),
+						String.valueOf( indexNumericEncodingType ), sortField.getField() );
 		}
+		if ( NumericEncodingType.UNKNOWN.equals( indexNumericEncodingType ) ) {
+			/*
+			 * The actual encoding type is unknown, so we can't validate more.
+			 * This happens most notably when using custom numeric field bridges that do not implement
+			 * MetadataProvidingFieldBridge. Even when implementing it, there are some quirks, see HSEARCH-2330.
+			 * Anyway, the simplest solution until HS6 and mandatory metadata is to skip the rest
+			 * of the validation in this particular case.
+			 */
+			return;
+		}
+		validateNumericEncodingType( sortField, indexNumericEncodingType, sortNumericEncodingType );
 	}
 
-	private void validateNumericEncodingType(SortField sortField, NumericEncodingType actualType, NumericEncodingType validType) {
-		if ( actualType != validType ) {
-			throw LOG.sortTypeDoesNotMatchFieldType( String.valueOf( sortField.getType() ), String.valueOf( actualType ), sortField.getField() );
+	private void validateNumericEncodingType(SortField sortField, NumericEncodingType sortEncodingType,
+			NumericEncodingType indexEncodingType) {
+		if ( sortEncodingType != indexEncodingType ) {
+			throw LOG.sortTypeDoesNotMatchFieldType(
+					String.valueOf( sortField.getType() ), String.valueOf( indexEncodingType ), sortField.getField()
+			);
 		}
 	}
 
