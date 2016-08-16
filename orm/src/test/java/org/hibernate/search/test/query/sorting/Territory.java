@@ -14,8 +14,10 @@ import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
 
@@ -26,6 +28,31 @@ import org.hibernate.search.bridge.spi.FieldType;
 @Indexed
 @ClassBridge(impl = Territory.NameFieldBridge.class)
 public class Territory {
+
+	/**
+	 * @author Yoann Rodiere
+	 */
+	public static class IdFieldBridge implements FieldBridge, StringBridge {
+
+		@Override
+		public String objectToString(Object object) {
+			if ( !( object instanceof Territory ) ) {
+				throw new IllegalStateException( "This field bridge only supports Territory values" );
+			}
+			int id = ( (Territory) object ).getId();
+			return String.valueOf( id );
+		}
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			if ( !( value instanceof Territory ) ) {
+				throw new IllegalStateException( "This field bridge only supports Territory values" );
+			}
+			int id = ( (Territory) value ).getId();
+			luceneOptions.addNumericFieldToDocument( name, id, document );
+		}
+
+	}
 
 	@Id
 	private int id;

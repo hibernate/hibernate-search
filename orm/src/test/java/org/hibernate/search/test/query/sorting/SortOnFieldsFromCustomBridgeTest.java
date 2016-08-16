@@ -134,6 +134,28 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2325")
+	public void testNumericCustomFieldLevelBridge() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		@SuppressWarnings("unchecked")
+		List<Book> result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Explorer.class )
+			.setSort(
+					new Sort(
+							new SortField( "favoriteTerritory", SortField.Type.INT )
+					)
+			)
+			.list();
+
+		assertNotNull( result );
+		assertThat( result ).onProperty( "id" ).containsExactly( 1, 2, 3 );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
 	public void testSortableFieldConfiguredThroughClassLevelBridgeOnEmbeddedEntity() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
