@@ -11,8 +11,6 @@ package org.hibernate.search.query.dsl.sort;
  */
 public interface SortMissingValueContext<T> {
 
-	// TODO YR Use the terms "highest" / "lowest" instead of last/first, which are dependent on the actual order (asc/desc)?
-
 	/**
 	 * Put missing values last in the sorting
 	 */
