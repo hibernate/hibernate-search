@@ -59,7 +59,7 @@ public class SortDSLTest {
 		storeData(
 				new IndexedEntry(0)
 				.setMainData(
-						"frequent infrequent1 infrequent2 infrequent1 inMultipleDocsWithDifferentScore",
+						"infrequent1 infrequent2 infrequent1 inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores inMultipleDocsWithVariousScores",
 						1, 2d
 				)
 				/*
@@ -72,7 +72,7 @@ public class SortDSLTest {
 		storeData(
 				new IndexedEntry(1)
 				.setMainData(
-						"frequent inMultipleDocsWithDifferentScore inMultipleDocsWithDifferentScore inMultipleDocsWithDifferentScore",
+						"inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores",
 						2, 1d
 				)
 				/*
@@ -89,7 +89,7 @@ public class SortDSLTest {
 		storeData(
 				new IndexedEntry(3)
 				.setMainData(
-						"frequent infrequent1 inMultipleDocsWithDifferentScore inMultipleDocsWithDifferentScore",
+						"infrequent1 inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores",
 						1, 3d
 				)
 				/*
@@ -573,7 +573,7 @@ public class SortDSLTest {
 	public void fieldThenScore() throws Exception {
 		Query query = builder().keyword()
 				.onField( "textField" )
-				.matching( "inMultipleDocsWithDifferentScore" )
+				.matching( "inMultipleDocsWithUniqueScores" )
 				.createQuery();
 
 		Sort sort = builder().sort()
@@ -608,8 +608,39 @@ public class SortDSLTest {
 
 	@Test
 	public void scoreThenField() throws Exception {
-		// TODO YR add the relevant API methods and code this test OR remove this test
-		Assert.fail( "Missing API for chaining chain a field sort after a score sort." );
+		Query query = builder().keyword()
+				.onField( "textField" )
+				.matching( "inMultipleDocsWithVariousScores" )
+				.createQuery();
+
+		Sort sort = builder().sort()
+				.byScore()
+				.andByField( "uniqueNumericField" )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 0, 1, 3 )
+		);
+
+		sort = builder().sort()
+				.byScore()
+						.asc()
+				.andByField( "uniqueNumericField" )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 1, 3, 0 )
+		);
+
+		sort = builder().sort()
+				.byScore()
+						.desc()
+				.andByField( "uniqueNumericField" )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 0, 1, 3 )
+		);
 	}
 
 	private Matcher<List<EntityInfo>> returnsIDsInOrder(Integer ... idsInOrder) {

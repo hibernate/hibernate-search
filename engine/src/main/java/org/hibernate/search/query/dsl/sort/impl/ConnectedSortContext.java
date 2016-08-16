@@ -8,7 +8,6 @@ package org.hibernate.search.query.dsl.sort.impl;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.query.dsl.sort.SortContext;
 import org.hibernate.search.query.dsl.sort.SortDistanceContext;
@@ -16,6 +15,7 @@ import org.hibernate.search.query.dsl.sort.SortDistanceFromContext;
 import org.hibernate.search.query.dsl.sort.SortFieldContext;
 import org.hibernate.search.query.dsl.sort.SortNativeContext;
 import org.hibernate.search.query.dsl.sort.SortOrderTermination;
+import org.hibernate.search.query.dsl.sort.SortScoreContext;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
@@ -27,9 +27,9 @@ public class ConnectedSortContext extends AbstractConnectedSortContext implement
 	}
 
 	@Override
-	public SortOrderTermination byScore() {
+	public SortScoreContext byScore() {
 		states.setCurrentType( SortField.Type.SCORE );
-		return new ConnectedSortOrderTermination( queryContext, states );
+		return new ConnectedSortScoreContext( queryContext, states );
 	}
 
 	@Override

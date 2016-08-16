@@ -21,8 +21,7 @@ public interface SortAdditionalSortFieldContext {
 	/**
 	 * Order elements by their relevance score in decreasing order by default.
 	 */
-	//TODO Is byScore terminal or can it be followed by other sorts?
-	SortOrderTermination andByScore();
+	SortScoreContext andByScore();
 
 	/**
 	 * Order elements by their internal index order.

@@ -19,7 +19,7 @@ public interface SortContext {
 	/**
 	 * Order elements by their relevance score in decreasing order by default.
 	 */
-	SortOrderTermination byScore();
+	SortScoreContext byScore();
 
 	/**
 	 * Order elements by their internal index order.

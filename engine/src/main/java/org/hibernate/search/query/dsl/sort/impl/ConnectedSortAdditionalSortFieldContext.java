@@ -16,6 +16,7 @@ import org.hibernate.search.query.dsl.sort.SortDistanceFromContext;
 import org.hibernate.search.query.dsl.sort.SortFieldContext;
 import org.hibernate.search.query.dsl.sort.SortNativeContext;
 import org.hibernate.search.query.dsl.sort.SortOrderTermination;
+import org.hibernate.search.query.dsl.sort.SortScoreContext;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
@@ -43,10 +44,10 @@ public abstract class ConnectedSortAdditionalSortFieldContext extends AbstractCo
 	}
 
 	@Override
-	public SortOrderTermination andByScore() {
+	public SortScoreContext andByScore() {
 		states.closeSortField();
 		states.setCurrentType( SortField.Type.SCORE );
-		return new ConnectedSortOrderTermination( queryContext, states );
+		return new ConnectedSortScoreContext( queryContext, states );
 	}
 
 	@Override
