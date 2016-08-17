@@ -143,6 +143,10 @@ public class SortFieldStates {
 	}
 
 	public void guessCurrentSortFieldType() {
+		this.currentType = getCurrentSortFieldTypeGuess();
+	}
+
+	private SortField.Type getCurrentSortFieldTypeGuess() {
 		FieldDescriptor fieldDescriptor = queryContext.getFactory()
 				.getIndexedTypeDescriptor( queryContext.getEntityType() )
 				.getIndexedField( currentName );
@@ -153,28 +157,24 @@ public class SortFieldStates {
 				NumericFieldSettingsDescriptor nfd = fieldDescriptor.as( NumericFieldSettingsDescriptor.class );
 				switch ( nfd.encodingType() ) {
 					case DOUBLE:
-						currentType = SortField.Type.DOUBLE;
-						break;
+						return SortField.Type.DOUBLE;
 					case FLOAT:
-						currentType = SortField.Type.FLOAT;
-						break;
+						return SortField.Type.FLOAT;
 					case LONG:
-						currentType = SortField.Type.LONG;
-						break;
+						return SortField.Type.LONG;
 					case INTEGER:
-						currentType = SortField.Type.INT;
-						break;
+						return SortField.Type.INT;
+					case UNKNOWN:
+						break; // Fail below
 				}
 				break;
 			case BASIC:
 				// TODO here I assume it will be a String, is that correct?
 				// TODO what about SortField.Type.String vs SortField.Type.StringVal
-				currentType = SortField.Type.STRING;
-				break;
+				return SortField.Type.STRING;
 		}
-		if ( currentType == null ) {
-			throw new SearchException( "Cannot guess the field type" );
-		}
+
+		throw new SearchException( "Cannot guess the field type" );
 	}
 
 	private void processMissingValue(SortField sortField) {
