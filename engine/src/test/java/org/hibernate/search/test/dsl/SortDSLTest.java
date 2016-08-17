@@ -40,7 +40,6 @@ import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -530,8 +529,33 @@ public class SortDSLTest {
 
 	@Test
 	public void nativeLucene() throws Exception {
-		// TODO YR code this test OR remove this test and remove "byNative" methods from the API.
-		Assert.fail( "API to be removed? native lucene sort" );
+		Query query = builder().all().createQuery();
+
+		// Missing value is not provided; the missing values should be considered as 0
+
+		Sort sort = builder().sort()
+				.byNative( new SortField( "uniqueNumericField", SortField.Type.DOUBLE ) )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 2, 1, 0, 3 )
+		);
+
+		sort = builder().sort()
+				.byNative( new SortField( "uniqueNumericField", SortField.Type.DOUBLE, false ) )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 2, 1, 0, 3 )
+		);
+
+		sort = builder().sort()
+				.byNative( new SortField( "uniqueNumericField", SortField.Type.DOUBLE, true ) )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 3, 0, 1, 2 )
+		);
 	}
 
 	@Test
