@@ -1,0 +1,11 @@
+= JSR 352 batch job for re-indexing entities (building...)
+Mincong Huang; Gunnar Morling; Emmanuel Bernard
+:revdate: {hibernateSearchVersion}
+:toc:
+:docinfo:
+
+include::preface.asciidoc[]
+
+:numbered:
+include::user-guide.asciidoc[]
+include::developer-guide.asciidoc[]

@@ -1,74 +1,145 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 package org.hibernate.search.jsr352;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
-import org.hibernate.search.jsr352.MassIndexer;
-import org.hibernate.search.jsr352.MassIndexerImpl;
+import javax.batch.operations.JobOperator;
+import javax.persistence.EntityManagerFactory;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
+/**
+ * @author Mincong Huang
+ */
+@RunWith(MockitoJUnitRunner.class)
 public class MassIndexerTest {
 
-    private final boolean OPTIMIZE_AFTER_PURGE = true;
-    private final boolean OPTIMIZE_AT_END = true;
-    private final boolean PURGE_AT_START = true;
-    private final int ARRAY_CAPACITY = 500;
-    private final int FETCH_SIZE = 100000;
-    private final int MAX_RESULTS = 1000000;
-    private final int PARTITION_CAPACITY = 500;
-    private final int PARTITIONS = 4;
-    private final int THREADS = 2;
+	private final boolean OPTIMIZE_AFTER_PURGE = true;
+	private final boolean OPTIMIZE_AT_END = true;
+	private final boolean PURGE_AT_START = true;
+	private final int FETCH_SIZE = 100000;
+	private final int MAX_RESULTS = 1000000;
+	private final int MAX_THREADS = 2;
+	private final int ROWS_PER_PARTITION = 500;
 
-    /*
-     * Test if all params are correctly set
-     */
-    @Test
-    public void testJobParams() {
-        
-        MassIndexer massIndexer = new MassIndexerImpl()
-                .arrayCapacity(ARRAY_CAPACITY)
-                .fetchSize(FETCH_SIZE)
-                .maxResults(MAX_RESULTS)
-                .optimizeAfterPurge(OPTIMIZE_AFTER_PURGE)
-                .optimizeAtEnd(OPTIMIZE_AT_END)
-                .partitionCapacity(PARTITION_CAPACITY)
-                .partitions(PARTITIONS)
-                .purgeAtStart(PURGE_AT_START)
-                .threads(THREADS);
-        
-        assertEquals(ARRAY_CAPACITY, massIndexer.getArrayCapacity());
-        assertEquals(FETCH_SIZE, massIndexer.getFetchSize());
-        assertEquals(MAX_RESULTS, massIndexer.getMaxResults());
-        assertEquals(OPTIMIZE_AFTER_PURGE, massIndexer.isOptimizeAfterPurge());
-        assertEquals(OPTIMIZE_AT_END, massIndexer.isOptimizeAtEnd());
-        assertEquals(PARTITION_CAPACITY, massIndexer.getPartitionCapacity());
-        assertEquals(PARTITIONS, massIndexer.getPartitions());
-        assertEquals(PURGE_AT_START, massIndexer.isPurgeAtStart());
-        assertEquals(THREADS, massIndexer.getThreads());
-    }
-    
-    /**
-     * Test if the set of root entities is set correctly via toString() method
-     */
-    @Test
-    public void testRootEntities_notNull() {
-        
-        Set<Class<?>> rootEntities = new HashSet<>();
-        rootEntities.add(String.class);
-        rootEntities.add(Integer.class);
-        
-        MassIndexer massIndexer = new MassIndexerImpl().addRootEntities(rootEntities);
-        Set<Class<?>> _rootEntities = massIndexer.getRootEntities();
-        
-        assertTrue(_rootEntities.contains(String.class));
-        assertTrue(_rootEntities.contains(Integer.class));
-    }
-    
-    @Test(expected=NullPointerException.class)
-    public void testRootEntities_empty() {
-        new MassIndexerImpl().addRootEntities(new HashSet<Class<?>>());
-    }
+	@Mock
+	private JobOperator mockedOperator;
+
+	@Mock
+	private EntityManagerFactory mockedEMF;
+
+	@Before
+	public void setUp() {
+		Mockito.when( mockedOperator.start( Mockito.anyString(), Mockito.any( Properties.class ) ) )
+				.thenReturn( 1L );
+		Mockito.when( mockedEMF.isOpen() ).thenReturn( true );
+	}
+
+	@Test
+	public void testJobParamsAll() {
+
+		ArgumentCaptor<Properties> propsCaptor = ArgumentCaptor.forClass( Properties.class );
+		long executionID = new MassIndexer().isJavaSE( true )
+				.jobOperator( mockedOperator )
+				.entityManagerFactory( mockedEMF )
+				.addRootEntities( String.class, Integer.class )
+				.fetchSize( FETCH_SIZE )
+				.maxResults( MAX_RESULTS )
+				.maxThreads( MAX_THREADS )
+				.optimizeAfterPurge( OPTIMIZE_AFTER_PURGE )
+				.optimizeAtEnd( OPTIMIZE_AT_END )
+				.rowsPerPartition( ROWS_PER_PARTITION )
+				.purgeAtStart( PURGE_AT_START )
+				.start();
+		assertEquals( 1L, executionID );
+
+		Mockito.verify( mockedOperator )
+				.start( Mockito.anyString(), propsCaptor.capture() );
+		Properties props = propsCaptor.getValue();
+		assertEquals( FETCH_SIZE, Integer.parseInt( props.getProperty( "fetchSize" ) ) );
+		assertEquals( MAX_RESULTS, Integer.parseInt( props.getProperty( "maxResults" ) ) );
+		assertEquals( OPTIMIZE_AFTER_PURGE, Boolean.parseBoolean( props.getProperty( "optimizeAfterPurge" ) ) );
+		assertEquals( OPTIMIZE_AT_END, Boolean.parseBoolean( props.getProperty( "optimizeAtEnd" ) ) );
+		assertEquals( ROWS_PER_PARTITION, Integer.parseInt( props.getProperty( "rowsPerPartition" ) ) );
+		assertEquals( PURGE_AT_START, Boolean.parseBoolean( props.getProperty( "purgeAtStart" ) ) );
+		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( "maxThreads" ) ) );
+
+		String rootEntities = propsCaptor.getValue().getProperty( "rootEntities" );
+		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
+		entityNames.forEach( entityName -> entityName = entityName.trim() );
+		assertTrue( entityNames.contains( Integer.class.getName() ) );
+		assertTrue( entityNames.contains( String.class.getName() ) );
+	}
+
+	@Test
+	public void testAddRootEntity_notNull() {
+
+		ArgumentCaptor<Properties> propsCaptor = ArgumentCaptor.forClass( Properties.class );
+		long executionID = new MassIndexer().isJavaSE( true )
+				.jobOperator( mockedOperator )
+				.entityManagerFactory( mockedEMF )
+				.addRootEntity( Integer.class )
+				.addRootEntity( String.class )
+				.start();
+		assertEquals( 1L, executionID );
+
+		Mockito.verify( mockedOperator )
+				.start( Mockito.anyString(), propsCaptor.capture() );
+		String rootEntities = propsCaptor.getValue().getProperty( "rootEntities" );
+		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
+		entityNames.forEach( entityName -> entityName = entityName.trim() );
+		assertTrue( entityNames.contains( Integer.class.getName() ) );
+		assertTrue( entityNames.contains( String.class.getName() ) );
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testAddRootEntity_null() {
+		new MassIndexer().addRootEntity( null );
+	}
+
+	@Test
+	public void testAddRootEntities_notNull() {
+
+		ArgumentCaptor<Properties> propsCaptor = ArgumentCaptor.forClass( Properties.class );
+		long executionID = new MassIndexer().isJavaSE( true )
+				.jobOperator( mockedOperator )
+				.entityManagerFactory( mockedEMF )
+				.addRootEntities( String.class, Integer.class )
+				.start();
+		assertEquals( 1L, executionID );
+
+		Mockito.verify( mockedOperator )
+				.start( Mockito.anyString(), propsCaptor.capture() );
+		String rootEntities = propsCaptor.getValue().getProperty( "rootEntities" );
+		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
+		entityNames.forEach( entityName -> entityName = entityName.trim() );
+		assertTrue( entityNames.contains( Integer.class.getName() ) );
+		assertTrue( entityNames.contains( String.class.getName() ) );
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testAddRootEntities_null() {
+		new MassIndexer().addRootEntities( null );
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testAddRootEntities_empty() {
+		new MassIndexer().addRootEntities( new Class<?>[0] );
+	}
 }
