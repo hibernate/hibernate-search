@@ -60,10 +60,11 @@ public class SortFieldStates {
 	private String currentName;
 	private SortOrder currentOrder;
 	private Object currentMissingValue;
-	private SortField currentSortField;
+	private SortField currentSortFieldNativeSortDescription;
 	private Coordinates coordinates;
 	private Double currentLatitude;
 	private Double currentLongitude;
+	private String currentStringNativeSortFieldDescription;
 
 	public SortFieldStates(QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
@@ -107,14 +108,14 @@ public class SortFieldStates {
 
 	public List<SortField> sortFields = new ArrayList<>( 3 );
 
-	public void setCurrentSortField(SortField currentSortField) {
-		this.currentSortField = currentSortField;
+	public void setCurrentSortFieldNativeSortDescription(SortField currentSortField) {
+		this.currentSortFieldNativeSortDescription = currentSortField;
 	}
 
 	public void closeSortField() {
 		SortField sortField;
-		if ( currentSortField != null ) {
-			sortField = currentSortField;
+		if ( currentSortFieldNativeSortDescription != null ) {
+			sortField = currentSortFieldNativeSortDescription;
 		}
 		else if ( currentType == SortField.Type.SCORE ) {
 			sortField = new SortField( null, SortField.Type.SCORE, isAsc() );
@@ -133,6 +134,9 @@ public class SortFieldStates {
 			if ( hasMissingValue() ) {
 				throw new AssertionFailure( "Missing values are not supported for distance sorting yet" );
 			}
+		}
+		else if ( currentStringNativeSortFieldDescription != null ) {
+			sortField = new NativeSortField( currentName, currentStringNativeSortFieldDescription );
 		}
 		else {
 			sortField = new SortField( currentName, currentType, isDesc() );
@@ -241,7 +245,7 @@ public class SortFieldStates {
 		this.currentName = null;
 		this.currentOrder = null;
 		this.currentMissingValue = null;
-		this.currentSortField = null;
+		this.currentSortFieldNativeSortDescription = null;
 		this.coordinates = null;
 		this.currentLatitude = null;
 		this.currentLongitude = null;
@@ -259,7 +263,7 @@ public class SortFieldStates {
 		this.currentLongitude = longitude;
 	}
 
-	public void setCurrentSortField(String sortField) {
-		throw new AssertionFailure( "What to do for ES byNative(String)?" );
+	public void setCurrentStringNativeSortFieldDescription(String nativeSortFieldDescription) {
+		this.currentStringNativeSortFieldDescription = nativeSortFieldDescription;
 	}
 }

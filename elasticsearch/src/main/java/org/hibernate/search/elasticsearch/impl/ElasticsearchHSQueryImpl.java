@@ -36,6 +36,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.elasticsearch.client.impl.ArbitrarySort;
 import org.hibernate.search.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
@@ -55,6 +56,7 @@ import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncod
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
+import org.hibernate.search.query.dsl.sort.impl.NativeSortField;
 import org.hibernate.search.query.engine.impl.AbstractHSQuery;
 import org.hibernate.search.query.engine.impl.EntityInfoImpl;
 import org.hibernate.search.query.engine.impl.FacetComparators;
@@ -418,6 +420,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				return new DistanceSort( distanceSortField.getField(),
 						distanceSortField.getCenter(),
 						distanceSortField.getReverse() ? Sorting.DESC : Sorting.ASC );
+			}
+			else if ( sortField instanceof NativeSortField ) {
+				NativeSortField nativeSortField = (NativeSortField) sortField;
+				String sortFieldName = nativeSortField.getField();
+				String sortDescriptionAsString = nativeSortField.getNativeSortDescription();
+				JsonElement sortDescription = JSON_PARSER.parse( sortDescriptionAsString );
+				return new ArbitrarySort( sortFieldName, sortDescription );
 			}
 			else {
 				String sortFieldName;

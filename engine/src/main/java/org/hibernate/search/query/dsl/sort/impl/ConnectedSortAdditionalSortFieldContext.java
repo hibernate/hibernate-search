@@ -64,14 +64,15 @@ public abstract class ConnectedSortAdditionalSortFieldContext extends AbstractCo
 	@Override
 	public SortNativeContext andByNative(SortField sortField) {
 		states.closeSortField();
-		states.setCurrentSortField(sortField);
+		states.setCurrentSortFieldNativeSortDescription(sortField);
 		return new ConnectedSortNativeContext( queryContext, states );
 	}
 
 	@Override
-	public SortNativeContext andByNative(String sortField) {
+	public SortNativeContext andByNative(String sortField, String nativeDescription) {
 		states.closeSortField();
-		states.setCurrentSortField(sortField);
+		states.setCurrentName( sortField );
+		states.setCurrentStringNativeSortFieldDescription( nativeDescription );
 		return new ConnectedSortNativeContext( queryContext, states );
 	}
 }

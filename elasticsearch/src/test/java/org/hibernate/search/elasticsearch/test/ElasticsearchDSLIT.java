@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.search.elasticsearch.testutil.JsonHelper.assertJsonEquals;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -18,7 +20,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -27,6 +31,7 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
@@ -247,6 +252,70 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testDSLSortNativeSimpleString() {
+		try ( Session session = openSession() ) {
+			Letter letter1 = new Letter();
+			Letter letter2 = new Letter();
+			persist( session, letter1 );
+			persist( session, letter2 );
+
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+
+			Query query = queryBuilder
+					.all()
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			Sort sort = queryBuilder.sort().byNative( "idSort", "\"desc\"" ).createSort();
+			fullTextQuery.setSort( sort );
+			List<?> list = fullTextQuery.list();
+			assertThat( list ).onProperty( "id" )
+					.containsExactly( letter2.getId(), letter1.getId() );
+
+			// Make sure the assertion above didn't just pass by chance
+			fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			sort = queryBuilder.sort().byNative( "idSort", "\"asc\"" ).createSort();
+			fullTextQuery.setSort( sort );
+			list = fullTextQuery.list();
+			assertThat( list ).onProperty( "id" )
+					.containsExactly( letter1.getId(), letter2.getId() );
+		}
+	}
+
+	@Test
+	public void testDSLSortNativeMap() {
+		try ( Session session = openSession() ) {
+			Letter letter1 = new Letter();
+			Letter letter2 = new Letter();
+			persist( session, letter1 );
+			persist( session, letter2 );
+
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+
+			Query query = queryBuilder
+					.all()
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			Sort sort = queryBuilder.sort().byNative( "idSort", "{\"order\":\"desc\"}" ).createSort();
+			fullTextQuery.setSort( sort );
+			List<?> list = fullTextQuery.list();
+			assertThat( list ).onProperty( "id" )
+					.containsExactly( letter2.getId(), letter1.getId() );
+
+			// Make sure the first assertion above didn't just pass by chance
+			fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			sort = queryBuilder.sort().byNative( "idSort", "{\"order\":\"asc\"}" ).createSort();
+			fullTextQuery.setSort( sort );
+			list = fullTextQuery.list();
+			assertThat( list ).onProperty( "id" )
+					.containsExactly( letter1.getId(), letter2.getId() );
+		}
+	}
+
 	private QueryBuilder queryBuilder(FullTextSession fullTextSession) {
 		final QueryBuilder tweetQueryBuilder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Letter.class ).get();
@@ -258,12 +327,21 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 		return new Class<?>[]{ Letter.class };
 	}
 
+	private void persist(Session session, Letter letter) {
+		Transaction tx = session.beginTransaction();
+		session.persist( letter );
+		tx.commit();
+		session.clear();
+	}
+
 	@Entity
 	@Indexed
 	public static class Letter {
 
 		@Id
 		@GeneratedValue
+		@Field(name = "idSort")
+		@SortableField(forField = "idSort")
 		private Integer id;
 
 		@Field
