@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>hsearch-jsr352-parent</artifactId>
+        <groupId>org.hibernate</groupId>
+        <version>5.5.4.Final</version>
+    </parent>
+
+    <artifactId>hsearch-jsr352-documentation</artifactId>
+    <packaging>pom</packaging>
+
+    <name>GSoC JSR352 - Manual</name>
+    <description>The Hibernate Search JSR352 reference manual (Beta)</description>
+
+    <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>output-html</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <backend>html</backend>
+                            <outputDirectory>${basedir}/target/asciidoc-html</outputDirectory>
+                            <sourceHighlighter>highlightjs</sourceHighlighter>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-resources-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>copy-asciidoc images</id>
+                  <phase>generate-resources</phase>
+                  <goals>
+                    <goal>copy-resources</goal>
+                  </goals>
+                  <configuration>
+                    <outputDirectory>${basedir}/target/asciidoc-html/images</outputDirectory>
+                    <resources>
+                      <resource>
+                        <directory>${basedir}/src/main/asciidoc/images</directory>
+                      </resource>
+                    </resources>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.jboss.maven.plugins</groupId>
+                    <artifactId>maven-jdocbook-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <configuration>
+                        <sourceDocumentName>index.asciidoc</sourceDocumentName>
+                        <doctype>book</doctype>
+                        <attributes>
+                            <hibernateSearchVersion>${project.version}</hibernateSearchVersion>
+                            <hibernateVersion>${org.hibernate}</hibernateVersion>
+                            <luceneVersion>${luceneVersion}</luceneVersion>
+                            <infinispanVersion>${infinispanVersion}</infinispanVersion>
+                        </attributes>
+                    </configuration>
+                </plugin>
+
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.jboss.maven.plugins</groupId>
+                                        <artifactId>maven-jdocbook-plugin</artifactId>
+                                        <versionRange>[2.3.5,)</versionRange>
+                                        <goals>
+                                            <goal>resources</goal>
+                                            <goal>generate</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <profiles>
+        <profile>
+            <id>docbook</id>
+            <build>
+              <plugins>
+                  <plugin>
+                      <groupId>org.asciidoctor</groupId>
+                      <artifactId>asciidoctor-maven-plugin</artifactId>
+                      <executions>
+                          <execution>
+                              <id>output-docbook</id>
+                              <phase>generate-resources</phase>
+                              <goals>
+                                  <goal>process-asciidoc</goal>
+                              </goals>
+                              <configuration>
+                                  <backend>docbook</backend>
+                                  <outputDirectory>target/asciidoc-docbook/en-US</outputDirectory>
+                              </configuration>
+                          </execution>
+                      </executions>
+                  </plugin>
+                  <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <executions>
+                      <execution>
+                        <id>copy-docbook-images-to-staging</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                          <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                          <outputDirectory>${basedir}/target/docbook/staging/images/images</outputDirectory>
+                          <resources>
+                            <resource>
+                              <directory>${basedir}/src/main/asciidoc/images</directory>
+                            </resource>
+                          </resources>
+                        </configuration>
+                      </execution>
+                    </executions>
+                  </plugin>
+                  <plugin>
+                      <groupId>org.jboss.maven.plugins</groupId>
+                      <artifactId>maven-jdocbook-plugin</artifactId>
+                      <configuration>
+                          <sourceDirectory>${basedir}/target/asciidoc-docbook</sourceDirectory>
+                          <sourceDocumentName>index.xml</sourceDocumentName>
+                          <masterTranslation>en-US</masterTranslation>
+                          <imageResource>
+                              <directory>${basedir}/src/main/asciidoc/images</directory>
+                          </imageResource>
+                          <formats>
+                              <format>
+                                  <formatName>html_single</formatName>
+                                  <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
+                                  </stylesheetResource>
+                                  <finalName>index.html</finalName>
+                              </format>
+                              <format>
+                                  <formatName>html</formatName>
+                                  <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
+                                  </stylesheetResource>
+                                  <finalName>index.html</finalName>
+                              </format>
+                              <format>
+                                  <formatName>pdf</formatName>
+                                  <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl
+                                  </stylesheetResource>
+                                  <finalName>hibernate_search_reference.pdf</finalName>
+                              </format>
+                          </formats>
+                          <options>
+                              <xincludeSupported>true</xincludeSupported>
+                              <xmlTransformerType>saxon</xmlTransformerType>
+                              <!-- needed for uri-resolvers; can be ommitted if using 'current' uri scheme -->
+                              <!--     could also locate the docbook dependency and inspect its version... -->
+                              <!--  docbookVersion>1.72.0</docbookVersioni -->
+                              <localeSeparator>-</localeSeparator>
+                              <injectionDateFormat>yyyy-MM-dd</injectionDateFormat>
+                              <transformerParameters>
+                                  <html.googleAnalyticsId>UA-45270411-3</html.googleAnalyticsId>
+                                  <html.googleTagManagerId>GTM-NJWS5L</html.googleTagManagerId>
+                                  <html.googleTagManagerChannel>Hibernate</html.googleTagManagerChannel>
+                              </transformerParameters>
+                          </options>
+                      </configuration>
+                      <executions>
+                          <execution>
+                              <id>docbook-processing</id>
+                              <phase>generate-resources</phase>
+                              <goals>
+                                  <goal>resources</goal>
+                                  <goal>generate</goal>
+                              </goals>
+                          </execution>
+                      </executions>
+                  </plugin>
+            </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

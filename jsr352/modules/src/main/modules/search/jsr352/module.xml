@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.jsr352" slot="${hibernate.search.version}">
+    <resources>
+        <resource-root path="hsearch-jsr352-${hibernate.search.version}.jar" />
+    </resources>
+    <dependencies>
+        <module name="javax.batch.api" />
+        <module name="javax.persistence.api" />
+        <module name="org.hibernate.search.engine" />
+        <module name="org.hibernate.search.orm" />
+        <module name="org.jboss.logging" />
+    </dependencies>
+</module>

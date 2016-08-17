@@ -1,25 +1,32 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 package org.hibernate.search.jsr352.test.entity;
 
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
 
-
 /**
  * The persistent class for the stock database table.
- * 
+ *
+ * @author Mincong Huang
  */
 @Entity
-@NamedQuery(name="Stock.findAll", query="SELECT s FROM Stock s")
-@Table(name="stock")
+@NamedQuery(name = "Stock.findAll", query = "SELECT s FROM Stock s")
+@Table(name = "stock")
 public class Stock implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@Column(name="adj_close")
+	@Column(name = "adj_close")
 	private float adjClose;
 
 	private float close;
@@ -112,11 +119,11 @@ public class Stock implements Serializable {
 		this.volume = volume;
 	}
 
-    @Override
-    public String toString() {
-        return "Stock [id=" + id + ", adjClose=" + adjClose + ", close=" + close
-                + ", company=" + company + ", date=" + date + ", high=" + high
-                + ", low=" + low + ", open=" + open + ", volume=" + volume
-                + "]";
-    }
+	@Override
+	public String toString() {
+		return "Stock [id=" + id + ", adjClose=" + adjClose + ", close=" + close
+				+ ", company=" + company + ", date=" + date + ", high=" + high
+				+ ", low=" + low + ", open=" + open + ", volume=" + volume
+				+ "]";
+	}
 }

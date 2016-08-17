@@ -1,116 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job id="massIndex" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
-    version="1.0">
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<job id="massIndex" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
 
     <listeners>
-        <listener ref="batchJobContextSetupListener">
-        <properties>
-            <property name="rootEntities" value="#{jobParameters['rootEntities']}"/>
-        </properties>
+        <listener ref="jobContextSetupListener">
+            <properties>
+                <property name="isJavaSE" value="#{jobParameters['isJavaSE']}" />
+                <property name="rootEntities" value="#{jobParameters['rootEntities']}" />
+            </properties>
         </listener>
-        <listener ref="flushingBatchJobListener"/>
     </listeners>
 
-  <step id="loadId" next="purgeDecision">
-    <batchlet ref="idProducerBatchlet">
-      <properties>
-        <!-- fetchSize - The number of rows returned in one chunk in criteria.
-             It tells the JDBC driver how many rows to return in one chunk, for 
-             large queries. It will do nothing if your driver does not support 
-             it. -->
-        <property name="fetchSize" value="#{jobParameters['fetchSize']}?:1000;"/>
-        <!-- arrayCapacity - The initial capacity of the list. Previously called 
-             batchSize, named changed to avoid naming confusion. Used to 
-             construct an empty array with the specified capacity. -->
-        <property name="arrayCapacity" value="#{jobParameters['arrayCapacity']}?:500;"/>
-        <!-- maxResults - the limit of rows returned in criteria. It defines the
-             limit of results the query will ever get. Same as LIMIT in SQL. -->
-        <property name="maxResults" value="#{jobParameters['maxResults']}?:10000000;"/>
-        <!-- entity type provided by the partition plan -->
-        <property name="entityType" value="#{partitionPlan['entityType']}"/>
-      </properties>
-    </batchlet>
-    <partition>
-      <!-- 
-           TODO: we have 2 partitions, but there're no way to reduce them at
-           the end !!! In order to debug the situation, the next step is set to
-           the optimization directly.
-       -->
-      <mapper ref="entityPartitionMapper">
-      </mapper>
-    </partition>
-  </step>
+    <step id="beforeChunk" next="produceLuceneDoc">
+        <batchlet ref="beforeChunkBatchlet">
+            <properties>
+                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
+                <property name="purgeAtStart" value="#{jobParameters['purgeAtStart']}" />
+            </properties>
+        </batchlet>
+    </step>
 
-  <decision id="purgeDecision" ref="purgeDecider">
-    <properties>
-      <property name="purgeAtStart" value="#{jobParameters['purgeAtStart']}?:false;"/>
-    </properties>
-    <next on="true" to="purgeIndex"/>
-    <next on="false" to="produceLuceneDoc"/>
-  </decision>
+    <step id="produceLuceneDoc" next="afterChunk">
+        <chunk checkpoint-policy="custom">
+            <reader ref="entityReader">
+                <properties>
+                    <property name="entityName" value="#{partitionPlan['entityName']}" />
+                    <property name="partitionID" value="#{partitionPlan['partitionID']}" />
+                    <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
+                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}" />
+                    <property name="maxResults" value="#{jobParameters['maxResults']}?:10000000;" />
+                </properties>
+            </reader>
+            <processor ref="luceneDocProducer">
+                <properties>
+                    <property name="entityName" value="#{partitionPlan['entityName']}" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
+                </properties>
+            </processor>
+            <writer ref="luceneDocWriter">
+                <properties>
+                    <property name="entityName" value="#{partitionPlan['entityName']}" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
+                </properties>
+            </writer>
+            <checkpoint-algorithm ref="checkpointAlgorithm">
+                <properties>
+                    <property name="itemCount" value="#{jobParameters['itemCount']}?:3;" />
+                </properties>
+            </checkpoint-algorithm>
+        </chunk>
+        <partition>
+            <mapper ref="partitionMapper">
+                <properties>
+                    <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
+                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
+                    <property name="maxThreads" value="#{jobParameters['threads']}?:8;" />
+                    <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:0;" />
+                </properties>
+            </mapper>
+            <collector ref="progressCollector" />
+            <analyzer ref="progressAggregator" />
+        </partition>
+    </step>
 
-  <step id="purgeIndex" next="afterPurgeDecision">
-    <batchlet ref="indexPurgerBatchlet"/>
-  </step>
-
-  <decision id="afterPurgeDecision" ref="afterPurgeDecider">
-    <properties>
-      <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:false;"/>
-    </properties>
-    <next on="true" to="optimizeAfterPurge"/>
-    <next on="false" to="produceLuceneDoc"/>
-  </decision>
-
-  <step id="optimizeAfterPurge" next="produceLuceneDoc">
-    <batchlet ref="optimizerBatchlet"/>
-  </step>
-
-  <step id="produceLuceneDoc" next="afterIndexDecision">
-    <properties>
-      <property name="javax.transaction.global.timeout" value="300"/>
-    </properties>
-    <listeners>
-      <listener ref="entityIndexingStepContextSetupListener">
-        <properties>
-          <property name="entityType" value="#{partitionPlan['entityType']}"/>
-        </properties>
-      </listener>
-    </listeners>
-    <chunk item-count="3">
-      <reader ref="batchItemReader"/>
-      <processor ref="batchItemProcessor"/>
-      <writer ref="batchItemWriter"/>
-    </chunk>
-    <partition>
-      <mapper ref="lucenePartitionMapper">
-        <properties>
-          <property name="partitionCapacity" value="#{jobParameters['partitionCapacity']}?:1;"/>
-          <property name="threads" value="#{jobParameters['threads']}?:2;"/>
-        </properties>
-      </mapper>
-      <collector ref="lucenePartitionCollector"/>
-      <analyzer ref="lucenePartitionAnalyzer">
-        <properties>
-          <!-- maxResults - the limit of rows returned in criteria. It defines the
-               limit of results the query will ever get. Same as LIMIT in SQL. -->
-          <property name="maxResults" value="#{jobParameters['maxResults']}?:2147483647;"/>
-        </properties>
-      </analyzer>
-      <reducer ref="lucenePartitionReducer"/>
-    </partition>
-  </step>
-
-  <decision id="afterIndexDecision" ref="afterIndexDecider">
-    <properties>
-      <property name="optimizeAtEnd" value="#{jobParameters['optimizeAtEnd']}?:false;"/>
-    </properties>
-    <next on="true" to="optimizeAfterIndex"/>
-    <end on="false" exit-status=""/><!-- TODO: add exit-status -->
-  </decision>
-
-  <step id="optimizeAfterIndex">
-    <batchlet ref="optimizerBatchlet"/>
-  </step>
+    <step id="afterChunk">
+        <batchlet ref="afterChunkBatchlet">
+            <properties>
+                <property name="optimizeAtEnd" value="#{jobParameters['optimizeAtEnd']}" />
+            </properties>
+        </batchlet>
+    </step>
 </job>

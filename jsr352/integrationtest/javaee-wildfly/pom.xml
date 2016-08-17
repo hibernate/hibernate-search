@@ -1,42 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hsearch-jsr352-parent</artifactId>
-    <version>5.6.0-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
-  </parent>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hsearch-jsr352-parent</artifactId>
+        <version>5.5.4.Final</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
 
-  <artifactId>hsearch-jsr352-integrationtest-wildfly</artifactId>
-  <name>GSoC JSR352 - Integration Tests in WildFly</name>
+    <artifactId>hsearch-jsr352-integrationtest-wildfly</artifactId>
+    <name>GSoC JSR352 - Integration Tests in WildFly</name>
 
-  <dependencies>
-    <!-- This integration test refers to classes in his parent -->
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hsearch-jsr352-core</artifactId>
-    </dependency>
+    <properties>
+        <path.tools_jar>${java.home}/../lib/tools.jar</path.tools_jar>
+        <byteman.version>3.0.6</byteman.version>
+        <byteman.agent.path>${org.jboss.byteman:byteman:jar}</byteman.agent.path>
+        <byteman.script.path>${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}JobInterruptor.btm</byteman.script.path>
+    </properties>
 
-    <dependency>
-       <groupId>org.hibernate.javax.persistence</groupId>
-       <artifactId>hibernate-jpa-2.1-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.spec.javax.batch</groupId>
-      <artifactId>jboss-batch-api_1.0_spec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.spec.javax.ejb</groupId>
-      <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-    </dependency>
-    <dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- This integration test refers to classes in his parent -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hsearch-jsr352-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ejb3</groupId>
+            <artifactId>jboss-ejb3-ext-api</artifactId>
+            <version>2.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.batch</groupId>
+            <artifactId>jboss-batch-api_1.0_spec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
             <scope>test</scope>
             <exclusions>
-                <!-- Pulled in transitively; Neither available on 
-                    Windows nor on JDK 9 -->
+                <!-- Pulled in transitively; Neither available on Windows nor on JDK 9 -->
                 <exclusion>
                     <groupId>sun.jdk</groupId>
                     <artifactId>jconsole</artifactId>
@@ -47,114 +71,136 @@
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
-</dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- byteman -->
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman</artifactId>
+            <scope>test</scope>
+            <version>${byteman.version}</version>
+        </dependency>
+    </dependencies>
 
-  <build>
-    <finalName>${project.artifactId}-${project.version}</finalName>
-    <testResources>
-      <testResource>
-        <filtering>true</filtering>
-        <directory>src/test/resources</directory>
-        <includes>
-          <include>**/persistence.xml</include>
-          <include>**/arquillian.xml</include>
-          <include>**/arquillian.launch</include>
-        </includes>
-      </testResource>
-    </testResources>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.17</version>
-        <!-- enable execution to run an integration test -->
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.wildfly</groupId>
-                  <artifactId>wildfly-dist</artifactId>
-                  <version>${org.wildfly}</version>
-                  <type>zip</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/node1</outputDirectory>
-                </artifactItem>
-                <!-- Provide hibernate search modules to wildfly
-                     because the modules are not enabled by default ?
-                     or because we want to provide the current project
-                     as a new slot beside the built-in HSEARCH modules ? -->
-                <artifactItem>
-                  <groupId>org.hibernate</groupId>
-                  <artifactId>hibernate-search-modules</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>wildfly-10-dist</classifier>
-                  <type>zip</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <!-- Copy the AS configuration files so we can use our custom configurations -->
-          <execution>
-            <id>configure-as-node-node1</id>
-            <!-- <phase>pre-integration-test</phase> -->
-            <!-- <phase>integration-test</phase> -->
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}</outputDirectory>
-              <overwrite>true</overwrite>
-              <resources>
-                <resource>
-                  <directory>${basedir}/src/wildflyConfig</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/persistence.xml</include>
+                    <include>**/arquillian.xml</include>
+                    <include>**/MANIFEST.MF</include>
+                </includes>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <!-- Allows to find the absolute path to dependencies -->
+                <groupId>org.bitstrings.maven.plugins</groupId>
+                <artifactId>dependencypath-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>set-all</id>
+                        <goals>
+                            <goal>set</goal>
+                        </goals>
+                        <configuration>
+                        <propertySets>
+                            <propertySet>
+                                <includes>
+                                    <include>org.jboss.byteman:byteman:jar</include>
+                                </includes>
+                            </propertySet>
+                        </propertySets>
+                    </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.17</version>
+                <!-- enable execution to run an integration test -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${org.wildfly}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/node1</outputDirectory>
+                                </artifactItem>
+                                <!-- Provide the current project to WildFly as a new module -->
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hsearch-jsr352-modules</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>wildfly-10-dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <!-- Copy the AS configuration files so we can use our custom configurations -->
+                    <execution>
+                        <id>configure-as-node-node1</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/wildflyConfig</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
