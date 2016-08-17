@@ -492,41 +492,6 @@ public class SortDSLTest {
 		);
 	}
 
-	@Test
-	public void distanceFromSpatialQuery() throws Exception {
-		// TODO YR Make sure it's really clear in the docs that the "within" call serves no purpose in this case
-
-		Query query = builder().spatial()
-				.onField("location_hash")
-						.within(51, Unit.KM).ofLatitude( 24 ).andLongitude( 32 )
-				.createQuery();
-
-		Sort sort = builder().sort()
-				.byDistanceFromSpatialQuery( query )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 3 )
-		);
-
-		sort = builder().sort()
-				.byDistanceFromSpatialQuery( query )
-						.asc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 3 )
-		);
-
-		sort = builder().sort()
-				.byDistanceFromSpatialQuery( query )
-						.desc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 3, 1, 0 )
-		);
-	}
 
 	@Test
 	public void distanceWithReturnedDistance() throws Exception {

@@ -11,7 +11,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
@@ -262,14 +261,5 @@ public class SortFieldStates {
 
 	public void setCurrentSortField(String sortField) {
 		throw new AssertionFailure( "What to do for ES byNative(String)?" );
-	}
-
-	public void setCurrentSpatialQuery(Query query) {
-		//TODO implement by:
-		// - unwrapping the original query
-		// - extract the field name
-		// - extract the coordinates or lat/long from the DistanceFilter
-		// - see ConnectedSpatialQueryBuilder
-		throw new AssertionFailure( "byDistanceFromSpatialQuery not implemented yet" );
 	}
 }

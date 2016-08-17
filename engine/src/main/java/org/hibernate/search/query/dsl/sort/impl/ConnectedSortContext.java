@@ -6,11 +6,9 @@
  */
 package org.hibernate.search.query.dsl.sort.impl;
 
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.query.dsl.sort.SortContext;
-import org.hibernate.search.query.dsl.sort.SortDistanceContext;
 import org.hibernate.search.query.dsl.sort.SortDistanceFromContext;
 import org.hibernate.search.query.dsl.sort.SortFieldContext;
 import org.hibernate.search.query.dsl.sort.SortNativeContext;
@@ -56,12 +54,6 @@ public class ConnectedSortContext extends AbstractConnectedSortContext implement
 	public SortDistanceFromContext byDistance(String field) {
 		states.setCurrentName( field );
 		return new ConnectedSortDistanceFromContext( queryContext, states );
-	}
-
-	@Override
-	public SortDistanceContext byDistanceFromSpatialQuery(Query query) {
-		states.setCurrentSpatialQuery(query);
-		return new ConnectedSortDistanceContext( queryContext, states );
 	}
 
 	@Override
