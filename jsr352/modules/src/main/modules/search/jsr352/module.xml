@@ -7,7 +7,7 @@
   -->
 <module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.jsr352" slot="${hibernate.search.version}">
     <resources>
-        <resource-root path="hsearch-jsr352-${hibernate.search.version}.jar" />
+        <resource-root path="hsearch-jsr352-core-${hibernate.search.version}.jar" />
     </resources>
     <dependencies>
         <module name="javax.batch.api" />

@@ -8,9 +8,7 @@ package org.hibernate.search.jsr352;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.batch.operations.JobOperator;
@@ -24,6 +22,7 @@ import javax.persistence.PersistenceContext;
 import org.hibernate.CacheMode;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.jsr352.test.entity.Address;
 import org.hibernate.search.jsr352.test.entity.Company;
 import org.hibernate.search.jsr352.test.entity.CompanyManager;
 import org.hibernate.search.jsr352.test.entity.Person;
@@ -70,12 +69,13 @@ public class PerformanceIT {
 	@Deployment
 	public static WebArchive createDeployment() {
 		WebArchive war = ShrinkWrap.create( WebArchive.class )
-				.addAsManifestResource( "META-INF/MANIFEST.MF" )
-				.addAsResource( "META-INF/persistence.xml" )
-				.addAsResource( "META-INF/batch-jobs/mass-index.xml" )
+//				.addAsManifestResource( "META-INF/MANIFEST.MF", "/MANIFEST.MF" )
+//				.addAsResource( "META-INF/batch-jobs/mass-index.xml" )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "/jboss-deployment-structure.xml" )
+				.addAsResource( "META-INF/persistence.xml", "META-INF/persistence.xml" )
+//				.addAsResource( "META-INF/batch-jobs/mass-index.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
-				.addClasses( Serializable.class, Date.class );
-//				.addPackages( true, "org.hibernate.search.jsr352" );
+				.addPackage( Address.class.getPackage() );
 		return war;
 	}
 
