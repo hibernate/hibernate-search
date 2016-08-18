@@ -330,6 +330,30 @@ Limitations:
 * The Elasticsearch implementation allows only limited backtracking. Calling `scrollableResylts.setRowNumber(4)` when currently positioned at index `1006`, for example, may result in a `SearchException` being thrown, because only 1000 previous elements had been kept in memory. You may work this around by tweaking the property: `hibernate.search.elasticsearch.scroll_backtracking_window_size` (see <<elasticsearch-integration-configuration>>).
 * The `ScrollableResults` will become stale and unusable after a given period of time spent without fetching results from Elasticsearch. You may work this around by tweaking two properties: `hibernate.search.elasticsearch.scroll_timeout` and `hibernate.search.elasticsearch.scroll_fetch_size` (see <<elasticsearch-integration-configuration>>). Typically, you will solve timeout issues by reducing the fetch size and/or increasing the timeout limit, but this will also increase the performance hit on Elasticsearch.
 
+==== [[elasticsearch-query-sorting]]Sorting
+
+Sorting is performed the same way as <<query-sorting,with the Lucene backend>>.
+
+If you happen to need an advanced Elasticsearch sorting feature that is not natively supported in `SortField` or in Hibernate Search sort DSL, you may still create a sort from JSON, and even mix it with DSL-defined sorts:
+
+.Mixing DSL-defined sorts with native Elasticsearch JSON sorts
+====
+[source, JAVA]
+----
+QueryBuilder qb = fullTextSession.getSearchFactory()
+    .buildQueryBuilder().forEntity(Book.class).get();
+Query luceneQuery = /* ... */;
+FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+SortField complexSortField = /* ... */;
+Sort sort = qb.sort()
+        .byNative( "authors.name", "{'order':'asc', 'mode': 'min'}" )
+        .andByField("title")
+        .createSort();
+query.setSort(sort);
+List results = query.list();
+----
+====
+
 ==== Projections
 
 All fields are stored by Elasticsearch in the JSON document it indexes,

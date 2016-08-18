@@ -327,9 +327,58 @@ and won't have distance calculated.
 ===== Sorting by distance
 
 To sort the results by distance to the center of the search you will have to build a `Sort` instance
-using a `DistanceSortField`:
+using Hibernate Search sort DSL:
 
-.Distance sort example
+.Distance sort example without using the sort DSL
+====
+[source, JAVA]
+----
+double centerLatitude = 24.0d;
+double centerLongitude = 32.0d;
+
+QueryBuilder builder = fullTextSession.getSearchFactory()
+   .buildQueryBuilder().forEntity( POI.class ).get();
+org.apache.lucene.search.Query luceneQuery = builder
+  .spatial()
+    .onField("location")
+      .within(100, Unit.KM)
+      .ofLatitude(centerLatitude)
+      .andLongitude(centerLongitude)
+  .createQuery();
+
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
+List results = query.list();
+Sort distanceSort = qb
+  .sort()
+    .byDistance()
+      .onField("location")
+      .fromLatitude(centerLatitude)
+      .andLongitude(centerLongitude)
+    .createSort();
+hibQuery.setSort(distanceSort);
+----
+====
+
+
+The sort must be constructed using the same coordinates on the same spatial field used
+to build the spatial query, otherwise the sorting will occur with another center than the query. This
+repetition is needed to allow you to define Queries with any tool.
+
+[NOTE]
+.Sorting and null values
+====
+Using distance sort on non `@Spatial` enabled entities and/or with a non spatial Query will have also
+unexpected results as entities non spatially indexed and/or with null values for latitude or
+longitude will be considered to be at (0,0)/(lat,0)/(0,long)
+
+Using distance sort with a spatial query on spatially indexed entities having, potentially, `null`
+values for latitude and/or longitude is safe as they will not be found by the spatial query and so
+won't be sorted
+====
+
+Alternatively, you may also use a `DistanceSortField` directly, as it was done before the introduction of Hibernate Search sort DSL:
+
+.Distance sort example without using the sort DSL
 ====
 [source, JAVA]
 ----
@@ -351,22 +400,6 @@ Sort distanceSort = new Sort(
 	new DistanceSortField(centerLatitude, centerLongitude, "location"));
 hibQuery.setSort(distanceSort);
 ----
-====
-
-The `DistanceSortField` must be constructed using the same coordinates on the same spatial field used
-to build the spatial query otherwise the sorting will occur with another center than the query. This
-repetition is needed to allow you to define Queries with any tool.
-
-[NOTE]
-.Sorting and null values
-====
-Using distance sort on non `@Spatial` enabled entities and/or with a non spatial Query will have also
-unexpected results as entities non spatially indexed and/or with null values for latitude or
-longitude will be considered to be at (0,0)/(lat,0)/(0,long)
-
-Using distance sort with a spatial query on spatially indexed entities having, potentially, `null`
-values for latitude and/or longitude is safe as they will not be found by the spatial query and so
-won't be sorted
 ====
 
 [[spatial-multiplecoordinates]]
