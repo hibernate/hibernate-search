@@ -7,7 +7,6 @@
 package org.hibernate.search.query.dsl.sort;
 
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -59,11 +58,12 @@ public interface SortContext {
 
 	/**
 	 * Order elements by distance.
-	 * <p>The distance is computed between the value of the given field (which must be
-	 * a {@link Spatial} field) and reference coordinates, to be provided in the
-	 * {@link SortDistanceFromContext next context}.
+	 *
+	 * <p>The distance is computed between the value of a field carrying coordinates
+	 * (to be provided in the {@link SortDistanceNoFieldContext next context})
+	 * and reference coordinates.
 	 */
-	SortDistanceFromContext byDistance(String field);
+	SortDistanceNoFieldContext byDistance();
 
 	/**
 	 * Order element using the native backend API for Lucene.

@@ -8,24 +8,24 @@ package org.hibernate.search.query.dsl.sort.impl;
 
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
-import org.hibernate.search.query.dsl.sort.SortDistanceContext;
+import org.hibernate.search.query.dsl.sort.SortDistanceFieldAndReferenceContext;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public class ConnectedSortDistanceContext extends ConnectedSortAdditionalSortFieldContext implements SortDistanceContext {
-	public ConnectedSortDistanceContext(QueryBuildingContext queryContext, SortFieldStates states) {
+public class ConnectedSortDistanceFieldAndReferenceContext extends ConnectedSortAdditionalSortFieldContext implements SortDistanceFieldAndReferenceContext {
+	public ConnectedSortDistanceFieldAndReferenceContext(QueryBuildingContext queryContext, SortFieldStates states) {
 		super( queryContext, states );
 	}
 
 	@Override
-	public SortDistanceContext asc() {
+	public SortDistanceFieldAndReferenceContext asc() {
 		getStates().setAsc();
 		return this;
 	}
 
 	@Override
-	public SortDistanceContext desc() {
+	public SortDistanceFieldAndReferenceContext desc() {
 		getStates().setDesc();
 		return this;
 	}

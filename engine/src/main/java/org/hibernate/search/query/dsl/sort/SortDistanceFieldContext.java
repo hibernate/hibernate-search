@@ -15,7 +15,7 @@ import org.hibernate.search.spatial.Coordinates;
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
  */
-public interface SortDistanceFromContext {
+public interface SortDistanceFieldContext {
 
 	/**
 	 * Sort by the distance to the given {@link Coordinates}.
@@ -23,7 +23,7 @@ public interface SortDistanceFromContext {
 	 * @param coordinates The reference coordinates to which the distance
 	 * will be computed for each document.
 	 */
-	SortDistanceContext fromCoordinates(Coordinates coordinates);
+	SortDistanceFieldAndReferenceContext fromCoordinates(Coordinates coordinates);
 
 	/**
 	 * Sort by the distance to the given latitude

@@ -8,6 +8,8 @@ package org.hibernate.search.query.dsl.sort;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
+ * @author Yoann Rodiere
  */
-public interface SortDistanceContext extends SortOrder<SortDistanceContext>, SortAdditionalSortFieldContext, SortTermination {
+public interface SortDistanceFieldAndReferenceContext
+		extends SortOrder<SortDistanceFieldAndReferenceContext>, SortAdditionalSortFieldContext, SortTermination {
 }

@@ -14,10 +14,10 @@ public interface SortLatLongContext {
 
 	/**
 	 * Sort by the distance to the given longitude
-	 * and {@link SortDistanceFromContext#fromLatitude(double) formerly-defined latitude}.
+	 * and {@link SortDistanceFieldContext#fromLatitude(double) formerly-defined latitude}.
 	 *
 	 * @param longitude The reference longitude, part of the coordinates
 	 * to which the distance will be computed for each document.
 	 */
-	SortDistanceContext andLongitude(double longitude);
+	SortDistanceFieldAndReferenceContext andLongitude(double longitude);
 }

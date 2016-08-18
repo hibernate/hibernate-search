@@ -7,8 +7,8 @@
 package org.hibernate.search.query.dsl.sort.impl;
 
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
-import org.hibernate.search.query.dsl.sort.SortDistanceContext;
-import org.hibernate.search.query.dsl.sort.SortDistanceFromContext;
+import org.hibernate.search.query.dsl.sort.SortDistanceFieldAndReferenceContext;
+import org.hibernate.search.query.dsl.sort.SortDistanceFieldContext;
 import org.hibernate.search.query.dsl.sort.SortLatLongContext;
 import org.hibernate.search.spatial.Coordinates;
 
@@ -16,17 +16,17 @@ import org.hibernate.search.spatial.Coordinates;
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
  */
-public class ConnectedSortDistanceFromContext extends AbstractConnectedSortContext
-		implements SortDistanceFromContext, SortLatLongContext {
+public class ConnectedSortDistanceFieldContext extends AbstractConnectedSortContext
+		implements SortDistanceFieldContext, SortLatLongContext {
 
-	public ConnectedSortDistanceFromContext(QueryBuildingContext queryContext, SortFieldStates states) {
+	public ConnectedSortDistanceFieldContext(QueryBuildingContext queryContext, SortFieldStates states) {
 		super( queryContext, states );
 	}
 
 	@Override
-	public SortDistanceContext fromCoordinates(Coordinates coordinates) {
+	public SortDistanceFieldAndReferenceContext fromCoordinates(Coordinates coordinates) {
 		getStates().setCoordinates(coordinates);
-		return new ConnectedSortDistanceContext( getQueryContext(), getStates() );
+		return new ConnectedSortDistanceFieldAndReferenceContext( getQueryContext(), getStates() );
 	}
 
 	@Override
@@ -36,9 +36,9 @@ public class ConnectedSortDistanceFromContext extends AbstractConnectedSortConte
 	}
 
 	@Override
-	public SortDistanceContext andLongitude(double longitude) {
+	public SortDistanceFieldAndReferenceContext andLongitude(double longitude) {
 		getStates().setCurrentLongitude(longitude);
-		return new ConnectedSortDistanceContext( getQueryContext(), getStates() );
+		return new ConnectedSortDistanceFieldAndReferenceContext( getQueryContext(), getStates() );
 	}
 
 }

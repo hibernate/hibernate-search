@@ -462,7 +462,8 @@ public class SortDSLTest {
 		Query query = builder().all().createQuery();
 
 		Sort sort = builder().sort()
-				.byDistance( "location_hash" )
+				.byDistance()
+						.onField( "location_hash" )
 						.fromLatitude( 24 ).andLongitude( 32 )
 				.createSort();
 		assertThat(
@@ -471,7 +472,8 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byDistance( "location_hash" )
+				.byDistance()
+						.onField( "location_hash" )
 						.fromLatitude( 24 ).andLongitude( 32 )
 						.asc()
 				.createSort();
@@ -481,7 +483,8 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byDistance( "location_hash" )
+				.byDistance()
+						.onField( "location_hash" )
 						.fromLatitude( 24 ).andLongitude( 32 )
 						.desc()
 				.createSort();
