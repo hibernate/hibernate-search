@@ -92,11 +92,6 @@
             <testResource>
                 <filtering>true</filtering>
                 <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/persistence.xml</include>
-                    <include>**/arquillian.xml</include>
-                    <include>**/MANIFEST.MF</include>
-                </includes>
             </testResource>
         </testResources>
         <plugins>

@@ -21,17 +21,16 @@
             <filtered>true</filtered>
         </file>
     </files>
-<!-- 
+
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>/org/hibernate/search/jsr352/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>org.hibernate:hibernate-search-orm</include>
+                <include>org.hibernate:hsearch-jsr352-core</include>
             </includes>
         </dependencySet>
     </dependencySets>
-     -->
 </assembly>
