@@ -173,8 +173,6 @@ public class SortFieldStates {
 				}
 				break;
 			case BASIC:
-				// TODO here I assume it will be a String, is that correct?
-				// TODO what about SortField.Type.String vs SortField.Type.StringVal
 				return SortField.Type.STRING;
 		}
 
