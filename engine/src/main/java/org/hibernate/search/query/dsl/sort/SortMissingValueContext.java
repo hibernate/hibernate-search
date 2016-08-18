@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.query.dsl.sort;
 
+import org.hibernate.search.exception.SearchException;
+
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
@@ -31,8 +33,10 @@ public interface SortMissingValueContext<T> {
 	/**
 	 * When documents are missing a value on the sort field, use the given value instead.
 	 *
-	 * <p>This is only available for numeric sorts fields.
+	 * <p>This is only available for numeric fields.
 	 * <p>Field bridges, if any, will be ignored. Thus the actual numeric value must be provided.
+	 *
+	 * @throws SearchException If the field is not numeric.
 	 */
 	T use(Object value);
 }

@@ -14,7 +14,6 @@ import java.util.Map;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
@@ -126,13 +125,13 @@ public class SortFieldStates {
 		else if ( coordinates != null ) {
 			sortField = new DistanceSortField( coordinates, currentName, isAsc() );
 			if ( hasMissingValue() ) {
-				throw new AssertionFailure( "Missing values are not supported for distance sorting yet" );
+				throw new SearchException( "Missing values substitutes are not supported for distance sorting yet" );
 			}
 		}
 		else if ( currentLatitude != null ) {
 			sortField = new DistanceSortField( currentLatitude, currentLongitude, currentName, isAsc() );
 			if ( hasMissingValue() ) {
-				throw new AssertionFailure( "Missing values are not supported for distance sorting yet" );
+				throw new SearchException( "Missing values substitutes are not supported for distance sorting yet" );
 			}
 		}
 		else if ( currentStringNativeSortFieldDescription != null ) {
@@ -156,7 +155,8 @@ public class SortFieldStates {
 				.getIndexedField( currentName );
 		switch ( fieldDescriptor.getType() ) {
 			case SPATIAL:
-				throw new SearchException( "wrong field type mate, use .fromCoordinates and co" );
+				throw new SearchException( "Field '" + currentName + "' is a spatial field."
+						+ " For spatial fields, use .byDistance() and not .byField()." );
 			case NUMERIC:
 				NumericFieldSettingsDescriptor nfd = fieldDescriptor.as( NumericFieldSettingsDescriptor.class );
 				switch ( nfd.encodingType() ) {
@@ -176,7 +176,8 @@ public class SortFieldStates {
 				return SortField.Type.STRING;
 		}
 
-		throw new SearchException( "Cannot guess the field type" );
+		throw new SearchException( "Cannot guess the field type for field '" + currentName
+				+ "'. Use byField(String, Sort.Type) to provide the sort type explicitly." );
 	}
 
 	private void processMissingValue(SortField sortField) {
@@ -189,7 +190,7 @@ public class SortFieldStates {
 					sortField.setMissingValue( SortField.STRING_FIRST );
 				}
 				else {
-					throw new SearchException( "Unsupported 'use(Object)' for the field type: " + currentType + "."
+					throw new SearchException( "Unsupported 'use(Object)' for the field type: '" + currentType + "'."
 							+ " Only 'sortFirst()' and 'sortLast()' are supported." );
 				}
 			}
@@ -202,8 +203,8 @@ public class SortFieldStates {
 						sortField.setMissingValue( min );
 					}
 					else {
-						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType + "."
-								+ " Only 'use(Object)' is supported.");
+						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: '"
+								+ currentType + "'." + " Only 'use(Object)' is supported." );
 					}
 				}
 				else if ( currentMissingValue == MISSING_VALUE_LAST && !reverse
@@ -213,8 +214,8 @@ public class SortFieldStates {
 						sortField.setMissingValue( max );
 					}
 					else {
-						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: " + currentType + "."
-								+ " Only 'use(Object)' is supported.");
+						throw new SearchException( "Unsupported 'sortFirst()'/'sortLast()' for the field type: '"
+								+ currentType + "'." + " Only 'use(Object)' is supported." );
 					}
 				}
 				else {
