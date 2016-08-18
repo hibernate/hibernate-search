@@ -8,21 +8,29 @@ package org.hibernate.search.query.dsl.sort;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
+ * @author Yoann Rodiere
  */
 public interface SortMissingValueContext<T> {
 
 	/**
-	 * Put missing values last in the sorting
+	 * Put documents with missing values last in the sorting.
+	 *
+	 * <p>This instruction is independent of whether the sort is being ascending
+	 * or descending.
 	 */
 	T sortLast();
 
 	/**
-	 * Put missing values first in the sorting
+	 * Put documents with missing values first in the sorting.
+	 *
+	 * <p>This instruction is independent of whether the sort is being ascending
+	 * or descending.
 	 */
 	T sortFirst();
 
 	/**
-	 * Value to replace a missing value with during sorting.
+	 * When documents are missing a value on the sort field, use the given value instead.
+	 *
 	 * <p>This is only available for numeric sorts fields.
 	 * <p>Field bridges, if any, will be ignored. Thus the actual numeric value must be provided.
 	 */

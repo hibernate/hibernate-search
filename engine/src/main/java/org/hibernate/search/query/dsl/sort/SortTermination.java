@@ -10,6 +10,7 @@ import org.apache.lucene.search.Sort;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
+ * @author Yoann Rodiere
  */
 public interface SortTermination {
 

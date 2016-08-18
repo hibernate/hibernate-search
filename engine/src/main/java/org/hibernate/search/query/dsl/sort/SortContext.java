@@ -12,24 +12,32 @@ import org.hibernate.search.exception.SearchException;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
+ * @author Yoann Rodiere
  */
 public interface SortContext {
 
 	/**
-	 * Order elements by their relevance score in decreasing order by default.
+	 * Order elements by their relevance score.
+	 *
+	 * <p>The default order is <strong>descending</strong>, i.e. higher scores come first.
 	 */
 	SortScoreContext byScore();
 
 	/**
 	 * Order elements by their internal index order.
-	 * This is the fastest sorting.
 	 */
 	SortOrderTermination byIndexOrder();
 
 	/**
-	 * Order elements by value of a specific field. The sort field type will be determined automatically.
-	 * @throws SearchException If the sort field type could not be guessed. This will happen in particular
-	 * if a custom field bridge is defined on the given field.
+	 * Order elements by the value of a specific field.
+	 *
+	 * <p>The default order is <strong>ascending</strong>.
+	 * <p>The sort field type will be determined automatically if possible, and an exception will be thrown
+	 * if guessing is not possible. Guessing is impossible in particular if a custom field bridge is
+	 * defined on the given field.
+	 *
+	 * @param fieldName The name of the index field to sort by
+	 * @throws SearchException If the sort field type could not be guessed.
 	 * @see {@link #byField(String, org.apache.lucene.search.SortField.Type)} for fields with
 	 * custom field bridges.
 	 */
@@ -37,9 +45,15 @@ public interface SortContext {
 
 	/**
 	 * Order elements by value of a specific field, with the sort field type provided.
-	 * <p><strong>Note:</strong> use of this method is only required when sorting on a
-	 * field that uses a custom field bridge. Otherwise, one may simply use
+	 *
+	 * <p>The default order is <strong>ascending</strong>.
+	 * <p><strong>Note:</strong> using this method is only required when sorting on a
+	 * field on which a custom field bridge is defined. Otherwise, one may simply use
 	 * {@link #byField(String)}.
+	 *
+	 * @param fieldName The name of the index field to sort by
+	 * @param sortFieldType The sort field type
+	 * @see #byField(String, org.apache.lucene.search.SortField.Type)
 	 */
 	SortFieldContext byField(String field, SortField.Type sortFieldType);
 
@@ -53,12 +67,17 @@ public interface SortContext {
 
 	/**
 	 * Order element using the native backend API for Lucene.
+	 *
+	 * <p>The sort order (ascending/descending) is defined in <code>field</code>
+	 *
+	 * @param field The sort field to be added to the sort list.
 	 */
 	SortNativeContext byNative(SortField sortField);
 
 	/**
 	 * Order element using the native backend API for Elasticsearch.
-	 * @param field The field name
+	 *
+	 * @param fieldName The name of the index field to sort by
 	 * @param nativeSortFieldDescription The sort field description, as valid JSON. This may be a
 	 * simple quoted string (e.g. "'asc'") or a JSON map (e.g. "{'key': 'value'}"). See
 	 * Elasticsearch's documentation for information about the exact syntax.

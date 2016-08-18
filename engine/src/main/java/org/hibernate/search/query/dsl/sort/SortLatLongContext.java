@@ -8,11 +8,16 @@ package org.hibernate.search.query.dsl.sort;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
+ * @author Yoann Rodiere
  */
 public interface SortLatLongContext {
 
 	/**
-	 * Longitude in degree
+	 * Sort by the distance to the given longitude
+	 * and {@link SortDistanceFromContext#fromLatitude(double) formerly-defined latitude}.
+	 *
+	 * @param longitude The reference longitude, part of the coordinates
+	 * to which the distance will be computed for each document.
 	 */
 	SortDistanceContext andLongitude(double longitude);
 }

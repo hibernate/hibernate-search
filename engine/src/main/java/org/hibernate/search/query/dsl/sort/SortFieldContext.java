@@ -8,6 +8,7 @@ package org.hibernate.search.query.dsl.sort;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
+ * @author Yoann Rodiere
  */
 public interface SortFieldContext extends SortAdditionalSortFieldContext, SortOrder<SortFieldContext>, SortTermination {
 

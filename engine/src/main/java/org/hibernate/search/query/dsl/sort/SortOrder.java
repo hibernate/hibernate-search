@@ -11,12 +11,12 @@ package org.hibernate.search.query.dsl.sort;
  */
 public interface SortOrder<T> {
 	/**
-	 * Sort in ascending order
+	 * Sort in ascending order.
 	 */
 	T asc();
 
 	/**
-	 * Sort in descending order
+	 * Sort in descending order.
 	 */
 	T desc();
 }
