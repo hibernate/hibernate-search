@@ -7,7 +7,6 @@
 package org.hibernate.search.query.dsl.sort.impl;
 
 import org.apache.lucene.search.Sort;
-import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.query.dsl.sort.SortDistanceContext;
 
@@ -35,11 +34,5 @@ public class ConnectedSortDistanceContext extends ConnectedSortAdditionalSortFie
 	public Sort createSort() {
 		getStates().closeSortField();
 		return getStates().createSort();
-	}
-
-	@Override
-	public SortDistanceContext in(Unit unit) {
-		// nothing to do for now
-		return this;
 	}
 }

@@ -34,7 +34,6 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spatial.Coordinates;
@@ -465,42 +464,6 @@ public class SortDSLTest {
 		Sort sort = builder().sort()
 				.byDistance( "location_hash" )
 						.fromLatitude( 24 ).andLongitude( 32 )
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 3, 2 )
-		);
-
-		sort = builder().sort()
-				.byDistance( "location_hash" )
-						.fromLatitude( 24 ).andLongitude( 32 )
-						.asc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 0, 1, 3, 2 )
-		);
-
-		sort = builder().sort()
-				.byDistance( "location_hash" )
-						.fromLatitude( 24 ).andLongitude( 32 )
-						.desc()
-				.createSort();
-		assertThat(
-				query( query, sort ),
-				returnsIDsInOrder( 2, 3, 1, 0 )
-		);
-	}
-
-
-	@Test
-	public void distanceWithReturnedDistance() throws Exception {
-		Query query = builder().all().createQuery();
-
-		Sort sort = builder().sort()
-				.byDistance( "location_hash" )
-						.fromLatitude( 24 ).andLongitude( 32 )
-						.in( Unit.KM )
 				.createSort();
 		assertThat(
 				query( query, sort ),

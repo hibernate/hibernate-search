@@ -6,15 +6,8 @@
  */
 package org.hibernate.search.query.dsl.sort;
 
-import org.hibernate.search.query.dsl.Unit;
-
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface SortDistanceContext extends SortOrder<SortDistanceContext>, SortAdditionalSortFieldContext, SortTermination {
-
-	/**
-	 * Hint for the backend to return data in the appropriate unit.
-	 */
-	SortDistanceContext in(Unit unit);
 }
