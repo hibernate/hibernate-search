@@ -59,6 +59,8 @@ public interface SortContext {
 	/**
 	 * Order elements by distance.
 	 *
+	 * <p>The default order is <strong>ascending</strong>, i.e. shorter distances
+	 * come first.
 	 * <p>The distance is computed between the value of a field carrying coordinates
 	 * (to be provided in the {@link SortDistanceNoFieldContext next context})
 	 * and reference coordinates.

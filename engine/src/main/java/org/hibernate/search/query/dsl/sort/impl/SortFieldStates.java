@@ -123,13 +123,13 @@ public class SortFieldStates {
 			sortField = new SortField( null, SortField.Type.DOC, isDesc() );
 		}
 		else if ( coordinates != null ) {
-			sortField = new DistanceSortField( coordinates, currentName, isAsc() );
+			sortField = new DistanceSortField( coordinates, currentName, isDesc() );
 			if ( hasMissingValue() ) {
 				throw new SearchException( "Missing values substitutes are not supported for distance sorting yet" );
 			}
 		}
 		else if ( currentLatitude != null ) {
-			sortField = new DistanceSortField( currentLatitude, currentLongitude, currentName, isAsc() );
+			sortField = new DistanceSortField( currentLatitude, currentLongitude, currentName, isDesc() );
 			if ( hasMissingValue() ) {
 				throw new SearchException( "Missing values substitutes are not supported for distance sorting yet" );
 			}
