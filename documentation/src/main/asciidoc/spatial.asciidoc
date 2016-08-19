@@ -329,7 +329,7 @@ and won't have distance calculated.
 To sort the results by distance to the center of the search you will have to build a `Sort` instance
 using Hibernate Search sort DSL:
 
-.Distance sort example without using the sort DSL
+.Distance sort example using the sort DSL
 ====
 [source, JAVA]
 ----
