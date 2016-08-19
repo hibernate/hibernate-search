@@ -37,10 +37,10 @@ public interface SortContext {
 	 *
 	 * @param fieldName The name of the index field to sort by
 	 * @throws SearchException If the sort field type could not be guessed.
-	 * @see {@link #byField(String, org.apache.lucene.search.SortField.Type)} for fields with
-	 * custom field bridges.
+	 * @see #byField(String, org.apache.lucene.search.SortField.Type) The alternative for
+	 * numeric fields with custom field bridges.
 	 */
-	SortFieldContext byField(String field);
+	SortFieldContext byField(String fieldName);
 
 	/**
 	 * Order elements by value of a specific field, with the sort field type provided.
@@ -54,7 +54,7 @@ public interface SortContext {
 	 * @param sortFieldType The sort field type
 	 * @see #byField(String, org.apache.lucene.search.SortField.Type)
 	 */
-	SortFieldContext byField(String field, SortField.Type sortFieldType);
+	SortFieldContext byField(String fieldName, SortField.Type sortFieldType);
 
 	/**
 	 * Order elements by distance.
@@ -70,9 +70,9 @@ public interface SortContext {
 	/**
 	 * Order element using the native backend API for Lucene.
 	 *
-	 * <p>The sort order (ascending/descending) is defined in <code>field</code>
+	 * <p>The sort order (ascending/descending) is defined in <code>sortField</code>
 	 *
-	 * @param field The sort field to be added to the sort list.
+	 * @param sortField The sort field to be added to the sort list.
 	 */
 	SortNativeContext byNative(SortField sortField);
 
@@ -80,9 +80,9 @@ public interface SortContext {
 	 * Order element using the native backend API for Elasticsearch.
 	 *
 	 * @param fieldName The name of the index field to sort by
-	 * @param nativeSortFieldDescription The sort field description, as valid JSON. This may be a
+	 * @param sortFieldNativeDescription The sort field description, as valid JSON. This may be a
 	 * simple quoted string (e.g. "'asc'") or a JSON map (e.g. "{'key': 'value'}"). See
 	 * Elasticsearch's documentation for information about the exact syntax.
 	 */
-	SortNativeContext byNative(String field, String sortFieldNativeDescription);
+	SortNativeContext byNative(String fieldName, String sortFieldNativeDescription);
 }
