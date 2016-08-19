@@ -218,6 +218,7 @@
                             org.hibernate.search.query;version="${project.version}",
                             org.hibernate.search.query.collector;version="${project.version}",
                             org.hibernate.search.query.dsl;version="${project.version}",
+                            org.hibernate.search.query.dsl.sort;version="${project.version}",
                             org.hibernate.search.query.engine;version="${project.version}",
                             org.hibernate.search.query.engine.spi;version="${project.version}",
                             org.hibernate.search.query.engine.impl;version="${project.version}",
