@@ -32,11 +32,11 @@ public interface SortContext {
 	 *
 	 * <p>The default order is <strong>ascending</strong>.
 	 * <p>The sort field type will be determined automatically if possible, and an exception will be thrown
-	 * if guessing is not possible. Guessing is impossible in particular if a custom field bridge is
-	 * defined on the given field.
+	 * if it is not possible. Automatically determining the type is impossible in particular if
+	 * a custom field bridge is defined on the given field.
 	 *
 	 * @param fieldName The name of the index field to sort by
-	 * @throws SearchException If the sort field type could not be guessed.
+	 * @throws SearchException If the sort field type could not be automatically determined.
 	 * @see #byField(String, org.apache.lucene.search.SortField.Type) The alternative for
 	 * numeric fields with custom field bridges.
 	 */

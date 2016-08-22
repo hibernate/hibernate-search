@@ -39,7 +39,7 @@ public class ConnectedSortContext extends AbstractConnectedSortContext implement
 	@Override
 	public SortFieldContext byField(String field) {
 		states.setCurrentName( field );
-		states.guessCurrentSortFieldType();
+		states.determineCurrentSortFieldTypeAutomaticaly();
 		return new ConnectedSortFieldContext( queryContext, states );
 	}
 

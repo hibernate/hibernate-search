@@ -28,7 +28,7 @@ public abstract class ConnectedSortAdditionalSortFieldContext extends AbstractCo
 	public SortFieldContext andByField(String field) {
 		states.closeSortField();
 		states.setCurrentName( field );
-		states.guessCurrentSortFieldType();
+		states.determineCurrentSortFieldTypeAutomaticaly();
 		return new ConnectedSortFieldContext( queryContext, states );
 	}
 

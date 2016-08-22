@@ -145,11 +145,11 @@ public class SortFieldStates {
 		reset();
 	}
 
-	public void guessCurrentSortFieldType() {
-		this.currentType = getCurrentSortFieldTypeGuess();
+	public void determineCurrentSortFieldTypeAutomaticaly() {
+		this.currentType = getCurrentSortFieldTypeFromMetamodel();
 	}
 
-	private SortField.Type getCurrentSortFieldTypeGuess() {
+	private SortField.Type getCurrentSortFieldTypeFromMetamodel() {
 		FieldDescriptor fieldDescriptor = queryContext.getFactory()
 				.getIndexedTypeDescriptor( queryContext.getEntityType() )
 				.getIndexedField( currentName );
@@ -176,7 +176,7 @@ public class SortFieldStates {
 				return SortField.Type.STRING;
 		}
 
-		throw new SearchException( "Cannot guess the field type for field '" + currentName
+		throw new SearchException( "Cannot automatically determine the field type for field '" + currentName
 				+ "'. Use byField(String, Sort.Type) to provide the sort type explicitly." );
 	}
 
