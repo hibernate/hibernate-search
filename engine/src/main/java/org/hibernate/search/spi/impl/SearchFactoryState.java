@@ -75,6 +75,8 @@ public interface SearchFactoryState {
 
 	boolean isIdProvidedImplicit();
 
+	boolean isMultitenancyEnabled();
+
 	IndexManagerFactory getIndexManagerFactory();
 
 	boolean enlistWorkerInTransaction();

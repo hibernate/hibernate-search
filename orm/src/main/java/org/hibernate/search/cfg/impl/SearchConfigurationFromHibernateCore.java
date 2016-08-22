@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Set;
 
+import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
@@ -42,6 +43,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	private final Map<Class<? extends Service>, Object> providedServices;
 	private final Metadata metadata;
 	private final Properties legacyConfigurationProperties;//For compatibility reasons only. Should be removed? See HSEARCH-1890
+	private final boolean multitenancyEnabled;
 
 	private ReflectionManager reflectionManager;
 
@@ -65,6 +67,10 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		providedServices.put( HibernateSessionFactoryService.class, sessionService );
 		this.providedServices = Collections.unmodifiableMap( providedServices );
 		this.legacyConfigurationProperties = extractProperties( configurationService );
+
+		MultiTenancyStrategy multitenancyStrategy =
+				sessionService.getSessionFactory().getSessionFactoryOptions().getMultiTenancyStrategy();
+		this.multitenancyEnabled = !MultiTenancyStrategy.NONE.equals( multitenancyStrategy );
 	}
 
 	@Override
@@ -121,6 +127,11 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	@Override
 	public boolean isIndexMetadataComplete() {
 		return true;
+	}
+
+	@Override
+	public boolean isMultitenancyEnabled() {
+		return multitenancyEnabled;
 	}
 
 	@Override

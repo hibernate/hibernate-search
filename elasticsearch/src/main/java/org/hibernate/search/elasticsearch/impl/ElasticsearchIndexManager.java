@@ -80,6 +80,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private boolean refreshAfterWrite;
 	private IndexSchemaManagementStrategy indexManagementStrategy;
 	private String indexManagementWaitTimeout;
+	private boolean multitenancyEnabled;
 
 	/**
 	 * Status the index needs to be at least in, otherwise we'll fail starting up.
@@ -136,6 +137,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		this.indexManagementWaitTimeout = getIndexManagementWaitTimeout( properties );
 		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
 		this.refreshAfterWrite = getRefreshAfterWrite( properties );
+		this.multitenancyEnabled = context.isMultitenancyEnabled();
 
 		this.similarity = similarity;
 
@@ -294,12 +296,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			JsonObject properties = new JsonObject();
 			payload.add( "properties", properties );
 
-			// Add field for tenant id though we don't know at this point if it's actually going to be needed.
-			// TODO HSEARCH-2256 Should we make this configurable?
-			JsonObject field = new JsonObject();
-			field.addProperty( "type", "string" );
-			field.addProperty( "index", NOT_ANALYZED );
-			properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
+			if ( multitenancyEnabled ) {
+				JsonObject field = new JsonObject();
+				field.addProperty( "type", "string" );
+				field.addProperty( "index", NOT_ANALYZED );
+				properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
+			}
 
 			// normal document fields
 			for ( DocumentFieldMetadata fieldMetadata : descriptor.getDocumentBuilder().getTypeMetadata().getAllDocumentFieldMetadata() ) {

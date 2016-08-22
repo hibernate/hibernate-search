@@ -16,10 +16,12 @@ import java.util.HashMap;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.engine.config.internal.ConfigurationServiceImpl;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -60,6 +62,9 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 	private ClassLoaderService mockClassLoaderService;
 
 	@Mock
+	private SessionFactoryOptions mockSessionFactoryOptions;
+
+	@Mock
 	private Metadata mockMetadata;
 
 	@Test
@@ -92,6 +97,14 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 						EasyMock.capture( capturedSessionFactoryObserver ),
 						isA( SessionFactoryObserver.class )
 				)
+		);
+
+		expect( mockSessionFactoryImplementor.getSessionFactoryOptions() ).andReturn(
+				mockSessionFactoryOptions
+		);
+
+		expect( mockSessionFactoryOptions.getMultiTenancyStrategy() ).andReturn(
+				MultiTenancyStrategy.NONE
 		);
 
 		expect( mockSessionFactoryServiceRegistry.getService( EventListenerRegistry.class ) ).andReturn(

@@ -55,4 +55,9 @@ public abstract class SearchConfigurationBase implements SearchConfiguration {
 	public boolean isIdProvidedImplicit() {
 		return false;
 	}
+
+	@Override
+	public boolean isMultitenancyEnabled() {
+		return true;
+	}
 }

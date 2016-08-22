@@ -14,6 +14,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
@@ -117,6 +118,12 @@ public interface SearchConfiguration {
 	 * with a {@link org.hibernate.search.annotations.ProvidedId}, if no other Id is specified.
 	 */
 	boolean isIdProvidedImplicit();
+
+	/**
+	 * @return {@code true} if {@link DocumentBuilderIndexedEntity#TENANT_ID_FIELDNAME multitenancy}
+	 * should be enabled. When in doubt, this should return {@code true}.
+	 */
+	boolean isMultitenancyEnabled();
 
 	/**
 	 * @return Returns a classloader service for this configuration of Search. Access to the service is via the

@@ -62,6 +62,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private boolean indexMetadataIsComplete;
 	private boolean deleteByTermEnforced;
 	private boolean isIdProvidedImplicit;
+	private boolean isMultitenancyEnabled;
 	private IndexManagerFactory indexManagerFactory;
 	private boolean enlistWorkerInTransaction;
 	private Statistics statistics;
@@ -88,6 +89,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		indexMetadataIsComplete = oldFactoryState.isIndexMetadataComplete();
 		deleteByTermEnforced = oldFactoryState.isDeleteByTermEnforced();
 		isIdProvidedImplicit = oldFactoryState.isIdProvidedImplicit();
+		isMultitenancyEnabled = oldFactoryState.isMultitenancyEnabled();
 		indexManagerFactory = oldFactoryState.getIndexManagerFactory();
 		enlistWorkerInTransaction = oldFactoryState.enlistWorkerInTransaction();
 		statistics = oldFactoryState.getStatistics();
@@ -299,6 +301,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setIdProvidedImplicit(boolean idProvidedImplicit) {
 		this.isIdProvidedImplicit = idProvidedImplicit;
+	}
+
+	@Override
+	public boolean isMultitenancyEnabled() {
+		return isMultitenancyEnabled;
+	}
+
+	public void setMultitenancyEnabled(boolean isMultitenancyEnabled) {
+		this.isMultitenancyEnabled = isMultitenancyEnabled;
 	}
 
 	@Override
