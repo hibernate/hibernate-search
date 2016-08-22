@@ -16,7 +16,7 @@ import org.hibernate.search.exception.SearchException;
 
 /**
  * A SortField extension that simply serves as a data holder, to be detected
- * and interpreted by non-Lucene backend implementations (elasticsearch in particular).
+ * and interpreted by non-Lucene backend implementations (Elasticsearch in particular).
  * @author Yoann Rodiere
  */
 public class NativeSortField extends SortField {
@@ -37,7 +37,7 @@ public class NativeSortField extends SortField {
 	public NativeSortField(String fieldName, String nativeSortFieldDescription) {
 		/*
 		 * Superclass is irrelevant here: we just want to extend SortField to be able
-		 * to put this native sort field in a Sort, so that non-standard backends such as elasticsearch
+		 * to put this native sort field in a Sort, so that non-standard backends such as Elasticsearch
 		 * may integrate the native sort field description (a string) directly in their native sort
 		 * representation.
 		 */
