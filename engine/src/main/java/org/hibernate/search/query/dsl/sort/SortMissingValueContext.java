@@ -33,7 +33,9 @@ public interface SortMissingValueContext<T> {
 	/**
 	 * When documents are missing a value on the sort field, use the given value instead.
 	 *
-	 * <p>This is only available for numeric fields.
+	 * <p>Lucene sort API limits this feature to numeric fields. As Hibernate Search sorts are currently
+	 * based on the Lucene API underneath, this is only available for numeric fields for all the indexing
+	 * services, Elasticsearch included.
 	 * <p>Field bridges, if any, will be ignored. Thus the actual numeric value must be provided.
 	 *
 	 * @throws SearchException If the field is not numeric.
