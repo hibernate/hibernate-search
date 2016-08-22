@@ -13,6 +13,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
@@ -35,6 +36,7 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -142,6 +144,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	@Override
 	public HSQuery createHSQuery() {
 		return delegate.createHSQuery();
+	}
+
+	@Override
+	public QueryDescriptor createQueryDescriptor(Query luceneQuery, Class<?>... entities) {
+		return delegate.createQueryDescriptor( luceneQuery, entities );
 	}
 
 	@Override

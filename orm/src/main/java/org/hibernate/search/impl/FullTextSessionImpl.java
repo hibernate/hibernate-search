@@ -29,13 +29,10 @@ import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
 import org.hibernate.search.batchindexing.spi.MassIndexerWithTenant;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
-import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
-import org.hibernate.search.query.hibernate.impl.LuceneQueryDescriptor;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -53,7 +50,6 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 
 	private transient ExtendedSearchIntegrator searchFactory;
 	private transient SearchFactory searchFactoryAPI;
-	private transient Boolean queryTranslatorPresent;
 
 	private final TransactionContext transactionContext;
 
@@ -73,26 +69,14 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	 */
 	@Override
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
-		QueryDescriptor descriptor = null;
-
-		try ( ServiceReference<LuceneQueryTranslator> translator = getQueryTranslatorOrNull() ) {
-			if ( translator != null ) {
-				if ( translator.get().conversionRequired( entities ) ) {
-					descriptor = translator.get().convertLuceneQuery( luceneQuery );
-				}
-			}
-		}
-
-		return createFullTextQuery(
-				descriptor != null ? descriptor : new LuceneQueryDescriptor( luceneQuery ),
-				entities
-		);
+		QueryDescriptor queryDescriptor = getSearchIntegrator().createQueryDescriptor( luceneQuery, entities );
+		return createFullTextQuery( queryDescriptor, entities );
 	}
 
 	@Override
-	public FullTextQuery createFullTextQuery(QueryDescriptor query, Class<?>... entities) {
+	public FullTextQuery createFullTextQuery(QueryDescriptor queryDescriptor, Class<?>... entities) {
 		return new FullTextQueryImpl(
-				query,
+				queryDescriptor,
 				entities,
 				sessionImplementor,
 				new ParameterMetadata( null, null )
@@ -228,29 +212,4 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		return factory;
 	}
 
-	private ServiceReference<LuceneQueryTranslator> getQueryTranslatorOrNull() {
-		if ( !isQueryTranslatorPresent() ) {
-			return null;
-		}
-
-		return getSearchIntegrator().getServiceManager().requestReference( LuceneQueryTranslator.class );
-	}
-
-	private boolean isQueryTranslatorPresent() {
-		if ( queryTranslatorPresent == null ) {
-			try {
-				getSearchIntegrator().getServiceManager().requestService( LuceneQueryTranslator.class );
-				queryTranslatorPresent = true;
-			}
-			catch (Exception e) {
-				// Ignore
-				queryTranslatorPresent = false;
-			}
-			finally {
-				getSearchIntegrator().getServiceManager().releaseService( LuceneQueryTranslator.class );
-			}
-		}
-
-		return queryTranslatorPresent;
-	}
 }

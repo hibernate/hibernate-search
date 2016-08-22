@@ -9,6 +9,7 @@ package org.hibernate.search.spi;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -21,6 +22,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.stat.Statistics;
 
@@ -57,7 +59,8 @@ public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Return an Hibernate Search query object.
-	 * This object uses fluent APIs to define the query executed.
+	 * This method does NOT support non-Lucene backends (e.g. Elasticsearch).
+	 * The returned object uses fluent APIs to define the query executed.
 	 * Offers a few execution approaches:
 	 * - return the list of results eagerly
 	 * - return the list of results lazily
@@ -66,6 +69,18 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @return an Hibernate Search query object
 	 */
 	HSQuery createHSQuery();
+
+	/**
+	 * Return an Hibernate Search query descriptor.
+	 * <p>This method supports non-Lucene backends (e.g. Elasticsearch).
+	 * <p>The returned object allows for the creation of an {@link HSQuery} supported
+	 * by the relevant backend.
+	 * <p>Be aware that some backends may not implement {@link HSQuery#luceneQuery(Query)},
+	 * in which case the query provided here cannot be overridden.
+	 *
+	 * @return an Hibernate Search query descriptor
+	 */
+	QueryDescriptor createQueryDescriptor(Query luceneQuery, Class<?>... entities);
 
 	/**
 	 * @return true if the SearchIntegrator was stopped

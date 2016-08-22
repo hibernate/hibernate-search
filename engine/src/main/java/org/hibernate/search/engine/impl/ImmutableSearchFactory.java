@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
@@ -26,6 +27,7 @@ import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -50,7 +52,9 @@ import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.impl.LuceneHSQuery;
+import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -99,6 +103,10 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final ErrorHandler errorHandler;
 	private final IndexingMode indexingMode;
 	private final ServiceManager serviceManager;
+	/**
+	 * A flag avoiding unnecessary service lookups when there's no query translator.
+	 */
+	private final boolean queryTranslatorPresent;
 	private final boolean enableDirtyChecks;
 	private final DefaultIndexReaderAccessor indexReaderAccessor;
 	private final InstanceInitializer instanceInitializer;
@@ -128,6 +136,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.indexingMode = state.getIndexingMode();
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
+		this.queryTranslatorPresent = determineQueryTranslatorPresent();
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
 		this.allIndexesManager = state.getAllIndexesManager();
 		this.errorHandler = state.getErrorHandler();
@@ -187,6 +196,17 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 			catch (IllegalArgumentException e) {
 				throw log.invalidPropertyValue( objectLookupMethod, Environment.OBJECT_LOOKUP_METHOD );
 			}
+		}
+	}
+
+	private boolean determineQueryTranslatorPresent() {
+		try (ServiceReference<LuceneQueryTranslator> translator =
+				getServiceManager().requestReference( LuceneQueryTranslator.class )) {
+			return true;
+		}
+		catch (Exception e) {
+			// Ignore
+			return false;
 		}
 	}
 
@@ -256,6 +276,22 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public HSQuery createHSQuery() {
 		return new LuceneHSQuery( this );
+	}
+
+	@Override
+	public QueryDescriptor createQueryDescriptor(Query luceneQuery, Class<?>... entities) {
+		QueryDescriptor descriptor = null;
+
+		if ( queryTranslatorPresent ) {
+			try (ServiceReference<LuceneQueryTranslator> translator =
+					getServiceManager().requestReference( LuceneQueryTranslator.class )) {
+				if ( translator.get().conversionRequired( entities ) ) {
+					descriptor = translator.get().convertLuceneQuery( luceneQuery );
+				}
+			}
+		}
+
+		return descriptor != null ? descriptor : new LuceneQueryDescriptor( luceneQuery );
 	}
 
 	@Override

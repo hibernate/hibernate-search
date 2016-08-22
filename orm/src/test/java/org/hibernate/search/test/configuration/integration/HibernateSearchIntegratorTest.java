@@ -31,6 +31,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
 import org.hibernate.search.hcore.impl.SearchFactoryReference;
+import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -144,6 +145,9 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 		expect( mockClassLoaderService.classForName( "javax.persistence.EmbeddedId" ) )
 			.andReturn( Object.class )
 			.anyTimes();
+
+		expect( mockClassLoaderService.loadJavaServices( LuceneQueryTranslator.class ) )
+				.andReturn( Collections.<LuceneQueryTranslator>emptySet() );
 
 		expect( mockClassLoaderService.loadJavaServices( IndexManagerTypeSpecificBridgeProvider.class ) )
 				.andReturn( Collections.<IndexManagerTypeSpecificBridgeProvider>emptySet() );
