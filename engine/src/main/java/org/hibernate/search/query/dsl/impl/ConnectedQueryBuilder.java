@@ -74,6 +74,6 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 
 	@Override
 	public SortContext sort() {
-		return new ConnectedSortContext(context);
+		return new ConnectedSortContext( context );
 	}
 }

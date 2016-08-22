@@ -57,7 +57,7 @@ public class ConnectedSortContext extends AbstractConnectedSortContext implement
 
 	@Override
 	public SortNativeContext byNative(SortField sortField) {
-		states.setCurrentSortFieldNativeSortDescription(sortField);
+		states.setCurrentSortFieldNativeSortDescription( sortField );
 		return new ConnectedSortNativeContext( queryContext, states );
 	}
 

@@ -56,7 +56,7 @@ public class SortDSLTest {
 	@Before
 	public void prepareTestData() {
 		storeData(
-				new IndexedEntry(0)
+				new IndexedEntry( 0 )
 				.setMainData(
 						"infrequent1 infrequent2 infrequent1 inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores inMultipleDocsWithVariousScores",
 						1, 2d
@@ -69,7 +69,7 @@ public class SortDSLTest {
 				.setLocation( 24.0d, 31.9d )
 		);
 		storeData(
-				new IndexedEntry(1)
+				new IndexedEntry( 1 )
 				.setMainData(
 						"inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores",
 						2, 1d
@@ -82,11 +82,11 @@ public class SortDSLTest {
 				.setLocation( 23.9d, 32.0d )
 		);
 		storeData(
-				new IndexedEntry(2)
+				new IndexedEntry( 2 )
 				.setMainData( null, 1, null)
 		);
 		storeData(
-				new IndexedEntry(3)
+				new IndexedEntry( 3 )
 				.setMainData(
 						"infrequent1 inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores",
 						1, 3d

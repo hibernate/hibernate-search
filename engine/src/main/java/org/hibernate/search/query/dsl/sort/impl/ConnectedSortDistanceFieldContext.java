@@ -25,19 +25,19 @@ public class ConnectedSortDistanceFieldContext extends AbstractConnectedSortCont
 
 	@Override
 	public SortDistanceFieldAndReferenceContext fromCoordinates(Coordinates coordinates) {
-		getStates().setCoordinates(coordinates);
+		getStates().setCoordinates( coordinates );
 		return new ConnectedSortDistanceFieldAndReferenceContext( getQueryContext(), getStates() );
 	}
 
 	@Override
 	public SortLatLongContext fromLatitude(double latitude) {
-		getStates().setCurrentLatitude(latitude);
+		getStates().setCurrentLatitude( latitude );
 		return this;
 	}
 
 	@Override
 	public SortDistanceFieldAndReferenceContext andLongitude(double longitude) {
-		getStates().setCurrentLongitude(longitude);
+		getStates().setCurrentLongitude( longitude );
 		return new ConnectedSortDistanceFieldAndReferenceContext( getQueryContext(), getStates() );
 	}
 
