@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.spi;
 
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+
 /**
  * Build context for the worker and other backend
  * Available after all index, entity metadata are built.
@@ -40,6 +42,12 @@ public interface WorkerBuildContext extends BuildContext {
 	 * @return An instance of the {@code InstanceInitializer} interface.
 	 */
 	InstanceInitializer getInstanceInitializer();
+
+	/**
+	 * @return {@code true} if {@link DocumentBuilderIndexedEntity#TENANT_ID_FIELDNAME multitenancy}
+	 * should be enabled. When in doubt, this should return {@code true}.
+	 */
+	boolean isMultitenancyEnabled();
 
 	/**
 	 * @return {@code true} if the worker and the backend enlist their work in the current transaction;

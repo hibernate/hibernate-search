@@ -337,6 +337,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
+	public boolean isMultitenancyEnabled() {
+		return delegate.isMultitenancyEnabled();
+	}
+
+	@Override
 	public IndexManagerFactory getIndexManagerFactory() {
 		return delegate.getIndexManagerFactory();
 	}

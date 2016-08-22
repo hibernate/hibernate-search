@@ -116,6 +116,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final boolean indexMetadataIsComplete;
 	private final boolean isDeleteByTermEnforced;
 	private final boolean isIdProvidedImplicit;
+	private final boolean isMultitenancyEnabled;
 	private final String statisticsMBeanName;
 	private final IndexManagerFactory indexManagerFactory;
 	private final ObjectLookupMethod defaultObjectLookupMethod;
@@ -157,6 +158,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.indexMetadataIsComplete = state.isIndexMetadataComplete();
 		this.isDeleteByTermEnforced = state.isDeleteByTermEnforced();
 		this.isIdProvidedImplicit = state.isIdProvidedImplicit();
+		this.isMultitenancyEnabled = state.isMultitenancyEnabled();
 		this.indexManagerFactory = state.getIndexManagerFactory();
 
 		this.enableDirtyChecks = ConfigurationParseHelper.getBooleanValue(
@@ -585,6 +587,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public boolean isIdProvidedImplicit() {
 		return isIdProvidedImplicit;
+	}
+
+	@Override
+	public boolean isMultitenancyEnabled() {
+		return isMultitenancyEnabled;
 	}
 
 	@Override
