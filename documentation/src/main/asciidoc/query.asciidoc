@@ -781,7 +781,7 @@ Apache Lucene provides a very flexible and powerful way to sort results. While t
 (by relevance) is appropriate most of the time, it can be interesting to sort by one or several
 other properties.
 
-In order to do so, you will have to build a Lucene `Sort` object, which can be done by using the Hibernate Search sort DSL or the native Lucene `SortField` class.
+In order to do so, you will have to build a Lucene `Sort` object, which can be done by using either the Hibernate Search sort DSL or the native Lucene `SortField` class.
 
 If you use the Hibernate Search sort DSL, it will look like this:
 
@@ -803,7 +803,7 @@ List results = query.list();
 ----
 ====
 
-Alternatively, you may build your sort using the `SortField` class directly. Then you will have to always specify the sort field type manually.
+Alternatively, you may build your sort using the Lucene `SortField` class directly. Then you will have to always specify the sort field type manually.
 
 .Sorting the results with a custom-built Lucene `Sort`
 ====
@@ -919,8 +919,6 @@ query.setSort(sort);
 List results = query.list();
 ----
 ====
-
-You may achieve similar mixes with Elasticsearch sorts when using the Elasticsearch backend. See <<elasticsearch-query-sorting>> for more information.
 
 ===== Fetching strategy
 

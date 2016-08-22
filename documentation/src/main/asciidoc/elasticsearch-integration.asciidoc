@@ -344,7 +344,6 @@ QueryBuilder qb = fullTextSession.getSearchFactory()
     .buildQueryBuilder().forEntity(Book.class).get();
 Query luceneQuery = /* ... */;
 FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
-SortField complexSortField = /* ... */;
 Sort sort = qb.sort()
         .byNative( "authors.name", "{'order':'asc', 'mode': 'min'}" )
         .andByField("title")
