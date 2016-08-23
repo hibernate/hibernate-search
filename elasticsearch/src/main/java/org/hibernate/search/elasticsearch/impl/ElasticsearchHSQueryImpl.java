@@ -47,7 +47,6 @@ import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
@@ -128,7 +127,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public HSQuery luceneQuery(Query query) {
-		throw new UnsupportedOperationException( "Cannot use Lucene query with Elasticsearch" );
+		throw LOG.hsQueryLuceneQueryUnsupported();
 	}
 
 	@Override
@@ -141,7 +140,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public Query getLuceneQuery() {
-		throw new UnsupportedOperationException( "Cannot use Lucene query with Elasticsearch" );
+		throw LOG.hsQueryLuceneQueryUnsupported();
 	}
 
 	@Override
@@ -593,8 +592,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			if ( field == null ) {
 				// We check if it is a field created by a field bridge
 				if ( !isBridgeDefinedField( binding, projectedField ) ) {
-					throw new IllegalArgumentException( "Unknown field " + projectedField + " for entity "
-						+ binding.getDocumentBuilder().getMetadata().getType().getName() );
+					throw LOG.unknownFieldForProjection(
+							binding.getDocumentBuilder().getMetadata().getType().getName(),
+							projectedField );
 				}
 			}
 
@@ -659,9 +659,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 						case DOUBLE:
 							tmp.add( new DoubleField( field.getName(), value.getAsDouble(), Store.NO ) );
 							break;
+						case UNKNOWN:
 						default:
-							throw new SearchException( "Unexpected numeric field type: " + binding.getDocumentBuilder().getMetadata().getType() + " "
-								+ field.getName() );
+							throw LOG.unexpectedNumericEncodingType(
+									binding.getDocumentBuilder().getMetadata().getType().getName(),
+									field.getName() );
 					}
 				}
 				else {
@@ -824,16 +826,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					jsonFilter = GsonHolder.PARSER.parse( ( (ElasticsearchFilter) candidateFilter ).getJsonFilter() ).getAsJsonObject();
 				}
 				else {
-					throw new SearchException(
-							"Factory method does not return a Filter class or an ElasticsearchFilter class: "
-									+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+					throw LOG.filterFactoryMethodReturnsUnsupportedType( def.getImpl().getName(), def.getFactoryMethod().getName() );
 				}
 			}
 			catch (IllegalAccessException | InvocationTargetException e) {
-				throw new SearchException(
-						"Unable to access @Factory method: "
-								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(),
-						e );
+				throw LOG.filterFactoryMethodInaccessible( def.getImpl().getName(), def.getFactoryMethod().getName(), e );
 			}
 		}
 		else {
@@ -844,10 +841,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				jsonFilter = GsonHolder.PARSER.parse( ( (ElasticsearchFilter) filterOrFactory ).getJsonFilter() ).getAsJsonObject();
 			}
 			else {
-				throw new SearchException(
-						"Filter implementation does not implement the Filter interface or does not extend ElasticsearchFilter: "
-								+ def.getImpl().getName() + ". "
-								+ ( def.getFactoryMethod() != null ? def.getFactoryMethod().getName() : "" ) );
+				throw LOG.filterHasUnsupportedType( filterOrFactory == null ? null : filterOrFactory.getClass().getName() );
 			}
 		}
 
@@ -912,7 +906,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		@Override
 		public TopDocs getTopDocs() {
-			throw new UnsupportedOperationException( "TopDocs not available when using Elasticsearch" );
+			throw LOG.documentExtractorTopDocsUnsupported();
 		}
 
 		private void runSearch() {

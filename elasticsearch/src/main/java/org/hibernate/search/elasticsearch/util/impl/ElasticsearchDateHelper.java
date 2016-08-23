@@ -15,6 +15,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
+import org.hibernate.search.exception.AssertionFailure;
 
 /**
  * Various utilities to manipulate dates and comply with Elasticsearch date format.
@@ -78,7 +79,7 @@ public final class ElasticsearchDateHelper {
 				// don't cut off anything
 				break;
 			default:
-				throw new IllegalArgumentException( "unknown resolution " + resolution );
+				throw new AssertionFailure( "unknown resolution " + resolution );
 		}
 		return calInstance;
 	}
