@@ -34,9 +34,9 @@ public @interface IndexedEmbedded {
 	String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
 
 	/**
-	 * Field name prefix, defaults to {@code propertyname.}.
+	 * Field name prefix.
 	 *
-	 * @return the field name prefix. Default to "."
+	 * @return the field name prefix. Default to ".", indicating that {@code propertyname.} will be used.
 	 */
 	String prefix() default ".";
 
