@@ -51,7 +51,7 @@ public class ToElasticsearch {
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final int DEFAULT_SLOP = 0;
-
+	private static final int DEFAULT_MAX_EDIT_DISTANCE = 0;
 	private static final float DEFAULT_BOOST = 1.0f;
 
 	private ToElasticsearch() {
@@ -347,7 +347,7 @@ public class ToElasticsearch {
 								JsonBuilder.object()
 										.addProperty( "query", query.getSearchTerms() )
 										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzer().getName( query.getField() ) )
-										.addProperty( "fuzziness", query.getMaxEditDistance() )
+										.append( fuzzinessAppender( query.getMaxEditDistance() ) )
 										.append( boostAppender( query ) )
 						)
 				).build();
@@ -476,6 +476,23 @@ public class ToElasticsearch {
 				@Override
 				public void append(JsonBuilder.Object object) {
 					object.addProperty( "slop", slop );
+				}
+			};
+		}
+		else {
+			return NOOP_APPENDER;
+		}
+	}
+
+	/**
+	 * Appender that adds a "fuzziness" property if necessary.
+	 */
+	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> fuzzinessAppender(final int maxEditDistance) {
+		if ( maxEditDistance != DEFAULT_MAX_EDIT_DISTANCE ) {
+			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
+				@Override
+				public void append(JsonBuilder.Object object) {
+					object.addProperty( "fuzziness", maxEditDistance );
 				}
 			};
 		}
