@@ -12,14 +12,18 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
+import org.hibernate.search.testsupport.indexmanager.RamIndexManagerFactory;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Chase Seibert
  */
 public class CustomerShardingStrategyTest {
+
+	@Rule
+	public RamIndexManagerFactory managerFactory = new RamIndexManagerFactory();
 
 	private CustomerShardingStrategy shardStrategy;
 
@@ -28,18 +32,7 @@ public class CustomerShardingStrategyTest {
 		shardStrategy = new CustomerShardingStrategy();
 
 		// initialize w/ 10 shards
-		shardStrategy.initialize( null, new IndexManager[] {
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory(),
-				RamIndexManager.makeRamDirectory()
-		} );
+		shardStrategy.initialize( null, managerFactory.createArray( 10 ) );
 	}
 
 	@Test

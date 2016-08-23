@@ -24,8 +24,9 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
+import org.hibernate.search.testsupport.indexmanager.RamIndexManagerFactory;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -33,6 +34,9 @@ import org.junit.experimental.categories.Category;
  * @author Emmanuel Bernard
  */
 public class ShardsTest extends SearchTestBase {
+
+	@Rule
+	public RamIndexManagerFactory managerFactory = new RamIndexManagerFactory();
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
@@ -48,13 +52,11 @@ public class ShardsTest extends SearchTestBase {
 
 	@Test
 	public void testIdShardingStrategy() {
-		IndexManager[] dps = new IndexManager[] { RamIndexManager.makeRamDirectory(), RamIndexManager.makeRamDirectory() };
+		IndexManager[] dps = managerFactory.createArray( 2 );
 		IdHashShardingStrategy shardingStrategy = new IdHashShardingStrategy();
 		shardingStrategy.initialize( null, dps );
 		assertTrue( dps[1] == shardingStrategy.getIndexManagerForAddition( Animal.class, 1, "1", null ) );
 		assertTrue( dps[0] == shardingStrategy.getIndexManagerForAddition( Animal.class, 2, "2", null ) );
-		dps[0].destroy();
-		dps[1].destroy();
 	}
 
 	@Test

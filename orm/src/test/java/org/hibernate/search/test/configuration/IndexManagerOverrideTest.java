@@ -14,9 +14,9 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,6 +27,10 @@ import org.junit.Test;
  */
 public class IndexManagerOverrideTest {
 
+	public static class FooIndexManager extends DirectoryBasedIndexManager {
+
+	}
+
 	@Test
 	public void verifyIndexExclusivity() {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
@@ -34,7 +38,7 @@ public class IndexManagerOverrideTest {
 			.setProperty( "hibernate.search.Book.indexmanager", "near-real-time" )
 			.setProperty(
 					"hibernate.search." + Foo.class.getName() + ".indexmanager",
-					"org.hibernate.search.testsupport.indexmanager.RamIndexManager"
+					FooIndexManager.class.getName()
 			)
 			.addAnnotatedClass( BlogEntry.class )
 			.addAnnotatedClass( Foo.class )
@@ -55,7 +59,7 @@ public class IndexManagerOverrideTest {
 
 		//Uses a fully qualified name to load an implementation
 		checkIndexManagerType( allIndexesManager, Foo.class.getName(),
-				RamIndexManager.class );
+				FooIndexManager.class );
 
 		builder.close();
 	}

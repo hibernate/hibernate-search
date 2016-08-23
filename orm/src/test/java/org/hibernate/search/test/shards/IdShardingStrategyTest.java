@@ -8,10 +8,10 @@ package org.hibernate.search.test.shards;
 
 import static org.junit.Assert.assertTrue;
 
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
-import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
+import org.hibernate.search.testsupport.indexmanager.RamIndexManagerFactory;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -19,13 +19,15 @@ import org.junit.Test;
  */
 public class IdShardingStrategyTest {
 
+	@Rule
+	public RamIndexManagerFactory managerFactory = new RamIndexManagerFactory();
+
 	private IdHashShardingStrategy shardStrategy;
 
 	@Before
 	public void setUp() throws Exception {
 		shardStrategy = new IdHashShardingStrategy();
-		shardStrategy.initialize( null, new IndexManager[] {
-				RamIndexManager.makeRamDirectory(), RamIndexManager.makeRamDirectory() } );
+		shardStrategy.initialize( null, managerFactory.createArray( 2 ) );
 	}
 
 	@Test
