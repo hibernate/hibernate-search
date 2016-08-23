@@ -7,6 +7,8 @@
 
 package org.hibernate.search.query.dsl;
 
+import org.hibernate.search.query.dsl.sort.SortContext;
+
 /**
  * Builds up Lucene queries for a given entity type following the fluent API pattern.
  *
@@ -77,4 +79,12 @@ public interface QueryBuilder {
 	 * @return the entry point for building more a more like this queryt
 	 */
 	MoreLikeThisContext moreLikeThis();
+
+	/**
+	 * Build a sort that can be applied to a query execution.
+	 * When multiple sort definitions are expressed,
+	 * they are processed in decreasing priority.
+	 */
+	SortContext sort();
+
 }

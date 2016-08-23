@@ -16,6 +16,8 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.RangeContext;
 import org.hibernate.search.query.dsl.SpatialContext;
 import org.hibernate.search.query.dsl.TermContext;
+import org.hibernate.search.query.dsl.sort.SortContext;
+import org.hibernate.search.query.dsl.sort.impl.ConnectedSortContext;
 
 /**
  * Assuming connection with the search factory
@@ -68,5 +70,10 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 	@Override
 	public MoreLikeThisContext moreLikeThis() {
 		return new ConnectedMoreLikeThisContext( context );
+	}
+
+	@Override
+	public SortContext sort() {
+		return new ConnectedSortContext(context);
 	}
 }
