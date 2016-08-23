@@ -61,7 +61,8 @@ public interface ProjectionConstants {
 	String OBJECT_CLASS = "_hibernate_class";
 
 	/**
-	 * Represents the distance between an entity and the center of the search radius in case of a spatial query
+	 * Represents the distance (in kilometers) between an entity and the
+	 * center of the search area in case of a spatial query.
 	 */
 	// TODO HSEARCH-2268: Make it start with "__"
 	String SPATIAL_DISTANCE = "_HSearch_SpatialDistance";

@@ -275,7 +275,7 @@ List results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 [[spatial-distance-projection]]
 ===== Returning distance to the center in the results
 
-To retrieve the actual distance values you need to use projection (see <<projections>>):
+To retrieve the actual distance values (in kilometers) you need to use projection (see <<projections>>):
 
 .Distance projection example
 ====
