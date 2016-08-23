@@ -95,7 +95,7 @@ public class ToElasticsearch {
 			}
 		}
 		else {
-			throw new IllegalArgumentException( "Faceting request of type " + facetingRequest.getClass().getName() + " not supported" );
+			throw LOG.facetingRequestHasUnsupportedType( facetingRequest.getClass().getName() );
 		}
 	}
 

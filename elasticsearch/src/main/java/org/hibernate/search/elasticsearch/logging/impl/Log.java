@@ -82,4 +82,79 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 11,
 			value = "Projection of non-JSON-primitive field values is not supported: '%1$s'")
 	SearchException unsupportedProjectionOfNonJsonPrimitiveFields(JsonElement value);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 12,
+			value = "Interrupted while waiting for requests to be processed."
+	)
+	SearchException interruptedWhileWaitingForRequestCompletion(@Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 13,
+			value = "@Factory method does not return a Filter class or an ElasticsearchFilter class: %1$s.%2$s"
+	)
+	SearchException filterFactoryMethodReturnsUnsupportedType(String implementorName, String factoryMethodName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 14,
+			value = "Unable to access @Factory method: %1$s.%2$s"
+	)
+	SearchException filterFactoryMethodInaccessible(String implementorName, String factoryMethodName, @Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 15,
+			value = "Filter implementation does not implement the Filter interface or the ElasticsearchFilter interface: %1$s"
+	)
+	SearchException filterHasUnsupportedType(String actualClassName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 16,
+			value = "TopDocs not available when using Elasticsearch"
+	)
+	UnsupportedOperationException documentExtractorTopDocsUnsupported();
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 17,
+			value = "Cannot use Lucene query with Elasticsearch"
+	)
+	UnsupportedOperationException hsQueryLuceneQueryUnsupported();
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 18,
+			value = "Unexpected numeric encoding type for field '%2$s': %1$s"
+	)
+	SearchException unexpectedNumericEncodingType(String fieldType, String fieldName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 19,
+			value = "Cannot project field '%2$s' for entity %1$s: unknown field"
+	)
+	SearchException unknownFieldForProjection(String entityType, String fieldName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 20,
+			value = "Could not create mapping for entity type %1$s"
+	)
+	SearchException elasticsearchMappingCreationFailed(String entityType, @Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 21,
+			value = "Unexpected field type for field '%2$s': %1$s"
+	)
+	SearchException unexpectedFieldType(String fieldType, String fieldName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 22,
+			value = "Unexpected index status string: '%1$s'. Specify one of 'green', 'yellow' or 'red'."
+	)
+	SearchException unexpectedIndexStatusString(String status);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 23,
+			value = "Positive timeout value expected, but it was: %1$s"
+	)
+	SearchException negativeTimeoutValue(int timeout);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 24,
+			value = "Index '%1$s' has status '%3$s', but it is expected to be '%2$s'."
+	)
+	SearchException unexpectedIndexStatus(String indexName, String expected, String actual);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 25,
+			value = "With an Elasticsearch backend it is not possible to get a ReaderProvider or an IndexReader"
+	)
+	UnsupportedOperationException indexManagerReaderProviderUnsupported();
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 26,
+			value = "Faceting request of type %1$s not supported"
+	)
+	SearchException facetingRequestHasUnsupportedType(String facetingRequestType);
 }

@@ -120,7 +120,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				}
 			}
 
-			throw new SearchException( "Unexpected index status: " + status + ". Specify one of 'green', 'yellow' or 'red'." );
+			throw LOG.unexpectedIndexStatusString( status );
 		}
 	}
 
@@ -166,7 +166,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		);
 
 		if ( timeout < 0 ) {
-			throw new SearchException( "Positive timeout value expected, but it was: " + timeout );
+			throw LOG.negativeTimeoutValue( timeout );
 		}
 
 		return timeout + "ms";
@@ -252,8 +252,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 		if ( !result.isSucceeded() ) {
 			String status = result.getJsonObject().get( "status" ).getAsString();
-			throw new SearchException( "Index '" + actualIndexName + "' has status '" + status + "', but it is expected to be '"
-					+ requiredIndexStatus.getElasticsearchString() + "'." );
+			throw LOG.unexpectedIndexStatus( actualIndexName, requiredIndexStatus.getElasticsearchString(),
+					status );
 		}
 	}
 
@@ -327,7 +327,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				jestClient.executeRequest( putMapping );
 			}
 			catch (Exception e) {
-				throw new SearchException( "Could not create mapping for entity type " + entityType.getName(), e );
+				throw LOG.elasticsearchMappingCreationFailed( entityType.getName(), e );
 			}
 		}
 	}
@@ -491,7 +491,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			case NO:
 				return "no";
 			default:
-				throw new IllegalArgumentException( "Unexpected index type: " + index );
+				throw new AssertionFailure( "Unexpected index type: " + index );
 		}
 	}
 
@@ -554,7 +554,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			case STRING:
 				return "string";
 			default:
-				throw new SearchException( "Unexpected field type: " + bridgeDefinedField.getType() );
+				throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getName() );
 		}
 	}
 
@@ -647,7 +647,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	@Override
 	public ReaderProvider getReaderProvider() {
-		throw new UnsupportedOperationException( "No ReaderProvider / IndexReader with ES" );
+		throw LOG.indexManagerReaderProviderUnsupported();
 	}
 
 	@Override
