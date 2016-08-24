@@ -50,6 +50,8 @@ public class ToElasticsearch {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
+	private static final int DEFAULT_SLOP = 0;
+
 	private static final float DEFAULT_BOOST = 1.0f;
 
 	private ToElasticsearch() {
@@ -311,7 +313,7 @@ public class ToElasticsearch {
 						JsonBuilder.object().add( field,
 								JsonBuilder.object()
 										.addProperty( "query", phrase.toString().trim() )
-										.addProperty( "slop", query.getSlop() )
+										.append( slopAppender( query.getSlop()) )
 										.append( boostAppender( query ) )
 								)
 				).build();
@@ -330,7 +332,7 @@ public class ToElasticsearch {
 								JsonBuilder.object()
 										.addProperty( "query", query.getPhrase().trim() )
 										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzer().getName( query.getField() ) )
-										.addProperty( "slop", query.getSlop() )
+										.append( slopAppender( query.getSlop() ) )
 										.append( boostAppender( query ) )
 								)
 				).build();
@@ -464,6 +466,23 @@ public class ToElasticsearch {
 					// Do nothing
 				}
 			};
+
+	/**
+	 * Appender that adds a "slop" property if necessary.
+	 */
+	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> slopAppender(final int slop) {
+		if ( slop != DEFAULT_SLOP ) {
+			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
+				@Override
+				public void append(JsonBuilder.Object object) {
+					object.addProperty( "slop", slop );
+				}
+			};
+		}
+		else {
+			return NOOP_APPENDER;
+		}
+	}
 
 	/**
 	 * Appender that adds a "boost" property if necessary.
