@@ -41,6 +41,15 @@ public class JsonBuilder {
 		return new JsonBuilder.Object( jsonObject );
 	}
 
+	/**
+	 * An interface for reusable objects that append data to a JSON object.
+	 * <p>Eases the use of conditional statements within this chainable API.
+	 * @author Yoann Rodiere
+	 */
+	public interface JsonAppender<T> {
+		void append(T appendable);
+	}
+
 	public static class Array {
 		private JsonArray jsonArray = new JsonArray();
 
@@ -63,6 +72,11 @@ public class JsonBuilder {
 
 		public Array add(JsonBuilder.Object element) {
 			jsonArray.add( element.build() );
+			return this;
+		}
+
+		public Array append(JsonAppender<? super Array> appender) {
+			appender.append( this );
 			return this;
 		}
 
@@ -144,6 +158,11 @@ public class JsonBuilder {
 
 		public JsonBuilder.Object addProperty(String property, String value) {
 			jsonObject.addProperty( property, value );
+			return this;
+		}
+
+		public Object append(JsonAppender<? super Object> appender) {
+			appender.append( this );
 			return this;
 		}
 
