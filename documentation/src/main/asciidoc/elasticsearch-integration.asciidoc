@@ -318,6 +318,28 @@ query = ftem.createFullTextQuery(
 projection = (Object[]) query.getSingleResult();
 --
 
+If you're looking for information about execution time, you may also use `org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants.TOOK` and `org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants.TIMED_OUT`: 
+
+[source,java]
+--
+query = ftem.createFullTextQuery(
+                    qb.keyword()
+                    .onField( "tags" )
+                    .matching( "round-based" )
+                    .createQuery(),
+                    VideoGame.class
+            )
+            .setProjection(
+                    ElasticsearchProjectionConstants.SOURCE,
+                    ElasticsearchProjectionConstants.TOOK,
+                    ElasticsearchProjectionConstants.TIMED_OUT 
+            );
+
+projection = (Object[]) query.getSingleResult();
+Integer took = (Integer) projection[1]; // Execution time (milliseconds)
+Boolean timedOut = (Boolean) projection[2]; // Whether the query timed out
+--
+
 ==== Filters
 
 The Elasticsearch integration supports the definition of full text filters.
