@@ -109,7 +109,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					ElasticsearchProjectionConstants.SCORE,
 					ElasticsearchProjectionConstants.SOURCE,
 					ElasticsearchProjectionConstants.SPATIAL_DISTANCE,
-					ElasticsearchProjectionConstants.THIS
+					ElasticsearchProjectionConstants.THIS,
+					ElasticsearchProjectionConstants.TOOK,
+					ElasticsearchProjectionConstants.TIMED_OUT
 			)
 	);
 
@@ -240,10 +242,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		List<EntityInfo> results = new ArrayList<>( searchResult.getTotal() );
-		JsonArray hits = searchResult.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+		JsonObject searchResultJsonObject = searchResult.getJsonObject();
+		JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
 
 		for ( JsonElement hit : hits ) {
-			EntityInfo entityInfo = searcher.convertQueryHit( hit.getAsJsonObject() );
+			EntityInfo entityInfo = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
 			if ( entityInfo != null ) {
 				results.add( entityInfo );
 			}
@@ -506,7 +509,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 
-		EntityInfo convertQueryHit(JsonObject hit) {
+		EntityInfo convertQueryHit(JsonObject searchResult, JsonObject hit) {
 			String type = hit.get( "_type" ).getAsString();
 			Class<?> clazz = entityTypesByName.get( type );
 
@@ -550,6 +553,12 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							else {
 								projections[i] = hit.getAsJsonObject().get( "fields" ).getAsJsonObject().get( SPATIAL_DISTANCE_FIELD ).getAsDouble();
 							}
+							break;
+						case ElasticsearchProjectionConstants.TOOK:
+							projections[i] = searchResult.get( "took" ).getAsInt();
+							break;
+						case ElasticsearchProjectionConstants.TIMED_OUT:
+							projections[i] = searchResult.get( "timed_out" ).getAsBoolean();
 							break;
 						case ElasticsearchProjectionConstants.THIS:
 							// Use EntityInfo.ENTITY_PLACEHOLDER as placeholder.
@@ -915,11 +924,12 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		private void runSearch() {
 			SearchResult searchResult = searcher.runSearch();
-			JsonArray hits = searchResult.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+			JsonObject searchResultJsonObject = searchResult.getJsonObject();
+			JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
 			results = new ArrayList<>( searchResult.getTotal() );
 
 			for ( JsonElement hit : hits ) {
-				EntityInfo converted = searcher.convertQueryHit( hit.getAsJsonObject() );
+				EntityInfo converted = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
 				if ( converted != null ) {
 					results.add( converted );
 				}

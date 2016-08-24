@@ -552,7 +552,9 @@ public class ElasticsearchIT extends SearchTestBase {
 						"dateOfBirth",
 						"handicap",
 						"driveWidth",
-						"ranking.value"
+						"ranking.value",
+						ElasticsearchProjectionConstants.TOOK,
+						ElasticsearchProjectionConstants.TIMED_OUT
 				)
 				.list();
 
@@ -575,6 +577,9 @@ public class ElasticsearchIT extends SearchTestBase {
 		assertThat( projection[8] ).describedAs( "handicap" ).isEqualTo( 3.4D );
 		assertThat( projection[9] ).describedAs( "driveWidth" ).isEqualTo( 285 );
 		assertThat( projection[10] ).describedAs( "ranking value" ).isEqualTo( BigInteger.valueOf( 311 ) );
+		assertThat( projection[11] ).describedAs( "took" ).isInstanceOf( Integer.class );
+		assertThat( (Integer) projection[11] ).describedAs( "took" ).isGreaterThanOrEqualTo( 0 );
+		assertThat( projection[12] ).describedAs( "timeout" ).isEqualTo( Boolean.FALSE );
 
 		tx.commit();
 		s.close();
