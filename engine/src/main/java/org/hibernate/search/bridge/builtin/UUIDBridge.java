@@ -9,13 +9,14 @@ package org.hibernate.search.bridge.builtin;
 import java.util.UUID;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 
 /**
  * Bridge a {@link UUID} to a {@link String}.
  *
  * @author Davide D'Alto
  */
-public class UUIDBridge implements TwoWayStringBridge {
+public class UUIDBridge implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 
 	@Override
 	public String objectToString(Object object) {

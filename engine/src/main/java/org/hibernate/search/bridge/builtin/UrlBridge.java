@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -18,7 +19,7 @@ import org.hibernate.search.exception.SearchException;
  *
  * @author Emmanuel Bernard
  */
-public class UrlBridge implements TwoWayStringBridge {
+public class UrlBridge implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 	@Override
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
