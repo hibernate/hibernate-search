@@ -44,14 +44,14 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 class BasicJDKTypesBridgeProvider implements BridgeProvider {
 
 	private static final TwoWayFieldBridge CHARACTER = new TwoWayString2FieldBridgeAdaptor( new CharacterBridge() );
-	private static final TwoWayFieldBridge DOUBLE = new TwoWayString2FieldBridgeAdaptor( new DoubleBridge() );
-	private static final TwoWayFieldBridge FLOAT = new TwoWayString2FieldBridgeAdaptor( new FloatBridge() );
-	private static final TwoWayFieldBridge BYTE = new TwoWayString2FieldBridgeAdaptor( new ByteBridge() );
-	private static final TwoWayFieldBridge SHORT = new TwoWayString2FieldBridgeAdaptor( new ShortBridge() );
-	private static final TwoWayFieldBridge INTEGER = new TwoWayString2FieldBridgeAdaptor( new IntegerBridge() );
-	private static final TwoWayFieldBridge LONG = new TwoWayString2FieldBridgeAdaptor( new LongBridge() );
-	private static final TwoWayFieldBridge BIG_INTEGER = new TwoWayString2FieldBridgeAdaptor( new BigIntegerBridge() );
-	private static final TwoWayFieldBridge BIG_DECIMAL = new TwoWayString2FieldBridgeAdaptor( new BigDecimalBridge() );
+	private static final TwoWayFieldBridge DOUBLE = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new DoubleBridge() );
+	private static final TwoWayFieldBridge FLOAT = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new FloatBridge() );
+	private static final TwoWayFieldBridge BYTE = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new ByteBridge() );
+	private static final TwoWayFieldBridge SHORT = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new ShortBridge() );
+	private static final TwoWayFieldBridge INTEGER = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new IntegerBridge() );
+	private static final TwoWayFieldBridge LONG = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new LongBridge() );
+	private static final TwoWayFieldBridge BIG_INTEGER = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new BigIntegerBridge() );
+	private static final TwoWayFieldBridge BIG_DECIMAL = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new BigDecimalBridge() );
 	private static final TwoWayFieldBridge STRING = new TwoWayString2FieldBridgeAdaptor( new StringBridge() );
 	private static final TwoWayFieldBridge BOOLEAN = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new BooleanBridge() );
 	private static final TwoWayFieldBridge Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
