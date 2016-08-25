@@ -7,6 +7,7 @@
 package org.hibernate.search.bridge.builtin;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 
 /**
  * Base class used to bridge numbers (integer, double, etc.) as strings.
@@ -16,7 +17,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
  * @see NumericFieldBridge
  * @author Emmanuel Bernard
  */
-public abstract class NumberBridge implements TwoWayStringBridge {
+public abstract class NumberBridge implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 	@Override
 	public String objectToString(Object object) {
 		return object != null ?
