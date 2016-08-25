@@ -12,13 +12,14 @@ import java.net.URISyntaxException;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 
 /**
  * Bridge a {@link URI} to a {@link String}.
  *
  * @author Emmanuel Bernard
  */
-public class UriBridge implements TwoWayStringBridge {
+public class UriBridge implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 	@Override
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {

@@ -54,9 +54,9 @@ class BasicJDKTypesBridgeProvider implements BridgeProvider {
 	private static final TwoWayFieldBridge BIG_DECIMAL = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new BigDecimalBridge() );
 	private static final TwoWayFieldBridge STRING = new TwoWayString2FieldBridgeAdaptor( new StringBridge() );
 	private static final TwoWayFieldBridge BOOLEAN = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new BooleanBridge() );
-	private static final TwoWayFieldBridge Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
-	private static final TwoWayFieldBridge Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
-	private static final TwoWayFieldBridge UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );
+	private static final TwoWayFieldBridge Url = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new UrlBridge() );
+	private static final TwoWayFieldBridge Uri = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new UriBridge() );
+	private static final TwoWayFieldBridge UUID = new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( new UUIDBridge() );
 
 	//Not static as it depends on the application's classloader
 	private final TwoWayFieldBridge clazz;
