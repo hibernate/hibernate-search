@@ -76,14 +76,6 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private static final String NOT_ANALYZED = "not_analyzed";
 	private static final String NOT_INDEXED = "no";
 
-	private static final String TYPE_STRING = "string";
-	private static final String TYPE_BOOLEAN = "boolean";
-	private static final String TYPE_DATE = "date";
-	private static final String TYPE_INTEGER = "integer";
-	private static final String TYPE_LONG = "long";
-	private static final String TYPE_FLOAT = "float";
-	private static final String TYPE_DOUBLE = "double";
-
 	private String indexName;
 	private String actualIndexName;
 	private boolean refreshAfterWrite;
@@ -307,7 +299,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 			if ( multitenancyEnabled ) {
 				JsonObject field = new JsonObject();
-				field.addProperty( "type", TYPE_STRING );
+				field.addProperty( "type", ElasticsearchFieldType.STRING.getElasticsearchString() );
 				field.addProperty( "index", NOT_ANALYZED );
 				properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
 			}
@@ -358,13 +350,13 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( fieldMetadata.getName() );
 		JsonObject field = new JsonObject();
 
-		String fieldType = getFieldType( descriptor, fieldMetadata );
+		ElasticsearchFieldType fieldType = getFieldType( descriptor, fieldMetadata );
 		if ( fieldType == null ) {
 			LOG.debug( "Not adding a mapping for field " + fieldMetadata.getFieldName() + " as its type could not be determined" );
 			return;
 		}
 
-		field.addProperty( "type", fieldType );
+		field.addProperty( "type", fieldType.getElasticsearchString() );
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 
 		addIndexOptions( field, descriptor, fieldMetadata.getName(),
@@ -399,8 +391,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		if ( !SpatialHelper.isSpatialField( simpleFieldName ) ) {
 			JsonObject field = new JsonObject();
 
-			String fieldType = getFieldType( bridgeDefinedField );
-			field.addProperty( "type", fieldType );
+			ElasticsearchFieldType fieldType = getFieldType( bridgeDefinedField );
+			field.addProperty( "type", fieldType.getElasticsearchString() );
 
 			addIndexOptions( field, binding, fieldName, fieldType, bridgeDefinedField.getIndex(), null );
 
@@ -420,7 +412,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				// we only add the geo_point for the latitude field
 				JsonObject field = new JsonObject();
 
-				field.addProperty( "type", "geo_point" );
+				field.addProperty( "type", ElasticsearchFieldType.GEO_POINT.getElasticsearchString() );
 
 				// in this case, the spatial field has precedence over an already defined field
 				getOrCreateProperties( payload, fieldName ).add( SpatialHelper.getSpatialFieldRootName( simpleFieldName ), field );
@@ -428,7 +420,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			else {
 				// the fields potentially created for the spatial hash queries
 				JsonObject field = new JsonObject();
-				field.addProperty( "type", TYPE_STRING );
+				field.addProperty( "type", ElasticsearchFieldType.STRING.getElasticsearchString() );
 				field.addProperty( "index", NOT_ANALYZED );
 
 				getOrCreateProperties( payload, fieldName ).add( fieldName, field );
@@ -441,7 +433,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		String fullFieldName = facetMetadata.getFacetName();
 
 		JsonObject field = new JsonObject();
-		field.addProperty( "type", getFieldType( facetMetadata ) );
+		field.addProperty( "type", getFieldType( facetMetadata ).getElasticsearchString() );
 		field.addProperty( "store", false );
 		field.addProperty( "index", NOT_ANALYZED );
 
@@ -453,7 +445,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	 * Adds the main indexing-related options to the given field: "index", "doc_values", "analyzer", ...
 	 */
 	private void addIndexOptions(JsonObject field, EntityIndexBinding binding, String fieldName,
-			String fieldType, Field.Index index, AnalyzerReference analyzerReference) {
+			ElasticsearchFieldType fieldType, Field.Index index, AnalyzerReference analyzerReference) {
 		String elasticsearchIndex;
 		switch ( index ) {
 			case ANALYZED:
@@ -485,20 +477,20 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
-	private boolean canTypeBeAnalyzed(String fieldType) {
+	private boolean canTypeBeAnalyzed(ElasticsearchFieldType fieldType) {
 		// Only strings can be analyzed
-		return TYPE_STRING.equals( fieldType );
+		return ElasticsearchFieldType.STRING.equals( fieldType );
 	}
 
-	private String getFieldType(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
-		String type;
+	private ElasticsearchFieldType getFieldType(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
+		ElasticsearchFieldType type;
 
 		if ( FieldHelper.isBoolean( descriptor, fieldMetadata.getName() ) ) {
-			type = TYPE_BOOLEAN;
+			type = ElasticsearchFieldType.BOOLEAN;
 		}
 		else if ( FieldHelper.isDate( descriptor, fieldMetadata.getName() ) ||
 				FieldHelper.isCalendar( descriptor, fieldMetadata.getName() ) ) {
-			type = TYPE_DATE;
+			type = ElasticsearchFieldType.DATE;
 		}
 		else if ( FieldHelper.isNumeric( fieldMetadata ) ) {
 
@@ -506,16 +498,16 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 			switch ( numericEncodingType ) {
 				case INTEGER:
-					type = TYPE_INTEGER;
+					type = ElasticsearchFieldType.INTEGER;
 					break;
 				case LONG:
-					type = TYPE_LONG;
+					type = ElasticsearchFieldType.LONG;
 					break;
 				case FLOAT:
-					type = TYPE_FLOAT;
+					type = ElasticsearchFieldType.FLOAT;
 					break;
 				case DOUBLE:
-					type = TYPE_DOUBLE;
+					type = ElasticsearchFieldType.DOUBLE;
 					break;
 				default:
 					// Likely a custom field bridge which does not expose the type of the given field; either correctly
@@ -526,41 +518,41 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			}
 		}
 		else {
-			type = TYPE_STRING;
+			type = ElasticsearchFieldType.STRING;
 		}
 
 		return type;
 	}
 
-	private String getFieldType(BridgeDefinedField bridgeDefinedField) {
+	private ElasticsearchFieldType getFieldType(BridgeDefinedField bridgeDefinedField) {
 		switch ( bridgeDefinedField.getType() ) {
 			case BOOLEAN:
-				return TYPE_BOOLEAN;
+				return ElasticsearchFieldType.BOOLEAN;
 			case DATE:
-				return TYPE_DATE;
+				return ElasticsearchFieldType.DATE;
 			case FLOAT:
-				return TYPE_FLOAT;
+				return ElasticsearchFieldType.FLOAT;
 			case DOUBLE:
-				return TYPE_DOUBLE;
+				return ElasticsearchFieldType.DOUBLE;
 			case INTEGER:
-				return TYPE_INTEGER;
+				return ElasticsearchFieldType.INTEGER;
 			case LONG:
-				return TYPE_LONG;
+				return ElasticsearchFieldType.LONG;
 			case STRING:
-				return TYPE_STRING;
+				return ElasticsearchFieldType.STRING;
 			default:
 				throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getName() );
 		}
 	}
 
-	private String getFieldType(FacetMetadata facetMetadata) {
+	private ElasticsearchFieldType getFieldType(FacetMetadata facetMetadata) {
 		switch ( facetMetadata.getEncoding() ) {
 			case DOUBLE:
-				return TYPE_DOUBLE;
+				return ElasticsearchFieldType.DOUBLE;
 			case LONG:
-				return TYPE_LONG;
+				return ElasticsearchFieldType.LONG;
 			case STRING:
-				return TYPE_STRING;
+				return ElasticsearchFieldType.STRING;
 			case AUTO:
 				throw new AssertionFailure( "The facet type should have been resolved during bootstrapping" );
 			default: {
@@ -593,7 +585,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				// * for these, the user should be able to opt out (nested would be the safe default mapping in this
 				// case, but they could want to opt out when only ever querying on single fields of the embeddable)
 
-//				property.addProperty( "type", "nested" );
+//				property.addProperty( "type", ElasticsearchFieldType.NESTED.getElasticsearchString() );
 
 				JsonObject properties = new JsonObject();
 				property.add( "properties", properties );
