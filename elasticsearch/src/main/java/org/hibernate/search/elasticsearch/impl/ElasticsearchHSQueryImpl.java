@@ -73,6 +73,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import io.searchbox.core.DocumentResult;
@@ -88,6 +89,8 @@ import io.searchbox.core.search.sort.Sort.Sorting;
  * @author Gunnar Morling
  */
 public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
+
+	private static final JsonParser JSON_PARSER = new JsonParser();
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -821,7 +824,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					jsonFilter = ToElasticsearch.fromLuceneFilter( (Filter) candidateFilter );
 				}
 				else if ( candidateFilter instanceof ElasticsearchFilter ) {
-					jsonFilter = GsonHolder.PARSER.parse( ( (ElasticsearchFilter) candidateFilter ).getJsonFilter() ).getAsJsonObject();
+					jsonFilter = JSON_PARSER.parse( ( (ElasticsearchFilter) candidateFilter ).getJsonFilter() )
+							.getAsJsonObject();
 				}
 				else {
 					throw new SearchException(
@@ -841,7 +845,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				jsonFilter = ToElasticsearch.fromLuceneFilter( (Filter) filterOrFactory );
 			}
 			else if ( filterOrFactory instanceof ElasticsearchFilter ) {
-				jsonFilter = GsonHolder.PARSER.parse( ( (ElasticsearchFilter) filterOrFactory ).getJsonFilter() ).getAsJsonObject();
+				jsonFilter = JSON_PARSER.parse( ( (ElasticsearchFilter) filterOrFactory ).getJsonFilter() ).getAsJsonObject();
 			}
 			else {
 				throw new SearchException(

@@ -15,9 +15,10 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.impl.GsonHolder;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
@@ -62,8 +63,14 @@ public class JestClient implements Service, Startable, Stoppable {
 
 	private io.searchbox.client.JestClient client;
 
+	private ServiceManager serviceManager;
+	private GsonService gsonService;
+
 	@Override
 	public void start(Properties properties, BuildContext context) {
+		serviceManager = context.getServiceManager();
+		gsonService = serviceManager.requestService( GsonService.class );
+
 		JestClientFactory factory = new JestClientFactory();
 
 		String serverUri = ConfigurationParseHelper.getString(
@@ -78,7 +85,7 @@ public class JestClient implements Service, Startable, Stoppable {
 				.multiThreaded( true )
 				.readTimeout( 60000 )
 				.connTimeout( 2000 )
-				.gson( GsonHolder.GSON )
+				.gson( gsonService.getGson() )
 				.build()
 		);
 
@@ -88,6 +95,11 @@ public class JestClient implements Service, Startable, Stoppable {
 	@Override
 	public void stop() {
 		client.shutdownClient();
+		client = null;
+
+		gsonService = null;
+		serviceManager.releaseService( GsonService.class );
+		serviceManager = null;
 	}
 
 	public <T extends JestResult> T executeRequest(Action<T> request, int... ignoredErrorStatuses) {
@@ -208,7 +220,7 @@ public class JestClient implements Service, Startable, Stoppable {
 		}
 
 		sb.append( "Data:\n" );
-		sb.append( action.getData( GsonHolder.GSON ) );
+		sb.append( action.getData( gsonService.getGson() ) );
 		sb.append( "\n" );
 		return sb.toString();
 	}

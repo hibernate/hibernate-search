@@ -7,9 +7,10 @@
 package org.hibernate.search.elasticsearch;
 
 import org.hibernate.search.elasticsearch.impl.ElasticsearchJsonQueryDescriptor;
-import org.hibernate.search.elasticsearch.impl.GsonHolder;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
+
+import com.google.gson.JsonParser;
 
 /**
  * Creates queries to be used with Elasticsearch.
@@ -17,6 +18,8 @@ import org.hibernate.search.query.engine.spi.QueryDescriptor;
  * @author Gunnar Morling
  */
 public class ElasticsearchQueries {
+
+	private static final JsonParser PARSER = new JsonParser();
 
 	private ElasticsearchQueries() {
 	}
@@ -27,7 +30,7 @@ public class ElasticsearchQueries {
 	 * documentation</a> for the complete query syntax.
 	 */
 	public static QueryDescriptor fromJson(String jsonQuery) {
-		return new ElasticsearchJsonQueryDescriptor( GsonHolder.PARSER.parse( jsonQuery ).getAsJsonObject() );
+		return new ElasticsearchJsonQueryDescriptor( PARSER.parse( jsonQuery ).getAsJsonObject() );
 	}
 
 	/**

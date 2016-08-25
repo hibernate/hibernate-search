@@ -8,25 +8,21 @@ package org.hibernate.search.elasticsearch.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 
 import io.searchbox.client.AbstractJestClient;
 
 /**
- * Centralizes the configuration of the Gson object.
- *
  * @author Guillaume Smet
  */
-public class GsonHolder {
+public class DefaultGsonService implements GsonService {
 
-	private GsonHolder() {
-	}
-
-	public static final Gson GSON = new GsonBuilder()
+	private final Gson gson = new GsonBuilder()
 			.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT )
 			.serializeNulls()
 			.create();
 
-	public static final JsonParser PARSER = new JsonParser();
+	public Gson getGson() {
+		return gson;
+	}
 
 }
