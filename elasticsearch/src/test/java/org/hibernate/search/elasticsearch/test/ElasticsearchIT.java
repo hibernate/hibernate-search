@@ -636,6 +636,26 @@ public class ElasticsearchIT extends SearchTestBase {
 		s.close();
 	}
 
+	@Test
+	public void testBooleanProperty() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'term' : { 'active' : 'true' } } }" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+				.setProjection( ElasticsearchProjectionConstants.ID )
+				.list();
+
+		assertThat( result ).hasSize( 1 );
+		Object[] projection = (Object[]) result.iterator().next();
+
+		assertThat( projection[0] ).isEqualTo( 1L );
+
+		tx.commit();
+		s.close();
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { ScientificArticle.class, Tower.class, Address.class, Country.class, State.class, StateCandidate.class, ResearchPaper.class,
