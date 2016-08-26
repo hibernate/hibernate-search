@@ -53,6 +53,8 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.searchbox.client.JestResult;
@@ -94,6 +96,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
 
 	private ServiceManager serviceManager;
+
+	private GsonService gsonService;
 
 	private ElasticsearchIndexWorkVisitor visitor;
 	private JestClient jestClient;
@@ -141,6 +145,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		this.multitenancyEnabled = context.isMultitenancyEnabled();
 
 		this.similarity = similarity;
+
+		this.gsonService = serviceManager.requestService( GsonService.class );
 
 		this.jestClient = serviceManager.requestService( JestClient.class );
 		this.visitor = new ElasticsearchIndexWorkVisitor(
@@ -199,7 +205,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			deleteIndexIfExisting();
 		}
 
-		searchIntegrator.getServiceManager().releaseService( JestClient.class );
+		serviceManager.releaseService( JestClient.class );
+		jestClient = null;
+
+		serviceManager.releaseService( GsonService.class );
+		gsonService = null;
 	}
 
 	@Override
@@ -367,8 +377,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 
 		if ( fieldMetadata.indexNullAs() != null ) {
-			// TODO HSEARCH-2262 Validate the type; Supported types are converted transparently by ES
-			field.addProperty( "null_value", fieldMetadata.indexNullAs() );
+			JsonElement nullValueJsonElement = getNullValue( descriptor, fieldType, fieldMetadata );
+			field.add( "null_value", nullValueJsonElement );
 		}
 
 		getOrCreateProperties( payload, fieldMetadata.getName() ).add( simpleFieldName, field );
@@ -563,6 +573,15 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				);
 			}
 		}
+	}
+
+	private JsonElement getNullValue(EntityIndexBinding indexBinding, ElasticsearchFieldType dataType,
+			DocumentFieldMetadata fieldMetadata) {
+		Gson gson = gsonService.getGson();
+		Object convertedValue = ElasticSearchIndexNullAsHelper.getNullValue(
+				fieldMetadata.getName(), dataType, fieldMetadata.indexNullAs()
+				);
+		return gson.toJsonTree( convertedValue );
 	}
 
 	private JsonObject getOrCreateProperties(JsonObject mapping, String fieldName) {

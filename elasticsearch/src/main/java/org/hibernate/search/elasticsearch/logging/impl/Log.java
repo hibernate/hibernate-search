@@ -157,4 +157,14 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Faceting request of type %1$s not supported"
 	)
 	SearchException facetingRequestHasUnsupportedType(String facetingRequestType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 27,
+			value = "The 'indexNullAs' property for field '%2$s' needs to represent a Boolean to match the field type of the index. "
+					+ "Please change value from '%1$s' to represent a Boolean." )
+	SearchException nullMarkerNeedsToRepresentABoolean(String proposedTokenValue, String fieldName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 28,
+			value = "The 'indexNullAs' property for field '%2$s' needs to represent a Date to match the field type of the index. "
+					+ "Please change value from '%1$s' to represent a Date." )
+	SearchException nullMarkerNeedsToRepresentADate(String proposedTokenValue, String fieldName);
 }
