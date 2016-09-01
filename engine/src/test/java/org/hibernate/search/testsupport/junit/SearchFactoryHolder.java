@@ -98,10 +98,15 @@ public class SearchFactoryHolder extends ExternalResource {
 		return this;
 	}
 
-	public AbstractWorkspaceImpl extractWorkspace(Class indexedType) {
+	public DirectoryBasedIndexManager extractIndexManager(Class indexedType) {
 		EntityIndexBinding indexBindingForEntity = getSearchFactory().getIndexBinding( indexedType );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
-		WorkspaceHolder backend = (WorkspaceHolder) indexManager.getWorkspaceHolder();
+		return indexManager;
+	}
+
+	public AbstractWorkspaceImpl extractWorkspace(Class indexedType) {
+		DirectoryBasedIndexManager indexManager = extractIndexManager( indexedType );
+		WorkspaceHolder backend = indexManager.getWorkspaceHolder();
 		return backend.getIndexResources().getWorkspace();
 	}
 
