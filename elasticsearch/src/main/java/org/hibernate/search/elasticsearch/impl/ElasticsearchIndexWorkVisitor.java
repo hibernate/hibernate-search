@@ -68,7 +68,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 	private static final Log LOG = LoggerFactory.make();
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
-	private static final Pattern NAME_AND_INDEX = Pattern.compile( "(.+?)(\\[([0-9])+\\])?" );
+	private static final Pattern NAME_AND_INDEX = Pattern.compile( "(.+?)(\\[([0-9]+)\\])?" );
 
 	private static final String DELETE_ALL_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"match_all\" : { } } } } }";
 	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
