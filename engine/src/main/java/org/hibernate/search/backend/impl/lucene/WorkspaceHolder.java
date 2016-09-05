@@ -104,10 +104,10 @@ public class WorkspaceHolder {
 		workProcessor.updateResources( resources );
 	}
 
-	public void closeIndexWriter() {
+	public void flushAndReleaseResources() {
 		LuceneBackendResources backendResources = resources;
 		if ( backendResources != null ) {
-			backendResources.getWorkspace().closeIndexWriter();
+			backendResources.flushAndReleaseResources();
 		}
 	}
 

@@ -150,7 +150,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void flushAndReleaseResources() {
-		workspaceHolder.closeIndexWriter();
+		workspaceHolder.flushAndReleaseResources();
 	}
 
 	private LuceneWorkSerializer requestSerializer() {

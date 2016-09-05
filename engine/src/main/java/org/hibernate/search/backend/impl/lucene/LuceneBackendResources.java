@@ -130,6 +130,7 @@ public final class LuceneBackendResources {
 		if ( ! asyncIndexingExecutor.isTerminated() ) {
 			log.unableToShutdownAsynchronousIndexingByTimeout( indexName );
 		}
+		asyncIndexingExecutor = null;
 	}
 
 	public ErrorHandler getErrorHandler() {
@@ -157,4 +158,9 @@ public final class LuceneBackendResources {
 		return new LuceneBackendResources( this );
 	}
 
+	public void flushAndReleaseResources() {
+		flushCloseExecutor();
+		workspace.getCommitPolicy().onClose();
+		workspace.closeIndexWriter();
+	}
 }
