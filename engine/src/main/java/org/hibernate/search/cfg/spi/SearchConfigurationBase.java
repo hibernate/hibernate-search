@@ -58,6 +58,6 @@ public abstract class SearchConfigurationBase implements SearchConfiguration {
 
 	@Override
 	public boolean isMultitenancyEnabled() {
-		return true;
+		return false;
 	}
 }

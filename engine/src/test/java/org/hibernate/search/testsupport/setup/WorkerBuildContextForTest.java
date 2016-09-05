@@ -39,7 +39,7 @@ public class WorkerBuildContextForTest extends BuildContextForTest implements Wo
 
 	@Override
 	public boolean isMultitenancyEnabled() {
-		return true;
+		return false;
 	}
 
 	@Override
