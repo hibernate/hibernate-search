@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 5.6.0.Beta2*
+*Version: 5.6.0.Beta2 - 05-09-2016*
 
 ## Description
 
