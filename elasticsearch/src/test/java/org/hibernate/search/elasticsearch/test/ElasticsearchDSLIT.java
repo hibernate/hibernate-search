@@ -230,6 +230,86 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 	}
 
 	@Test
+	public void testDSLKeywordBoolean() throws Exception {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+
+			Query query = queryBuilder
+					.keyword()
+						.onField( "personal" )
+						.matching( true )
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'term':{'personal':{'value':'true','boost':1.0}}}}", queryString );
+		}
+	}
+
+	@Test
+	public void testDSLKeywordFloat() throws Exception {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+
+			Query query = queryBuilder
+					.keyword()
+						.onField( "shippingCost" )
+						.matching( 0.40f )
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'range':{'shippingCost':{'gte':0.4,'lte':0.4,'boost':1.0}}}}", queryString );
+		}
+	}
+
+	@Test
+	public void testDSLKeywordDate() throws Exception {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+
+			Calendar date = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
+			date.set( 1958, 3, 7, 5, 5, 5 );
+			date.set( Calendar.MILLISECOND, 0 );
+
+			Query query = queryBuilder
+					.keyword()
+						.onField( "dateWritten" )
+						.matching( date.getTime() )
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'term':{'dateWritten':{'value':'1958-04-07T00:00:00Z','boost':1.0}}}}", queryString );
+		}
+	}
+
+	@Test
+	public void testDSLKeywordCalendar() throws Exception {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+
+			Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ), Locale.ENGLISH );
+			calendar.set( 1958, 3, 7, 5, 5, 5 );
+			calendar.set( Calendar.MILLISECOND, 0 );
+
+			Query query = queryBuilder
+					.keyword()
+						.onField( "dateSent" )
+						.matching( calendar )
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'term':{'dateSent':{'value':'1958-04-07T00:00:00Z','boost':1.0}}}}", queryString );
+		}
+	}
+
+	@Test
 	public void testDSLPhraseQueryWithoutAnalyzer() {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
