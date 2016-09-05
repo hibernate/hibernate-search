@@ -9,6 +9,7 @@ package org.hibernate.search.bridge.builtin.time.impl;
 import java.time.ZoneOffset;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.util.StringHelper;
 
 /**
@@ -18,7 +19,7 @@ import org.hibernate.search.util.StringHelper;
  * @see ZoneOffset#of(String)
  * @author Davide D'Alto
  */
-public class ZoneOffsetBridge implements TwoWayStringBridge {
+public class ZoneOffsetBridge implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 
 	public static final ZoneOffsetBridge INSTANCE = new ZoneOffsetBridge();
 

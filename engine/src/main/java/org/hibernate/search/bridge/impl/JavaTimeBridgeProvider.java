@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor;
 import org.hibernate.search.bridge.builtin.time.impl.DurationBridge;
 import org.hibernate.search.bridge.builtin.time.impl.InstantBridge;
 import org.hibernate.search.bridge.builtin.time.impl.LocalDateBridge;
@@ -72,17 +72,17 @@ public class JavaTimeBridgeProvider implements BridgeProvider {
 	private static Map<String, FieldBridge> populateBridgeMap() {
 		Map<String, FieldBridge> bridges = new HashMap<String, FieldBridge>( 12 );
 		bridges.put( Year.class.getName(), YearBridge.INSTANCE );
-		bridges.put( YearMonth.class.getName(), new TwoWayString2FieldBridgeAdaptor( YearMonthBridge.INSTANCE ) );
-		bridges.put( MonthDay.class.getName(), new TwoWayString2FieldBridgeAdaptor( MonthDayBridge.INSTANCE ) );
-		bridges.put( LocalDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalDateTimeBridge.INSTANCE ) );
-		bridges.put( LocalDate.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalDateBridge.INSTANCE ) );
-		bridges.put( LocalTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( LocalTimeBridge.INSTANCE ) );
-		bridges.put( OffsetDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( OffsetDateTimeBridge.INSTANCE ) );
-		bridges.put( OffsetTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( OffsetTimeBridge.INSTANCE ) );
-		bridges.put( ZonedDateTime.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZonedDateTimeBridge.INSTANCE ) );
-		bridges.put( ZoneOffset.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZoneOffsetBridge.INSTANCE ) );
-		bridges.put( ZoneId.class.getName(), new TwoWayString2FieldBridgeAdaptor( ZoneIdBridge.INSTANCE ) );
-		bridges.put( Period.class.getName(), new TwoWayString2FieldBridgeAdaptor( PeriodBridge.INSTANCE ) );
+		bridges.put( YearMonth.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( YearMonthBridge.INSTANCE ) );
+		bridges.put( MonthDay.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( MonthDayBridge.INSTANCE ) );
+		bridges.put( LocalDateTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( LocalDateTimeBridge.INSTANCE ) );
+		bridges.put( LocalDate.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( LocalDateBridge.INSTANCE ) );
+		bridges.put( LocalTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( LocalTimeBridge.INSTANCE ) );
+		bridges.put( OffsetDateTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( OffsetDateTimeBridge.INSTANCE ) );
+		bridges.put( OffsetTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( OffsetTimeBridge.INSTANCE ) );
+		bridges.put( ZonedDateTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ZonedDateTimeBridge.INSTANCE ) );
+		bridges.put( ZoneOffset.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ZoneOffsetBridge.INSTANCE ) );
+		bridges.put( ZoneId.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ZoneIdBridge.INSTANCE ) );
+		bridges.put( Period.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( PeriodBridge.INSTANCE ) );
 		bridges.put( Duration.class.getName(), DurationBridge.INSTANCE );
 		bridges.put( Instant.class.getName(), InstantBridge.INSTANCE );
 		return bridges;

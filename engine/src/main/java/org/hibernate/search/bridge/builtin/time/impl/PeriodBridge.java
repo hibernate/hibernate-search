@@ -11,6 +11,7 @@ import java.time.Period;
 import java.util.Locale;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -21,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Davide D'Alto
  */
-public class PeriodBridge implements TwoWayStringBridge {
+public class PeriodBridge implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 
 	private static final Log log = LoggerFactory.make();
 	private static final int PADDING = 11;

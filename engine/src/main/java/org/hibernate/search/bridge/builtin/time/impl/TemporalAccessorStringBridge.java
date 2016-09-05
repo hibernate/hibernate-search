@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -18,7 +19,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Davide D'Alto
  */
-public abstract class TemporalAccessorStringBridge<T extends TemporalAccessor> implements TwoWayStringBridge {
+public abstract class TemporalAccessorStringBridge<T extends TemporalAccessor> implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 
 	private static final Log log = LoggerFactory.make();
 

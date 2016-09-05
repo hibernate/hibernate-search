@@ -9,6 +9,7 @@ package org.hibernate.search.bridge.builtin.time.impl;
 import java.time.ZoneId;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.util.StringHelper;
 
 /**
@@ -18,7 +19,7 @@ import org.hibernate.search.util.StringHelper;
  * @see ZoneId#of(String)
  * @author Davide D'Alto
  */
-public class ZoneIdBridge implements TwoWayStringBridge {
+public class ZoneIdBridge implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 
 	public static final ZoneIdBridge INSTANCE = new ZoneIdBridge();
 
