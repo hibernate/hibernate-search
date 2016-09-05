@@ -50,6 +50,10 @@ public class ToElasticsearch {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
+	private static final int DEFAULT_SLOP = 0;
+	private static final int DEFAULT_MAX_EDIT_DISTANCE = 0;
+	private static final float DEFAULT_BOOST = 1.0f;
+
 	private ToElasticsearch() {
 	}
 
@@ -239,15 +243,15 @@ public class ToElasticsearch {
 		return bool;
 	}
 
-	private static JsonObject convertTermQuery(TermQuery termQuery) {
-		String field = termQuery.getTerm().field();
+	private static JsonObject convertTermQuery(TermQuery query) {
+		String field = query.getTerm().field();
 
 		JsonObject matchQuery = JsonBuilder.object()
 				.add( "term",
 						JsonBuilder.object().add( field,
 								JsonBuilder.object()
-										.addProperty( "value", termQuery.getTerm().text() )
-										.addProperty( "boost", termQuery.getBoost() )
+										.addProperty( "value", query.getTerm().text() )
+										.append( boostAppender( query ) )
 						)
 				).build();
 
@@ -262,7 +266,7 @@ public class ToElasticsearch {
 						JsonBuilder.object().add( field,
 								JsonBuilder.object()
 										.addProperty( "value", query.getTerm().text() )
-										.addProperty( "boost", query.getBoost() )
+										.append( boostAppender( query ) )
 						)
 				).build();
 
@@ -279,7 +283,7 @@ public class ToElasticsearch {
 										.addProperty( "value", query.getTerm().text() )
 										.addProperty( "fuzziness", query.getMaxEdits() )
 										.addProperty( "prefix_length", query.getPrefixLength() )
-										.addProperty( "boost", query.getBoost() )
+										.append( boostAppender( query ) )
 						)
 				).build();
 
@@ -309,9 +313,9 @@ public class ToElasticsearch {
 						JsonBuilder.object().add( field,
 								JsonBuilder.object()
 										.addProperty( "query", phrase.toString().trim() )
-										.addProperty( "slop", query.getSlop() )
-										.addProperty( "boost", query.getBoost() )
-						)
+										.append( slopAppender( query.getSlop()) )
+										.append( boostAppender( query ) )
+								)
 				).build();
 
 		return wrapQueryForNestedIfRequired( field, phraseQuery );
@@ -328,9 +332,9 @@ public class ToElasticsearch {
 								JsonBuilder.object()
 										.addProperty( "query", query.getPhrase().trim() )
 										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzer().getName( query.getField() ) )
-										.addProperty( "slop", query.getSlop() )
-										.addProperty( "boost", query.getBoost() )
-						)
+										.append( slopAppender( query.getSlop() ) )
+										.append( boostAppender( query ) )
+								)
 				).build();
 
 		return wrapQueryForNestedIfRequired( query.getField(), phraseQuery );
@@ -343,8 +347,8 @@ public class ToElasticsearch {
 								JsonBuilder.object()
 										.addProperty( "query", query.getSearchTerms() )
 										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzer().getName( query.getField() ) )
-										.addProperty( "fuzziness", query.getMaxEditDistance() )
-										.addProperty( "boost", query.getBoost() )
+										.append( fuzzinessAppender( query.getMaxEditDistance() ) )
+										.append( boostAppender( query ) )
 						)
 				).build();
 
@@ -352,7 +356,7 @@ public class ToElasticsearch {
 	}
 
 	private static JsonObject convertTermRangeQuery(TermRangeQuery query) {
-		JsonObject interval = new JsonObject();
+		JsonBuilder.Object interval = JsonBuilder.object();
 
 		if ( query.getLowerTerm() != null ) {
 			interval.addProperty( query.includesLower() ? "gte" : "gt", query.getLowerTerm().utf8ToString() );
@@ -360,7 +364,8 @@ public class ToElasticsearch {
 		if ( query.getUpperTerm() != null ) {
 			interval.addProperty( query.includesUpper() ? "lte" : "lt", query.getUpperTerm().utf8ToString() );
 		}
-		interval.addProperty( "boost", query.getBoost() );
+
+		interval.append( boostAppender( query ) );
 
 		JsonObject range = JsonBuilder.object().add( "range",
 						JsonBuilder.object().add( query.getField(), interval ))
@@ -370,14 +375,16 @@ public class ToElasticsearch {
 	}
 
 	private static JsonObject convertNumericRangeQuery(NumericRangeQuery<?> query) {
-		JsonObject interval = new JsonObject();
+		JsonBuilder.Object interval = JsonBuilder.object();
+
 		if ( query.getMin() != null ) {
 			interval.addProperty( query.includesMin() ? "gte" : "gt", query.getMin() );
 		}
 		if ( query.getMax() != null ) {
 			interval.addProperty( query.includesMax() ? "lte" : "lt", query.getMax() );
 		}
-		interval.addProperty( "boost", query.getBoost() );
+
+		interval.append( boostAppender( query ) );
 
 		JsonObject range = JsonBuilder.object().add( "range",
 						JsonBuilder.object().add( query.getField(), interval ))
@@ -391,7 +398,7 @@ public class ToElasticsearch {
 				.add( "constant_score",
 						JsonBuilder.object()
 								.add( "filter", fromLuceneQuery( query.getQuery() ) )
-								.addProperty( "boost", query.getBoost() )
+								.append( boostAppender( query ) )
 				).build();
 
 		return constantScoreQuery;
@@ -403,7 +410,7 @@ public class ToElasticsearch {
 						JsonBuilder.object()
 								.add( "query", fromLuceneQuery( query.getQuery() ) )
 								.add( "filter", fromLuceneQuery( query.getFilter() ) )
-								.addProperty( "boost", query.getBoost() )
+								.append( boostAppender( query ) )
 				).build();
 
 		return filteredQuery;
@@ -450,6 +457,66 @@ public class ToElasticsearch {
 				).build();
 
 		return wrapQueryForNestedIfRequired( filter.getFieldName(), spatialHashFilter );
+	}
+
+	private static final JsonBuilder.JsonAppender<Object> NOOP_APPENDER =
+			new JsonBuilder.JsonAppender<Object>() {
+				@Override
+				public void append(Object appendable) {
+					// Do nothing
+				}
+			};
+
+	/**
+	 * Appender that adds a "slop" property if necessary.
+	 */
+	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> slopAppender(final int slop) {
+		if ( slop != DEFAULT_SLOP ) {
+			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
+				@Override
+				public void append(JsonBuilder.Object object) {
+					object.addProperty( "slop", slop );
+				}
+			};
+		}
+		else {
+			return NOOP_APPENDER;
+		}
+	}
+
+	/**
+	 * Appender that adds a "fuzziness" property if necessary.
+	 */
+	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> fuzzinessAppender(final int maxEditDistance) {
+		if ( maxEditDistance != DEFAULT_MAX_EDIT_DISTANCE ) {
+			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
+				@Override
+				public void append(JsonBuilder.Object object) {
+					object.addProperty( "fuzziness", maxEditDistance );
+				}
+			};
+		}
+		else {
+			return NOOP_APPENDER;
+		}
+	}
+
+	/**
+	 * Appender that adds a "boost" property if necessary.
+	 */
+	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> boostAppender(Query query) {
+		final float boost = query.getBoost();
+		if ( boost != DEFAULT_BOOST ) { // We actually want to use float equality here
+			return new JsonBuilder.JsonAppender<JsonBuilder.Object>() {
+				@Override
+				public void append(JsonBuilder.Object object) {
+					object.addProperty( "boost", boost );
+				}
+			};
+		}
+		else {
+			return NOOP_APPENDER;
+		}
 	}
 
 	private static JsonObject wrapQueryForNestedIfRequired(String field, JsonObject query) {
