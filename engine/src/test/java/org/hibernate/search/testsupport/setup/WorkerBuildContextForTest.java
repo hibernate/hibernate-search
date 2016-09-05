@@ -38,6 +38,11 @@ public class WorkerBuildContextForTest extends BuildContextForTest implements Wo
 	}
 
 	@Override
+	public boolean isMultitenancyEnabled() {
+		return true;
+	}
+
+	@Override
 	public InstanceInitializer getInstanceInitializer() {
 		return DefaultInstanceInitializer.DEFAULT_INITIALIZER;
 	}

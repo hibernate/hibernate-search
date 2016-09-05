@@ -17,7 +17,7 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -26,7 +26,7 @@ import org.hibernate.search.spi.impl.SearchFactoryState;
 /**
  * @author Emmanuel Bernard
  */
-public class IncrementalSearchConfiguration implements SearchConfiguration {
+public class IncrementalSearchConfiguration extends SearchConfigurationBase {
 	private final List<Class<?>> classes;
 	private final Map<String, Class<?>> classesByName = new HashMap<String, Class<?>>();
 	private final SearchFactoryState searchFactoryState;

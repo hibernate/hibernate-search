@@ -13,6 +13,7 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -23,7 +24,7 @@ import org.hibernate.search.spi.InstanceInitializer;
  * @author Sanne Grinovero
  * @since 4.1
  */
-public final class ReflectionReplacingSearchConfiguration implements SearchConfiguration {
+public final class ReflectionReplacingSearchConfiguration extends SearchConfigurationBase {
 
 	private final ReflectionManager reflectionManager;
 	private final SearchConfiguration searchConfiguration;

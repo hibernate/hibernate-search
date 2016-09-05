@@ -294,6 +294,7 @@ public class SearchIntegratorBuilder {
 			factoryState.setTransactionManagerExpected( cfg.isTransactionManagerExpected() );
 			factoryState.setDeleteByTermEnforced( cfg.isDeleteByTermEnforced() );
 			factoryState.setIdProvidedImplicit( cfg.isIdProvidedImplicit() );
+			factoryState.setMultitenancyEnabled( cfg.isMultitenancyEnabled() );
 		}
 	}
 
@@ -590,6 +591,11 @@ public class SearchIntegratorBuilder {
 		@Override
 		public ServiceManager getServiceManager() {
 			return factoryState.getServiceManager();
+		}
+
+		@Override
+		public boolean isMultitenancyEnabled() {
+			return factoryState.isMultitenancyEnabled();
 		}
 
 	}
