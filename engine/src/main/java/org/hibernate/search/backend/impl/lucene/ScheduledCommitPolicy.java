@@ -26,7 +26,7 @@ public final class ScheduledCommitPolicy extends AbstractCommitPolicy {
 	public static final int DEFAULT_DELAY_MS = 1000;
 	private static final Log log = LoggerFactory.make();
 
-	private ScheduledExecutorService scheduledExecutorService;
+	private volatile ScheduledExecutorService scheduledExecutorService;
 	private final ErrorHandler errorHandler;
 	private final int delay;
 	private final String indexName;
@@ -45,20 +45,18 @@ public final class ScheduledCommitPolicy extends AbstractCommitPolicy {
 
 	@Override
 	public void onChangeSetApplied(boolean someFailureHappened, boolean streaming) {
-		if ( running.compareAndSet( false, true ) ) {
-			getScheduledExecutorService().scheduleWithFixedDelay(
-					new CommitTask(),
-					delay,
-					delay,
-					TimeUnit.MILLISECONDS
-			);
+		if ( running.get() == false ) {
+			startScheduledExecutor();
 		}
 		if ( someFailureHappened ) {
 			indexWriterHolder.forceLockRelease();
 		}
 	}
 
-	public ScheduledExecutorService getScheduledExecutorService() {
+	/**
+	 * Exposed as public method for tests only
+	 */
+	public synchronized ScheduledExecutorService getScheduledExecutorService() {
 		if ( scheduledExecutorService == null ) {
 			scheduledExecutorService = Executors.newScheduledThreadPool( "Commit Scheduler for index " + indexName );
 		}
@@ -73,16 +71,36 @@ public final class ScheduledCommitPolicy extends AbstractCommitPolicy {
 	@Override
 	public void onClose() {
 		if ( scheduledExecutorService != null ) {
-			try {
-				scheduledExecutorService.shutdown();
-				scheduledExecutorService.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
-				running.set( false );
-				scheduledExecutorService = null;
-			}
-			catch (InterruptedException e) {
-				log.timedOutWaitingShutdown( indexName );
-			}
+			stopScheduledExecutor();
 		}
+	}
+
+	private synchronized void stopScheduledExecutor() {
+		if ( scheduledExecutorService == null ) {
+			return;
+		}
+		try {
+			scheduledExecutorService.shutdown();
+			scheduledExecutorService.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
+			running.set( false );
+			scheduledExecutorService = null;
+		}
+		catch (InterruptedException e) {
+			log.timedOutWaitingShutdown( indexName );
+		}
+	}
+
+	private synchronized void startScheduledExecutor() {
+		if ( running.get() ) {
+			return;
+		}
+		getScheduledExecutorService().scheduleWithFixedDelay(
+				new CommitTask(),
+				delay,
+				delay,
+				TimeUnit.MILLISECONDS
+		);
+		running.set( true );
 	}
 
 	private final class CommitTask implements Runnable {
