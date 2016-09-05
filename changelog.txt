@@ -1,6 +1,68 @@
 Hibernate Search Changelog
 ==========================
 
+5.6.0.Beta2 (05-09-2016)
+-------------------------
+
+** Bug
+    * HSEARCH-2307 - documentation         - Documentation shouldn't suggest need for @Indexed of embedded association fields
+    * HSEARCH-2336 -                       - Upgrade Unitils to 3.4.3
+    * HSEARCH-2325 - query                 - AbstractHSQuery.validateSortField validates SortFields even when lacking information
+    * HSEARCH-2094 - elasticsearch         - ConfigurationPropertiesProvider leaks the configuration Properties
+    * HSEARCH-2337 - engine                - Async backend not properly flushed
+    * HSEARCH-2287 - engine                - Clear cached results of a query when sort is changed
+    * HSEARCH-2322 - engine                - Spatial sort on optional field may fail in corner cases
+    * HSEARCH-2221 -                       - Document in the migration guide that sort by Long @Id doesn't work anymore
+    * HSEARCH-2326 - elasticsearch, engine - The default unit for the spatial distance projection in ES is not documented (same for Lucene's)
+    * HSEARCH-2338 - elasticsearch         - Regex in ElasticsearchIndexWorkVisitor.NAME_AND_INDEX doesn't deal with numbers with more than 1 digit
+
+** Deprecation
+    * HSEARCH-2310 - documentation, engine - Deprecate the ProvidedId annotation
+
+** Improvement
+    * HSEARCH-2301 - query                 - CriteriaObjectInitializer is suboptimal when we query only one subtype of a hierarchy
+    * HSEARCH-2321 - documentation         - Upgrade maven-jdocbook-plugin and pressgang to generate valid HTML5 documentation
+    * HSEARCH-2281 - elasticsearch         - Omit the "boost" attribute on queries when not required
+    * HSEARCH-2318 - tests                 - Improve error messages on BytemanHelper
+    * HSEARCH-2333 - query                 - There's no straightforward way to execute backend-independent queries from the engine module
+    * HSEARCH-2299 - documentation         - Create CONTRIBUTING.md file
+    * HSEARCH-2171 - elasticsearch         - Convert query values to correct type
+    * HSEARCH-2312 - engine                - Do not require the lucene-backward-codecs dependency
+    * HSEARCH-2168 - elasticsearch         - Raise exceptions via Log API in Elasticsearch backend
+    * HSEARCH-2323 - documentation         - Properly ignore hibernate-noorm-release-scripts directory in the build
+    * HSEARCH-2300 - build                 - Use Maven Central first and only contact JBoss Nexus if the artifact is not found in Central
+    * HSEARCH-2304 -                       - Add missing @Override annotation
+    * HSEARCH-2098 - engine                - Clarify documentation of @IndexedEmbedded#prefix()
+
+** New Feature
+    * HSEARCH-2286 - spatial               - DistanceSortField should support reverse sorting
+
+** Patch
+    * HSEARCH-2297 - build                 - Avoid logging method tracef( String, int )
+
+** Sub-task
+    * HSEARCH-2207 -                       - Treat BooleanQuery as an immutable Query
+
+** Task
+    * HSEARCH-2157 - spatial               - Options not exposed in SpatialFieldBridgeByHash
+    * HSEARCH-2257 - elasticsearch         - Add more Elasticsearch specific projection constants
+    * HSEARCH-2285 - build                 - Explicit dependency on the javax.annotations to allow compiling on JDK9
+    * HSEARCH-2308 - backend, build        - Upgrade JGroups to version 3.6.10.Final
+    * HSEARCH-2293 - build                 - Validate builds are backwards compatible with JBoss Logger 3.1
+    * HSEARCH-2272 -                       - Upgrade to Hibernate ORM 5.1
+    * HSEARCH-2316 - build                 - Upgrade to Narayana 5.2.14.Final
+    * HSEARCH-2317 - build                 - Upgrade to Apache ActiveMQ 5.13.3
+    * HSEARCH-2305 -                       - Upgrade to Apache Lucene 5.5.2
+    * HSEARCH-2276 - tests                 - Unclosed test utilities cause leaking of threads
+    * HSEARCH-2302 - integration           - Avoid depending on implementation details to get the JPA FlushMode for a Query
+    * HSEARCH-2289 - tests                 - DurationBridgeTest assumes an overflow not happening on JDK9
+    * HSEARCH-2309 -                       - Getting started documentation points to an old version of Luke
+    * HSEARCH-2256 - elasticsearch         - Consider adding an option to include the tenant id field in the mapping or not
+    * HSEARCH-2303 - build                 - Cleanup build: maven-injection-plugin is no longer used
+    * HSEARCH-2290 - build                 - Get build to pass on JDK9 preview 9-ea+120
+    * HSEARCH-2170 -                       - Convert the GsonHolder to a Service to ensure cleanup
+    * HSEARCH-1969 -                       - Setup a build job to test the project works with JDK7
+
 Version 5.6.0.Beta2 (5-9-2016)
 ------------------------
 
