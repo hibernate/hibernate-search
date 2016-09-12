@@ -7,6 +7,7 @@
 package org.hibernate.search.hcore.util.impl;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -37,6 +38,10 @@ public class ContextHelper {
 		return getSearchIntegratorBySFI( session.getFactory() );
 	}
 
+	public static ExtendedSearchIntegrator getSearchIntegratorBySF(SessionFactory factory) {
+		return getSearchIntegratorBySFI( (SessionFactoryImplementor) factory );
+	}
+
 	public static ExtendedSearchIntegrator getSearchIntegratorBySFI(SessionFactoryImplementor sfi) {
 		final SearchFactoryReference factoryReference = sfi.getServiceRegistry()
 			.getService( SearchFactoryReference.class );
@@ -47,4 +52,5 @@ public class ContextHelper {
 			throw LoggerFactory.make().searchFactoryReferenceServiceNotFound();
 		}
 	}
+
 }
