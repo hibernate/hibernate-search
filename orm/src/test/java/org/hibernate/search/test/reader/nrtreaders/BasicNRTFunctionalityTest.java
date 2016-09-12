@@ -16,7 +16,6 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -92,7 +91,7 @@ public class BasicNRTFunctionalityTest extends SearchTestBase {
 
 	@Test
 	public void testMultipleEntitiesPerIndex() throws Exception {
-		ExtendedSearchIntegrator integrator = ContextHelper.getSearchIntegratorBySFI( (SessionFactoryImplementor) getSessionFactory() );
+		ExtendedSearchIntegrator integrator = ContextHelper.getSearchIntegratorBySF( getSessionFactory() );
 		IndexManager documentsIndexManager = integrator.getIndexManagerHolder().getIndexManager( "Documents" );
 		Assert.assertNotNull( documentsIndexManager );
 		Assert.assertTrue( documentsIndexManager.getClass().equals( org.hibernate.search.indexes.impl.NRTIndexManager.class ) );
