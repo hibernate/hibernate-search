@@ -936,4 +936,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 	}
+
+	@Override
+	public String getQueryString() {
+		return jsonQuery.toString();
+	}
+
 }
