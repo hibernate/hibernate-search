@@ -17,7 +17,6 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.Criteria;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
-import org.hibernate.Query;
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.Session;
@@ -390,12 +389,12 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	}
 
 	@Override
-	public Query setEntity(int position, Object val) {
+	public FullTextQuery<R> setEntity(int position, Object val) {
 		throw new UnsupportedOperationException( "setEntity(int,Object) is not implemented in Hibernate Search queries" );
 	}
 
 	@Override
-	public Query setEntity(String name, Object val) {
+	public FullTextQuery<R> setEntity(String name, Object val) {
 		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
 	}
 

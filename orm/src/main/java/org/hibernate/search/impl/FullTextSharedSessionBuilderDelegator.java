@@ -7,10 +7,12 @@
 package org.hibernate.search.impl;
 
 import java.sql.Connection;
+import java.util.TimeZone;
 
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Interceptor;
+import org.hibernate.SessionBuilder;
 import org.hibernate.SessionEventListener;
 import org.hibernate.SharedSessionBuilder;
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
@@ -172,4 +174,11 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 		builder.flushMode( flushMode );
 		return this;
 	}
+
+	@Override
+	public SessionBuilder jdbcTimeZone(TimeZone timeZone) {
+		builder.jdbcTimeZone( timeZone );
+		return this;
+	}
+
 }
