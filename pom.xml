@@ -1026,7 +1026,14 @@
                                      </bundledSignatures>
                                      <failOnMissingClasses>false</failOnMissingClasses>
                                      <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
+                                     <!--
+                                     The method SharedSessionContract#getTransaction() should never be used
+                                     as it is only reliable in certain configurations.
+                                     The banned Logger methods are the ones which avoid autoboxing, to allow backwards
+                                     compatibility with containers using an older JBoss Logger versions.
+                                      -->
                                      <signatures>
+org.hibernate.SharedSessionContract#getTransaction()
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int ,int)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int, java.lang.Object)

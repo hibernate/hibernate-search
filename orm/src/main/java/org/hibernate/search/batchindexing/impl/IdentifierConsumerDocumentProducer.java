@@ -106,11 +106,11 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	@Override
 	public void run() {
 		log.trace( "started" );
-		Session session = sessionFactory
+		SessionImplementor session = (SessionImplementor) sessionFactory
 				.withOptions()
 				.tenantIdentifier( tenantId )
 				.openSession();
-		session.setFlushMode( FlushMode.MANUAL );
+		session.setHibernateFlushMode( FlushMode.MANUAL );
 		session.setCacheMode( cacheMode );
 		session.setDefaultReadOnly( true );
 		try {
@@ -126,11 +126,8 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		log.trace( "finished" );
 	}
 
-	private void loadAllFromQueue(Session session) throws Exception {
-		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
-				(SessionImplementor) session
-		);
-
+	private void loadAllFromQueue(SessionImplementor session) throws Exception {
+		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer( session );
 		try {
 			List<Serializable> idList;
 			do {
@@ -159,7 +156,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	 *
 	 * @throws InterruptedException
 	 */
-	private void loadList(List<Serializable> listIds, Session session, InstanceInitializer sessionInitializer) throws Exception {
+	private void loadList(List<Serializable> listIds, SessionImplementor session, InstanceInitializer sessionInitializer) throws Exception {
 		try {
 			beginTransaction( session );
 
@@ -196,13 +193,13 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		}
 	}
 
-	private void rollbackTransaction(Session session) throws Exception {
+	private void rollbackTransaction(SessionImplementor session) throws Exception {
 		try {
 			if ( transactionManager != null ) {
 				transactionManager.rollback();
 			}
 			else {
-				session.getTransaction().rollback();
+				session.accessTransaction().rollback();
 			}
 		}
 		catch (Exception e) {

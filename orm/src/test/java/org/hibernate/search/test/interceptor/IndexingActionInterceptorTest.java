@@ -16,6 +16,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -46,7 +47,7 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 	@Override
 	@After
 	public void tearDown() throws Exception {
-		if ( fullTextSession.getTransaction().getStatus() != TransactionStatus.ACTIVE ) {
+		if ( getTransactionStatus( fullTextSession ) != TransactionStatus.ACTIVE ) {
 			Transaction tx = fullTextSession.beginTransaction();
 			blog = (Blog) fullTextSession.get( Blog.class, blog.getId() );
 			fullTextSession.delete( blog );
@@ -58,6 +59,11 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 		}
 		fullTextSession.close();
 		super.tearDown();
+	}
+
+	private static TransactionStatus getTransactionStatus(FullTextSession fullTextSession) {
+		SharedSessionContractImplementor actualSession = (SharedSessionContractImplementor) fullTextSession;
+		return actualSession.accessTransaction().getStatus();
 	}
 
 	@Test
