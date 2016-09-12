@@ -13,10 +13,12 @@ import javax.naming.InitialContext;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
@@ -82,9 +84,8 @@ public class IndexControl implements IndexControlMBean {
 		Class<?> clazz = getEntityClass( entity );
 
 		SessionFactory factory = getSessionFactory();
-		Session session = factory.openSession();
-		FullTextSession fulltextSession = Search.getFullTextSession( session );
-		try {
+		try ( Session session = factory.openSession() ) {
+			FullTextSession fulltextSession = Search.getFullTextSession( session );
 			fulltextSession.createIndexer( clazz )
 					.batchSizeToLoadObjects( batchSize )
 					.cacheMode( CacheMode.NORMAL )
@@ -95,20 +96,14 @@ public class IndexControl implements IndexControlMBean {
 			Thread.currentThread().interrupt();
 			throw new SearchException( "Unable to complete indexing" );
 		}
-		session.close();
 	}
 
 	@Override
 	public void optimize(String entity) {
 		Class<?> clazz = getEntityClass( entity );
-
 		SessionFactory factory = getSessionFactory();
-		Session session = factory.openSession();
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		fullTextSession.beginTransaction();
-		fullTextSession.getSearchFactory().optimize( clazz );
-		fullTextSession.getTransaction().commit();
-		session.close();
+		ExtendedSearchIntegrator searchIntegrator = ContextHelper.getSearchIntegratorBySF( factory );
+		searchIntegrator.optimize( clazz );
 	}
 
 	@Override
@@ -116,12 +111,12 @@ public class IndexControl implements IndexControlMBean {
 		Class<?> clazz = getEntityClass( entity );
 
 		SessionFactory factory = getSessionFactory();
-		Session session = factory.openSession();
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		fullTextSession.beginTransaction();
-		fullTextSession.purgeAll( clazz );
-		fullTextSession.getTransaction().commit();
-		session.close();
+		try ( Session session = factory.openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			Transaction transaction = fullTextSession.beginTransaction();
+			fullTextSession.purgeAll( clazz );
+			transaction.commit();
+		}
 	}
 
 	private Class<?> getEntityClass(String entity) {
