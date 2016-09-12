@@ -59,7 +59,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	@Override
 	public Object getTransactionIdentifier() {
 		if ( isRealTransactionInProgress() ) {
-			return eventSource.getTransaction();
+			return eventSource.accessTransaction();
 		}
 		else {
 			return eventSource;
@@ -90,7 +90,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			else {
 				//TODO could we remove the action queue registration in this case?
 				actionQueue.registerProcess( new DelegateToSynchronizationOnBeforeTx( synchronization ) );
-				eventSource.getTransaction().registerSynchronization(
+				eventSource.accessTransaction().registerSynchronization(
 						new BeforeCommitSynchronizationDelegator( synchronization )
 				);
 			}
