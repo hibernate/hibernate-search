@@ -22,8 +22,8 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.ejb.HibernatePersistence;
 import org.hibernate.engine.transaction.jta.platform.internal.JBossStandAloneJtaPlatform;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -70,7 +70,7 @@ public class JBossTSIT {
 		final PersistenceUnitInfo unitInfo = pub
 				.setExcludeUnlistedClasses( true )
 				.setJtaDataSource( ds )
-				.setPersistenceProviderClassName( HibernatePersistence.class.getName() )
+				.setPersistenceProviderClassName( HibernatePersistenceProvider.class.getName() )
 				.setPersistenceUnitName( "jbossjta" )
 				.setPersistenceXMLSchemaVersion( "2.0" )
 				.setSharedCacheMode( SharedCacheMode.NONE )
@@ -85,7 +85,7 @@ public class JBossTSIT {
 				.addProperty( Environment.RELEASE_CONNECTIONS, ConnectionReleaseMode.AFTER_TRANSACTION.toString() )
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.create();
-		final HibernatePersistence hp = new HibernatePersistence();
+		final HibernatePersistenceProvider hp = new HibernatePersistenceProvider();
 		factory = hp.createContainerEntityManagerFactory( unitInfo, new HashMap() );
 
 	}

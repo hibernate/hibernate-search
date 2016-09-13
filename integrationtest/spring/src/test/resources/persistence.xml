@@ -8,7 +8,7 @@
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
 
     <persistence-unit name="integration" transaction-type="JTA">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>org.hibernate.search.test.integration.jtaspring.Snert</class>
         <class>org.hibernate.search.test.integration.jtaspring.Container</class>
         <class>org.hibernate.search.test.integration.jtaspring.Box</class>
@@ -17,7 +17,7 @@
     </persistence-unit>
 
     <persistence-unit name="jbossjta" transaction-type="JTA">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
             <property name="" value="" />
         </properties>
