@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
@@ -109,13 +110,22 @@ public class IndexControl implements IndexControlMBean {
 	@Override
 	public void purge(String entity) {
 		Class<?> clazz = getEntityClass( entity );
-
 		SessionFactory factory = getSessionFactory();
 		try ( Session session = factory.openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			Transaction transaction = fullTextSession.beginTransaction();
-			fullTextSession.purgeAll( clazz );
-			transaction.commit();
+			Transaction transaction = ( (SessionImplementor) session ).accessTransaction();
+			final boolean controlTransactions = ! transaction.isActive();
+			if ( controlTransactions ) {
+				transaction.begin();
+			}
+			try {
+				fullTextSession.purgeAll( clazz );
+			}
+			finally {
+				if ( controlTransactions ) {
+					transaction.commit();
+				}
+			}
 		}
 	}
 

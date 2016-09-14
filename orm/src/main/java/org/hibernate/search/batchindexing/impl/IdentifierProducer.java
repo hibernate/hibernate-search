@@ -105,9 +105,18 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		}
 		try {
 			Transaction transaction = session.accessTransaction();
-			transaction.begin();
-			loadAllIdentifiers( session );
-			transaction.commit();
+			final boolean controlTransactions = ! transaction.isActive();
+			if ( controlTransactions ) {
+				transaction.begin();
+			}
+			try {
+				loadAllIdentifiers( session );
+			}
+			finally {
+				if ( controlTransactions ) {
+					transaction.commit();
+				}
+			}
 		}
 		catch (InterruptedException e) {
 			// just quit
