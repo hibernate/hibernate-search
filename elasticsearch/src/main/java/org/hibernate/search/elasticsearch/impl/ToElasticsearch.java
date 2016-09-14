@@ -16,6 +16,7 @@ import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
@@ -152,6 +153,9 @@ public class ToElasticsearch {
 		else if ( query instanceof WildcardQuery ) {
 			return convertWildcardQuery( (WildcardQuery) query );
 		}
+		else if ( query instanceof PrefixQuery ) {
+			return convertPrefixQuery( (PrefixQuery) query );
+		}
 		else if ( query instanceof FuzzyQuery ) {
 			return convertFuzzyQuery( (FuzzyQuery) query );
 		}
@@ -266,6 +270,21 @@ public class ToElasticsearch {
 						JsonBuilder.object().add( field,
 								JsonBuilder.object()
 										.addProperty( "value", query.getTerm().text() )
+										.append( boostAppender( query ) )
+						)
+				).build();
+
+		return wrapQueryForNestedIfRequired( field, wildcardQuery );
+	}
+
+	private static JsonObject convertPrefixQuery(PrefixQuery query) {
+		String field = query.getField();
+
+		JsonObject wildcardQuery = JsonBuilder.object()
+				.add( "prefix",
+						JsonBuilder.object().add( field,
+								JsonBuilder.object()
+										.addProperty( "value", query.getPrefix().text() )
 										.append( boostAppender( query ) )
 						)
 				).build();
