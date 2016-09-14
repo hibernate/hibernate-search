@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.test.performance;
 
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
@@ -55,8 +58,6 @@ public class TestRunnerArquillian {
 				.addPackages( true, TestRunnerArquillian.class.getPackage() )
 				.addClass( TestConstants.class )
 				.addAsResource( createPersistenceXml(), "META-INF/persistence.xml" )
-				.addAsWebInfResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
-				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
 				.addAsLibraries( PackagerHelper.hibernateSearchTestingLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.add( manifest(), "META-INF/MANIFEST.MF" )
@@ -91,7 +92,11 @@ public class TestRunnerArquillian {
 					name( property.getKey().toString() ).
 					value( property.getValue().toString() );
 		}
-
+		//Additional properties:
+		pu.getOrCreateProperties()
+			.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
+			.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+			;
 		return new StringAsset( pd.exportAsString() );
 	}
 

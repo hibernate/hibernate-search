@@ -12,8 +12,9 @@ import java.sql.SQLException;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.jdbc.Work;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.jdbc.WorkExecutor;
+import org.hibernate.jdbc.WorkExecutorVisitable;
 
 /**
  * @author Tomas Hradec
@@ -41,10 +42,11 @@ public class BatchSupport {
 				final long idOffset = initialOffset + ( iterationIndex * batchSize );
 				final long idCount = initialOffset + ( iterationIndex * batchSize ) + batchSize - 1;
 
-				Transaction tx = s.beginTransaction();
-				s.doWork( new Work() {
+				final SessionImplementor session = (SessionImplementor) s;
+				session.getTransactionCoordinator().createIsolationDelegate().delegateWork(
+					new WorkExecutorVisitable() {
 					@Override
-					public void execute(Connection connection) throws SQLException {
+					public Object accept(WorkExecutor executor, Connection connection) throws SQLException {
 						PreparedStatement ps = connection.prepareStatement( sql );
 						for ( long id = idOffset; id < idCount; id++ ) {
 							batchCallback.initStatement( ps, id );
@@ -52,9 +54,9 @@ public class BatchSupport {
 						}
 						ps.executeBatch();
 						ps.close();
+						return null;
 					}
-				} );
-				tx.commit();
+				}, true );
 			}
 		}
 		finally {

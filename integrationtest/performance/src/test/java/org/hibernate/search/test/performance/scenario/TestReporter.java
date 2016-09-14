@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -141,8 +142,8 @@ public class TestReporter {
 
 		out.println( "" );
 		out.println( "HIBERNATE SEARCH PROPERTIES" );
-		Properties properties = ( (SessionFactoryImplementor) ctx.sf ).getProperties();
-		for ( Entry<Object, Object> e : properties.entrySet() ) {
+		Map<String, Object> properties = ( (SessionFactoryImplementor) ctx.sf ).getProperties();
+		for ( Entry<String, Object> e : properties.entrySet() ) {
 			if ( e.getKey().toString().startsWith( "hibernate.search" ) ) {
 				out.println( "    " + e.getKey() + " = " + e.getValue() );
 			}
