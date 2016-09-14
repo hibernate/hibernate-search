@@ -19,9 +19,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import javax.transaction.TransactionManager;
+
 import org.apache.commons.lang.time.StopWatch;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.performance.model.Book;
@@ -170,21 +174,17 @@ public abstract class TestScenario {
 
 	protected void performCleanUp(SessionFactory sf) {
 		log( "starting clean up phase" );
+		try ( Session s = sf.openSession() ) {
+			final SessionImplementor session = (SessionImplementor) s;
+			FullTextSession fulltextSession = Search.getFullTextSession( s );
+			beginTransaction( session );
+			s.createNativeQuery( "delete from book_author where book_id < :id" ).setParameter( "id", initialOffset ).executeUpdate();
+			s.createNativeQuery( "delete from book where id < :id" ).setParameter( "id", initialOffset ).executeUpdate();
+			s.createNativeQuery( "delete from author where id < :id" ).setParameter( "id", initialOffset ).executeUpdate();
 
-		FullTextSession s = Search.getFullTextSession( sf.openSession() );
-		try {
-			Transaction tx = s.beginTransaction();
-			s.createSQLQuery( "delete from book_author where book_id < :id" ).setParameter( "id", initialOffset ).executeUpdate();
-			s.createSQLQuery( "delete from book where id < :id" ).setParameter( "id", initialOffset ).executeUpdate();
-			s.createSQLQuery( "delete from author where id < :id" ).setParameter( "id", initialOffset ).executeUpdate();
-
-			s.purgeAll( Book.class );
-			s.flush();
-			s.flushToIndexes();
-			tx.commit();
-		}
-		finally {
-			s.close();
+			fulltextSession.purgeAll( Book.class );
+			fulltextSession.flushToIndexes();
+			commitTransaction( session );
 		}
 	}
 
@@ -228,6 +228,44 @@ public abstract class TestScenario {
 		}
 
 		ctx.startAndWait();
+	}
+
+	private void commitTransaction(SessionImplementor session) {
+		if ( session.getTransactionCoordinator().getTransactionCoordinatorBuilder().isJta() ) {
+			TransactionManager transactionManager = lookupTransactionManager( session );
+			try {
+				transactionManager.commit();
+			}
+			catch (Exception e) {
+				throw new RuntimeException( e );
+			}
+		}
+		else {
+			session.getTransaction().commit();
+		}
+	}
+
+	private void beginTransaction(SessionImplementor session) {
+		if ( session.getTransactionCoordinator().getTransactionCoordinatorBuilder().isJta() ) {
+			TransactionManager transactionManager = lookupTransactionManager( session );
+			try {
+				transactionManager.begin();
+			}
+			catch (Exception e) {
+				throw new RuntimeException( e );
+			}
+		}
+		else {
+			session.getTransaction().begin();
+		}
+	}
+
+	private static TransactionManager lookupTransactionManager(SessionImplementor session) {
+		return session
+				.getSessionFactory()
+				.getServiceRegistry()
+				.getService( JtaPlatform.class )
+				.retrieveTransactionManager();
 	}
 
 }
