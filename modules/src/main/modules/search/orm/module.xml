@@ -11,7 +11,7 @@
     </resources>
     <dependencies>
         <module name="javax.transaction.api" />
-        <module name="org.hibernate" />
+        <module name="org.hibernate" slot="${hibernate-orm.module.slot}" />
         <module name="org.hibernate.commons-annotations" />
         <module name="org.hibernate.search.engine" export="true" services="import" slot="${hibernate.search.version}" />
         <module name="org.jboss.logging" />

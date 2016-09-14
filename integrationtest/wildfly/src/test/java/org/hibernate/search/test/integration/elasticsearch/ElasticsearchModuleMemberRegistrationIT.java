@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.integration.elasticsearch;
 
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
 import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -83,6 +84,7 @@ public class ElasticsearchModuleMemberRegistrationIT {
 					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
 					.createProperty().name( "hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY )
 						.value( IndexSchemaManagementStrategy.RECREATE_DELETE.name() ).up()
+					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
 					.createProperty().name( "hibernate.search.default.elasticsearch.refresh_after_write" ).value( "true" ).up()
 				.up().up()
 			.exportAsString();

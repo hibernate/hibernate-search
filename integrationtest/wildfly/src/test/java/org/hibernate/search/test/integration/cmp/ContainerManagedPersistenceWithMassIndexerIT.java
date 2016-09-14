@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
 import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 
 /**
@@ -74,6 +75,7 @@ public class ContainerManagedPersistenceWithMassIndexerIT {
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
 					.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
 					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
 				.up().up()
 				.exportAsString();
 		return new StringAsset( persistenceXml );
