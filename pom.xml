@@ -141,6 +141,7 @@
 
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
         <lucene.module.slot>5.5</lucene.module.slot>
+        <hibernate-orm.module.slot>5.2</hibernate-orm.module.slot>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>

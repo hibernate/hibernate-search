@@ -29,6 +29,7 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
 import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 import static org.junit.Assert.assertEquals;
 
@@ -67,6 +68,7 @@ public class MassIndexingTimeoutIT {
 					.createProperty().name( "hibernate.search.indexing_strategy" ).value( "manual" ).up()
 					.createProperty().name( "hibernate.jdbc.batch_size" ).value( "50" ).up()
 					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );

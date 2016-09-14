@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.integration.wildfly;
 
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
+import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -113,7 +115,8 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
-					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( "none" ).up()
+					.createProperty().name( "wildfly.jpa.hibernate.search.module" ).value( getWildFlyModuleIdentifier() ).up()
+					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );

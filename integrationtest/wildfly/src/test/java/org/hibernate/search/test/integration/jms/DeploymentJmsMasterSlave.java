@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.integration.jms;
 
+import static org.hibernate.search.test.integration.VersionTestHelper.getHibernateORMModuleName;
 import static org.hibernate.search.test.integration.VersionTestHelper.getWildFlyModuleIdentifier;
 
 import java.io.File;
@@ -122,6 +123,10 @@ public final class DeploymentJmsMasterSlave {
 						.createProperty()
 							.name( "wildfly.jpa.hibernate.search.module" )
 							.value( getWildFlyModuleIdentifier() )
+							.up()
+						.createProperty()
+							.name( "jboss.as.jpa.providerModule" )
+							.value( getHibernateORMModuleName() )
 							.up()
 						.createProperty()
 							.name( "hibernate.hbm2ddl.auto" )

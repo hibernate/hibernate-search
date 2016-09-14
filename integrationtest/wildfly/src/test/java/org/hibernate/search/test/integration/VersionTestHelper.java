@@ -25,6 +25,7 @@ public class VersionTestHelper {
 
 	private static String hibernateSearchVersion = null;
 	private static String hibernateSearchModuleSlot = null;
+	private static String hibernateOrmModuleName = null;
 	private static String luceneFullVersion = null;
 	private static String hibernateAnnotationsFullVersion = null;
 
@@ -49,6 +50,13 @@ public class VersionTestHelper {
 			hibernateSearchVersion = injectVariables( "${dependency.version.HibernateSearch}" );
 		}
 		return hibernateSearchVersion;
+	}
+
+	public static synchronized String getHibernateORMModuleName() {
+		if ( hibernateOrmModuleName == null ) {
+			hibernateOrmModuleName = "org.hibernate:" + injectVariables( "${hibernate-orm.module.slot}" );
+		}
+		return hibernateOrmModuleName;
 	}
 
 	public static synchronized String getDependencyVersionLucene() {
