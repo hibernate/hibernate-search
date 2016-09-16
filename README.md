@@ -19,6 +19,7 @@ Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the c
 
 This version of Hibernate Search requires:
 
+* Java SE 8
 * Hibernate ORM 5.2.x
 * Apache Lucene 5.5.x
 

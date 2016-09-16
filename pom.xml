@@ -136,7 +136,7 @@
     </prerequisites>
 
     <properties>
-        <!-- JDK version required for the build; we still create 1.7 byte code -->
+        <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.2 requires Java 8 -->
         <minJdkVersion>1.8</minJdkVersion>
 
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
@@ -688,8 +688,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <showWarnings>true</showWarnings>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                     <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
                     <proc>none</proc>
@@ -782,7 +782,7 @@
                 <configuration>
                     <rules>
                         <requireJavaVersion>
-                            <!-- require JDK 1.7 to run the build -->
+                            <!-- require JDK 1.8 to run the build -->
                             <version>[${minJdkVersion},)</version>
                         </requireJavaVersion>
                         <requireMavenVersion>
@@ -1014,7 +1014,7 @@
                         <execution>
                             <id>verify-forbidden-apis</id>
                                 <configuration>
-                                     <targetVersion>1.7</targetVersion>
+                                     <targetVersion>1.8</targetVersion>
                                      <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                                      <internalRuntimeForbidden>true</internalRuntimeForbidden>
                                      <!-- if the used Java version is too new, don't fail, just do nothing: -->
@@ -1089,7 +1089,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                          <execution>
                              <id>verify-forbidden-test-apis</id>
                              <configuration>
-                                 <targetVersion>1.7</targetVersion>
+                                 <targetVersion>1.8</targetVersion>
                                  <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                                  <internalRuntimeForbidden>true</internalRuntimeForbidden>
                                  <!-- if the used Java version is too new, don't fail, just do nothing: -->
@@ -1392,7 +1392,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             <id>non-jigsaw</id>
             <activation>
                 <!-- Asciidoctor, Karaf and WildFly won't work on JDK9 yet  -->
-                <jdk>[1.7,1.8]</jdk>
+                <jdk>1.8</jdk>
             </activation>
             <modules>
                 <module>documentation</module>

@@ -10,7 +10,7 @@ Hibernate new timer we recommend you start link:http://hibernate.org/quick-start
 .System requirements
 
 |===============
-|Java Runtime|Requires Java version _7_ or greater. You
+|Java Runtime|Requires Java version _8_ or greater. You
             can download a Java Runtime for Windows/Linux/Solaris link:http://www.oracle.com/technetwork/java/javase/downloads/index.html[here].
 |Hibernate Search| `hibernate-search-{hibernateSearchVersion}.jar` and all
             runtime dependencies. You can get the jar artifacts either from
