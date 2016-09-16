@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -60,6 +62,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import io.searchbox.action.AbstractAction;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.Health.Builder;
@@ -267,7 +270,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		Health health = new Health( healthBuilder ) {
 			@Override
 			protected String buildURI() {
-				return super.buildURI() + actualIndexName;
+				try {
+					return super.buildURI() + URLEncoder.encode(actualIndexName, AbstractAction.CHARSET);
+				}
+				catch (UnsupportedEncodingException e) {
+					throw new AssertionFailure("Unexpectedly unsupported charset", e);
+				}
 			}
 		};
 
