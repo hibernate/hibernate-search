@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,6 +35,9 @@ import org.hibernate.search.elasticsearch.client.impl.BackendRequestProcessor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaValidator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
@@ -65,6 +69,8 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 
 import io.searchbox.action.AbstractAction;
 import io.searchbox.client.JestResult;
@@ -73,6 +79,7 @@ import io.searchbox.cluster.Health.Builder;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
+import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
 
 /**
@@ -83,6 +90,11 @@ import io.searchbox.indices.mapping.PutMapping;
 public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerProvider {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
+	private static final TypeToken<Map<String, TypeMapping>> STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN =
+			new TypeToken<Map<String, TypeMapping>>() {
+				// Create a new class to capture generic parameters
+			};
 
 	private String indexName;
 	private String actualIndexName;
@@ -213,12 +225,10 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 		requestProcessor = null;
 		serviceManager.releaseService( BackendRequestProcessor.class );
-
-		serviceManager.releaseService( JestClient.class );
 		jestClient = null;
-
-		serviceManager.releaseService( GsonService.class );
+		serviceManager.releaseService( JestClient.class );
 		gsonService = null;
+		serviceManager.releaseService( GsonService.class );
 	}
 
 	@Override
@@ -245,6 +255,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			case MERGE:
 				createIndexIfNotYetExisting();
 				putIndexMappings();
+				break;
+			case VALIDATE:
+				validateIndexMappings();
 				break;
 			default:
 				break;
@@ -361,6 +374,41 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			catch (RuntimeException e) {
 				throw LOG.elasticsearchMappingCreationFailed( mappingName, e );
 			}
+		}
+	}
+
+	private void validateIndexMappings() {
+		ElasticsearchSchemaValidator validator = new DefaultElasticsearchSchemaValidator();
+		try {
+			validator.validate( createIndexMetadata(), getCurrentIndexMetadata() );
+		}
+		catch (ElasticsearchSchemaValidationException e) {
+			throw LOG.schemaValidationFailed( actualIndexName, e );
+		}
+	}
+
+	private IndexMetadata getCurrentIndexMetadata() {
+		GetMapping getMapping = new GetMapping.Builder()
+				.build();
+
+		try {
+			JestResult result = jestClient.executeRequest( getMapping );
+			JsonElement index = result.getJsonObject().get( actualIndexName );
+			if ( index == null || !index.isJsonObject() ) {
+				throw LOG.mappingsMissing( actualIndexName );
+			}
+			JsonElement mappings = index.getAsJsonObject().get( "mappings" );
+			if ( mappings == null ) {
+				throw LOG.mappingsMissing( actualIndexName );
+			}
+			Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
+			IndexMetadata indexMetadata = new IndexMetadata();
+			indexMetadata.setName( actualIndexName );
+			indexMetadata.setMappings( gsonService.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType ) );
+			return indexMetadata;
+		}
+		catch (RuntimeException e) {
+			throw LOG.elasticsearchMappingRetrievalForValidationFailed( e );
 		}
 	}
 
