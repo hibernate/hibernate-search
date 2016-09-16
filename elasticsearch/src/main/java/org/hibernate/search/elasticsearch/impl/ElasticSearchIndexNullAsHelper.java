@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.impl;
 import java.util.Date;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -25,7 +26,7 @@ class ElasticSearchIndexNullAsHelper {
 		// not to be instantiated
 	}
 
-	public static Object getNullValue(String fieldName, ElasticsearchFieldType dataType, String indexNullAs) {
+	public static Object getNullValue(String fieldName, DataType dataType, String indexNullAs) {
 		switch ( dataType ) {
 			case STRING:
 				return indexNullAs;

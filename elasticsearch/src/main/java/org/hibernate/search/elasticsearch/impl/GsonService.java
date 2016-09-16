@@ -19,4 +19,9 @@ public interface GsonService extends Service {
 
 	Gson getGson();
 
+	/**
+	 * @return Same as {@link #getGson()}, but with null serialization turned off.
+	 */
+	Gson getGsonNoSerializeNulls();
+
 }
