@@ -11,6 +11,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -33,6 +34,12 @@ import org.hibernate.search.elasticsearch.client.impl.BackendRequestProcessor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
+import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
+import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
+import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
+import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
+import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
@@ -54,13 +61,10 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import io.searchbox.action.AbstractAction;
 import io.searchbox.client.JestResult;
@@ -79,10 +83,6 @@ import io.searchbox.indices.mapping.PutMapping;
 public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerProvider {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
-
-	private static final String ANALYZED = "analyzed";
-	private static final String NOT_ANALYZED = "not_analyzed";
-	private static final String NOT_INDEXED = "no";
 
 	private String indexName;
 	private String actualIndexName;
@@ -228,23 +228,26 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	private void initializeIndex() {
-		if ( indexManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
-			return;
-		}
-		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.CREATE ) {
-			if ( createIndexIfNotYetExisting() ) {
-				createIndexMappings();
-			}
-		}
-		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.RECREATE ||
-				indexManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
-			deleteIndexIfExisting();
-			createIndex();
-			createIndexMappings();
-		}
-		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.MERGE ) {
-			createIndexIfNotYetExisting();
-			createIndexMappings();
+		switch (indexManagementStrategy) {
+			case NONE:
+				break;
+			case CREATE:
+				if ( createIndexIfNotYetExisting() ) {
+					putIndexMappings();
+				}
+				break;
+			case RECREATE:
+			case RECREATE_DELETE:
+				deleteIndexIfExisting();
+				createIndex();
+				putIndexMappings();
+				break;
+			case MERGE:
+				createIndexIfNotYetExisting();
+				putIndexMappings();
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -331,41 +334,61 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
-	// TODO HSEARCH-2260
-	// What happens if mappings already exist? We need an option similar to hbm2ddl
-	// What happens if several nodes in a cluster try to create the mappings?
-	private void createIndexMappings() {
-		for ( Class<?> entityType : containedEntityTypes ) {
-			EntityIndexBinding descriptor = searchIntegrator.getIndexBinding( entityType );
+	// TODO What happens if several nodes in a cluster try to create the mappings?
+	private void putIndexMappings() {
+		IndexMetadata indexMetadata = createIndexMetadata();
+		for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
+			String mappingName = entry.getKey();
+			TypeMapping mapping = entry.getValue();
 
-			JsonObject payload = new JsonObject();
-			payload.addProperty( "dynamic", "strict" );
-			JsonObject properties = new JsonObject();
-			payload.add( "properties", properties );
-
-			if ( multitenancyEnabled ) {
-				JsonObject field = new JsonObject();
-				field.addProperty( "type", ElasticsearchFieldType.STRING.getElasticsearchString() );
-				field.addProperty( "index", NOT_ANALYZED );
-				properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
-			}
-
-			addMappings( new ElasticsearchMappingBuilder( descriptor, payload ) );
+			/*
+			 * Serializing nulls is really not a good idea here, it triggers NPEs in ElasticSearch
+			 * We better not include the null fields.
+			 */
+			Gson gson = gsonService.getGsonNoSerializeNulls();
+			String mappingAsJson = gson.toJson( mapping );
 
 			PutMapping putMapping = new PutMapping.Builder(
-					actualIndexName,
-					entityType.getName(),
-					payload
+					indexMetadata.getName(),
+					mappingName,
+					mappingAsJson
 			)
 			.build();
 
 			try {
 				jestClient.executeRequest( putMapping );
 			}
-			catch (Exception e) {
-				throw LOG.elasticsearchMappingCreationFailed( entityType.getName(), e );
+			catch (RuntimeException e) {
+				throw LOG.elasticsearchMappingCreationFailed( mappingName, e );
 			}
 		}
+	}
+
+	private IndexMetadata createIndexMetadata() {
+		IndexMetadata index = new IndexMetadata();
+		index.setName( actualIndexName );
+		for ( Class<?> entityType : containedEntityTypes ) {
+			index.putMapping( entityType.getName(), createTypeMapping( entityType ) );
+		}
+		return index;
+	}
+
+	private TypeMapping createTypeMapping(Class<?> entityType) {
+		EntityIndexBinding descriptor = searchIntegrator.getIndexBinding( entityType );
+		TypeMapping root = new TypeMapping();
+
+		root.setDynamic( DynamicType.STRICT );
+
+		if ( multitenancyEnabled ) {
+			PropertyMapping tenantId = new PropertyMapping();
+			tenantId.setType( DataType.STRING );
+			tenantId.setIndex( IndexType.NOT_ANALYZED );
+			root.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
+		}
+
+		addMappings( new ElasticsearchMappingBuilder( descriptor, root ) );
+
+		return root;
 	}
 
 	private void addMappings(ElasticsearchMappingBuilder mappingBuilder) {
@@ -373,13 +396,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 		// normal document fields
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getNonEmbeddedDocumentFieldMetadata() ) {
-			if ( fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." )
-					|| fieldMetadata.isSpatial() ) {
-				continue;
-			}
-
 			try {
-				addFieldMapping( mappingBuilder, fieldMetadata );
+				addPropertyMapping( mappingBuilder, fieldMetadata );
 			}
 			catch (IncompleteDataException e) {
 				LOG.debug( "Not adding a mapping for field " + fieldMetadata.getFieldName() + " because of incomplete data", e );
@@ -389,7 +407,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		// bridge-defined fields
 		for ( BridgeDefinedField bridgeDefinedField : getNonEmbeddedBridgeDefinedFields( typeMetadata ) ) {
 			try {
-				addFieldMapping( mappingBuilder, bridgeDefinedField );
+				addPropertyMapping( mappingBuilder, bridgeDefinedField );
 			}
 			catch (IncompleteDataException e) {
 				LOG.debug( "Not adding a mapping for field " + bridgeDefinedField.getName() + " because of incomplete data", e );
@@ -404,46 +422,50 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	/**
-	 * Adds a type mapping for the given field to the given request payload.
+	 * Adds a property mapping for the given field to the given type mapping.
 	 */
-	private void addFieldMapping(ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {
-		String fieldPath = fieldMetadata.getName();
-		JsonObject field = new JsonObject();
+	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {
+		if ( fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." )
+				|| fieldMetadata.isSpatial() ) {
+			return;
+		}
 
-		ElasticsearchFieldType fieldType = addTypeOptions( field, fieldMetadata );
+		String propertyPath = fieldMetadata.getName();
 
-		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
+		PropertyMapping propertyMapping = new PropertyMapping();
 
-		addIndexOptions( field, mappingBuilder, fieldMetadata.getSourceProperty(), fieldMetadata.getFieldName(),
-				fieldType, fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
+		addTypeOptions( propertyMapping, fieldMetadata );
 
-		field.addProperty( "boost", mappingBuilder.getBoost( fieldMetadata.getBoost() ) );
+		propertyMapping.setStore( fieldMetadata.getStore() == Store.NO ? false : true );
 
-		logDynamicBoostWarning( mappingBuilder, fieldMetadata.getSourceType().getDynamicBoost(), fieldPath );
+		addIndexOptions( propertyMapping, mappingBuilder, fieldMetadata.getSourceProperty(), fieldMetadata.getFieldName(),
+				fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
+
+		propertyMapping.setBoost( mappingBuilder.getBoost( fieldMetadata.getBoost() ) );
+
+		logDynamicBoostWarning( mappingBuilder, fieldMetadata.getSourceType().getDynamicBoost(), propertyPath );
 		PropertyMetadata sourceProperty = fieldMetadata.getSourceProperty();
 		if ( sourceProperty != null ) {
-			logDynamicBoostWarning( mappingBuilder, sourceProperty.getDynamicBoostStrategy(), fieldPath );
+			logDynamicBoostWarning( mappingBuilder, sourceProperty.getDynamicBoostStrategy(), propertyPath );
 		}
 
-		if ( fieldMetadata.indexNullAs() != null ) {
-			JsonElement nullValueJsonElement = getNullValue( fieldType, fieldMetadata );
-			field.add( "null_value", nullValueJsonElement );
-		}
-
-		mappingBuilder.setPropertyAbsolute( fieldPath, field );
+		addNullValue( propertyMapping, fieldMetadata );
 
 		// Create facet fields if needed: if the facet has the same name as the field, we don't need to create an
 		// extra field for it
 		for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
 			if ( !facetMetadata.getFacetName().equals( fieldMetadata.getFieldName() ) ) {
 				try {
-					addFieldMapping( mappingBuilder, facetMetadata );
+					addPropertyMapping( mappingBuilder, facetMetadata );
 				}
 				catch (IncompleteDataException e) {
 					LOG.debug( "Not adding a mapping for facet " + facetMetadata.getFacetName() + " because of incomplete data", e );
 				}
 			}
 		}
+
+		// Do this last, when we're sure no exception will be thrown for this mapping
+		mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
 	}
 
 	private void logDynamicBoostWarning(ElasticsearchMappingBuilder mappingBuilder, BoostStrategy dynamicBoostStrategy, String fieldPath) {
@@ -455,115 +477,112 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
-	private void addFieldMapping(ElasticsearchMappingBuilder mappingBuilder, BridgeDefinedField bridgeDefinedField) {
-		String fieldPath = bridgeDefinedField.getName();
-		if ( !SpatialHelper.isSpatialField( fieldPath ) ) {
-			JsonObject field = new JsonObject();
+	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, BridgeDefinedField bridgeDefinedField) {
+		String propertyPath = bridgeDefinedField.getName();
 
-			ElasticsearchFieldType fieldType = addTypeOptions( field, bridgeDefinedField );
-
-			addIndexOptions( field, mappingBuilder, bridgeDefinedField.getSourceField().getSourceProperty(),
-					fieldPath, fieldType, bridgeDefinedField.getIndex(), null );
+		if ( !SpatialHelper.isSpatialField( propertyPath ) ) {
+			PropertyMapping propertyMapping = new PropertyMapping();
+			addTypeOptions( propertyMapping, bridgeDefinedField );
+			addIndexOptions( propertyMapping, mappingBuilder, bridgeDefinedField.getSourceField().getSourceProperty(),
+					propertyPath, bridgeDefinedField.getIndex(), null );
 
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
-			if ( !mappingBuilder.hasPropertyAbsolute( fieldPath ) ) {
-				mappingBuilder.setPropertyAbsolute( fieldPath, field );
+			if ( !mappingBuilder.hasPropertyAbsolute( propertyPath ) ) {
+				mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
 			}
 		}
 		else {
-			if ( SpatialHelper.isSpatialFieldLongitude( fieldPath ) ) {
+			if ( SpatialHelper.isSpatialFieldLongitude( propertyPath ) ) {
 				// we ignore the longitude field, we will create the geo_point mapping only once with the latitude field
 				return;
 			}
-			else if ( SpatialHelper.isSpatialFieldLatitude( fieldPath ) ) {
+			else if ( SpatialHelper.isSpatialFieldLatitude( propertyPath ) ) {
 				// we only add the geo_point for the latitude field
-				JsonObject field = new JsonObject();
+				PropertyMapping propertyMapping = new PropertyMapping();
 
-				field.addProperty( "type", ElasticsearchFieldType.GEO_POINT.getElasticsearchString() );
+				propertyMapping.setType( DataType.GEO_POINT );
 
 				// in this case, the spatial field has precedence over an already defined field
-				mappingBuilder.setPropertyAbsolute( SpatialHelper.stripSpatialFieldSuffix( fieldPath ), field );
+				mappingBuilder.setPropertyAbsolute( SpatialHelper.stripSpatialFieldSuffix( propertyPath ), propertyMapping );
 			}
 			else {
 				// the fields potentially created for the spatial hash queries
-				JsonObject field = new JsonObject();
-				field.addProperty( "type", ElasticsearchFieldType.STRING.getElasticsearchString() );
-				field.addProperty( "index", NOT_ANALYZED );
+				PropertyMapping propertyMapping = new PropertyMapping();
+				propertyMapping.setType( DataType.STRING );
+				propertyMapping.setIndex( IndexType.NOT_ANALYZED );
 
-				mappingBuilder.setPropertyAbsolute( fieldPath, field );
+				mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
 			}
 		}
 	}
 
-	private JsonObject addFieldMapping(ElasticsearchMappingBuilder mappingBuilder, FacetMetadata facetMetadata) {
-		String fullFieldName = facetMetadata.getFacetName();
+	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, FacetMetadata facetMetadata) {
+		String propertyPath = facetMetadata.getFacetName();
 
-		JsonObject field = new JsonObject();
-		addTypeOptions( field, facetMetadata );
-		field.addProperty( "store", false );
-		field.addProperty( "index", NOT_ANALYZED );
+		PropertyMapping propertyMapping = new PropertyMapping();
 
-		mappingBuilder.setPropertyAbsolute( fullFieldName, field );
-		return field;
+		addTypeOptions( propertyMapping, facetMetadata );
+		propertyMapping.setStore( false );
+		propertyMapping.setIndex( IndexType.NOT_ANALYZED );
+
+		// Do this last, when we're sure no exception will be thrown for this mapping
+		mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
 	}
 
 	/**
 	 * Adds the main indexing-related options to the given field: "index", "doc_values", "analyzer", ...
 	 */
-	private void addIndexOptions(JsonObject field, ElasticsearchMappingBuilder mappingBuilder, PropertyMetadata sourceProperty,
-			String fieldName, ElasticsearchFieldType fieldType, Field.Index index, AnalyzerReference analyzerReference) {
-		String elasticsearchIndex;
+	private void addIndexOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder, PropertyMetadata sourceProperty,
+			String propertyPath, Field.Index index, AnalyzerReference analyzerReference) {
+		IndexType elasticsearchIndex;
 		switch ( index ) {
 			case ANALYZED:
 			case ANALYZED_NO_NORMS:
-				elasticsearchIndex = canTypeBeAnalyzed( fieldType ) ? ANALYZED : NOT_ANALYZED;
+				elasticsearchIndex = canTypeBeAnalyzed( propertyMapping.getType() ) ? IndexType.ANALYZED : IndexType.NOT_ANALYZED;
 				break;
 			case NOT_ANALYZED:
 			case NOT_ANALYZED_NO_NORMS:
-				elasticsearchIndex = NOT_ANALYZED;
+				elasticsearchIndex = IndexType.NOT_ANALYZED;
 				break;
 			case NO:
-				elasticsearchIndex = NOT_INDEXED;
+				elasticsearchIndex = IndexType.NO;
 				break;
 			default:
 				throw new AssertionFailure( "Unexpected index type: " + index );
 		}
-		field.addProperty( "index", elasticsearchIndex );
+		propertyMapping.setIndex( elasticsearchIndex );
 
-		if ( NOT_INDEXED.equals( elasticsearchIndex ) && FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, fieldName ) ) {
+		if ( IndexType.NO.equals( elasticsearchIndex ) && FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, propertyPath ) ) {
 			// We must use doc values in order to enable sorting on non-indexed fields
-			field.addProperty( "doc_values", true );
+			propertyMapping.setDocValues( true );
 		}
 
-		if ( ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
-			String analyzerName = mappingBuilder.getAnalyzerName( analyzerReference, fieldName );
-			if ( analyzerName != null ) {
-				field.addProperty( "analyzer", analyzerName );
-			}
+		if ( IndexType.ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
+			String analyzerName = mappingBuilder.getAnalyzerName( analyzerReference, propertyPath );
+			propertyMapping.setAnalyzer( analyzerName );
 		}
 	}
 
-	private boolean canTypeBeAnalyzed(ElasticsearchFieldType fieldType) {
-		// Only strings can be analyzed
-		return ElasticsearchFieldType.STRING.equals( fieldType );
+	private boolean canTypeBeAnalyzed(DataType fieldType) {
+		return DataType.STRING.equals( fieldType );
 	}
 
-	private ElasticsearchFieldType addTypeOptions(JsonObject field, DocumentFieldMetadata fieldMetadata) {
-		return addTypeOptions( fieldMetadata.getFieldName(), field, FieldHelper.getType( fieldMetadata ) );
+	private void addTypeOptions(PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
+		addTypeOptions( fieldMetadata.getFieldName(), propertyMapping, FieldHelper.getType( fieldMetadata ) );
 	}
 
-	private ElasticsearchFieldType addTypeOptions(JsonObject field, BridgeDefinedField bridgeDefinedField) {
+	private void addTypeOptions(PropertyMapping propertyMapping, BridgeDefinedField bridgeDefinedField) {
 		ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
 
 		if ( ExtendedFieldType.UNKNOWN.equals( type ) ) {
 			throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getName() );
 		}
 
-		return addTypeOptions( bridgeDefinedField.getName(), field, FieldHelper.getType( bridgeDefinedField ) );
+		addTypeOptions( bridgeDefinedField.getName(), propertyMapping, type );
 	}
 
-	private ElasticsearchFieldType addTypeOptions(JsonObject field, FacetMetadata facetMetadata) {
+	private void addTypeOptions(PropertyMapping propertyMapping, FacetMetadata facetMetadata) {
 		ExtendedFieldType type;
 
 		switch ( facetMetadata.getEncoding() ) {
@@ -587,11 +606,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			}
 		}
 
-		return addTypeOptions( facetMetadata.getFacetName(), field, type );
+		addTypeOptions( facetMetadata.getFacetName(), propertyMapping, type );
 	}
 
-	private ElasticsearchFieldType addTypeOptions(String fieldName, JsonObject field, ExtendedFieldType extendedType) {
-		ElasticsearchFieldType elasticsearchType;
+	private DataType addTypeOptions(String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType) {
+		DataType elasticsearchType;
 		List<String> formats = new ArrayList<>();
 
 		/* Note: for date formats, we use a 4-digit year format as the first format
@@ -600,54 +619,54 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		 */
 		switch ( extendedType ) {
 			case BOOLEAN:
-				elasticsearchType = ElasticsearchFieldType.BOOLEAN;
+				elasticsearchType = DataType.BOOLEAN;
 				break;
 			case CALENDAR:
 			case DATE:
 			case INSTANT:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				// Use default formats ("strict_date_optional_time||epoch_millis")
 				break;
 			case LOCAL_DATE:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				formats.add( "strict_date" );
 				formats.add( "yyyyyyyyy-MM-dd" );
 				break;
 			case LOCAL_DATE_TIME:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				formats.add( "strict_date_hour_minute_second_fraction" );
 				formats.add( "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS" );
 				break;
 			case LOCAL_TIME:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				formats.add( "strict_hour_minute_second_fraction" );
 				break;
 			case OFFSET_DATE_TIME:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				formats.add( "strict_date_time" );
 				formats.add( "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ" );
 				break;
 			case OFFSET_TIME:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				formats.add( "strict_time" );
 				break;
 			case ZONED_DATE_TIME:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				formats.add( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'" );
 				formats.add( "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'" );
 				break;
 			case YEAR:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				formats.add( "strict_year" );
 				formats.add( "yyyyyyyyy" );
 				break;
 			case YEAR_MONTH:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				formats.add( "strict_year_month" );
 				formats.add( "yyyyyyyyy-MM" );
 				break;
 			case MONTH_DAY:
-				elasticsearchType = ElasticsearchFieldType.DATE;
+				elasticsearchType = DataType.DATE;
 				/*
 				 * This seems to be the ISO-8601 format for dates without year.
 				 * It's also the default format for Java's MonthDay, see MonthDay.PARSER.
@@ -655,16 +674,16 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				formats.add( "--MM-dd" );
 				break;
 			case INTEGER:
-				elasticsearchType = ElasticsearchFieldType.INTEGER;
+				elasticsearchType = DataType.INTEGER;
 				break;
 			case LONG:
-				elasticsearchType = ElasticsearchFieldType.LONG;
+				elasticsearchType = DataType.LONG;
 				break;
 			case FLOAT:
-				elasticsearchType = ElasticsearchFieldType.FLOAT;
+				elasticsearchType = DataType.FLOAT;
 				break;
 			case DOUBLE:
-				elasticsearchType = ElasticsearchFieldType.DOUBLE;
+				elasticsearchType = DataType.DOUBLE;
 				break;
 			case UNKNOWN_NUMERIC:
 				// Likely a custom field bridge which does not expose the type of the given field; either correctly
@@ -676,7 +695,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			case STRING:
 			case UNKNOWN:
 			default:
-				elasticsearchType = ElasticsearchFieldType.STRING;
+				elasticsearchType = DataType.STRING;
 				break;
 		}
 
@@ -684,21 +703,24 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			throw new IncompleteDataException( "Field type could not be determined" );
 		}
 
-		field.addProperty( "type", elasticsearchType.getElasticsearchString() );
+		propertyMapping.setType( elasticsearchType );
 
-		if ( ! formats.isEmpty() ) {
-			field.addProperty( "format", StringHelper.join( formats, "||" ) );
+		if ( !formats.isEmpty() ) {
+			propertyMapping.setFormat( formats );
 		}
 
 		return elasticsearchType;
 	}
 
-	private JsonElement getNullValue(ElasticsearchFieldType dataType, DocumentFieldMetadata fieldMetadata) {
-		Gson gson = gsonService.getGson();
-		Object convertedValue = ElasticSearchIndexNullAsHelper.getNullValue(
-				fieldMetadata.getName(), dataType, fieldMetadata.indexNullAs()
-				);
-		return gson.toJsonTree( convertedValue );
+	private void addNullValue(PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
+		String indexNullAs = fieldMetadata.indexNullAs();
+		if ( indexNullAs != null ) {
+			Object convertedValue = ElasticSearchIndexNullAsHelper.getNullValue(
+					fieldMetadata.getName(), propertyMapping.getType(), indexNullAs
+					);
+			Gson gson = gsonService.getGson();
+			propertyMapping.setNullValue( gson.toJsonTree( convertedValue ).getAsJsonPrimitive() );
+		}
 	}
 
 	/**

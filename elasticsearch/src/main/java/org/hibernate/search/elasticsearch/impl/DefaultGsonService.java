@@ -16,13 +16,26 @@ import io.searchbox.client.AbstractJestClient;
  */
 public class DefaultGsonService implements GsonService {
 
-	private final Gson gson = new GsonBuilder()
-			.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT )
+	private static GsonBuilder builderBase() {
+		return new GsonBuilder()
+				.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT );
+	}
+
+	// TODO find out and document why null serialization needs to be turned on...
+	private final Gson gson = builderBase()
 			.serializeNulls()
+			.create();
+
+	private final Gson gsonNoSerializeNulls = builderBase()
 			.create();
 
 	public Gson getGson() {
 		return gson;
+	}
+
+	@Override
+	public Gson getGsonNoSerializeNulls() {
+		return gsonNoSerializeNulls;
 	}
 
 }
