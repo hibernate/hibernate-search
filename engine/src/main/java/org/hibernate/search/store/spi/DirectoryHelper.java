@@ -51,7 +51,7 @@ public class DirectoryHelper {
 		try {
 			if ( ! DirectoryReader.indexExists( directory ) ) {
 				try {
-					IndexWriterConfig iwriterConfig = new IndexWriterConfig( analyzer ).setOpenMode( OpenMode.CREATE );
+					IndexWriterConfig iwriterConfig = new IndexWriterConfig( analyzer ).setOpenMode( OpenMode.CREATE_OR_APPEND );
 					//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
 					//for distributed indexes (Infinispan but probably also NFS and similar)
 					iwriterConfig.setWriteLockTimeout( 2000 );
