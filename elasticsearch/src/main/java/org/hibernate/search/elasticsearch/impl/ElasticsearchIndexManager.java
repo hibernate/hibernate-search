@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,14 +26,16 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequestProcessor;
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaValidator;
-import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaDropper;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaMigrator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
+import org.hibernate.search.elasticsearch.schema.impl.ExecutionOptions;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
@@ -70,18 +69,6 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-
-import io.searchbox.action.AbstractAction;
-import io.searchbox.client.JestResult;
-import io.searchbox.cluster.Health;
-import io.searchbox.cluster.Health.Builder;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.DeleteIndex;
-import io.searchbox.indices.IndicesExists;
-import io.searchbox.indices.mapping.GetMapping;
-import io.searchbox.indices.mapping.PutMapping;
 
 /**
  * An {@link IndexManager} applying indexing work to an Elasticsearch server.
@@ -90,24 +77,14 @@ import io.searchbox.indices.mapping.PutMapping;
  */
 public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerProvider {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
-
-	private static final TypeToken<Map<String, TypeMapping>> STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN =
-			new TypeToken<Map<String, TypeMapping>>() {
-				// Create a new class to capture generic parameters
-			};
+	static final Log LOG = LoggerFactory.make( Log.class );
 
 	private String indexName;
 	private String actualIndexName;
 	private boolean refreshAfterWrite;
-	private IndexSchemaManagementStrategy indexManagementStrategy;
-	private String indexManagementWaitTimeout;
+	private IndexSchemaManagementStrategy schemaManagementStrategy;
+	private ExecutionOptions schemaManagementExecutionOptions;
 	private boolean multitenancyEnabled;
-
-	/**
-	 * Status the index needs to be at least in, otherwise we'll fail starting up.
-	 */
-	private IndexStatus requiredIndexStatus;
 
 	private Similarity similarity;
 
@@ -119,35 +96,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private GsonService gsonService;
 
 	private ElasticsearchIndexWorkVisitor visitor;
-	private JestClient jestClient;
 	private BackendRequestProcessor requestProcessor;
 
-	private enum IndexStatus {
-
-		GREEN("green"),
-		YELLOW("yellow"),
-		RED("red");
-
-		private final String elasticsearchString;
-
-		private IndexStatus(String elasticsearchString) {
-			this.elasticsearchString = elasticsearchString;
-		}
-
-		public String getElasticsearchString() {
-			return elasticsearchString;
-		}
-
-		static IndexStatus fromString(String status) {
-			for ( IndexStatus indexStatus : IndexStatus.values() ) {
-				if ( indexStatus.getElasticsearchString().equalsIgnoreCase( status ) ) {
-					return indexStatus;
-				}
-			}
-
-			throw LOG.unexpectedIndexStatusString( status );
-		}
-	}
+	private ElasticsearchSchemaCreator schemaCreator;
+	private ElasticsearchSchemaDropper schemaDropper;
+	private ElasticsearchSchemaMigrator schemaMigrator;
+	private ElasticsearchSchemaValidator schemaValidator;
 
 	// Lifecycle
 
@@ -156,9 +110,25 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		this.serviceManager = context.getServiceManager();
 
 		this.indexName = getIndexName( indexName, properties );
-		this.requiredIndexStatus = getRequiredIndexStatus( properties );
-		this.indexManagementStrategy = getIndexManagementStrategy( properties );
-		this.indexManagementWaitTimeout = getIndexManagementWaitTimeout( properties );
+		this.schemaManagementStrategy = getIndexManagementStrategy( properties );
+		final ElasticsearchIndexStatus requiredIndexStatus = getRequiredIndexStatus( properties );
+		final int indexManagementWaitTimeout = getIndexManagementWaitTimeout( properties );
+		this.schemaManagementExecutionOptions = new ExecutionOptions() {
+			@Override
+			public ElasticsearchIndexStatus getRequiredIndexStatus() {
+				return requiredIndexStatus;
+			}
+
+			@Override
+			public int getIndexManagementTimeoutInMs() {
+				return indexManagementWaitTimeout;
+			}
+		};
+		this.schemaCreator = serviceManager.requestService( ElasticsearchSchemaCreator.class );
+		this.schemaDropper = serviceManager.requestService( ElasticsearchSchemaDropper.class );
+		this.schemaMigrator = serviceManager.requestService( ElasticsearchSchemaMigrator.class );
+		this.schemaValidator = serviceManager.requestService( ElasticsearchSchemaValidator.class );
+
 		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
 		this.refreshAfterWrite = getRefreshAfterWrite( properties );
 		this.multitenancyEnabled = context.isMultitenancyEnabled();
@@ -167,7 +137,6 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 		this.gsonService = serviceManager.requestService( GsonService.class );
 
-		this.jestClient = serviceManager.requestService( JestClient.class );
 		this.visitor = new ElasticsearchIndexWorkVisitor(
 				this.actualIndexName,
 				this.refreshAfterWrite,
@@ -186,7 +155,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return strategy != null ? IndexSchemaManagementStrategy.valueOf( strategy ) : ElasticsearchEnvironment.Defaults.INDEX_SCHEMA_MANAGEMENT_STRATEGY;
 	}
 
-	private static String getIndexManagementWaitTimeout(Properties properties) {
+	private static int getIndexManagementWaitTimeout(Properties properties) {
 		int timeout = ConfigurationParseHelper.getIntValue(
 				properties,
 				ElasticsearchEnvironment.INDEX_MANAGEMENT_WAIT_TIMEOUT,
@@ -197,17 +166,17 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			throw LOG.negativeTimeoutValue( timeout );
 		}
 
-		return timeout + "ms";
+		return timeout;
 	}
 
-	private static IndexStatus getRequiredIndexStatus(Properties properties) {
+	private static ElasticsearchIndexStatus getRequiredIndexStatus(Properties properties) {
 		String status = ConfigurationParseHelper.getString(
 				properties,
 				ElasticsearchEnvironment.REQUIRED_INDEX_STATUS,
 				ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS
 		);
 
-		return IndexStatus.fromString( status );
+		return ElasticsearchIndexStatus.fromString( status );
 	}
 
 	private static boolean getRefreshAfterWrite(Properties properties) {
@@ -220,16 +189,26 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	@Override
 	public void destroy() {
-		if ( indexManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
-			deleteIndexIfExisting();
+		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
+			schemaDropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
 		}
 
 		requestProcessor = null;
 		serviceManager.releaseService( BackendRequestProcessor.class );
-		jestClient = null;
-		serviceManager.releaseService( JestClient.class );
 		gsonService = null;
 		serviceManager.releaseService( GsonService.class );
+		schemaValidator = null;
+		serviceManager.releaseService( ElasticsearchSchemaValidator.class );
+		schemaMigrator = null;
+		serviceManager.releaseService( ElasticsearchSchemaMigrator.class );
+		schemaDropper = null;
+		serviceManager.releaseService( ElasticsearchSchemaDropper.class );
+		schemaCreator = null;
+		serviceManager.releaseService( ElasticsearchSchemaCreator.class );
+
+		schemaManagementExecutionOptions = null;
+
+		serviceManager = null;
 	}
 
 	@Override
@@ -239,26 +218,22 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	}
 
 	private void initializeIndex() {
-		switch (indexManagementStrategy) {
+		switch ( schemaManagementStrategy ) {
 			case NONE:
 				break;
 			case CREATE:
-				if ( createIndexIfNotYetExisting() ) {
-					putIndexMappings();
-				}
+				schemaCreator.createIfAbsent( createIndexMetadata(), schemaManagementExecutionOptions );
 				break;
 			case RECREATE:
 			case RECREATE_DELETE:
-				deleteIndexIfExisting();
-				createIndex();
-				putIndexMappings();
+				schemaDropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
+				schemaCreator.create( createIndexMetadata(), schemaManagementExecutionOptions );
 				break;
 			case MERGE:
-				createIndexIfNotYetExisting();
-				putIndexMappings();
+				schemaMigrator.merge( createIndexMetadata(), schemaManagementExecutionOptions );
 				break;
 			case VALIDATE:
-				validateIndexMappings();
+				schemaValidator.validate( createIndexMetadata(), schemaManagementExecutionOptions );
 				break;
 			default:
 				break;
@@ -270,146 +245,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		containedEntityTypes.add( entity );
 	}
 
-	private void createIndex() {
-		CreateIndex createIndex = new CreateIndex.Builder( actualIndexName )
-				.build();
-
-		jestClient.executeRequest( createIndex );
-
-		waitForIndexCreation();
-	}
-
-	private void waitForIndexCreation() {
-		Builder healthBuilder = new Health.Builder()
-				.setParameter( "wait_for_status", requiredIndexStatus.getElasticsearchString() )
-				.setParameter( "timeout", indexManagementWaitTimeout );
-
-		Health health = new Health( healthBuilder ) {
-			@Override
-			protected String buildURI() {
-				try {
-					return super.buildURI() + URLEncoder.encode(actualIndexName, AbstractAction.CHARSET);
-				}
-				catch (UnsupportedEncodingException e) {
-					throw new AssertionFailure("Unexpectedly unsupported charset", e);
-				}
-			}
-		};
-
-		JestResult result = jestClient.executeRequest( health, 408 );
-
-		if ( !result.isSucceeded() ) {
-			String status = result.getJsonObject().get( "status" ).getAsString();
-			throw LOG.unexpectedIndexStatus( actualIndexName, requiredIndexStatus.getElasticsearchString(),
-					status );
-		}
-	}
-
-	/**
-	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
-	 */
-	private boolean createIndexIfNotYetExisting() {
-		if ( jestClient.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 200 ) {
-			return false;
-		}
-
-		JestResult result = jestClient.executeRequest(
-				new CreateIndex.Builder( actualIndexName ).build(),
-				"index_already_exists_exception"
-				);
-		if ( !result.isSucceeded() ) {
-			// The index was created just after we checked if it existed: just do as if it had been created when we checked.
-			return false;
-		}
-
-		return true;
-	}
-
-	private void deleteIndexIfExisting() {
-		// Not actually needed, but do it to avoid cluttering the ES log
-		if ( jestClient.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 404 ) {
-			return;
-		}
-
-		try {
-			jestClient.executeRequest( new DeleteIndex.Builder( actualIndexName ).build() );
-		}
-		catch (SearchException e) {
-			// ignoring deletion of non-existing index
-			if ( !e.getMessage().contains( "index_not_found_exception" ) ) {
-				throw e;
-			}
-		}
-	}
-
 	private static class IncompleteDataException extends SearchException {
 		public IncompleteDataException(String message) {
 			super( message );
-		}
-	}
-
-	// TODO What happens if several nodes in a cluster try to create the mappings?
-	private void putIndexMappings() {
-		IndexMetadata indexMetadata = createIndexMetadata();
-		for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
-			String mappingName = entry.getKey();
-			TypeMapping mapping = entry.getValue();
-
-			/*
-			 * Serializing nulls is really not a good idea here, it triggers NPEs in ElasticSearch
-			 * We better not include the null fields.
-			 */
-			Gson gson = gsonService.getGsonNoSerializeNulls();
-			String mappingAsJson = gson.toJson( mapping );
-
-			PutMapping putMapping = new PutMapping.Builder(
-					indexMetadata.getName(),
-					mappingName,
-					mappingAsJson
-			)
-			.build();
-
-			try {
-				jestClient.executeRequest( putMapping );
-			}
-			catch (RuntimeException e) {
-				throw LOG.elasticsearchMappingCreationFailed( mappingName, e );
-			}
-		}
-	}
-
-	private void validateIndexMappings() {
-		ElasticsearchSchemaValidator validator = new DefaultElasticsearchSchemaValidator();
-		try {
-			validator.validate( createIndexMetadata(), getCurrentIndexMetadata() );
-		}
-		catch (ElasticsearchSchemaValidationException e) {
-			throw LOG.schemaValidationFailed( actualIndexName, e );
-		}
-	}
-
-	private IndexMetadata getCurrentIndexMetadata() {
-		GetMapping getMapping = new GetMapping.Builder()
-				.build();
-
-		try {
-			JestResult result = jestClient.executeRequest( getMapping );
-			JsonElement index = result.getJsonObject().get( actualIndexName );
-			if ( index == null || !index.isJsonObject() ) {
-				throw LOG.mappingsMissing( actualIndexName );
-			}
-			JsonElement mappings = index.getAsJsonObject().get( "mappings" );
-			if ( mappings == null ) {
-				throw LOG.mappingsMissing( actualIndexName );
-			}
-			Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
-			IndexMetadata indexMetadata = new IndexMetadata();
-			indexMetadata.setName( actualIndexName );
-			indexMetadata.setMappings( gsonService.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType ) );
-			return indexMetadata;
-		}
-		catch (RuntimeException e) {
-			throw LOG.elasticsearchMappingRetrievalForValidationFailed( e );
 		}
 	}
 
