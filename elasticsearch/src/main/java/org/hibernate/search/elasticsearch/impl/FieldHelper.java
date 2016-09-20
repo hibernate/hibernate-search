@@ -19,6 +19,7 @@ import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
@@ -231,6 +232,16 @@ class FieldHelper {
 		}
 
 		return null;
+	}
+
+	public static boolean isSortableField(EntityIndexBinding indexBinding, String fieldName) {
+		PropertyMetadata property = getPropertyMetadata( indexBinding, fieldName );
+		for ( SortableFieldMetadata sortableField : property.getSortableFieldMetadata() ) {
+			if ( fieldName.equals( sortableField.getFieldName() ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean isEmbeddedField(String field) {

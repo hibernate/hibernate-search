@@ -315,7 +315,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 			// bridge-defined fields
 			for ( BridgeDefinedField bridgeDefinedField : getAllBridgeDefinedFields( descriptor ) ) {
-				addFieldMapping( payload, bridgeDefinedField );
+				addFieldMapping( payload, descriptor, bridgeDefinedField );
 			}
 
 			PutMapping putMapping = new PutMapping.Builder(
@@ -334,12 +334,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
-	private String analyzerName(Class<?> entityType, DocumentFieldMetadata fieldMetadata) {
-		AnalyzerReference analyzerReference = fieldMetadata.getAnalyzerReference();
+	private String analyzerName(Class<?> entityType, String fieldName, AnalyzerReference analyzerReference) {
 		if ( analyzerReference.is( RemoteAnalyzerReference.class ) ) {
-			return analyzerReference.unwrap( RemoteAnalyzerReference.class ).getAnalyzer().getName( fieldMetadata.getFieldName() );
+			return analyzerReference.unwrap( RemoteAnalyzerReference.class ).getAnalyzer().getName( fieldName );
 		}
-		LOG.analyzerIsNotRemote( entityType, fieldMetadata.getFieldName(), analyzerReference );
+		LOG.analyzerIsNotRemote( entityType, fieldName, analyzerReference );
 		return null;
 	}
 
@@ -359,13 +358,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		field.addProperty( "type", fieldType );
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 
-		String index = getIndex( descriptor, fieldMetadata );
-		field.addProperty( "index", index );
-
-		String analyzerName = getAnalyzerName( descriptor, fieldMetadata, index );
-		if ( analyzerName != null ) {
-			field.addProperty( "analyzer", analyzerName );
-		}
+		addIndexOptions( field, descriptor, fieldMetadata.getName(),
+				fieldType, fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
 
 		if ( fieldMetadata.getBoost() != null ) {
 			field.addProperty( "boost", fieldMetadata.getBoost() );
@@ -387,30 +381,19 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
-	private String getAnalyzerName(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata, String index) {
-		if ( isAnalyzed( index ) && fieldMetadata.getAnalyzerReference() != null ) {
-			return analyzerName( descriptor.getDocumentBuilder().getBeanClass(), fieldMetadata );
-		}
-		return null;
-	}
-
-	private boolean isAnalyzed(String index) {
-		return ANALYZED.equals( index );
-	}
-
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
-	private void addFieldMapping(JsonObject payload, BridgeDefinedField bridgeDefinedField) {
+	private void addFieldMapping(JsonObject payload, EntityIndexBinding binding, BridgeDefinedField bridgeDefinedField) {
 		String fieldName = bridgeDefinedField.getName();
 		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( fieldName );
 		if ( !SpatialHelper.isSpatialField( simpleFieldName ) ) {
 			JsonObject field = new JsonObject();
 
-			field.addProperty( "type", getFieldType( bridgeDefinedField ) );
+			String fieldType = getFieldType( bridgeDefinedField );
+			field.addProperty( "type", fieldType );
 
-			String index = getIndex( bridgeDefinedField );
-			field.addProperty( "index", index );
+			addIndexOptions( field, binding, fieldName, fieldType, bridgeDefinedField.getIndex(), null );
 
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
@@ -457,44 +440,45 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return field;
 	}
 
-	private String getIndex(EntityIndexBinding binding, DocumentFieldMetadata fieldMetadata) {
-		// Never analyze boolean, date or numeric
-		if ( FieldHelper.isBoolean( binding, fieldMetadata.getName() ) ||
-				FieldHelper.isDate( binding, fieldMetadata.getName() ) ||
-				FieldHelper.isCalendar( binding, fieldMetadata.getName() ) ||
-				FieldHelper.isNumeric(fieldMetadata) ) {
-			return NOT_ANALYZED;
-		}
-
-		return getIndexValue( fieldMetadata.getIndex() );
-	}
-
-	@SuppressWarnings("deprecation")
-	private String getIndex(BridgeDefinedField bridgeDefinedField) {
-		// Never analyze boolean
-		if ( FieldHelper.isBoolean( bridgeDefinedField )
-				|| FieldHelper.isNumeric( bridgeDefinedField )
-				|| FieldHelper.isDate( bridgeDefinedField ) ) {
-			return NOT_ANALYZED;
-		}
-
-		Field.Index index = bridgeDefinedField.getIndex();
-		return getIndexValue( index );
-	}
-
-	private String getIndexValue(Field.Index index) {
+	/**
+	 * Adds the main indexing-related options to the given field: "index", "doc_values", "analyzer", ...
+	 */
+	private void addIndexOptions(JsonObject field, EntityIndexBinding binding, String fieldName,
+			String fieldType, Field.Index index, AnalyzerReference analyzerReference) {
+		String elasticsearchIndex;
 		switch ( index ) {
 			case ANALYZED:
 			case ANALYZED_NO_NORMS:
-				return ANALYZED;
+				elasticsearchIndex = canTypeBeAnalyzed( fieldType ) ? ANALYZED : NOT_ANALYZED;
+				break;
 			case NOT_ANALYZED:
 			case NOT_ANALYZED_NO_NORMS:
-				return NOT_ANALYZED;
+				elasticsearchIndex = NOT_ANALYZED;
+				break;
 			case NO:
-				return "no";
+				elasticsearchIndex = "no";
+				break;
 			default:
 				throw new AssertionFailure( "Unexpected index type: " + index );
 		}
+		field.addProperty( "index", elasticsearchIndex );
+
+		if ( "no".equals( elasticsearchIndex ) && FieldHelper.isSortableField( binding, fieldName ) ) {
+			// We must use doc values in order to enable sorting on non-indexed fields
+			field.addProperty( "doc_values", true );
+		}
+
+		if ( ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
+			String analyzerName = analyzerName( binding.getDocumentBuilder().getBeanClass(), fieldName, analyzerReference );
+			if ( analyzerName != null ) {
+				field.addProperty( "analyzer", analyzerName );
+			}
+		}
+	}
+
+	private boolean canTypeBeAnalyzed(String fieldType) {
+		// Only strings can be analyzed
+		return "string".equals( fieldType );
 	}
 
 	private String getFieldType(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
