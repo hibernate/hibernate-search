@@ -1229,7 +1229,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
 					fieldName,
 					store,
-					Field.Index.NOT_ANALYZED_NO_NORMS,
+					Field.Index.NO.equals( index ) ? index : Field.Index.NOT_ANALYZED_NO_NORMS,
 					termVector
 			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
 					.fieldBridge( fieldBridge )
