@@ -71,7 +71,10 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	}
 
 	private void validateTypeMapping(TypeMapping expectedMapping, TypeMapping actualMapping) {
-		validateEqualWithDefault( "dynamic", expectedMapping.getDynamic(), actualMapping.getDynamic(), DynamicType.TRUE );
+		DynamicType expectedDynamic = expectedMapping.getDynamic();
+		if ( expectedDynamic != null ) { // If not provided, we don't care
+			validateEqualWithDefault( "dynamic", expectedDynamic, actualMapping.getDynamic(), DynamicType.TRUE );
+		}
 		validateTypeMappingProperties( expectedMapping, actualMapping );
 	}
 
@@ -145,6 +148,42 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		}
 	}
 
+	/**
+	 * Special validation for an Elasticsearch format:
+	 * <ul>
+	 * <li>Checks that the first element (the format used for output format in ES) is equal
+	 * <li>Checks all expected formats are present in the actual value
+	 * </ul>
+	 */
+	private static <T> void validateFormatWithDefault(String attributeName, List<String> expectedValue,
+			List<String> actualValue, List<String> defaultValueForNulls) {
+		List<String> defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
+		List<String> defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
+		if ( defaultedExpectedValue.isEmpty() ) {
+			return;
+		}
+
+		String expectedOutputFormat = defaultedExpectedValue.get( 0 );
+		String actualOutputFormat = defaultedActualValue.isEmpty() ? null : defaultedActualValue.get( 0 );
+		if ( ! Objects.equals( expectedOutputFormat, actualOutputFormat ) ) {
+			// Don't show the defaulted actual value, this might confuse users
+			throw LOG.mappingInvalidOutputFormat( attributeName, expectedOutputFormat, actualOutputFormat );
+		}
+
+		List<String> missingFormats = new ArrayList<>();
+		missingFormats.addAll( defaultedExpectedValue );
+		missingFormats.removeAll( defaultedActualValue );
+
+		List<String> unexpectedFormats = new ArrayList<>();
+		unexpectedFormats.addAll( defaultedActualValue );
+		unexpectedFormats.removeAll( defaultedExpectedValue );
+
+		if ( !missingFormats.isEmpty() || !unexpectedFormats.isEmpty() ) {
+			throw LOG.mappingInvalidInputFormat( attributeName, defaultedExpectedValue, defaultedActualValue,
+					missingFormats, unexpectedFormats );
+		}
+	}
+
 	private void validateTypeMappingProperties(TypeMapping expectedMapping, TypeMapping actualMapping) {
 		// Unknown properties are ignored, we only validate expected properties
 		Map<String, PropertyMapping> expectedPropertyMappings = expectedMapping.getProperties();
@@ -178,21 +217,30 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 
 		List<String> formatDefault = DataType.DATE.equals( expectedMapping.getType() )
 				? DEFAULT_DATE_FORMAT : Collections.<String>emptyList();
-		validateEqualWithDefault( "format", expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault );
+		validateFormatWithDefault( "format", expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault );
 
 		validateEqualWithDefault( "boost", expectedMapping.getBoost(), actualMapping.getBoost(), DEFAULT_FLOAT_DELTA, 1.0f );
 
-		// See Elasticsearch doc: this attribute's default value depends on the data type.
-		IndexType indexDefault = DataType.STRING.equals( expectedMapping.getType() ) ? IndexType.ANALYZED : IndexType.NOT_ANALYZED;
-		validateEqualWithDefault( "index", expectedMapping.getIndex(), actualMapping.getIndex(), indexDefault );
+		IndexType expectedIndex = expectedMapping.getIndex();
+		if ( !IndexType.NO.equals( expectedIndex ) ) { // If we don't need an index, we don't care
+			// See Elasticsearch doc: this attribute's default value depends on the data type.
+			IndexType indexDefault = DataType.STRING.equals( expectedMapping.getType() ) ? IndexType.ANALYZED : IndexType.NOT_ANALYZED;
+			validateEqualWithDefault( "index", expectedIndex, actualMapping.getIndex(), indexDefault );
+		}
 
-		/*
-		 * Elasticsearch documentation (2.3) says doc_values is true by default on fields
-		 * supporting it, but tests show it's wrong.
-		 */
-		validateEqualWithDefault( "doc_values", expectedMapping.getDocValues(), actualMapping.getDocValues(), false );
+		Boolean expectedDocValues = expectedMapping.getDocValues();
+		if ( Boolean.TRUE.equals( expectedDocValues ) ) { // If we don't need doc_values, we don't care
+			/*
+			 * Elasticsearch documentation (2.3) says doc_values is true by default on fields
+			 * supporting it, but tests show it's wrong.
+			 */
+			validateEqualWithDefault( "doc_values", expectedDocValues, actualMapping.getDocValues(), false );
+		}
 
-		validateEqualWithDefault( "store", expectedMapping.getStore(), actualMapping.getStore(), false );
+		Boolean expectedStore = expectedMapping.getStore();
+		if ( Boolean.TRUE.equals( expectedStore ) ) { // If we don't need storage, we don't care
+			validateEqualWithDefault( "store", expectedStore, actualMapping.getStore(), false );
+		}
 
 		validateJsonPrimitive( expectedMapping.getType(), "null_value", expectedMapping.getNullValue(), actualMapping.getNullValue() );
 

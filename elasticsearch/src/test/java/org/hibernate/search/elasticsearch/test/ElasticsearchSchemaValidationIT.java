@@ -17,7 +17,9 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
@@ -44,6 +46,8 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	private static final String MISSING_PROPERTY_MESSAGE_ID = "HSEARCH400038";
 	private static final String INVALID_PROPERTY_MESSAGE_ID = "HSEARCH400039";
 	private static final String INVALID_ATTRIBUTE_MESSAGE_ID = "HSEARCH400040";
+	private static final String INVALID_OUTPUT_FORMAT_MESSAGE_ID = "HSEARCH400041";
+	private static final String INVALID_INPUT_FORMAT_MESSAGE_ID = "HSEARCH400042";
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -351,7 +355,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	}
 
 	@Test
-	public void property_format_invalid() throws Exception {
+	public void property_format_invalidOutputFormat() throws Exception {
 		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
 		elasticSearchClient.putMapping(
 				SimpleDateEntity.class,
@@ -380,12 +384,116 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 						.withMessage( INVALID_PROPERTY_MESSAGE_ID )
 						.withMessage( "myField" )
 				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_ATTRIBUTE_MESSAGE_ID )
+						.withMessage( INVALID_OUTPUT_FORMAT_MESSAGE_ID )
 						.withMessage( "format" )
 				.build()
 		);
 
 		init( SimpleDateEntity.class );
+	}
+
+	@Test
+	public void property_format_missingInputFormat() throws Exception {
+		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
+		elasticSearchClient.putMapping(
+				SimpleDateEntity.class,
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'date',"
+									+ "'format': 'strict_date_optional_time'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( SearchException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+				.causedBy( ElasticsearchSchemaValidationException.class )
+						.withMessage( INVALID_MAPPING_MESSAGE_ID )
+				.causedBy( ElasticsearchSchemaValidationException.class )
+						.withMessage( INVALID_PROPERTY_MESSAGE_ID )
+						.withMessage( "myField" )
+				.causedBy( ElasticsearchSchemaValidationException.class )
+						.withMessage( INVALID_INPUT_FORMAT_MESSAGE_ID )
+						.withMessage( "format" )
+				.build()
+		);
+
+		init( SimpleDateEntity.class );
+	}
+
+	@Test
+	public void property_format_unexpectedInputFormat() throws Exception {
+		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
+		elasticSearchClient.putMapping(
+				SimpleDateEntity.class,
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'date',"
+									+ "'format': 'strict_date_optional_time||epoch_millis||yyyy'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( SearchException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+				.causedBy( ElasticsearchSchemaValidationException.class )
+						.withMessage( INVALID_MAPPING_MESSAGE_ID )
+				.causedBy( ElasticsearchSchemaValidationException.class )
+						.withMessage( INVALID_PROPERTY_MESSAGE_ID )
+						.withMessage( "myField" )
+				.causedBy( ElasticsearchSchemaValidationException.class )
+						.withMessage( INVALID_INPUT_FORMAT_MESSAGE_ID )
+						.withMessage( "format" )
+				.build()
+		);
+
+		init( SimpleDateEntity.class );
+	}
+
+	/**
+	 * Tests that mappings that are more powerful than requested will pass validation.
+	 */
+	@Test
+	public void property_attribute_leniency() throws Exception {
+		elasticSearchClient.deleteAndCreateIndex( SimpleLenientEntity.class );
+		elasticSearchClient.putMapping(
+				SimpleLenientEntity.class,
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'long',"
+									+ "'index': 'analyzed',"
+									+ "'store': 'yes'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		init( SimpleLenientEntity.class );
 	}
 
 	@Indexed
@@ -408,6 +516,17 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 
 		@Field
 		Date myField;
+	}
+
+	@Indexed
+	@Entity
+	public static class SimpleLenientEntity {
+		@DocumentId
+		@Id
+		Long id;
+
+		@Field(index = Index.NO, store = Store.NO)
+		Long myField;
 	}
 
 }
