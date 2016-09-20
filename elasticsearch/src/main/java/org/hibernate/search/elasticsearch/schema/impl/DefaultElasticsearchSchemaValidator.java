@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
@@ -20,6 +21,10 @@ import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.engine.service.spi.Stoppable;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
@@ -31,7 +36,7 @@ import com.google.gson.JsonPrimitive;
  * Hibernate Search, by setting those attributes manually.
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaValidator {
+public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaValidator, Startable, Stoppable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -46,11 +51,35 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		DEFAULT_DATE_FORMAT = CollectionHelper.toImmutableList( formats );
 	}
 
-	public DefaultElasticsearchSchemaValidator() {
+	private ServiceManager serviceManager;
+	private ElasticsearchSchemaAccessor schemaAccessor;
+
+	@Override
+	public void start(Properties properties, BuildContext context) {
+		serviceManager = context.getServiceManager();
+		schemaAccessor = serviceManager.requestService( ElasticsearchSchemaAccessor.class );
 	}
 
 	@Override
-	public void validate(IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
+	public void stop() {
+		schemaAccessor = null;
+		serviceManager.releaseService( ElasticsearchSchemaAccessor.class );
+		serviceManager = null;
+	}
+
+	@Override
+	public void validate(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
+		String indexName = expectedIndexMetadata.getName();
+		try {
+			IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
+			validate( expectedIndexMetadata, actualIndexMetadata );
+		}
+		catch (ElasticsearchSchemaValidationException e) {
+			throw LOG.schemaValidationFailed( indexName, e );
+		}
+	}
+
+	private void validate(IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
 		// Unknown mappings are ignored, we only validate expected mappings
 		for ( Map.Entry<String, TypeMapping> entry : expectedIndexMetadata.getMappings().entrySet() ) {
 			String mappingName = entry.getKey();
