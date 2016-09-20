@@ -24,6 +24,7 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
