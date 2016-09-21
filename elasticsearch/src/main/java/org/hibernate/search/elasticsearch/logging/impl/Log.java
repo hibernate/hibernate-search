@@ -244,4 +244,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	ElasticsearchSchemaValidationException mappingInvalidInputFormat(String string, List<String> expectedValue,
 			List<String> actualValue, List<String> missingFormats, List<String> unexpectedFormats);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 43,
+			value = "Could not merge mappings in index '%1$s'"
+	)
+	SearchException schemaMergeFailed(String indexName, @Cause Exception cause);
+
 }
