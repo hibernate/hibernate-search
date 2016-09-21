@@ -61,11 +61,11 @@ public class GolfPlayer {
 	@Field(indexNullAs = "false")
 	private Boolean active;
 
-	@Field(indexNullAs = "1970-01-01")
+	@Field(indexNullAs = "1970-01-01+00:00")
 	@DateBridge(resolution = Resolution.DAY)
 	private Date dateOfBirth;
 
-	@Field(indexNullAs = "1970-01-01")
+	@Field(indexNullAs = "1970-01-01+00:00")
 	@DateBridge(resolution = Resolution.DAY)
 	private Calendar subscriptionEndDate;
 
