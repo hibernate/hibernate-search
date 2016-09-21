@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.impl;
+package org.hibernate.search.elasticsearch.util.impl;
 
 import org.hibernate.search.exception.AssertionFailure;
 
@@ -14,7 +14,7 @@ import org.hibernate.search.exception.AssertionFailure;
  *
  * @author Yoann Rodiere
  */
-class PathComponentExtractor implements Cloneable {
+public class PathComponentExtractor implements Cloneable {
 
 	private static final String PATH_COMPONENT_SEPARATOR = ".";
 

@@ -24,4 +24,9 @@ public interface ExecutionOptions {
 	 */
 	int getIndexManagementTimeoutInMs();
 
+	/**
+	 * Whether multitenancy is enabled ({@code true}) or not ({@code false}).
+	 */
+	boolean isMultitenancyEnabled();
+
 }
