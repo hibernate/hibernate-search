@@ -105,6 +105,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	public IndexMetadata getCurrentIndexMetadata(String indexName) {
 		GetMapping getMapping = new GetMapping.Builder()
+				.addIndex( indexName )
 				.build();
 
 		try {
