@@ -1409,7 +1409,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <additionalRuntimeArgLine>-addmods java.xml.bind</additionalRuntimeArgLine>
+                <additionalRuntimeArgLine>--add-modules java.xml.bind</additionalRuntimeArgLine>
             </properties>
         </profile>
 
