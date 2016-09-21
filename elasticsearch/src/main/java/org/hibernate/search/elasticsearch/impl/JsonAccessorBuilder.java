@@ -11,7 +11,8 @@ import java.util.Deque;
 import java.util.List;
 
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
-import org.hibernate.search.elasticsearch.impl.PathComponentExtractor.ConsumptionLimit;
+import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor;
+import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor.ConsumptionLimit;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 
 /**
