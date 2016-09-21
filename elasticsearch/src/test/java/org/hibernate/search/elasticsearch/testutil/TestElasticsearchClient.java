@@ -22,6 +22,7 @@ import org.junit.rules.ExternalResource;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import io.searchbox.action.AbstractAction;
@@ -33,6 +34,7 @@ import io.searchbox.cluster.Health;
 import io.searchbox.cluster.Health.Builder;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
+import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
 
 /**
@@ -56,6 +58,14 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	public void putMapping(Class<?> rootClass, Class<?> mappedClass, String mappingJson) throws IOException {
 		putMapping( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), mappingJson );
+	}
+
+	public String getMapping(Class<?> mappedAndRootClass) throws IOException {
+		return getMapping( mappedAndRootClass, mappedAndRootClass );
+	}
+
+	public String getMapping(Class<?> rootClass, Class<?> mappedClass) throws IOException {
+		return getMapping( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName() );
 	}
 
 	public void deleteAndCreateIndex(String indexName) throws IOException {
@@ -109,6 +119,27 @@ public class TestElasticsearchClient extends ExternalResource {
 			throw new AssertionFailure( "Error while putting mapping '" + mappingName
 					+ "' on index '" + indexName + "' for tests:" + result.getErrorMessage() );
 		}
+	}
+
+	public String getMapping(String indexName, String mappingName) throws IOException {
+		JestResult result = client.execute( new GetMapping.Builder().addIndex( indexName ).addType( mappingName ).build() );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while getting mapping '" + mappingName
+					+ "' on index '" + indexName + "' for tests:" + result.getErrorMessage() );
+		}
+		JsonElement index = result.getJsonObject().get( indexName );
+		if ( index == null ) {
+			return new JsonObject().toString();
+		}
+		JsonElement mappings = index.getAsJsonObject().get( "mappings" );
+		if ( mappings == null ) {
+			return new JsonObject().toString();
+		}
+		JsonElement mapping = mappings.getAsJsonObject().get( mappingName );
+		if ( mapping == null ) {
+			return new JsonObject().toString();
+		}
+		return mapping.toString();
 	}
 
 	@Override
