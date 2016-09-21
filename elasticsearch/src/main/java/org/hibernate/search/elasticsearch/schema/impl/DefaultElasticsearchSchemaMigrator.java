@@ -9,12 +9,15 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import java.util.Map;
 import java.util.Properties;
 
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * The default {@link ElasticsearchSchemaMigrator} implementation.
@@ -22,6 +25,8 @@ import org.hibernate.search.spi.BuildContext;
  * @author Yoann Rodiere
  */
 public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMigrator, Startable, Stoppable {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private ServiceManager serviceManager;
 	private ElasticsearchSchemaAccessor schemaAccessor;
@@ -39,23 +44,27 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 		serviceManager = null;
 	}
 
-	/*
-	 * TODO yrodiere Actually implement "merging" as documented in super.merge (i.e. when a mapping already exists, validate instead of erasing)
-	 */
 	@Override
 	public void merge(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
 		String indexName = indexMetadata.getName();
 
-		if ( !schemaAccessor.indexExists( indexName ) ) {
-			schemaAccessor.createIndexIfAbsent( indexName, executionOptions );
+		try {
+			if ( !schemaAccessor.indexExists( indexName ) ) {
+				schemaAccessor.createIndexIfAbsent( indexName, executionOptions );
+			}
+
+			schemaAccessor.waitForIndexStatus( indexName, executionOptions );
+
+			for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
+				String mappingName = entry.getKey();
+				TypeMapping mapping = entry.getValue();
+
+				// Elasticsearch itself takes care of the actual merging
+				schemaAccessor.putMapping( indexName, mappingName, mapping );
+			}
 		}
-
-		schemaAccessor.waitForIndexStatus( indexName, executionOptions );
-
-		for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
-			String mappingName = entry.getKey();
-			TypeMapping mapping = entry.getValue();
-			schemaAccessor.putMapping( indexName, mappingName, mapping );
+		catch (SearchException e) {
+			throw LOG.schemaMergeFailed( indexName, e );
 		}
 	}
 
