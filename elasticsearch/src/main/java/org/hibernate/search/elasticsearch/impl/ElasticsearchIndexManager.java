@@ -74,6 +74,15 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	private static final String ANALYZED = "analyzed";
 	private static final String NOT_ANALYZED = "not_analyzed";
+	private static final String NOT_INDEXED = "no";
+
+	private static final String TYPE_STRING = "string";
+	private static final String TYPE_BOOLEAN = "boolean";
+	private static final String TYPE_DATE = "date";
+	private static final String TYPE_INTEGER = "integer";
+	private static final String TYPE_LONG = "long";
+	private static final String TYPE_FLOAT = "float";
+	private static final String TYPE_DOUBLE = "double";
 
 	private String indexName;
 	private String actualIndexName;
@@ -298,7 +307,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 			if ( multitenancyEnabled ) {
 				JsonObject field = new JsonObject();
-				field.addProperty( "type", "string" );
+				field.addProperty( "type", TYPE_STRING );
 				field.addProperty( "index", NOT_ANALYZED );
 				properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
 			}
@@ -419,7 +428,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			else {
 				// the fields potentially created for the spatial hash queries
 				JsonObject field = new JsonObject();
-				field.addProperty( "type", "string" );
+				field.addProperty( "type", TYPE_STRING );
 				field.addProperty( "index", NOT_ANALYZED );
 
 				getOrCreateProperties( payload, fieldName ).add( fieldName, field );
@@ -456,14 +465,14 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				elasticsearchIndex = NOT_ANALYZED;
 				break;
 			case NO:
-				elasticsearchIndex = "no";
+				elasticsearchIndex = NOT_INDEXED;
 				break;
 			default:
 				throw new AssertionFailure( "Unexpected index type: " + index );
 		}
 		field.addProperty( "index", elasticsearchIndex );
 
-		if ( "no".equals( elasticsearchIndex ) && FieldHelper.isSortableField( binding, fieldName ) ) {
+		if ( NOT_INDEXED.equals( elasticsearchIndex ) && FieldHelper.isSortableField( binding, fieldName ) ) {
 			// We must use doc values in order to enable sorting on non-indexed fields
 			field.addProperty( "doc_values", true );
 		}
@@ -478,18 +487,18 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	private boolean canTypeBeAnalyzed(String fieldType) {
 		// Only strings can be analyzed
-		return "string".equals( fieldType );
+		return TYPE_STRING.equals( fieldType );
 	}
 
 	private String getFieldType(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
 		String type;
 
 		if ( FieldHelper.isBoolean( descriptor, fieldMetadata.getName() ) ) {
-			type = "boolean";
+			type = TYPE_BOOLEAN;
 		}
 		else if ( FieldHelper.isDate( descriptor, fieldMetadata.getName() ) ||
 				FieldHelper.isCalendar( descriptor, fieldMetadata.getName() ) ) {
-			type = "date";
+			type = TYPE_DATE;
 		}
 		else if ( FieldHelper.isNumeric( fieldMetadata ) ) {
 
@@ -497,16 +506,16 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 			switch ( numericEncodingType ) {
 				case INTEGER:
-					type = "integer";
+					type = TYPE_INTEGER;
 					break;
 				case LONG:
-					type = "long";
+					type = TYPE_LONG;
 					break;
 				case FLOAT:
-					type = "float";
+					type = TYPE_FLOAT;
 					break;
 				case DOUBLE:
-					type = "double";
+					type = TYPE_DOUBLE;
 					break;
 				default:
 					// Likely a custom field bridge which does not expose the type of the given field; either correctly
@@ -517,7 +526,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			}
 		}
 		else {
-			type = "string";
+			type = TYPE_STRING;
 		}
 
 		return type;
@@ -526,19 +535,19 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private String getFieldType(BridgeDefinedField bridgeDefinedField) {
 		switch ( bridgeDefinedField.getType() ) {
 			case BOOLEAN:
-				return "boolean";
+				return TYPE_BOOLEAN;
 			case DATE:
-				return "date";
+				return TYPE_DATE;
 			case FLOAT:
-				return "float";
+				return TYPE_FLOAT;
 			case DOUBLE:
-				return "double";
+				return TYPE_DOUBLE;
 			case INTEGER:
-				return "integer";
+				return TYPE_INTEGER;
 			case LONG:
-				return "long";
+				return TYPE_LONG;
 			case STRING:
-				return "string";
+				return TYPE_STRING;
 			default:
 				throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getName() );
 		}
@@ -547,11 +556,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	private String getFieldType(FacetMetadata facetMetadata) {
 		switch ( facetMetadata.getEncoding() ) {
 			case DOUBLE:
-				return "double";
+				return TYPE_DOUBLE;
 			case LONG:
-				return "long";
+				return TYPE_LONG;
 			case STRING:
-				return "string";
+				return TYPE_STRING;
 			case AUTO:
 				throw new AssertionFailure( "The facet type should have been resolved during bootstrapping" );
 			default: {
