@@ -7,13 +7,15 @@
 package org.hibernate.search.elasticsearch.test;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * @author Gunnar Morling
  */
-public class NameConcatenationBridge implements FieldBridge {
+public class NameConcatenationBridge implements MetadataProvidingFieldBridge {
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
@@ -28,5 +30,10 @@ public class NameConcatenationBridge implements FieldBridge {
 		}
 
 		luceneOptions.addFieldToDocument( name, names.toString(), document );
+	}
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name, FieldType.STRING );
 	}
 }
