@@ -26,6 +26,13 @@ import org.apache.lucene.search.TopDocs;
  */
 public interface DocumentExtractor extends Closeable {
 
+	/**
+	 * Retrieves entity information for the result at the given index.
+	 *
+	 * @param index The requested result index.
+	 * @return The entity information for the requested result.
+	 * @throws IOException
+	 */
 	EntityInfo extract(int index) throws IOException;
 
 	int getFirstIndex();

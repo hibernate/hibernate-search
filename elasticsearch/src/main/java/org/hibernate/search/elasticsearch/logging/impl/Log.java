@@ -157,4 +157,14 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Faceting request of type %1$s not supported"
 	)
 	SearchException facetingRequestHasUnsupportedType(String facetingRequestType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 27,
+			value = "Cannot use an offset ('from', 'firstResult') when scrolling through Elasticsearch results"
+	)
+	UnsupportedOperationException unsupportedOffsettedScrolling();
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 28,
+			value = "Cannot scroll backward through Elasticsearch results. Previously accessed index was %1$s, requested index is %2$s."
+	)
+	UnsupportedOperationException unsupportedBackwardTraversal(int lastRequestedIndex, int index);
 }
