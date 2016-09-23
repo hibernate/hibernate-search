@@ -35,6 +35,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
@@ -65,6 +66,7 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.DistanceSortField;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -75,12 +77,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
+import io.searchbox.client.JestResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Explain;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
+import io.searchbox.core.SearchScroll;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.core.search.sort.Sort.Sorting;
+import io.searchbox.params.Parameters;
 
 /**
  * Query implementation based on Elasticsearch.
@@ -101,6 +106,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	 * ES default limit for (firstResult + maxResult)
 	 */
 	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
+
+	private static final String QUERY_PROPERTIES_PREFIX = "hibernate.search.";
 
 	private static final Set<String> SUPPORTED_PROJECTION_CONSTANTS = Collections.unmodifiableSet(
 			CollectionHelper.asSet(
@@ -150,7 +157,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public DocumentExtractor queryDocumentExtractor() {
-		return new ElasticsearchDocumentExtractor();
+		return new ElasticsearchScrollAPIDocumentExtractor();
 	}
 
 	SearchResult getSearchResult() {
@@ -188,7 +195,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					hit.get( "_index" ).getAsString(),
 					hit.get( "_type" ).getAsString(),
 					hit.get( "_id" ).getAsString(),
-					searcher.executedQuery
+					searcher.completeQueryAsString
 				)
 				.build();
 
@@ -263,24 +270,23 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private void execute() {
 		searcher = new IndexSearcher();
 
-		searchResult = searcher.runSearch();
+		searchResult = searcher.search();
 		resultSize = searchResult.getTotal();
 	}
 
 	/**
-	 * Determines the affected indexes and runs the given query against them.
+	 * Stores all information required to execute the query: query string, relevant indices, query parameters, ...
 	 */
 	private class IndexSearcher {
 
-		private final Search search;
-		private final Map<String, Class<?>> entityTypesByName;
-		private final String executedQuery;
+		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
+		private final Set<String> indexNames = new HashSet<>();
+		private final String idFieldName;
+		private final String completeQueryAsString;
 
 		private IndexSearcher() {
-			entityTypesByName = new HashMap<>();
-			String idFieldName = null;
 			JsonArray typeFilters = new JsonArray();
-			Set<String> indexNames = new HashSet<>();
+			String queriedEntityIdFieldName = null;
 			Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
 
 			for ( Class<?> queriedEntityType : queriedEntityTypes ) {
@@ -300,7 +306,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					// TODO HSEARCH-2253 the id field name is used to detect if we should sort using the internal Elasticsearch id field
 					// as it's currently the only field in which we store the id of the entity.
 					// Thus the id fields must be consistent accross all the entity types when querying multiple ones.
-					idFieldName = binding.getDocumentBuilder().getIdentifierName();
+					queriedEntityIdFieldName = binding.getDocumentBuilder().getIdentifierName();
 
 					ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
 					indexNames.add( esIndexManager.getActualIndexName() );
@@ -308,6 +314,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 				typeFilters.add( getEntityTypeFilter( queriedEntityType ) );
 			}
+
+			this.idFieldName = queriedEntityIdFieldName;
 
 			// Query filters; always a type filter, possibly a tenant id filter;
 			JsonObject effectiveFilter = getEffectiveFilter( typeFilters );
@@ -333,24 +341,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			sortByDistanceIndex = getSortByDistanceIndex();
 			addScriptFields( completeQuery );
 
-			executedQuery = completeQuery.build().toString();
-
-			Search.Builder search = new Search.Builder( executedQuery );
-			search.addIndex( indexNames );
-			search.setParameter( "from", firstResult );
-
-			// If the user has given a value, take it as is, let ES itself complain if it's too high; if no value is
-			// given, I take as much as possible, as by default only 10 rows would be returned
-			search.setParameter( "size", maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult );
-
-			// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
-			if ( sort != null ) {
-				validateSortFields( extendedIntegrator, queriedEntityTypes );
-				for ( SortField sortField : sort.getSort() ) {
-					search.addSort( getSort( sortField, idFieldName ) );
-				}
-			}
-			this.search = search.build();
+			completeQueryAsString = completeQuery.build().toString();
 		}
 
 		private JsonObject getEffectiveFilter(JsonArray typeFilters) {
@@ -503,9 +494,93 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 
-		SearchResult runSearch() {
+		SearchResult search() {
+			return search( false );
+		}
+
+		SearchResult searchWithScrollEnabled() {
+			return search( true );
+		}
+
+		private SearchResult search(boolean enableScrolling) {
+			Search.Builder builder = new Search.Builder( completeQueryAsString );
+			builder.addIndex( indexNames );
+
+			if ( enableScrolling ) {
+				if ( firstResult != 0 ) {
+					throw LOG.unsupportedOffsettedScrolling();
+				}
+				builder.setParameter( Parameters.SCROLL, getScrollTimeout() );
+
+				/*
+				 * The "size" parameter has a slightly different meaning when scrolling: it defines the window
+				 * size for the first search *and* for the next calls to the scroll API.
+				 * We still reduce the number of results in accordance to "maxResults", but that's done on our side
+				 * in the document extractor.
+				 */
+				builder.setParameter( Parameters.SIZE, getScrollFetchSize() );
+			}
+			else {
+				builder.setParameter( "from", firstResult );
+
+				// If the user has given a value, take it as is, let ES itself complain if it's too high; if no value is
+				// given, I take as much as possible, as by default only 10 rows would be returned
+				builder.setParameter( Parameters.SIZE, maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult );
+			}
+
+			// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
+			if ( sort != null ) {
+				validateSortFields( extendedIntegrator, getQueriedEntityTypes() );
+				for ( SortField sortField : sort.getSort() ) {
+					builder.addSort( getSort( sortField, idFieldName ) );
+				}
+			}
+			Search search = builder.build();
 			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
 				return client.get().executeRequest( search );
+			}
+		}
+
+		private String getScrollTimeout() {
+			return ConfigurationParseHelper.getIntValue(
+					getExtendedSearchIntegrator().getConfigurationProperties(),
+					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_TIMEOUT,
+					ElasticsearchEnvironment.Defaults.SCROLL_TIMEOUT
+					) + "s";
+		}
+
+		private int getScrollFetchSize() {
+			return ConfigurationParseHelper.getIntValue(
+					getExtendedSearchIntegrator().getConfigurationProperties(),
+					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_FETCH_SIZE,
+					ElasticsearchEnvironment.Defaults.SCROLL_FETCH_SIZE
+					);
+		}
+
+		/**
+		 * Scroll through search results, using a previously obtained scrollId.
+		 */
+		JestResult scroll(String scrollId) {
+			SearchScroll.Builder builder = new SearchScroll.Builder( scrollId, getScrollTimeout() );
+
+			SearchScroll scroll = builder.build();
+			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
+				return client.get().executeRequest( scroll );
+			}
+		}
+
+		JestResult clearScroll(String scrollId) {
+			SearchScroll.Builder builder = new SearchScroll.Builder( scrollId, getScrollTimeout() );
+
+			SearchScroll scroll = new SearchScroll( builder ) {
+				@Override
+				public String getRestMethodName() {
+					return "DELETE";
+				}
+			};
+
+			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
+				return client.get().executeRequest( scroll );
 			}
 		}
 
@@ -879,42 +954,84 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		return false;
 	}
 
-	// TODO: HSEARCH-2189  Investigate scrolling API:
-	// https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
-	private class ElasticsearchDocumentExtractor implements DocumentExtractor {
+	private class ElasticsearchScrollAPIDocumentExtractor implements DocumentExtractor {
 
+		// Search parameters
 		private final IndexSearcher searcher;
-		private List<EntityInfo> results;
+		private final Integer queryIndexLimit;
 
-		private ElasticsearchDocumentExtractor() {
+		// Position
+		private String scrollId;
+		private int currentWindowStartIndex;
+		private int lastRequestedIndex;
+
+		// Results
+		private Integer totalResultCount;
+		private final List<EntityInfo> results = new ArrayList<>();
+
+		private ElasticsearchScrollAPIDocumentExtractor() {
 			searcher = new IndexSearcher();
+			queryIndexLimit = ElasticsearchHSQueryImpl.this.maxResults == null
+					? null : ElasticsearchHSQueryImpl.this.firstResult + ElasticsearchHSQueryImpl.this.maxResults;
+			currentWindowStartIndex = ElasticsearchHSQueryImpl.this.firstResult; // Currently always 0, see IndexSearcher.search
+			lastRequestedIndex = currentWindowStartIndex;
 		}
 
 		@Override
 		public EntityInfo extract(int index) throws IOException {
-			if ( results == null ) {
-				runSearch();
+			if ( index < 0 ) {
+				throw new IndexOutOfBoundsException( "Index must be >= 0" );
+			}
+			else if ( index < lastRequestedIndex ) {
+				throw LOG.unsupportedBackwardTraversal( lastRequestedIndex, index );
 			}
 
-			return results.get( index );
+			if ( totalResultCount == null ) {
+				initResults();
+			}
+
+			int maxIndex = getMaxIndex();
+			if ( maxIndex < index ) {
+				throw new IndexOutOfBoundsException( "Index must be <= " + maxIndex );
+			}
+
+			lastRequestedIndex = index;
+			while ( !results.isEmpty() && currentWindowStartIndex + results.size() <= index ) {
+				fetchNextResults();
+			}
+
+			return results.get( index - currentWindowStartIndex );
 		}
 
 		@Override
 		public int getFirstIndex() {
-			return 0;
+			return ElasticsearchHSQueryImpl.this.firstResult;
 		}
 
 		@Override
 		public int getMaxIndex() {
-			if ( results == null ) {
-				runSearch();
+			if ( totalResultCount == null ) {
+				initResults();
 			}
 
-			return results.size() - 1;
+			if ( queryIndexLimit == null ) {
+				return totalResultCount - 1;
+			}
+			else {
+				return Math.min( totalResultCount, queryIndexLimit ) - 1;
+			}
 		}
 
 		@Override
 		public void close() {
+			if ( scrollId != null ) {
+				searcher.clearScroll( scrollId );
+				scrollId = null;
+				currentWindowStartIndex = ElasticsearchHSQueryImpl.this.firstResult;
+				lastRequestedIndex = 0;
+				results.clear();
+				totalResultCount = null;
+			}
 		}
 
 		@Override
@@ -922,12 +1039,30 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			throw LOG.documentExtractorTopDocsUnsupported();
 		}
 
-		private void runSearch() {
-			SearchResult searchResult = searcher.runSearch();
-			JsonObject searchResultJsonObject = searchResult.getJsonObject();
-			JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
-			results = new ArrayList<>( searchResult.getTotal() );
+		private void initResults() {
+			SearchResult searchResult = searcher.searchWithScrollEnabled();
+			totalResultCount = searchResult.getTotal();
 
+			JsonObject searchResultJsonObject = searchResult.getJsonObject();
+			extractWindow( searchResultJsonObject );
+		}
+
+		private void fetchNextResults() {
+			currentWindowStartIndex += results.size();
+			results.clear();
+			if ( totalResultCount <= currentWindowStartIndex ) {
+				return;
+			}
+
+			JestResult searchResult = searcher.scroll( scrollId );
+			JsonObject searchResultJsonObject = searchResult.getJsonObject();
+			extractWindow( searchResultJsonObject );
+		}
+
+		private void extractWindow(JsonObject searchResultJsonObject) {
+			scrollId = searchResultJsonObject.get( "_scroll_id" ).getAsString();
+			JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+			results.clear();
 			for ( JsonElement hit : hits ) {
 				EntityInfo converted = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
 				if ( converted != null ) {

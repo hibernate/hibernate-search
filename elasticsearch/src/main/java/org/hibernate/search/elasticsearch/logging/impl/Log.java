@@ -167,4 +167,15 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "The 'indexNullAs' property for field '%2$s' needs to represent a Date to match the field type of the index. "
 					+ "Please change value from '%1$s' to represent a Date." )
 	SearchException nullMarkerNeedsToRepresentADate(String proposedTokenValue, String fieldName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 29,
+			value = "Cannot use an offset ('from', 'firstResult') when scrolling through Elasticsearch results"
+	)
+	UnsupportedOperationException unsupportedOffsettedScrolling();
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 30,
+			value = "Cannot scroll backward through Elasticsearch results. Previously accessed index was %1$s, requested index is %2$s."
+	)
+	UnsupportedOperationException unsupportedBackwardTraversal(int lastRequestedIndex, int index);
+
 }
