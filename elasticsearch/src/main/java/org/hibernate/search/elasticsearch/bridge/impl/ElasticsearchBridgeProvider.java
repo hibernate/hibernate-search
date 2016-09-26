@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.impl;
+package org.hibernate.search.elasticsearch.bridge.impl;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Calendar;
@@ -15,6 +15,8 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.impl.ExtendedBridgeProvider;
 import org.hibernate.search.bridge.spi.IndexManagerTypeSpecificBridgeProvider;
+import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchCalendarBridge;
+import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchDateBridge;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.util.logging.impl.Log;
