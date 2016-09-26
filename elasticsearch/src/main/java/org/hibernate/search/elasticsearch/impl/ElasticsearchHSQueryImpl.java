@@ -508,9 +508,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			builder.addIndex( indexNames );
 
 			if ( enableScrolling ) {
-				if ( firstResult != 0 ) {
-					throw LOG.unsupportedOffsettedScrolling();
-				}
+				/*
+				 * Note: "firstResult" is currently being ignored by Elasticsearch when scrolling.
+				 * See https://github.com/elastic/elasticsearch/issues/9373
+				 * To work this around, we don't use the "from" parameter here, and the document
+				 * extractor will skip the results by scrolling until it gets the right index.
+				 */
+
 				builder.setParameter( Parameters.SCROLL, getScrollTimeout() );
 
 				/*
@@ -981,7 +985,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			queryIndexLimit = ElasticsearchHSQueryImpl.this.maxResults == null
 					? null : ElasticsearchHSQueryImpl.this.firstResult + ElasticsearchHSQueryImpl.this.maxResults;
 			results = new Window<>(
-					ElasticsearchHSQueryImpl.this.firstResult,
+					/*
+					 * The offset is currently ignored by Elasticsearch.
+					 * See https://github.com/elastic/elasticsearch/issues/9373
+					 * To work this around, we don't use the "from" parameter when querying, and the document
+					 * extractor will skip the results by querying until it gets the right index.
+					 */
+					0,
 					/*
 					 * Sizing for the worst-case scenario: we just fetched a batch of elements to
 					 * give access to the result just after the previously fetched results, and

@@ -391,7 +391,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		assertEquals( -1, scrollableResults.getRowNumber() );
 		assertTrue( scrollableResults.last() );
 		assertEquals( 3, scrollableResults.getRowNumber() );
-		scrollableResults.beforeFirst(); // Won't fail even if we're going backward, because we didn't actually fetch the last result
+		scrollableResults.beforeFirst();
 
 		List<ScientificArticle> articles = new ArrayList<>();
 		while ( scrollableResults.next() ) {
@@ -406,29 +406,32 @@ public class ElasticsearchIT extends SearchTestBase {
 				"ORM modelling"
 		);
 
+		fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class )
+				.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
+
+		scrollableResults = fullTextQuery
+				.setFirstResult( 1 )
+				.setMaxResults( 2 )
+				.scroll();
+
+		assertEquals( -1, scrollableResults.getRowNumber() );
+		assertTrue( scrollableResults.last() );
+		assertEquals( 1, scrollableResults.getRowNumber() );
+		scrollableResults.beforeFirst();
+
+		articles = new ArrayList<>();
+		while ( scrollableResults.next() ) {
+			articles.add( (ScientificArticle) scrollableResults.get()[0] );
+		}
+		scrollableResults.close();
+
+		assertThat( articles ).onProperty( "title" ).containsExactly(
+				"Latest in ORM",
+				"High-performance ORM"
+		);
+
 		tx.commit();
 		s.close();
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void testScrollWithOffset() throws Exception {
-		Session s = openSession();
-		FullTextSession session = Search.getFullTextSession( s );
-		Transaction tx = s.beginTransaction();
-		try {
-			QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
-			FullTextQuery fullTextQuery = session.createFullTextQuery( query, ScientificArticle.class )
-					.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) );
-
-			fullTextQuery
-					.setFirstResult( 1 )
-					.setMaxResults( 2 )
-					.scroll();
-		}
-		finally {
-			tx.commit();
-			s.close();
-		}
 	}
 
 	@Test
