@@ -178,4 +178,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	UnsupportedOperationException unsupportedBackwardTraversal(int lastRequestedIndex, int index);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 31,
+			value = "Cannot scroll backward more than %1$s positions through Elasticsearch results. First index still in memory is %2$s, requested index is %3$s."
+	)
+	SearchException backtrackingWindowOverflow(int backtrackingLimit, int windowStartIndex, int requestedIndex);
+
 }
