@@ -40,6 +40,7 @@ import org.hibernate.search.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.Window;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
@@ -557,6 +558,14 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					);
 		}
 
+		private int getScrollBacktrackingWindowSize() {
+			return ConfigurationParseHelper.getIntValue(
+					getExtendedSearchIntegrator().getConfigurationProperties(),
+					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_BACKTRACKING_WINDOW_SIZE,
+					ElasticsearchEnvironment.Defaults.SCROLL_BACKTRACKING_WINDOW_SIZE
+					);
+		}
+
 		/**
 		 * Scroll through search results, using a previously obtained scrollId.
 		 */
@@ -962,19 +971,24 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		// Position
 		private String scrollId;
-		private int currentWindowStartIndex;
-		private int lastRequestedIndex;
 
 		// Results
 		private Integer totalResultCount;
-		private final List<EntityInfo> results = new ArrayList<>();
+		private final Window<EntityInfo> results;
 
 		private ElasticsearchScrollAPIDocumentExtractor() {
 			searcher = new IndexSearcher();
 			queryIndexLimit = ElasticsearchHSQueryImpl.this.maxResults == null
 					? null : ElasticsearchHSQueryImpl.this.firstResult + ElasticsearchHSQueryImpl.this.maxResults;
-			currentWindowStartIndex = ElasticsearchHSQueryImpl.this.firstResult; // Currently always 0, see IndexSearcher.search
-			lastRequestedIndex = currentWindowStartIndex;
+			results = new Window<>(
+					ElasticsearchHSQueryImpl.this.firstResult,
+					/*
+					 * Sizing for the worst-case scenario: we just fetched a batch of elements to
+					 * give access to the result just after the previously fetched results, and
+					 * we still need to keep enough of the previous elements to backtrack.
+					 */
+					searcher.getScrollBacktrackingWindowSize() + searcher.getScrollFetchSize()
+					);
 		}
 
 		@Override
@@ -982,8 +996,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			if ( index < 0 ) {
 				throw new IndexOutOfBoundsException( "Index must be >= 0" );
 			}
-			else if ( index < lastRequestedIndex ) {
-				throw LOG.unsupportedBackwardTraversal( lastRequestedIndex, index );
+			else if ( index < results.start() ) {
+				throw LOG.backtrackingWindowOverflow( searcher.getScrollBacktrackingWindowSize(), results.start(), index );
 			}
 
 			if ( totalResultCount == null ) {
@@ -995,12 +1009,12 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				throw new IndexOutOfBoundsException( "Index must be <= " + maxIndex );
 			}
 
-			lastRequestedIndex = index;
-			while ( !results.isEmpty() && currentWindowStartIndex + results.size() <= index ) {
-				fetchNextResults();
+			boolean fetchMayReturnResults = true;
+			while ( results.start() + results.size() <= index && fetchMayReturnResults ) {
+				fetchMayReturnResults = fetchNextResults();
 			}
 
-			return results.get( index - currentWindowStartIndex );
+			return results.get( index );
 		}
 
 		@Override
@@ -1027,10 +1041,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			if ( scrollId != null ) {
 				searcher.clearScroll( scrollId );
 				scrollId = null;
-				currentWindowStartIndex = ElasticsearchHSQueryImpl.this.firstResult;
-				lastRequestedIndex = 0;
-				results.clear();
 				totalResultCount = null;
+				results.clear();
 			}
 		}
 
@@ -1047,28 +1059,35 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			extractWindow( searchResultJsonObject );
 		}
 
-		private void fetchNextResults() {
-			currentWindowStartIndex += results.size();
-			results.clear();
-			if ( totalResultCount <= currentWindowStartIndex ) {
-				return;
+		/**
+		 * @return {@code true} if at least one result was fetched, {@code false} otherwise.
+		 */
+		private boolean fetchNextResults() {
+			if ( totalResultCount <= results.start() + results.size() ) {
+				// No more results to fetch
+				return false;
 			}
 
 			JestResult searchResult = searcher.scroll( scrollId );
 			JsonObject searchResultJsonObject = searchResult.getJsonObject();
-			extractWindow( searchResultJsonObject );
+			return extractWindow( searchResultJsonObject );
 		}
 
-		private void extractWindow(JsonObject searchResultJsonObject) {
+		/**
+		 * @return {@code true} if at least one result was fetched, {@code false} otherwise.
+		 */
+		private boolean extractWindow(JsonObject searchResultJsonObject) {
+			boolean fetchedAtLeastOne = false;
 			scrollId = searchResultJsonObject.get( "_scroll_id" ).getAsString();
 			JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
-			results.clear();
 			for ( JsonElement hit : hits ) {
 				EntityInfo converted = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
 				if ( converted != null ) {
 					results.add( converted );
+					fetchedAtLeastOne = true;
 				}
 			}
+			return fetchedAtLeastOne;
 		}
 	}
 }

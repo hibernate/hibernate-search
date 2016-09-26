@@ -109,15 +109,22 @@ public class ElasticsearchScrollingIT {
 		assertEquals( 500, info.getId() );
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void scrollBackward() throws Exception {
-		generateData( 0, 3 );
+		generateData( 0, 1001 );
 
 		Query query = builder().all().createQuery();
 		DocumentExtractor extractor = getQuery( query )
 				.queryDocumentExtractor();
-		extractor.extract( 1 );
-		extractor.extract( 0 );
+
+		EntityInfo info = extractor.extract( 1000 );
+		assertNotNull( info );
+		assertEquals( 1000, info.getId() );
+
+		// Backtrack exactly 1000 positions
+		info = extractor.extract( 0 );
+		assertNotNull( info );
+		assertEquals( 0, info.getId() );
 	}
 
 	private QueryBuilder builder() {
