@@ -88,7 +88,7 @@ you will need the new `hibernate-search-elasticsearch` jar.
 ----
 ====
 
-==== Configuration
+==== [[elasticsearch-integration-configuration]] Configuration
 
 Configuration is minimal.
 Add them to your `persistence.xml` or where you put the rest of your Hibernate Search configuration.
@@ -99,6 +99,10 @@ Selects the index creation strategy:: `hibernate.search.default.elasticsearch.in
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000`
 Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red"):: `hibernate.search.default.elasticsearch.required_index_status green`
 Whether to perform an explicit refresh after a set of operations has been executed against a specific index (`true` or `false`):: `hibernate.search.default.elasticsearch.refresh_after_write false`
+When <<elasticsearch-scrolling,scrolling>>, the minimum number of previous results kept in memory at any time:: `hibernate.search.elasticsearch.scroll_backtracking_window_size`
+When <<elasticsearch-scrolling,scrolling>>, the number of results fetched by each Elasticsearch call:: `hibernate.search.elasticsearch.scroll_fetch_size`
+When <<elasticsearch-scrolling,scrolling>>, the maximum duration `ScrollableResults` will be usable if no other results are fetched from Elasticsearch, in seconds::
+`hibernate.search.elasticsearch.scroll_timeout`
 
 Let's see the options for the `index_schema_management_strategy` property:
 
@@ -111,7 +115,7 @@ Let's see the options for the `index_schema_management_strategy` property:
 |CREATE_DELETE|Similarly to 'CREATE' but will also delete the index at shutdown. Commonly used for tests.
 |===============
 
-Note that all properties besides `host` can be given globally as shown above and/or be given for specific indexes:
+Note that all properties prefixed with `hibernate.search.default` (besides `host`) can be given globally as shown above and/or be given for specific indexes:
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`.
 
 ===== Elasticsearch configuration
@@ -125,6 +129,7 @@ However there are a few features that would benefit from a few changes:
   see <<elasticsearch-query-spatial>>
 * if you want to be able to use the purge all Hibernate Search command,
   install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query`] plugin
+* if you want to use paging (as opposed to <<elasticsearch-scrolling,scrolling>>) on result sets larger than 10000 elements (for instance access the 10001st result), you may increase the value of the `index.max_result_window` property (default is 10000).
 
 === Mapping and indexing
 
@@ -295,6 +300,23 @@ you need to enable the Groovy plugin by adding the following snippet to your Ela
 script.engine.groovy.inline.search: on
 ----
 
+==== [[elasticsearch-scrolling]] Paging and scrolling
+
+You may handle large result sets in two different ways, with different limitations.
+
+For (relatively) smaller result sets, you may use the traditional offset/limit querying provided by the `FullTextQuery` interfaces: `setFirstResult(int)` and `setMaxResults(int)`.
+Limitations:
+
+* This will only get you as far as the 10000 first documents, i.e. when requesting a window that includes documents beyond the 10000th result, Elasticsearch will return an error. If you want to raise this limit, see the `index.max_result_window` property in https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#dynamic-index-settings[Elasticsearch's settings].
+
+If your result set is bigger, you may take advantage of scrolling by using the `scroll` method on `org.hibernate.search.FullTextQuery`.
+Limitations:
+
+* This method is not available in `org.hibernate.search.jpa.FullTextQuery`.
+* The Elasticsearch implementation has poor performance when an offset has been defined (i.e. `setFirstResult(int)` has been called on the query before calling `scroll()`). This is because Elasticsearch does not provide such feature, thus Hibernate Search has to scroll through every previous result under the hood.
+* The Elasticsearch implementation allows only limited backtracking. Calling `scrollableResylts.setRowNumber(4)` when currently positioned at index `1006`, for example, may result in a `SearchException` being thrown, because only 1000 previous elements had been kept in memory. You may work this around by tweaking the property: `hibernate.search.elasticsearch.scroll_backtracking_window_size` (see <<elasticsearch-integration-configuration>>).
+* The `ScrollableResults` will become stale and unusable after a given period of time spent without fetching results from Elasticsearch. You may work this around by tweaking two properties: `hibernate.search.elasticsearch.scroll_timeout` and `hibernate.search.elasticsearch.scroll_fetch_size` (see <<elasticsearch-integration-configuration>>). Typically, you will solve timeout issues by reducing the fetch size and/or increasing the timeout limit, but this will also increase the performance hit on Elasticsearch.
+
 ==== Projections
 
 All fields are stored by Elasticsearch in the JSON document it indexes,
@@ -407,9 +429,6 @@ Please check with JIRA and the mailing lists for updates, but at the time of wri
 
 * Defining analyzers with `@AnalyzerDef`, analyzers have to be defined in the Elasticsearch configuration
 * Query timeouts
-* Pagination is limited to the 10000 first documents (configurable in Elasticsearch)
-** better support through the scrolling API is planned
-* Scrolling on large results
 * MoreLikeThis queries
 * Mixing Lucene based indexes and Elasticsearch based indexes (partial support is here though)
 * There is room for improvements in the performances of the MassIndexer implementation

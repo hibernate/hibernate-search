@@ -157,4 +157,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Faceting request of type %1$s not supported"
 	)
 	SearchException facetingRequestHasUnsupportedType(String facetingRequestType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 27,
+			value = "Cannot scroll backward more than %1$s positions through Elasticsearch results. First index still in memory is %2$s, requested index is %3$s."
+	)
+	SearchException backtrackingWindowOverflow(int backtrackingLimit, int windowStartIndex, int requestedIndex);
 }

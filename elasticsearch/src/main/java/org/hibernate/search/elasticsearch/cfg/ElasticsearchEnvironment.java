@@ -23,6 +23,9 @@ public final class ElasticsearchEnvironment {
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final String REQUIRED_INDEX_STATUS = "green";
 		public static final boolean REFRESH_AFTER_WRITE = false;
+		public static final int SCROLL_BACKTRACKING_WINDOW_SIZE = 10_000;
+		public static final int SCROLL_FETCH_SIZE = 1_000;
+		public static final int SCROLL_TIMEOUT = 60;
 	}
 
 	/**
@@ -87,6 +90,46 @@ public final class ElasticsearchEnvironment {
 	 * specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.refresh_after_write=true}).
 	 */
 	public static final String REFRESH_AFTER_WRITE = "elasticsearch.refresh_after_write";
+
+	/**
+	 * Property for specifying the the minimum number of previous results kept in memory at any time when scrolling.
+	 * <p>
+	 * This determines the number of positions one will be able to scroll backward (<em>backtracking</em>) without
+	 * starting over the scrolling.
+	 * <p>
+	 * A strictly positive value is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#SCROLL_BACKTRACKING_WINDOW_SIZE}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.elasticsearch.scroll_backtracking_window_size=10000}).
+	 */
+	public static final String SCROLL_BACKTRACKING_WINDOW_SIZE = "elasticsearch.scroll_backtracking_window_size";
+
+	/**
+	 * Property for specifying the the number of results fetched by each Elasticsearch call when scrolling.
+	 * <p>
+	 * A strictly positive value is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#SCROLL_FETCH_SIZE}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.elasticsearch.scroll_fetch_size=1000}).
+	 */
+	public static final String SCROLL_FETCH_SIZE = "elasticsearch.scroll_fetch_size";
+
+	/**
+	 * Property for specifying the maximum duration {@code ScrollableResults} will be usable if no
+	 * other results are fetched from Elasticsearch, in seconds.
+	 * <p>
+	 * A strictly positive value is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#SCROLL_TIMEOUT}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.elasticsearch.scroll_timeout=60}).
+	 */
+	public static final String SCROLL_TIMEOUT = "elasticsearch.scroll_timeout";
 
 	private ElasticsearchEnvironment() {
 	}
