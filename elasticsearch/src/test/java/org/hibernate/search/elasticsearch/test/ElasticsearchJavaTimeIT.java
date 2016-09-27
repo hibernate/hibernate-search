@@ -1,0 +1,260 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.elasticsearch.test;
+
+import static org.junit.Assert.assertEquals;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+import org.hibernate.Transaction;
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
+import org.hibernate.search.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.elasticsearch.impl.IndexNameNormalizer;
+import org.hibernate.search.engine.service.spi.ServiceReference;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.After;
+import org.junit.Test;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+
+import io.searchbox.core.SearchResult;
+
+/**
+ * @author Gunnar Morling
+ * @author Yoann Rodiere
+ */
+public class ElasticsearchJavaTimeIT extends SearchTestBase {
+
+	@After
+	public void deleteEntity() {
+		try (org.hibernate.Session s = openSession()) {
+			Transaction tx = s.beginTransaction();
+			s.delete( s.load( Sample.class, 1L ) );
+			s.flush();
+			tx.commit();
+		}
+	}
+
+	@Test
+	public void testLocalDate() throws Exception {
+		LocalDate date = LocalDate.of( 2012, Month.DECEMBER, 30 );
+		Sample sample = new Sample( 1L, "LocalDate example" );
+		sample.localDate = date;
+
+		assertThatFieldIsFormatted( sample, "localDate", "2012-12-30" );
+	}
+
+	@Test
+	public void testLocalTimeMilliseconds() throws Exception {
+		LocalTime time = LocalTime.of( 13, 15, 55, 7_000_000 );
+
+		Sample sample = new Sample( 1L, "LocalTime example" );
+		sample.localTime = time;
+
+		assertThatFieldIsFormatted( sample, "localTime", "13:15:55.007", "13:15:55.007" );
+	}
+
+	@Test
+	public void testLocalTimeNanoseconds() throws Exception {
+		LocalTime time = LocalTime.of( 13, 15, 55, 7 );
+
+		Sample sample = new Sample( 1L, "LocalTime example" );
+		sample.localTime = time;
+
+		// Elasticsearch only has millisecond-precision, so the "fields" value is missing the nanoseconds
+		assertThatFieldIsFormatted( sample, "localTime", "13:15:55.000000007", "13:15:55.000" );
+	}
+
+	@Test
+	public void testLocalDateTimeMilliseconds() throws Exception {
+		LocalDate date = LocalDate.of( 221998, Month.FEBRUARY, 12 );
+		LocalTime time = LocalTime.of( 13, 05, 33, 7_000_000 );
+		LocalDateTime dateTime = LocalDateTime.of( date, time );
+
+		Sample sample = new Sample( 1L, "LocalDateTime example" );
+		sample.localDateTime = dateTime;
+
+		assertThatFieldIsFormatted( sample, "localDateTime", "+221998-02-12T13:05:33.007", "221998-02-12T13:05:33.007" );
+	}
+
+	@Test
+	public void testLocalDateTimeNanoseconds() throws Exception {
+		LocalDate date = LocalDate.of( 221998, Month.FEBRUARY, 12 );
+		LocalTime time = LocalTime.of( 13, 05, 33, 7 );
+		LocalDateTime dateTime = LocalDateTime.of( date, time );
+
+		Sample sample = new Sample( 1L, "LocalDateTime example" );
+		sample.localDateTime = dateTime;
+
+		// Elasticsearch only has millisecond-precision, so the "fields" value is missing the nanoseconds
+		assertThatFieldIsFormatted( sample, "localDateTime", "+221998-02-12T13:05:33.000000007", "221998-02-12T13:05:33.000" );
+	}
+
+	@Test
+	public void testInstant() throws Exception {
+		LocalDate date = LocalDate.of( 1998, Month.FEBRUARY, 12 );
+		LocalTime time = LocalTime.of( 13, 05, 33, 5 * 1000_000 );
+		LocalDateTime dateTime = LocalDateTime.of( date, time );
+		Instant instant = dateTime.toInstant( ZoneOffset.UTC );
+
+		Sample sample = new Sample( 1L, "Instant example" );
+		sample.instant = instant;
+
+		assertThatFieldIsFormatted( sample, "instant", "1998-02-12T13:05:33.005Z" );
+	}
+
+	@Test
+	public void testYear() throws Exception {
+		/* Elasticsearch only accepts years in the range [-292275054,292278993]
+		 */
+		Year value = Year.of( 292278993 );
+
+		Sample sample = new Sample( 1L, "Year example" );
+		sample.year = value;
+
+		assertThatFieldIsFormatted( sample, "year", "+292278993", "292278993" );
+	}
+
+	@Test
+	public void testYearMonth() throws Exception {
+		YearMonth value = YearMonth.of( 124, 12 );
+
+		Sample sample = new Sample( 1L, "YearMonth example" );
+		sample.yearMonth = value;
+
+		assertThatFieldIsFormatted( sample, "yearMonth", "0124-12" );
+	}
+
+	@Test
+	public void testMonthDay() throws Exception {
+		MonthDay value = MonthDay.of( 12, 1 );
+
+		Sample sample = new Sample( 1L, "MonthDay example" );
+		sample.monthDay = value;
+
+		assertThatFieldIsFormatted( sample, "monthDay", "--12-01" );
+	}
+
+	private void assertThatFieldIsFormatted(Sample sample, String field, String expectedSourceAndFieldValue) {
+		assertThatFieldIsFormatted( sample, field, expectedSourceAndFieldValue, expectedSourceAndFieldValue );
+
+	}
+
+	private void assertThatFieldIsFormatted(Sample sample, String field, String expectedSourceValue, String expectedFieldValue) {
+		try (org.hibernate.Session s = openSession()) {
+			Transaction tx = s.beginTransaction();
+			s.persist( sample );
+			s.flush();
+			tx.commit();
+
+			try ( ServiceReference<JestClient> reference = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
+				JestClient client = reference.get();
+				SearchResult result = client.executeRequest(
+						new io.searchbox.core.Search.Builder( "{\"query\":{\"match_all\":{}},\"fields\":[\"_source\", \"" + field + "\"]}" )
+								.addIndex( IndexNameNormalizer.getElasticsearchIndexName( Sample.class.getName() ) )
+								.build()
+						);
+
+				JsonArray hits = result.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+				assertEquals( "Unexpected number of indexed documents; indexing probably failed.", 1, hits.size() );
+
+				JsonElement hit = hits.get( 0 );
+				assertEquals( "Unexpected '_source' value", expectedSourceValue,
+						hit.getAsJsonObject().get( "_source" ).getAsJsonObject().get( field ).getAsString() );
+				assertEquals( "Unexpected 'fields' value", expectedFieldValue,
+						hit.getAsJsonObject().get( "fields" ).getAsJsonObject().get( field ).getAsJsonArray().get( 0 ).getAsString() );
+			}
+		}
+	}
+
+	@Entity
+	@Indexed
+	static class Sample {
+
+		public Sample() {
+		}
+
+		public Sample(long id, String description) {
+			this.id = id;
+			this.description = description;
+		}
+
+		@Id
+		@DocumentId
+		long id;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		String description;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private LocalDate localDate;
+
+		@Column(name = "LOCAL_TIME") // localTime is a special keywork for some db
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private LocalTime localTime;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private LocalDateTime localDateTime;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private Instant instant;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private Duration duration;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private Period period;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private ZoneOffset zoneOffset;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private ZoneId zoneId;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private OffsetDateTime offsetDateTime;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private OffsetTime offsetTime;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private Year year;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private YearMonth yearMonth;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private MonthDay monthDay;
+	}
+
+	@Override
+	public Class<?>[] getAnnotatedClasses() {
+		return new Class<?>[] { Sample.class };
+	}
+}

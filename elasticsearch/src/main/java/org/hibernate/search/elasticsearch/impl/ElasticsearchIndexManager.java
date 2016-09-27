@@ -50,6 +50,7 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -532,14 +533,53 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	private ElasticsearchFieldType addTypeOptions(String fieldName, JsonObject field, ExtendedFieldType extendedType) {
 		ElasticsearchFieldType elasticsearchType;
+		List<String> formats = new ArrayList<>();
 
+		/* Note: for date formats, we use a 4-digit year format as the first format
+		 * (which is the output format), so that Elasticsearch outputs are more
+		 * human-readable.
+		 */
 		switch ( extendedType ) {
 			case BOOLEAN:
 				elasticsearchType = ElasticsearchFieldType.BOOLEAN;
 				break;
 			case CALENDAR:
 			case DATE:
+			case INSTANT:
 				elasticsearchType = ElasticsearchFieldType.DATE;
+				// Use default formats ("strict_date_optional_time||epoch_millis")
+				break;
+			case LOCAL_DATE:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				formats.add( "strict_date" );
+				formats.add( "yyyyyyyyy-MM-dd" );
+				break;
+			case LOCAL_DATE_TIME:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				formats.add( "strict_date_hour_minute_second_fraction" );
+				formats.add( "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS" );
+				break;
+			case LOCAL_TIME:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				formats.add( "strict_hour_minute_second_fraction" );
+				break;
+			case YEAR:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				formats.add( "strict_year" );
+				formats.add( "yyyyyyyyy" );
+				break;
+			case YEAR_MONTH:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				formats.add( "strict_year_month" );
+				formats.add( "yyyyyyyyy-MM" );
+				break;
+			case MONTH_DAY:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				/*
+				 * This seems to be the ISO-8601 format for dates without year.
+				 * It's also the default format for Java's MonthDay, see MonthDay.PARSER.
+				 */
+				formats.add( "--MM-dd" );
 				break;
 			case INTEGER:
 				elasticsearchType = ElasticsearchFieldType.INTEGER;
@@ -573,6 +613,10 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 
 		field.addProperty( "type", elasticsearchType.getElasticsearchString() );
+
+		if ( ! formats.isEmpty() ) {
+			field.addProperty( "format", StringHelper.join( formats, "||" ) );
+		}
 
 		return elasticsearchType;
 	}

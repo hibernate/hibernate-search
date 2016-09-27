@@ -164,7 +164,9 @@ public class JavaTimeTest extends SearchTestBase {
 
 	@Test
 	public void testYear() throws Exception {
-		Year value = Year.of( Year.MAX_VALUE );
+		/* Elasticsearch only accepts years in the range [-292275054,292278993]
+		 */
+		Year value = Year.of( 292278993 );
 
 		Sample sample = new Sample( 1L, "Year example" );
 		sample.year = value;

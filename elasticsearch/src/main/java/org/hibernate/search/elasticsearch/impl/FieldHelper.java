@@ -45,6 +45,13 @@ class FieldHelper {
 		BOOLEAN,
 		DATE,
 		CALENDAR,
+		INSTANT,
+		LOCAL_DATE,
+		LOCAL_TIME,
+		LOCAL_DATE_TIME,
+		YEAR,
+		YEAR_MONTH,
+		MONTH_DAY,
 		INTEGER {
 			public boolean isNumeric() {
 				return true;
@@ -144,6 +151,29 @@ class FieldHelper {
 		}
 		else if ( Calendar.class.isAssignableFrom( propertyClass ) ) {
 			return ExtendedFieldType.CALENDAR;
+		}
+		// For the following, don't reference the class directly, in case we're in JDK 7
+		// TODO HSEARCH-2350 Reference the class directly when JDK8 becomes mandatory
+		else if ( "java.time.Instant".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.INSTANT;
+		}
+		else if ( "java.time.LocalDate".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.LOCAL_DATE;
+		}
+		else if ( "java.time.LocalTime".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.LOCAL_TIME;
+		}
+		else if ( "java.time.LocalDateTime".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.LOCAL_DATE_TIME;
+		}
+		else if ( "java.time.Year".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.YEAR;
+		}
+		else if ( "java.time.YearMonth".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.YEAR_MONTH;
+		}
+		else if ( "java.time.MonthDay".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.MONTH_DAY;
 		}
 		else {
 			return ExtendedFieldType.UNKNOWN;

@@ -29,6 +29,9 @@ public class ElasticsearchBridgeProvider implements IndexManagerTypeSpecificBrid
 	public ElasticsearchBridgeProvider() {
 		super();
 		delegates.add( new ElasticsearchJavaUtilTimeBridgeProvider() );
+		if ( ElasticsearchJavaTimeBridgeProvider.isActive() ) {
+			delegates.add( new ElasticsearchJavaTimeBridgeProvider() );
+		}
 	}
 
 	@Override
