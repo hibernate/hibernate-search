@@ -9,8 +9,8 @@ package org.hibernate.search.test.bridge.provider;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
-import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 
 /**
  * @author Emmanuel Bernard

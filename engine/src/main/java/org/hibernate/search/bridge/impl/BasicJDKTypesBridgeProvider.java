@@ -31,9 +31,9 @@ import org.hibernate.search.bridge.builtin.StringBridge;
 import org.hibernate.search.bridge.builtin.UUIDBridge;
 import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
-import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
-import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor;
 import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**

@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor;
 import org.hibernate.search.bridge.builtin.time.impl.DurationBridge;
 import org.hibernate.search.bridge.builtin.time.impl.InstantBridge;
 import org.hibernate.search.bridge.builtin.time.impl.LocalDateBridge;
@@ -42,6 +41,7 @@ import org.hibernate.search.bridge.builtin.time.impl.ZoneIdBridge;
 import org.hibernate.search.bridge.builtin.time.impl.ZoneOffsetBridge;
 import org.hibernate.search.bridge.builtin.time.impl.ZonedDateTimeBridge;
 import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

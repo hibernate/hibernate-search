@@ -9,8 +9,8 @@ package org.hibernate.search.bridge.impl;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.EnumBridge;
-import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
 
 /**
  * Provide a bridge for enums.

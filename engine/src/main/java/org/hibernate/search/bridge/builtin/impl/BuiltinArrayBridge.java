@@ -11,6 +11,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.builtin.ArrayBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
+import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 
 /**
  * An implementation of {@link org.hibernate.search.bridge.builtin.ArrayBridge} that can be used with Hibernate Search query DSL.

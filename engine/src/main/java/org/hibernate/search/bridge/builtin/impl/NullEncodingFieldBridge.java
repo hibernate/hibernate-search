@@ -11,6 +11,7 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 
 /**
  * @author Davide D'Alto
