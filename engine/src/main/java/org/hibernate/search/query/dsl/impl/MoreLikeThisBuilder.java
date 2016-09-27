@@ -165,7 +165,7 @@ public class MoreLikeThisBuilder<T> {
 		findById = new TermQuery( new Term( documentBuilder.getIdKeywordName(), id ) );
 		HSQuery query = queryContext.getFactory().createHSQuery();
 		//can't use Arrays.asList for some obscure capture reason
-		List<Class<?>> classes = new ArrayList<Class<?>>(1);
+		List<Class<?>> classes = new ArrayList<Class<?>>( 1 );
 		classes.add( queryContext.getEntityType() );
 		List<EntityInfo> entityInfos = query
 				.luceneQuery( findById )

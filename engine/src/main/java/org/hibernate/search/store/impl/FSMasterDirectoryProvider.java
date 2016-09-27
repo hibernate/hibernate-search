@@ -97,7 +97,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				currentLocal = 1;
 			}
 			else {
-				log.debugf( "Source directory for '%s' will be initialized", indexName);
+				log.debugf( "Source directory for '%s' will be initialized", indexName );
 				currentLocal = 1;
 			}
 			String currentString = Integer.valueOf( currentLocal ).toString();

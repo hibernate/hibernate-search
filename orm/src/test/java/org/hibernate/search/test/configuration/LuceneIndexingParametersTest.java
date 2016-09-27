@@ -45,7 +45,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		cfg.put( "hibernate.search.Book.indexwriter.merge_factor", "13" );
 		cfg.put( "hibernate.search.Book.indexwriter.max_buffered_docs", "14" );
 		cfg.put( "hibernate.search.Book.indexwriter.ram_buffer_size", "4" );
-		cfg.put( "hibernate.search.Book.indexwriter.merge_max_optimize_size", "256");
+		cfg.put( "hibernate.search.Book.indexwriter.merge_max_optimize_size", "256" );
 
 		cfg.put( "hibernate.search.Documents.indexwriter.ram_buffer_size", "default" );
 		cfg.put( "hibernate.search.Documents.indexwriter.merge_factor", "6" );

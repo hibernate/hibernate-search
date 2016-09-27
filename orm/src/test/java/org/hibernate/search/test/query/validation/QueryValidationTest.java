@@ -71,7 +71,7 @@ public class QueryValidationTest extends SearchTestBase {
 
 	@Test
 	public void testTargetNumericEncodedFieldWithStringQueryThrowsException() {
-		TermQuery query = new TermQuery( new Term("value", "bar") );
+		TermQuery query = new TermQuery( new Term( "value", "bar" ) );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, B.class );
 		try {
 			fullTextQuery.list();
@@ -84,7 +84,7 @@ public class QueryValidationTest extends SearchTestBase {
 
 	@Test
 	public void testTargetingNonIndexedEntityThrowsException() {
-		TermQuery query = new TermQuery( new Term("foo", "bar") );
+		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
 		try {
 			fullTextSession.createFullTextQuery( query, C.class );
 		}

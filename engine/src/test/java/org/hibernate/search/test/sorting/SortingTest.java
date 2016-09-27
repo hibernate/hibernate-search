@@ -68,7 +68,7 @@ public class SortingTest {
 
 		// Non sorted, expect results in indexing order:
 		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
-		assertSortedResults( query, null, 0, 1, 2, 3);
+		assertSortedResults( query, null, 0, 1, 2, 3 );
 
 		// Sorting Age as string:
 		Sort sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING ) );
@@ -264,7 +264,7 @@ public class SortingTest {
 		TransactionContextForTest tc = new TransactionContextForTest();
 		for ( int i = 0; i < testData.length; i++ ) {
 			Person p = testData[i];
-			worker.performWork( new Work( p, p.id, WorkType.INDEX ), tc);
+			worker.performWork( new Work( p, p.id, WorkType.INDEX ), tc );
 		}
 		tc.end();
 	}
@@ -274,7 +274,7 @@ public class SortingTest {
 		TransactionContextForTest tc = new TransactionContextForTest();
 		for ( int i = 0; i < testData.length; i++ ) {
 			UnsortableToy toy = testData[i];
-			worker.performWork( new Work( toy, toy.id, WorkType.INDEX ), tc);
+			worker.performWork( new Work( toy, toy.id, WorkType.INDEX ), tc );
 		}
 		tc.end();
 	}

@@ -284,15 +284,15 @@ public final class BenchWithGeonames {
 
 					System.out.println(
 							">>>>> Different numbers of documents fetched for point (" +
-									Double.toString( center.getLatitude()) +
+									Double.toString( center.getLatitude() ) +
 									"," +
-									Double.toString( center.getLongitude()) +
+									Double.toString( center.getLongitude() ) +
 									") and radius " +
 									Double.toString( radius )
 					);
 					System.out.println( "Range results : " + rangeResults );
 					System.out.println( "Spatial Hash results : " + spatialHashResults );
-					System.out.println( "Pure distance results : " + hibQuery.getResultSize());
+					System.out.println( "Pure distance results : " + hibQuery.getResultSize() );
 
 					List<Integer> rangeIds = new ArrayList<Integer>();
 					for ( int index = 0; index < rangeResults.size(); index++ ) {

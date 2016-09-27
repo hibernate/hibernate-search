@@ -47,7 +47,7 @@ public class IncorrectGet {
 
 		@Override
 		public Object stringToObject(String stringValue) {
-			throw new RuntimeException("Failure");
+			throw new RuntimeException( "Failure" );
 		}
 
 		@Override

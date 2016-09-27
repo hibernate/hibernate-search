@@ -23,7 +23,7 @@ public class ConnectedFacetFieldContext implements FacetFieldContext {
 	@Override
 	public FacetContinuationContext onField(String fieldName) {
 		context.setFieldName( fieldName );
-		return new ConnectedFacetContinuationContext(context);
+		return new ConnectedFacetContinuationContext( context );
 	}
 }
 

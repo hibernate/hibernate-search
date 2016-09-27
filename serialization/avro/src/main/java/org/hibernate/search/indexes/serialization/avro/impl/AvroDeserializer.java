@@ -297,22 +297,22 @@ public class AvroDeserializer implements Deserializer {
 				hydrator.addCharTermAttribute( (CharSequence) record.get( "sequence" ) );
 			}
 			else if ( "PayloadAttribute".equals( name ) ) {
-				hydrator.addPayloadAttribute( asByteArray( record, "payload") );
+				hydrator.addPayloadAttribute( asByteArray( record, "payload" ) );
 			}
 			else if ( "KeywordAttribute".equals( name ) ) {
-				hydrator.addKeywordAttribute( asBoolean( record, "isKeyword") );
+				hydrator.addKeywordAttribute( asBoolean( record, "isKeyword" ) );
 			}
 			else if ( "PositionIncrementAttribute".equals( name ) ) {
-				hydrator.addPositionIncrementAttribute( asInt( record, "positionIncrement") );
+				hydrator.addPositionIncrementAttribute( asInt( record, "positionIncrement" ) );
 			}
 			else if ( "FlagsAttribute".equals( name ) ) {
-				hydrator.addFlagsAttribute( asInt( record, "flags") );
+				hydrator.addFlagsAttribute( asInt( record, "flags" ) );
 			}
 			else if ( "TypeAttribute".equals( name ) ) {
-				hydrator.addTypeAttribute( asString( record, "type") );
+				hydrator.addTypeAttribute( asString( record, "type" ) );
 			}
 			else if ( "OffsetAttribute".equals( name ) ) {
-				hydrator.addOffsetAttribute( asInt( record, "startOffset"), asInt( record, "endOffset" ) );
+				hydrator.addOffsetAttribute( asInt( record, "startOffset" ), asInt( record, "endOffset" ) );
 			}
 			else {
 				throw log.unknownAttributeSerializedRepresentation( name );

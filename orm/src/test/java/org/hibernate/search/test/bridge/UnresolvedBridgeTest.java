@@ -37,7 +37,7 @@ public class UnresolvedBridgeTest {
 				if ( ee == null ) {
 					break;
 				}
-				else if (ee instanceof SearchException) {
+				else if ( ee instanceof SearchException ) {
 					hasSearchException = true;
 					break;
 				}

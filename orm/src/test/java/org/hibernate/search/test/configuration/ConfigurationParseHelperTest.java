@@ -23,7 +23,7 @@ public class ConfigurationParseHelperTest {
 
 	@Test
 	public void testIntegerParsers() {
-		assertEquals( 0, ConfigurationParseHelper.parseInt( "   0 ", "not important") );
+		assertEquals( 0, ConfigurationParseHelper.parseInt( "   0 ", "not important" ) );
 		assertEquals( 8, ConfigurationParseHelper.parseInt( null, 8, null ) );
 		assertEquals( 56, ConfigurationParseHelper.parseInt( "56", 8, null ) );
 		Properties props = new Properties();

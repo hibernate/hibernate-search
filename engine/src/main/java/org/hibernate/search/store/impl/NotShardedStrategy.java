@@ -26,7 +26,7 @@ public class NotShardedStrategy implements IndexShardingStrategy {
 	public void initialize(Properties properties, IndexManager[] indexManagers) {
 		this.directoryProvider = indexManagers;
 		if ( directoryProvider.length > 1 ) {
-			throw new AssertionFailure("Using SingleDirectoryProviderSelectionStrategy with multiple DirectoryProviders");
+			throw new AssertionFailure( "Using SingleDirectoryProviderSelectionStrategy with multiple DirectoryProviders" );
 		}
 	}
 

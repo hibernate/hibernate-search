@@ -243,7 +243,7 @@ public class NumericFieldTest extends SearchTestBase {
 					.getIndexedFields();
 
 			assertThat( fields ).onProperty( "name" )
-					.containsOnly( "rating", "ratingNumericPrecision1", "ratingNumericPrecision2");
+					.containsOnly( "rating", "ratingNumericPrecision1", "ratingNumericPrecision2" );
 
 			for ( FieldDescriptor field : fields ) {
 				if ( "ratingNumericPrecision1".equals( field.getName() ) ) {

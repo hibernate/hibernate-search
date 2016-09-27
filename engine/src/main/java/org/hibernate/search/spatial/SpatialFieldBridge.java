@@ -72,7 +72,7 @@ public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge
 						coordinateField,
 						clazz,
 						"get" + capitalize( coordinateField ),
-						null);
+						null );
 				Method latitudeGetter = propertyDescriptor.getReadMethod();
 				if ( latitudeGetter != null ) {
 					return (Double) latitudeGetter.invoke( value );

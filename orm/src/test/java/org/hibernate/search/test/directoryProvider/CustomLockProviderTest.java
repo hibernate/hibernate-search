@@ -53,7 +53,7 @@ public class CustomLockProviderTest {
 			builder
 				.addAnnotatedClass( SnowStorm.class )
 				.setProperty( "hibernate.search.default.locking_option", "somethingHere" )
-				.setProperty( "hibernate.search.default.locking_strategy", "org.hibernate.NotExistingFactory")
+					.setProperty( "hibernate.search.default.locking_strategy", "org.hibernate.NotExistingFactory" )
 				.build();
 			builder.close();
 			fail();

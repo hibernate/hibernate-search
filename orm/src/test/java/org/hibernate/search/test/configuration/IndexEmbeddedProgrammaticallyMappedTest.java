@@ -39,7 +39,7 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 		try (FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
 			// given
 			builder.fluentMapping()
-				.entity( Address.class)
+				.entity( Address.class )
 					.indexed()
 					.property( "addressId", ElementType.METHOD )
 						.documentId()
@@ -73,7 +73,7 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 		try (FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
 			// given
 			builder.fluentMapping()
-				.entity( Address.class)
+				.entity( Address.class )
 					.indexed()
 					.property( "addressId", ElementType.METHOD )
 						.documentId()
@@ -107,7 +107,7 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 		try (FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
 			// given
 			builder.fluentMapping()
-				.entity( Address.class)
+				.entity( Address.class )
 					.indexed()
 					.property( "addressId", ElementType.METHOD )
 						.documentId()
@@ -115,7 +115,7 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 					.property( "country", ElementType.METHOD )
 						.indexEmbedded()
 							.includePaths( "id", "name" )
-				.entity( Country.class)
+				.entity( Country.class )
 					.indexed()
 						.property( "name", ElementType.METHOD )
 							.field();

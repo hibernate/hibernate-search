@@ -71,7 +71,7 @@ public class ReadWriteParallelismTest {
 		threadPool.shutdown();
 		//Time to warmup only:
 		threadPool.awaitTermination( WARM_UP_SECONDS, TimeUnit.SECONDS );
-		System.out.println( "Warmup complete. Start measuring now..");
+		System.out.println( "Warmup complete. Start measuring now.." );
 		//Start measuring:
 		cyclesCompleted.set( 0 );
 		long startMeasurementTime = System.nanoTime();

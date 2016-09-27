@@ -33,7 +33,7 @@ public class PropertySpatialMapping {
 	}
 
 	public PropertySpatialMapping spatial() {
-		return new PropertySpatialMapping(property, entity, mapping);
+		return new PropertySpatialMapping( property, entity, mapping );
 	}
 
 	public PropertySpatialMapping name(String fieldName) {
@@ -69,19 +69,19 @@ public class PropertySpatialMapping {
 	}
 
 	public FieldMapping field() {
-		return new FieldMapping(property, entity, mapping);
+		return new FieldMapping( property, entity, mapping );
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, mapping);
+		return new PropertyMapping( name, type, entity, mapping );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 
 	public PropertyMapping bridge(Class<? extends FieldBridge> fieldBridge) {

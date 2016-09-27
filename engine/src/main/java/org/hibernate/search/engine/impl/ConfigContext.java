@@ -305,7 +305,7 @@ public final class ConfigContext {
 		final Map<String, AnalyzerReference> initializedAnalyzers = new HashMap<>( analyzerDefs.size() );
 
 		for ( LuceneAnalyzerReference lazyAnalyzerReference : lazyLuceneAnalyzerReferences ) {
-			initLazyLuceneAnalyzer(initializedAnalyzers, lazyAnalyzerReference);
+			initLazyLuceneAnalyzer( initializedAnalyzers, lazyAnalyzerReference );
 		}
 
 		for ( RemoteAnalyzerReference remoteAnalyzerReference : lazyRemoteAnalyzerReferences ) {
@@ -355,8 +355,8 @@ public final class ConfigContext {
 		LazyLuceneAnalyzer lazyAnalyzer = (LazyLuceneAnalyzer) lazyLuceneAnalyzerReference.getAnalyzer();
 
 		if ( initializedAnalyzers.containsKey( lazyAnalyzer.getName() ) ) {
-			lazyAnalyzer.setDelegate( ((LuceneAnalyzerReference) initializedAnalyzers.get( lazyAnalyzer.getName() ))
-					.getAnalyzer());
+			lazyAnalyzer.setDelegate( ( (LuceneAnalyzerReference) initializedAnalyzers.get( lazyAnalyzer.getName() ) )
+					.getAnalyzer() );
 			return;
 		}
 

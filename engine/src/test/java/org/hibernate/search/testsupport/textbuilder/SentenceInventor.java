@@ -135,7 +135,7 @@ public class SentenceInventor {
 			return sentence[0];
 		}
 		else {
-			StringBuilder sb = new StringBuilder( sentence[0]);
+			StringBuilder sb = new StringBuilder( sentence[0] );
 			for ( int i = 1; i < sentenceLength; i++ ) {
 				sb.append( " " );
 				sb.append( sentence[i] );

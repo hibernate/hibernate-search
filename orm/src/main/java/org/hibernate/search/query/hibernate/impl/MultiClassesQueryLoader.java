@@ -161,7 +161,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			this.rootEntity = rootEntity;
 			EntityIndexBinding provider = extendedIntegrator.getIndexBinding( rootEntity );
 			if ( provider == null ) {
-				throw new AssertionFailure("Provider not found for class: " + rootEntity);
+				throw new AssertionFailure( "Provider not found for class: " + rootEntity );
 			}
 			this.mappedSubclasses = provider.getDocumentBuilder().getMappedSubclasses();
 			this.criteria = null; //default

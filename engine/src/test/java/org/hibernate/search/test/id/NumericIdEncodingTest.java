@@ -70,7 +70,7 @@ public class NumericIdEncodingTest {
 		TransactionContextForTest tc = new TransactionContextForTest();
 		for ( int i = 0; i < testData.length; i++ ) {
 			Staff p = testData[i];
-			worker.performWork( new Work( p, p.id, WorkType.INDEX ), tc);
+			worker.performWork( new Work( p, p.id, WorkType.INDEX ), tc );
 		}
 		tc.end();
 	}

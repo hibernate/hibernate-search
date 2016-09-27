@@ -316,7 +316,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					spatialFieldName
 			);
 		}
-		else if ( 0 == n) {
+		else if ( 0 == n ) {
 			queryHits = new QueryHits(
 					searcher,
 					filter,

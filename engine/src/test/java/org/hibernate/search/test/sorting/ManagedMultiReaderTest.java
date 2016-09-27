@@ -135,7 +135,7 @@ public class ManagedMultiReaderTest {
 				configuredSorts,
 				sort,
 				indexManagers.toArray( new IndexManager[indexManagers.size()] ),
-				true) ) {
+				true ) ) {
 			List<? extends IndexReader> actualReaders = reader.getSubReaders();
 			assertThat( actualReaders ).hasSize( 2 );
 			assertThat( actualReaders.get( 0 ).getClass().getSimpleName() ).isEqualTo( "UninvertingDirectoryReader" );

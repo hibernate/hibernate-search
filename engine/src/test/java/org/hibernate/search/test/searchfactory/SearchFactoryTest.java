@@ -99,7 +99,7 @@ public class SearchFactoryTest {
 		SearchConfigurationForTest cfg = getManualConfiguration();
 
 		try ( SearchIntegrator si = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
-			IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class);
+			IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class );
 			assertNotNull( indexedTypeDescriptor );
 			assertFalse( indexedTypeDescriptor.isIndexed() );
 		}
@@ -117,7 +117,7 @@ public class SearchFactoryTest {
 		cfg.setProgrammaticMapping( mapping );
 
 		try ( SearchIntegrator si = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
-			IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class);
+			IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class );
 			assertNotNull( indexedTypeDescriptor );
 			assertTrue( indexedTypeDescriptor.isIndexed() );
 		}

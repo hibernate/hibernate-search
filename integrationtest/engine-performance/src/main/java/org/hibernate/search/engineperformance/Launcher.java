@@ -54,7 +54,7 @@ public class Launcher {
 			.forks( 1 )
 			.build();
 
-		new Runner(opts).run();
+		new Runner( opts ).run();
 	}
 
 	private Launcher() {

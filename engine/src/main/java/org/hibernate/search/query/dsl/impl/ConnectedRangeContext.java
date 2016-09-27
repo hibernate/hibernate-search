@@ -26,7 +26,7 @@ class ConnectedRangeContext implements RangeContext {
 
 	@Override
 	public RangeMatchingContext onField(String fieldName) {
-		return new ConnectedRangeMatchingContext(fieldName, queryCustomizer, queryContext);
+		return new ConnectedRangeMatchingContext( fieldName, queryCustomizer, queryContext );
 	}
 
 	@Override

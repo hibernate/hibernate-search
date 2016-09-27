@@ -38,7 +38,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext, FieldB
 
 	@Override
 	public TermTermination matching(Object value) {
-		return new ConnectedMultiFieldsTermQueryBuilder( termContext, value, fieldsContext, queryCustomizer, queryContext);
+		return new ConnectedMultiFieldsTermQueryBuilder( termContext, value, fieldsContext, queryCustomizer, queryContext );
 	}
 
 	@Override

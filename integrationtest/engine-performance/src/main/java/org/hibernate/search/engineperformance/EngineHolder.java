@@ -54,7 +54,7 @@ public class EngineHolder {
 	public void initializeState() throws IOException {
 		pickIndexStorageDirectory();
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
-		switch (backend) {
+		switch ( backend ) {
 			case "ram" :
 				cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 				break;

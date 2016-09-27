@@ -41,7 +41,7 @@ final class Helper {
 					fieldName, value, queryAnalyzer
 			);
 			if ( termsFromText.size() > 1 ) {
-				StringBuilder error = new StringBuilder( "The ")
+				StringBuilder error = new StringBuilder( "The " )
 						.append( name )
 						.append( " parameter leads to several terms when analyzed: " );
 				for ( String term : termsFromText ) {
@@ -53,7 +53,7 @@ final class Helper {
 			return termsFromText.size() == 0 ? null : termsFromText.get( 0 );
 		}
 		catch (IOException e) {
-			throw new AssertionFailure("IO exception while reading String stream??", e);
+			throw new AssertionFailure( "IO exception while reading String stream??", e );
 		}
 	}
 
@@ -68,7 +68,7 @@ final class Helper {
 					"pass String parameters" );
 		}
 		final Reader reader = new StringReader( localText );
-		final TokenStream stream = analyzer.tokenStream( fieldName, reader);
+		final TokenStream stream = analyzer.tokenStream( fieldName, reader );
 		try {
 			CharTermAttribute attribute = stream.addAttribute( CharTermAttribute.class );
 			stream.reset();

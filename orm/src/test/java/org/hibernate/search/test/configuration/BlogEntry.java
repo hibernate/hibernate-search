@@ -98,7 +98,7 @@ public class BlogEntry {
 				return null;
 			}
 			if ( !( value instanceof String ) ) {
-				throw new IllegalArgumentException( "expecte string as value in language discriminator");
+				throw new IllegalArgumentException( "expecte string as value in language discriminator" );
 			}
 			if ( "description".equals( field ) ) {
 				return (String) value;

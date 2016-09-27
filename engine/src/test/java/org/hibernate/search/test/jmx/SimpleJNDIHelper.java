@@ -34,7 +34,7 @@ class SimpleJNDIHelper {
 	public static Path makeTestingJndiDirectory(Class<?> testClass) {
 		Path targetDir = getTargetDir();
 		Path simpleJndiDir = targetDir.resolve( "simpleJndi" );
-		if ( ! Files.exists( simpleJndiDir) ) {
+		if ( !Files.exists( simpleJndiDir ) ) {
 			try {
 				Files.createDirectory( simpleJndiDir );
 			}

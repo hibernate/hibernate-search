@@ -77,7 +77,7 @@ public class InheritanceTest extends SearchTestBase {
 		assertItsTheElephant( hibQuery.list() );
 
 		query = parser.parse( "Elephant" );
-		hibQuery = s.createFullTextQuery( query);
+		hibQuery = s.createFullTextQuery( query );
 		assertItsTheElephant( hibQuery.list() );
 
 		query = parser.parse( "hasSweatGlands:false" );

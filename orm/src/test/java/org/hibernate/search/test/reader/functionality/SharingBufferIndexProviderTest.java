@@ -28,7 +28,7 @@ import org.junit.Test;
 public class SharingBufferIndexProviderTest {
 
 	private final ExtendedSharingBufferReaderProvider readerProvider = new ExtendedSharingBufferReaderProvider();
-	private final CountDownLatch startSignal = new CountDownLatch(1);
+	private final CountDownLatch startSignal = new CountDownLatch( 1 );
 	private final Runnable searchTask = new SearchTask();
 	private final Runnable changeTask = new ChangeTask();
 	private final Runnable directorySwitchTask = new DirectorySwitchTask();

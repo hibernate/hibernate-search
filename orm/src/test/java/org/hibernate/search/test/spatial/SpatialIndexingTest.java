@@ -102,8 +102,8 @@ public class SpatialIndexingTest extends SearchTestBase {
 		fullTextSession.save( new GetterUser( 1, 24.0d, 32.0d ) );
 
 		//DoubleIndexedPOIs
-		fullTextSession.save( new DoubleIndexedPOI( 1, "Davide D'Alto", 37.780392d, -122.513898d, "Hibernate team member"));
-		fullTextSession.save( new DoubleIndexedPOI( 2, "Peter O'Tall", 40.723165d, -73.987439d, "" ));
+		fullTextSession.save( new DoubleIndexedPOI( 1, "Davide D'Alto", 37.780392d, -122.513898d, "Hibernate team member" ) );
+		fullTextSession.save( new DoubleIndexedPOI( 2, "Peter O'Tall", 40.723165d, -73.987439d, "" ) );
 
 		tx.commit();
 	}

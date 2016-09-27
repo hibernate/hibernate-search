@@ -25,7 +25,7 @@ public class FilterCacheModeTypeHelper {
 			case INSTANCE_ONLY:
 				return true;
 			default:
-				throw new AssertionFailure("Unknown FilterCacheModeType:" + type);
+				throw new AssertionFailure( "Unknown FilterCacheModeType:" + type );
 		}
 	}
 
@@ -38,7 +38,7 @@ public class FilterCacheModeTypeHelper {
 			case INSTANCE_ONLY:
 				return false;
 			default:
-				throw new AssertionFailure("Unknown FilterCacheModeType:" + type);
+				throw new AssertionFailure( "Unknown FilterCacheModeType:" + type );
 		}
 	}
 }

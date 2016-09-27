@@ -49,7 +49,7 @@ public class ImmutableTestConfiguration implements TestConfiguration {
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return annotatedClasses.toArray( new Class<?>[ annotatedClasses.size() ]);
+		return annotatedClasses.toArray( new Class<?>[annotatedClasses.size()] );
 	}
 
 }

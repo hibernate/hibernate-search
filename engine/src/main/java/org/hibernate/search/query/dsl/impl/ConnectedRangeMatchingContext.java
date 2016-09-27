@@ -32,7 +32,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext, Fiel
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.rangeContext = new RangeQueryContext();
-		this.fieldContexts = new ArrayList<FieldContext>(4);
+		this.fieldContexts = new ArrayList<FieldContext>( 4 );
 		this.fieldContexts.add( new FieldContext( fieldName, queryContext ) );
 	}
 
@@ -46,7 +46,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext, Fiel
 	@Override
 	public <T> FromRangeContext<T> from(T from) {
 		rangeContext.setFrom( from );
-		return new ConnectedFromRangeContext<T>(this);
+		return new ConnectedFromRangeContext<T>( this );
 	}
 
 	static class ConnectedFromRangeContext<T> implements FromRangeContext<T> {
@@ -63,7 +63,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext, Fiel
 					mother.rangeContext,
 					mother.queryCustomizer,
 					mother.fieldContexts,
-					mother.queryContext);
+					mother.queryContext );
 		}
 
 		@Override
@@ -76,13 +76,13 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext, Fiel
 	@Override
 	public RangeTerminationExcludable below(Object below) {
 		rangeContext.setTo( below );
-		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext);
+		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext );
 	}
 
 	@Override
 	public RangeTerminationExcludable above(Object above) {
 		rangeContext.setFrom( above );
-		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext);
+		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext );
 	}
 
 	@Override

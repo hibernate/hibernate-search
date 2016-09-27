@@ -40,7 +40,7 @@ public class RoleFilterFactory {
 
 	@Factory
 	public Filter getFilter() {
-		Query query = new TermQuery( new Term("role", role.name()) );
-		return new QueryWrapperFilter(query);
+		Query query = new TermQuery( new Term( "role", role.name() ) );
+		return new QueryWrapperFilter( query );
 	}
 }

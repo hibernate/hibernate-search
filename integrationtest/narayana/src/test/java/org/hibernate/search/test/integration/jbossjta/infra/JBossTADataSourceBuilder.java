@@ -50,7 +50,7 @@ public class JBossTADataSourceBuilder {
 				dataSource
 		);
 		dsw.setProperty( TransactionalDriver.dynamicClass, DataSourceProvider.class.getName() );
-		dsw.setProperty( TransactionalDriver.userName, user);
+		dsw.setProperty( TransactionalDriver.userName, user );
 		dsw.setProperty( TransactionalDriver.password, password );
 		return dsw;
 	}

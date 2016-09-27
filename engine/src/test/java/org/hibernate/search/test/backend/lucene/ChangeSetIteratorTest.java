@@ -51,8 +51,8 @@ public class ChangeSetIteratorTest {
 	@Test
 	public void testInnerIteratorBeingEmpty() {
 		ArrayList<Changeset> outher = new ArrayList<Changeset>( 2 );
-		outher.add( new Changeset( new ArrayList<LuceneWork>(2), null, null ) );
-		outher.add( new Changeset( new ArrayList<LuceneWork>(2), null, null ) );
+		outher.add( new Changeset( new ArrayList<LuceneWork>( 2 ), null, null ) );
+		outher.add( new Changeset( new ArrayList<LuceneWork>( 2 ), null, null ) );
 		ChangesetList list = new ChangesetList( outher );
 		Iterator<LuceneWork> iterator = list.iterator();
 		Assert.assertFalse( "Iterator should have been empty", iterator.hasNext() );
@@ -61,8 +61,8 @@ public class ChangeSetIteratorTest {
 	@Test
 	public void testInnerIteratorBeingEmptyException() {
 		ArrayList<Changeset> outher = new ArrayList<Changeset>( 2 );
-		outher.add( new Changeset( new ArrayList<LuceneWork>(2), null, null ) );
-		outher.add( new Changeset( new ArrayList<LuceneWork>(2), null, null ) );
+		outher.add( new Changeset( new ArrayList<LuceneWork>( 2 ), null, null ) );
+		outher.add( new Changeset( new ArrayList<LuceneWork>( 2 ), null, null ) );
 		ChangesetList list = new ChangesetList( outher );
 		Iterator<LuceneWork> iterator = list.iterator();
 		try {
@@ -76,8 +76,8 @@ public class ChangeSetIteratorTest {
 
 	@Test
 	public void testInnerIteratorSingleEmpty() {
-		ArrayList<LuceneWork> workListOne = new ArrayList<LuceneWork>(2);
-		workListOne.add( new PurgeAllLuceneWork(Object.class) );
+		ArrayList<LuceneWork> workListOne = new ArrayList<LuceneWork>( 2 );
+		workListOne.add( new PurgeAllLuceneWork( Object.class ) );
 		ArrayList<Changeset> outher = new ArrayList<Changeset>( 2 );
 		outher.add( new Changeset( workListOne, null, null ) );
 		ChangesetList list = new ChangesetList( outher );
@@ -88,12 +88,12 @@ public class ChangeSetIteratorTest {
 
 	@Test
 	public void testFourElementsIterator() {
-		ArrayList<LuceneWork> workListOne = new ArrayList<LuceneWork>(2);
-		workListOne.add( new PurgeAllLuceneWork(Object.class) );
-		workListOne.add( new AddLuceneWork(null, null, null, null ) );
-		ArrayList<LuceneWork> workListTwo = new ArrayList<LuceneWork>(2);
-		workListTwo.add( new OptimizeLuceneWork(Object.class) );
-		workListTwo.add( new UpdateLuceneWork(null, null, null, null ) );
+		ArrayList<LuceneWork> workListOne = new ArrayList<LuceneWork>( 2 );
+		workListOne.add( new PurgeAllLuceneWork( Object.class ) );
+		workListOne.add( new AddLuceneWork( null, null, null, null ) );
+		ArrayList<LuceneWork> workListTwo = new ArrayList<LuceneWork>( 2 );
+		workListTwo.add( new OptimizeLuceneWork( Object.class ) );
+		workListTwo.add( new UpdateLuceneWork( null, null, null, null ) );
 		ArrayList<Changeset> outher = new ArrayList<Changeset>( 2 );
 		outher.add( new Changeset( workListOne, null, null ) );
 		outher.add( new Changeset( workListTwo, null, null ) );

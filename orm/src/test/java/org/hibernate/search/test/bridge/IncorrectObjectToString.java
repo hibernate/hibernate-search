@@ -44,7 +44,7 @@ public class IncorrectObjectToString {
 
 		@Override
 		public String objectToString(Object object) {
-			throw new RuntimeException("Failure");
+			throw new RuntimeException( "Failure" );
 		}
 	}
 }

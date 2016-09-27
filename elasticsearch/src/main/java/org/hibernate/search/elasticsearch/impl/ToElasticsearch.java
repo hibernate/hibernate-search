@@ -73,8 +73,8 @@ public class ToElasticsearch {
 				JsonBuilder.Object facetJsonQuery = JsonBuilder.object();
 				facetJsonQuery.add( "nested", JsonBuilder.object()
 								.addProperty( "path", FieldHelper.getEmbeddedFieldPath( fieldName ) ) );
-				facetJsonQuery.add( "aggregations", JsonBuilder.object().add( facetingRequest.getFacetingName(), termsJsonQuery));
-				jsonQuery.add( facetingRequest.getFacetingName(), facetJsonQuery);
+				facetJsonQuery.add( "aggregations", JsonBuilder.object().add( facetingRequest.getFacetingName(), termsJsonQuery ) );
+				jsonQuery.add( facetingRequest.getFacetingName(), facetJsonQuery );
 			}
 			else {
 				jsonQuery.add( facetingRequest.getFacetingName(), termsJsonQuery );
@@ -93,10 +93,10 @@ public class ToElasticsearch {
 
 				JsonObject rangeQuery = wrapQueryForNestedIfRequired( fieldName,
 						JsonBuilder.object().add( "range",
-								JsonBuilder.object().add( fieldName, comparisonFragment)).build());
+								JsonBuilder.object().add( fieldName, comparisonFragment ) ).build() );
 
 				jsonQuery.add( facetingRequest.getFacetingName() + "-" + facetRange.getIdentifier(),
-						JsonBuilder.object().add( "filter", rangeQuery));
+						JsonBuilder.object().add( "filter", rangeQuery ) );
 			}
 		}
 		else {
@@ -332,7 +332,7 @@ public class ToElasticsearch {
 						JsonBuilder.object().add( field,
 								JsonBuilder.object()
 										.addProperty( "query", phrase.toString().trim() )
-										.append( slopAppender( query.getSlop()) )
+										.append( slopAppender( query.getSlop() ) )
 										.append( boostAppender( query ) )
 								)
 				).build();
@@ -387,10 +387,10 @@ public class ToElasticsearch {
 		interval.append( boostAppender( query ) );
 
 		JsonObject range = JsonBuilder.object().add( "range",
-						JsonBuilder.object().add( query.getField(), interval ))
+						JsonBuilder.object().add( query.getField(), interval ) )
 				.build();
 
-		return wrapQueryForNestedIfRequired( query.getField(), range);
+		return wrapQueryForNestedIfRequired( query.getField(), range );
 	}
 
 	private static JsonObject convertNumericRangeQuery(NumericRangeQuery<?> query) {
@@ -406,10 +406,10 @@ public class ToElasticsearch {
 		interval.append( boostAppender( query ) );
 
 		JsonObject range = JsonBuilder.object().add( "range",
-						JsonBuilder.object().add( query.getField(), interval ))
+						JsonBuilder.object().add( query.getField(), interval ) )
 				.build();
 
-		return wrapQueryForNestedIfRequired( query.getField(), range);
+		return wrapQueryForNestedIfRequired( query.getField(), range );
 	}
 
 	private static JsonObject convertConstantScoreQuery(ConstantScoreQuery query) {

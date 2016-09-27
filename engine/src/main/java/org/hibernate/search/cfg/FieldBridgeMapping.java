@@ -77,21 +77,21 @@ public class FieldBridgeMapping {
 
 	//PropertyMapping level
 	public FieldMapping field() {
-		return new FieldMapping(property, entity, mapping);
+		return new FieldMapping( property, entity, mapping );
 	}
 
 	//EntityMapping level
 	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, mapping);
+		return new PropertyMapping( name, type, entity, mapping );
 	}
 
 	//Global level
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 
 }

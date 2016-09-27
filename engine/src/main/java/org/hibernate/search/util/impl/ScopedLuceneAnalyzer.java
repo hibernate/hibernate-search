@@ -61,7 +61,7 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 
 	@Override
 	public void addScopedAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
-		scopedAnalyzers.put( scope, getLuceneAnalyzer( analyzerReference ));
+		scopedAnalyzers.put( scope, getLuceneAnalyzer( analyzerReference ) );
 	}
 
 	@Override

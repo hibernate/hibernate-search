@@ -251,7 +251,7 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		public IndexInput clone() {
 			//This is needed to make sure that the cloned instance can seek independently
 			IndexInput clonedDelegate = (IndexInput) delegate.clone();
-			return new IndexInputDelegate(clonedDelegate);
+			return new IndexInputDelegate( clonedDelegate );
 		}
 
 	}

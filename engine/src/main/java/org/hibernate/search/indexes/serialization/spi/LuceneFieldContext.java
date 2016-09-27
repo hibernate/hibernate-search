@@ -57,7 +57,7 @@ public final class LuceneFieldContext {
 			case NOT_ANALYZED_NO_NORMS:
 				return SerializableIndex.NOT_ANALYZED_NO_NORMS;
 			default:
-				throw new SearchException( "Unable to convert Field.Index value into serializable Index: " + index);
+				throw new SearchException( "Unable to convert Field.Index value into serializable Index: " + index );
 		}
 	}
 
@@ -75,7 +75,7 @@ public final class LuceneFieldContext {
 			case YES:
 				return SerializableTermVector.YES;
 			default:
-				throw new SearchException( "Unable to convert Field.TermVector value into serializable TermVector: " + vector);
+				throw new SearchException( "Unable to convert Field.TermVector value into serializable TermVector: " + vector );
 		}
 	}
 

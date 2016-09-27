@@ -213,7 +213,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 			BooleanQuery boolQuery = new BooleanQuery.Builder()
 					.add( new MatchAllDocsQuery(), BooleanClause.Occur.FILTER )
 					.add( new TermQuery( new Term( ProjectionConstants.OBJECT_CLASS, entity ) ),
-							BooleanClause.Occur.FILTER)
+							BooleanClause.Occur.FILTER )
 					.build();
 			try {
 				TopDocs topdocs = searcher.search( boolQuery, 1 );

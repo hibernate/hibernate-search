@@ -30,7 +30,7 @@ public class LocalTimeBridge extends TemporalAccessorStringBridge<LocalTime> {
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( HOUR_OF_DAY, 2 )
 			.appendValue( MINUTE_OF_HOUR, 2 )
-			.appendValue( SECOND_OF_MINUTE, 2)
+			.appendValue( SECOND_OF_MINUTE, 2 )
 			.appendValue( NANO_OF_SECOND, 9 )
 			.toFormatter();
 

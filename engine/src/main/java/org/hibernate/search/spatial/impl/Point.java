@@ -113,7 +113,7 @@ public final class Point implements Coordinates {
 	 * @return a point with coordinates given in radians
 	 */
 	public static Point fromRadians(double latitude, double longitude) {
-		return fromDegrees( latitude * GeometricConstants.TO_DEGREES_RATIO, longitude * GeometricConstants.TO_DEGREES_RATIO);
+		return fromDegrees( latitude * GeometricConstants.TO_DEGREES_RATIO, longitude * GeometricConstants.TO_DEGREES_RATIO );
 	}
 
 	/**
@@ -180,7 +180,8 @@ public final class Point implements Coordinates {
 		double destinationLongitudeRadians = normalizeLongitude( longitude ) * GeometricConstants.TO_RADIANS_RATIO;
 		final double dLat = ( destinationLatitudeRadians - getLatitudeRad() ) / 2.0d;
 		final double dLon = ( destinationLongitudeRadians - getLongitudeRad() ) / 2.0d;
-		final double a = Math.pow( Math.sin( dLat ), 2 ) + Math.pow( Math.sin( dLon ), 2) * Math.cos( getLatitudeRad()) * Math.cos( destinationLatitudeRadians );
+		final double a = Math.pow( Math.sin( dLat ), 2 )
+				+ Math.pow( Math.sin( dLon ), 2 ) * Math.cos( getLatitudeRad() ) * Math.cos( destinationLatitudeRadians );
 		final double c = 2.0d * Math.atan2( Math.sqrt( a ), Math.sqrt( 1.0d - a ) );
 		return c * GeometricConstants.EARTH_MEAN_RADIUS_KM;
 	}

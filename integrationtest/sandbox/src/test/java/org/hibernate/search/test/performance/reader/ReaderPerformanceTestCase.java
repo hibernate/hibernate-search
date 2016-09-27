@@ -50,7 +50,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
-		File indexDir = new File(indexBase);
+		File indexDir = new File( indexBase );
 		indexDir.mkdir();
 		File[] files = indexDir.listFiles();
 		for ( File file : files ) {
@@ -66,7 +66,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	public void tearDown() throws Exception {
 		super.tearDown();
 		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
-		File indexDir = new File(indexBase);
+		File indexDir = new File( indexBase );
 		FileHelper.delete( indexDir );
 	}
 

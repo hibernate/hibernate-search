@@ -49,7 +49,7 @@ public class JmsBackendQueueTask implements Runnable {
 
 	@Override
 	public void run() {
-		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>(queue);
+		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>( queue );
 		for ( LuceneWork work : queue ) {
 			if ( work instanceof OptimizeLuceneWork ) {
 				//we don't want optimization to be propagated

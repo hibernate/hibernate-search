@@ -19,7 +19,7 @@ import org.junit.Test;
 public class MonthDayBridgeTest {
 	private static final MonthDayBridge BRIDGE = MonthDayBridge.INSTANCE;
 
-	private static final MonthDay MAX_VALUE = MonthDay.of( 12, 31);
+	private static final MonthDay MAX_VALUE = MonthDay.of( 12, 31 );
 	private static final MonthDay MIN_VALUE = MonthDay.of( 1, 1 );
 	private static final MonthDay CUSTOM_VALUE = MonthDay.of( 1, 4 );
 

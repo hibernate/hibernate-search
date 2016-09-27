@@ -22,7 +22,7 @@ class ConnectedFuzzyContext implements FuzzyContext {
 
 	public ConnectedFuzzyContext(QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
 		this.queryCustomizer = queryCustomizer;
-		this.termContext = new TermQueryContext( TermQueryContext.Approximation.FUZZY);
+		this.termContext = new TermQueryContext( TermQueryContext.Approximation.FUZZY );
 		this.queryContext = queryContext;
 	}
 

@@ -314,7 +314,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		hibQuery.setResultTransformer( counters );
 
 		hibQuery.list();
-		assertEquals( counters.getTransformListCounter(), 1);
+		assertEquals( counters.getTransformListCounter(), 1 );
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
@@ -526,9 +526,9 @@ public class ProjectionQueryTest extends SearchTestBase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 
 		Transaction tx = s.beginTransaction();
-		FootballTeam chelsea = new FootballTeam(1, "Chelsea", 0.5d, 4);
-		FootballTeam manUtd = new FootballTeam(2, "Manchester United", 700.5d, 18);
-		FootballTeam liverpool = new FootballTeam(3, "Liverpool", 502.4d, 18);
+		FootballTeam chelsea = new FootballTeam( 1, "Chelsea", 0.5d, 4 );
+		FootballTeam manUtd = new FootballTeam( 2, "Manchester United", 700.5d, 18 );
+		FootballTeam liverpool = new FootballTeam( 3, "Liverpool", 502.4d, 18 );
 		s.save( manUtd );
 		s.save( liverpool );
 		s.save( chelsea );

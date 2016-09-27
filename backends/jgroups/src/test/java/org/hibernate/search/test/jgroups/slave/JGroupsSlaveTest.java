@@ -117,7 +117,7 @@ public class JGroupsSlaveTest extends SearchTestBase {
 	private void prepareJGroupsChannel() throws Exception {
 		channel = new JChannel( ConfigurationParseHelper.locateConfig( "testing-flush-loopback.xml" ) );
 		channel.connect( CHANNEL_NAME );
-		JGroupsReceiver listener = new JGroupsReceiver(getExtendedSearchIntegrator());
+		JGroupsReceiver listener = new JGroupsReceiver( getExtendedSearchIntegrator() );
 		MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( listener );
 		MessageDispatcher standardDispatcher = new MessageDispatcher( channel, listener, listener, adapter );
 	}

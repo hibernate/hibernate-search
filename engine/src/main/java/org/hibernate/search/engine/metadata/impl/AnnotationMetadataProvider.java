@@ -362,7 +362,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		DocumentFieldMetadata fieldMetadata = idMetadataBuilder.build();
 		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member,
-				reflectionManager.toClass( member.getType() ));
+				reflectionManager.toClass( member.getType() ) );
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 		checkForSortableField( member, typeMetadataBuilder, propertyMetadataBuilder, "", true, null, parseContext );
 		checkForSortableFields( member, typeMetadataBuilder, propertyMetadataBuilder, "", true, null, parseContext );
@@ -623,7 +623,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		ClassBridge classBridgeAnnotation = clazz.getAnnotation( ClassBridge.class );
 		if ( classBridgeAnnotation != null ) {
 			bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, clazz, configContext,
-					parseContext);
+					parseContext );
 		}
 
 		//Check for Spatial annotation on class level
@@ -946,7 +946,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			boolean hasExplicitDocumentId) {
 
 		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member,
-				reflectionManager.toClass( member.getType() ))
+				reflectionManager.toClass( member.getType() ) )
 			.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
 		NumericFieldsConfiguration numericFields = buildNumericFieldsConfiguration( typeMetadataBuilder.getIndexedType(), member, prefix, pathsContext, parseContext );

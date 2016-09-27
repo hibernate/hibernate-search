@@ -151,7 +151,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 						tenantId
 				),
 				transactionTimeout,
-				tenantId);
+				tenantId );
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
 		try {

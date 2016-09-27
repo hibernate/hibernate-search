@@ -131,7 +131,8 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		fts.getTransaction().commit();
 		fts.clear();
 
-		assertEquals( 0, fts.createFullTextQuery( new TermQuery( new Term("entity1.uid", String.valueOf( otherId ) ) ), Entity2ForUnindexed.class ).getResultSize() );
+		assertEquals( 0,
+				fts.createFullTextQuery( new TermQuery( new Term( "entity1.uid", String.valueOf( otherId ) ) ), Entity2ForUnindexed.class ).getResultSize() );
 
 		tx = fts.beginTransaction();
 		for ( Entity2ForUnindexed e : (List<Entity2ForUnindexed>) fts.createCriteria( Entity2ForUnindexed.class ).list() ) {

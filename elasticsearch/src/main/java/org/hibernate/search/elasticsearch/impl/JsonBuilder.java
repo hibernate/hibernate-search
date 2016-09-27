@@ -30,7 +30,7 @@ public class JsonBuilder {
 	}
 
 	public static JsonBuilder.Array array(JsonArray jsonArray) {
-		return new JsonBuilder.Array(jsonArray);
+		return new JsonBuilder.Array( jsonArray );
 	}
 
 	public static JsonBuilder.Object object() {
@@ -132,7 +132,7 @@ public class JsonBuilder {
 			else if ( value instanceof Character ) {
 				jsonObject.addProperty( property, (Character) value );
 			}
-			else if (value instanceof Date) {
+			else if ( value instanceof Date ) {
 				jsonObject.addProperty( property, ElasticsearchDateHelper.dateToString( (Date) value ) );
 			}
 			else if ( value instanceof Calendar ) {

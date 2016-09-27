@@ -445,7 +445,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		field.addProperty( "store", false );
 		field.addProperty( "index", NOT_ANALYZED );
 
-		getOrCreateProperties( payload, fullFieldName).add( simpleFieldName, field );
+		getOrCreateProperties( payload, fullFieldName ).add( simpleFieldName, field );
 		return field;
 	}
 

@@ -210,6 +210,6 @@ public class FileHelper {
 				Files.delete( dir );
 				return FileVisitResult.CONTINUE;
 			}
-		});
+		} );
 	}
 }

@@ -181,7 +181,7 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public byte[] serialize() {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		out.write( KnownProtocols.MAJOR_VERSION);
+		out.write( KnownProtocols.MAJOR_VERSION );
 		out.write( KnownProtocols.LATEST_MINOR_VERSION );
 		Schema msgSchema = protocol.getType( "Message" );
 		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<>( msgSchema );

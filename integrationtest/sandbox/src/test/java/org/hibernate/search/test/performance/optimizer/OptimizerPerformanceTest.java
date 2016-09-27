@@ -39,7 +39,7 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
-		File indexDir = new File(indexBase);
+		File indexDir = new File( indexBase );
 		FileHelper.delete( indexDir );
 		indexDir.mkdirs();
 		File[] files = indexDir.listFiles();
@@ -56,7 +56,7 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	public void tearDown() throws Exception {
 		super.tearDown();
 		String indexBase = TestConstants.getIndexDirectory( TargetDirHelper.getTargetDir() );
-		File indexDir = new File(indexBase);
+		File indexDir = new File( indexBase );
 		FileHelper.delete( indexDir );
 	}
 

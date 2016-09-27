@@ -85,7 +85,7 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 	public Connection getConnection() throws SQLException {
 		String url = TransactionalDriver.arjunaDriver + _name;
 		// although we are not setting any properties, the driver will barf if we pass 'null'.
-		Properties properties = new Properties(defaultProperties);
+		Properties properties = new Properties( defaultProperties );
 		return getTransactionalConnection( url, properties );
 	}
 
@@ -102,7 +102,7 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
 		String url = TransactionalDriver.arjunaDriver + _name;
-		Properties properties = new Properties(defaultProperties);
+		Properties properties = new Properties( defaultProperties );
 		properties.setProperty( TransactionalDriver.userName, username );
 		properties.setProperty( TransactionalDriver.password, password );
 		return getTransactionalConnection( url, properties );

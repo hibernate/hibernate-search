@@ -144,7 +144,7 @@ public class ClassBridgeTest extends SearchTestBase {
 		Object[] projection = projections.get();
 
 		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Departments );
-		assertEquals( "id incorrect", 1, ((Departments)projection[0]).getId() );
+		assertEquals( "id incorrect", 1, ( (Departments) projection[0] ).getId() );
 		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
 		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getField( "equiptype" ) );
@@ -156,7 +156,7 @@ public class ClassBridgeTest extends SearchTestBase {
 		projection = projections.get();
 
 		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Departments );
-		assertEquals( "id incorrect", 4, ((Departments)projection[0]).getId() );
+		assertEquals( "id incorrect", 4, ( (Departments) projection[0] ).getId() );
 		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
 		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getField( "equiptype" ) );

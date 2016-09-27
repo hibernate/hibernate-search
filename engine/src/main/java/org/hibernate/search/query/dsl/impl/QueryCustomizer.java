@@ -55,7 +55,7 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		}
 		finalQuery.setBoost( boost * finalQuery.getBoost() );
 		if ( filter != null ) {
-			finalQuery = new FilteredQuery(finalQuery, filter);
+			finalQuery = new FilteredQuery( finalQuery, filter );
 		}
 		if ( constantScore ) {
 			finalQuery = new ConstantScoreQuery( new QueryWrapperFilter( finalQuery ) );

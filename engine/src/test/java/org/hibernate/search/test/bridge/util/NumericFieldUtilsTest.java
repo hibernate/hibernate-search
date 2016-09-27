@@ -94,8 +94,8 @@ public class NumericFieldUtilsTest {
 	private Object[] getNumericTestValues() {
 		Object[] numericValues = {
 				40.5d,
-				Byte.valueOf("100"),
-				Short.valueOf((short) 4),
+				Byte.valueOf( "100" ),
+				Short.valueOf( (short) 4 ),
 				20L,
 				10,
 				30.5f,

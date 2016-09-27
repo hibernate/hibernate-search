@@ -93,25 +93,25 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer, Startable
 				if ( work instanceof OptimizeLuceneWork ) {
 					serializer.addOptimizeAll();
 				}
-				else if (work instanceof PurgeAllLuceneWork) {
+				else if ( work instanceof PurgeAllLuceneWork ) {
 					serializer.addPurgeAll( work.getEntityClass().getName() );
 				}
-				else if (work instanceof FlushLuceneWork) {
+				else if ( work instanceof FlushLuceneWork ) {
 					serializer.addFlush();
 				}
-				else if (work instanceof DeleteLuceneWork) {
+				else if ( work instanceof DeleteLuceneWork ) {
 					processId( work, serializer );
 					serializer.addDelete( work.getEntityClass().getName() );
 				}
 				else if ( work instanceof DeleteByQueryLuceneWork ) {
 					serializer.addDeleteByQuery( work.getEntityClass().getName(), ( (DeleteByQueryLuceneWork) work ).getDeletionQuery() );
 				}
-				else if (work instanceof AddLuceneWork ) {
+				else if ( work instanceof AddLuceneWork ) {
 					serializeDocument( work.getDocument(), serializer );
 					processId( work, serializer );
 					serializer.addAdd( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
 				}
-				else if (work instanceof UpdateLuceneWork ) {
+				else if ( work instanceof UpdateLuceneWork ) {
 					serializeDocument( work.getDocument(), serializer );
 					processId( work, serializer );
 					serializer.addUpdate( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );

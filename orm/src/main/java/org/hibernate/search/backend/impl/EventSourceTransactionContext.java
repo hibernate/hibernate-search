@@ -107,7 +107,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			}
 			else {
 				//shouldn't happen if the code about serialization is fine:
-				throw new SearchException( "AssertionFailure: flushListener not registered any more.");
+				throw new SearchException( "AssertionFailure: flushListener not registered any more." );
 			}
 		}
 	}
@@ -169,7 +169,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 				synchronization.beforeCompletion();
 			}
 			catch (Exception e) {
-				throw new HibernateException( "Error while indexing in Hibernate Search (before transaction completion)", e);
+				throw new HibernateException( "Error while indexing in Hibernate Search (before transaction completion)", e );
 			}
 		}
 	}
@@ -187,7 +187,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 				synchronization.afterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
 			}
 			catch (Exception e) {
-				throw new HibernateException( "Error while indexing in Hibernate Search (after transaction completion)", e);
+				throw new HibernateException( "Error while indexing in Hibernate Search (after transaction completion)", e );
 			}
 		}
 	}

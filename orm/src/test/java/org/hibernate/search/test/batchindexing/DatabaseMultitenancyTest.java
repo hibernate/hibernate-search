@@ -62,15 +62,15 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	private static final String GEOCHRON_TID = "geochron";
 
 	private static Object[] METAMEC_MODELS = {
-		new Clock( 1, "Metamec - Model A850"),
-		new Clock( 2, "Metamec - Model 4562"),
-		new Clock( 5, "Metamec - Model 792")
+			new Clock( 1, "Metamec - Model A850" ),
+			new Clock( 2, "Metamec - Model 4562" ),
+			new Clock( 5, "Metamec - Model 792" )
 		};
 
 	private static Object[] GEOCHRON_MODELS = {
-		new Clock( 1, "Geochron - Model The Original Kilburg" ),
-		new Clock( 2, "Geochron - Model The Boardroom" ),
-		new Clock( 9, "Geochron - Model Designer Series")
+			new Clock( 1, "Geochron - Model The Original Kilburg" ),
+			new Clock( 2, "Geochron - Model The Boardroom" ),
+			new Clock( 9, "Geochron - Model Designer Series" )
 		};
 
 	@Override

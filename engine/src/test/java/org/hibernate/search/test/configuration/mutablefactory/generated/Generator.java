@@ -31,7 +31,7 @@ public final class Generator {
 			.append( "public class Generated {\n" );
 
 		StringBuilder inner = new StringBuilder( );
-		inner.append( "\t" ).append( "@Indexed").append( "\n" )
+		inner.append( "\t" ).append( "@Indexed" ).append( "\n" )
 				.append( "\t" ).append( "public static class Ax {" ).append( "\n" )
 				.append( "\t" ).append( "\t" ).append( "public Ax(Integer id, String name) { this.id = id; this.name = name; }" ).append( "\n\n" )
 				.append( "\t" ).append( "\t" ).append( "@DocumentId" ).append( "\n" )

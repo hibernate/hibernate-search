@@ -54,7 +54,7 @@ public class MassIndexTest extends SearchTestBase {
 						statmt.close();
 					}
 				}
-			});
+		} );
 		tx.commit();
 		s.close();
 
@@ -199,7 +199,7 @@ public class MassIndexTest extends SearchTestBase {
 		s.close();
 
 		s = getSessionWithAutoCommit();
-		Iterator it = s.createQuery( "from Entite where id = :id").setParameter( "id", ent.getId() ).iterate();
+		Iterator it = s.createQuery( "from Entite where id = :id" ).setParameter( "id", ent.getId() ).iterate();
 		session = Search.getFullTextSession( s );
 		while ( it.hasNext() ) {
 			ent = (Entite) it.next();

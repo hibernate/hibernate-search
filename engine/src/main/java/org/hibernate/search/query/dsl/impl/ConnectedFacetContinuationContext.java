@@ -24,12 +24,12 @@ public class ConnectedFacetContinuationContext implements FacetContinuationConte
 	@Override
 	public <T> FacetRangeAboveBelowContext<T> range() {
 		context.setRangeQuery( true );
-		return new ConnectedFacetRangeAboveBelowContext<T>(context);
+		return new ConnectedFacetRangeAboveBelowContext<T>( context );
 	}
 
 	@Override
 	public DiscreteFacetContext discrete() {
-		return new ConnectedDiscreteFacetContext(context);
+		return new ConnectedDiscreteFacetContext( context );
 	}
 }
 

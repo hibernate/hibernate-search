@@ -253,7 +253,7 @@ public final class BridgeFactory {
 					}
 					multipleMatchError
 							.append( "\n" )
-							.append( "FieldBridge: ")
+							.append( "FieldBridge: " )
 							.append( createdBridge )
 							.append( " - BridgeProvider: " )
 							.append( provider.getClass() );

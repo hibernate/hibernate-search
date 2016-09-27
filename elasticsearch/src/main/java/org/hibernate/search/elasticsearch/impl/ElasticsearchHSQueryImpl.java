@@ -430,7 +430,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			else {
 				String sortFieldName;
 				if ( sortField.getField() == null ) {
-					switch (sortField.getType()) {
+					switch ( sortField.getType() ) {
 						case DOC:
 							sortFieldName = "_uid";
 							break;
@@ -577,7 +577,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		private Object getId(JsonObject hit, EntityIndexBinding binding) {
 			Document tmp = new Document();
-			tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO) );
+			tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO ) );
 
 			addIdBridgeDefinedFields( hit, binding, tmp );
 

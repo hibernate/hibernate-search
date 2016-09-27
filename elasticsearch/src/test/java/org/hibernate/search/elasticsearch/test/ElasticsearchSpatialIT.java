@@ -97,7 +97,7 @@ public class ElasticsearchSpatialIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromJson( geoDistanceQuery );
 		List<?> result = session.createFullTextQuery( query, POI.class )
-				.setSort(new Sort(new DistanceSortField( 24, 32, "location" )))
+				.setSort( new Sort( new DistanceSortField( 24, 32, "location" ) ) )
 				.list();
 		assertThat( result ).onProperty( "id" ).describedAs( "Geo distance query" ).containsOnly( 1, 2, 3 );
 

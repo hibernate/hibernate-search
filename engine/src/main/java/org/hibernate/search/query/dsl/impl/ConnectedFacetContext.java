@@ -23,7 +23,7 @@ class ConnectedFacetContext implements FacetContext {
 	@Override
 	public FacetFieldContext name(String name) {
 		context.setName( name );
-		return new ConnectedFacetFieldContext(context);
+		return new ConnectedFacetFieldContext( context );
 	}
 }
 

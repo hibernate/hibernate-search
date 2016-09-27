@@ -33,7 +33,7 @@ public final class SerializationHelper {
 		//no need to close ByteArrayOutputStream
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			ObjectOutputStream stream = new ObjectOutputStream(out);
+			ObjectOutputStream stream = new ObjectOutputStream( out );
 			stream.writeObject( instance );
 			stream.close();
 		}

@@ -27,7 +27,7 @@ public class ConnectedAllContext implements AllContext {
 
 	public ConnectedAllContext() {
 		this.queryCustomizer = new QueryCustomizer();
-		this.clauses = new ArrayList<BooleanClause>(5);
+		this.clauses = new ArrayList<BooleanClause>( 5 );
 		this.clauses.add( new BooleanClause( new MatchAllDocsQuery(), BooleanClause.Occur.SHOULD ) );
 	}
 

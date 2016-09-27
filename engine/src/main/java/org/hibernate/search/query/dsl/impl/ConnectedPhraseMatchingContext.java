@@ -32,7 +32,7 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.phraseContext = phraseContext;
-		this.fieldContexts = new ArrayList<FieldContext>(4);
+		this.fieldContexts = new ArrayList<FieldContext>( 4 );
 		this.fieldContexts.add( new FieldContext( fieldName, queryContext ) );
 	}
 

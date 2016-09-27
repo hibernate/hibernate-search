@@ -17,7 +17,7 @@ public class DateResolutionUtil {
 
 	public static Resolution getLuceneResolution(org.hibernate.search.annotations.Resolution hibResolution) {
 		final Resolution resolution;
-		switch (hibResolution) {
+		switch ( hibResolution ) {
 			case YEAR:
 				resolution = DateTools.Resolution.YEAR;
 				break;

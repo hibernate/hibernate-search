@@ -33,8 +33,8 @@ public class SecurityFilterFactory {
 
 	@Factory
 	public Filter buildSecurityFilter() {
-		SecurityFilter securityFilter = new SecurityFilter(ownerName);
-		return new CachingWrapperFilter(securityFilter);
+		SecurityFilter securityFilter = new SecurityFilter( ownerName );
+		return new CachingWrapperFilter( securityFilter );
 	}
 
 	@Key

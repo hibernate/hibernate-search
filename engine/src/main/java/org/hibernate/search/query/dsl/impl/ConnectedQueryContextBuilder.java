@@ -34,7 +34,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 	@Override
 	public EntityContext forEntity(Class<?> entityType) {
-		return new HSearchEntityContext(entityType, factory );
+		return new HSearchEntityContext( entityType, factory );
 	}
 
 	public final class HSearchEntityContext implements EntityContext {

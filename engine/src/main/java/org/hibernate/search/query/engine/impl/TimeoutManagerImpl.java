@@ -141,7 +141,8 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	@Override
 	public void raiseExceptionOnTimeout() {
 		if ( this.type == Type.LIMIT ) {
-			throw new SearchException("Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team");
+			throw new SearchException(
+					"Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team" );
 		}
 		this.type = Type.EXCEPTION;
 	}
@@ -149,7 +150,8 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	@Override
 	public void limitFetchingOnTimeout() {
 		if ( this.type == Type.EXCEPTION ) {
-			throw new SearchException("Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team");
+			throw new SearchException(
+					"Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team" );
 		}
 		this.type = Type.LIMIT;
 	}

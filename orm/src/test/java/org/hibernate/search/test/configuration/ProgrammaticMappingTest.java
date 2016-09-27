@@ -324,7 +324,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		address.setStreet1( "Peachtree Rd NE" );
 		address.setStreet2( "Peachtnot Rd NE" );
 		Calendar c = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
-		c.set( 2009, Calendar.NOVEMBER, 15);
+		c.set( 2009, Calendar.NOVEMBER, 15 );
 
 		Date date = new Date( c.getTimeInMillis() );
 		address.setDateCreated( date );
@@ -476,7 +476,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		address.setStreet2( "Peachtnot Rd NE" );
 		address.setOwner( "test" );
 		Calendar c = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
-		c.set( 2009, Calendar.NOVEMBER, 15);
+		c.set( 2009, Calendar.NOVEMBER, 15 );
 
 		address.setLastUpdated( c );
 		s.persist( address );

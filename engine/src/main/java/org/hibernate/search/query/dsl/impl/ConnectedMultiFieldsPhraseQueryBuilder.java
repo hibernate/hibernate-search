@@ -85,7 +85,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			Map<Integer, List<Term>> termsPerPosition = new HashMap<Integer, List<Term>>();
 			try {
 				Reader reader = new StringReader( sentence );
-				stream = analyzer.tokenStream( fieldName, reader);
+				stream = analyzer.tokenStream( fieldName, reader );
 
 				CharTermAttribute termAttribute = stream.addAttribute( CharTermAttribute.class );
 				PositionIncrementAttribute positionAttribute = stream.addAttribute( PositionIncrementAttribute.class );
@@ -117,7 +117,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 				}
 			}
 			catch (IOException e) {
-				throw new AssertionFailure( "IOException while reading a string. Doh!", e);
+				throw new AssertionFailure( "IOException while reading a string. Doh!", e );
 			}
 			finally {
 				if ( stream != null ) {
@@ -126,7 +126,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 						stream.close();
 					}
 					catch (IOException e) {
-						throw new AssertionFailure( "IOException while reading a string. Doh!", e);
+						throw new AssertionFailure( "IOException while reading a string. Doh!", e );
 					}
 				}
 			}
@@ -148,7 +148,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 				else {
 					BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 					for ( Term term : terms ) {
-						booleanQueryBuilder.add( new TermQuery(term), BooleanClause.Occur.SHOULD );
+						booleanQueryBuilder.add( new TermQuery( term ), BooleanClause.Occur.SHOULD );
 					}
 					perFieldQuery = booleanQueryBuilder.build();
 				}

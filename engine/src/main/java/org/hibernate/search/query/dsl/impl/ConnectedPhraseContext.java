@@ -35,7 +35,7 @@ class ConnectedPhraseContext implements PhraseContext {
 
 	@Override
 	public PhraseMatchingContext onField(String fieldName) {
-		return new ConnectedPhraseMatchingContext(fieldName, phraseContext, queryCustomizer, queryContext);
+		return new ConnectedPhraseMatchingContext( fieldName, phraseContext, queryCustomizer, queryContext );
 	}
 
 	@Override
