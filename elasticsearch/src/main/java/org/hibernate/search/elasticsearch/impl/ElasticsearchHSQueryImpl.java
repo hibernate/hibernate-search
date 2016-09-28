@@ -40,6 +40,7 @@ import org.hibernate.search.elasticsearch.client.impl.ArbitrarySort;
 import org.hibernate.search.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
+import org.hibernate.search.elasticsearch.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.Window;
 import org.hibernate.search.engine.impl.FilterDef;
@@ -52,7 +53,6 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
@@ -751,37 +751,33 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private Object convertFieldValue(EntityIndexBinding binding, DocumentFieldMetadata field, JsonElement value) {
 			FieldBridge fieldBridge = field.getFieldBridge();
 
-			if ( FieldHelper.isBoolean( binding, field.getName() ) ) {
+			ExtendedFieldType type = FieldHelper.getType( binding, field );
+			if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 				return value.getAsBoolean();
 			}
 			else if ( fieldBridge instanceof TwoWayFieldBridge ) {
 				Document tmp = new Document();
 
-				if ( FieldHelper.isNumeric( field ) ) {
-					NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( binding, field );
-
-					switch ( numericEncodingType ) {
-						case INTEGER:
-							tmp.add( new IntField( field.getName(), value.getAsInt(), Store.NO ) );
-							break;
-						case LONG:
-							tmp.add( new LongField( field.getName(), value.getAsLong(), Store.NO ) );
-							break;
-						case FLOAT:
-							tmp.add( new FloatField( field.getName(), value.getAsFloat(), Store.NO ) );
-							break;
-						case DOUBLE:
-							tmp.add( new DoubleField( field.getName(), value.getAsDouble(), Store.NO ) );
-							break;
-						case UNKNOWN:
-						default:
-							throw LOG.unexpectedNumericEncodingType(
-									binding.getDocumentBuilder().getMetadata().getType().getName(),
-									field.getName() );
-					}
-				}
-				else {
-					tmp.add( new StringField( field.getName(), value.getAsString(), Store.NO ) );
+				switch ( type ) {
+					case INTEGER:
+						tmp.add( new IntField( field.getName(), value.getAsInt(), Store.NO ) );
+						break;
+					case LONG:
+						tmp.add( new LongField( field.getName(), value.getAsLong(), Store.NO ) );
+						break;
+					case FLOAT:
+						tmp.add( new FloatField( field.getName(), value.getAsFloat(), Store.NO ) );
+						break;
+					case DOUBLE:
+						tmp.add( new DoubleField( field.getName(), value.getAsDouble(), Store.NO ) );
+						break;
+					case UNKNOWN_NUMERIC:
+						throw LOG.unexpectedNumericEncodingType(
+								binding.getDocumentBuilder().getMetadata().getType().getName(),
+								field.getName() );
+					default:
+						tmp.add( new StringField( field.getName(), value.getAsString(), Store.NO ) );
+						break;
 				}
 
 				return ( (TwoWayFieldBridge) fieldBridge ).get( field.getName(), tmp );

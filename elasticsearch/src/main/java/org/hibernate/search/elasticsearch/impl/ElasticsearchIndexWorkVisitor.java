@@ -34,6 +34,7 @@ import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
+import org.hibernate.search.elasticsearch.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -267,35 +268,38 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 						}
 					}
 				}
-				else if ( FieldHelper.isBoolean( indexBinding, field.name() ) ) {
-					FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
-					Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
-					addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-							value != null ? new JsonPrimitive( value ) : null );
-				}
-				// TODO HSEARCH-2261 falling back for now to checking actual Field type to cover numeric fields created by custom
-				// bridges
-				else if ( FieldHelper.isNumeric( documentFieldMetadata ) || isNumeric( field ) ) {
-					// Explicitly propagate null in case value is not given and let ES handle the default token set
-					// in the meta-data
-					Number value = field.numericValue();
-
-					if ( value != null && value.toString().equals( documentFieldMetadata.indexNullAs() ) ) {
-						value = null;
-					}
-
-					addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-							value != null ? new JsonPrimitive( value ) : null );
-				}
 				else {
-					// Explicitly propagate null in case value is not given and let ES handle the default token set in the meta-data
-					String value = field.stringValue();
-					if ( value != null && value.equals( documentFieldMetadata.indexNullAs() ) ) {
-						value = null;
+					ExtendedFieldType type = FieldHelper.getType( indexBinding, documentFieldMetadata );
+					if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
+						FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
+						Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
+						addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+								value != null ? new JsonPrimitive( value ) : null );
 					}
+					// TODO HSEARCH-2261 falling back for now to checking actual Field type to cover numeric fields created by custom
+					// bridges
+					else if ( type.isNumeric() || isNumeric( field ) ) {
+						// Explicitly propagate null in case value is not given and let ES handle the default token set
+						// in the meta-data
+						Number value = field.numericValue();
 
-					addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-							value != null ? new JsonPrimitive( value ) : null );
+						if ( value != null && value.toString().equals( documentFieldMetadata.indexNullAs() ) ) {
+							value = null;
+						}
+
+						addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+								value != null ? new JsonPrimitive( value ) : null );
+					}
+					else {
+						// Explicitly propagate null in case value is not given and let ES handle the default token set in the meta-data
+						String value = field.stringValue();
+						if ( value != null && value.equals( documentFieldMetadata.indexNullAs() ) ) {
+							value = null;
+						}
+
+						addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+								value != null ? new JsonPrimitive( value ) : null );
+					}
 				}
 			}
 			else if ( FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( field.name() )

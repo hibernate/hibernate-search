@@ -22,7 +22,6 @@ import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
@@ -41,8 +40,45 @@ class FieldHelper {
 	private FieldHelper() {
 	}
 
+	public enum ExtendedFieldType {
+		STRING,
+		BOOLEAN,
+		DATE,
+		CALENDAR,
+		INTEGER {
+			public boolean isNumeric() {
+				return true;
+			}
+		},
+		LONG {
+			public boolean isNumeric() {
+				return true;
+			}
+		},
+		FLOAT {
+			public boolean isNumeric() {
+				return true;
+			}
+		},
+		DOUBLE {
+			public boolean isNumeric() {
+				return true;
+			}
+		},
+		UNKNOWN_NUMERIC {
+			public boolean isNumeric() {
+				return true;
+			}
+		},
+		UNKNOWN;
+
+		public boolean isNumeric() {
+			return false;
+		}
+	}
+
 	// TODO HSEARCH-2259 make it work with fields embedded types
-	static NumericEncodingType getNumericEncodingType(EntityIndexBinding indexBinding, DocumentFieldMetadata field) {
+	private static NumericEncodingType getNumericEncodingType(EntityIndexBinding indexBinding, DocumentFieldMetadata field) {
 		NumericEncodingType numericEncodingType = field.getNumericEncodingType();
 
 		if ( numericEncodingType == NumericEncodingType.UNKNOWN ) {
@@ -73,36 +109,70 @@ class FieldHelper {
 		}
 	}
 
-	static boolean isBoolean(EntityIndexBinding indexBinding, String fieldName) {
+	private static ExtendedFieldType toExtendedFieldType(NumericEncodingType numericEncodingType) {
+		switch ( numericEncodingType ) {
+			case INTEGER:
+				return ExtendedFieldType.INTEGER;
+			case LONG:
+				return ExtendedFieldType.LONG;
+			case FLOAT:
+				return ExtendedFieldType.FLOAT;
+			case DOUBLE:
+				return ExtendedFieldType.DOUBLE;
+			case UNKNOWN:
+			default:
+				return ExtendedFieldType.UNKNOWN_NUMERIC;
+		}
+	}
+
+	static ExtendedFieldType getType(EntityIndexBinding indexBinding, DocumentFieldMetadata fieldMetadata) {
+		String fieldName = fieldMetadata.getFieldName();
+
 		Class<?> propertyClass = getPropertyClass( indexBinding, fieldName );
 		if ( propertyClass == null ) {
-			return false;
+			return ExtendedFieldType.UNKNOWN;
 		}
-		return boolean.class.equals( propertyClass ) || Boolean.class.isAssignableFrom( propertyClass );
-	}
 
-	static boolean isBoolean(BridgeDefinedField field) {
-		return FieldType.BOOLEAN == field.getType();
-	}
-
-	static boolean isDate(EntityIndexBinding indexBinding, String fieldName) {
-		Class<?> propertyClass = getPropertyClass( indexBinding, fieldName );
-		if ( propertyClass == null ) {
-			return false;
+		if ( boolean.class.equals( propertyClass ) || Boolean.class.isAssignableFrom( propertyClass ) ) {
+			return ExtendedFieldType.BOOLEAN;
 		}
-		return Date.class.isAssignableFrom( propertyClass );
-	}
-
-	static boolean isCalendar(EntityIndexBinding indexBinding, String fieldName) {
-		Class<?> propertyClass = getPropertyClass( indexBinding, fieldName );
-		if ( propertyClass == null ) {
-			return false;
+		else if ( isNumeric(fieldMetadata) ) {
+			return toExtendedFieldType( getNumericEncodingType( indexBinding, fieldMetadata ) );
 		}
-		return Calendar.class.isAssignableFrom( propertyClass );
+		else if ( Date.class.isAssignableFrom( propertyClass ) ) {
+			return ExtendedFieldType.DATE;
+		}
+		else if ( Calendar.class.isAssignableFrom( propertyClass ) ) {
+			return ExtendedFieldType.CALENDAR;
+		}
+		else {
+			return ExtendedFieldType.UNKNOWN;
+		}
 	}
 
-	static boolean isDate(BridgeDefinedField field) {
-		return FieldType.DATE == field.getType();
+	static ExtendedFieldType getType(BridgeDefinedField field) {
+		FieldType type = field.getType();
+		if ( type == null ) {
+			return null;
+		}
+		switch ( type ) {
+			case BOOLEAN:
+				return ExtendedFieldType.BOOLEAN;
+			case DATE:
+				return ExtendedFieldType.DATE;
+			case DOUBLE:
+				return ExtendedFieldType.DOUBLE;
+			case FLOAT:
+				return ExtendedFieldType.FLOAT;
+			case INTEGER:
+				return ExtendedFieldType.INTEGER;
+			case LONG:
+				return ExtendedFieldType.LONG;
+			case STRING:
+				return ExtendedFieldType.STRING;
+			default:
+				return ExtendedFieldType.UNKNOWN;
+		}
 	}
 
 	static boolean isNumeric(DocumentFieldMetadata field) {
@@ -117,22 +187,6 @@ class FieldHelper {
 		}
 
 		return false;
-	}
-
-	static boolean isNumeric(BridgeDefinedField field) {
-		switch ( field.getType() ) {
-			case LONG:
-			case INTEGER:
-			case FLOAT:
-			case DOUBLE:
-				return true;
-			case STRING:
-			case BOOLEAN:
-			case DATE:
-				return false;
-			default:
-				throw new AssertionFailure( "Type not recognized: " + field.getType() );
-		}
 	}
 
 	static String[] getFieldNameParts(String fieldName) {

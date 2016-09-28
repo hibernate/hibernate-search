@@ -30,6 +30,7 @@ import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequestProcessor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.elasticsearch.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -47,7 +48,6 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.ReaderProvider;
-import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -363,13 +363,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( fieldMetadata.getName() );
 		JsonObject field = new JsonObject();
 
-		ElasticsearchFieldType fieldType = getFieldType( descriptor, fieldMetadata );
-		if ( fieldType == null ) {
-			LOG.debug( "Not adding a mapping for field " + fieldMetadata.getFieldName() + " as its type could not be determined" );
-			return;
-		}
+		ElasticsearchFieldType fieldType = addTypeOptions( field, descriptor, fieldMetadata );
 
-		field.addProperty( "type", fieldType.getElasticsearchString() );
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 
 		addIndexOptions( field, descriptor, fieldMetadata.getName(),
@@ -404,8 +399,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		if ( !SpatialHelper.isSpatialField( simpleFieldName ) ) {
 			JsonObject field = new JsonObject();
 
-			ElasticsearchFieldType fieldType = getFieldType( bridgeDefinedField );
-			field.addProperty( "type", fieldType.getElasticsearchString() );
+			ElasticsearchFieldType fieldType = addTypeOptions( field, bridgeDefinedField );
 
 			addIndexOptions( field, binding, fieldName, fieldType, bridgeDefinedField.getIndex(), null );
 
@@ -446,7 +440,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		String fullFieldName = facetMetadata.getFacetName();
 
 		JsonObject field = new JsonObject();
-		field.addProperty( "type", getFieldType( facetMetadata ).getElasticsearchString() );
+		addTypeOptions( field, facetMetadata );
 		field.addProperty( "store", false );
 		field.addProperty( "index", NOT_ANALYZED );
 
@@ -495,77 +489,33 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return ElasticsearchFieldType.STRING.equals( fieldType );
 	}
 
-	private ElasticsearchFieldType getFieldType(EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
-		ElasticsearchFieldType type;
-
-		if ( FieldHelper.isBoolean( descriptor, fieldMetadata.getName() ) ) {
-			type = ElasticsearchFieldType.BOOLEAN;
-		}
-		else if ( FieldHelper.isDate( descriptor, fieldMetadata.getName() ) ||
-				FieldHelper.isCalendar( descriptor, fieldMetadata.getName() ) ) {
-			type = ElasticsearchFieldType.DATE;
-		}
-		else if ( FieldHelper.isNumeric( fieldMetadata ) ) {
-
-			NumericEncodingType numericEncodingType = FieldHelper.getNumericEncodingType( descriptor, fieldMetadata );
-
-			switch ( numericEncodingType ) {
-				case INTEGER:
-					type = ElasticsearchFieldType.INTEGER;
-					break;
-				case LONG:
-					type = ElasticsearchFieldType.LONG;
-					break;
-				case FLOAT:
-					type = ElasticsearchFieldType.FLOAT;
-					break;
-				case DOUBLE:
-					type = ElasticsearchFieldType.DOUBLE;
-					break;
-				default:
-					// Likely a custom field bridge which does not expose the type of the given field; either correctly
-					// so (because the given name is the default field and this bridge does not wish to use that field
-					// name as is) or incorrectly; The field will not be added to the mapping, causing an exception at
-					// runtime if the bridge writes that field nevertheless
-					type = null;
-			}
-		}
-		else {
-			type = ElasticsearchFieldType.STRING;
-		}
-
-		return type;
+	private ElasticsearchFieldType addTypeOptions(JsonObject field, EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
+		return addTypeOptions( fieldMetadata.getFieldName(), field, FieldHelper.getType( descriptor, fieldMetadata ) );
 	}
 
-	private ElasticsearchFieldType getFieldType(BridgeDefinedField bridgeDefinedField) {
-		switch ( bridgeDefinedField.getType() ) {
-			case BOOLEAN:
-				return ElasticsearchFieldType.BOOLEAN;
-			case DATE:
-				return ElasticsearchFieldType.DATE;
-			case FLOAT:
-				return ElasticsearchFieldType.FLOAT;
-			case DOUBLE:
-				return ElasticsearchFieldType.DOUBLE;
-			case INTEGER:
-				return ElasticsearchFieldType.INTEGER;
-			case LONG:
-				return ElasticsearchFieldType.LONG;
-			case STRING:
-				return ElasticsearchFieldType.STRING;
-			default:
-				throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getName() );
+	private ElasticsearchFieldType addTypeOptions(JsonObject field, BridgeDefinedField bridgeDefinedField) {
+		ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
+
+		if ( ExtendedFieldType.UNKNOWN.equals( type ) ) {
+			throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getName() );
 		}
+
+		return addTypeOptions( bridgeDefinedField.getName(), field, FieldHelper.getType( bridgeDefinedField ) );
 	}
 
-	private ElasticsearchFieldType getFieldType(FacetMetadata facetMetadata) {
+	private ElasticsearchFieldType addTypeOptions(JsonObject field, FacetMetadata facetMetadata) {
+		ExtendedFieldType type;
+
 		switch ( facetMetadata.getEncoding() ) {
 			case DOUBLE:
-				return ElasticsearchFieldType.DOUBLE;
+				type = ExtendedFieldType.DOUBLE;
+				break;
 			case LONG:
-				return ElasticsearchFieldType.LONG;
+				type = ExtendedFieldType.LONG;
+				break;
 			case STRING:
-				return ElasticsearchFieldType.STRING;
+				type = ExtendedFieldType.STRING;
+				break;
 			case AUTO:
 				throw new AssertionFailure( "The facet type should have been resolved during bootstrapping" );
 			default: {
@@ -576,6 +526,55 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				);
 			}
 		}
+
+		return addTypeOptions( facetMetadata.getFacetName(), field, type );
+	}
+
+	private ElasticsearchFieldType addTypeOptions(String fieldName, JsonObject field, ExtendedFieldType extendedType) {
+		ElasticsearchFieldType elasticsearchType;
+
+		switch ( extendedType ) {
+			case BOOLEAN:
+				elasticsearchType = ElasticsearchFieldType.BOOLEAN;
+				break;
+			case CALENDAR:
+			case DATE:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				break;
+			case INTEGER:
+				elasticsearchType = ElasticsearchFieldType.INTEGER;
+				break;
+			case LONG:
+				elasticsearchType = ElasticsearchFieldType.LONG;
+				break;
+			case FLOAT:
+				elasticsearchType = ElasticsearchFieldType.FLOAT;
+				break;
+			case DOUBLE:
+				elasticsearchType = ElasticsearchFieldType.DOUBLE;
+				break;
+			case UNKNOWN_NUMERIC:
+				// Likely a custom field bridge which does not expose the type of the given field; either correctly
+				// so (because the given name is the default field and this bridge does not wish to use that field
+				// name as is) or incorrectly; The field will not be added to the mapping, causing an exception at
+				// runtime if the bridge writes that field nevertheless
+				elasticsearchType = null;
+				break;
+			case STRING:
+			case UNKNOWN:
+			default:
+				elasticsearchType = ElasticsearchFieldType.STRING;
+				break;
+		}
+
+		if ( elasticsearchType == null ) {
+			LOG.debug( "Not adding a mapping for field " + fieldName + " as its type could not be determined" );
+			return null;
+		}
+
+		field.addProperty( "type", elasticsearchType.getElasticsearchString() );
+
+		return elasticsearchType;
 	}
 
 	private JsonElement getNullValue(EntityIndexBinding indexBinding, ElasticsearchFieldType dataType,
