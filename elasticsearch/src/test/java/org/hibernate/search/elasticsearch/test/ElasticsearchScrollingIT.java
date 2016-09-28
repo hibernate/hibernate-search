@@ -54,7 +54,8 @@ public class ElasticsearchScrollingIT {
 					"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
 					IndexSchemaManagementStrategy.CREATE_DELETE.name()
 					)
-			.withProperty( "hibernate.search.default." + Environment.INDEX_MANAGER_IMPL_NAME, "elasticsearch" );
+			.withProperty( "hibernate.search.default." + Environment.INDEX_MANAGER_IMPL_NAME, "elasticsearch" )
+			.withProperty( "hibernate.search.default." + ElasticsearchEnvironment.REFRESH_AFTER_WRITE, "true" );
 
 	@Test
 	public void searchBeforeMaxResultWindow() throws Exception {
@@ -148,9 +149,6 @@ public class ElasticsearchScrollingIT {
 			sfHolder.getSearchFactory().getWorker().performWork( work, tc );
 		}
 		tc.end();
-
-		// Wait for Elasticsearch to make everything available
-		Thread.sleep( 1000 );
 	}
 
 	@Indexed
