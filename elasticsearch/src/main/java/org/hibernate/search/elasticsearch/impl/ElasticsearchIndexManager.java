@@ -299,6 +299,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
+	private static class IncompleteDataException extends SearchException {
+		public IncompleteDataException(String message) {
+			super( message );
+		}
+	}
+
 	// TODO HSEARCH-2260
 	// What happens if mappings already exist? We need an option similar to hbm2ddl
 	// What happens if several nodes in a cluster try to create the mappings?
@@ -325,12 +331,22 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 					continue;
 				}
 
-				addFieldMapping( payload, descriptor, fieldMetadata );
+				try {
+					addFieldMapping( payload, descriptor, fieldMetadata );
+				}
+				catch (IncompleteDataException e) {
+					LOG.debug( "Not adding a mapping for field " + fieldMetadata.getFieldName() + " because of incomplete data", e );
+				}
 			}
 
 			// bridge-defined fields
 			for ( BridgeDefinedField bridgeDefinedField : getAllBridgeDefinedFields( descriptor ) ) {
-				addFieldMapping( payload, descriptor, bridgeDefinedField );
+				try {
+					addFieldMapping( payload, descriptor, bridgeDefinedField );
+				}
+				catch (IncompleteDataException e) {
+					LOG.debug( "Not adding a mapping for field " + bridgeDefinedField.getName() + " because of incomplete data", e );
+				}
 			}
 
 			PutMapping putMapping = new PutMapping.Builder(
@@ -386,7 +402,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		// extra field for it
 		for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
 			if ( !facetMetadata.getFacetName().equals( fieldMetadata.getFieldName() ) ) {
-				addFieldMapping( payload, facetMetadata );
+				try {
+					addFieldMapping( payload, facetMetadata );
+				}
+				catch (IncompleteDataException e) {
+					LOG.debug( "Not adding a mapping for facet " + facetMetadata.getFacetName() + " because of incomplete data", e );
+				}
 			}
 		}
 	}
@@ -622,8 +643,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 
 		if ( elasticsearchType == null ) {
-			LOG.debug( "Not adding a mapping for field " + fieldName + " as its type could not be determined" );
-			return null;
+			throw new IncompleteDataException( "Field type could not be determined" );
 		}
 
 		field.addProperty( "type", elasticsearchType.getElasticsearchString() );
