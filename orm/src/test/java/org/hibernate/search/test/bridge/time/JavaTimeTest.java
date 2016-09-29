@@ -22,6 +22,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -169,6 +170,21 @@ public class JavaTimeTest extends SearchTestBase {
 	}
 
 	@Test
+	public void testZonedDateTime() throws Exception {
+		// CET DST rolls back at 2011-10-30 2:59:59 (+02) to 2011-10-30 2:00:00 (+01)
+		// Credit: user leonbloy at http://stackoverflow.com/a/18794412/6692043
+		LocalDateTime localDateTime = LocalDateTime.of( 2011, 10, 30, 2, 50, 0, 0 );
+
+		ZonedDateTime value = localDateTime.atZone( ZoneId.of( "CET" ) ).withLaterOffsetAtOverlap();
+
+		Sample sample = new Sample( 1L, "ZonedDateTime example" );
+		sample.zonedDateTime = value;
+
+		assertThatFieldIsIndexed( "zonedDateTime", value, sample );
+	}
+
+
+	@Test
 	public void testYear() throws Exception {
 		/* Elasticsearch only accepts years in the range [-292275054,292278993]
 		 */
@@ -271,6 +287,9 @@ public class JavaTimeTest extends SearchTestBase {
 
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private OffsetDateTime offsetDateTime;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private ZonedDateTime zonedDateTime;
 
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private OffsetTime offsetTime;
