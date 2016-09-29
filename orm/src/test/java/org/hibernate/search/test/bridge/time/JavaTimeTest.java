@@ -144,7 +144,13 @@ public class JavaTimeTest extends SearchTestBase {
 
 	@Test
 	public void testOffsetDateTime() throws Exception {
-		OffsetDateTime value = OffsetDateTime.MIN;
+		/* Elasticsearch only accepts years in the range [-292275054,292278993]
+		 */
+		OffsetDateTime value = OffsetDateTime.of(
+				221998, Month.FEBRUARY.getValue(), 12,
+				13, 05, 33, 7,
+				ZoneOffset.of( "+01:00" )
+				);
 
 		Sample sample = new Sample( 1L, "OffsetDateTime example" );
 		sample.offsetDateTime = value;

@@ -22,6 +22,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -127,6 +128,97 @@ public class ElasticsearchJavaTimeIT extends SearchTestBase {
 		sample.instant = instant;
 
 		assertThatFieldIsFormatted( sample, "instant", "1998-02-12T13:05:33.005Z" );
+	}
+
+	@Test
+	public void testOffsetDateTimeMilliseconds() throws Exception {
+		OffsetDateTime value = OffsetDateTime.of(
+				221998, Month.FEBRUARY.getValue(), 12,
+				13, 05, 33, 7_000_000,
+				ZoneOffset.of( "+01:00" )
+				);
+
+		Sample sample = new Sample( 1L, "OffsetDateTime example" );
+		sample.offsetDateTime = value;
+
+		// The "fields" attribute only ever contains UTC date/times
+		assertThatFieldIsFormatted( sample, "offsetDateTime", "+221998-02-12T13:05:33.007+01:00", "221998-02-12T12:05:33.007Z" );
+	}
+
+	@Test
+	public void testOffsetDateTimeNanoseconds() throws Exception {
+		OffsetDateTime value = OffsetDateTime.of(
+				221998, Month.FEBRUARY.getValue(), 12,
+				13, 05, 33, 7,
+				ZoneOffset.of( "+01:00" )
+				);
+
+		Sample sample = new Sample( 1L, "OffsetDateTime example" );
+		sample.offsetDateTime = value;
+
+		// Elasticsearch only has millisecond-precision, so the "fields" value is missing the nanoseconds
+		// Also, the "fields" attribute only ever contains UTC date/times
+		assertThatFieldIsFormatted( sample, "offsetDateTime", "+221998-02-12T13:05:33.000000007+01:00", "221998-02-12T12:05:33.000Z" );
+	}
+
+	@Test
+	public void testOffsetTimeMilliseconds() throws Exception {
+		OffsetTime value = OffsetTime.of(
+				13, 05, 33, 7_000_000,
+				ZoneOffset.of( "+01:00" )
+				);
+
+		Sample sample = new Sample( 1L, "OffsetTime example" );
+		sample.offsetTime = value;
+
+		// The "fields" attribute only ever contains UTC date/times
+		assertThatFieldIsFormatted( sample, "offsetTime", "13:05:33.007+01:00", "12:05:33.007Z" );
+	}
+
+	@Test
+	public void testOffsetTimeNanoseconds() throws Exception {
+		OffsetTime value = OffsetTime.of(
+				13, 05, 33, 7,
+				ZoneOffset.of( "+01:00" )
+				);
+
+		Sample sample = new Sample( 1L, "OffsetTime example" );
+		sample.offsetTime = value;
+
+		// Elasticsearch only has millisecond-precision, so the "fields" value is missing the nanoseconds
+		// Also, the "fields" attribute only ever contains UTC date/times
+		assertThatFieldIsFormatted( sample, "offsetTime", "13:05:33.000000007+01:00", "12:05:33.000Z" );
+	}
+
+	@Test
+	public void testZonedDateTimeMilliseconds() throws Exception {
+		// CET DST rolls back at 2011-10-30 2:59:59 (+02) to 2011-10-30 2:00:00 (+01)
+		// Credit: user leonbloy at http://stackoverflow.com/a/18794412/6692043
+		LocalDateTime localDateTime = LocalDateTime.of( 2011, 10, 30, 2, 50, 0, 7_000_000 );
+
+		ZonedDateTime value = localDateTime.atZone( ZoneId.of( "CET" ) ).withLaterOffsetAtOverlap();
+
+		Sample sample = new Sample( 1L, "ZonedDateTime example" );
+		sample.zonedDateTime = value;
+
+		// The "fields" attribute only ever contains UTC date/times
+		assertThatFieldIsFormatted( sample, "zonedDateTime", "2011-10-30T02:50:00.007+01:00[CET]", "2011-10-30T01:50:00.007+00:00[UTC]" );
+	}
+
+	@Test
+	public void testZonedDateTimeNanoseconds() throws Exception {
+		// CET DST rolls back at 2011-10-30 2:59:59 (+02) to 2011-10-30 2:00:00 (+01)
+		// Credit: user leonbloy at http://stackoverflow.com/a/18794412/6692043
+		LocalDateTime localDateTime = LocalDateTime.of( 2011, 10, 30, 2, 50, 0, 7 );
+
+		ZonedDateTime value = localDateTime.atZone( ZoneId.of( "CET" ) ).withLaterOffsetAtOverlap();
+
+		Sample sample = new Sample( 1L, "ZonedDateTime example" );
+		sample.zonedDateTime = value;
+
+		// Elasticsearch only has millisecond-precision, so the "fields" value is missing the nanoseconds
+		// Also, the "fields" attribute only ever contains UTC date/times
+		assertThatFieldIsFormatted( sample, "zonedDateTime", "2011-10-30T02:50:00.000000007+01:00[CET]", "2011-10-30T01:50:00.000+00:00[UTC]" );
 	}
 
 	@Test
@@ -239,6 +331,9 @@ public class ElasticsearchJavaTimeIT extends SearchTestBase {
 
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private OffsetDateTime offsetDateTime;
+
+		@Field(analyze = Analyze.NO, store = Store.YES)
+		private ZonedDateTime zonedDateTime;
 
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private OffsetTime offsetTime;

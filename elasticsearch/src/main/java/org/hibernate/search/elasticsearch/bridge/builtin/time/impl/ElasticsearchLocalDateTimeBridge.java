@@ -24,7 +24,7 @@ import java.util.Locale;
  */
 public class ElasticsearchLocalDateTimeBridge extends ElasticsearchTemporalAccessorStringBridge<LocalDateTime> {
 
-	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.append( ElasticsearchLocalDateBridge.FORMATTER )
 			.appendLiteral( 'T' )
 			.append( ElasticsearchLocalTimeBridge.FORMATTER )

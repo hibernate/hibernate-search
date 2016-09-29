@@ -12,8 +12,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.Year;
 import java.time.YearMonth;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +29,11 @@ import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.Elasticsearch
 import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchLocalDateTimeBridge;
 import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchLocalTimeBridge;
 import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchMonthDayBridge;
+import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchOffsetDateTimeBridge;
+import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchOffsetTimeBridge;
 import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchYearBridge;
 import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchYearMonthBridge;
+import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchZonedDateTimeBridge;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -65,6 +71,9 @@ class ElasticsearchJavaTimeBridgeProvider implements BridgeProvider {
 		bridges.put( LocalDate.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchLocalDateBridge.INSTANCE ) );
 		bridges.put( LocalTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchLocalTimeBridge.INSTANCE ) );
 		bridges.put( Instant.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchInstantBridge.INSTANCE ) );
+		bridges.put( OffsetDateTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchOffsetDateTimeBridge.INSTANCE ) );
+		bridges.put( OffsetTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchOffsetTimeBridge.INSTANCE ) );
+		bridges.put( ZonedDateTime.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchZonedDateTimeBridge.INSTANCE ) );
 
 		/*
 		 * Use the default Lucene bridges for ZoneOffset, ZoneId, Period and Duration

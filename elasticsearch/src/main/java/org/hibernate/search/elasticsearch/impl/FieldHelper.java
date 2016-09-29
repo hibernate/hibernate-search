@@ -49,6 +49,9 @@ class FieldHelper {
 		LOCAL_DATE,
 		LOCAL_TIME,
 		LOCAL_DATE_TIME,
+		OFFSET_DATE_TIME,
+		OFFSET_TIME,
+		ZONED_DATE_TIME,
 		YEAR,
 		YEAR_MONTH,
 		MONTH_DAY,
@@ -165,6 +168,15 @@ class FieldHelper {
 		}
 		else if ( "java.time.LocalDateTime".equals( propertyClass.getName() ) ) {
 			return ExtendedFieldType.LOCAL_DATE_TIME;
+		}
+		else if ( "java.time.OffsetDateTime".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.OFFSET_DATE_TIME;
+		}
+		else if ( "java.time.OffsetTime".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.OFFSET_TIME;
+		}
+		else if ( "java.time.ZonedDateTime".equals( propertyClass.getName() ) ) {
+			return ExtendedFieldType.ZONED_DATE_TIME;
 		}
 		else if ( "java.time.Year".equals( propertyClass.getName() ) ) {
 			return ExtendedFieldType.YEAR;

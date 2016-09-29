@@ -563,6 +563,20 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				elasticsearchType = ElasticsearchFieldType.DATE;
 				formats.add( "strict_hour_minute_second_fraction" );
 				break;
+			case OFFSET_DATE_TIME:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				formats.add( "strict_date_time" );
+				formats.add( "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ" );
+				break;
+			case OFFSET_TIME:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				formats.add( "strict_time" );
+				break;
+			case ZONED_DATE_TIME:
+				elasticsearchType = ElasticsearchFieldType.DATE;
+				formats.add( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'" );
+				formats.add( "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'" );
+				break;
 			case YEAR:
 				elasticsearchType = ElasticsearchFieldType.DATE;
 				formats.add( "strict_year" );
