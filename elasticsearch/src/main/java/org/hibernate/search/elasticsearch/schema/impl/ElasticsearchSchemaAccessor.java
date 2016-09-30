@@ -129,7 +129,6 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		}
 	}
 
-	// TODO What happens if several nodes in a cluster try to create the mappings?
 	public void putMapping(String indexName, String mappingName, TypeMapping mapping) {
 		/*
 		 * Serializing nulls is really not a good idea here, it triggers NPEs in ElasticSearch
