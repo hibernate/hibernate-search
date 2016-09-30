@@ -506,6 +506,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private SearchResult search(boolean enableScrolling) {
 			Search.Builder builder = new Search.Builder( completeQueryAsString );
 			builder.addIndex( indexNames );
+			builder.setParameter( "ignore_unavailable", true );
 
 			if ( enableScrolling ) {
 				/*
