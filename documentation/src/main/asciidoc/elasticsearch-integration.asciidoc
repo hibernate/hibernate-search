@@ -110,12 +110,30 @@ Let's see the options for the `index_schema_management_strategy` property:
 [options="header"]
 |===============
 |Value|Definition
-|`NONE`|Indexes will not be created nor deleted.
+|`NONE`|Indexes and their mappings will not be created, deleted nor altered.
+|`VALIDATE`|Existing indexes and mappings will be checked for conflicts with Hibernate Search's metamodel. Indexes and their mappings will not be created, deleted nor altered.
 |`MERGE`|Missing indexes and mappings will be created, mappings will be updated if there are no conflicts.
 |`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created.
 |`RECREATE`|Indexed will be deleted if existing and then created. This will delete all content from the index!
 |`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
 |===============
++
+[CAUTION]
+.Strategies in production environments
+====
+It is strongly recommended to use either `NONE` or `VALIDATE` in a production environment. `CREATE` and `CREATE_DELETE` are obviously unsuitable in this context (unless you want to reindex everything upon every startup), and `MERGE` may leave your mapping half-merged in case of conflict.
+
+To be precise, if your mapping changed in an incompatible way, such as a field having its type changed, merging may be impossible. In this case, the `MERGE` strategy will prevent Hibernate Search from starting, but it may already have successfully merged another index, making a rollback difficult at best.
+
+For this reason, migrating your mapping should be considered a part of your deployment process and be planned cautiously.
+====
++
+[NOTE]
+--
+Mapping validation is as permissive as possible. Fields or mappings that are unknown to Hibernate Search will be ignored, and settings that are more powerful than required (e.g. a field annotated with `@Field(index = Index.NO)` in Search but marked as `"index": analyzed` in Elasticsearch) will be deemed valid.
+
+One exception should be noted, though: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
+--
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000` (default)
 Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red")::
 `hibernate.search.default.elasticsearch.required_index_status green` (default)
@@ -133,7 +151,6 @@ When <<elasticsearch-scrolling,scrolling>>, the minimum number of previous resul
 When <<elasticsearch-scrolling,scrolling>>, the number of results fetched by each Elasticsearch call:: `hibernate.search.elasticsearch.scroll_fetch_size 1000` (default)
 When <<elasticsearch-scrolling,scrolling>>, the maximum duration `ScrollableResults` will be usable if no other results are fetched from Elasticsearch, in seconds::
 `hibernate.search.elasticsearch.scroll_timeout 60` (default)
-
 
 Note that all properties prefixed with `hibernate.search.default` (besides `host`) can be given globally as shown above and/or be given for specific indexes:
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`.
