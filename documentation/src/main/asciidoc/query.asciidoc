@@ -835,10 +835,10 @@ This does not apply to numeric fields using default field bridges.
 QueryBuilder builder = fullTextSession.getSearchFactory()
     .buildQueryBuilder().forEntity(Book.class).get();
 Query luceneQuery = /* ... */;
-FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+FullTextQuery query = s.createFullTextQuery(luceneQuery, Book.class);
 Sort sort = builder
   .sort()
-    .byField("authorId", SortField.Type.LONG) // Sort type provided HERE
+    .byField("authorId", SortField.Type.LONG)//Defining Sort type
     .andByField("title")
   .createSort();
 query.setSort(sort);
