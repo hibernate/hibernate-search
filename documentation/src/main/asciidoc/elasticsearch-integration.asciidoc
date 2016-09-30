@@ -299,6 +299,14 @@ List<?> result = session.createFullTextQuery(query, GolfPlayer.class).list();
 ----
 ====
 
+[CAUTION]
+.Date/time in native Elasticsearch queries
+====
+By default Elasticsearch interprets the date/time strings lacking the time zone as if they were represented using the UTC time zone. If overlooked, this can cause your native Elasticsearch queries to be completely off.
+
+The simplest way to avoid issues is to always explicitly provide time zones IDs or offsets when building native Elasticsearch queries. This may be achieved either by directly adding the time zone ID or offset in date strings, or by using the `time_zone` parameter (range queries only). See Elasticsearch documentation for more information.
+====
+
 ==== [[elasticsearch-query-spatial]]Spatial queries
 
 The Elasticsearch integration supports spatial queries by using either the DSL or native Elasticsearch queries.
