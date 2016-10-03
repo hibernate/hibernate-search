@@ -277,8 +277,9 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
+	@Deprecated
 	public HSQuery createHSQuery() {
-		return new LuceneHSQuery( this );
+		return createLuceneBasedHSQuery();
 	}
 
 	@Override
@@ -638,6 +639,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		}
 
 		return workSerializer;
+	}
+
+	@Override
+	public HSQuery createLuceneBasedHSQuery() {
+		return new LuceneHSQuery( this );
 	}
 
 }

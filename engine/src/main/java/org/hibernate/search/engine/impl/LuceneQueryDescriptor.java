@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.impl;
 
 import org.apache.lucene.search.Query;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -25,8 +26,9 @@ public class LuceneQueryDescriptor implements QueryDescriptor {
 	}
 
 	@Override
-	public HSQuery createHSQuery(SearchIntegrator extendedIntegrator) {
-		HSQuery hsQuery = extendedIntegrator.createHSQuery();
+	public HSQuery createHSQuery(SearchIntegrator integrator) {
+		ExtendedSearchIntegrator extendedIntegrator = integrator.unwrap( ExtendedSearchIntegrator.class );
+		HSQuery hsQuery = extendedIntegrator.createLuceneBasedHSQuery();
 		hsQuery.luceneQuery( luceneQuery );
 
 		return hsQuery;

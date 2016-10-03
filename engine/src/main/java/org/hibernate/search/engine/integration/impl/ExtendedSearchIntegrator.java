@@ -19,6 +19,7 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
@@ -149,4 +150,12 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * class is not an indexed entity.
 	 */
 	AnalyzerReference getAnalyzerReference(Class<?> clazz);
+
+	/**
+	 * Return an Hibernate Search query object.
+	 * This method does NOT support non-Lucene backends (e.g. Elasticsearch).
+	 *
+	 * @return an Hibernate Search query object
+	 */
+	HSQuery createLuceneBasedHSQuery();
 }

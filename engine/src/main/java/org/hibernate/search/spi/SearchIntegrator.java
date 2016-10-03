@@ -66,7 +66,9 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * - get the number of results
 	 *
 	 * @return an Hibernate Search query object
+	 * @deprecated This method will be removed. Use {@link #createHSQuery(Query, Class...)}
 	 */
+	@Deprecated
 	HSQuery createHSQuery();
 
 	/**

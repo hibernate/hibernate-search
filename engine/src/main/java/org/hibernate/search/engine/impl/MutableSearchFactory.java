@@ -374,4 +374,10 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	public LuceneWorkSerializer getWorkSerializer() {
 		return delegate.getWorkSerializer();
 	}
+
+	@Override
+	public HSQuery createLuceneBasedHSQuery() {
+		return delegate.createLuceneBasedHSQuery();
+	}
+
 }
