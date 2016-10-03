@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.engine.impl;
 
-import org.apache.lucene.search.Query;
+import java.util.List;
+
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
+
+import org.apache.lucene.search.Query;
 
 /**
  * A {@link QueryDescriptor} for a Lucene query.
@@ -19,15 +22,17 @@ import org.hibernate.search.query.engine.spi.QueryDescriptor;
 public class LuceneQueryDescriptor implements QueryDescriptor {
 
 	private final Query luceneQuery;
+	private List<Class<?>> targetEntities;
 
-	public LuceneQueryDescriptor(Query luceneQuery) {
+	public LuceneQueryDescriptor(Query luceneQuery, List<Class<?>> targetEntities) {
 		this.luceneQuery = luceneQuery;
+		this.targetEntities = targetEntities;
 	}
 
 	@Override
 	public HSQuery createHSQuery(ExtendedSearchIntegrator extendedIntegrator) {
 		HSQuery hsQuery = extendedIntegrator.createHSQuery();
-		hsQuery.luceneQuery( luceneQuery );
+		hsQuery.luceneQuery( luceneQuery ).targetedEntities( targetEntities );
 
 		return hsQuery;
 	}
