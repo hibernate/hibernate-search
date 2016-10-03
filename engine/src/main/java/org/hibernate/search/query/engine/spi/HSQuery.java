@@ -65,6 +65,10 @@ public interface HSQuery extends ProjectionConstants {
 	/**
 	 * Defines the targeted entities. This helps to reduce the number of targeted indexes.
 	 *
+	 * <p><strong>Note:</strong> calling this method is not necessary if you obtained the HSQuery through
+	 * {@link SearchIntegrator#createHSQuery(Query, Class...)}, unless you want to change the targeted
+	 * entities.
+	 *
 	 * @param classes the list of classes (indexes) targeted by this query
 	 * @return {@code this} to allow for method chaining
 	 */
@@ -165,9 +169,14 @@ public interface HSQuery extends ProjectionConstants {
 	FacetManager getFacetManager();
 
 	/**
-	 * @return the underlying Lucene query
+	 * @return the underlying Lucene query (if any)
 	 */
 	Query getLuceneQuery();
+
+	/**
+	 * @return a String representation of the underlying query
+	 */
+	String getQueryString();
 
 	/**
 	 * Execute the Lucene query and return the list of {@code EntityInfo}s populated with

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.spatial.Coordinates;
@@ -67,27 +65,24 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	/**
 	 * Constructs a  <code>FullTextQueryImpl</code> instance.
 	 *
-	 * @param query The query.
-	 * @param classes Array of classes (must be immutable) used to filter the results to the given class types.
+	 * @param hSearchQuery The query, with the {@link HSQuery#targetedEntities(List) targeted entities} already set if necessary.
 	 * @param session Access to the Hibernate session.
 	 * @param parameterMetadata Additional query metadata.
 	 */
-	public FullTextQueryImpl(QueryDescriptor query,
-			Class<?>[] classes,
+	public FullTextQueryImpl(HSQuery hSearchQuery,
 			SessionImplementor session,
 			ParameterMetadata parameterMetadata) {
 		//TODO handle flushMode
-		super( query.toString(), null, session, parameterMetadata );
+		super( hSearchQuery.getQueryString(), null, session, parameterMetadata );
 
 		ExtendedSearchIntegrator extendedIntegrator = getExtendedSearchIntegrator();
 		this.objectLookupMethod = extendedIntegrator.getDefaultObjectLookupMethod();
 		this.databaseRetrievalMethod = extendedIntegrator.getDefaultDatabaseRetrievalMethod();
 
-		hSearchQuery = query.createHSQuery( extendedIntegrator );
-		hSearchQuery
+		this.hSearchQuery = hSearchQuery;
+		this.hSearchQuery
 				.timeoutExceptionFactory( exceptionFactory )
-				.tenantIdentifier( session.getTenantIdentifier() )
-				.targetedEntities( Arrays.asList( classes ) );
+				.tenantIdentifier( session.getTenantIdentifier() );
 	}
 
 	@Override

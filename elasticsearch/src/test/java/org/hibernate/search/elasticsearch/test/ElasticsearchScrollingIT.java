@@ -9,7 +9,6 @@ package org.hibernate.search.elasticsearch.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
@@ -134,10 +133,8 @@ public class ElasticsearchScrollingIT {
 
 	private HSQuery getQuery(Query luceneQuery) {
 		ExtendedSearchIntegrator sf = sfHolder.getSearchFactory();
-		HSQuery hsQuery = sf.createQueryDescriptor( luceneQuery, IndexedObject.class )
-				.createHSQuery( sf );
+		HSQuery hsQuery = sf.createHSQuery( luceneQuery, IndexedObject.class );
 		return hsQuery
-				.targetedEntities( Arrays.asList( new Class<?>[] { IndexedObject.class } ) )
 				.projection( "id" )
 				.sort( new Sort( new SortField( "idSort", SortField.Type.INT ) ) );
 	}

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -281,7 +282,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public QueryDescriptor createQueryDescriptor(Query luceneQuery, Class<?>... entities) {
+	public HSQuery createHSQuery(Query luceneQuery, Class<?>... entities) {
 		QueryDescriptor descriptor = null;
 
 		if ( queryTranslatorPresent ) {
@@ -293,7 +294,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 			}
 		}
 
-		return descriptor != null ? descriptor : new LuceneQueryDescriptor( luceneQuery );
+		if ( descriptor == null ) {
+			descriptor = new LuceneQueryDescriptor( luceneQuery );
+		}
+
+		return descriptor.createHSQuery( this ).targetedEntities( Arrays.asList( entities ) );
 	}
 
 	@Override
