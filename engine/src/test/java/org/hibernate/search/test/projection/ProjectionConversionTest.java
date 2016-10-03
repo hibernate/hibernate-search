@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.projection;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -173,8 +172,7 @@ public class ProjectionConversionTest {
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity( ExampleEntity.class ).get();
 		Query queryAllGuests = queryBuilder.all().createQuery();
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery().luceneQuery( queryAllGuests )
-				.targetedEntities( Arrays.asList( new Class<?>[] { ExampleEntity.class } ) )
+		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery( queryAllGuests, ExampleEntity.class )
 				.projection( projectionField )
 				.queryEntityInfos();
 

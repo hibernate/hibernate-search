@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.bridge;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -52,8 +51,7 @@ public class PropertiesExampleBridgeTest {
 
 		Query queryAllGuests = guestQueryBuilder.all().createQuery();
 
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery().luceneQuery( queryAllGuests )
-				.targetedEntities( Arrays.asList( new Class<?>[] { DynamicIndexedValueHolder.class } ) )
+		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery( queryAllGuests, DynamicIndexedValueHolder.class )
 				.projection( "value.surname" )
 				.queryEntityInfos();
 

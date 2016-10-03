@@ -7,7 +7,6 @@
 package org.hibernate.search.test.query.serialization;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
@@ -55,8 +54,7 @@ public class QuerySerializationTest {
 		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( Book.class ).get();
 
 		Query luceneQuery = queryBuilder.keyword().onField( "text" ).matching( "art" ).createQuery();
-		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( luceneQuery );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( Book.class ) );
+		HSQuery hsQuery = integrator.createHSQuery( luceneQuery, Book.class );
 		//Lucene Queries are not serializable: who's using LuceneHSQuery will need to
 		//encode the query separately and set it again.
 		hsQuery.luceneQuery( null );

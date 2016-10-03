@@ -217,10 +217,7 @@ public class DeleteByQueryTest {
 	private void assertCount(Class<?> entityType, int count, ExtendedSearchIntegrator integrator) {
 		{
 			Query query = integrator.buildQueryBuilder().forEntity( Book.class ).get().all().createQuery();
-			HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
-			List<Class<?>> l = new ArrayList<>();
-			l.add( entityType );
-			hsQuery.targetedEntities( l );
+			HSQuery hsQuery = integrator.createHSQuery( query, entityType );
 			assertEquals( count, hsQuery.queryResultSize() );
 		}
 	}

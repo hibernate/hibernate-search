@@ -78,18 +78,14 @@ public class FreshReadersProvidedTest {
 
 		Query queryAllGuests = guestQueryBuilder.all().createQuery();
 
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery()
-			.luceneQuery( queryAllGuests )
-			.targetedEntities( Arrays.asList( new Class<?>[]{ Guest.class } ) )
+		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery( queryAllGuests, Guest.class )
 			.queryEntityInfos();
 
 		Assert.assertEquals( 1, queryEntityInfos.size() );
 		Assert.assertEquals( 13L, queryEntityInfos.get( 0 ).getId() );
 
 		RecordingFilter filter = new RecordingFilter( "name" );
-		List<EntityInfo> filteredQueryEntityInfos = searchFactory.createHSQuery()
-				.luceneQuery( queryAllGuests )
-				.targetedEntities( Arrays.asList( new Class<?>[]{ Guest.class } ) )
+		List<EntityInfo> filteredQueryEntityInfos = searchFactory.createHSQuery( queryAllGuests, Guest.class )
 				.filter( filter )
 				.queryEntityInfos();
 
@@ -109,9 +105,7 @@ public class FreshReadersProvidedTest {
 			tc.end();
 		}
 
-		List<EntityInfo> queryEntityInfosAgain = searchFactory.createHSQuery()
-			.luceneQuery( queryAllGuests )
-			.targetedEntities( Arrays.asList( new Class<?>[]{ Guest.class } ) )
+		List<EntityInfo> queryEntityInfosAgain = searchFactory.createHSQuery( queryAllGuests, Guest.class )
 			.queryEntityInfos();
 
 		Assert.assertEquals( 2, queryEntityInfosAgain.size() );
@@ -119,9 +113,7 @@ public class FreshReadersProvidedTest {
 		Assert.assertEquals( 7L, queryEntityInfosAgain.get( 1 ).getId() );
 
 		RecordingFilter secondFilter = new RecordingFilter( "name" );
-		List<EntityInfo> secondFilteredQueryEntityInfos = searchFactory.createHSQuery()
-				.luceneQuery( queryAllGuests )
-				.targetedEntities( Arrays.asList( new Class<?>[]{ Guest.class } ) )
+		List<EntityInfo> secondFilteredQueryEntityInfos = searchFactory.createHSQuery( queryAllGuests, Guest.class )
 				.filter( secondFilter )
 				.queryEntityInfos();
 

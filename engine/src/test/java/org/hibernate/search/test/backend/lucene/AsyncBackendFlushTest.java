@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.backend.lucene;
 
-import java.util.Collections;
-
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -51,8 +49,7 @@ public class AsyncBackendFlushTest {
 
 	private void assertDocumentsIndexed(int number) {
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-		HSQuery hsQuery = searchFactory.createHSQuery().luceneQuery( new MatchAllDocsQuery() )
-				.targetedEntities( Collections.<Class<?>>singletonList( Quote.class ) );
+		HSQuery hsQuery = searchFactory.createHSQuery( new MatchAllDocsQuery(), Quote.class );
 		assertEquals( number, hsQuery.queryResultSize() );
 	}
 

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.dsl;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
@@ -60,8 +59,7 @@ public class NumericTypeGuessedTest {
 						.to( 3 ).excludeLimit()
 						.createQuery();
 
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery().luceneQuery( query )
-				.targetedEntities( Arrays.asList( new Class<?>[] { CustomBridgedNumbers.class } ) )
+		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery( query, CustomBridgedNumbers.class )
 				.projection( "title" )
 				.queryEntityInfos();
 

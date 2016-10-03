@@ -7,7 +7,6 @@
 package org.hibernate.search.test.fileleaks;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import org.junit.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -118,10 +117,7 @@ public class AllFilesClosedTest {
 	 * @param expected number of elements found in the index
 	 */
 	private void assertElementsInIndex(int expected) {
-		HSQuery hsQuery = searchIntegrator.createHSQuery();
-		hsQuery
-			.luceneQuery( new MatchAllDocsQuery() )
-			.targetedEntities( Arrays.asList( new Class<?>[]{ Book.class, Dvd.class } ) );
+		HSQuery hsQuery = searchIntegrator.createHSQuery( new MatchAllDocsQuery(), Book.class, Dvd.class );
 		int resultSize = hsQuery.queryResultSize();
 		Assert.assertEquals( expected, resultSize );
 	}

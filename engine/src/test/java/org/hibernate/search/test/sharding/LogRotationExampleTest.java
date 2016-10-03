@@ -7,7 +7,6 @@
 package org.hibernate.search.test.sharding;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
@@ -106,9 +105,7 @@ public class LogRotationExampleTest {
 
 	private int queryAndFilter(Query luceneQuery, int fromHour, int toHour) {
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-		HSQuery hsQuery = searchFactory.createHSQuery()
-			.luceneQuery( luceneQuery )
-			.targetedEntities( Arrays.asList( new Class<?>[]{ LogMessage.class } ) );
+		HSQuery hsQuery = searchFactory.createHSQuery( luceneQuery, LogMessage.class );
 		hsQuery
 			.enableFullTextFilter( "timeRange" )
 				.setParameter( "from", Integer.valueOf( fromHour ) )

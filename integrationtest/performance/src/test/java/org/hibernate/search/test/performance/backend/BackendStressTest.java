@@ -203,9 +203,7 @@ public class BackendStressTest {
 		@Override
 		public boolean evaluate() {
 			int size = integrator
-					.createHSQuery()
-					.luceneQuery( new MatchAllDocsQuery() )
-					.targetedEntities( Arrays.<Class<?>>asList( Quote.class ) )
+					.createHSQuery( new MatchAllDocsQuery(), Quote.class )
 					.queryResultSize();
 			System.out.println( "Index size=" + size + ", expected=" + expectedSize );
 			return size >= expectedSize;

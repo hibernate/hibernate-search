@@ -6,14 +6,18 @@
  */
 package org.hibernate.search.query.engine.spi;
 
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * An index query which is able to create a corresponding {@link HSQuery} object.
+ *
+ * <p><strong>Note:</strong>In the Hibernate-Search-ORM module, you may pass query descriptors to
+ * {@code org.hibernate.search.FullTextSession.createFullTextQuery(QueryDescriptor, Class<?>...)}
+ * to create a FullTextQuery.
  *
  * @author Gunnar Morling
  */
 public interface QueryDescriptor {
 
-	HSQuery createHSQuery(ExtendedSearchIntegrator extendedIntegrator);
+	HSQuery createHSQuery(SearchIntegrator searchIntegrator);
 }

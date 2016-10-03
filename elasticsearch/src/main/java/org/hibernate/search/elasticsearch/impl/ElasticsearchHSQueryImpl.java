@@ -159,6 +159,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	@Override
+	public String getQueryString() {
+		return jsonQuery.toString();
+	}
+
+	@Override
 	public DocumentExtractor queryDocumentExtractor() {
 		return new ElasticsearchScrollAPIDocumentExtractor();
 	}

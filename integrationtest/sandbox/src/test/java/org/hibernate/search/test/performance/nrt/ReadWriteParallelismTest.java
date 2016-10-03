@@ -7,7 +7,6 @@
 
 package org.hibernate.search.test.performance.nrt;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -105,9 +104,7 @@ public class ReadWriteParallelismTest {
 	}
 
 	private static void verifyMatches(SearchIntegrator searchIntegrator, int expectedMatches, Query query) {
-		List<EntityInfo> queryEntityInfos = searchIntegrator.createHSQuery()
-				.luceneQuery( query )
-				.targetedEntities( Arrays.asList( new Class<?>[]{ Book.class } ) )
+		List<EntityInfo> queryEntityInfos = searchIntegrator.createHSQuery( query, Book.class )
 				.queryEntityInfos();
 		Assert.assertEquals( expectedMatches, queryEntityInfos.size() );
 	}

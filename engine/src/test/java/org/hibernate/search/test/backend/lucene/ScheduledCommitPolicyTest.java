@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static org.hibernate.search.test.backend.lucene.Conditions.assertConditionMet;
@@ -121,9 +120,7 @@ public class ScheduledCommitPolicyTest {
 
 		private HSQuery matchAllQuery() {
 			return searchFactory
-					.createHSQuery()
-					.luceneQuery( new MatchAllDocsQuery() )
-					.targetedEntities( Arrays.<Class<?>>asList( Quote.class ) );
+					.createHSQuery( new MatchAllDocsQuery(), Quote.class );
 		}
 
 		@Override

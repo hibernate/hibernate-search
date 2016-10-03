@@ -22,7 +22,6 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.stat.Statistics;
 
@@ -71,16 +70,17 @@ public interface SearchIntegrator extends AutoCloseable {
 	HSQuery createHSQuery();
 
 	/**
-	 * Return an Hibernate Search query descriptor.
-	 * <p>This method supports non-Lucene backends (e.g. Elasticsearch).
-	 * <p>The returned object allows for the creation of an {@link HSQuery} supported
-	 * by the relevant backend.
+	 * Return an Hibernate Search query object.
+	 * This method DOES support non-Lucene backends (e.g. Elasticsearch).
+	 * The returned object uses fluent APIs to define additional query settings.
 	 * <p>Be aware that some backends may not implement {@link HSQuery#luceneQuery(Query)},
 	 * in which case the query provided here cannot be overridden.
+	 * <p>Calling {@link HSQuery#targetedEntities(java.util.List)} on the resulting query
+	 * is not necessary, unless you later decide to target a subset of {@code entities}.
 	 *
-	 * @return an Hibernate Search query descriptor
+	 * @return an Hibernate Search query object
 	 */
-	QueryDescriptor createQueryDescriptor(Query luceneQuery, Class<?>... entities);
+	HSQuery createHSQuery(Query luceneQuery, Class<?>... entities);
 
 	/**
 	 * @return true if the SearchIntegrator was stopped

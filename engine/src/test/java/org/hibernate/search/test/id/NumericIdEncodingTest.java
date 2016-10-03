@@ -8,7 +8,6 @@ package org.hibernate.search.test.id;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.search.NumericRangeQuery;
@@ -53,9 +52,7 @@ public class NumericIdEncodingTest {
 	}
 
 	private void expectedProjections(NumericRangeQuery<Long> numericRangeQuery, String... expectedProjections) {
-		HSQuery hsQuery = factoryHolder.getSearchFactory().createHSQuery()
-				.luceneQuery( numericRangeQuery )
-				.targetedEntities( Arrays.<Class<?>>asList( Staff.class ) )
+		HSQuery hsQuery = factoryHolder.getSearchFactory().createHSQuery( numericRangeQuery, Staff.class )
 				.projection( "name" );
 		List<EntityInfo> result = hsQuery.queryEntityInfos();
 		assertEquals( expectedProjections.length, result.size() );

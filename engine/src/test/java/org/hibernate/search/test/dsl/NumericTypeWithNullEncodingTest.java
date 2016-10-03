@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.dsl;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.search.NumericRangeQuery;
@@ -117,8 +116,7 @@ public class NumericTypeWithNullEncodingTest {
 	private List<EntityInfo> runProjection(Query query, String fieldName) {
 		return sfHolder
 				.getSearchFactory()
-				.createHSQuery().luceneQuery( query )
-				.targetedEntities( Arrays.asList( new Class<?>[] { SomeEntity.class } ) )
+				.createHSQuery( query, SomeEntity.class )
 				.projection( fieldName )
 				.queryEntityInfos();
 	}

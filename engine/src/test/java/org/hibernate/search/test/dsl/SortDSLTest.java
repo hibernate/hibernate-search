@@ -629,10 +629,8 @@ public class SortDSLTest {
 
 	private List<EntityInfo> query(Query luceneQuery, Sort sort) {
 		ExtendedSearchIntegrator sf = sfHolder.getSearchFactory();
-		HSQuery hsQuery = sf.createQueryDescriptor( luceneQuery, IndexedEntry.class )
-				.createHSQuery( sf );
+		HSQuery hsQuery = sf.createHSQuery( luceneQuery, IndexedEntry.class );
 		return hsQuery
-				.targetedEntities( Arrays.asList( new Class<?>[] { IndexedEntry.class } ) )
 				.projection( "id" )
 				.sort( sort )
 				.queryEntityInfos();

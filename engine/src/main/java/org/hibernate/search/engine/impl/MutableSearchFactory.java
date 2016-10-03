@@ -36,7 +36,6 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -147,8 +146,8 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public QueryDescriptor createQueryDescriptor(Query luceneQuery, Class<?>... entities) {
-		return delegate.createQueryDescriptor( luceneQuery, entities );
+	public HSQuery createHSQuery(Query luceneQuery, Class<?>... entities) {
+		return delegate.createHSQuery( luceneQuery, entities );
 	}
 
 	@Override

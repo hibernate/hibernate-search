@@ -7,6 +7,7 @@
 package org.hibernate.search.impl;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -69,15 +71,20 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	 */
 	@Override
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
-		QueryDescriptor queryDescriptor = getSearchIntegrator().createQueryDescriptor( luceneQuery, entities );
-		return createFullTextQuery( queryDescriptor, entities );
+		HSQuery hsQuery = getSearchIntegrator().createHSQuery( luceneQuery, entities );
+		return createFullTextQuery( hsQuery );
 	}
 
 	@Override
 	public FullTextQuery createFullTextQuery(QueryDescriptor queryDescriptor, Class<?>... entities) {
+		HSQuery hsQuery = queryDescriptor.createHSQuery( getSearchIntegrator() )
+				.targetedEntities( Arrays.asList( entities ) );
+		return createFullTextQuery( hsQuery );
+	}
+
+	private FullTextQuery createFullTextQuery(HSQuery hsQuery, Class<?>... entities) {
 		return new FullTextQueryImpl(
-				queryDescriptor,
-				entities,
+				hsQuery,
 				sessionImplementor,
 				new ParameterMetadata( null, null )
 		);
