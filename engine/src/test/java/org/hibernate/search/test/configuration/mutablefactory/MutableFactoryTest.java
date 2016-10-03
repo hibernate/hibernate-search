@@ -175,11 +175,7 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		HSQuery hsQuery = sf.createHSQuery().luceneQuery( luceneQuery );
-		List<Class<?>> l = new ArrayList<>();
-		l.add( A.class );
-
-		hsQuery.targetedEntities( l );
+		HSQuery hsQuery = sf.createHSQuery( luceneQuery, A.class );
 
 		hsQuery.getTimeoutManager().start();
 
@@ -201,11 +197,7 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		hsQuery = sf.createHSQuery().luceneQuery( luceneQuery );
-		l.add( B.class );
-		l.add( C.class );
-
-		hsQuery.targetedEntities( l );
+		hsQuery = sf.createHSQuery( luceneQuery, A.class, B.class, C.class );
 
 		hsQuery.getTimeoutManager().start();
 
@@ -218,8 +210,7 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Vincent" );
 
-		hsQuery = sf.createHSQuery().luceneQuery( luceneQuery );
-		hsQuery.targetedEntities( l );
+		hsQuery = sf.createHSQuery( luceneQuery, A.class, B.class, C.class );
 
 		hsQuery.getTimeoutManager().start();
 

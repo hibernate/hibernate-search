@@ -7,7 +7,6 @@
 package org.hibernate.search.test.configuration;
 
 import java.lang.annotation.ElementType;
-import java.util.Arrays;
 
 import org.junit.Assert;
 import org.apache.lucene.search.Query;
@@ -166,9 +165,7 @@ public class ImplicitProvidedIdTest {
 				.matching( matchTitle ? book.title : isbn )
 				.createQuery();
 
-			int queryResultSize = searchIntegrator.createHSQuery()
-					.luceneQuery( query )
-					.targetedEntities( Arrays.asList( new Class<?>[]{ Book.class } ) )
+			int queryResultSize = searchIntegrator.createHSQuery( query, Book.class )
 					.queryResultSize();
 			Assert.assertEquals( 1, queryResultSize );
 		}

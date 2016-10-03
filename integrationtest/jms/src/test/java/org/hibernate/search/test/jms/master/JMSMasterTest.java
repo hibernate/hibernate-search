@@ -140,11 +140,10 @@ public class JMSMasterTest extends SearchTestBase {
 			Thread.sleep( 1000 );
 
 			{
-				HSQuery hsQuery = this.getExtendedSearchIntegrator().createHSQuery()
-						.luceneQuery( this.getExtendedSearchIntegrator().buildQueryBuilder().forEntity( TShirt.class ).get().all().createQuery() );
-				List<Class<?>> l = new ArrayList<>( 1 );
-				l.add( TShirt.class );
-				hsQuery.targetedEntities( l );
+				HSQuery hsQuery = this.getExtendedSearchIntegrator().createHSQuery(
+						this.getExtendedSearchIntegrator().buildQueryBuilder().forEntity( TShirt.class ).get().all().createQuery(),
+						TShirt.class
+						);
 				assertEquals( 0, hsQuery.queryResultSize() );
 			}
 		}

@@ -176,8 +176,8 @@ public class SortingTest {
 				.createQuery();
 
 		Sort sort = new Sort( new SortField( "description", SortField.Type.DOUBLE ) );
-		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( entityType ) ).sort( sort );
+		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
+		hsQuery.sort( sort );
 		hsQuery.queryEntityInfos().size();
 	}
 
@@ -198,8 +198,8 @@ public class SortingTest {
 				.createQuery();
 
 		Sort sort = new Sort( new SortField( "longValue", SortField.Type.STRING ) );
-		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( entityType ) ).sort( sort );
+		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
+		hsQuery.sort( sort );
 		hsQuery.queryEntityInfos().size();
 	}
 
@@ -220,8 +220,8 @@ public class SortingTest {
 				.createQuery();
 
 		Sort sort = new Sort( new SortField( "longValue", SortField.Type.INT ) );
-		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( entityType ) ).sort( sort );
+		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
+		hsQuery.sort( sort );
 		hsQuery.queryEntityInfos().size();
 	}
 
@@ -240,8 +240,7 @@ public class SortingTest {
 
 	private void assertNumberOfResults(int expectedResultsNumber, Query query, Sort sort) {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
-		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( Person.class ) );
+		HSQuery hsQuery = integrator.createHSQuery( query, Person.class );
 		if ( sort != null ) {
 			hsQuery.sort( sort );
 		}
@@ -281,8 +280,7 @@ public class SortingTest {
 
 	private void assertSortedResults(Query query, Sort sort, int... expectedIds) {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
-		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( Person.class ) );
+		HSQuery hsQuery = integrator.createHSQuery( query, Person.class );
 		if ( sort != null ) {
 			hsQuery.sort( sort );
 		}
@@ -305,9 +303,9 @@ public class SortingTest {
 				.matching( null )
 				.createQuery();
 
-		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
+		HSQuery hsQuery = integrator.createHSQuery( query, Person.class );
 		Sort sort = new Sort( new SortField( fieldName, sortType ) );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( Person.class ) ).sort( sort );
+		hsQuery.sort( sort );
 		return hsQuery;
 	}
 

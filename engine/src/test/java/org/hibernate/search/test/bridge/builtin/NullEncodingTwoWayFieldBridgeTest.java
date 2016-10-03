@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.bridge.builtin;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.lucene.search.Query;
@@ -56,9 +55,7 @@ public class NullEncodingTwoWayFieldBridgeTest {
 
 		Query termQuery = NumericFieldUtils.createExactMatchQuery( "deletionDate", Long.parseLong( "-1" ) );
 		int queryResultSize = searchFactory
-					.createHSQuery()
-					.targetedEntities( Arrays.asList( new Class<?>[] { Sample.class } ) )
-					.luceneQuery( termQuery )
+					.createHSQuery( termQuery, Sample.class )
 					.queryResultSize();
 		Assert.assertEquals( 1, queryResultSize );
 	}
