@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.impl;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
+import org.hibernate.search.spi.SearchIntegrator;
 
 import com.google.gson.JsonObject;
 
@@ -26,8 +27,8 @@ public class ElasticsearchJsonQueryDescriptor implements QueryDescriptor {
 	}
 
 	@Override
-	public HSQuery createHSQuery(ExtendedSearchIntegrator extendedIntegrator) {
-		return new ElasticsearchHSQueryImpl( jsonQuery, extendedIntegrator );
+	public HSQuery createHSQuery(SearchIntegrator searchIntegrator) {
+		return new ElasticsearchHSQueryImpl( jsonQuery, searchIntegrator.unwrap( ExtendedSearchIntegrator.class ) );
 	}
 
 	@Override

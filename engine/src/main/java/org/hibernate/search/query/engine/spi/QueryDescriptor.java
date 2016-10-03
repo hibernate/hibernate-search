@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.query.engine.spi;
 
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * An index query which is able to create a corresponding {@link HSQuery} object.
@@ -15,5 +15,5 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
  */
 public interface QueryDescriptor {
 
-	HSQuery createHSQuery(ExtendedSearchIntegrator extendedIntegrator);
+	HSQuery createHSQuery(SearchIntegrator searchIntegrator);
 }
