@@ -205,6 +205,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			deleteIndexIfExisting();
 		}
 
+		requestProcessor = null;
+		serviceManager.releaseService( BackendRequestProcessor.class );
+
 		serviceManager.releaseService( JestClient.class );
 		jestClient = null;
 

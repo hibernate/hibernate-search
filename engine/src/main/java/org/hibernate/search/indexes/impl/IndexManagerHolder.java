@@ -28,6 +28,7 @@ import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -249,21 +250,19 @@ public class IndexManagerHolder {
 			WorkerBuildContext workerBuildContext) {
 		// get hold of the index manager factory via the service manager
 		ServiceManager serviceManager = workerBuildContext.getServiceManager();
-		IndexManagerFactory indexManagerFactory = serviceManager.requestService( IndexManagerFactory.class );
 
 		// create IndexManager instance via the index manager factory
 		String indexManagerImplementationName = properties.getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
 		final IndexManager manager;
-		try {
+		try ( ServiceReference<IndexManagerFactory> indexManagerFactoryRef
+				= serviceManager.requestReference( IndexManagerFactory.class ) ) {
+			IndexManagerFactory indexManagerFactory = indexManagerFactoryRef.get();
 			if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
 				manager = indexManagerFactory.createDefaultIndexManager();
 			}
 			else {
 				manager = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName );
 			}
-		}
-		finally {
-			serviceManager.releaseService( IndexManagerFactory.class );
 		}
 
 		// init the IndexManager
@@ -566,7 +565,6 @@ public class IndexManagerHolder {
 
 	public synchronized IndexManagerType getIndexManagerType(XClass entity, SearchConfiguration cfg, WorkerBuildContext buildContext) {
 		ServiceManager serviceManager = buildContext.getServiceManager();
-		IndexManagerFactory indexManagerFactory = serviceManager.requestService( IndexManagerFactory.class );
 
 		String indexName = getIndexName( entity, cfg );
 		Properties[] indexProperties = getIndexProperties( cfg, indexName );
@@ -581,11 +579,11 @@ public class IndexManagerHolder {
 		}
 
 		final IndexManagerType indexManagerType;
-		try {
-			indexManagerType = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName ).getIndexManagerType();
-		}
-		finally {
-			serviceManager.releaseService( IndexManagerFactory.class );
+		try ( ServiceReference<IndexManagerFactory> indexManagerFactoryRef
+				= serviceManager.requestReference( IndexManagerFactory.class ) ) {
+			IndexManagerFactory indexManagerFactory = indexManagerFactoryRef.get();
+			indexManagerType = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName )
+					.getIndexManagerType();
 		}
 		indexManagerImplementationsRegistry.put( indexManagerImplementationKey, indexManagerType );
 		return indexManagerType;
