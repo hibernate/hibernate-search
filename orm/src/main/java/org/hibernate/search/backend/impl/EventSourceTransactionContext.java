@@ -16,6 +16,7 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.event.spi.EventType;
@@ -58,7 +59,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	@Override
 	public Object getTransactionIdentifier() {
 		if ( isRealTransactionInProgress() ) {
-			return eventSource.getTransaction();
+			return eventSource.accessTransaction();
 		}
 		else {
 			return eventSource;
@@ -89,7 +90,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			else {
 				//TODO could we remove the action queue registration in this case?
 				actionQueue.registerProcess( new DelegateToSynchronizationOnBeforeTx( synchronization ) );
-				eventSource.getTransaction().registerSynchronization(
+				eventSource.accessTransaction().registerSynchronization(
 						new BeforeCommitSynchronizationDelegator( synchronization )
 				);
 			}
@@ -182,7 +183,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 		}
 
 		@Override
-		public void doAfterTransactionCompletion(boolean success, SessionImplementor sessionImplementor) {
+		public void doAfterTransactionCompletion(boolean success, SharedSessionContractImplementor sessionImplementor) {
 			try {
 				synchronization.afterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
 			}

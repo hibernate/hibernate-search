@@ -24,6 +24,7 @@ import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.ScrollableResults;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -53,7 +54,7 @@ import org.hibernate.type.Type;
  * @author John Griffin
  * @author Sanne Grinovero
  */
-public class ScrollableResultsImpl implements ScrollableResults {
+public class ScrollableResultsImpl implements ScrollableResults, ScrollableResultsImplementor {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -72,6 +73,8 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	private final LoadedObject[] resultsContext;
 
 	private int current;
+
+	private boolean closed = false;
 
 	public ScrollableResultsImpl(int fetchSize, DocumentExtractor extractor,
 			Loader loader, SessionImplementor sessionImplementor,
@@ -210,6 +213,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 
 	@Override
 	public void close() {
+		closed = true;
 		try {
 			documentExtractor.close();
 		}
@@ -422,6 +426,15 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	@Override
+	public int getNumberOfTypes() {
+		throw new UnsupportedOperationException( "Not implemented for Lucene query results" );
+	}
+
 	@Override
 	public int getRowNumber() {
 		if ( max < first ) {
@@ -507,6 +520,11 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		else {
 			return hibSession.contains( objects[0] );
 		}
+	}
+
+	@Override
+	public boolean isClosed() {
+		return closed;
 	}
 
 }

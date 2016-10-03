@@ -9,9 +9,11 @@ package org.hibernate.search.impl;
 import java.sql.Connection;
 
 import org.hibernate.ConnectionReleaseMode;
+import org.hibernate.FlushMode;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionEventListener;
 import org.hibernate.SharedSessionBuilder;
+import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextSharedSessionBuilder;
@@ -138,6 +140,36 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	@Override
 	public FullTextSharedSessionBuilder statementInspector(StatementInspector statementInspector) {
 		builder.statementInspector( statementInspector );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder connectionHandlingMode() {
+		builder.connectionHandlingMode();
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder flushMode() {
+		builder.flushMode();
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder connectionHandlingMode(PhysicalConnectionHandlingMode mode) {
+		builder.connectionHandlingMode( mode );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder autoClear(boolean autoClear) {
+		builder.autoClear( autoClear );
+		return this;
+	}
+
+	@Override
+	public FullTextSharedSessionBuilder flushMode(FlushMode flushMode) {
+		builder.flushMode( flushMode );
 		return this;
 	}
 }

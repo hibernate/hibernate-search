@@ -17,7 +17,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
+import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
@@ -82,7 +82,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	public void run(StatelessSession upperSession) throws Exception {
 		log.trace( "started" );
 		try {
-			inTransactionWrapper( upperSession );
+			inTransactionWrapper( (StatelessSessionImpl) upperSession );
 		}
 		catch (Exception exception) {
 			errorHandler.handleException( log.massIndexerExceptionWhileFetchingIds(), exception );
@@ -93,21 +93,30 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		log.trace( "finished" );
 	}
 
-	private void inTransactionWrapper(StatelessSession upperSession) throws Exception {
-		StatelessSession session = upperSession;
+	private void inTransactionWrapper(StatelessSessionImpl upperSession) throws Exception {
+		StatelessSessionImpl session = upperSession;
 		if ( upperSession == null ) {
 			if ( tenantId == null ) {
-				session = sessionFactory.openStatelessSession();
+				session = (StatelessSessionImpl) sessionFactory.openStatelessSession();
 			}
 			else {
-				session = sessionFactory.withStatelessOptions().tenantIdentifier( tenantId ).openStatelessSession();
+				session = (StatelessSessionImpl) sessionFactory.withStatelessOptions().tenantIdentifier( tenantId ).openStatelessSession();
 			}
 		}
 		try {
-			Transaction transaction = session.getTransaction();
-			transaction.begin();
-			loadAllIdentifiers( session );
-			transaction.commit();
+			Transaction transaction = session.accessTransaction();
+			final boolean controlTransactions = ! transaction.isActive();
+			if ( controlTransactions ) {
+				transaction.begin();
+			}
+			try {
+				loadAllIdentifiers( session );
+			}
+			finally {
+				if ( controlTransactions ) {
+					transaction.commit();
+				}
+			}
 		}
 		catch (InterruptedException e) {
 			// just quit
@@ -151,7 +160,8 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 				if ( destinationList.size() == batchSize ) {
 					// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
 					// might be produced otherwise if the driver fetches all rows up-front
-					if ( session.getTransaction().getStatus() != TransactionStatus.ACTIVE ) {
+					StatelessSessionImpl sessionImpl = (StatelessSessionImpl) session;
+					if ( sessionImpl.isTransactionInProgress() == false ) {
 						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing( indexedType );
 					}
 

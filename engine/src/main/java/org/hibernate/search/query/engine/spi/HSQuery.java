@@ -248,4 +248,10 @@ public interface HSQuery extends ProjectionConstants {
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery setSpatialParameters(Coordinates center, String fieldName);
+
+	/**
+	 * @return a human readable representation of the Query in String format
+	 */
+	String getQueryString();
+
 }

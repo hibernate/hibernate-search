@@ -10,7 +10,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>5.6.0-SNAPSHOT</version>
+    <version>5.7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>
@@ -136,11 +136,12 @@
     </prerequisites>
 
     <properties>
-        <!-- JDK version required for the build; we still create 1.7 byte code -->
+        <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.2 requires Java 8 -->
         <minJdkVersion>1.8</minJdkVersion>
 
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
         <lucene.module.slot>5.5</lucene.module.slot>
+        <hibernate-orm.module.slot>5.2</hibernate-orm.module.slot>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
@@ -149,7 +150,7 @@
         <jgroupsVersion>3.6.10.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
-        <hibernateVersion>5.1.0.Final</hibernateVersion>
+        <hibernateVersion>5.2.1.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>5.0.1.Final</hibernateCommonsAnnotationVersion>
         <jandexVersion>2.0.0.Final</jandexVersion>
         <classMateVersion>1.3.1</classMateVersion>
@@ -161,7 +162,7 @@
             exact versions in this pom are being tested.
             Essentially we allow older versions when we know no changes were necessary when we upgraded the dependency. -->
         <luceneOsgiRangeVersion>[5.3.0,5.6.0)</luceneOsgiRangeVersion>
-        <hibernateOrmOsgiRangeVersion>[5.0.0,5.2.0)</hibernateOrmOsgiRangeVersion>
+        <hibernateOrmOsgiRangeVersion>[5.2.0,5.3.0)</hibernateOrmOsgiRangeVersion>
         <hibernateHcannOsgiRangeVersion>[5,6)</hibernateHcannOsgiRangeVersion>
         <jGroupsOsgiRangeVersion>[3.6.0,4)</jGroupsOsgiRangeVersion>
         <jbossLoggingOsgiRangeVersion>[3.3,4.0.0)</jbossLoggingOsgiRangeVersion>
@@ -493,11 +494,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-entitymanager</artifactId>
-                <version>${hibernateVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-envers</artifactId>
                 <version>${hibernateVersion}</version>
             </dependency>
@@ -688,8 +684,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <showWarnings>true</showWarnings>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                     <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
                     <proc>none</proc>
@@ -782,7 +778,7 @@
                 <configuration>
                     <rules>
                         <requireJavaVersion>
-                            <!-- require JDK 1.7 to run the build -->
+                            <!-- require JDK 1.8 to run the build -->
                             <version>[${minJdkVersion},)</version>
                         </requireJavaVersion>
                         <requireMavenVersion>
@@ -1014,7 +1010,7 @@
                         <execution>
                             <id>verify-forbidden-apis</id>
                                 <configuration>
-                                     <targetVersion>1.7</targetVersion>
+                                     <targetVersion>1.8</targetVersion>
                                      <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                                      <internalRuntimeForbidden>true</internalRuntimeForbidden>
                                      <!-- if the used Java version is too new, don't fail, just do nothing: -->
@@ -1031,7 +1027,14 @@
                                      </bundledSignatures>
                                      <failOnMissingClasses>false</failOnMissingClasses>
                                      <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
+                                     <!--
+                                     The method SharedSessionContract#getTransaction() should never be used
+                                     as it is only reliable in certain configurations.
+                                     The banned Logger methods are the ones which avoid autoboxing, to allow backwards
+                                     compatibility with containers using an older JBoss Logger versions.
+                                      -->
                                      <signatures>
+org.hibernate.SharedSessionContract#getTransaction()
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int ,int)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int, java.lang.Object)
@@ -1089,7 +1092,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                          <execution>
                              <id>verify-forbidden-test-apis</id>
                              <configuration>
-                                 <targetVersion>1.7</targetVersion>
+                                 <targetVersion>1.8</targetVersion>
                                  <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                                  <internalRuntimeForbidden>true</internalRuntimeForbidden>
                                  <!-- if the used Java version is too new, don't fail, just do nothing: -->
@@ -1392,7 +1395,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             <id>non-jigsaw</id>
             <activation>
                 <!-- Asciidoctor, Karaf and WildFly won't work on JDK9 yet  -->
-                <jdk>[1.7,1.8]</jdk>
+                <jdk>1.8</jdk>
             </activation>
             <modules>
                 <module>documentation</module>

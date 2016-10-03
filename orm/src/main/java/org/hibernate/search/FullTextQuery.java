@@ -14,7 +14,7 @@ import org.apache.lucene.search.Sort;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-
+import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
@@ -29,7 +29,7 @@ import org.hibernate.transform.ResultTransformer;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-public interface FullTextQuery extends Query, ProjectionConstants {
+public interface FullTextQuery<R> extends Query<R>, ProjectionConstants, QueryImplementor<R> {
 
 	/**
 	 * Allows to let lucene sort the results. This is useful when you have
