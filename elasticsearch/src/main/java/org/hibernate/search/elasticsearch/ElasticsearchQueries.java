@@ -15,6 +15,9 @@ import com.google.gson.JsonParser;
 /**
  * Creates queries to be used with Elasticsearch.
  *
+ * <p>Methods in this class return {@link QueryDescriptor}s. See {@code QueryDescriptor}'s
+ * javadoc for more information about how to use it.
+ *
  * @author Gunnar Morling
  */
 public class ElasticsearchQueries {
