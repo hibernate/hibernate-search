@@ -11,6 +11,10 @@ import org.hibernate.search.spi.SearchIntegrator;
 /**
  * An index query which is able to create a corresponding {@link HSQuery} object.
  *
+ * <p><strong>Note:</strong>In the hibernate-search-orm module, you may pass query descriptors to
+ * {@code org.hibernate.search.FullTextSession.createFullTextQuery(QueryDescriptor, Class<?>...)}
+ * to create a FullTextQuery.
+ *
  * @author Gunnar Morling
  */
 public interface QueryDescriptor {
