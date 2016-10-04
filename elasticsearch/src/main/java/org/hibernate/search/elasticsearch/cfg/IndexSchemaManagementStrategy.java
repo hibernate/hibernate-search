@@ -25,12 +25,17 @@ public enum IndexSchemaManagementStrategy {
 	MERGE,
 
 	/**
+	 * Existing indexes will not be altered, missing indexes will be created.
+	 */
+	CREATE,
+
+	/**
 	 * Indexes - and all their contents - will be deleted and newly created upon session factory initialization.
 	 */
 	RECREATE,
 
 	/**
-	 * The same as {@link #DELETE_CREATE}, but indexes - and all their contents - will be deleted upon session factory
+	 * The same as {@link #RECREATE}, but indexes - and all their contents - will be deleted upon session factory
 	 * shut-down as well.
 	 */
 	RECREATE_DELETE;
