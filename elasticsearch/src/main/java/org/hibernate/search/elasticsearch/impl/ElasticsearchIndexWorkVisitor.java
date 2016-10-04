@@ -42,8 +42,6 @@ import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.spatial.impl.SpatialHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -52,10 +50,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import io.searchbox.action.Action;
+import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
 import io.searchbox.core.DeleteByQuery;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
+import io.searchbox.indices.Optimize;
 
 /**
  * Converts {@link LuceneWork}s into corresponding {@link BackendRequest}s. Instances are specific
@@ -64,8 +64,6 @@ import io.searchbox.core.Index;
  * @author Gunnar Morling
  */
 class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendRequest<?>> {
-
-	private static final Log LOG = LoggerFactory.make();
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
 	private static final Pattern NAME_AND_INDEX = Pattern.compile( "(.+?)(\\[([0-9]+)\\])?" );
@@ -101,9 +99,17 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 	@Override
 	public BackendRequest<?> visitOptimizeWork(OptimizeLuceneWork work, Void p) {
-		// TODO HSEARCH-2092 implement
-		LOG.warn( "Optimize work is not yet supported for Elasticsearch, ignoring it" );
-		return null;
+		/*
+		 * As of ES 2.1, the Optimize API has been renamed to ForceMerge,
+		 * but Jest still does not provide commands for the ForceMerge API as of
+		 * version 2.0.3
+		 * See https://github.com/searchbox-io/Jest/issues/292
+		 */
+		Optimize optimize = new Optimize.Builder()
+				.addIndex( indexName )
+				.build();
+
+		return new BackendRequest<JestResult>( optimize, work, indexName, refreshAfterWrite );
 	}
 
 	@Override
