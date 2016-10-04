@@ -64,7 +64,7 @@ public class ElasticsearchIndexNullAsTypeCheckingIT {
 		public void configure(Map<String, Object> settings) {
 			settings.put(
 					ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-					IndexSchemaManagementStrategy.CREATE
+					IndexSchemaManagementStrategy.RECREATE
 					);
 		}
 
