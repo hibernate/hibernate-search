@@ -285,7 +285,15 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			return false;
 		}
 
-		jestClient.executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
+		JestResult result = jestClient.executeRequest(
+				new CreateIndex.Builder( actualIndexName ).build(),
+				"index_already_exists_exception"
+				);
+		if ( !result.isSucceeded() ) {
+			// The index was created just after we checked if it existed: just do as if it had been created when we checked.
+			return false;
+		}
+
 		return true;
 	}
 
