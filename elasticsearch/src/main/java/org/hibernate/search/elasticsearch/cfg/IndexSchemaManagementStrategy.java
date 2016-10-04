@@ -27,11 +27,11 @@ public enum IndexSchemaManagementStrategy {
 	/**
 	 * Indexes - and all their contents - will be deleted and newly created upon session factory initialization.
 	 */
-	CREATE,
+	RECREATE,
 
 	/**
-	 * The same as {@link #CREATE}, but indexes - and all their contents - will be deleted upon session factory
+	 * The same as {@link #DELETE_CREATE}, but indexes - and all their contents - will be deleted upon session factory
 	 * shut-down as well.
 	 */
-	CREATE_DELETE;
+	RECREATE_DELETE;
 }

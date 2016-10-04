@@ -50,7 +50,7 @@ public final class ElasticsearchEnvironment {
 	 * The name of one of the {@link IndexSchemaManagementStrategy} constants is expected, e.g. MERGE.
 	 * <p>
 	 * Can be given globally (e.g. {@code hibernate.search.default.elasticsearch.index_schema_management_strategy=MERGE}) or
-	 * for specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.index_schema_management_strategy=CREATE}).
+	 * for specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.index_schema_management_strategy=RECREATE}).
 	 */
 	public static final String INDEX_SCHEMA_MANAGEMENT_STRATEGY = "elasticsearch.index_schema_management_strategy";
 

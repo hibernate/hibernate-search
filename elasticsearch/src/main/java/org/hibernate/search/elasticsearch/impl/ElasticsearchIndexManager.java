@@ -201,7 +201,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 	@Override
 	public void destroy() {
-		if ( indexManagementStrategy == IndexSchemaManagementStrategy.CREATE_DELETE ) {
+		if ( indexManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
 			deleteIndexIfExisting();
 		}
 
@@ -225,8 +225,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		if ( indexManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
 			return;
 		}
-		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.CREATE ||
-				indexManagementStrategy == IndexSchemaManagementStrategy.CREATE_DELETE ) {
+		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.RECREATE ||
+				indexManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
 
 			deleteIndexIfExisting();
 			createIndex();

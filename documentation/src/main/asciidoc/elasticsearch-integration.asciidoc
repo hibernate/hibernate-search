@@ -95,7 +95,7 @@ Add them to your `persistence.xml` or where you put the rest of your Hibernate S
 
 Select Elasticsearch as the backend:: `hibernate.search.default.indexmanager elasticsearch`
 Hostname and port for Elasticsearch:: `hibernate.search.default.elasticsearch.host \http://127.0.0.1:9200`
-Selects the index creation strategy:: `hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE_DELETE`
+Selects the index creation strategy:: `hibernate.search.default.elasticsearch.index_schema_management_strategy RECREATE_DELETE`
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000`
 Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red"):: `hibernate.search.default.elasticsearch.required_index_status green`
 Whether to perform an explicit refresh after a set of operations has been executed against a specific index (`true` or `false`):: `hibernate.search.default.elasticsearch.refresh_after_write false`
@@ -109,10 +109,10 @@ Let's see the options for the `index_schema_management_strategy` property:
 [options="header"]
 |===============
 |Value|Definition
-|NONE|Indexes will not be created nor deleted.
-|MERGE|Missing indexes and mappings will be created, mappings will be updated if there are no conflicts.
-|CREATE|Indexed will be deleted if existing and then created. This will delete all content from the index!
-|CREATE_DELETE|Similarly to 'CREATE' but will also delete the index at shutdown. Commonly used for tests.
+|`NONE`|Indexes will not be created nor deleted.
+|`MERGE`|Missing indexes and mappings will be created, mappings will be updated if there are no conflicts.
+|`RECREATE`|Indexed will be deleted if existing and then created. This will delete all content from the index!
+|`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
 |===============
 
 Note that all properties prefixed with `hibernate.search.default` (besides `host`) can be given globally as shown above and/or be given for specific indexes:
