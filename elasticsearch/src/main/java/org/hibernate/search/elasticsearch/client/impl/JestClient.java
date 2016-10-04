@@ -23,6 +23,7 @@ import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -102,16 +103,33 @@ public class JestClient implements Service, Startable, Stoppable {
 		serviceManager = null;
 	}
 
+	/**
+	 * Just to remove ambiguity between {@link #executeRequest(Action, int...)} and {@link #executeRequest(Action, String...)}
+	 * when the vararg is empty.
+	 */
+	public <T extends JestResult> T executeRequest(Action<T> request) {
+		return executeRequest( request, Collections.<Integer>emptySet(), Collections.<String>emptySet() );
+	}
+
 	public <T extends JestResult> T executeRequest(Action<T> request, int... ignoredErrorStatuses) {
 		return executeRequest( request, asSet( ignoredErrorStatuses ) );
 	}
 
+	public <T extends JestResult> T executeRequest(Action<T> request, String... ignoredErrorTypes) {
+		return executeRequest( request, Collections.<Integer>emptySet(), CollectionHelper.asImmutableSet( ignoredErrorTypes ) );
+	}
+
 	public <T extends JestResult> T executeRequest(Action<T> request, Set<Integer> ignoredErrorStatuses) {
+		return executeRequest( request, ignoredErrorStatuses, Collections.<String>emptySet() );
+	}
+
+	public <T extends JestResult> T executeRequest(Action<T> request, Set<Integer> ignoredErrorStatuses, Set<String> ignoredErrorTypes) {
 		try {
 			T result = client.execute( request );
 
 			// The request failed with a status that's not ignore-able
-			if ( !result.isSucceeded() && !isIgnored( result.getResponseCode(), ignoredErrorStatuses ) ) {
+			if ( !result.isSucceeded() && !isResponseCode( result.getResponseCode(), ignoredErrorStatuses )
+					&& !isErrorType( result, ignoredErrorTypes ) ) {
 				if ( result.getResponseCode() == TIME_OUT ) {
 					throw LOG.elasticsearchRequestTimeout( requestToString( request ), resultToString( result ) );
 				}
@@ -180,13 +198,36 @@ public class JestClient implements Service, Startable, Stoppable {
 		return erroneousItems;
 	}
 
-	private boolean isIgnored(int responseCode, Set<Integer> ignoredStatuses) {
-		if ( ignoredStatuses == null ) {
-			return true;
+	private boolean isResponseCode(int responseCode, Set<Integer> codes) {
+		if ( codes == null ) {
+			return false;
 		}
 		else {
-			return ignoredStatuses.contains( responseCode );
+			return codes.contains( responseCode );
 		}
+	}
+
+	private boolean isErrorType(JestResult result, Set<String> errorTypes) {
+		if ( errorTypes == null ) {
+			return false;
+		}
+		else {
+			return errorTypes.contains( getErrorType(result) );
+		}
+	}
+
+	private String getErrorType(JestResult result) {
+		JsonElement error = result.getJsonObject().get( "error" );
+		if ( error == null || !error.isJsonObject() ) {
+			return null;
+		}
+
+		JsonElement errorType = error.getAsJsonObject().get( "type" );
+		if ( errorType == null || !errorType.isJsonPrimitive() ) {
+			return null;
+		}
+
+		return errorType.getAsString();
 	}
 
 	private Set<Integer> asSet(int... ignoredErrorStatuses) {
