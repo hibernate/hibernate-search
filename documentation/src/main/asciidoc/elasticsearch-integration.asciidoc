@@ -464,6 +464,13 @@ ftQuery.enableFullTextFilter( "namedDriver" ).setParameter( "name", "liz" );
 
 For static filters, you can simply extend the `SimpleElasticsearchFilter` and provide an Elasticsearch filter in JSON form.
 
+=== Index optimization
+
+The optimization features documented in <<search-optimize>> are only partially implemented. That kind of optimization is rarely needed with recent versions of Lucene (on which Elasticsearch is based), but some of it is still provided for the very specific case of indexes meant to stay read-only for a long period of time:
+
+ * The automatic optimization is not implemented and most probably never will be.
+ * The manual optimization (`searchFactory.optimize()`) is implemented.
+
 === Limitations
 
 Not everything is implemented yet.
