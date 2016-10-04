@@ -226,9 +226,13 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		if ( indexManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
 			return;
 		}
+		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.CREATE ) {
+			if ( createIndexIfNotYetExisting() ) {
+				createIndexMappings();
+			}
+		}
 		else if ( indexManagementStrategy == IndexSchemaManagementStrategy.RECREATE ||
 				indexManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
-
 			deleteIndexIfExisting();
 			createIndex();
 			createIndexMappings();
@@ -274,12 +278,16 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
-	private void createIndexIfNotYetExisting() {
+	/**
+	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
+	 */
+	private boolean createIndexIfNotYetExisting() {
 		if ( jestClient.executeRequest( new IndicesExists.Builder( actualIndexName ).build(), 404 ).getResponseCode() == 200 ) {
-			return;
+			return false;
 		}
 
 		jestClient.executeRequest( new CreateIndex.Builder( actualIndexName ).build() );
+		return true;
 	}
 
 	private void deleteIndexIfExisting() {

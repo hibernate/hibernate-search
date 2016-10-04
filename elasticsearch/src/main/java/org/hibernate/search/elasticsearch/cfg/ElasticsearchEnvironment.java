@@ -19,7 +19,7 @@ public final class ElasticsearchEnvironment {
 	public static final class Defaults {
 
 		public static final String SERVER_URI = "http://localhost:9200";
-		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.NONE;
+		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.CREATE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final String REQUIRED_INDEX_STATUS = "green";
 		public static final boolean REFRESH_AFTER_WRITE = false;
