@@ -1,6 +1,39 @@
 Hibernate Search Changelog
 ==========================
 
+5.6.0.Beta3 (05-10-2016)
+-------------------------
+
+** Bug
+    * HSEARCH-2376 Unable to sort string with non case sensitive order
+    * HSEARCH-2373 Some ES-related services are not properly released
+    * HSEARCH-2372 QueryDescriptor creates an implementation leak
+    * HSEARCH-2371 Using a SearchIntegrator-provided QueryDescriptor will require passing the targeted entities twice
+    * HSEARCH-2367 QueryDescriptors ignore targetEntities
+    * HSEARCH-2355 Add some documentation about time (especially java.util.Date) handling in Elasticsearch integration
+    * HSEARCH-2352 Index.NO is being ignored for numeric fields (and also boolean or date fields for Elasticearch)
+    * HSEARCH-2351 Documents lost after concurrent initialization of DirectoryProvider
+    * HSEARCH-2343 Possible resource leak in IndexControl MBean
+    * HSEARCH-2189 Querying elastic search triggers exception "Result window is too large"
+
+** Improvement
+    * HSEARCH-2374 Make the default value of hibernate.search.default.elasticsearch.index_schema_management_strategy less confusing
+    * HSEARCH-2370 Document how to use QueryDescriptor
+    * HSEARCH-2359 Checkstyle: stricter ParenPad rule
+    * HSEARCH-2349 PrefixQuery Apache Lucene query type is not automatically translated to json  
+    * HSEARCH-2092 Map the optimize() operation to Elasticsearch 'force merge' requests
+
+** New Feature
+    * HSEARCH-2269 Provide support for new Java 8 time/date types (JSR 310) with Elasticsearch backend
+    * HSEARCH-1872 Create a proper API for sorting definitions
+
+** Task
+    * HSEARCH-2356 Latest Java 9 preview builds need --add-modules instead of -addmods as build option
+    * HSEARCH-2347 Upgrade JUnit to 4.12
+    * HSEARCH-2346 Upgrade Spring Framework used for integration tests to 4.3.2.RELEASE
+    * HSEARCH-2342 Upgrade to WildFly 10.1.0.Final
+    * HSEARCH-2262 In the Elasticsearch mapping, validate the type of the null_value/indexNullAs property
+
 Version 5.6.0.Beta2 (5-9-2016)
 ------------------------
 
