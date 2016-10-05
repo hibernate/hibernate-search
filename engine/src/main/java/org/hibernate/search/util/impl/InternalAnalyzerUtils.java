@@ -17,7 +17,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Analysis helpers that have no reason to be exposed publicy as {@link AnalyzerUtils} is.
+ * Analysis helpers that have no reason to be exposed publicly.
  *
  * @author Yoann Rodiere
  */
@@ -31,6 +31,12 @@ public final class InternalAnalyzerUtils {
 
 	/**
 	 * Returns the first token resulting from the analysis, logging a warning if there are more than one token.
+	 *
+	 * @param analyzer the Lucene analyzer to use
+	 * @param fieldName the name of the field: might affect the analyzer behavior
+	 * @param text the value to analyze
+	 * @return the first token resulting from the analysis
+	 *
 	 * @throws SearchException if a problem occurs when analyzing the sortable field's value.
 	 */
 	public static String analyzeSortableValue(Analyzer analyzer, String fieldName, String text) {
