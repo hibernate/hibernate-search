@@ -985,4 +985,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 319, value = "Using serialization service %1$s")
 	void usingSerializationService(String serializerDescription);
 
+	@Message(id = 320, value = "Could not analyze sortable field '%1$s'.")
+	SearchException couldNotAnalyzeSortableField(String fieldName, @Cause Exception cause);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 321, value = "The analysis of field '%1$s' produced multiple tokens. Tokenization or term generation"
+			+ " (synonyms) should not be used on sortable fields. Only the first token will be indexed.")
+	void multipleTermsInAnalyzedSortableField(String fieldName);
+
 }

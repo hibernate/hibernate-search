@@ -21,7 +21,9 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Helper class to test analyzers. Taken and modified from <i>Lucene in Action</i>.
+ * Helper class to hide boilerplate code when using Lucene Analyzers.
+ *
+ * <p>Taken and modified from <i>Lucene in Action</i>.
  *
  * @author Hardy Ferentschik
  */
