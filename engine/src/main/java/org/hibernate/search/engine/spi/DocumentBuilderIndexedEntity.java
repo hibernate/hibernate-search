@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.spi;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collection;
@@ -13,10 +14,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleDocValuesField;
@@ -34,6 +37,8 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -68,6 +73,7 @@ import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -803,9 +809,42 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					}
 				}
 				else {
-					document.add( new SortedDocValuesField( sortField.getFieldName(), new BytesRef( field.stringValue() ) ) );
+					String value = field.stringValue();
+					AnalyzerReference analyzerReference = fieldMetaData.getAnalyzerReference();
+					if ( fieldMetaData.getIndex().isAnalyzed() && analyzerReference.is( LuceneAnalyzerReference.class ) ) {
+						// Analysis is skipped altogether when the analyzer is remote. It's up to the backend to handle it.
+						Analyzer analyzer = analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
+						value = analyzeSortFieldValue( sortField.getFieldName(), value, analyzer );
+					}
+					if ( value != null ) {
+						document.add( new SortedDocValuesField( sortField.getFieldName(), new BytesRef( value ) ) );
+					}
 				}
 			}
+		}
+	}
+
+	/*
+	 * Necessary because Lucene doesn't automatically analyze SortedDocValuesFields.
+	 * See https://hibernate.atlassian.net/browse/HSEARCH-2376
+	 */
+	private String analyzeSortFieldValue(String fieldName, String fieldValue, Analyzer analyzer) {
+		try {
+			Iterator<String> analyzedTokens = AnalyzerUtils.tokenizedTermValues( analyzer, fieldName, fieldValue ).iterator();
+
+			if ( analyzedTokens.hasNext() ) {
+				String firstToken = analyzedTokens.next();
+				if ( analyzedTokens.hasNext() ) {
+					log.multipleTermsInAnalyzedSortableField( fieldName );
+				}
+				return firstToken;
+			}
+			else {
+				return null;
+			}
+		}
+		catch (SearchException | IOException e) {
+			throw log.couldNotAnalyzeSortableField( fieldName, e );
 		}
 	}
 
