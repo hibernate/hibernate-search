@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.spi;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collection;
@@ -14,7 +13,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,7 +71,7 @@ import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.util.AnalyzerUtils;
+import org.hibernate.search.util.impl.InternalAnalyzerUtils;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -814,39 +812,20 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					String value = field.stringValue();
 					AnalyzerReference analyzerReference = fieldMetaData.getAnalyzerReference();
 					if ( fieldMetaData.getIndex().isAnalyzed() && analyzerReference.is( LuceneAnalyzerReference.class ) ) {
-						// Analysis is skipped altogether when the analyzer is remote. It's up to the backend to handle it.
+						/*
+						 * Necessary because Lucene doesn't automatically analyze SortedDocValuesFields.
+						 * See https://hibernate.atlassian.net/browse/HSEARCH-2376
+						 *
+						 * Analysis is skipped altogether when the analyzer is remote. It's up to the backend to handle it.
+						 */
 						Analyzer analyzer = analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
-						value = analyzeSortFieldValue( sortField.getFieldName(), value, analyzer );
+						value = InternalAnalyzerUtils.analyzeSortableValue( analyzer, sortField.getFieldName(), value );
 					}
 					if ( value != null ) {
 						document.add( new SortedDocValuesField( sortField.getFieldName(), new BytesRef( value ) ) );
 					}
 				}
 			}
-		}
-	}
-
-	/*
-	 * Necessary because Lucene doesn't automatically analyze SortedDocValuesFields.
-	 * See https://hibernate.atlassian.net/browse/HSEARCH-2376
-	 */
-	private String analyzeSortFieldValue(String fieldName, String fieldValue, Analyzer analyzer) {
-		try {
-			Iterator<String> analyzedTokens = AnalyzerUtils.tokenizedTermValues( analyzer, fieldName, fieldValue ).iterator();
-
-			if ( analyzedTokens.hasNext() ) {
-				String firstToken = analyzedTokens.next();
-				if ( analyzedTokens.hasNext() ) {
-					log.multipleTermsInAnalyzedSortableField( fieldName );
-				}
-				return firstToken;
-			}
-			else {
-				return null;
-			}
-		}
-		catch (SearchException | IOException e) {
-			throw log.couldNotAnalyzeSortableField( fieldName, e );
 		}
 	}
 
