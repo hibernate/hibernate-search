@@ -934,4 +934,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 307, value = "Sort type %1$s is not compatible with %2$s type of field '%3$s'.")
 	SearchException sortTypeDoesNotMatchFieldType(String sortType, String fieldType, String fieldName);
 
+	@Message(id = 320, value = "Could not analyze sortable field '%1$s'.")
+	SearchException couldNotAnalyzeSortableField(String fieldName, @Cause Exception cause);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 321, value = "The analysis of field '%1$s' produced multiple tokens. Tokenization or term generation"
+			+ " (synonyms) should not be used on sortable fields. Only the first token will be indexed.")
+	void multipleTermsInAnalyzedSortableField(String fieldName);
+
 }

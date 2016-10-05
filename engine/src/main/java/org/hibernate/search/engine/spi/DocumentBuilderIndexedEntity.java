@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleDocValuesField;
@@ -64,6 +65,7 @@ import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.util.impl.InternalAnalyzerUtils;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -704,6 +706,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 * Adds the doc field values to the document required to map the configured sort fields. The value from the
 	 * underlying field will be obtained from the document (it has been written at this point already) and an equivalent
 	 * doc field value will be added.
+	 * For non-numeric fields, if the field value is supposed to be analyzed, the analysis will be performed by
+	 * this method, because Lucene does not analyze SortedDocValuesFields values automatically.
 	 */
 	private void addSortFieldDocValues(Document document, PropertyMetadata propertyMetadata, float documentBoost, Object propertyValue) {
 		for ( SortableFieldMetadata sortField : propertyMetadata.getSortableFieldMetadata() ) {
@@ -760,7 +764,20 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					}
 				}
 				else {
-					document.add( new SortedDocValuesField( sortField.getFieldName(), new BytesRef( field.stringValue() ) ) );
+					String value = field.stringValue();
+					Analyzer analyzer = fieldMetaData.getAnalyzer();
+					if ( fieldMetaData.getIndex().isAnalyzed() && analyzer != null ) {
+						/*
+						 * Necessary because Lucene doesn't automatically analyze SortedDocValuesFields.
+						 * See https://hibernate.atlassian.net/browse/HSEARCH-2376
+						 *
+						 * Analysis is skipped altogether when the analyzer is remote. It's up to the backend to handle it.
+						 */
+						value = InternalAnalyzerUtils.analyzeSortableValue( analyzer, sortField.getFieldName(), value );
+					}
+					if ( value != null ) {
+						document.add( new SortedDocValuesField( sortField.getFieldName(), new BytesRef( value ) ) );
+					}
 				}
 			}
 		}

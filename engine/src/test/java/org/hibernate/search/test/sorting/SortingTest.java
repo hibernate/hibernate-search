@@ -13,10 +13,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -25,6 +32,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
@@ -93,6 +102,65 @@ public class SortingTest {
 		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
 		Sort sortAsString = new Sort( new SortField( "name", SortField.Type.STRING ) );
 		assertSortedResults( query, sortAsString, 3, 2, 1, 0 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2376")
+	public void testSortingOnCollatedString() {
+		// Index all testData:
+		storeTestingData(
+				new Person( 0, 3, "Éléonore" ),
+				new Person( 1, 10, "édouard" ),
+				new Person( 2, 9, "Edric" ),
+				new Person( 3, 5, "aaron" ),
+				new Person( 4, 7, " zach" )
+			);
+
+		// Sorting by collated name
+		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
+		Sort sortAsString = new Sort( new SortField( "collatedName", SortField.Type.STRING ) );
+		assertSortedResults( query, sortAsString, 4, 3, 1, 2, 0 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2376")
+	public void testAnalyzedSortableStoredField() {
+		Person person = new Person( 0, 3, "Éléonore" );
+
+		// Index all testData:
+		storeTestingData( person );
+
+		/*
+		 * Check the stored value is the value *before* analysis
+		 * This check makes sens mainly because we use DocValues for sorting, and
+		 * so should field value storage.
+		 */
+		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().keyword()
+				.onField( "id" )
+				.matching( person.id )
+				.createQuery();
+		assertStoredValueEquals( query, "collatedName", person.name );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2376")
+	public void testSortingOnTokenizedString() {
+		// Index all testData:
+		storeTestingData(
+				new Person( 0, 3, "elizabeth" ),
+				new Person( 1, 10, "zach other" ),
+				new Person( 2, 9, " edric" ),
+				new Person( 3, 5, "bob" ),
+				new Person( 4, 10, "zach Aaron" )
+			);
+
+		// Sorting by tokenized name: ensure only the first token is taken into account
+		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
+		Sort sortAsString = new Sort(
+				new SortField( "tokenizedName", SortField.Type.STRING ),
+				SortField.FIELD_DOC // Stabilize the sort for the two zachs
+				);
+		assertSortedResults( query, sortAsString, 3, 2, 0, 1, 4 );
 	}
 
 	@Test
@@ -296,6 +364,17 @@ public class SortingTest {
 		}
 	}
 
+	private void assertStoredValueEquals(Query query, String fieldName, Object expectedValue) {
+		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		HSQuery hsQuery = integrator.createHSQuery().luceneQuery( query );
+		hsQuery.targetedEntities( Arrays.<Class<?>>asList( Person.class ) );
+		hsQuery.projection( fieldName );
+		assertEquals( 1, hsQuery.queryResultSize() );
+		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();
+		assertEquals( 1, queryEntityInfos.size() );
+		assertEquals( expectedValue, queryEntityInfos.get( 0 ).getProjection()[0] );
+	}
+
 	private HSQuery queryForValueNullAndSorting(String fieldName, SortField.Type sortType) {
 		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
 		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( Person.class ).get();
@@ -311,6 +390,20 @@ public class SortingTest {
 		return hsQuery;
 	}
 
+	@AnalyzerDefs({
+		@AnalyzerDef(
+				name = "collatingAnalyzer",
+				tokenizer = @TokenizerDef(factory = KeywordTokenizerFactory.class),
+				filters = {
+						@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+						@TokenFilterDef(factory = LowerCaseFilterFactory.class)
+				}
+		),
+		@AnalyzerDef(
+				name = "tokenizingAnalyzer",
+				tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class)
+		)
+	})
 	@Indexed
 	private class Person {
 
@@ -328,8 +421,16 @@ public class SortingTest {
 		})
 		final Integer age;
 
-		@org.hibernate.search.annotations.SortableField
-		@Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+		@SortableFields({
+				@org.hibernate.search.annotations.SortableField(forField = "name"),
+				@org.hibernate.search.annotations.SortableField(forField = "collatedName"),
+				@org.hibernate.search.annotations.SortableField(forField = "tokenizedName")
+		})
+		@Fields({
+				@Field(name = "name", store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN),
+				@Field(name = "collatedName", store = Store.YES, analyzer = @Analyzer(definition = "collatingAnalyzer")),
+				@Field(name = "tokenizedName", store = Store.YES, analyzer = @Analyzer(definition = "tokenizingAnalyzer"))
+		})
 		final String name;
 
 		@IndexedEmbedded
