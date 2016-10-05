@@ -753,6 +753,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 * Adds the doc field values to the document required to map the configured sort fields. The value from the
 	 * underlying field will be obtained from the document (it has been written at this point already) and an equivalent
 	 * doc field value will be added.
+	 * For non-numeric fields, if the field value is supposed to be analyzed, the analysis will be performed by
+	 * this method, because Lucene does not analyze SortedDocValuesFields values automatically.
 	 */
 	private void addSortFieldDocValues(Document document, PropertyMetadata propertyMetadata, float documentBoost, Object propertyValue) {
 		for ( SortableFieldMetadata sortField : propertyMetadata.getSortableFieldMetadata() ) {
