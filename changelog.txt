@@ -1,6 +1,13 @@
 Hibernate Search Changelog
 ==========================
 
+5.7.0.Alpha1 (05-10-2016)
+-------------------------
+
+** Task
+    * HSEARCH-2350 Require Java 8
+    * HSEARCH-2296 Upgrade to Hibernate ORM 5.2.1.Final
+
 5.6.0.Beta3 (05-10-2016)
 -------------------------
 
