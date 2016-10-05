@@ -69,8 +69,8 @@
                 <entry key="hibernate.generate_statistics" value="true"/>
                 <!-- 2 is TRANSACTION_READ_COMMITTED -->
                 <entry key="hibernate.connection.isolation" value="2"/>
-                <!-- http://docs.jboss.org/hibernate/core/3.3/reference/en/html/architecture.html#architecture-current-session -->
-                <entry key="hibernate.current_session_context_class" value="org.hibernate.context.JTASessionContext"/>
+                <!-- http://docs.jboss.org/hibernate/orm/5.2/userguide/html_single/Hibernate_User_Guide.html#configurations-general -->
+                <entry key="hibernate.current_session_context_class" value="jta"/>
 
                 <!--  trying things to make Oracle happy -->
                 <entry key="hibernate.jdbc.batch_size" value="0"/>
