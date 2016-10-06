@@ -70,6 +70,13 @@ docker run -p 9200:9200 -d -v "$PWD/plugin_dir":/usr/share/elasticsearch/plugins
     elasticsearch
 --
 
+[NOTE]
+.Elasticsearch version
+--
+Hibernate Search expects an Elasticsearch node version 2.0 at least.
+Hibernate Search internal tests run against Elasticsearch 2.3.
+--
+
 ==== Dependencies in your Java application
 
 In addition to the usual dependencies like Hibernate ORM and Hibernate Search,
