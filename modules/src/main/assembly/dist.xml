@@ -31,6 +31,11 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>${aliases.xml.basedir}/search/infinispan-storage/module.xml</source>
+            <outputDirectory>/org/hibernate/search/infinispan-storage/${infinispan.module.slot.previous}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
             <source>${module.xml.basedir}/search/orm/module.xml</source>
             <outputDirectory>/org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
