@@ -82,6 +82,7 @@ public class CopyTokenStream extends TokenStream implements Serializable {
 
 	private static List<List<AttributeImpl>> createAttributeLists(TokenStream input) throws IOException {
 		List<List<AttributeImpl>> results = new ArrayList<>();
+		input.reset();
 		while ( input.incrementToken() ) {
 			List<AttributeImpl> attrs = new ArrayList<>();
 			results.add( attrs );

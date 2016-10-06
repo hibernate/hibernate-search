@@ -191,12 +191,6 @@ public final class SerializationTestHelper {
 		if ( original == null ) {
 			return copy == null;
 		}
-		try {
-			original.reset();
-		}
-		catch (IOException e) {
-			throw new RuntimeException( e );
-		}
 		SerializableTokenStream serOriginal = CopyTokenStream.buildSerializableTokenStream( original );
 		SerializableTokenStream serCopy = CopyTokenStream.buildSerializableTokenStream( copy );
 		if ( serOriginal.getStream().size() != serCopy.getStream().size() ) {
