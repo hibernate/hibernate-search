@@ -14,8 +14,7 @@ import org.apache.lucene.document.Document;
  *
  * @author Emmanuel Bernard
  */
-// FIXME rework the interface inheritance there are some common concepts with StringBridge
-public interface TwoWayFieldBridge extends FieldBridge {
+public interface TwoWayFieldBridge extends FieldBridge, StringBridge {
 	/**
 	 * Build the element object from the <code>Document</code>
 	 *
