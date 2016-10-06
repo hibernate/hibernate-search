@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+5.5.5.Final (06-10-2016)
+-------------------------
+
+** Bug
+    * HSEARCH-2376 Unable to sort string with non case sensitive order
+    * HSEARCH-2351 Documents lost after concurrent initialization of DirectoryProvider
+    * HSEARCH-2314 TokenStream contract violation during serialization of index on slave node in a JMS cluster
+
+** Task
+    * HSEARCH-2377 Upgrade branch 5.5 to Hibernate ORM 5.0.11.Final
+    * HSEARCH-2315 Upgrade branch 5.5 to Hibernate ORM 5.0.10.Final
+    * HSEARCH-2309 Getting started documentation points to an old version of Luke
+    * HSEARCH-2308 Upgrade JGroups to version 3.6.10.Final
+
 Version 5.5.4.Final (29-06-2016)
 ------------------------
 
