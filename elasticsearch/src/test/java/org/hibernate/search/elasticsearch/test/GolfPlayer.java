@@ -20,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 
+import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.DateBridge;
@@ -66,7 +67,7 @@ public class GolfPlayer {
 	private Date dateOfBirth;
 
 	@Field(indexNullAs = "1970-01-01+00:00")
-	@DateBridge(resolution = Resolution.DAY)
+	@CalendarBridge(resolution = Resolution.DAY)
 	private Calendar subscriptionEndDate;
 
 	@Field
