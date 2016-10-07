@@ -31,6 +31,10 @@ public class NoOpNestingContext implements NestingContext {
 	}
 
 	@Override
+	public void markObjectValue(Document document) {
+	}
+
+	@Override
 	public void incrementCollectionIndex() {
 	}
 }
