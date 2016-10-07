@@ -22,10 +22,12 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.WriteOutContentHandler;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.MetadataProvidingTikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaParseContextProvider;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -37,7 +39,7 @@ import static org.apache.tika.io.IOUtils.closeQuietly;
  *
  * @author Hardy Ferentschik
  */
-public class TikaBridge implements FieldBridge {
+public class TikaBridge implements MetadataProvidingFieldBridge {
 	private static final Log log = LoggerFactory.make();
 
 	// Expensive, so only do it once. The Parser is threadsafe.
@@ -49,6 +51,14 @@ public class TikaBridge implements FieldBridge {
 	public TikaBridge() {
 		setMetadataProcessorClass( null );
 		setParseContextProviderClass( null );
+	}
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		if ( metadataProcessor instanceof MetadataProvidingTikaMetadataProcessor ) {
+			( (MetadataProvidingTikaMetadataProcessor) metadataProcessor )
+					.configureFieldMetadata( name, builder );
+		}
 	}
 
 	public void setParseContextProviderClass(Class<?> parseContextProviderClass) {
