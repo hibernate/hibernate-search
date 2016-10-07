@@ -10,14 +10,14 @@ import java.util.Map;
 
 import org.apache.lucene.document.Document;
 
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
  * @author John Griffin
  */
-public class EquipmentType implements FieldBridge, ParameterizedBridge {
+public class EquipmentType implements TwoWayFieldBridge, ParameterizedBridge {
 
 	private Map<String,String> equips;
 
@@ -33,12 +33,31 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 		// from the name field of the ClassBridge Annotation. This is not
 		// a requirement. It just works that way in this instance. The
 		// actual name could be supplied by hard coding it below.
-		Departments deps = (Departments) value;
-		String fieldValue1 = deps.getManufacturer();
 
-		if ( fieldValue1 != null ) {
-			String indexedString = equips.get( fieldValue1 );
+		String indexedString = objectToString( value );
+		if ( !indexedString.isEmpty() ) {
 			luceneOptions.addFieldToDocument( name, indexedString, document );
 		}
+	}
+
+	@Override
+	public Object get(String name, Document document) {
+		return document.get( name );
+	}
+
+	@Override
+	public String objectToString(Object value) {
+		Departments deps = (Departments) value;
+		String fieldValue1 = deps.getManufacturer();
+		String result = null;
+
+		if ( fieldValue1 != null ) {
+			result = equips.get( fieldValue1 );
+		}
+		if ( result == null ) {
+			result = "";
+		}
+
+		return result;
 	}
 }
