@@ -24,9 +24,11 @@ import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * Verifies basic behavior of FSSlaveDirectoryProvider around
@@ -35,6 +37,7 @@ import org.junit.Test;
  *
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
+@Category(SkipOnElasticsearch.class) // Directory providers are specific to the Lucene backend
 public class RetryInitializeTest {
 
 	private FullTextSessionBuilder slave;

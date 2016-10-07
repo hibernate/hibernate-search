@@ -22,9 +22,11 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Book;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
@@ -91,6 +93,7 @@ public class SortWithIndexUninvertingTest extends SearchTestBase {
 	 * exception is expected.
 	 */
 	@Test
+	@Category(SkipOnElasticsearch.class) // This problem does not affect the Elasticsearch backend
 	public void testQueryOnIndexSharedByEntityWithRequiredSortFieldAndEntityWithoutRaisesException() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 

@@ -16,7 +16,9 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,6 +29,7 @@ import static org.junit.Assert.assertNull;
  * @author John Griffin
  * @author Sanne Grinovero
  */
+@Category(SkipOnElasticsearch.class) // IndexReaders (which provide access to term vectors) are specific to the Lucene backend
 public class TermVectorTest extends SearchTestBase {
 
 	@Test

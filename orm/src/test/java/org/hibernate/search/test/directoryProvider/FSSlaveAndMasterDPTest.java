@@ -21,9 +21,11 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.experimental.categories.Category;
 
 /**
  * Test case for master/slave directories.
@@ -31,6 +33,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
+@Category(SkipOnElasticsearch.class) // Directories are specific to the Lucene backend
 public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 	private static final Log log = LoggerFactory.make();

@@ -27,9 +27,11 @@ import org.hibernate.Session;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.impl.FileHelper;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -38,6 +40,7 @@ import static org.junit.Assert.assertTrue;
  * @author Gavin King
  * @author Sanne Grinovero
  */
+@Category(SkipOnElasticsearch.class) // Directories are specific to the Lucene backend
 public class FSDirectoryTest extends SearchTestBase {
 
 	@Test

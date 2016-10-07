@@ -486,8 +486,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class)
-	// The resolution is not yet supported for the date bridges
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2393 Remove dependency to Lucene in tests for features common to Lucene and Elasticsearch
 	public void testRangeQueryFromToIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -552,8 +551,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class)
-	// The resolution is not yet supported for the date bridges
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2393 Remove dependency to Lucene in tests for features common to Lucene and Elasticsearch
 	public void testRangeQueryBelowIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -634,8 +632,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class)
-	// The resolution is not yet supported for the date bridges
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2393 Remove dependency to Lucene in tests for features common to Lucene and Elasticsearch
 	public void testRangeQueryAboveIgnoreFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()

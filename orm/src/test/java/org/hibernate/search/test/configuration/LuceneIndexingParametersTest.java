@@ -14,8 +14,10 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.serialization.SerializationTestHelper;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_BUFFERED_DOCS;
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_MERGE_DOCS;
@@ -28,6 +30,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Sanne Grinovero
  */
+@Category(SkipOnElasticsearch.class) // These parameters are specific to the Lucene backend
 public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 
 	@Override

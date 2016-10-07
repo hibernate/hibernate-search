@@ -193,99 +193,99 @@
                                 <include>**/*.java</include>
                             </includes>
                             <excludes>
-                                <!-- Unknown cause failures (to be explored still) -->
-                                <exclude>**/EmbeddedSortableIdFieldTest.java</exclude>
-                                <exclude>**/CollectionUpdateEventTest.java</exclude>
-
-                                <!-- Analyzers -->
+                                <!-- HSEARCH-2391 Support -orm/-engine analyzer-related tests in -elasticsearch -->
                                 <exclude>**/CustomAnalyzerInClassBridgeTest.java</exclude>
                                 <exclude>**/SolrAnalyzerTest.java</exclude>
-
-                                <!-- Bridges -->
+                                <exclude>**/AnalyzerTest.java</exclude>
+                                <exclude>**/DoubleAnalyzerTest.java</exclude>
+                                <exclude>**/AnalyzerInheritanceTest.java</exclude>
+                                
+                                <!-- HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch -->
+                                <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
+                                <!-- Also, parts of NullEmbeddedTest -->
+                                
+                                <!-- HSEARCH-2271 Enable ArrayBridgeTest (and similar) for Elasticsearch -->
                                 <exclude>**/ArrayBridgeTest.java</exclude>
-                                <exclude>**/BridgeTest.java</exclude>
-                                <exclude>**/ClassBridgeTest.java</exclude>
                                 <exclude>**/IterableBridgeTest.java</exclude>
                                 <exclude>**/MapBridgeTest.java</exclude>
+                                
+                                <!-- HSEARCH-2402 Elasticsearch backend mistakes @DateBridge for @CalendarBridge -->
+                                <exclude>**/BridgeTest.java</exclude>
+                                <exclude>**/NumericEncodingQueriesTest.java</exclude>
+                                
+                                <!-- HSEARCH-2403 TwoWayFieldBridge exceptions are not wrapped properly when retrieving ES projection values -->
+                                <exclude>**/BridgeTest.java</exclude>
+                                
+                                <!-- HSEARCH-2392 Enable BridgeProviderTest for Elasticsearch -->
                                 <exclude>**/BridgeProviderTest.java</exclude>
+                                
+                                <!-- HSEARCH-2386 TikaMetadataProcessor cannot add sortable fields (or fields usable in Elasticsearch) -->
                                 <exclude>**/TikaBridgeBlobSupportTest.java</exclude>
                                 <exclude>**/TikaBridgeTest.java</exclude>
-
-                                <exclude>**/HibernateSearchIntegratorTest.java</exclude>
-                                <exclude>**/OptimizationTriggerTest.java</exclude>
-                                <exclude>**/WorkQueueLengthConfiguredTest.java</exclude>
-                                <exclude>**/CompressionTest.java</exclude>
-                                <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
-                                <exclude>**/ProgrammaticMappingTest.java</exclude>
-                                <exclude>**/ShardsConfigurationTest.java</exclude>
-                                <exclude>**/WorkDoneOnEntitiesTest.java</exclude>
-                                <exclude>**/NumericFieldTest.java</exclude>
-                                <exclude>**/DeleteByTermTest.java</exclude>
-                                <exclude>**/UpdateOperationsTest.java</exclude>
-                                <exclude>**/TransactionTest.java</exclude>
-                                <exclude>**/SearchAndEnversIntegrationTest.java</exclude>
-                                <exclude>**/IndexingActionInterceptorTest.java</exclude>
-                                <exclude>**/IndexControlMBeanTest.java</exclude>
-                                <exclude>**/ToStringTest.java</exclude>
-                                <exclude>**/DynamicBoostingTest.java</exclude>
+                                
+                                <!-- HSEARCH-2393 Remove depencies to Lucene in tests for features common to Lucene and Elasticsearch -->
+                                <exclude>**/ClassBridgeTest.java</exclude><!-- QueryParser -->
+                                <exclude>**/ProgrammaticMappingTest.java</exclude><!-- Analyzers -->
+                                <exclude>**/WorkDoneOnEntitiesTest.java</exclude><!-- IndexReader -->
+                                <exclude>**/DeleteByTermTest.java</exclude><!-- WorkspaceHolder -->
+                                <exclude>**/UpdateOperationsTest.java</exclude><!-- LeakingOptimizer -->
+                                <exclude>**/TransactionTest.java</exclude><!-- Directory -->
+                                <exclude>**/IndexingActionInterceptorTest.java</exclude><!-- Queries on the object's class -->
+                                <exclude>**/IndexControlMBeanTest.java</exclude><!-- IndexReader -->
+                                <exclude>**/ToStringTest.java</exclude><!-- Relies on the lucene query's toString(), should be the HSQuery's getQueryString? -->
+                                <exclude>**/DynamicBoostingTest.java</exclude><!-- Projection constant __HSearch_Explanation -->
+                                <exclude>**/IndexAndQueryNullTest.java</exclude><!-- Projection constant __HSearch_Document -->
+                                <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude><!-- Projection constant __HSearch_Document -->
+                                <exclude>**/ProjectionQueryTest.java</exclude><!-- Projection constant __HSearch_Document -->
+                                <exclude>**/SortUsingEntityManagerTest.java</exclude><!-- Sort type LONG instead of STRING? -->
+                                <exclude>**/LazyM2OContainedInTest.java</exclude><!-- Use of TermQuery? -->
+                                <exclude>**/SearchAfterUninitializedProxyEntityLoadingTest.java</exclude><!-- Use of TermQuery? -->
+                                <exclude>**/LazyCollectionsUpdatingTest.java</exclude><!-- Use of TermQuery? -->
+                                <exclude>**/LuceneErrorHandlingTest.java</exclude><!-- LuceneErrorHandlingTest$NoOpLuceneWorkDelegate cannot be cast ... -->
+                                <exclude>**/SyncWorkerTest.java</exclude><!-- Use of QueryParser? -->
+                                <exclude>**/WorkerTestCase.java</exclude><!-- Use of QueryParser? -->
+                                <exclude>**/NumericFieldTest.java</exclude><!-- Missing field metadata (should use MetadataProvidingFieldBridge) -->
+                                <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude><!-- Missing field metadata (should use MetadataProvidingFieldBridge) -->
+                                <exclude>**/DirectoryProviderForQueryTest.java</exclude><!-- Full text filters must implement ElasticsearchFilter -->
+                                
+                                <!-- HSEARCH-2394 Fix dependency issues for tests that are re-used in Elasticsearch -->
+                                <exclude>**/SearchAndEnversIntegrationTest.java</exclude><!-- Envers -->
+                                <exclude>**/HibernateSearchIntegratorTest.java</exclude><!-- Unitils -->
+                                
+                                <!-- HSEARCH-2395 Support MoreLikeThisQueries with the Elasticsearch backend -->
                                 <exclude>**/MoreLikeThisTest.java</exclude>
-                                <exclude>**/NumericEncodingQueriesTest.java</exclude>
+                                
+                                <!-- HSEARCH-2137 Translate core Lucene Queries to Elasticsearch queries -->
                                 <exclude>**/ExplanationTest.java</exclude>
 
-                                <!-- Embedded ids -->
+                                <!-- HSEARCH-2396 Support EmbeddedIds with the Elasticsearch backend -->
                                 <exclude>**/EmbeddedIdTest.java</exclude>
                                 <exclude>**/EmbeddedIdWithDocumentIdTest.java</exclude>
                                 <exclude>**/ProgrammaticEmbeddedItTest.java</exclude>
                                 <exclude>**/CollectionInitializeTest.java</exclude>
-
-                                <!-- Needs range queries on nested fields -->
+                                <exclude>**/EmbeddedSortableIdFieldTest.java</exclude>
+                                
+                                <!-- HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly -->
                                 <exclude>**/DslEmbeddedSearchTest.java</exclude>
-
-                                <!-- Faceting -->
-                                <exclude>**/FacetUnknownFieldFailureTest.java</exclude>
-
-                                <exclude>**/IndexAndQueryNullTest.java</exclude>
-                                <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude>
-                                <exclude>**/ProjectionQueryTest.java</exclude>
-                                <exclude>**/SortUsingEntityManagerTest.java</exclude>
-                                <exclude>**/SortUsingEntityManagerTest.java</exclude>
-                                <exclude>**/TermVectorTest.java</exclude>
-                                <exclude>**/JPATimeoutTest.java</exclude>
-                                <exclude>**/DirectoryProviderForQueryTest.java</exclude>
-                                <exclude>**/DirectorySelectionTest.java</exclude>
-                                <exclude>**/AnalyzerTest.java</exclude>
-                                <exclude>**/DoubleAnalyzerTest.java</exclude>
-                                <exclude>**/AnalyzerInheritanceTest.java</exclude>
-                                <exclude>**/ProgressMonitorTest.java</exclude>
-                                <exclude>**/RetryInitializeTest.java</exclude>
-                                <exclude>**/LazyM2OContainedInTest.java</exclude>
-                                <exclude>**/SearchAfterUninitializedProxyEntityLoadingTest.java</exclude>
-                                <exclude>**/LazyCollectionsUpdatingTest.java</exclude>
-                                <exclude>**/SyncWorkerTest.java</exclude>
-                                <exclude>**/WorkerTestCase.java</exclude>
-                                <exclude>**/ConcurrentMergeErrorHandledTest.java</exclude>
-                                <exclude>**/LuceneErrorHandlingTest.java</exclude>
-                                <exclude>**/EmbeddedFieldBoostTest.java</exclude>
-                                <exclude>**/TimeoutTest.java</exclude>
-                                <exclude>**/QueryValidationTest.java</exclude>
-                                <exclude>**/SimilarityTest.java</exclude>
-                                <exclude>**/SortWithIndexUninvertingTest.java</exclude>
-                                <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude>
                                 <exclude>**/PrefixedEmbeddedCaseInPathTest.java</exclude>
-
-                                <!-- Specific to other backends -->
-                                <exclude>**/CustomBackendTest.java</exclude>
-                                <exclude>**/FSDirectorySelectionTest.java</exclude>
-                                <exclude>**/FSDirectoryTest.java</exclude>
-                                <exclude>**/RamDirectoryTest.java</exclude>
-                                <exclude>**/ExclusiveIndexTest.java</exclude>
-                                <exclude>**/IndexManagerOverrideTest.java</exclude>
-                                <exclude>**/CustomLockProviderTest.java</exclude>
-                                <exclude>**/DirectoryLifecycleTest.java</exclude>
-                                <exclude>**/ScheduledCommitPolicyTest.java</exclude>
-                                <exclude>**/FSSlaveAndMasterDPTest.java</exclude>
-                                <exclude>**/IndexReaderSeeOptimizedIndexTest.java</exclude>
-                                <exclude>**/LuceneIndexingParametersTest.java</exclude>
+                                
+                                <!-- HSEARCH-2398 Improve field name/type validation when querying the Elasticsearch backend -->
+                                <exclude>**/FacetUnknownFieldFailureTest.java</exclude><!-- The elasticsearch backend seems too lenient for unknown field names. -->
+                                <exclude>**/QueryValidationTest.java</exclude><!-- testTargetNumericEncodedFieldWithStringQueryThrowsException: The Elasticsearch backend throws an exception, but not exactly the one we expect -->
+                                <exclude>**/QueryValidationTest.java</exclude><!-- testTargetStringEncodedFieldWithNumericRangeQueryThrowsException: The Elasticsearch backend seems to accept numeric range queries on string fields...? (it even seems to match) -->
+                                
+                                <!-- HSEARCH-2399 Implement timeouts for the Elasticsearch backend -->
+                                <exclude>**/JPATimeoutTest.java</exclude>
+                                <exclude>**/TimeoutTest.java</exclude>
+                                
+                                <!-- HSEARCH-2400 Support IndexingMonitor for the Elasticsearch backend -->
+                                <exclude>**/ProgressMonitorTest.java</exclude>
+                                
+                                <!-- HSEARCH-2401 Boosts are (erroneously) not applied to IndexedEmbeddeds -->
+                                <exclude>**/EmbeddedFieldBoostTest.java</exclude>
+                                
+                                <!-- HSEARCH-2404 Enable CollectionUpdateEventTest for Elasticsearch -->
+                                <exclude>**/CollectionUpdateEventTest.java</exclude><!-- Only fails on CI (Travis) -->
                             </excludes>
                             <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress</excludedGroups>
                         </configuration>
