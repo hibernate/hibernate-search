@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
@@ -19,8 +17,8 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -57,10 +55,10 @@ public class ClassBridgeTest extends SearchTestBase {
 		// Departments entity after being massaged by passing it
 		// through the EquipmentType class. This field is in
 		// the Lucene document but not in the Department entity itself.
-		QueryParser parser = new QueryParser( "equipment", TestConstants.simpleAnalyzer );
+		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder().forEntity( Departments.class ).get();
 
 		// Check the second ClassBridge annotation
-		Query query = parser.parse( "equiptype:Cisco" );
+		Query query = createQuery(queryBuilder, "equiptype", "Cisco" );
 		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Departments.class );
 		List<Departments> result = hibQuery.list();
 		assertNotNull( result );
@@ -70,15 +68,14 @@ public class ClassBridgeTest extends SearchTestBase {
 		}
 
 		// No data cross-ups.
-		query = parser.parse( "branchnetwork:Kent Lewin" );
+		query = createQuery(queryBuilder, "branchnetwork", "Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertTrue( "problem with field cross-ups", result.size() == 0 );
 
 		// Non-ClassBridge field.
-		parser = new QueryParser( "branchHead", TestConstants.simpleAnalyzer );
-		query = parser.parse( "branchHead:Kent Lewin" );
+		query = createQuery(queryBuilder, "branchHead", "Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -86,8 +83,7 @@ public class ClassBridgeTest extends SearchTestBase {
 		assertEquals( "incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead() );
 
 		// Check other ClassBridge annotation.
-		parser = new QueryParser( "branchnetwork", TestConstants.simpleAnalyzer );
-		query = parser.parse( "branchnetwork:st. george 1D" );
+		query = createQuery(queryBuilder, "branchnetwork", "st. george 1D" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -128,13 +124,13 @@ public class ClassBridgeTest extends SearchTestBase {
 		// Departments entity after being massaged by passing it
 		// through the EquipmentType class. This field is in
 		// the Lucene document but not in the Department entity itself.
-		QueryParser parser = new QueryParser( "equipment", TestConstants.simpleAnalyzer );
+		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder().forEntity( Departments.class ).get();
 
 		// Check the second ClassBridge annotation
-		Query query = parser.parse( "equiptype:Cisco" );
+		Query query = createQuery(queryBuilder, "equiptype", "Cisco" );
 		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Departments.class );
 
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.DOCUMENT );
+		hibQuery.setProjection( FullTextQuery.THIS, "equiptype", "branchnetwork" );
 
 		ScrollableResults projections = hibQuery.scroll();
 		assertNotNull( projections );
@@ -143,26 +139,18 @@ public class ClassBridgeTest extends SearchTestBase {
 		projections.next();
 		Object[] projection = projections.get();
 
-		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Departments );
-		assertEquals( "id incorrect", 1, ( (Departments) projection[0] ).getId() );
-		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
-		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getField( "equiptype" ) );
-		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getField( "equiptype" ).stringValue() );
-		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getField( "branchnetwork" ) );
-		assertEquals( "branchnetwork incorrect", "Salt Lake City 1A", ( (Document) projection[1] ).getField( "branchnetwork" ).stringValue() );
+		assertTrue( "Result type incorrect", projection[0] instanceof Departments );
+		assertEquals( "Result id incorrect", 1, ( (Departments) projection[0] ).getId() );
+		assertEquals( "equiptype incorrect", "Cisco", projection[1] );
+		assertEquals( "branchnetwork incorrect", "Salt Lake City 1A", projection[2] );
 
 		projections.next();
 		projection = projections.get();
 
-		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Departments );
-		assertEquals( "id incorrect", 4, ( (Departments) projection[0] ).getId() );
-		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
-		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getField( "equiptype" ) );
-		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getField( "equiptype" ).stringValue() );
-		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getField( "branchnetwork" ) );
-		assertEquals( "branchnetwork incorrect", "St. George 1D", ( (Document) projection[1] ).getField( "branchnetwork" ).stringValue() );
+		assertTrue( "Result type incorrect", projection[0] instanceof Departments );
+		assertEquals( "Result id incorrect", 4, ( (Departments) projection[0] ).getId() );
+		assertEquals( "equiptype incorrect", "Cisco", projection[1] );
+		assertEquals( "branchnetwork incorrect", "St. George 1D", projection[2] );
 
 		assertTrue( "incorrect result count returned", projections.isLast() );
 		//cleanup
@@ -171,6 +159,15 @@ public class ClassBridgeTest extends SearchTestBase {
 		}
 		tx.commit();
 		s.close();
+	}
+
+	private Query createQuery(QueryBuilder queryBuilder, String fieldName, String term) {
+		return queryBuilder
+				.keyword()
+				.onField( fieldName )
+				.ignoreFieldBridge()
+				.matching( term )
+				.createQuery();
 	}
 
 	/**
@@ -197,9 +194,9 @@ public class ClassBridgeTest extends SearchTestBase {
 		// the branch field and the network field of the Department
 		// class. This is in the Lucene document but not in the
 		// Department entity itself.
-		QueryParser parser = new QueryParser( "branchnetwork", TestConstants.simpleAnalyzer );
+		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder().forEntity( Department.class ).get();
 
-		Query query = parser.parse( "branchnetwork:layton 2B" );
+		Query query = createQuery( queryBuilder, "branchnetwork", "layton 2B" );
 		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Department.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
@@ -208,7 +205,7 @@ public class ClassBridgeTest extends SearchTestBase {
 		assertEquals( "incorrect number of results returned", 1, result.size() );
 
 		// Partial match.
-		query = parser.parse( "branchnetwork:3c" );
+		query = createQuery( queryBuilder, "branchnetwork", "3c" );
 		hibQuery = session.createFullTextQuery( query, Department.class );
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -217,15 +214,14 @@ public class ClassBridgeTest extends SearchTestBase {
 		assertEquals( "incorrect number of results returned", 1, result.size() );
 
 		// No data cross-ups .
-		query = parser.parse( "branchnetwork:Kent Lewin" );
+		query = createQuery( queryBuilder, "branchnetwork", "Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Department.class );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertTrue( "problem with field cross-ups", result.size() == 0 );
 
 		// Non-ClassBridge field.
-		parser = new QueryParser( "branchHead", TestConstants.simpleAnalyzer );
-		query = parser.parse( "branchHead:Kent Lewin" );
+		query = createQuery( queryBuilder, "branchHead", "Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Department.class );
 		result = hibQuery.list();
 		assertNotNull( result );

@@ -9,14 +9,14 @@ package org.hibernate.search.test.bridge;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
  * @author John Griffin
  */
-public class CatDeptsFieldsClassBridge implements FieldBridge, ParameterizedBridge {
+public class CatDeptsFieldsClassBridge implements TwoWayFieldBridge, ParameterizedBridge {
 
 	private String sepChar;
 
@@ -31,6 +31,20 @@ public class CatDeptsFieldsClassBridge implements FieldBridge, ParameterizedBrid
 		// from the name field of the ClassBridge Annotation. This is not
 		// a requirement. It just works that way in this instance. The
 		// actual name could be supplied by hard coding it below.
+
+		String indexedString = objectToString( value );
+		if ( !indexedString.isEmpty() ) {
+			luceneOptions.addFieldToDocument( name, indexedString, document );
+		}
+	}
+
+	@Override
+	public Object get(String name, Document document) {
+		return document.get( name );
+	}
+
+	@Override
+	public String objectToString(Object value) {
 		Departments dep = (Departments) value;
 		String fieldValue1 = dep.getBranch();
 		if ( fieldValue1 == null ) {
@@ -40,7 +54,6 @@ public class CatDeptsFieldsClassBridge implements FieldBridge, ParameterizedBrid
 		if ( fieldValue2 == null ) {
 			fieldValue2 = "";
 		}
-		String indexedString = fieldValue1 + sepChar + fieldValue2;
-		luceneOptions.addFieldToDocument( name, indexedString, document );
+		return fieldValue1 + sepChar + fieldValue2;
 	}
 }

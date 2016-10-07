@@ -233,7 +233,6 @@
                                 <exclude>**/BridgeProviderTest.java</exclude>
                                 
                                 <!-- HSEARCH-2393 Remove depencies to Lucene in tests for features common to Lucene and Elasticsearch -->
-                                <exclude>**/ClassBridgeTest.java</exclude><!-- QueryParser -->
                                 <exclude>**/ProgrammaticMappingTest.java</exclude><!-- Analyzers -->
                                 <exclude>**/WorkDoneOnEntitiesTest.java</exclude><!-- IndexReader -->
                                 <exclude>**/DeleteByTermTest.java</exclude><!-- WorkspaceHolder -->
