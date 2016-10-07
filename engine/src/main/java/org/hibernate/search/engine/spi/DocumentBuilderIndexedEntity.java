@@ -482,14 +482,16 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
 			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
+			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
+			if ( value == null ) {
+				nestingContext.markObjectValue( doc );
+				processEmbeddedNullValue( doc, embeddedTypeMetadata, conversionContext );
+				continue;
+			}
+
 			conversionContext.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
 			nestingContext.push( embeddedTypeMetadata.getEmbeddedFieldName(), embeddedTypeMetadata.getEmbeddedContainer() );
 			try {
-				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-				if ( value == null ) {
-					processEmbeddedNullValue( doc, embeddedTypeMetadata, conversionContext );
-					continue;
-				}
 
 				switch ( embeddedTypeMetadata.getEmbeddedContainer() ) {
 					case ARRAY:

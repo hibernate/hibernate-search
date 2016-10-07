@@ -25,5 +25,13 @@ public interface NestingContext {
 
 	void mark(Document document);
 
+	/**
+	 * Used when adding a field for the actual embedded object (embedded.this), instead of a property.
+	 * Mainly used to distinguish between array/collection/map values (typically added only when
+	 * they are null) and their element values.
+	 * @param document The document to mark.
+	 */
+	void markObjectValue(Document document);
+
 	void incrementCollectionIndex();
 }
