@@ -27,6 +27,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -356,7 +357,7 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 		private Date dateWritten;
 
 		@Field
-		@DateBridge(resolution = Resolution.DAY)
+		@CalendarBridge(resolution = Resolution.DAY)
 		private Calendar dateSent;
 
 		@Field
