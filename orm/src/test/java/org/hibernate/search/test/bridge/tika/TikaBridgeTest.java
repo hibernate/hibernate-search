@@ -7,9 +7,7 @@
 
 package org.hibernate.search.test.bridge.tika;
 
-import java.io.File;
 import java.io.Serializable;
-import java.net.URISyntaxException;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,9 +36,11 @@ import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
+import org.hibernate.search.test.util.impl.ClasspathResourceAsFile;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -52,17 +52,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class TikaBridgeTest extends SearchTestBase {
 	private static final String TEST_MP3_DOCUMENT = "/org/hibernate/search/test/bridge/tika/mysong.mp3";
-	private static final String PATH_TO_TEST_MP3;
 
-	static {
-		try {
-			File mp3File = new File( TikaBridgeTest.class.getResource( TEST_MP3_DOCUMENT ).toURI() );
-			PATH_TO_TEST_MP3 = mp3File.getAbsolutePath();
-		}
-		catch (URISyntaxException e) {
-			throw new RuntimeException( "Unable to determine file path for test document" );
-		}
-	}
+	@Rule
+	public ClasspathResourceAsFile testMp3 = new ClasspathResourceAsFile( getClass(), TEST_MP3_DOCUMENT );
 
 	@Test
 	public void testIndexMp3MetaTags() throws Exception {
@@ -121,7 +113,7 @@ public class TikaBridgeTest extends SearchTestBase {
 
 	private void persistSong(Session session) {
 		Transaction tx = session.beginTransaction();
-		Song mySong = new Song( PATH_TO_TEST_MP3 );
+		Song mySong = new Song( testMp3.get().getPath() );
 		session.save( mySong );
 		tx.commit();
 	}

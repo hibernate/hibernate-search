@@ -6,15 +6,16 @@
  */
 package org.hibernate.search.test.bridge.builtin;
 
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
@@ -22,12 +23,11 @@ import org.hibernate.search.bridge.TikaParseContextProvider;
 import org.hibernate.search.bridge.builtin.TikaBridge;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.test.util.impl.ClasspathResourceAsFile;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -35,17 +35,9 @@ import static org.junit.Assert.fail;
 public class TikaBridgeTest {
 
 	private static final String TEST_DOCUMENT_PDF = "/org/hibernate/search/test/bridge/builtin/test-document-1.pdf";
-	private static final String PATH_TO_TEST_DOCUMENT_PDF;
 
-	static {
-		try {
-			File pdfFile = new File( TikaBridgeTest.class.getResource( TEST_DOCUMENT_PDF ).toURI() );
-			PATH_TO_TEST_DOCUMENT_PDF = pdfFile.getAbsolutePath();
-		}
-		catch (URISyntaxException e) {
-			throw new RuntimeException( "Unable to determine file path for test document" );
-		}
-	}
+	@Rule
+	public ClasspathResourceAsFile testDocumentPdf = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF );
 
 	private final String testFieldName = "content";
 	private TikaBridge bridgeUnderTest;
@@ -95,7 +87,7 @@ public class TikaBridgeTest {
 	@Test
 	public void testPrepareMetadata() {
 		bridgeUnderTest.setMetadataProcessorClass( CustomTikaMetadataProcessor.class );
-		bridgeUnderTest.set( testFieldName, PATH_TO_TEST_DOCUMENT_PDF, testDocument, options );
+		bridgeUnderTest.set( testFieldName, testDocumentPdf.get().getPath(), testDocument, options );
 		assertEquals(
 				"The set method of the custom metadata processor should have been called",
 				1,
@@ -106,7 +98,7 @@ public class TikaBridgeTest {
 	@Test
 	public void testIndexingMetadata() {
 		bridgeUnderTest.setMetadataProcessorClass( CustomTikaMetadataProcessor.class );
-		bridgeUnderTest.set( testFieldName, PATH_TO_TEST_DOCUMENT_PDF, testDocument, options );
+		bridgeUnderTest.set( testFieldName, testDocumentPdf.get().getPath(), testDocument, options );
 
 		assertEquals(
 				"The content type should have been indexed",
@@ -133,7 +125,7 @@ public class TikaBridgeTest {
 	@Test
 	public void testCustomTikaParseContextProvider() throws Exception {
 		bridgeUnderTest.setParseContextProviderClass( CustomTikaParseContextProvider.class );
-		bridgeUnderTest.set( testFieldName, PATH_TO_TEST_DOCUMENT_PDF, testDocument, options );
+		bridgeUnderTest.set( testFieldName, testDocumentPdf.get().getPath(), testDocument, options );
 
 		assertEquals(
 				"The getParseContext method of the custom parse context provider should have been called",
@@ -159,7 +151,7 @@ public class TikaBridgeTest {
 		@Override
 		public Metadata prepareMetadata() {
 			Metadata meta = new Metadata();
-			meta.add( Metadata.RESOURCE_NAME_KEY, PATH_TO_TEST_DOCUMENT_PDF );
+			meta.add( Metadata.RESOURCE_NAME_KEY, "foo" );
 			return meta;
 		}
 
@@ -169,7 +161,7 @@ public class TikaBridgeTest {
 
 			assertEquals(
 					"Metadata.RESOURCE_NAME_KEY should be set in the metadata",
-					PATH_TO_TEST_DOCUMENT_PDF,
+					"foo",
 					metadata.get( Metadata.RESOURCE_NAME_KEY )
 			);
 
