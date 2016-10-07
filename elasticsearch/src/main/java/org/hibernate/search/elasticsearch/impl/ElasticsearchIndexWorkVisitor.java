@@ -66,6 +66,14 @@ import io.searchbox.indices.Optimize;
  */
 class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendRequest<?>> {
 
+	/*
+	 * Nesting marker field name: fields with this name have the parent path as their value,
+	 * and are used for denoting the parent element of the subsequent fields
+	 *
+	 * Use a very specific String to avoid naming conflict with user-defined field names
+	 */
+	public static final String NESTING_MARKER = "__HSearch_NestingMarker";
+
 	private static final Pattern DOT = Pattern.compile( "\\." );
 	private static final Pattern NAME_AND_INDEX = Pattern.compile( "(.+?)(\\[([0-9]+)\\])?" );
 
@@ -200,8 +208,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 		String parentPath = null;
 		for ( IndexableField field : document.getFields() ) {
-			// marker field for denoting the parent element of the subsequent fields
-			if ( "$nesting".equals( field.name() ) ) {
+			if ( NESTING_MARKER.equals( field.name() ) ) {
 				parentPath = field.stringValue();
 				continue;
 			}
