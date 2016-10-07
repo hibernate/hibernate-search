@@ -233,9 +233,6 @@
                                 <exclude>**/BridgeTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>
                                 
-                                <!-- HSEARCH-2403 TwoWayFieldBridge exceptions are not wrapped properly when retrieving ES projection values -->
-                                <exclude>**/BridgeTest.java</exclude>
-                                
                                 <!-- HSEARCH-2392 Enable BridgeProviderTest for Elasticsearch -->
                                 <exclude>**/BridgeProviderTest.java</exclude>
                                 
