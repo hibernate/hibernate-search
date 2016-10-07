@@ -119,6 +119,12 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 		}
 
 		@Override
+		public void markObjectValue(Document document) {
+			String currentPath = StringHelper.join( path.descendingIterator(), "." );
+			document.add( new TextField( ElasticsearchIndexWorkVisitor.OBJECT_VALUE_MARKER, currentPath, Store.NO ) );
+		}
+
+		@Override
 		public void incrementCollectionIndex() {
 			path.peek().increment();
 		}

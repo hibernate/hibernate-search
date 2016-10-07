@@ -39,9 +39,11 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata.Container;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 
 import com.google.gson.JsonArray;
@@ -73,6 +75,17 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 	 * Use a very specific String to avoid naming conflict with user-defined field names
 	 */
 	public static final String NESTING_MARKER = "__HSearch_NestingMarker";
+
+	/*
+	 * Object value marker field name: fields with this name are used for denoting that the
+	 * subsequent field represents an embedded as a whole, as opposed to simply a field
+	 * in an embedded.
+	 * The marker is necessary because in some cases, the embedded and its elements
+	 * share a common field name. For instance it is the case for embedded collections.
+	 *
+	 * Use a very specific String to avoid naming conflict with user-defined field names
+	 */
+	public static final String OBJECT_VALUE_MARKER = "__HSearch_ObjectValueMarker";
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
 	private static final Pattern NAME_AND_INDEX = Pattern.compile( "(.+?)(\\[([0-9]+)\\])?" );
@@ -207,13 +220,51 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 		JsonObject source = new JsonObject();
 
 		String parentPath = null;
+		boolean isObjectValue = false;
 		for ( IndexableField field : document.getFields() ) {
-			if ( NESTING_MARKER.equals( field.name() ) ) {
-				parentPath = field.stringValue();
-				continue;
+			switch ( field.name() ) {
+				case NESTING_MARKER:
+					parentPath = field.stringValue();
+					isObjectValue = false;
+					continue; // Inspect the next field taking into account this metadata
+				case OBJECT_VALUE_MARKER:
+					isObjectValue = true;
+					continue; // Inspect the next field taking into account this metadata
+				default:
+					break;
 			}
 
-			if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
+			if ( isObjectValue ) { // This only happens for null embeddeds, because non-null embeddeds only have their own fields or their elements indexed
+				String[] fieldNameParts = FieldHelper.getFieldNameParts( field.name() );
+				JsonObject parent = getOrCreateDocumentTree( source, parentPath );
+				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
+
+				EmbeddedTypeMetadata embeddedType = getEmbeddedTypeMetadata( indexBinding.getDocumentBuilder().getTypeMetadata(), fieldNameParts );
+				Container containerType = embeddedType.getEmbeddedContainer();
+
+				switch ( containerType ) {
+					case ARRAY:
+					case COLLECTION:
+					case MAP:
+						/*
+						 * When a indexNullAs is set for array/collection/map embeddeds, and we get a null replacement
+						 * token from the engine, just keep the token, and don't replace it back with null (which is
+						 * what we do for other fields, see below).
+						 * This behavior is necessary because Elasticsearch treats null arrays exactly as arrays
+						 * containing only null, so propagating null for an array/collection/map as a whole would
+						 * lead to conflicts when querying.
+						 */
+						String value = field.stringValue();
+						parent.add( jsonPropertyName, value != null ? new JsonPrimitive( value ) : null );
+						break;
+					case OBJECT:
+						// TODO HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
+						break;
+					default:
+						throw new AssertionFailure( "Unexpected container type: " + containerType );
+				}
+			}
+			else if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
 					!field.name().equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
 					!FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( field.name() ) &&
 					!isDocValueField( field ) ) {
@@ -286,8 +337,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 					// TODO HSEARCH-2261 falling back for now to checking actual Field type to cover numeric fields created by custom
 					// bridges
 					else if ( type.isNumeric() || isNumeric( field ) ) {
-						// Explicitly propagate null in case value is not given and let ES handle the default token set
-						// in the meta-data
+						// If the value was initially null, explicitly propagate null and let ES handle the default token.
 						Number value = field.numericValue();
 
 						if ( value != null && value.toString().equals( documentFieldMetadata.indexNullAs() ) ) {
@@ -298,7 +348,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 								value != null ? new JsonPrimitive( value ) : null );
 					}
 					else {
-						// Explicitly propagate null in case value is not given and let ES handle the default token set in the meta-data
+						// If the value was initially null, explicitly propagate null and let ES handle the default token.
 						String value = field.stringValue();
 						if ( value != null && value.equals( documentFieldMetadata.indexNullAs() ) ) {
 							value = null;
