@@ -70,6 +70,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>simple-jndi</groupId>
             <artifactId>simple-jndi</artifactId>
             <scope>test</scope>
@@ -223,10 +233,6 @@
                                 
                                 <!-- HSEARCH-2392 Enable BridgeProviderTest for Elasticsearch -->
                                 <exclude>**/BridgeProviderTest.java</exclude>
-                                
-                                <!-- HSEARCH-2386 TikaMetadataProcessor cannot add sortable fields (or fields usable in Elasticsearch) -->
-                                <exclude>**/TikaBridgeBlobSupportTest.java</exclude>
-                                <exclude>**/TikaBridgeTest.java</exclude>
                                 
                                 <!-- HSEARCH-2393 Remove depencies to Lucene in tests for features common to Lucene and Elasticsearch -->
                                 <exclude>**/ClassBridgeTest.java</exclude><!-- QueryParser -->

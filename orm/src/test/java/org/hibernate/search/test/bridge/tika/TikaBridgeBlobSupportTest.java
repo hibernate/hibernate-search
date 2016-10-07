@@ -9,7 +9,6 @@ package org.hibernate.search.test.bridge.tika;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.Blob;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,9 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.util.impl.ClasspathResourceAsFile;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,23 +40,15 @@ import static org.junit.Assert.assertEquals;
  */
 public class TikaBridgeBlobSupportTest extends SearchTestBase {
 	private static final String TEST_DOCUMENT_PDF = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
-	private static final String PATH_TO_TEST_DOCUMENT_PDF;
 
-	static {
-		try {
-			File pdfFile = new File( TikaBridgeBlobSupportTest.class.getResource( TEST_DOCUMENT_PDF ).toURI() );
-			PATH_TO_TEST_DOCUMENT_PDF = pdfFile.getAbsolutePath();
-		}
-		catch (URISyntaxException e) {
-			throw new RuntimeException( "Unable to determine file path for test document" );
-		}
-	}
+	@Rule
+	public ClasspathResourceAsFile testDocumentPdf = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF );
 
 	@Test
 	public void testDefaultTikaBridgeWithBlobData() throws Exception {
 		Session session = openSession();
 
-		persistBook( session, getBlobData( PATH_TO_TEST_DOCUMENT_PDF, session ) );
+		persistBook( session, getBlobData( testDocumentPdf.get().getPath(), session ) );
 		persistBook( session, null );
 
 		// we have to index manually. Using the Blob (streaming approach) the indexing would try to re-read the
