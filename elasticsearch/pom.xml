@@ -209,11 +209,6 @@
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
                                 <!-- Also, parts of NullEmbeddedTest -->
                                 
-                                <!-- HSEARCH-2271 Enable ArrayBridgeTest (and similar) for Elasticsearch -->
-                                <exclude>**/ArrayBridgeTest.java</exclude>
-                                <exclude>**/IterableBridgeTest.java</exclude>
-                                <exclude>**/MapBridgeTest.java</exclude>
-                                
                                 <!-- HSEARCH-2402 Elasticsearch backend mistakes @DateBridge for @CalendarBridge -->
                                 <exclude>**/BridgeTest.java</exclude>
                                 <exclude>**/NumericEncodingQueriesTest.java</exclude>
