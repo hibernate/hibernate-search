@@ -34,6 +34,8 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.ArbitrarySort;
@@ -621,7 +623,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 
 			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( clazz );
-			Object id = getId( hit, binding );
+			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
+			conversionContext.setClass( clazz );
+			Object id = getId( hit, binding, conversionContext );
 			Object[] projections = null;
 
 			if ( projectedFields != null ) {
@@ -669,7 +673,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							projections[i] = EntityInfo.ENTITY_PLACEHOLDER;
 							break;
 						default:
-							projections[i] = getFieldValue( binding, hit, field );
+							projections[i] = getFieldValue( binding, hit, field, conversionContext );
 					}
 				}
 			}
@@ -677,21 +681,21 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdentifierName(), (Serializable) id, projections );
 		}
 
-		private Object getId(JsonObject hit, EntityIndexBinding binding) {
+		private Object getId(JsonObject hit, EntityIndexBinding binding, ConversionContext conversionContext) {
 			Document tmp = new Document();
 			tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO ) );
 
-			addIdBridgeDefinedFields( hit, binding, tmp );
+			addIdBridgeDefinedFields( hit, binding, tmp, conversionContext );
 
 			return binding.getDocumentBuilder().getIdBridge().get( "id", tmp );
 		}
 
 		// Add to the document the additional fields created when indexing the id
-		private void addIdBridgeDefinedFields(JsonObject hit, EntityIndexBinding binding, Document tmp) {
+		private void addIdBridgeDefinedFields(JsonObject hit, EntityIndexBinding binding, Document tmp, ConversionContext conversionContext) {
 			Set<BridgeDefinedField> allBridgeDefinedFields = new HashSet<>();
 			allBridgeDefinedFields.addAll( binding.getDocumentBuilder().getMetadata().getIdPropertyMetadata().getBridgeDefinedFields().values() );
 			for ( BridgeDefinedField bridgeDefinedField : allBridgeDefinedFields ) {
-				Object fieldValue = getFieldValue( binding, hit, bridgeDefinedField.getName() );
+				Object fieldValue = getFieldValue( binding, hit, bridgeDefinedField.getName(), conversionContext );
 				tmp.add( new StringField( bridgeDefinedField.getName(), String.valueOf( fieldValue ), Store.NO ) );
 			}
 		}
@@ -700,7 +704,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		 * Returns the value of the given field as retrieved from the ES result and converted using the corresponding
 		 * field bridge. In case this bridge is not a 2-way bridge, the unconverted value will be returned.
 		 */
-		private Object getFieldValue(EntityIndexBinding binding, JsonObject hit, String projectedField) {
+		private Object getFieldValue(EntityIndexBinding binding, JsonObject hit, String projectedField, ConversionContext conversionContext) {
 			DocumentFieldMetadata field = FieldHelper.getFieldMetadata( binding, projectedField );
 
 			if ( field == null ) {
@@ -726,7 +730,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 
 			if ( field != null ) {
-				return convertFieldValue( binding, field, value );
+				conversionContext.pushProperty( field.getFieldName() );
+				try {
+					return convertFieldValue( binding, field, value, conversionContext );
+				}
+				finally {
+					conversionContext.popProperty();
+				}
 			}
 			else {
 				return convertPrimitiveValue( value );
@@ -748,7 +758,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return false;
 		}
 
-		private Object convertFieldValue(EntityIndexBinding binding, DocumentFieldMetadata field, JsonElement value) {
+		private Object convertFieldValue(EntityIndexBinding binding, DocumentFieldMetadata field, JsonElement value, ConversionContext conversionContext) {
 			FieldBridge fieldBridge = field.getFieldBridge();
 
 			ExtendedFieldType type = FieldHelper.getType( binding, field );
@@ -780,7 +790,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 						break;
 				}
 
-				return ( (TwoWayFieldBridge) fieldBridge ).get( field.getName(), tmp );
+				return conversionContext.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge ).get( field.getName(), tmp );
 			}
 			// Should only be the case for custom bridges
 			else {
