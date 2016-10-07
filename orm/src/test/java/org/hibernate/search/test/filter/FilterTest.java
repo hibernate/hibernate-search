@@ -73,9 +73,7 @@ public class FilterTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class)
-	// For now, the Elasticsearch backend does not support caching of the Filter instances as the caching API is based
-	// on Lucene filters.
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2405 Support caching for filters with Elasticsearch
 	// Moreover the Elasticsearch backend does not support custom Lucene filters.
 	public void testCache() {
 		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 ); // SearchFactory tests filter construction once
@@ -114,9 +112,7 @@ public class FilterTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-295")
-	@Category(SkipOnElasticsearch.class)
-	// For now, the Elasticsearch backend does not support caching of the Filter instances as the caching API is based
-	// on Lucene filters.
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2405 Support caching for filters with Elasticsearch
 	// Moreover the Elasticsearch backend does not support custom Lucene filters.
 	public void testFiltersCreatedByFactoryWithoutKeyMethodShouldBeCachedByAllParameterNamesAndValues() {
 		assertEquals( 0, FieldConstraintFilterFactoryWithoutKeyMethod.getBuiltFilters().size() );

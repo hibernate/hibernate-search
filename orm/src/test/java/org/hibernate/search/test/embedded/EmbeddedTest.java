@@ -34,8 +34,7 @@ import org.junit.experimental.categories.Category;
 public class EmbeddedTest extends SearchTestBase {
 
 	@Test
-	// other separators than "." not supported for now
-	@Category(ElasticsearchSupportInProgress.class)
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly
 	public void testEmbeddedIndexing() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
@@ -135,8 +134,7 @@ public class EmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	// other separators than "." not supported for now
-	@Category(ElasticsearchSupportInProgress.class)
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly
 	public void testContainedIn() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );

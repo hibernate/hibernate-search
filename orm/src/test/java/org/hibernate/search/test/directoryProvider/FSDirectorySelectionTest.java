@@ -23,7 +23,9 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +34,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Hardy Ferentschik
  */
+@Category(SkipOnElasticsearch.class) // Directories are specific to the Lucene backend
 public class FSDirectorySelectionTest extends SearchTestBase {
 
 	@Test

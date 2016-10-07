@@ -18,7 +18,9 @@ import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_BUFFERED_DOCS;
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_MERGE_DOCS;
@@ -79,6 +81,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 
 	@Test
+	@Category(SkipOnElasticsearch.class) // DirectoryProviders and IndexWriterSettings are specific to the Lucene backend
 	public void testShardingSettingsInherited() {
 		IndexManager[] indexManagers = getExtendedSearchIntegrator().getIndexBindings().get( Document.class ).getIndexManagers();
 		assertTrue( getDirectoryProvider( indexManagers[0] ) instanceof RAMDirectoryProvider );
@@ -89,6 +92,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 
 	@Test
+	@Category(SkipOnElasticsearch.class) // IndexWriterSettings are specific to the Lucene backend
 	public void testShardN2UsesDefaults() {
 		assertValueIsSet( Document.class, 2, MAX_BUFFERED_DOCS, 4 );
 		assertValueIsSet( Document.class, 2, MERGE_FACTOR, 100 );
@@ -99,6 +103,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 
 	@Test
+	@Category(SkipOnElasticsearch.class) // IndexWriterSettings are specific to the Lucene backend
 	public void testShardN1_ExplicitParams() {
 		assertValueIsSet( Document.class, 1, MAX_BUFFERED_DOCS, 12 );
 		assertValueIsSet( Document.class, 1, MAX_MERGE_DOCS, 11 );

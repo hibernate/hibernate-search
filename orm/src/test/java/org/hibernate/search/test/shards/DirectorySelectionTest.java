@@ -16,15 +16,18 @@ import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * Test to retrieve specific IndexReader instances by index name.
  *
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
+@Category(SkipOnElasticsearch.class) // Directories are specific to the Lucene backend
 public class DirectorySelectionTest extends SearchTestBase {
 	private IndexReaderAccessor indexReaderAccessor;
 

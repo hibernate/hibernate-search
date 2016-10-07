@@ -17,14 +17,17 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * Verifies the configured IndexManager implementation is used for each index .
  *
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
+@Category(SkipOnElasticsearch.class) // This test does not actually use backends
 public class IndexManagerOverrideTest {
 
 	public static class FooIndexManager extends DirectoryBasedIndexManager {

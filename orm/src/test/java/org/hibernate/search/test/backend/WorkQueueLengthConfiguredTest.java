@@ -15,7 +15,9 @@ import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,6 +27,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
+@Category(SkipOnElasticsearch.class) // The "max_queue_length" parameter is specific to the Lucene backend
 public class WorkQueueLengthConfiguredTest extends SearchTestBase {
 
 	@Override

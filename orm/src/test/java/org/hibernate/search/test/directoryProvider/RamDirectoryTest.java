@@ -19,13 +19,16 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
+@Category(SkipOnElasticsearch.class) // Directories are specific to the Lucene backend
 public class RamDirectoryTest extends SearchTestBase {
 
 	@Test

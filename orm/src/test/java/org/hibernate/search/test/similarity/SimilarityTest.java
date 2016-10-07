@@ -18,7 +18,9 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -26,6 +28,7 @@ import static org.junit.Assert.assertFalse;
 /**
  * @author Emmanuel Bernard
  */
+@Category(SkipOnElasticsearch.class) // Similarity tuning is specific to the Lucene backend
 public class SimilarityTest extends SearchTestBase {
 
 	@Test

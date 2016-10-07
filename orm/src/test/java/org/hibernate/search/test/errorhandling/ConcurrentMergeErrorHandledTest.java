@@ -15,10 +15,12 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 /**
@@ -37,6 +39,7 @@ import org.junit.runner.RunWith;
  * @see Environment#ERROR_HANDLER
  */
 @RunWith(BMUnitRunner.class)
+@Category(SkipOnElasticsearch.class) // Merge schedulers are specific to the Lucene backend
 public class ConcurrentMergeErrorHandledTest extends SearchTestBase {
 
 	@Test

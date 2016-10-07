@@ -26,9 +26,11 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -39,6 +41,7 @@ import static org.junit.Assert.assertTrue;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
+@Category(SkipOnElasticsearch.class) // Compression is specific to the Lucene backend
 public class CompressionTest extends SearchTestBase {
 
 	/**

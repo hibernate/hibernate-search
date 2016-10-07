@@ -14,7 +14,9 @@ import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -25,6 +27,7 @@ import java.io.IOException;
 /**
  * @author Sanne Grinovero
  */
+@Category(SkipOnElasticsearch.class) // Locking parameters are specific to the Lucene backend
 public class CustomLockProviderTest {
 
 	private static final String SINGLE_INSTANCE_LOCK_FQN = "org.apache.lucene.store.SingleInstanceLockFactory$SingleInstanceLock";

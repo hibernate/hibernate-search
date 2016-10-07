@@ -19,9 +19,11 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * Test that the IndexReader can see an optmized index before the factory is closed.
@@ -29,6 +31,7 @@ import org.junit.Test;
  * @author Davide D'Alto
  */
 @TestForIssue(jiraKey = "HSEARCH-1681")
+@Category(SkipOnElasticsearch.class) // IndexReaders are specific to the Lucene backend
 public class IndexReaderSeeOptimizedIndexTest extends SearchTestBase {
 
 	private String indexBasePath;

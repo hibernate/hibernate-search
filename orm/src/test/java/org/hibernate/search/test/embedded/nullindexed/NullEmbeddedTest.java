@@ -78,9 +78,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	// "IS NULL" for intermediary element in the graph (pet) needs to be mapped to missing filter:
-	// https://www.elastic.co/guide/en/elasticsearch/guide/current/_dealing_with_null_values.html
-	@Category(ElasticsearchSupportInProgress.class)
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
 	public void testNestedEmebeddedNullIndexing() throws Exception {
 		Man withPet = new Man( "Davide" );
 
@@ -126,9 +124,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	// "IS NULL" for intermediary element in the graph (pet) needs to be mapped to missing filter:
-	// https://www.elastic.co/guide/en/elasticsearch/guide/current/_dealing_with_null_values.html
-	@Category(ElasticsearchSupportInProgress.class)
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
 	public void testEmbeddedNullIndexing() throws Exception {
 		Man me = new Man( "Davide" );
 		Pet dog = new Pet( "dog" );
