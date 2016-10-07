@@ -29,7 +29,9 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TikaBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.TikaMetadataProcessor;
+import org.hibernate.search.bridge.MetadataProvidingTikaMetadataProcessor;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
@@ -224,10 +226,15 @@ public class TikaBridgeTest extends SearchTestBase {
 		}
 	}
 
-	public static class Mp3TikaMetadataProcessor implements TikaMetadataProcessor {
+	public static class Mp3TikaMetadataProcessor implements MetadataProvidingTikaMetadataProcessor {
 		@Override
 		public Metadata prepareMetadata() {
 			return new Metadata();
+		}
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( XMPDM.ARTIST.getName(), FieldType.STRING );
 		}
 
 		@Override

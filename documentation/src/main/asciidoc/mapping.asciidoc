@@ -1497,6 +1497,16 @@ prepareMetadata() and set(String, Object, Document, LuceneOptions, Metadata meta
 allows to add additional metadata to the parsing process (for example the file name) and the latter
 allows you to index metadata discovered during the parsing process.
 
+[NOTE]
+.Sortable fields with Tika
+====
+If you want to add multiple fields in your `TikaMetadataProcessor`, and also want to make those
+fields sortable, you should make your processor implement the `MetadataProvidingTikaMetadataProcessor` interface.
+This is similar to implementing `MetadataProvidingFieldBridge` on a regular field bridge: see <<sortablefield-annotation>>.
+
+Like `MetadataProvidingFieldBridge`, the `MetadataProvidingTikaMetadataProcessor` contract is under active development and considered experimental at this time. It may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
+====
+
 TikaParseContextProvider as well as TikaMetadataProcessor implementation classes can both be
 specified as parameters on the TikaBridge annotation.
 

@@ -265,6 +265,10 @@ This interface and `FieldBridge` in general are likely going to evolve in the ne
 to remove its adherence to Lucene specific classes like `Document`.
 --
 
+==== Tika bridges
+
+If your metadata processors create fields with a different name from the one passed as a parameter, make sure to make your processor also implement the `MetadataProvidingTikaMetadataProcessor` contract.
+
 === Queries
 
 You can write queries like you usually do in Hibernate Search: native Lucene queries and DSL queries (see <<search-query>>).
