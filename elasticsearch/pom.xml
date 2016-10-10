@@ -220,7 +220,6 @@
                                 <exclude>**/OptimizationTriggerTest.java</exclude>
                                 <exclude>**/WorkQueueLengthConfiguredTest.java</exclude>
                                 <exclude>**/CompressionTest.java</exclude>
-                                <exclude>**/ConcurrentFlushTest.java</exclude>
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
                                 <exclude>**/ProgrammaticMappingTest.java</exclude>
                                 <exclude>**/ShardsConfigurationTest.java</exclude>
@@ -248,7 +247,6 @@
                                 <exclude>**/DslEmbeddedSearchTest.java</exclude>
 
                                 <!-- Faceting -->
-                                <exclude>**/FacetIndexingFailureTest.java</exclude>
                                 <exclude>**/FacetUnknownFieldFailureTest.java</exclude>
 
                                 <exclude>**/IndexAndQueryNullTest.java</exclude>
@@ -271,11 +269,8 @@
                                 <exclude>**/SyncWorkerTest.java</exclude>
                                 <exclude>**/WorkerTestCase.java</exclude>
                                 <exclude>**/ConcurrentMergeErrorHandledTest.java</exclude>
-                                <exclude>**/ErrorHandlingDuringDocumentCreationTest.java</exclude>
                                 <exclude>**/LuceneErrorHandlingTest.java</exclude>
-                                <exclude>**/ManualIndexingOnlyInterceptorTest.java</exclude>
                                 <exclude>**/EmbeddedFieldBoostTest.java</exclude>
-                                <exclude>**/MultiClassesQueryLoaderTest.java</exclude>
                                 <exclude>**/TimeoutTest.java</exclude>
                                 <exclude>**/QueryValidationTest.java</exclude>
                                 <exclude>**/SimilarityTest.java</exclude>
