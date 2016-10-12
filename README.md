@@ -4,16 +4,30 @@
 
 ## Description
 
-Full text search engines like Apache Lucene are very powerful technologies to add efficient free
-text search capabilities to applications. However, Lucene suffers several mismatches when dealing
-with object domain models. Amongst other things indexes have to be kept up to date and mismatches
-between index structure and domain model as well as query mismatches have to be avoided.
+Full text search for Java objects
 
-Hibernate Search addresses these shortcomings - it indexes your domain model with the help of a few
-annotations, takes care of database/index synchronization and brings back regular managed objects
-from free text queries.
+This project provides synchronization between entities managed by Hibernate ORM and full-text
+indexing services like Apache Lucene and Elasticsearch.
 
-Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the cover.
+It will automatically apply changes to indexes, which is tedious and error prone coding work,
+while leaving you full control on the query aspects. The development community constantly
+researches and refines the index writing techniques to improve performance.
+
+Mapping your objects to the indexes is declarative, using a combination of Hibernate Search
+specific annotations and the knowledge it can gather from your existing Hibernate/JPA
+mapping.
+
+Queries can be defined by any combination of:
+ - "native" Apache Lucene queries
+ - writing "native" Elasticsearch queries in Json format (if using Elasticsearch, which is optional)
+ - using our DSL which abstracts the previous two generating optimal backend specific queries
+
+Query results can include projections to be loaded directly from the index, or can materialize
+fully managed Hibernate entities loaded from the database within the current transactional scope.
+
+Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the cover; this
+can be used directly (running embedded in the same JVM) or remotely provided by Elasticsearch
+over its REST API.
 
 ## Requirements
 
@@ -48,8 +62,8 @@ installation directory. Then read the documentation available in *docs/reference
 
 #### Build options (profiles and properties)
 
-The documentation is based on [AsciiDoctor](http://asciidoctor.org/). Per default only the html
-output is enabled. To also generate the docbok output and build the documentation from there use:
+The documentation is based on [AsciiDoctor](http://asciidoctor.org/). By default only the html
+output is enabled; to also generate the docbok output use:
 
     > mvn clean install -Pdocbook -s settings-example.xml
 
@@ -57,11 +71,8 @@ To build the distribution bundle run:
 
     > mvn clean install -Pdocbook,dist -s settings-example.xml
 
-You can also build the above mentioned modules directly by changing into these directories and
-executing maven in the module directory.
-
-The Elasticsearch module tests against only one version of Elasticsearch at a time. You may
-redefine the version to use by specifying the right profile and using the
+The Elasticsearch module tests against one single version of Elasticsearch at a time.
+You may redefine the version to use by specifying the right profile and using the
 `testElasticsearchVersion` property:
 
     > mvn clean install -Pelasticsearch-2.0 -DtestElasticsearchVersion=2.1.0
@@ -76,8 +87,8 @@ A list of available versions for `testElasticsearchVersion` can be found on
 
 ### Contributing
 
-If you want to contribute, you find all you need to know in
-[Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
+New contributors are always welcome. We collected some helpful hints on how to get started
+on our website at [Contribute to Hibernate Search](http://hibernate.org/search/contribute/)
 
 ### Source code structure
 
@@ -91,25 +102,27 @@ The project is split in several Maven modules:
 
 * _documentation_: The project documentation.
 
+* _elasticsearch_: All code relating to the Elasticsearch integration.
+
 * _engine_: The engine of the project. Most of the beef is here.
 
-* _integrationtest_: Integration tests with various technologies like WildFly, Spring or Karaf.
+* _integrationtest_: Integration tests with various technologies like WildFly, Spring and Karaf.
 Also includes performance tests.
 
 * _modules_: Integration with [WildFly](http://www.wildfly.org/) using JBoss Modules.
 
-* _orm_: Native integration for [Hibernate ORM](http://hibernate.org/orm/).
+* _orm_: Native integration for [Hibernate ORM](http://hibernate.org/orm/), and also home of most public API code.
 
-* serialization: Serialization code used by remote backends.
+* _serialization_: Serialization code used by remote backends.
 
-* testing: Various helper classes to write tests using Hibernate Search. This module is
+* _testing_: Various helper classes to write tests using Hibernate Search. This module is
 semi private.
 
 ## Contact
 
 ### Latest Documentation:
 
-* [http://search.hibernate.org](http://www.hibernate.org/subprojects/search/docs)
+* [http://search.hibernate.org](http://hibernate.org/search/documentation/)
 
 ### Bug Reports:
 
@@ -119,6 +132,7 @@ semi private.
 ### Free Technical Support:
 
 * [Hibernate Forum](http://forum.hibernate.org/viewforum.php?f=9)
+* [Stackoverflow](http://stackoverflow.com/questions/tagged/hibernate-search); please use tag `hibernate-search`.
 
 ## License
 
