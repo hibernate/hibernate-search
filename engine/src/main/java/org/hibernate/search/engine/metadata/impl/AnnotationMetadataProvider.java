@@ -1031,7 +1031,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void updateContainedInMetadataForProperty(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty property) {
 		IndexedEmbedded indexedEmbeddedAnnotation = property.getAnnotation( IndexedEmbedded.class );
 		containedInMetadataBuilder.maxDepth( indexedEmbeddedAnnotation.depth() );
-		containedInMetadataBuilder.prefix( buildEmbeddedPrefix( "", indexedEmbeddedAnnotation, property ) );
+		containedInMetadataBuilder.prefix( buildEmbeddedPrefix( indexedEmbeddedAnnotation, property ) );
 		containedInMetadataBuilder.includePaths( indexedEmbeddedAnnotation.includePaths() );
 	}
 
@@ -1692,7 +1692,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		parseContext.incrementLevel();
 
 		XClass elementClass = elementCollection ? returnedType( member ) : elementClass( member, indexedEmbeddedAnnotation );
-		String localPrefix = elementCollection ? defaultPrefix( member ) : buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member );
+		String localPrefix = elementCollection ? defaultPrefix( member ) : buildEmbeddedPrefix( indexedEmbeddedAnnotation, member );
+		String fullPrefix = prefix + localPrefix;
 		boolean includeEmbeddedObjectId = elementCollection ? false : indexedEmbeddedAnnotation.includeEmbeddedObjectId();
 
 		if ( parseContext.getMaxLevel() == INFINITE_DEPTH
@@ -1700,10 +1701,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			throw log.detectInfiniteTypeLoopInIndexedEmbedded(
 					elementClass.getName(),
 					typeMetadataBuilder.getIndexedType().getName(),
-					localPrefix );
+					fullPrefix );
 		}
 
-		PathsContext updatedPathsContext = updatePaths( localPrefix, pathsContext, indexedEmbeddedAnnotation );
+		PathsContext updatedPathsContext = updatePaths( fullPrefix, pathsContext, indexedEmbeddedAnnotation );
 
 		boolean pathsCreatedAtThisLevel = false;
 		if ( pathsContext == null && updatedPathsContext != null ) {
@@ -1713,7 +1714,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		if ( !parseContext.isMaxLevelReached() || isInPath(
-				localPrefix,
+				fullPrefix,
 				updatedPathsContext,
 				indexedEmbeddedAnnotation
 		) ) {
@@ -1753,7 +1754,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			initializeClass(
 					embeddedTypeMetadataBuilder,
 					false,
-					localPrefix,
+					fullPrefix,
 					parseContext,
 					configContext,
 					disableOptimizations,
@@ -1769,7 +1770,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				FieldBridge fieldBridge = new NullEncodingFieldBridge( NULL_EMBEDDED_STRING_BRIDGE, indexNullAs );
 				embeddedTypeMetadataBuilder.indexNullToken(
 						indexNullAs,
-						embeddedNullField( localPrefix ),
+						embeddedNullField( fullPrefix ),
 						fieldBridge
 				);
 			}
@@ -1783,7 +1784,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			parseContext.removeProcessedClass( elementClass ); //pop
 		}
 		else if ( log.isTraceEnabled() ) {
-			log.tracef( "depth reached, ignoring %s", localPrefix );
+			log.tracef( "depth reached, ignoring %s", fullPrefix );
 		}
 
 		parseContext.decrementLevel();
@@ -1882,16 +1883,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return newPathsContext;
 	}
 
-	private String buildEmbeddedPrefix(String prefix, IndexedEmbedded indexedEmbeddedAnnotation, XProperty member) {
-		String localPrefix = prefix;
+	private String buildEmbeddedPrefix(IndexedEmbedded indexedEmbeddedAnnotation, XProperty member) {
 		if ( isDefaultPrefix( indexedEmbeddedAnnotation ) ) {
 			//default to property name
-			localPrefix += defaultPrefix( member );
+			return defaultPrefix( member );
 		}
 		else {
-			localPrefix += indexedEmbeddedAnnotation.prefix();
+			return indexedEmbeddedAnnotation.prefix();
 		}
-		return localPrefix;
 	}
 
 	private String defaultPrefix(XProperty member) {
