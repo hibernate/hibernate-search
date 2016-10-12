@@ -9,6 +9,7 @@ package org.hibernate.search.test.embedded;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -38,6 +39,10 @@ public class Address {
 	@IndexedEmbedded(depth = 1, prefix = "ownedBy_", targetElement = Owner.class)
 	@Target(Owner.class)
 	private Person ownedBy;
+
+	@ElementCollection
+	@IndexedEmbedded
+	private Set<Resident> residents = new HashSet<Resident>();
 
 	@OneToMany(mappedBy = "address")
 	@ContainedIn
@@ -71,6 +76,13 @@ public class Address {
 		this.ownedBy = ownedBy;
 	}
 
+	public Set<Resident> getResidents() {
+		return residents;
+	}
+
+	public void setResidents(Set<Resident> residents) {
+		this.residents = residents;
+	}
 
 	public Set<Tower> getTowers() {
 		return towers;
