@@ -362,7 +362,7 @@ public abstract class AbstractDocumentBuilder {
 
 			// consider IndexedEmbedded:
 			for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
-				String name = embeddedTypeMetadata.getEmbeddedFieldName();
+				String name = embeddedTypeMetadata.getEmbeddedPropertyName();
 				if ( name.equals( dirtyPropertyName ) ) {
 					return true;
 				}

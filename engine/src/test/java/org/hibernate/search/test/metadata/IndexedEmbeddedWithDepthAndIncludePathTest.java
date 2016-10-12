@@ -43,7 +43,7 @@ public class IndexedEmbeddedWithDepthAndIncludePathTest {
 
 		EmbeddedTypeMetadata embeddedWithDepthTypeMetadata = null;
 		for ( EmbeddedTypeMetadata typeMetadata : rootTypeMetadata.getEmbeddedTypeMetadata() ) {
-			if ( "indexedEmbeddedWithDepth".equals( typeMetadata.getEmbeddedFieldName() ) ) {
+			if ( "indexedEmbeddedWithDepth".equals( typeMetadata.getEmbeddedPropertyName() ) ) {
 				embeddedWithDepthTypeMetadata = typeMetadata;
 			}
 		}

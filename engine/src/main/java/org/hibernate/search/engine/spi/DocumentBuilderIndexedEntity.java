@@ -483,7 +483,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
 			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
 
-			conversionContext.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
+			conversionContext.pushProperty( embeddedTypeMetadata.getEmbeddedPropertyName() );
 			nestingContext.push( embeddedTypeMetadata );
 			try {
 				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );

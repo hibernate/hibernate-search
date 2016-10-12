@@ -188,7 +188,7 @@ public final class DocumentBuilderHelper {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			//there is nothing we can do for collections
 			if ( embeddedTypeMetadata.getEmbeddedContainer() == EmbeddedTypeMetadata.Container.OBJECT ) {
-				contextualBridge.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
+				contextualBridge.pushProperty( embeddedTypeMetadata.getEmbeddedPropertyName() );
 				try {
 					processMetadataRecursivelyForProjections(
 							embeddedTypeMetadata, fields, result, document, contextualBridge
