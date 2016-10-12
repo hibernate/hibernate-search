@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.ScopedAnalyzerReference;
  * @author Hardy Ferentschik
  */
 public class EmbeddedTypeMetadata extends TypeMetadata {
-	private final String embeddedFieldName;
+	private final String embeddedPropertyName;
 	private final String embeddedFieldPrefix;
 	private final XMember embeddedGetter;
 	private final Container embeddedContainer;
@@ -31,7 +31,7 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 
 	private EmbeddedTypeMetadata(Builder builder) {
 		super( builder );
-		this.embeddedFieldName = builder.embeddedFieldName;
+		this.embeddedPropertyName = builder.embeddedPropertyName;
 		this.embeddedFieldPrefix = builder.embeddedFieldPrefix;
 		this.embeddedGetter = builder.embeddedGetter;
 		this.embeddedContainer = builder.embeddedContainer;
@@ -41,8 +41,11 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 		this.embeddedNullFieldBridge = builder.embeddedNullFieldBridge;
 	}
 
-	public String getEmbeddedFieldName() {
-		return embeddedFieldName;
+	/**
+	 * @return The name of the Java property holding this embedded.
+	 */
+	public String getEmbeddedPropertyName() {
+		return embeddedPropertyName;
 	}
 
 	/**
@@ -77,7 +80,7 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "EmbeddedTypeMetadata{" );
-		sb.append( "embeddedFieldName='" ).append( embeddedFieldName ).append( '\'' );
+		sb.append( "embeddedPropertyName='" ).append( embeddedPropertyName ).append( '\'' );
 		sb.append( ", embeddedFieldPrefix='" ).append( embeddedFieldPrefix ).append( '\'' );
 		sb.append( ", embeddedGetter=" ).append( embeddedGetter );
 		sb.append( ", embeddedContainer=" ).append( embeddedContainer );
@@ -89,7 +92,7 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	}
 
 	public static class Builder extends TypeMetadata.Builder {
-		private final String embeddedFieldName;
+		private final String embeddedPropertyName;
 		private final String embeddedFieldPrefix;
 		private final XMember embeddedGetter;
 		private final Container embeddedContainer;
@@ -101,7 +104,7 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 		public Builder(Class<?> indexedType, XMember embeddedGetter, String embeddedFieldPrefix, ScopedAnalyzerReference.Builder scopedAnalyzerBuilder) {
 			super( indexedType, scopedAnalyzerBuilder );
 			ReflectionHelper.setAccessible( embeddedGetter );
-			this.embeddedFieldName = embeddedGetter.getName();
+			this.embeddedPropertyName = embeddedGetter.getName();
 			this.embeddedFieldPrefix = embeddedFieldPrefix;
 			this.embeddedGetter = embeddedGetter;
 			this.embeddedContainer = determineContainerType( embeddedGetter );

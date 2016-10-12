@@ -294,7 +294,7 @@ class FieldHelper {
 
 		for ( int i = 0; i < fieldNameParts.length - 1; i++ ) {
 			for ( EmbeddedTypeMetadata embeddedTypeMetadata : parentMetadata.getEmbeddedTypeMetadata() ) {
-				if ( embeddedTypeMetadata.getEmbeddedFieldName().equals( fieldNameParts[i] ) ) {
+				if ( embeddedTypeMetadata.getEmbeddedPropertyName().equals( fieldNameParts[i] ) ) {
 					parentMetadata = embeddedTypeMetadata;
 					break;
 				}
@@ -316,7 +316,7 @@ class FieldHelper {
 		}
 
 		for ( EmbeddedTypeMetadata embeddedType : type.getEmbeddedTypeMetadata() ) {
-			if ( !lastParticle.startsWith( embeddedType.getEmbeddedFieldName() ) ) {
+			if ( !lastParticle.startsWith( embeddedType.getEmbeddedPropertyName() ) ) {
 				continue;
 			}
 
