@@ -21,6 +21,7 @@ import org.hibernate.search.util.impl.ScopedAnalyzerReference;
  */
 public class EmbeddedTypeMetadata extends TypeMetadata {
 	private final String embeddedFieldName;
+	private final String embeddedFieldPrefix;
 	private final XMember embeddedGetter;
 	private final Container embeddedContainer;
 
@@ -31,6 +32,7 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	private EmbeddedTypeMetadata(Builder builder) {
 		super( builder );
 		this.embeddedFieldName = builder.embeddedFieldName;
+		this.embeddedFieldPrefix = builder.embeddedFieldPrefix;
 		this.embeddedGetter = builder.embeddedGetter;
 		this.embeddedContainer = builder.embeddedContainer;
 
@@ -41,6 +43,15 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 
 	public String getEmbeddedFieldName() {
 		return embeddedFieldName;
+	}
+
+	/**
+	 * @return The field prefix, i.e. the string that should be concatenated to
+	 * prefixes of containing embeddeds and to the local field name to give the
+	 * full index field name.
+	 */
+	public String getEmbeddedFieldPrefix() {
+		return embeddedFieldPrefix;
 	}
 
 	public XMember getEmbeddedGetter() {
@@ -67,9 +78,10 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "EmbeddedTypeMetadata{" );
 		sb.append( "embeddedFieldName='" ).append( embeddedFieldName ).append( '\'' );
+		sb.append( ", embeddedFieldPrefix='" ).append( embeddedFieldPrefix ).append( '\'' );
 		sb.append( ", embeddedGetter=" ).append( embeddedGetter );
 		sb.append( ", embeddedContainer=" ).append( embeddedContainer );
-		sb.append( ", embeddedNullFieldName='" ).append( embeddedNullFieldName ).append( '\'' );
+		sb.append( ", embeddedNullFieldPath='" ).append( embeddedNullFieldName ).append( '\'' );
 		sb.append( ", embeddedNullToken='" ).append( embeddedNullToken ).append( '\'' );
 		sb.append( ", embeddedNullFieldBridge=" ).append( embeddedNullFieldBridge );
 		sb.append( '}' );
@@ -78,17 +90,19 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 
 	public static class Builder extends TypeMetadata.Builder {
 		private final String embeddedFieldName;
+		private final String embeddedFieldPrefix;
 		private final XMember embeddedGetter;
 		private final Container embeddedContainer;
 
-		private String embeddedNullFieldName;
 		private String embeddedNullToken;
+		private String embeddedNullFieldName;
 		private FieldBridge embeddedNullFieldBridge;
 
-		public Builder(Class<?> indexedType, XMember embeddedGetter, ScopedAnalyzerReference.Builder scopedAnalyzerBuilder) {
+		public Builder(Class<?> indexedType, XMember embeddedGetter, String embeddedFieldPrefix, ScopedAnalyzerReference.Builder scopedAnalyzerBuilder) {
 			super( indexedType, scopedAnalyzerBuilder );
 			ReflectionHelper.setAccessible( embeddedGetter );
 			this.embeddedFieldName = embeddedGetter.getName();
+			this.embeddedFieldPrefix = embeddedFieldPrefix;
 			this.embeddedGetter = embeddedGetter;
 			this.embeddedContainer = determineContainerType( embeddedGetter );
 		}

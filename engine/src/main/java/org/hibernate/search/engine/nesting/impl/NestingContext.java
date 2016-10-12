@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.nesting.impl;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata.Container;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 
 /**
  * Allows backends to insert "marker" fields representing the current nesting in case of index embedded associations.
@@ -19,19 +19,11 @@ import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata.Container;
  */
 public interface NestingContext {
 
-	void push(String fieldName, Container containerType);
+	void push(EmbeddedTypeMetadata embeddedTypeMetadata);
 
 	void pop();
 
 	void mark(Document document);
-
-	/**
-	 * Used when adding a field for the actual embedded object (embedded.this), instead of a property.
-	 * Mainly used to distinguish between array/collection/map values (typically added only when
-	 * they are null) and their element values.
-	 * @param document The document to mark.
-	 */
-	void markObjectValue(Document document);
 
 	void incrementCollectionIndex();
 }
