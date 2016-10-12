@@ -23,9 +23,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * @author Emmanuel Bernard
@@ -34,7 +32,6 @@ import org.junit.experimental.categories.Category;
 public class EmbeddedTest extends SearchTestBase {
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly
 	public void testEmbeddedIndexing() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
@@ -134,7 +131,6 @@ public class EmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly
 	public void testEmbeddedIndexingElementCollection() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
@@ -172,7 +168,6 @@ public class EmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly
 	public void testContainedIn() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
