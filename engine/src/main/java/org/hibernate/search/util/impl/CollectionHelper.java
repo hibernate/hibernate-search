@@ -60,7 +60,7 @@ public final class CollectionHelper {
 		return set;
 	}
 
-	public static <T> List<T> toImmutableList(final Collection<T> c) {
+	public static <T> List<T> toImmutableList(final Collection<? extends T> c) {
 		if ( c.isEmpty() ) {
 			return Collections.emptyList();
 		}

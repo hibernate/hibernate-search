@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.nesting.impl;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata.Container;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 
 /**
  * No-op {@link NestingContext}.
@@ -19,7 +19,7 @@ public class NoOpNestingContext implements NestingContext {
 	public static final NestingContext INSTANCE = new NoOpNestingContext();
 
 	@Override
-	public void push(String fieldName, Container containerType) {
+	public void push(EmbeddedTypeMetadata embeddedTypeMetadata) {
 	}
 
 	@Override
@@ -28,10 +28,6 @@ public class NoOpNestingContext implements NestingContext {
 
 	@Override
 	public void mark(Document document) {
-	}
-
-	@Override
-	public void markObjectValue(Document document) {
 	}
 
 	@Override

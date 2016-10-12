@@ -1724,6 +1724,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					new EmbeddedTypeMetadata.Builder(
 							reflectionManager.toClass( elementClass ),
 							member,
+							localPrefix,
 							typeMetadataBuilder.getScopedAnalyzerReferenceBuilder()
 					);
 
