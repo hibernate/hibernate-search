@@ -8,15 +8,18 @@ package org.hibernate.search.elasticsearch.impl;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata.Container;
 import org.hibernate.search.engine.nesting.impl.NestingContext;
 import org.hibernate.search.engine.nesting.impl.NestingContextFactory;
@@ -26,7 +29,7 @@ import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.impl.CollectionHelper;
 
 public class ElasticsearchNestingContextFactoryProvider implements NestingContextFactoryProvider, Startable {
 
@@ -103,59 +106,93 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 		private Deque<NestingStackElement> path = new ArrayDeque<>();
 
 		@Override
-		public void push(String fieldName, Container containerType) {
-			path.push(
+		public void push(EmbeddedTypeMetadata embeddedTypeMetadata) {
+			path.addLast(
 					new NestingStackElement(
-							fieldName,
-							containerType == Container.OBJECT ? null : 0
+							embeddedTypeMetadata,
+							embeddedTypeMetadata.getEmbeddedContainer() == Container.OBJECT ? null : 0
 					)
 			);
 		}
 
 		@Override
 		public void mark(Document document) {
-			String currentPath = StringHelper.join( path.descendingIterator(), "." );
-			document.add( new TextField( ElasticsearchIndexWorkVisitor.NESTING_MARKER, currentPath, Store.NO ) );
-		}
-
-		@Override
-		public void markObjectValue(Document document) {
-			String currentPath = StringHelper.join( path.descendingIterator(), "." );
-			document.add( new TextField( ElasticsearchIndexWorkVisitor.OBJECT_VALUE_MARKER, currentPath, Store.NO ) );
+			List<NestingPathComponent> currentPath = CollectionHelper.<NestingPathComponent>toImmutableList( path );
+			document.add( new NestingMarkerField( currentPath ) );
 		}
 
 		@Override
 		public void incrementCollectionIndex() {
-			path.peek().increment();
+			NestingStackElement current = path.removeLast();
+			path.addLast( current.createNext() );
 		}
 
 		@Override
 		public void pop() {
-			path.pop();
+			path.removeLast();
 		}
 	}
 
-	private static class NestingStackElement {
-		String field;
-		Integer index;
+	private static class NestingStackElement implements NestingMarker.NestingPathComponent, Cloneable {
+		private final EmbeddedTypeMetadata embeddedTypeMetadata;
+		private final Integer index;
 
-		public NestingStackElement(String fieldName, Integer index) {
-			this.field = fieldName;
+		public NestingStackElement(EmbeddedTypeMetadata embeddedTypeMetadata, Integer index) {
+			this.embeddedTypeMetadata = embeddedTypeMetadata;
 			this.index = index;
 		}
 
 		@Override
 		public String toString() {
-			if ( index == null ) {
-				return field;
+			StringBuilder builder = new StringBuilder( embeddedTypeMetadata.getEmbeddedFieldName() );
+			if ( index != null ) {
+				builder.append( "[" ).append( index ).append( "]" );
 			}
-			else {
-				return field + "[" + index + "]";
-			}
+			builder.append( " => " ).append( embeddedTypeMetadata.getEmbeddedFieldPrefix() );
+			return builder.toString();
 		}
 
-		void increment() {
-			index = index + 1;
+		public NestingStackElement createNext() {
+			return new NestingStackElement( embeddedTypeMetadata, index + 1 );
+		}
+
+		@Override
+		public EmbeddedTypeMetadata getEmbeddedTypeMetadata() {
+			return embeddedTypeMetadata;
+		}
+
+		@Override
+		public Integer getIndex() {
+			return index;
 		}
 	}
+
+	private abstract static class MarkerField extends Field {
+
+		public MarkerField() {
+			super( "", new FieldType() );
+		}
+
+	}
+
+	private static final class NestingMarkerField extends MarkerField implements NestingMarker {
+
+		private final List<NestingPathComponent> nestingPath;
+
+		public NestingMarkerField(List<NestingPathComponent> nestingPath) {
+			super();
+			this.nestingPath = nestingPath;
+		}
+
+		@Override
+		public List<NestingPathComponent> getPath() {
+			return nestingPath;
+		}
+
+		@Override
+		public String toString() {
+			return "<ES nesting marker: " + nestingPath.toString() + ">";
+		}
+	}
+
 }

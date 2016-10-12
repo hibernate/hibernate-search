@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.elasticsearch.impl;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleDocValuesField;
@@ -35,20 +34,18 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.impl.FieldHelper.ExtendedFieldType;
+import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata.Container;
-import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -67,28 +64,6 @@ import io.searchbox.indices.Optimize;
  * @author Gunnar Morling
  */
 class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendRequest<?>> {
-
-	/*
-	 * Nesting marker field name: fields with this name have the parent path as their value,
-	 * and are used for denoting the parent element of the subsequent fields
-	 *
-	 * Use a very specific String to avoid naming conflict with user-defined field names
-	 */
-	public static final String NESTING_MARKER = "__HSearch_NestingMarker";
-
-	/*
-	 * Object value marker field name: fields with this name are used for denoting that the
-	 * subsequent field represents an embedded as a whole, as opposed to simply a field
-	 * in an embedded.
-	 * The marker is necessary because in some cases, the embedded and its elements
-	 * share a common field name. For instance it is the case for embedded collections.
-	 *
-	 * Use a very specific String to avoid naming conflict with user-defined field names
-	 */
-	public static final String OBJECT_VALUE_MARKER = "__HSearch_ObjectValueMarker";
-
-	private static final Pattern DOT = Pattern.compile( "\\." );
-	private static final Pattern NAME_AND_INDEX = Pattern.compile( "(.+?)(\\[([0-9]+)\\])?" );
 
 	private static final String DELETE_ALL_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"match_all\" : { } } } } }";
 	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
@@ -218,28 +193,28 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 	private JsonObject convertToJson(Document document, Class<?> entityType) {
 		EntityIndexBinding indexBinding = searchIntegrator.getIndexBinding( entityType );
 		JsonObject source = new JsonObject();
+		JsonTreeBuilder treeBuilder = new JsonTreeBuilder( source );
 
-		String parentPath = null;
-		boolean isObjectValue = false;
+		NestingMarker nestingMarker = null;
 		for ( IndexableField field : document.getFields() ) {
-			switch ( field.name() ) {
-				case NESTING_MARKER:
-					parentPath = field.stringValue();
-					isObjectValue = false;
-					continue; // Inspect the next field taking into account this metadata
-				case OBJECT_VALUE_MARKER:
-					isObjectValue = true;
-					continue; // Inspect the next field taking into account this metadata
-				default:
-					break;
+			if ( field instanceof NestingMarker ) {
+				nestingMarker = (NestingMarker) field;
+				continue; // Inspect the next field taking into account this metadata
 			}
 
-			if ( isObjectValue ) { // This only happens for null embeddeds, because non-null embeddeds only have their own fields or their elements indexed
-				String[] fieldNameParts = FieldHelper.getFieldNameParts( field.name() );
-				JsonObject parent = getOrCreateDocumentTree( source, parentPath );
-				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
+			String fieldPath = field.name();
+			List<NestingPathComponent> nestingPath = nestingMarker == null ? null : nestingMarker.getPath();
+			NestingPathComponent lastPathComponent = nestingPath == null ? null : nestingPath.get( nestingPath.size() - 1 );
+			EmbeddedTypeMetadata embeddedType = lastPathComponent == null ? null : lastPathComponent.getEmbeddedTypeMetadata();
 
-				EmbeddedTypeMetadata embeddedType = getEmbeddedTypeMetadata( indexBinding.getDocumentBuilder().getTypeMetadata(), fieldNameParts );
+			if ( embeddedType != null && fieldPath.equals( embeddedType.getEmbeddedNullFieldName() ) ) {
+				// Case of a null indexed embedded
+
+				// Exclude the last path component: it represents the null embedded
+				nestingPath = nestingPath.subList( 0, nestingPath.size() - 1 );
+				JsonObject parent = treeBuilder.getOrCreateParent( nestingPath );
+				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldPath );
+
 				Container containerType = embeddedType.getEmbeddedContainer();
 
 				switch ( containerType ) {
@@ -264,13 +239,12 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 						throw new AssertionFailure( "Unexpected container type: " + containerType );
 				}
 			}
-			else if ( !field.name().equals( ProjectionConstants.OBJECT_CLASS ) &&
-					!field.name().equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
-					!FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( field.name() ) &&
+			else if ( !fieldPath.equals( ProjectionConstants.OBJECT_CLASS ) &&
+					!fieldPath.equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
+					!FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( fieldPath ) &&
 					!isDocValueField( field ) ) {
-
-				JsonObject parent = getOrCreateDocumentTree( source, parentPath );
-				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
+				JsonObject parent = treeBuilder.getOrCreateParent( nestingPath );
+				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldPath );
 
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
 
@@ -308,21 +282,14 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 						}
 					}
 					else {
-						String[] fieldNameParts = FieldHelper.getFieldNameParts( field.name() );
-
-						EmbeddedTypeMetadata embeddedType = getEmbeddedTypeMetadata( indexBinding.getDocumentBuilder().getTypeMetadata(), fieldNameParts );
-
-						// Make sure this field does not represent an embeddable (not a field thereof)
-						if ( embeddedType == null ) {
-							// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
-							String stringValue = field.stringValue();
-							if ( stringValue != null ) {
-								addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName, new JsonPrimitive( stringValue ) );
-							}
-							else {
-								addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-										field.numericValue() != null ? new JsonPrimitive( field.numericValue() ) : null );
-							}
+						// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
+						String stringValue = field.stringValue();
+						if ( stringValue != null ) {
+							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName, new JsonPrimitive( stringValue ) );
+						}
+						else {
+							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
+									field.numericValue() != null ? new JsonPrimitive( field.numericValue() ) : null );
 						}
 					}
 				}
@@ -375,7 +342,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 					continue;
 				}
 
-				JsonObject parent = getOrCreateDocumentTree( source, fieldName );
+				JsonObject parent = treeBuilder.getOrCreateParent( nestingPath );
 				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldName );
 				addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
 						value != null ? new JsonPrimitive( value ) : null );
@@ -394,8 +361,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 				else {
 					value = field.numericValue();
 				}
-				JsonObject parent = getOrCreateDocumentTree( source, parentPath );
-				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( field.name() );
+				JsonObject parent = treeBuilder.getOrCreateParent( nestingPath );
+				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldPath );
 				addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
 						value != null ? new JsonPrimitive( value ) : null );
 			}
@@ -420,83 +387,6 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 	private boolean isNumeric(IndexableField field) {
 		return field instanceof IntField || field instanceof LongField || field instanceof FloatField || field instanceof DoubleField;
-	}
-
-	private EmbeddedTypeMetadata getEmbeddedTypeMetadata(TypeMetadata type, String[] fieldNameParts) {
-		TypeMetadata parent = type;
-
-		for ( String namePart : fieldNameParts ) {
-			EmbeddedTypeMetadata embeddedType = getDirectEmbeddedTypeMetadata( parent, namePart );
-			if ( embeddedType == null ) {
-				return null;
-			}
-
-			parent = embeddedType;
-		}
-
-		return (EmbeddedTypeMetadata) parent;
-	}
-
-	private EmbeddedTypeMetadata getDirectEmbeddedTypeMetadata(TypeMetadata type, String fieldName) {
-		for ( EmbeddedTypeMetadata embeddedType : type.getEmbeddedTypeMetadata() ) {
-			if ( embeddedType.getEmbeddedFieldName().equals( fieldName ) ) {
-				return embeddedType;
-			}
-		}
-
-		return null;
-	}
-
-	private JsonObject getOrCreateDocumentTree(JsonObject source, String path) {
-		if ( path == null ) {
-			return source;
-		}
-
-		// embedded property Create JSON hierarchy as needed
-		String[] parts = DOT.split( path );
-		JsonObject parent = source;
-
-		for ( int i = 0; i < parts.length; i++ ) {
-			Matcher nameAndIndex = NAME_AND_INDEX.matcher( parts[i] );
-			nameAndIndex.matches();
-
-			String name = nameAndIndex.group( 1 );
-			String idx = nameAndIndex.group( 3 );
-			Integer index = null;
-
-			if ( idx != null ) {
-				index = Integer.valueOf( idx );
-				JsonArray array = parent.getAsJsonArray( name );
-				if ( array == null ) {
-					array = new JsonArray();
-					parent.add( name, array );
-				}
-
-				JsonObject newParent = index < array.size() ? array.get( index ).getAsJsonObject() : null;
-				if ( newParent == null ) {
-					newParent = new JsonObject();
-
-					if ( index >= array.size() ) {
-						for ( int j = array.size(); j <= index; j++ ) {
-							array.add( JsonNull.INSTANCE );
-						}
-					}
-					array.set( index, newParent );
-				}
-
-				parent = newParent;
-			}
-			else {
-				JsonObject newParent = parent.getAsJsonObject( name );
-				if ( newParent == null ) {
-					newParent = new JsonObject();
-					parent.add( name, newParent );
-				}
-				parent = newParent;
-			}
-		}
-
-		return parent;
 	}
 
 	private boolean isDocValueField(IndexableField field) {

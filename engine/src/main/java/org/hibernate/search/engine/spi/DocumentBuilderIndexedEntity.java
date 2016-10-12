@@ -482,16 +482,21 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
 			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
-			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-			if ( value == null ) {
-				nestingContext.markObjectValue( doc );
-				processEmbeddedNullValue( doc, embeddedTypeMetadata, conversionContext );
-				continue;
-			}
 
 			conversionContext.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
-			nestingContext.push( embeddedTypeMetadata.getEmbeddedFieldName(), embeddedTypeMetadata.getEmbeddedContainer() );
+			nestingContext.push( embeddedTypeMetadata );
 			try {
+				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
+				if ( value == null ) {
+					/*
+					 * This must be executed after the "nestingContext.push" so as to
+					 * include this embedded's metadata in the nesting context (which
+					 * will allow backends to detect a embedded null value)
+					 */
+					nestingContext.mark( doc );
+					processEmbeddedNullValue( doc, embeddedTypeMetadata, conversionContext );
+					continue;
+				}
 
 				switch ( embeddedTypeMetadata.getEmbeddedContainer() ) {
 					case ARRAY:
