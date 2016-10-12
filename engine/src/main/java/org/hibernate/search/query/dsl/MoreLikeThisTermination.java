@@ -8,8 +8,6 @@
 package org.hibernate.search.query.dsl;
 
 /**
- * @hsearch.experimental More Like This queries are considered experimental
- *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public interface MoreLikeThisTermination extends Termination<MoreLikeThisTermination> {

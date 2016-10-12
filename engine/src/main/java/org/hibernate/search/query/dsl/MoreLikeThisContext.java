@@ -8,7 +8,12 @@
 package org.hibernate.search.query.dsl;
 
 /**
- * @hsearch.experimental More Like This queries are considered experimental
+ * Context to build a More Like This Query.
+ * These queries are useful to find similar objects to a given object;
+ * the Hibernate Search implementation is a variation on Lucene's
+ * MoreLikeThisQuery Query implementation as it will not mix
+ * comparisons across different fields, but only match domain
+ * objects which have similar properties matching.
  *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
