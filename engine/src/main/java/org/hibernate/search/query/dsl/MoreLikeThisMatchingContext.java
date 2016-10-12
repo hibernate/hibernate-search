@@ -13,8 +13,6 @@ package org.hibernate.search.query.dsl;
  *
  * Sub interfaces are expected to clarify whether additional fields can be set.
  *
- * @hsearch.experimental More Like This queries are considered experimental
- *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public interface MoreLikeThisMatchingContext {
