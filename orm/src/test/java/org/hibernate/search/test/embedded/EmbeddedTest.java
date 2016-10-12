@@ -135,6 +135,44 @@ public class EmbeddedTest extends SearchTestBase {
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly
+	public void testEmbeddedIndexingElementCollection() throws Exception {
+		Tower tower = new Tower();
+		tower.setName( "JBoss tower" );
+		Address a = new Address();
+		a.setStreet( "Tower place" );
+		a.getTowers().add( tower );
+		tower.setAddress( a );
+		Person o = new Owner();
+		o.setName( "Atlanta Renting corp" );
+		a.setOwnedBy( o );
+		o.setAddress( a );
+
+		Resident r1 = new Resident();
+		r1.setName( "John Doe" );
+		a.getResidents().add( r1 );
+
+		Resident r2 = new Resident();
+		r2.setName( "Jane Smith" );
+		a.getResidents().add( r2 );
+
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( tower );
+		tx.commit();
+
+		FullTextSession session = Search.getFullTextSession( s );
+		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+		Query query;
+		List<?> result;
+
+		query = parser.parse( "address.residents.name:Smith" );
+		result = session.createFullTextQuery( query ).list();
+		assertEquals( "unable to find property in embedded @ElementCollection", 1, result.size() );
+		s.close();
+	}
+
+	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly
 	public void testContainedIn() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
