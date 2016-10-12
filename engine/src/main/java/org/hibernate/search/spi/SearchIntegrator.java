@@ -26,8 +26,6 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.stat.Statistics;
 
 /**
- * This contract is considered experimental.
- *
  * This contract gives access to lower level APIs of Hibernate Search for
  * frameworks integrating with it.
  * Frameworks should not expose this as public API though, but expose a simplified view; for
@@ -35,7 +33,6 @@ import org.hibernate.search.stat.Statistics;
  * its clients.
  *
  * @author Emmanuel Bernard
- * @hsearch.experimental
  */
 public interface SearchIntegrator extends AutoCloseable {
 
