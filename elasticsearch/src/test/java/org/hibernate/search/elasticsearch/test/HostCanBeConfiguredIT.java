@@ -45,7 +45,9 @@ public class HostCanBeConfiguredIT {
 
 			Throwable rootCause = getRootCause( e );
 			assertThat( rootCause ).isInstanceOf( ConnectException.class );
-			assertThat( rootCause ).hasMessage( "Connection refused" );
+			//N.B. the exact message is different on Windows vs Linux so
+			//we only check for it to contain this string:
+			assertThat( rootCause.getMessage() ).contains( "Connection refused" );
 		}
 
 	}
