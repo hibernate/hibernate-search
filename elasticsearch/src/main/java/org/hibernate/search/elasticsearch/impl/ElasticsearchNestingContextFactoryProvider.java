@@ -144,7 +144,7 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 
 		@Override
 		public String toString() {
-			StringBuilder builder = new StringBuilder( embeddedTypeMetadata.getEmbeddedFieldName() );
+			StringBuilder builder = new StringBuilder( embeddedTypeMetadata.getEmbeddedPropertyName() );
 			if ( index != null ) {
 				builder.append( "[" ).append( index ).append( "]" );
 			}
