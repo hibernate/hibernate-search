@@ -265,10 +265,6 @@
                                 <exclude>**/CollectionInitializeTest.java</exclude>
                                 <exclude>**/EmbeddedSortableIdFieldTest.java</exclude>
                                 
-                                <!-- HSEARCH-2397 The Elasticsearch backend doesn't support embeddeds prefixes properly -->
-                                <exclude>**/DslEmbeddedSearchTest.java</exclude>
-                                <exclude>**/PrefixedEmbeddedCaseInPathTest.java</exclude>
-                                
                                 <!-- HSEARCH-2398 Improve field name/type validation when querying the Elasticsearch backend -->
                                 <exclude>**/FacetUnknownFieldFailureTest.java</exclude><!-- The elasticsearch backend seems too lenient for unknown field names. -->
                                 <exclude>**/QueryValidationTest.java</exclude><!-- testTargetNumericEncodedFieldWithStringQueryThrowsException: The Elasticsearch backend throws an exception, but not exactly the one we expect -->
