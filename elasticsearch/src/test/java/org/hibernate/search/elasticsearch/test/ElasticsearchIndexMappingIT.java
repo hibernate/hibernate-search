@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.test;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -18,12 +19,22 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
+import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.testutil.JsonHelper;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.gson.GsonBuilder;
+
+import io.searchbox.client.AbstractJestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.indices.mapping.GetMapping;
 
 /**
  * @author Gunnar Morling
@@ -85,6 +96,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 		GolfPlayer brand = new GolfPlayer.Builder()
 				.lastName( "Brand" )
 				.playedCourses( purbeck, mountMaja )
+				.wonCourses( purbeck, mountMaja )
 				.build();
 		s.persist( brand );
 
@@ -114,12 +126,124 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 		s.close();
 	}
 
+	private String getMapping(String indexName, String typeName) {
+		ServiceManager serviceManager = getExtendedSearchIntegrator().getServiceManager();
+		try (ServiceReference<JestClient> clientReference = serviceManager.requestReference( JestClient.class ) ) {
+			JestClient client = clientReference.get();
+			JestResult result = client.executeRequest(
+					new GetMapping.Builder()
+					.addIndex( indexName )
+					.addType( typeName )
+					.build()
+					);
+
+			return result.getJsonObject()
+					.get( indexName ).getAsJsonObject()
+					.get( "mappings" ).getAsJsonObject()
+					.get( typeName ).toString();
+		}
+	}
+
 	@Test
 	public void testMapping() throws Exception {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
 
+		// Check the generated mapping
+		JsonHelper.assertJsonEquals(
+				"{" +
+					"'dynamic':'strict'," +
+					"'properties':{" +
+						"'active':{" +
+							"'type':'boolean'," +
+							"'null_value':false" +
+						"}," +
+						"'age':{" +
+							"'type':'string'" +
+						"}," +
+						"'dateOfBirth':{" +
+							"'type':'date'," +
+							"'format':'strict_date_optional_time||epoch_millis'," +
+							"'null_value':" + toGsonDateString("1970-01-01+00:00") +
+						"}," +
+						"'driveWidth':{" +
+							"'type':'integer'," +
+							"'null_value':-1" +
+						"}," +
+						"'firstName':{" +
+							"'type':'string'," +
+							"'null_value':'<NULL>'" +
+						"}," +
+						"'fullName':{" +
+							"'type':'string'" +
+						"}," +
+						"'handicap':{" +
+							"'type':'double'" +
+						"}," +
+						"'lastName':{" +
+							"'type':'string'" +
+						"}," +
+						"'playedCourses':{" +
+							"'properties':{" +
+								"'holes':{" +
+									"'properties':{" +
+										"'length':{" +
+											"'type':'integer'" +
+										"}," +
+										"'par':{" +
+											"'type':'integer'" +
+										"}" +
+									"}" +
+								"}," +
+								"'name':{" +
+									"'type':'string'" +
+								"}," +
+								"'rating':{" +
+									"'type':'double'" +
+								"}" +
+							"}" +
+						"}," +
+						"'puttingStrength':{" +
+							"'type':'string'" +
+						"}," +
+						"'ranking':{" +
+							"'properties':{" +
+									"'value':{" +
+										"'type':'string'" +
+									"}" +
+							"}" +
+						"}," +
+						"'strengths':{" +
+							"'type':'string'" +
+						"}," +
+						"'subscriptionEndDate':{" +
+							"'type':'date'," +
+							"'format':'strict_date_optional_time||epoch_millis'," +
+							"'null_value':" + toGsonDateString("1970-01-01+00:00") +
+						"}," +
+						"'won_holes':{" +
+							"'properties':{" +
+								"'length':{" +
+									"'type':'integer'" +
+								"}," +
+								"'par':{" +
+									"'type':'integer'" +
+								"}" +
+							"}" +
+						"}," +
+						"'won_name':{" +
+							"'type':'string'" +
+						"}," +
+						"'won_rating':{" +
+							"'type':'double'" +
+						"}" +
+					"}" +
+				"}",
+				getMapping( "golfplayer", GolfPlayer.class.getName() )
+		);
+
+		// Check we send correctly formatted data when indexing
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Hergesheimer' } } }" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
 				.setProjection( ElasticsearchProjectionConstants.SOURCE )
@@ -145,6 +269,16 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 		tx.commit();
 		s.close();
+	}
+
+	/*
+	 * Allows generating a date exactly as it would be outputed by GSON. GSON
+	 * internally uses the JVM's timezone to format dates, so the actual output
+	 * depends on the platform and cannot be stored as a constant string.
+	 */
+	private String toGsonDateString(String string) {
+		Date date = ElasticsearchDateHelper.stringToDate( string );
+		return new GsonBuilder().setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT ).create().toJsonTree( date ).toString();
 	}
 
 	@Test
@@ -203,6 +337,59 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 	@Test
 	public void testEmbeddedListOfEntityMapping() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'lastName' : 'Brand' } } }" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+						.setProjection( ElasticsearchProjectionConstants.SOURCE )
+						.list();
+
+		String source = (String) ( (Object[]) result.iterator().next() )[0];
+
+		JsonHelper.assertJsonEqualsIgnoringUnknownFields(
+			"{" +
+				"'lastName' : 'Brand'," +
+				"'playedCourses': [" +
+					"{" +
+						"'name' : 'Purbeck'," +
+						"'rating' : 127.3, " +
+						"'holes': [" +
+							"{ 'par' : 4, 'length' : 433 }," +
+							"{ 'par' : 3, 'length' : 163 }" +
+						"]" +
+					"}," +
+					"{" +
+						"'name' : 'Mount Maja'," +
+						"'rating' : 111.9, " +
+						"'holes': [" +
+							"{ 'par' : 5, 'length' : 512 }," +
+							"{ 'par' : 3, 'length' : 113 }" +
+						"]" +
+					"}" +
+				"]," +
+				"'won_name': ['Purbeck', 'Mount Maja']," +
+				"'won_rating': [127.3, 111.9]," +
+				"'won_holes': [" +
+					"[" +
+						"{ 'par' : 4, 'length' : 433 }," +
+						"{ 'par' : 3, 'length' : 163 }" +
+					"], [" +
+						"{ 'par' : 5, 'length' : 512 }," +
+						"{ 'par' : 3, 'length' : 113 }" +
+					"]" +
+				"]" +
+			"}",
+			source
+		);
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testEmbeddedListOfEntityWithPrefixMapping() throws Exception {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
 		Transaction tx = s.beginTransaction();
