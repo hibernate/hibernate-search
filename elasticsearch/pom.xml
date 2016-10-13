@@ -79,6 +79,16 @@
             <artifactId>simple-jndi</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-envers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -248,10 +258,6 @@
                                 <exclude>**/NumericFieldTest.java</exclude><!-- Missing field metadata (should use MetadataProvidingFieldBridge) -->
                                 <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude><!-- Missing field metadata (should use MetadataProvidingFieldBridge) -->
                                 <exclude>**/DirectoryProviderForQueryTest.java</exclude><!-- Full text filters must implement ElasticsearchFilter -->
-                                
-                                <!-- HSEARCH-2394 Fix dependency issues for tests that are re-used in Elasticsearch -->
-                                <exclude>**/SearchAndEnversIntegrationTest.java</exclude><!-- Envers -->
-                                <exclude>**/HibernateSearchIntegratorTest.java</exclude><!-- Unitils -->
                                 
                                 <!-- HSEARCH-2395 Support MoreLikeThisQueries with the Elasticsearch backend -->
                                 <exclude>**/MoreLikeThisTest.java</exclude>
