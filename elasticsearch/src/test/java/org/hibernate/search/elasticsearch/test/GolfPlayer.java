@@ -17,6 +17,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 
@@ -88,8 +89,14 @@ public class GolfPlayer {
 	private Set<String> strengths;
 
 	@ManyToMany
+	@JoinTable(name = "golfPlayer_playedCourses")
 	@IndexedEmbedded
 	private Set<GolfCourse> playedCourses;
+
+	@ManyToMany
+	@JoinTable(name = "golfPlayer_wonCourses")
+	@IndexedEmbedded(prefix = "won_")
+	private Set<GolfCourse> wonCourses;
 
 	GolfPlayer() {
 	}
@@ -191,6 +198,14 @@ public class GolfPlayer {
 		this.playedCourses = playedCourses;
 	}
 
+	public Set<GolfCourse> getWonCourses() {
+		return wonCourses;
+	}
+
+	public void setWonCourses(Set<GolfCourse> wonCourses) {
+		this.wonCourses = wonCourses;
+	}
+
 	public static class Builder {
 
 		private String firstName;
@@ -204,6 +219,7 @@ public class GolfPlayer {
 		private Integer ranking;
 		private Set<String> strengths = new HashSet<>();
 		private final Set<GolfCourse> playedCourses = new HashSet<>();
+		private final Set<GolfCourse> wonCourses = new HashSet<>();
 
 		public Builder firstName(String firstName) {
 			this.firstName = firstName;
@@ -263,6 +279,14 @@ public class GolfPlayer {
 			return this;
 		}
 
+		public Builder wonCourses(GolfCourse... courses) {
+			for ( GolfCourse course : courses ) {
+				this.wonCourses.add( course );
+			}
+
+			return this;
+		}
+
 		GolfPlayer build() {
 			GolfPlayer player = new GolfPlayer();
 
@@ -280,6 +304,9 @@ public class GolfPlayer {
 			player.setStrengths( strengths );
 			if ( !playedCourses.isEmpty() ) {
 				player.setPlayedCourses( playedCourses );
+			}
+			if ( !wonCourses.isEmpty() ) {
+				player.setWonCourses( wonCourses );
 			}
 			return player;
 		}
