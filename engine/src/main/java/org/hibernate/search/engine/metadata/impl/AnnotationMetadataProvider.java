@@ -269,7 +269,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		DocumentFieldMetadata fieldMetadata =
-				new DocumentFieldMetadata.Builder( fieldName, Store.YES, index, termVector )
+				new DocumentFieldMetadata.Builder(
+						typeMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(),
+						fieldName, Store.YES, index, termVector
+						)
 						.boost( AnnotationProcessingHelper.getBoost( member, null ) )
 						.fieldBridge( fieldBridge )
 						.idInEmbedded()
@@ -345,7 +349,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 
+		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder(
+				typeMetadataBuilder.getResultReference(), member,
+				reflectionManager.toClass( member.getType() ) );
+
 		DocumentFieldMetadata.Builder idMetadataBuilder = new DocumentFieldMetadata.Builder(
+						typeMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(),
 						path,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -361,8 +371,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			idMetadataBuilder.numericEncodingType( numericEncodingType );
 		}
 		DocumentFieldMetadata fieldMetadata = idMetadataBuilder.build();
-		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member,
-				reflectionManager.toClass( member.getType() ) );
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 		checkForSortableField( member, typeMetadataBuilder, propertyMetadataBuilder, "", true, null, parseContext );
 		checkForSortableFields( member, typeMetadataBuilder, propertyMetadataBuilder, "", true, null, parseContext );
@@ -432,8 +440,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			providedIdFieldName = ProvidedId.defaultFieldName;
 		}
 
+		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( typeMetadataBuilder.getResultReference(), null, null );
+
 		DocumentFieldMetadata fieldMetadata =
 				new DocumentFieldMetadata.Builder(
+						typeMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(),
 						providedIdFieldName,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -442,9 +454,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						.fieldBridge( providedIdFieldBridge )
 						.boost( 1.0f )
 						.build();
-		propertyMetadata = new PropertyMetadata.Builder( null, null )
-				.addDocumentField( fieldMetadata )
-				.build();
+
+		propertyMetadataBuilder.addDocumentField( fieldMetadata );
+		propertyMetadata = propertyMetadataBuilder.build();
 		typeMetadataBuilder.idProperty( propertyMetadata );
 	}
 
@@ -692,7 +704,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( classBridgeAnnotation.termVector() );
 
-		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
+		DocumentFieldMetadata fieldMetadata =
+				new DocumentFieldMetadata.Builder(
+						typeMetadataBuilder.getResultReference(),
+						BackReference.<PropertyMetadata>empty(), // Class bridge, there's no related property
+						fieldName, store, index, termVector
+				)
 				.boost( classBridgeAnnotation.boost().value() )
 				.fieldBridge( fieldBridge )
 				.build();
@@ -735,7 +752,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				configContext.getServiceManager()
 		);
 
-		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
+		DocumentFieldMetadata fieldMetadata =
+				new DocumentFieldMetadata.Builder(
+						typeMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(),
+						fieldName, store, index, termVector
+				)
 				.boost( AnnotationProcessingHelper.getBoost( member, spatialAnnotation ) )
 				.fieldBridge( fieldBridge )
 				.spatial()
@@ -778,7 +800,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 		FieldBridge spatialBridge = determineSpatialFieldBridge( spatialAnnotation, parseContext );
 
-		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
+		DocumentFieldMetadata fieldMetadata =
+				new DocumentFieldMetadata.Builder(
+						typeMetadataBuilder.getResultReference(),
+						BackReference.<PropertyMetadata>empty(), // Class-level spatial annotation, there's no related property
+						fieldName, store, index, termVector
+				)
 				.boost( spatialAnnotation.boost().value() )
 				.fieldBridge( spatialBridge )
 				.spatial()
@@ -945,9 +972,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ParseContext parseContext,
 			boolean hasExplicitDocumentId) {
 
-		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member,
-				reflectionManager.toClass( member.getType() ) )
-			.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
+		PropertyMetadata.Builder propertyMetadataBuilder =
+				new PropertyMetadata.Builder(
+						typeMetadataBuilder.getResultReference(), member,
+						reflectionManager.toClass( member.getType() )
+				)
+				.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
 		NumericFieldsConfiguration numericFields = buildNumericFieldsConfiguration( typeMetadataBuilder.getIndexedType(), member, prefix, pathsContext, parseContext );
 
@@ -965,6 +995,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		checkForAnalyzerDiscriminator( member, typeMetadataBuilder, configContext );
 		checkForIndexedEmbedded(
 				member,
+				propertyMetadataBuilder,
 				prefix,
 				disableOptimizations,
 				typeMetadataBuilder,
@@ -1227,6 +1258,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		// also numeric values don't need to be analyzed and norms are omitted (see also org.apache.lucene.document.LongField)
 		if ( isNumericField( numericFieldAnnotation, fieldBridge ) ) {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
+					typeMetadataBuilder.getResultReference(),
+					propertyMetadataBuilder.getResultReference(),
 					fieldName,
 					store,
 					Field.Index.NO.equals( index ) ? index : Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -1241,6 +1274,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
+					typeMetadataBuilder.getResultReference(),
+					propertyMetadataBuilder.getResultReference(),
 					fieldName,
 					store,
 					index,
@@ -1663,6 +1698,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private void checkForIndexedEmbedded(
 			XProperty member,
+			PropertyMetadata.Builder propertyMetadataBuilder,
 			String prefix,
 			boolean disableOptimizations,
 			TypeMetadata.Builder typeMetadataBuilder,
@@ -1723,6 +1759,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			EmbeddedTypeMetadata.Builder embeddedTypeMetadataBuilder =
 					new EmbeddedTypeMetadata.Builder(
 							reflectionManager.toClass( elementClass ),
+							propertyMetadataBuilder.getResultReference(),
 							member,
 							localPrefix,
 							typeMetadataBuilder.getScopedAnalyzerReferenceBuilder()

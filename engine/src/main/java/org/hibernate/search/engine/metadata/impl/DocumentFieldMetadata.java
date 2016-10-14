@@ -27,6 +27,9 @@ import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.Numer
  */
 @SuppressWarnings("deprecation")
 public class DocumentFieldMetadata {
+	private final BackReference<TypeMetadata> sourceType;
+	private final BackReference<PropertyMetadata> sourceProperty;
+
 	private final String fieldName;
 	private final Store store;
 	private final Field.Index index;
@@ -44,6 +47,9 @@ public class DocumentFieldMetadata {
 	private final Set<FacetMetadata> facetMetadata;
 
 	private DocumentFieldMetadata(Builder builder) {
+		this.sourceType = builder.sourceType;
+		this.sourceProperty = builder.sourceProperty;
+
 		this.fieldName = builder.fieldName;
 		this.store = builder.store;
 		this.index = builder.index;
@@ -59,6 +65,23 @@ public class DocumentFieldMetadata {
 		this.precisionStep = builder.precisionStep;
 		this.numericEncodingType = builder.numericEncodingType;
 		this.facetMetadata = Collections.unmodifiableSet( builder.facetMetadata );
+	}
+
+	/**
+	 * @return The type from which the value for this field is extracted. This is not
+	 * the type of the actual value, since the value might be extracted by accessing a
+	 * {@link #getSourceProperty() property} on this type.
+	 */
+	public TypeMetadata getSourceType() {
+		return sourceType.get();
+	}
+
+	/**
+	 * @return The property from which the value for this field is extracted.
+	 * {@code null} for class bridges.
+	 */
+	public PropertyMetadata getSourceProperty() {
+		return sourceProperty.get();
 	}
 
 	public String getName() {
@@ -133,6 +156,8 @@ public class DocumentFieldMetadata {
 	public String toString() {
 		return "DocumentFieldMetadata{" +
 				"fieldName='" + fieldName + '\'' +
+				", sourceType='" + sourceType + '\'' +
+				", sourceProperty='" + sourceProperty + '\'' +
 				", store=" + store +
 				", index=" + index +
 				", termVector=" + termVector +
@@ -152,6 +177,8 @@ public class DocumentFieldMetadata {
 
 	public static class Builder {
 		// required parameters
+		private final BackReference<TypeMetadata> sourceType;
+		private final BackReference<PropertyMetadata> sourceProperty;
 		private final String fieldName;
 		private final Store store;
 		private final Field.Index index;
@@ -170,11 +197,14 @@ public class DocumentFieldMetadata {
 		private Set<FacetMetadata> facetMetadata;
 		private NullMarkerCodec nullMarkerCodec = NotEncodingCodec.SINGLETON;
 
-		public Builder(String fieldName,
+		public Builder(BackReference<TypeMetadata> sourceType,
+				BackReference<PropertyMetadata> sourceProperty,
+				String fieldName,
 				Store store,
 				Field.Index index,
 				Field.TermVector termVector) {
-
+			this.sourceType = sourceType;
+			this.sourceProperty = sourceProperty;
 			this.fieldName = fieldName;
 			this.store = store;
 			this.index = index;

@@ -27,6 +27,7 @@ import org.hibernate.search.util.impl.ReflectionHelper;
  * @author Hardy Ferentschik
  */
 public class PropertyMetadata {
+	private final BackReference<TypeMetadata> declaringType;
 	private final XProperty propertyAccessor;
 	private final Class<?> propertyClass;
 	private final Map<String, DocumentFieldMetadata> documentFieldMetadataMap;
@@ -44,6 +45,7 @@ public class PropertyMetadata {
 	private final Map<String, BridgeDefinedField> bridgeDefinedFields;
 
 	private PropertyMetadata(Builder builder) {
+		this.declaringType = builder.declaringType;
 		this.propertyAccessor = builder.propertyAccessor;
 		this.propertyClass = builder.propertyClass;
 		this.documentFieldMetadataList = Collections.unmodifiableSet( builder.fieldMetadataSet );
@@ -65,6 +67,14 @@ public class PropertyMetadata {
 			tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
 		}
 		return Collections.unmodifiableMap( tmpMap );
+	}
+
+
+	/**
+	 * @return The type declaring this property.
+	 */
+	public BackReference<TypeMetadata> getDeclaringType() {
+		return declaringType;
 	}
 
 	public XProperty getPropertyAccessor() {
@@ -113,7 +123,10 @@ public class PropertyMetadata {
 	}
 
 	public static class Builder {
+		private final BackReference<PropertyMetadata> resultReference = new BackReference<>();
+
 		// required parameters
+		private final BackReference<TypeMetadata> declaringType;
 		private final XProperty propertyAccessor;
 		private final Class<?> propertyClass;
 		private final Set<DocumentFieldMetadata> fieldMetadataSet;
@@ -123,7 +136,8 @@ public class PropertyMetadata {
 		// optional parameters
 		private BoostStrategy dynamicBoostStrategy;
 
-		public Builder(XProperty propertyAccessor, Class<?> propertyClass) {
+		public Builder(BackReference<TypeMetadata> declaringType, XProperty propertyAccessor, Class<?> propertyClass) {
+			this.declaringType = declaringType;
 			if ( propertyAccessor != null ) {
 				ReflectionHelper.setAccessible( propertyAccessor );
 			}
@@ -162,8 +176,15 @@ public class PropertyMetadata {
 			return fieldMetadataSet;
 		}
 
+
+		public BackReference<PropertyMetadata> getResultReference() {
+			return resultReference;
+		}
+
 		public PropertyMetadata build() {
-			return new PropertyMetadata( this );
+			PropertyMetadata result = new PropertyMetadata( this );
+			resultReference.initialize( result );
+			return result;
 		}
 	}
 

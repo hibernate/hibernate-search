@@ -406,6 +406,7 @@ public class TypeMetadata {
 	}
 
 	public static class Builder {
+		protected final BackReference<TypeMetadata> resultReference = new BackReference<>();
 		private final Class<?> indexedType;
 		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
 
@@ -559,8 +560,14 @@ public class TypeMetadata {
 			return idPropertyMetadata;
 		}
 
+		public BackReference<TypeMetadata> getResultReference() {
+			return resultReference;
+		}
+
 		public TypeMetadata build() {
-			return new TypeMetadata( this );
+			TypeMetadata result = new TypeMetadata( this );
+			resultReference.initialize( result );
+			return result;
 		}
 
 		@Override

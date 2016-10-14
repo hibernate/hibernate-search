@@ -294,7 +294,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 					}
 				}
 				else {
-					ExtendedFieldType type = FieldHelper.getType( indexBinding, documentFieldMetadata );
+					ExtendedFieldType type = FieldHelper.getType( documentFieldMetadata );
 					if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 						FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
 						Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );

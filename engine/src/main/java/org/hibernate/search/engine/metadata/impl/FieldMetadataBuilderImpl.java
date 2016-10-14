@@ -44,11 +44,10 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 	private class FieldMetadataCreationContextImpl implements FieldMetadataCreationContext {
 
 		private final String fieldName;
-		private DocumentFieldMetadata.Builder builder;
 
 		public FieldMetadataCreationContextImpl(String name, FieldType type) {
 			this.fieldName = name;
-			fields.add( new BridgeDefinedField( name, type, fieldMetadata.getIndex() ) );
+			fields.add( new BridgeDefinedField( fieldMetadata, name, type ) );
 		}
 
 		@Override
