@@ -76,6 +76,10 @@ public class ArrayBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
 	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@OrderColumn
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "array_id"))
@@ -90,8 +94,11 @@ public class ArrayBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
-	// The attribute prefix should be ignored; It does not make much sense in the context of a collection
-	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(prefix = "embeddedNum.", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@OrderColumn
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "array_id"))
 	@Column(name = "numericNullIndexed")

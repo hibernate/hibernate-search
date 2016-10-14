@@ -21,8 +21,10 @@ import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.hibernate.search.test.bridge.IterableBridgeTestEntity.Language.ENGLISH;
 import static org.hibernate.search.test.bridge.IterableBridgeTestEntity.Language.ITALIAN;
@@ -102,6 +104,7 @@ public class IterableBridgeTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
 	public void testSearchNullEmbedded() throws Exception {
 		List<IterableBridgeTestEntity> results = findEmbeddedNullResults( "nullIndexed", IterableBridgeTestEntity.NULL_EMBEDDED, true );
 
@@ -111,9 +114,10 @@ public class IterableBridgeTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
 	public void testSearchNullNumericEmbedded() throws Exception {
 		List<IterableBridgeTestEntity> results =
-				findEmbeddedNullResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
+				findEmbeddedNullResults( "embeddedNum", IterableBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
