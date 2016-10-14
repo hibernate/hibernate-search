@@ -79,7 +79,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
-	public void testNestedEmebeddedNullIndexing() throws Exception {
+	public void testNestedEmbeddedNullIndexing() throws Exception {
 		Man withPet = new Man( "Davide" );
 
 		Pet dog = new Pet( "dog" );
@@ -104,7 +104,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 		s.persist( puppy2 );
 		tx.commit();
 
-		List<Man> result = findNullsFor( s, "pet.puppies", "_null_" );
+		List<Man> result = findNullsFor( s, "pet.pups", "_null_" );
 
 		assertEquals( "Wrong number of results found", 1, result.size() );
 		assertEquals( "Wrong result returned", withPet, result.get( 0 ) );
@@ -165,6 +165,49 @@ public class NullEmbeddedTest extends SearchTestBase {
 
 		s.close();
 	}
+
+	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
+	public void testNestedEmbeddedNullElementCollectionIndexing() throws Exception {
+		Man withPetWithoutTricks = new Man( "Davide" );
+
+		Pet cat = new Pet( "cat" );
+		cat.setTricks( null );
+		withPetWithoutTricks.setPet( cat );
+
+		Man withPetWithTricks = new Man( "Omar" );
+
+		Pet dog = new Pet( "dog" );
+		withPetWithTricks.setPet( dog );
+		Trick trick1 = new Trick( "sit", "bone" );
+		Trick trick2 = new Trick( "high five", "steak" );
+		dog.addTrick( trick1 ).addTrick( trick2 );
+
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( withPetWithoutTricks );
+		s.persist( withPetWithTricks );
+		s.persist( cat );
+		s.persist( dog );
+		tx.commit();
+
+		List<Man> result = findNullsFor( s, "pet.tricks_", "_null_" );
+
+		assertEquals( "Wrong number of results found", 1, result.size() );
+		assertEquals( "Wrong result returned", withPetWithoutTricks, result.get( 0 ) );
+
+		s.clear();
+
+		tx = s.beginTransaction();
+		s.delete( s.get( Man.class, withPetWithoutTricks.getId() ) );
+		s.delete( s.get( Man.class, withPetWithTricks.getId() ) );
+		s.delete( s.get( Pet.class, cat.getId() ) );
+		s.delete( s.get( Pet.class, dog.getId() ) );
+		tx.commit();
+
+		s.close();
+	}
+
 
 	private List<Man> findNullsFor(Session s, String fieldName, String value) {
 		FullTextSession session = Search.getFullTextSession( s );
