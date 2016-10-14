@@ -145,7 +145,7 @@ you can specify a string which will be inserted as token for the null value. Per
 is set to `org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL` indicating that null values
 should not be indexed. You can set this value to `DEFAULT_NULL_TOKEN` to indicate that a default null
 token should be used. This default null token can be specified in the configuration using
-`hibernate.search.default_null_token`. If this property is not set the string "_null_" will
+`hibernate.search.default_null_token`. If this property is not set the string `\_null_` will
 be used as default.
 When the field is of a Numeric Type (see <<numeric-field-annotation>>), the token will be encoded as the
 respective numeric type: the `indexNullAs` value needs to be set to a value which can be parsed into
@@ -836,6 +836,24 @@ You can explicitly include the id of the embedded object using `includePath`, fo
 Having explicit control of the indexed paths might be easier if you're designing your application by
 defining the needed queries first, as at that point you might know exactly which fields you need,
 and which other fields are unnecessary to implement your use case.
+====
+
+
+===== Indexing null embeddeds
+Per default null values are ignored and not indexed. However, using `indexNullAs` you can specify that a field should be added when the embedded is null, with a value of your choice.
+
+Per default `indexNullAs` is set to `org.hibernate.search.annotations.IndexedEmbedded.DO_NOT_INDEX_NULL`, indicating that null values should not be indexed. You can set this value to `IndexedEmbedded.DEFAULT_NULL_TOKEN` to indicate that a default null token should be used. This default null token can be specified in the configuration using `hibernate.search.default_null_token`. If this property is not set the string `\_null_` will be used as default.
+
+The field name used when indexing null values depend on the `prefix`:
+
+ * if the `prefix` is not set, the field name will be the Java property name
+ * if the `prefix` is set, the field name will be the prefix with the trailing dot (if any) removed.
+   For instance with the prefix `my_embedded.`, the null field name will be `my_embedded` (without dot).
+
+[NOTE]
+====
+When `indexNullAs` is used, it is important to use the chosen null token in search queries (see
+<<search-query>>) in order to find null values.
 ====
 
 ==== Associated objects: building a dependency graph with @ContainedIn
