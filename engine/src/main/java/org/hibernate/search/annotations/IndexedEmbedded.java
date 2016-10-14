@@ -77,6 +77,12 @@ public @interface IndexedEmbedded {
 	Class<?> targetElement() default void.class;
 
 	/**
+	 * By default, null values are not indexed. Use {@link #indexNullAs()} if you want
+	 * null values to be indexed.
+	 * <p>If this property is set to something different from the default, null values
+	 * will be indexed in a field named after the {@link #prefix() prefix}, with the
+	 * trailing dot (if any) removed.
+	 *
 	 * @return Returns the value to be used for indexing {@code null}. Per default
 	 *         {@code IndexedEmbedded.DO_NOT_INDEX_NULL} is
 	 *         returned indicating that null values are not indexed.
