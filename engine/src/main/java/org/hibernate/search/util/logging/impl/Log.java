@@ -970,10 +970,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 315, value = "Lazy remote analyzer %1$s is not initialized.")
 	SearchException lazyRemoteAnalyzerNotInitialized(LazyRemoteAnalyzer analyzer);
 
-	@LogMessage(level = Level.WARN)
-	@Message(id = 316, value = "The value for @IndexEmbedded#%2$s() on the property `%1$s` is ignored when the annotation is used with @ElementCollection")
-	void indexEmbeddedValueIgnored(String propertyName, String indexEmbeddedAttribute);
-
 	@Message(id = 317, value = "Projection constant '%s' is not supported for this query.")
 	SearchException unexpectedProjectionConstant(String constantName);
 
