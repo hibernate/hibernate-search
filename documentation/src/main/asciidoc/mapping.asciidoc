@@ -123,21 +123,21 @@ The different values of this attribute are:
 [options="header"]
 |===============
 |Value|Definition
-|TermVector.YES|Store the term vectors of each document. This
+|`TermVector.YES`|Store the term vectors of each document. This
                     produces two synchronized arrays, one contains document
                     terms and the other contains the term's frequency.
-|TermVector.NO|Do not store term vectors.
-|TermVector.WITH_OFFSETS|Store the term vector and token offset information.
-                    This is the same as TermVector.YES plus it contains the
+|`TermVector.NO`|Do not store term vectors.
+|`TermVector.WITH_OFFSETS`|Store the term vector and token offset information.
+                    This is the same as `TermVector.YES` plus it contains the
                     starting and ending offset position information for the
                     terms.
-|TermVector.WITH_POSITIONS|Store the term vector and token position
-                    information. This is the same as TermVector.YES plus it
+|`TermVector.WITH_POSITIONS`|Store the term vector and token position
+                    information. This is the same as `TermVector.YES` plus it
                     contains the ordinal positions of each occurrence of a
                     term in a document.
-|TermVector.WITH_POSITION_OFFSETS|Store the term vector, token position and offset
-                    information. This is a combination of the YES,
-                    WITH_OFFSETS and WITH_POSITIONS.
+|`TermVector.WITH_POSITION_OFFSETS`|Store the term vector, token position and offset
+                    information. This is a combination of the `YES`,
+                    `WITH_OFFSETS` and `WITH_POSITIONS`.
 |===============
 
 * `indexNullAs`: Per default null values are ignored and not indexed. However, using `indexNullAs`
@@ -153,7 +153,7 @@ a number of the matching type, for example "-1".
 +
 [NOTE]
 ====
-When indexNullAs is used, it is important to use the chosen null token in search queries (see
+When `indexNullAs` is used, it is important to use the chosen null token in search queries (see
 <<search-query>>) in order to find null values. It is also advisable to use this feature only with
 un-analyzed fields (`analyze=Analyze.NO`).
 ====
@@ -199,7 +199,7 @@ potential loss in precision, in which case a custom `NumericFieldBridge` can be 
 <<example-custom-numericfieldbridge>>.
 
 [[example-custom-numericfieldbridge]]
-.Defining a custom NumericFieldBridge for BigDecimal
+.Defining a custom NumericFieldBridge for `BigDecimal`
 ====
 [source, JAVA]
 ----
@@ -385,8 +385,8 @@ hibernate.search.index_uninverting_allowed = false
 ----
 ====
 
-You e.g. may set this to "false" during testing to identify the sortable fields required for your queries and set it to
-"true" in production environments to fall back to index uninverting for uncovered sorts accidentally left over.
+You e.g. may set this to `false` during testing to identify the sortable fields required for your queries and set it to
+`true` in production environments to fall back to index uninverting for uncovered sorts accidentally left over.
 
 [[id-annotation]]
 ===== @Id
@@ -427,7 +427,7 @@ public class Essay {
 
 <<example-annotated-entity>> defines an index with four fields: `id`, `Abstract`, `text` and
 `grade`. Note that by default the field name is de-capitalized, following the JavaBean
-specification. The `grade` field is annotated as Numeric with a slightly larger precisionStep than
+specification. The `grade` field is annotated as numeric with a slightly larger `precisionStep` than
 the default.
 
 [NOTE]
@@ -442,10 +442,10 @@ document id, it is recommended to declare another field specifically for sorting
 Sometimes one has to map a property multiple times per index, with slightly different indexing
 strategies. For example, sorting a query by field requires the field to be un-analyzed. If one wants
 to search by words in this property and still sort it, one need to index it twice - once analyzed
-and once un-analyzed. @Fields allows to achieve this goal.
+and once un-analyzed. `@Fields` allows to achieve this goal.
 
 [[example-fields-annotation]]
-.Using @Fields to map a property multiple times
+.Using `@Fields` to map a property multiple times
 ====
 [source, JAVA]
 ----
@@ -467,11 +467,11 @@ public class Book {
 ====
 
 In <<example-fields-annotation>> the field `summary` is indexed twice, once as `summary` in a
-tokenized way, and once as `summary_forSort` in an un-tokenized way. @Field supports 2 attributes
-useful when @Fields is used:
+tokenized way, and once as `summary_forSort` in an un-tokenized way. `@Field` supports 2 attributes
+useful when `@Fields` is used:
 
-* analyzer: defines a @Analyzer annotation per field rather than per property
-* bridge: defines a @FieldBridge annotation per field rather than per property
+* `analyzer`: defines a `@Analyzer` annotation per field rather than per property
+* `bridge`: defines a `@FieldBridge` annotation per field rather than per property
 
 See below for more information about analyzers and field bridges.
 
@@ -617,11 +617,11 @@ As you can see, any `@*ToMany`, `@*ToOne` or `@Embedded` attribute can be annota
 `@IndexedEmbedded`. The attributes of the associated class will then be added to the main entity
 index. In <<example-nested-index-embedded>> the index will contain the following fields
 
-* id
-* name
-* address.street
-* address.city
-* address.ownedBy_name
+* `id`
+* `name`
+* `address.street`
+* `address.city`
+* `address.ownedBy_name`
 
 The default prefix is `propertyName.`, following the traditional object navigation convention. You
 can override it using the `prefix` attribute as it is shown on the `ownedBy` property.
@@ -671,7 +671,7 @@ Hibernate and Hibernate Search. This is especially the case when interfaces are 
 their implementation. For this reason you can override the object type targeted by Hibernate Search
 using the `targetElement` parameter.
 
-.Using the targetElement property of @IndexedEmbedded
+.Using the `targetElement` property of `@IndexedEmbedded`
 ====
 [source, JAVA]
 ----
@@ -715,7 +715,7 @@ A typical application might need different depths for different paths, or in oth
 need to specify paths explicitly, as shown in <<indexedembedded-includePath>>
 
 [[indexedembedded-includePath]]
-.Using the includePaths property of @IndexedEmbedded
+.Using the `includePaths` property of `@IndexedEmbedded`
 ====
 [source, JAVA]
 ----
@@ -764,7 +764,7 @@ index normally specifying a limited value for depth. Using `includePaths` with a
 value for `depth` is equivalent to setting `depth=0`: only the included paths are indexed.
 
 [[indexedembedded-includePathsAndDepth]]
-.Using the includePaths property of @IndexedEmbedded
+.Using the `includePaths` property of `@IndexedEmbedded`
 ====
 [source, JAVA]
 ----
@@ -805,7 +805,7 @@ public class Human {
 
 In <<indexedembedded-includePathsAndDepth>>, every human will have it's name and surname attributes
 indexed. The name and surname of parents will be indexed too, recursively up to second line because
-of the depth attribute. It will be possible to search by name or surname, of the person directly,
+of the `depth` attribute. It will be possible to search by name or surname, of the person directly,
 his parents or of his grand parents. Beyond the second level, we will in addition index one more
 level but only the name, not the surname.
 
@@ -856,11 +856,11 @@ following sections show you how you can achieve index time boosting using Hibern
 [[section-boost-annotation]]
 ==== Static index time boosting
 
-To define a static boost value for an indexed class or property you can use the @Boost annotation.
-You can use this annotation within @Field or specify it directly on method or class level.
+To define a static boost value for an indexed class or property you can use the `@Boost` annotation.
+You can use this annotation within `@Field` or specify it directly on method or class level.
 
 [[example-boost]]
-.Different ways of using @Boost
+.Different ways of using `@Boost`
 ====
 [source, JAVA]
 ----
@@ -902,7 +902,7 @@ Lucene In Action from Otis Gospodnetic and Erik Hatcher.
 The `@Boost` annotation used in <<section-boost-annotation>> defines a static boost factor which
 is independent of the state of of the indexed entity at runtime. However, there are use cases in
 which the boost factor may depend on the actual state of the entity. In this case you can use the
-`@DynamicBoost` annotation together with an accompanying custom BoostStrategy.
+`@DynamicBoost` annotation together with an accompanying custom `BoostStrategy`.
 
 [[example-dynamic-boosting]]
 .Dynamic boost example
@@ -945,15 +945,15 @@ public class VIPBoostStrategy implements BoostStrategy {
 ====
 
 In <<example-dynamic-boosting>> a dynamic boost is defined on class level specifying
-VIPBoostStrategy as implementation of the BoostStrategy interface to be used at indexing time. You
+`VIPBoostStrategy` as implementation of the `BoostStrategy` interface to be used at indexing time. You
 can place the `@DynamicBoost` either at class or field level. Depending on the placement of the
-annotation either the whole entity is passed to the defineBoost method or just the annotated
+annotation either the whole entity is passed to the `defineBoost` method or just the annotated
 field/property value. It's up to you to cast the passed object to the correct type. In the example
 all indexed values of a VIP person would be double as important as the values of a normal person.
 
 [NOTE]
 ====
-The specified BoostStrategy implementation must define a public no-arg constructor.
+The specified `BoostStrategy` implementation must define a public no-arg constructor.
 ====
 
 
@@ -973,9 +973,9 @@ configure the analyzers.
 
 The default analyzer class used to index tokenized fields is configurable through the
 `hibernate.search.analyzer` property. The default value for this property is
-org.apache.lucene.analysis.standard.StandardAnalyzer.
+`org.apache.lucene.analysis.standard.StandardAnalyzer`.
 
-You can also define the analyzer class per entity, property and even per @Field (useful when
+You can also define the analyzer class per entity, property and even per `@Field` (useful when
 multiple fields are indexed from a single property).
 
 .Different ways of using @Analyzer
@@ -1006,21 +1006,21 @@ public class MyEntity {
 ----
 ====
 
-In this example, EntityAnalyzer is used to index all tokenized properties (eg. `name`), except
-`summary` and `body` which are indexed with PropertyAnalyzer and FieldAnalyzer respectively.
+In this example, `EntityAnalyzer` is used to index all tokenized properties (eg. `name`), except
+`summary` and `body` which are indexed with `PropertyAnalyzer` and `FieldAnalyzer` respectively.
 
 [CAUTION]
 ====
 Mixing different analyzers in the same entity is most of the time a bad practice. It makes query
 building more complex and results less predictable (for the novice), especially if you are using a
-QueryParser (which uses the same analyzer for the whole query). As a rule of thumb, for any given
+`QueryParser` (which uses the same analyzer for the whole query). As a rule of thumb, for any given
 field the same analyzer should be used for indexing and querying.
 ====
 
 ==== Named analyzers
 
 Analyzers can become quite complex to deal with. For this reason introduces Hibernate Search the
-notion of analyzer definitions. An analyzer definition can be reused by many @Analyzer declarations
+notion of analyzer definitions. An analyzer definition can be reused by many `@Analyzer` declarations
 and is composed of:
 
 * a name: the unique string used to refer to the definition
@@ -1047,7 +1047,7 @@ the Analyzer Framework.
 ====
 Some of the analyzers and filters will require additional dependencies. For example to use the
 snowball stemmer you have to also include the `lucene-snowball` jar and for the
-PhoneticFilterFactory you need the link:http://commons.apache.org/codec[commons-codec] jar. Your
+`PhoneticFilterFactory` you need the link:http://commons.apache.org/codec[commons-codec] jar. Your
 distribution of Hibernate Search provides these dependencies in its _lib/optional_ directory. Have a
 look at <<table-available-tokenizers>> and <<table-available-filters>> to see which analyzers and
 filters have additional dependencies
@@ -1093,7 +1093,7 @@ public class Team {
 
 [TIP]
 ====
-Filters and char filters are applied in the order they are defined in the @AnalyzerDef annotation.
+Filters and char filters are applied in the order they are defined in the `@AnalyzerDef` annotation.
 Order matters!
 ====
 
@@ -1128,7 +1128,7 @@ public class Team {
 ----
 ====
 
-Once defined, an analyzer definition can be reused by an @Analyzer declaration as seen in
+Once defined, an analyzer definition can be reused by an `@Analyzer` declaration as seen in
 <<example-referencing-analyzer-def>>.
 
 [[example-referencing-analyzer-def]]
@@ -1158,7 +1158,7 @@ public class Team {
 ----
 ====
 
-Analyzer instances declared by @AnalyzerDef are also available by their name in the SearchFactory
+Analyzer instances declared by `@AnalyzerDef` are also available by their name in the `SearchFactory`
 which is quite useful wen building queries.
 
 ====
@@ -1185,15 +1185,15 @@ Let's check a few of them.
 [options="header"]
 |===============
 |Factory|Description|Parameters|Additional dependencies
-|MappingCharFilterFactory|Replaces one or more characters with one or more characters, based on
+|`MappingCharFilterFactory`|Replaces one or more characters with one or more characters, based on
 mappings specified in the resource file|`mapping`: points to a resource file containing the mappings
 using the format:
 "á" => "a" +
 "ñ" => "n" +
 "ø" => "o"
 
-|lucene-analyzers-common
-|HTMLStripCharFilterFactory|Remove HTML standard tags, keeping the text|none|lucene-analyzers-common
+|`lucene-analyzers-common`
+|`HTMLStripCharFilterFactory`|Remove HTML standard tags, keeping the text|none|`lucene-analyzers-common`
 |===============
 
 [[table-available-tokenizers]]
@@ -1201,10 +1201,10 @@ using the format:
 [options="header"]
 |===============
 |Factory|Description|Parameters|Additional dependencies
-|StandardTokenizerFactory|Use the Lucene StandardTokenizer|none|lucene-analyzers-common
-|HTMLStripCharFilterFactory|Remove HTML tags, keep the text and pass it to a
-                StandardTokenizer.|none|`lucene-analyzers-common`
-|PatternTokenizerFactory|Breaks text at the specified regular expression
+|`StandardTokenizerFactory`|Use the Lucene StandardTokenizer|none|`lucene-analyzers-common`
+|`HTMLStripCharFilterFactory`|Remove HTML tags, keep the text and pass it to a
+                `StandardTokenizer`.|none|`lucene-analyzers-common`
+|`PatternTokenizerFactory`|Breaks text at the specified regular expression
                 pattern.|`pattern`: the regular expression to use for tokenizing
 
 group: says which pattern group to extract into tokens|`lucene-analyzers-common`
@@ -1216,27 +1216,28 @@ group: says which pattern group to extract into tokens|`lucene-analyzers-common`
 [options="header"]
 |===============
 |Factory|Description|Parameters|Additional dependencies
-|StandardFilterFactory|Remove dots from acronyms and 's from words|none|`lucene-analyzers-common`
-|LowerCaseFilterFactory|Lowercases all words|none|`lucene-analyzers-common`
-|StopFilterFactory|Remove words (tokens) matching a list of stop
+|`StandardFilterFactory`|Remove dots from acronyms and 's from words|none|`lucene-analyzers-common`
+|`LowerCaseFilterFactory`|Lowercases all words|none|`lucene-analyzers-common`
+|`StopFilterFactory`|Remove words (tokens) matching a list of stop
                 words|`words`: points to a resource file containing the stop words
 
-ignoreCase: true if `case` should be ignore when comparing stop words, `false` otherwise |`lucene-analyzers-common`|SnowballPorterFilterFactory|Reduces a word to it's root in a given language. (eg.
+`ignoreCase`: true if `case` should be ignore when comparing stop words, `false` otherwise |`lucene-analyzers-common`
+|`SnowballPorterFilterFactory`|Reduces a word to it's root in a given language. (eg.
                 protect, protects, protection share the same root). Using such
                 a filter allows searches matching related words.|`language`: Danish, Dutch, English,
                 Finnish, French, German, Italian, Norwegian, Portuguese,
                 Russian, Spanish, Swedish and a few more|`lucene-analyzers-common`
-|ASCIIFoldingFilterFactory|Remove accents for languages like French|none|`lucene-analyzers-common`
-|PhoneticFilterFactory|Inserts phonetically similar tokens into the token
-                stream|`encoder`: One of DoubleMetaphone, Metaphone, Soundex or RefinedSoundex
+|`ASCIIFoldingFilterFactory`|Remove accents for languages like French|none|`lucene-analyzers-common`
+|`PhoneticFilterFactory`|Inserts phonetically similar tokens into the token
+                stream|`encoder`: One of `DoubleMetaphone`, `Metaphone`, `Soundex` or `RefinedSoundex`
 
-inject: true will add tokens to the stream, false will replace the existing token
+`inject`: true will add tokens to the stream, false will replace the existing token
 
 `maxCodeLength`: sets the maximum length of the code to be generated. Supported only for Metaphone and DoubleMetaphone encodings|`lucene-analyzers-phonetic` and
-                `commons-codec`|CollationKeyFilterFactory|Converts each token into its
-                java.text.CollationKey, and then
-                encodes the CollationKey with
-                IndexableBinaryStringTools, to allow it
+                `commons-codec`|`CollationKeyFilterFactory`|Converts each token into its
+                `java.text.CollationKey`, and then
+                encodes the `CollationKey` with
+                `IndexableBinaryStringTools`, to allow it
                 to be stored as an index term.|`custom`, `language`,
                 `country`, `variant`,
                 `strength`, `decomposition
@@ -1248,23 +1249,23 @@ inject: true will add tokens to the stream, false will replace the existing toke
 |===============
 
 
-We recommend to check out the implementations of org.apache.lucene.analysis.util.TokenizerFactory
-and org.apache.lucene.analysis.util.TokenFilterFactory in your IDE to see the implementations
+We recommend to check out the implementations of `org.apache.lucene.analysis.util.TokenizerFactory`
+and `org.apache.lucene.analysis.util.TokenFilterFactory` in your IDE to see the implementations
 available.
 
 ==== Dynamic analyzer selection
 
 So far all the introduced ways to specify an analyzer were static. However, there are use cases
 where it is useful to select an analyzer depending on the current state of the entity to be indexed,
-for example in a multilingual applications. For an BlogEntry class for example the analyzer could
+for example in a multilingual applications. For an `BlogEntry` class for example the analyzer could
 depend on the language property of the entry. Depending on this property the correct language
 specific stemmer should be chosen to index the actual text.
 
-To enable this dynamic analyzer selection Hibernate Search introduces the AnalyzerDiscriminator
+To enable this dynamic analyzer selection Hibernate Search introduces the `@AnalyzerDiscriminator`
 annotation. <<example-analyzer-discriminator>> demonstrates the usage of this annotation.
 
 [[example-analyzer-discriminator]]
-.Usage of @AnalyzerDiscriminator
+.Usage of `@AnalyzerDiscriminator`
 ====
 [source, JAVA]
 ----
@@ -1322,21 +1323,21 @@ public class LanguageDiscriminator implements Discriminator {
 ----
 ====
 
-The prerequisite for using @AnalyzerDiscriminator is that all analyzers which are going to be used
-dynamically are predefined via @AnalyzerDef definitions. If this is the case, one can place the
-@AnalyzerDiscriminator annotation either on the class or on a specific property of the entity for
-which to dynamically select an analyzer. Via the `impl` parameter of the AnalyzerDiscriminator you
-specify a concrete implementation of the Discriminator interface. It is up to you to provide an
+The prerequisite for using `@AnalyzerDiscriminator` is that all analyzers which are going to be used
+dynamically are predefined via `@AnalyzerDef` definitions. If this is the case, one can place the
+`@AnalyzerDiscriminator` annotation either on the class or on a specific property of the entity for
+which to dynamically select an analyzer. Via the `impl` parameter of the `@AnalyzerDiscriminator` you
+specify a concrete implementation of the `Discriminator` interface. It is up to you to provide an
 implementation for this interface. The only method you have to implement is
-getAnalyzerDefinitionName() which gets called for each field added to the Lucene document. The
+`getAnalyzerDefinitionName()` which gets called for each field added to the Lucene document. The
 entity which is getting indexed is also passed to the interface method. The `value` parameter is
-only set if the AnalyzerDiscriminator is placed on property level instead of class level. In this
+only set if the `AnalyzerDiscriminator` is placed on property level instead of class level. In this
 case the value represents the current value of this property.
 
-An implementation of the Discriminator interface has to return the name of an existing analyzer
+An implementation of the `Discriminator` interface has to return the name of an existing analyzer
 definition or null if the default analyzer should not be overridden.
 <<example-analyzer-discriminator>> assumes that the language parameter is either 'de' or 'en' which matches the
-specified names in the @AnalyzerDefs.
+specified names in the ++@AnalyzerDef++s.
 
 [[analyzer-retrievinganalyzer]]
 ==== Retrieving an analyzer
@@ -1385,8 +1386,8 @@ field targeted.
 
 [TIP]
 ====
-You can also retrieve analyzers defined via @AnalyzerDef by their definition name using
-searchFactory.getAnalyzer(String).
+You can also retrieve analyzers defined via `@AnalyzerDef` by their definition name using
+`searchFactory.getAnalyzer(String)`.
 ====
 
 [[search-mapping-bridge]]
@@ -1480,20 +1481,20 @@ classloader is used when the class is rehydrated
 ==== Tika bridge
 
 Hibernate Search allows you to extract text from various document types using the built-in
-TikaBridge which utilizes link:http://tika.apache.org[Apache Tika] to extract text and metadata
-from the provided documents. The TikaBridge annotation can be used with String, URI, byte[] or
-java.sql.Blob properties. In the case of String and URI the bridge interprets the values are file
-paths and tries to open a file to parse the document. In the case of byte[] and Blob the values are
+`TikaBridge` which utilizes link:http://tika.apache.org[Apache Tika] to extract text and metadata
+from the provided documents. The `@TikaBridge` annotation can be used with `String`, `URI`, `byte[]` or
+`java.sql.Blob` properties. In the case of `String` and `URI` the bridge interprets the values are file
+paths and tries to open a file to parse the document. In the case of `byte[]` and `Blob` the values are
 directly passed to Tika for parsing.
 
 Tika uses metadata as in- and output of the parsing process and it also allows to provide additional
 context information. This process is described in
 link:http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html[Parser interface].
 The Hibernate Search Tika bridge allows you to make use of these additional
-configuration options by providing two interfaces in conjunction with TikaBridge. The first
-interface is the TikaParseContextProvider. It allows you to create a custom ParseContext for the
-document parsing. The second interface is TikaMetadataProcessor which has two methods -
-prepareMetadata() and set(String, Object, Document, LuceneOptions, Metadata metadata). The former
+configuration options by providing two interfaces in conjunction with `TikaBridge`. The first
+interface is the `TikaParseContextProvider`. It allows you to create a custom `ParseContext` for the
+document parsing. The second interface is `TikaMetadataProcessor` which has two methods -
+`prepareMetadata()` and `set(String, Object, Document, LuceneOptions, Metadata metadata)`. The former
 allows to add additional metadata to the parsing process (for example the file name) and the latter
 allows you to index metadata discovered during the parsing process.
 
@@ -1501,14 +1502,14 @@ allows you to index metadata discovered during the parsing process.
 .Sortable fields with Tika
 ====
 If you want to add multiple fields in your `TikaMetadataProcessor`, and also want to make those
-fields sortable, you should make your processor implement the `MetadataProvidingTikaMetadataProcessor` interface.
+fields sortable, you should make your processor implement the `MetadataProvidingTikaMetadataProcessor`.
 This is similar to implementing `MetadataProvidingFieldBridge` on a regular field bridge: see <<sortablefield-annotation>>.
 
 Like `MetadataProvidingFieldBridge`, the `MetadataProvidingTikaMetadataProcessor` contract is under active development and considered experimental at this time. It may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
 ====
 
-TikaParseContextProvider as well as TikaMetadataProcessor implementation classes can both be
-specified as parameters on the TikaBridge annotation.
+`TikaParseContextProvider` as well as `TikaMetadataProcessor` implementation classes can both be
+specified as parameters on the `TikaBridge` annotation.
 
 [[example-tika-mapping]]
 .Example mapping with Apache Tika
@@ -1545,13 +1546,13 @@ List result = fullTextSession.createFullTextQuery( query ).list();
 ----
 ====
 
-In the <<example-tika-mapping>> the property mp3FileName represents a path to an MP3 file; the
+In the <<example-tika-mapping>> the property `mp3FileName` represents a path to an MP3 file; the
 headers of this file will be indexed and so the performed query will be able to match the MP3
 metadata.
 
 [WARNING]
 ====
-TikaBridge does not implement TwoWayFieldBridge: queries built using the DSL (as in the
+`TikaBridge` does not implement `TwoWayFieldBridge`: queries built using the DSL (as in the
 <<example-tika-mapping>>) need to explicitly enable the option ignoreFieldBridge().
 ====
 
@@ -1559,13 +1560,13 @@ TikaBridge does not implement TwoWayFieldBridge: queries built using the DSL (as
 ==== Custom bridges
 
 Sometimes, the built-in bridges of Hibernate Search do not cover some of your property types, or the
-String representation used by the bridge does not meet your requirements. The following paragraphs
+`String` representation used by the bridge does not meet your requirements. The following paragraphs
 describe several solutions to this problem.
 
 ===== StringBridge
 
-The simplest custom solution is to give Hibernate Search an implementation of your expected Object
-to String bridge. To do so you need to implement the `org.hibernate.search.bridge.StringBridge`
+The simplest custom solution is to give Hibernate Search an implementation of your expected `Object`
+to `String` bridge. To do so you need to implement the `org.hibernate.search.bridge.StringBridge`
 interface. All implementations have to be thread-safe as they are used concurrently.
 
 [[example-custom-string-bridge]]
@@ -1611,7 +1612,7 @@ private Integer length;
 ====== Parameterized bridge
 
 Parameters can also be passed to the bridge implementation making it more flexible.
-<<example-passing-bridge-parameters>> implements a ParameterizedBridge interface and parameters are
+<<example-passing-bridge-parameters>> implements a `ParameterizedBridge` interface and parameters are
 passed through the `@FieldBridge` annotation.
 
 [[example-passing-bridge-parameters]]
@@ -1652,8 +1653,8 @@ private Integer length;
 ----
 ====
 
-The ParameterizedBridge interface can be implemented by StringBridge, TwoWayStringBridge,
-FieldBridge implementations.
+The `ParameterizedBridge` interface can be implemented by `StringBridge`, `TwoWayStringBridge`,
+`FieldBridge` implementations.
 
 All implementations have to be thread-safe, but the parameters are set during initialization and no
 special care is required at this stage.
@@ -1666,18 +1667,18 @@ It is sometimes useful to get the type the bridge is applied on:
 * the class type for class-level bridges
 
 An example is a bridge that deals with enums in a custom fashion but needs to access the actual enum
-type. Any bridge implementing AppliedOnTypeAwareBridge will get the type the bridge is applied on
+type. Any bridge implementing `AppliedOnTypeAwareBridge` will get the type the bridge is applied on
 injected. Like parameters, the type injected needs no particular care with regard to thread-safety.
 
 ====== Two-way bridge
 
 If you expect to use your bridge implementation on an id property (ie annotated with `@DocumentId`
-), you need to use a slightly extended version of `StringBridge` named TwoWayStringBridge. Hibernate
+), you need to use a slightly extended version of `StringBridge` named `TwoWayStringBridge`. Hibernate
 Search needs to read the string representation of the identifier and generate the object out of it.
 There is no difference in the way the `@FieldBridge` annotation is used.
 
 
-.Implementing a TwoWayStringBridge usable for id properties
+.Implementing a `TwoWayStringBridge` usable for id properties
 ====
 [source, JAVA]
 ----
@@ -1794,18 +1795,18 @@ delegate to `LuceneOptions` to add fields to the `Document`, nothing stops you f
 
 [TIP]
 ====
-Classes like LuceneOptions are created to shield your application from changes in Lucene API and
+Classes like `LuceneOptions` are created to shield your application from changes in Lucene API and
 simplify your code. Use them if you can, but if you need more flexibility you're not required to.
 ====
 
 ===== ClassBridge
 
 It is sometimes useful to combine more than one property of a given entity and index this
-combination in a specific way into the Lucene index. The @ClassBridge respectively @ClassBridges
+combination in a specific way into the Lucene index. The `@ClassBridge` and `@ClassBridges`
 annotations can be defined at class level (as opposed to the property level). In this case the
 custom field bridge implementation receives the entity instance as the value parameter instead of a
-particular property. Though not shown in <<example-class-bridge>>, @ClassBridge supports the
-termVector attribute discussed in section <<basic-mapping>>.
+particular property. Though not shown in <<example-class-bridge>>, `@ClassBridge` supports the
+`termVector` attribute discussed in section <<basic-mapping>>.
 
 [[example-class-bridge]]
 .Implementing a class bridge
@@ -1862,19 +1863,19 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
 ----
 ====
 
-In this example, the particular CatFieldsClassBridge is applied to the `department` instance, the
+In this example, the particular `CatFieldsClassBridge` is applied to the `department` instance, the
 field bridge then concatenate both branch and network and index the concatenation.
 
 ==== BridgeProvider: associate a bridge to a given return type
 
 Custom field bridges are very flexible, but it can be tedious and error prone to apply the same
-custom @FieldBridge annotation every time a property of a given type is present in your domain
-model. That is what BridgeProviders are for.
+custom `@FieldBridge` annotation every time a property of a given type is present in your domain
+model. That is what ++BridgeProvider++s are for.
 
-Let's imagine that you have a type Currency in your application and that you want to apply your very
-own CurrencyFieldBridge every time an indexed property returns Currency. You can do it the hard way:
+Let's imagine that you have a type `Currency` in your application and that you want to apply your very
+own `CurrencyFieldBridge` every time an indexed property returns `Currency`. You can do it the hard way:
 
-.Applying the same @FieldBridge for a type the hard way
+.Applying the same `@FieldBridge` for a type the hard way
 ====
 [source, JAVA]
 ----
@@ -1898,9 +1899,9 @@ public class Account {
 ----
 ====
 
-Or you can write your own BridgeProvider implementation for Currency.
+Or you can write your own `BridgeProvider` implementation for `Currency`.
 
-.Writing a BridgeProvider
+.Writing a `BridgeProvider`
 ====
 [source, JAVA]
 ----
@@ -1924,14 +1925,14 @@ com.acme.myapps.hibernatesearch.CurrencyBridgeProvider
 ----
 ====
 
-You need to implement BridgeProvider and create a service file named
+You need to implement `BridgeProvider` and create a service file named
 _META-INF/services/org.hibernate.search.bridge.spi.BridgeProvider_. This file must contain the fully
-qualified class name(s) of the BridgeProvider implementations. This is the classic Service Loader
+qualified class name(s) of the `BridgeProvider` implementations. This is the classic Service Loader
 discovery mechanism.
 
-Now, any indexed property of type Currency will use CurrencyFieldBridge automatically.
+Now, any indexed property of type `Currency` will use `CurrencyFieldBridge` automatically.
 
-.An explicit @FieldBrige is no longer needed
+.An explicit `@FieldBrige` is no longer needed
 ====
 [source, JAVA]
 ----
@@ -1959,12 +1960,12 @@ public class Account {
 
 A few more things you need to know:
 
-* a BridgeProvider must have a no-arg constructor
+* a `BridgeProvider` must have a no-arg constructor
 
-* if a BridgeProvider only returns FieldBridge instances if it is meaningful for the calling context.
-Null otherwise. In our example, the return type must be Currency to be meaningful to our provider.
+* if a `BridgeProvider` only returns `FieldBridge` instances if it is meaningful for the calling context.
+Null otherwise. In our example, the return type must be `Currency` to be meaningful to our provider.
 
-* if two or more bridge providers return a FieldBridge instance for a given return type, an exception
+* if two or more bridge providers return a `FieldBridge` instance for a given return type, an exception
 will be raised.
 
 
@@ -1972,9 +1973,9 @@ will be raised.
 .What is a calling context
 ====
 
-A calling context is represented by the BridgeProviderContext object and represents the environment for
-which we are looking for a bridge. BridgeProviderContext gives access to the return type of the indexed
-property as well as the ServiceManager which gives access to the ClassLoaderService for everything
+A calling context is represented by the `BridgeProviderContext` object and represents the environment for
+which we are looking for a bridge. `BridgeProviderContext` gives access to the return type of the indexed
+property as well as the `ServiceManager` which gives access to the `ClassLoaderService` for everything
 class loader related.
 
 [source, JAVA]
@@ -2006,7 +2007,7 @@ required to be indexed and you want to limit indexing overhead and keep indexes 
 Hibernate Search lets you intercept entity indexing operations and override them. It is quite
 simple:
 
-* Write an EntityIndexingInterceptor class with your entity state based logic
+* Write an `EntityIndexingInterceptor` class with your entity state based logic
 * Mark the entity as intercepted by this implementation
 
 Let's look at the blog example at <<example-search-mapping-indexinginterceptor-blog>>
@@ -2075,9 +2076,9 @@ public class Blog {
 ----
 ====
 
-We mark the Blog entity with @Indexed.interceptor. As you can see, IndexWhenPublishedInterceptor
-implements EntityIndexingInterceptor and accepts Blog entities (it could have accepted super classes
-as well - for example Object if you create a generic interceptor.
+We mark the `Blog` entity with `@Indexed.interceptor`. As you can see, `IndexWhenPublishedInterceptor`
+implements `EntityIndexingInterceptor` and accepts `Blog` entities (it could have accepted super classes
+as well - for example `Object` if you create a generic interceptor.
 
 You can react to several planned indexing events:
 
@@ -2110,10 +2111,10 @@ for you. That's rarely the case though.
 ====
 
 By default, no interceptor is applied on an entity. You have to explicitly define an interceptor via
-the @Indexed annotation (see <<indexed-annotation>>) or programmatically (see
+the `@Indexed` annotation (see <<indexed-annotation>>) or programmatically (see
 <<hsearch-mapping-programmaticapi>>). This class and all its subclasses will then be intercepted.
-You can stop or change the interceptor used in a subclass by overriding @Indexed.interceptor.
-Hibernate Search provides DontInterceptEntityInterceptor which will explicitly not intercept any call.
+You can stop or change the interceptor used in a subclass by overriding `@Indexed.interceptor`.
+Hibernate Search provides `DontInterceptEntityInterceptor` which will explicitly not intercept any call.
 This is useful to reset interception within a class hierarchy.
 
 [NOTE]
@@ -2136,17 +2137,17 @@ An `EntityIndexingInterceptor` can never override an explicit indexing operation
 
 You can provide your own id for Hibernate Search if you are extending the internals. You will have
 to generate a unique value so it can be given to Lucene to be indexed. This will have to be given to
-Hibernate Search when you create an org.hibernate.search.Work object - the document id is required
+Hibernate Search when you create an `org.hibernate.search.Work` object - the document id is required
 in the constructor.
 
 [[ProvidedId]]
 ==== The ProvidedId annotation
 
-Unlike @DocumentIdwhich is applied on field level, @ProvidedId is used on the class level.
+Unlike `@DocumentId` which is applied on field level, `@ProvidedId` is used on the class level.
 Optionally you can specify your own bridge implementation using the bridge property. Also, if you
-annotate a class with @ProvidedId, your subclasses will also get the annotation - but it is not done
-by using the java.lang.annotations.@Inherited. Be sure however, to _not_ use this annotation with
-@DocumentId as your system will break.
+annotate a class with `@ProvidedId`, your subclasses will also get the annotation - but it is not done
+by using the `java.lang.annotations.@Inherited`. Be sure however, to _not_ use this annotation with
+`@DocumentId` as your system will break.
 
 .Providing your own id
 ====
@@ -2182,15 +2183,15 @@ indexable by using mapping classes which effectively mirror the annotation conce
 Search. Note that fan(s) of XML approach can design their own schema and use the programmatic API to
 create the mapping while parsing the XML stream.
 
-In order to use the programmatic model you must first construct a SearchMapping object which you can
+In order to use the programmatic model you must first construct a `SearchMapping` object which you can
 do in two ways:
 
 * directly
 * via a factory
 
 You can pass the SearchMapping object directly via the property key
-`hibernate.search.model_mapping` or the constant Environment.MODEL_MAPPING. Use the
-Configuration API or the Map passed to the JPA Persistence bootstrap methods.
+`hibernate.search.model_mapping` or the constant `Environment.MODEL_MAPPING`. Use the
+Configuration API or the `Map` passed to the JPA Persistence bootstrap methods.
 
 .Programmatic mapping
 ====
@@ -2216,10 +2217,10 @@ EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", pro
 ----
 ====
 
-Alternatively, you can create a factory class (ie hosting a method annotated with @Factory) whose
-factory method returns the SearchMapping object. The factory class must have a no-arg constructor
+Alternatively, you can create a factory class (ie hosting a method annotated with `@Factory`) whose
+factory method returns the `SearchMapping` object. The factory class must have a no-arg constructor
 and its fully qualified class name is passed to the property key
-`hibernate.search.model_mapping` or its type-safe representation Environment.MODEL_MAPPING. This
+`hibernate.search.model_mapping` or its type-safe representation `Environment.MODEL_MAPPING`. This
 approach is useful when you do not necessarily control the bootstrap process like in a Java EE, CDI
 or Spring Framework container.
 
@@ -2256,14 +2257,14 @@ public class MyAppSearchMappingFactory {
 ----
 ====
 
-The SearchMapping is the root object which contains all the necessary indexable entities and fields.
-From there, the SearchMapping object exposes a fluent (and thus intuitive) API to express your
+The `SearchMapping` is the root object which contains all the necessary indexable entities and fields.
+From there, the `SearchMapping` object exposes a fluent (and thus intuitive) API to express your
 mappings: it contextually exposes the relevant mapping options in a type-safe way. Just let your IDE
 auto-completion feature guide you through.
 
 Today, the programmatic API cannot be used on a class annotated with Hibernate Search annotations,
 chose one approach or the other. Also note that the same default values apply in annotations and the
-programmatic API. For example, the @Field.name is defaulted to the property name and does not have
+programmatic API. For example, the `@Field.name` is defaulted to the property name and does not have
 to be set.
 
 Each core concept of the programmatic API has a corresponding example to depict how the same
@@ -2274,7 +2275,7 @@ entities and associated properties.
 ==== Mapping an entity as indexable
 
 The first concept of the programmatic API is to define an entity as indexable. Using the annotation
-approach a user would mark the entity as @Indexed, the following example demonstrates how to
+approach a user would mark the entity as `@Indexed`, the following example demonstrates how to
 programmatically achieve this.
 
 .Marking an entity indexable
@@ -2292,9 +2293,9 @@ cfg.getProperties().put("hibernate.search.model_mapping", mapping);
 ----
 ====
 
-As you can see you must first create a SearchMapping object which is the root object that is then
+As you can see you must first create a `SearchMapping` object which is the root object that is then
 passed to the Configuration object as property. You must declare an entity and if you wish to make
-that entity as indexable then you must call the indexed() method. The `indexed()` method has an
+that entity as indexable then you must call the `indexed()` method. The `indexed()` method has an
 optional `indexName(String indexName)` which can be used to change the default index name that is
 created by Hibernate Search. Likewise, an `interceptor(Class<? extends EntityIndexedInterceptor>)`
 is available. Using the annotation model the above can be achieved as:
@@ -2330,10 +2331,10 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping);
 ----
 ====
 
-The above is equivalent to annotating a property in the entity as @DocumentId as seen in the
+The above is equivalent to annotating a property in the entity as `@DocumentId` as seen in the
 following example:
 
-.DocumentId annotation definition
+.`@DocumentId` annotation definition
 ====
 [source, JAVA]
 ----
@@ -2385,8 +2386,8 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
 ====
 
-The analyzer mapping defined above is equivalent to the annotation model using @AnalyzerDef in
-conjunction with @AnalyzerDefs:
+The analyzer mapping defined above is equivalent to the annotation model using `@AnalyzerDef` in
+conjunction with `@AnalyzerDefs`:
 
 .Analyzer definition using annotation
 ====
@@ -2430,7 +2431,7 @@ public class Address {
 ==== Defining full text filter definitions
 
 The programmatic API provides easy mechanism for defining full text filter definitions which is
-available via @FullTextFilterDef and @FullTextFilterDefs (see <<query-filter>>). The next example
+available via `@FullTextFilterDef` and `@FullTextFilterDefs` (see <<query-filter>>). The next example
 depicts the creation of full text filter definition using the `fullTextFilterDef` method.
 
 
@@ -2464,7 +2465,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
 ====
 
-The previous example can effectively been seen as annotating your entity with @FullTextFilterDef
+The previous example can effectively been seen as annotating your entity with `@FullTextFilterDef`
 like below:
 
 .Using annotation to define full text filter definition
@@ -2508,7 +2509,7 @@ public class Address {
 
 When defining fields for indexing using the programmatic API, call `field()` on the
 `property(String propertyName, ElementType elementType)` method. From `field()` you can specify
-the name, index, store, bridge and analyzer definitions.
+the `name`, `index`, `store`, `bridge` and `analyzer` definitions.
 
 .Indexing fields using programmatic API
 ====
@@ -2536,7 +2537,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
 ====
 
-The above example of marking fields as indexable is equivalent to defining fields using @Field as
+The above example of marking fields as indexable is equivalent to defining fields using `@Field` as
 seen below:
 
 .Indexing fields using annotation
@@ -2573,9 +2574,9 @@ public class Address {
 
 [NOTE]
 ====
-When using a programmatic mapping for a given type X, you can only refer to fields defined on X.
+When using a programmatic mapping for a given type `X`, you can only refer to fields defined on `X`.
 Fields or methods inherited from a super type are not configurable. In case you need to configure a
-super class property, you need to either override the property in X or create a programmatic mapping
+super class property, you need to either override the property in `X` or create a programmatic mapping
 for the super class. This mimics the usage of annotations where you cannot annotate a field or
 method of a super class either, unless it is redefined in the given type.
 ====
@@ -2583,8 +2584,8 @@ method of a super class either, unless it is redefined in the given type.
 ==== Programmatically defining embedded entities
 
 In this section you will see how to programmatically define entities to be embedded into the indexed
-entity similar to using the @IndexedEmbedded model. In order to define this you must mark the
-property as indexEmbedded.There is the option to add a prefix to the embedded entity definition
+entity similar to using the `@IndexedEmbedded` model. In order to define this you must mark the
+property as `indexEmbedded`. There is the option to add a prefix to the embedded entity definition
 which can be done by calling prefix as seen in the example below:
 
 
@@ -2616,9 +2617,9 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping )
 ----
 ====
 
-The next example shows the same definition using annotation (@IndexedEmbedded):
+The next example shows the same definition using annotation (`@IndexedEmbedded`):
 
-.Using @IndexedEmbedded
+.Using `@IndexedEmbedded`
 ====
 [source, JAVA]
 ----
@@ -2649,9 +2650,9 @@ public class ProductCatalog {
 
 ==== Contained In definition
 
-@ContainedIn can be defined as seen in the example below:
+`@ContainedIn` can be defined as seen in the example below:
 
-.Programmatically defining ContainedIn
+.Programmatically defining `containedIn`
 ====
 [source, JAVA]
 ----
@@ -2679,9 +2680,9 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
 ====
 
-This is equivalent to defining @ContainedIn in your entity:
+This is equivalent to defining `@ContainedIn` in your entity:
 
-.Annotation approach for ContainedIn
+.Annotation approach for `@ContainedIn`
 ====
 [source, JAVA]
 ----
@@ -2733,8 +2734,8 @@ public class Item {
 
 ==== Date/Calendar Bridge
 
-In order to define a calendar or date bridge mapping, call the dateBridge(Resolution resolution) or
-calendarBridge(Resolution resolution) methods after you have defined a field() in the SearchMapping
+In order to define a calendar or date bridge mapping, call the `dateBridge(Resolution resolution)` or
+`calendarBridge(Resolution resolution)` methods after you have defined a `field()` in the `SearchMapping`
 hierarchy.
 
 .Programmatic model for defining calendar/date bridge
@@ -2760,9 +2761,9 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
 ====
 
-See below for defining the above using @CalendarBridge and @DateBridge:
+See below for defining the above using `@CalendarBridge` and `@DateBridge`:
 
-.@CalendarBridge and @DateBridge definition
+.`@CalendarBridge` and `@DateBridge` definition
 ====
 [source, JAVA]
 ----
@@ -2793,7 +2794,7 @@ public class Address {
 ==== Declaring bridges
 
 It is possible to associate bridges to programmatically defined fields. When you define a `field()`
-programmatically you can use the `bridge(Class<?> impl)` to associate a FieldBridge implementation
+programmatically you can use the `bridge(Class<?> impl)` to associate a `FieldBridge` implementation
 class. The bridge method also provides optional methods to include any parameters required for the
 bridge class. The below shows an example of programmatically defining a bridge:
 
@@ -2879,9 +2880,9 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
 ====
 
-The above is similar to using @ClassBridge as seen in the next example:
+The above is similar to using `@ClassBridge` as seen in the next example:
 
-.Using @ClassBridge
+.Using `@ClassBridge`
 ====
 [source, JAVA]
 ----
@@ -2912,7 +2913,7 @@ public class Departments {
 
 You can apply a dynamic boost factor on either a field or a whole entity:
 
-.DynamicBoost mapping using programmatic model
+.`dynamicBoost` mapping using programmatic model
 ====
 [source, JAVA]
 ----
@@ -2932,9 +2933,9 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
 ====
 
-The next example shows the equivalent mapping using the @DynamicBoost annotation:
+The next example shows the equivalent mapping using the `@DynamicBoost` annotation:
 
-.Using the @DynamicBoost
+.Using the `@DynamicBoost`
 ====
 [source, JAVA]
 ----
