@@ -62,6 +62,7 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.BackReference;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.nesting.impl.DefaultNestingContextFactory;
@@ -99,6 +100,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	static {
 		DocumentFieldMetadata fieldMetadata =
 				new DocumentFieldMetadata.Builder(
+						BackReference.<TypeMetadata>empty(),
+						BackReference.<PropertyMetadata>empty(),
 						null,
 						Store.NO,
 						Field.Index.NOT_ANALYZED_NO_NORMS,

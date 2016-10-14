@@ -22,9 +22,12 @@ import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaParseContextProvider;
 import org.hibernate.search.bridge.builtin.TikaBridge;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
+import org.hibernate.search.engine.metadata.impl.BackReference;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.util.impl.ClasspathResourceAsFile;
+import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,7 +52,11 @@ public class TikaBridgeTest {
 		bridgeUnderTest = new TikaBridge();
 		testDocument = new Document();
 		DocumentFieldMetadata fieldMetadata =
-				new DocumentFieldMetadata.Builder( null, Store.YES, Field.Index.ANALYZED, Field.TermVector.NO )
+				new DocumentFieldMetadata.Builder(
+						new BackReference<TypeMetadata>(),
+						new BackReference<PropertyMetadata>(),
+						null, Store.YES, Field.Index.ANALYZED, Field.TermVector.NO
+				)
 						.boost( 0F )
 						.build();
 		options = new LuceneOptionsImpl( fieldMetadata, 1f, 1f );
