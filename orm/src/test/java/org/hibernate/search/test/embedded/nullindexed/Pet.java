@@ -10,6 +10,7 @@ package org.hibernate.search.test.embedded.nullindexed;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -34,8 +35,12 @@ public class Pet {
 	private String name;
 
 	@OneToMany
-	@IndexedEmbedded ( indexNullAs = IndexedEmbedded.DEFAULT_NULL_TOKEN )
+	@IndexedEmbedded( prefix = "pups.", indexNullAs = IndexedEmbedded.DEFAULT_NULL_TOKEN )
 	private List<Puppy> puppies = new ArrayList<Puppy>();
+
+	@ElementCollection
+	@IndexedEmbedded( prefix = "tricks_", indexNullAs = IndexedEmbedded.DEFAULT_NULL_TOKEN )
+	private List<Trick> tricks = new ArrayList<Trick>();
 
 	public Pet() {
 	}
@@ -70,6 +75,19 @@ public class Pet {
 
 	public Pet addPuppy(Puppy puppy) {
 		this.puppies.add( puppy );
+		return this;
+	}
+
+	public List<Trick> getTricks() {
+		return tricks;
+	}
+
+	public void setTricks(List<Trick> tricks) {
+		this.tricks = tricks;
+	}
+
+	public Pet addTrick(Trick trick) {
+		this.tricks.add( trick );
 		return this;
 	}
 
