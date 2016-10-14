@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.metadata.impl;
 
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
 import org.hibernate.search.bridge.spi.FieldType;
 
 /**
@@ -17,18 +16,26 @@ import org.hibernate.search.bridge.spi.FieldType;
  */
 public class BridgeDefinedField {
 
+	private final DocumentFieldMetadata sourceField;
+
 	private final String name;
 	private final FieldType type;
-	private final Index index;
 
-	public BridgeDefinedField(String name, FieldType type, Index index) {
+	public BridgeDefinedField(DocumentFieldMetadata sourceField, String name, FieldType type) {
+		this.sourceField = sourceField;
 		this.name = name;
 		this.type = type;
-		this.index = index;
+	}
+
+	/**
+	 * @return The {@link DocumentFieldMetadata} whose field bridge declared this field.
+	 */
+	public DocumentFieldMetadata getSourceField() {
+		return sourceField;
 	}
 
 	public Field.Index getIndex() {
-		return index;
+		return sourceField.getIndex();
 	}
 
 	public String getName() {

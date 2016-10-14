@@ -761,7 +761,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private Object convertFieldValue(EntityIndexBinding binding, DocumentFieldMetadata field, JsonElement value, ConversionContext conversionContext) {
 			FieldBridge fieldBridge = field.getFieldBridge();
 
-			ExtendedFieldType type = FieldHelper.getType( binding, field );
+			ExtendedFieldType type = FieldHelper.getType( field );
 			if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 				return value.getAsBoolean();
 			}

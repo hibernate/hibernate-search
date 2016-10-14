@@ -17,10 +17,8 @@ import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
-import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
-import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
@@ -88,11 +86,11 @@ class FieldHelper {
 	}
 
 	// TODO HSEARCH-2259 make it work with fields embedded types
-	private static NumericEncodingType getNumericEncodingType(EntityIndexBinding indexBinding, DocumentFieldMetadata field) {
+	private static NumericEncodingType getNumericEncodingType(DocumentFieldMetadata field) {
 		NumericEncodingType numericEncodingType = field.getNumericEncodingType();
 
 		if ( numericEncodingType == NumericEncodingType.UNKNOWN ) {
-			PropertyMetadata hostingProperty = getPropertyMetadata( indexBinding, field.getName() );
+			PropertyMetadata hostingProperty = field.getSourceProperty();
 			if ( hostingProperty != null ) {
 				BridgeDefinedField bridgeDefinedField = hostingProperty.getBridgeDefinedFields().get( field.getName() );
 				if ( bridgeDefinedField != null ) {
@@ -135,10 +133,9 @@ class FieldHelper {
 		}
 	}
 
-	static ExtendedFieldType getType(EntityIndexBinding indexBinding, DocumentFieldMetadata fieldMetadata) {
-		String fieldName = fieldMetadata.getFieldName();
-
-		Class<?> propertyClass = getPropertyClass( indexBinding, fieldName );
+	static ExtendedFieldType getType(DocumentFieldMetadata fieldMetadata) {
+		PropertyMetadata propertyMetata = fieldMetadata.getSourceProperty();
+		Class<?> propertyClass = propertyMetata == null ? null : propertyMetata.getPropertyClass();
 		if ( propertyClass == null ) {
 			return ExtendedFieldType.UNKNOWN;
 		}
@@ -147,7 +144,7 @@ class FieldHelper {
 			return ExtendedFieldType.BOOLEAN;
 		}
 		else if ( isNumeric(fieldMetadata) ) {
-			return toExtendedFieldType( getNumericEncodingType( indexBinding, fieldMetadata ) );
+			return toExtendedFieldType( getNumericEncodingType( fieldMetadata ) );
 		}
 		else if ( Date.class.isAssignableFrom( propertyClass ) ) {
 			return ExtendedFieldType.DATE;
@@ -236,103 +233,25 @@ class FieldHelper {
 		return isEmbeddedField ? DOT.split( fieldName ) : new String[]{ fieldName };
 	}
 
-	private static Class<?> getPropertyClass(EntityIndexBinding indexBinding, String fieldName) {
-		PropertyMetadata propertyMetadata = getPropertyMetadata( indexBinding, fieldName );
-		return propertyMetadata != null ? propertyMetadata.getPropertyClass() : null;
-	}
-
-	private static PropertyMetadata getPropertyMetadata(EntityIndexBinding indexBinding, String fieldName) {
-		TypeMetadata typeMetadata;
-
-		boolean isEmbeddedField = isEmbeddedField( fieldName );
-		String[] fieldNameParts = isEmbeddedField ? DOT.split( fieldName ) : new String[]{ fieldName };
-
-		if ( isEmbeddedField ) {
-			typeMetadata = getLeafTypeMetadata( indexBinding, fieldNameParts );
-		}
-		else {
-			typeMetadata = indexBinding.getDocumentBuilder().getMetadata();
-		}
-
-		PropertyMetadata property = getPropertyMetadata( typeMetadata, fieldName, fieldNameParts );
-		if ( property != null ) {
-			return property;
-		}
-
-		return null;
-	}
-
 	static DocumentFieldMetadata getFieldMetadata(EntityIndexBinding indexBinding, String fieldName) {
-		if ( indexBinding.getDocumentBuilder().getIdentifierName().equals( fieldName ) ) {
-			return indexBinding.getDocumentBuilder()
-					.getTypeMetadata()
-					.getIdPropertyMetadata()
-					.getFieldMetadata( fieldName );
+		// This also addresses the ID case
+		DocumentFieldMetadata result = indexBinding.getDocumentBuilder().getMetadata().getDocumentFieldMetadataFor( fieldName );
+		if ( result != null ) {
+			return result;
 		}
 
-		PropertyMetadata property = FieldHelper.getPropertyMetadata( indexBinding, fieldName );
-
-		if ( property != null ) {
-			return property.getFieldMetadata( fieldName );
-		}
-		else {
-			Set<DocumentFieldMetadata> classBridgeMetadata = indexBinding.getDocumentBuilder().getMetadata().getClassBridgeMetadata();
-			for ( DocumentFieldMetadata documentFieldMetadata : classBridgeMetadata ) {
-				if ( documentFieldMetadata.getFieldName().equals( fieldName ) ) {
-					return documentFieldMetadata;
-				}
+		Set<DocumentFieldMetadata> classBridgeMetadata = indexBinding.getDocumentBuilder().getMetadata().getClassBridgeMetadata();
+		for ( DocumentFieldMetadata documentFieldMetadata : classBridgeMetadata ) {
+			if ( documentFieldMetadata.getFieldName().equals( fieldName ) ) {
+				return documentFieldMetadata;
 			}
 		}
 
 		return null;
 	}
 
-	private static TypeMetadata getLeafTypeMetadata(EntityIndexBinding indexBinding, String[] fieldNameParts) {
-		TypeMetadata parentMetadata = indexBinding.getDocumentBuilder().getMetadata();
-
-		for ( int i = 0; i < fieldNameParts.length - 1; i++ ) {
-			for ( EmbeddedTypeMetadata embeddedTypeMetadata : parentMetadata.getEmbeddedTypeMetadata() ) {
-				if ( embeddedTypeMetadata.getEmbeddedPropertyName().equals( fieldNameParts[i] ) ) {
-					parentMetadata = embeddedTypeMetadata;
-					break;
-				}
-			}
-		}
-
-		return parentMetadata;
-	}
-
-	private static PropertyMetadata getPropertyMetadata(TypeMetadata type, String fieldName, String[] fieldNameParts) {
-		String lastParticle = fieldNameParts[fieldNameParts.length - 1];
-
-		for ( PropertyMetadata property : type.getAllPropertyMetadata() ) {
-			for ( DocumentFieldMetadata field : property.getFieldMetadata() ) {
-				if ( field.getName().equals( fieldName ) ) {
-					return property;
-				}
-			}
-		}
-
-		for ( EmbeddedTypeMetadata embeddedType : type.getEmbeddedTypeMetadata() ) {
-			if ( !lastParticle.startsWith( embeddedType.getEmbeddedPropertyName() ) ) {
-				continue;
-			}
-
-			for ( PropertyMetadata property : embeddedType.getAllPropertyMetadata() ) {
-				for ( DocumentFieldMetadata field : embeddedType.getAllDocumentFieldMetadata() ) {
-					if ( field.getName().equals( fieldName ) ) {
-						return property;
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public static boolean isSortableField(EntityIndexBinding indexBinding, String fieldName) {
-		PropertyMetadata property = getPropertyMetadata( indexBinding, fieldName );
-		for ( SortableFieldMetadata sortableField : property.getSortableFieldMetadata() ) {
+	public static boolean isSortableField(PropertyMetadata sourceProperty, String fieldName) {
+		for ( SortableFieldMetadata sortableField : sourceProperty.getSortableFieldMetadata() ) {
 			if ( fieldName.equals( sortableField.getFieldName() ) ) {
 				return true;
 			}

@@ -396,11 +396,11 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( fieldMetadata.getName() );
 		JsonObject field = new JsonObject();
 
-		ElasticsearchFieldType fieldType = addTypeOptions( field, descriptor, fieldMetadata );
+		ElasticsearchFieldType fieldType = addTypeOptions( field, fieldMetadata );
 
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 
-		addIndexOptions( field, descriptor, fieldMetadata.getName(),
+		addIndexOptions( field, descriptor, fieldMetadata.getSourceProperty(), fieldMetadata.getFieldName(),
 				fieldType, fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
 
 		if ( fieldMetadata.getBoost() != null ) {
@@ -408,7 +408,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 
 		if ( fieldMetadata.indexNullAs() != null ) {
-			JsonElement nullValueJsonElement = getNullValue( descriptor, fieldType, fieldMetadata );
+			JsonElement nullValueJsonElement = getNullValue( fieldType, fieldMetadata );
 			field.add( "null_value", nullValueJsonElement );
 		}
 
@@ -439,7 +439,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 			ElasticsearchFieldType fieldType = addTypeOptions( field, bridgeDefinedField );
 
-			addIndexOptions( field, binding, fieldName, fieldType, bridgeDefinedField.getIndex(), null );
+			addIndexOptions( field, binding, bridgeDefinedField.getSourceField().getSourceProperty(),
+					fieldName, fieldType, bridgeDefinedField.getIndex(), null );
 
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
@@ -489,8 +490,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	/**
 	 * Adds the main indexing-related options to the given field: "index", "doc_values", "analyzer", ...
 	 */
-	private void addIndexOptions(JsonObject field, EntityIndexBinding binding, String fieldName,
-			ElasticsearchFieldType fieldType, Field.Index index, AnalyzerReference analyzerReference) {
+	private void addIndexOptions(JsonObject field, EntityIndexBinding binding, PropertyMetadata sourceProperty,
+			String fieldName, ElasticsearchFieldType fieldType, Field.Index index, AnalyzerReference analyzerReference) {
 		String elasticsearchIndex;
 		switch ( index ) {
 			case ANALYZED:
@@ -509,7 +510,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 		field.addProperty( "index", elasticsearchIndex );
 
-		if ( NOT_INDEXED.equals( elasticsearchIndex ) && FieldHelper.isSortableField( binding, fieldName ) ) {
+		if ( NOT_INDEXED.equals( elasticsearchIndex ) && FieldHelper.isSortableField( sourceProperty, fieldName ) ) {
 			// We must use doc values in order to enable sorting on non-indexed fields
 			field.addProperty( "doc_values", true );
 		}
@@ -527,8 +528,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return ElasticsearchFieldType.STRING.equals( fieldType );
 	}
 
-	private ElasticsearchFieldType addTypeOptions(JsonObject field, EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
-		return addTypeOptions( fieldMetadata.getFieldName(), field, FieldHelper.getType( descriptor, fieldMetadata ) );
+	private ElasticsearchFieldType addTypeOptions(JsonObject field, DocumentFieldMetadata fieldMetadata) {
+		return addTypeOptions( fieldMetadata.getFieldName(), field, FieldHelper.getType( fieldMetadata ) );
 	}
 
 	private ElasticsearchFieldType addTypeOptions(JsonObject field, BridgeDefinedField bridgeDefinedField) {
@@ -671,8 +672,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return elasticsearchType;
 	}
 
-	private JsonElement getNullValue(EntityIndexBinding indexBinding, ElasticsearchFieldType dataType,
-			DocumentFieldMetadata fieldMetadata) {
+	private JsonElement getNullValue(ElasticsearchFieldType dataType, DocumentFieldMetadata fieldMetadata) {
 		Gson gson = gsonService.getGson();
 		Object convertedValue = ElasticSearchIndexNullAsHelper.getNullValue(
 				fieldMetadata.getName(), dataType, fieldMetadata.indexNullAs()

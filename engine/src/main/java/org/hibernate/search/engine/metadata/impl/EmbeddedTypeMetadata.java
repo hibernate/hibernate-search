@@ -20,9 +20,9 @@ import org.hibernate.search.util.impl.ScopedAnalyzerReference;
  * @author Hardy Ferentschik
  */
 public class EmbeddedTypeMetadata extends TypeMetadata {
-	private final String embeddedPropertyName;
+	private final BackReference<PropertyMetadata> sourceProperty;
+
 	private final String embeddedFieldPrefix;
-	private final XMember embeddedGetter;
 	private final Container embeddedContainer;
 
 	private final String embeddedNullFieldName;
@@ -31,9 +31,9 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 
 	private EmbeddedTypeMetadata(Builder builder) {
 		super( builder );
-		this.embeddedPropertyName = builder.embeddedPropertyName;
+		this.sourceProperty = builder.sourceProperty;
+
 		this.embeddedFieldPrefix = builder.embeddedFieldPrefix;
-		this.embeddedGetter = builder.embeddedGetter;
 		this.embeddedContainer = builder.embeddedContainer;
 
 		this.embeddedNullFieldName = builder.embeddedNullFieldName;
@@ -42,10 +42,17 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	}
 
 	/**
+	 * @return The property from which the value for this embedded is extracted.
+	 */
+	public PropertyMetadata getSourceProperty() {
+		return sourceProperty.get();
+	}
+
+	/**
 	 * @return The name of the Java property holding this embedded.
 	 */
 	public String getEmbeddedPropertyName() {
-		return embeddedPropertyName;
+		return getSourceProperty().getPropertyAccessorName();
 	}
 
 	/**
@@ -58,7 +65,7 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	}
 
 	public XMember getEmbeddedGetter() {
-		return embeddedGetter;
+		return getSourceProperty().getPropertyAccessor();
 	}
 
 	public Container getEmbeddedContainer() {
@@ -80,9 +87,10 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "EmbeddedTypeMetadata{" );
-		sb.append( "embeddedPropertyName='" ).append( embeddedPropertyName ).append( '\'' );
+		sb.append( "embeddedPropertyName='" ).append( getEmbeddedPropertyName() ).append( '\'' );
+		sb.append( ", sourceProperty='" ).append( sourceProperty ).append( '\'' );
 		sb.append( ", embeddedFieldPrefix='" ).append( embeddedFieldPrefix ).append( '\'' );
-		sb.append( ", embeddedGetter=" ).append( embeddedGetter );
+		sb.append( ", embeddedGetter=" ).append( getEmbeddedGetter() );
 		sb.append( ", embeddedContainer=" ).append( embeddedContainer );
 		sb.append( ", embeddedNullFieldPath='" ).append( embeddedNullFieldName ).append( '\'' );
 		sb.append( ", embeddedNullToken='" ).append( embeddedNullToken ).append( '\'' );
@@ -92,21 +100,21 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 	}
 
 	public static class Builder extends TypeMetadata.Builder {
-		private final String embeddedPropertyName;
+		private final BackReference<PropertyMetadata> sourceProperty;
+
 		private final String embeddedFieldPrefix;
-		private final XMember embeddedGetter;
 		private final Container embeddedContainer;
 
 		private String embeddedNullToken;
 		private String embeddedNullFieldName;
 		private FieldBridge embeddedNullFieldBridge;
 
-		public Builder(Class<?> indexedType, XMember embeddedGetter, String embeddedFieldPrefix, ScopedAnalyzerReference.Builder scopedAnalyzerBuilder) {
+		public Builder(Class<?> indexedType, BackReference<PropertyMetadata> sourceProperty, XMember embeddedGetter,
+				String embeddedFieldPrefix, ScopedAnalyzerReference.Builder scopedAnalyzerBuilder) {
 			super( indexedType, scopedAnalyzerBuilder );
+			this.sourceProperty = sourceProperty;
 			ReflectionHelper.setAccessible( embeddedGetter );
-			this.embeddedPropertyName = embeddedGetter.getName();
 			this.embeddedFieldPrefix = embeddedFieldPrefix;
-			this.embeddedGetter = embeddedGetter;
 			this.embeddedContainer = determineContainerType( embeddedGetter );
 		}
 
@@ -123,7 +131,9 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 
 		@Override
 		public EmbeddedTypeMetadata build() {
-			return new EmbeddedTypeMetadata( this );
+			EmbeddedTypeMetadata result = new EmbeddedTypeMetadata( this );
+			resultReference.initialize( result );
+			return result;
 		}
 
 		private Container determineContainerType(XMember member) {
