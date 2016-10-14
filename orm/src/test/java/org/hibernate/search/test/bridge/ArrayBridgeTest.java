@@ -13,7 +13,7 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
 import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.experimental.categories.Category;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -24,6 +24,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.bridge.ArrayBridgeTestEntity.Language;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 
 import static org.hibernate.search.test.bridge.ArrayBridgeTestEntity.Language.ENGLISH;
 import static org.hibernate.search.test.bridge.ArrayBridgeTestEntity.Language.ITALIAN;
@@ -93,6 +94,7 @@ public class ArrayBridgeTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
 	public void testSearchNullEmbedded() throws Exception {
 		List<ArrayBridgeTestEntity> results = findEmbeddedNullResults( "nullIndexed", ArrayBridgeTestEntity.NULL_EMBEDDED, true );
 
@@ -102,9 +104,10 @@ public class ArrayBridgeTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
 	public void testSearchNullNumericEmbedded() throws Exception {
 		List<ArrayBridgeTestEntity> results =
-				findEmbeddedNullResults( "numericNullIndexed", ArrayBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
+				findEmbeddedNullResults( "embeddedNum", ArrayBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
