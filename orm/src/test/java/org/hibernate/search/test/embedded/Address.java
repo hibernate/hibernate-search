@@ -29,6 +29,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Entity
 @Indexed
 public class Address {
+
 	@Id
 	@GeneratedValue
 	private Long id;
@@ -41,7 +42,7 @@ public class Address {
 	private Person ownedBy;
 
 	@ElementCollection
-	@IndexedEmbedded
+	@IndexedEmbedded( prefix = "inhabitants." )
 	private Set<Resident> residents = new HashSet<Resident>();
 
 	@OneToMany(mappedBy = "address")

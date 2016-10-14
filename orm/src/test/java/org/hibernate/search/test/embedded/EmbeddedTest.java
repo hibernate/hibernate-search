@@ -161,7 +161,7 @@ public class EmbeddedTest extends SearchTestBase {
 		Query query;
 		List<?> result;
 
-		query = parser.parse( "address.residents.name:Smith" );
+		query = parser.parse( "address.inhabitants.name:Smith" );
 		result = session.createFullTextQuery( query ).list();
 		assertEquals( "unable to find property in embedded @ElementCollection", 1, result.size() );
 		s.close();
