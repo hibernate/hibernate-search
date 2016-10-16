@@ -87,6 +87,15 @@ public final class Environment {
 	public static final String READER_STRATEGY = READER_PREFIX + "." + "strategy";
 
 	/**
+	 * When the "async" reader strategy is enabled queries might be allowed to use a
+	 * stale read of the index; this property controls how often the indexes are
+	 * refreshed, in milliseconds.
+	 * If the refresh operation takes longer than the configured period, the longer
+	 * time will apply: this is a best-effort limit meant to maximize performance.
+	 */
+	public static final String ASYNC_READER_REFRESH_PERIOD_MS = READER_PREFIX + "." + "async_refresh_period_ms";
+
+	/**
 	 * filter caching strategy class (must have a no-arg constructor and implement FilterCachingStrategy)
 	 */
 	public static final String FILTER_CACHING_STRATEGY = "hibernate.search.filter.cache_strategy";
