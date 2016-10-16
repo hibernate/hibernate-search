@@ -993,4 +993,9 @@ public interface Log extends BasicLogger {
 			+ " (synonyms) should not be used on sortable fields. Only the first token will be indexed.")
 	void multipleTermsInAnalyzedSortableField(String fieldName);
 
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 322, value = "Timeout while waiting for background index reader resources to shut down"
+			+ "gracefully for index '%s'.")
+	void timedOutWaitingShutdownOfReaderProvider(String indexName);
+
 }

@@ -160,6 +160,9 @@ public class PropertiesParseHelper {
 		else if ( "shared".equalsIgnoreCase( readerProviderImplName ) ) {
 			readerProvider = new SharingBufferReaderProvider();
 		}
+		else if ( "async".equalsIgnoreCase( readerProviderImplName ) ) {
+			readerProvider = new PeriodicRefreshingReaderProvider();
+		}
 		else {
 			ServiceManager serviceManager = buildContext.getServiceManager();
 			readerProvider = ClassLoaderHelper.instanceFromName(
