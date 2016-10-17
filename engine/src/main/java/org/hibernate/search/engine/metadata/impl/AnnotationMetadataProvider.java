@@ -1765,7 +1765,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 							typeMetadataBuilder.getScopedAnalyzerReferenceBuilder()
 					);
 
-			embeddedTypeMetadataBuilder.boost( AnnotationProcessingHelper.getBoost( member, null ) );
+			embeddedTypeMetadataBuilder.boost( getBoost( elementClass ) * AnnotationProcessingHelper.getBoost( member, null ) );
 			//property > entity analyzer
 			if ( !parseContext.skipAnalyzers() ) {
 				AnalyzerReference analyzerReference = AnnotationProcessingHelper.

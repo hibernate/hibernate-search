@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.test.query.boost.embeddable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.Field;
@@ -22,8 +24,13 @@ public class Title {
 	private String value;
 
 	@IndexedEmbedded(includePaths = { "value" })
-	@Boost(0.7F) // rank sub-title hits a bit lower than the main title
+	@Boost(0.5F) // rank sub-title hits a bit lower than the main title
 	private SubTitle subTitle;
+
+	@IndexedEmbedded(includePaths = { "value" })
+	@ManyToOne(cascade = CascadeType.ALL)
+	// rank original title hits a bit higher than the subtitle, but lower than the main title (see LocalizedTitle class)
+	private LocalizedTitle localizedTitle;
 
 	Title() {
 	}
@@ -53,8 +60,16 @@ public class Title {
 		this.subTitle = subTitle;
 	}
 
+	public LocalizedTitle getLocalizedTitle() {
+		return localizedTitle;
+	}
+
+	public void setLocalizedTitle(LocalizedTitle localizedTitle) {
+		this.localizedTitle = localizedTitle;
+	}
+
 	@Override
 	public String toString() {
-		return "Title [value=" + value + ", subTitle=" + subTitle + "]";
+		return "Title [value=" + value + ", subTitle=" + subTitle + ", localizedTitle=" + localizedTitle + "]";
 	}
 }
