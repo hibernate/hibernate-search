@@ -17,6 +17,8 @@ import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.util.Locale;
+
 /**
  * Tests around boosting of embeddable fields.
  *
@@ -32,14 +34,23 @@ public class EmbeddedFieldBoostTest extends SearchTestBase {
 		// Given
 		Transaction tx = fullTextSession.beginTransaction();
 
-		Magazine highPerfComputing = new Magazine( 1L, "High-perf trends", new Title( "High Performance Computing" ) );
+		Magazine highPerfComputing = new Magazine( 1L, "High-perf trends", new Title( "High Performance Computing", "Faster, faster, faster" ) );
+		highPerfComputing.getTitle().setLocalizedTitle( new LocalizedTitle( 1L, Locale.FRENCH, "Informatique hautes-performances" ) );
 		fullTextSession.persist( highPerfComputing );
 
-		Magazine roseGrowers = new Magazine( 2L, null, new Title( "Rose Grower's Weekly" ) );
+		Magazine roseGrowers = new Magazine( 2L, null, new Title( "Rose Grower's Weekly", "No petunia here" ) );
+		roseGrowers.getTitle().setLocalizedTitle( new LocalizedTitle( 2L, Locale.FRENCH, "L'hebdomadaire des cultivateurs de roses" ) );
 		fullTextSession.persist( roseGrowers );
 
 		Magazine astronautDigest = new Magazine( 3L, null, new Title( "Astronaut Digest", "Tips for astronauts" ) );
+		astronautDigest.getTitle().setLocalizedTitle( new LocalizedTitle( 3L, Locale.FRENCH, "Le bréviaire des astronautes" ) );
 		fullTextSession.persist( astronautDigest );
+
+		Magazine diyMagazine = new Magazine( 4L, null,
+				new Title( "DIY magazine", "The do-it-yourself magazine" )
+				);
+		diyMagazine.getTitle().setLocalizedTitle( new LocalizedTitle( 4L, Locale.FRENCH, "Brico magazine" ) );
+		fullTextSession.persist( diyMagazine );
 
 		tx.commit();
 		fullTextSession.clear();
@@ -71,13 +82,19 @@ public class EmbeddedFieldBoostTest extends SearchTestBase {
 								.matching( "tips" )
 								.createQuery()
 				)
+				.should(
+						queryBuilder.keyword()
+								.onField( "title.localizedTitle.value" )
+								.matching( "brico" )
+								.createQuery()
+				)
 				.createQuery();
 
 		// Then
 		assertThat( fullTextSession.createFullTextQuery( query, Magazine.class ).list() )
 				.describedAs( "Query results are not in the order expected as per configured field boosts" )
 				.onProperty( "id" )
-				.containsExactly( 2L, 3L, 1L );
+				.containsExactly( 2L, 4L, 3L, 1L );
 
 		tx.commit();
 
@@ -86,6 +103,6 @@ public class EmbeddedFieldBoostTest extends SearchTestBase {
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] { Magazine.class };
+		return new Class[] { Magazine.class, LocalizedTitle.class };
 	}
 }
