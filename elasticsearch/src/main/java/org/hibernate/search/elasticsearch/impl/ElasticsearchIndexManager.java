@@ -18,7 +18,6 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
@@ -36,6 +35,7 @@ import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -340,30 +340,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				properties.add( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, field );
 			}
 
-			// normal document fields
-			for ( DocumentFieldMetadata fieldMetadata : descriptor.getDocumentBuilder().getTypeMetadata().getAllDocumentFieldMetadata() ) {
-				if ( fieldMetadata.isId() || fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." )
-						|| fieldMetadata.isSpatial() ) {
-					continue;
-				}
-
-				try {
-					addFieldMapping( payload, descriptor, fieldMetadata );
-				}
-				catch (IncompleteDataException e) {
-					LOG.debug( "Not adding a mapping for field " + fieldMetadata.getFieldName() + " because of incomplete data", e );
-				}
-			}
-
-			// bridge-defined fields
-			for ( BridgeDefinedField bridgeDefinedField : getAllBridgeDefinedFields( descriptor ) ) {
-				try {
-					addFieldMapping( payload, descriptor, bridgeDefinedField );
-				}
-				catch (IncompleteDataException e) {
-					LOG.debug( "Not adding a mapping for field " + bridgeDefinedField.getName() + " because of incomplete data", e );
-				}
-			}
+			addMappings( new ElasticsearchMappingBuilder( descriptor, payload ) );
 
 			PutMapping putMapping = new PutMapping.Builder(
 					actualIndexName,
@@ -381,45 +358,70 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 	}
 
-	private String analyzerName(Class<?> entityType, String fieldName, AnalyzerReference analyzerReference) {
-		if ( analyzerReference.is( RemoteAnalyzerReference.class ) ) {
-			return analyzerReference.unwrap( RemoteAnalyzerReference.class ).getAnalyzer().getName( fieldName );
+	private void addMappings(ElasticsearchMappingBuilder mappingBuilder) {
+		TypeMetadata typeMetadata = mappingBuilder.getMetadata();
+
+		// normal document fields
+		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getNonEmbeddedDocumentFieldMetadata() ) {
+			if ( fieldMetadata.isId() || fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." )
+					|| fieldMetadata.isSpatial() ) {
+				continue;
+			}
+
+			try {
+				addFieldMapping( mappingBuilder, fieldMetadata );
+			}
+			catch (IncompleteDataException e) {
+				LOG.debug( "Not adding a mapping for field " + fieldMetadata.getFieldName() + " because of incomplete data", e );
+			}
 		}
-		LOG.analyzerIsNotRemote( entityType, fieldName, analyzerReference );
-		return null;
+
+		// bridge-defined fields
+		for ( BridgeDefinedField bridgeDefinedField : getNonEmbeddedBridgeDefinedFields( typeMetadata ) ) {
+			try {
+				addFieldMapping( mappingBuilder, bridgeDefinedField );
+			}
+			catch (IncompleteDataException e) {
+				LOG.debug( "Not adding a mapping for field " + bridgeDefinedField.getName() + " because of incomplete data", e );
+			}
+		}
+
+		// Recurse into embedded types
+		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
+			ElasticsearchMappingBuilder embeddedContext = mappingBuilder.createEmbedded( embeddedTypeMetadata );
+			addMappings( embeddedContext );
+		}
 	}
 
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
-	private void addFieldMapping(JsonObject payload, EntityIndexBinding descriptor, DocumentFieldMetadata fieldMetadata) {
-		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( fieldMetadata.getName() );
+	private void addFieldMapping(ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {
+		String fieldPath = fieldMetadata.getName();
 		JsonObject field = new JsonObject();
 
 		ElasticsearchFieldType fieldType = addTypeOptions( field, fieldMetadata );
 
 		field.addProperty( "store", fieldMetadata.getStore() == Store.NO ? false : true );
 
-		addIndexOptions( field, descriptor, fieldMetadata.getSourceProperty(), fieldMetadata.getFieldName(),
+		addIndexOptions( field, mappingBuilder, fieldMetadata.getSourceProperty(), fieldMetadata.getFieldName(),
 				fieldType, fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
 
-		if ( fieldMetadata.getBoost() != null ) {
-			field.addProperty( "boost", fieldMetadata.getBoost() );
-		}
+		field.addProperty( "boost", mappingBuilder.getBoost( fieldMetadata.getBoost() ) );
 
 		if ( fieldMetadata.indexNullAs() != null ) {
 			JsonElement nullValueJsonElement = getNullValue( fieldType, fieldMetadata );
 			field.add( "null_value", nullValueJsonElement );
 		}
 
-		getOrCreateProperties( payload, fieldMetadata.getName() ).add( simpleFieldName, field );
+		mappingBuilder.setPropertyAbsolute( fieldPath, field );
 
 		// Create facet fields if needed: if the facet has the same name as the field, we don't need to create an
 		// extra field for it
 		for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
 			if ( !facetMetadata.getFacetName().equals( fieldMetadata.getFieldName() ) ) {
 				try {
-					addFieldMapping( payload, facetMetadata );
+					addFieldMapping( mappingBuilder, facetMetadata );
 				}
 				catch (IncompleteDataException e) {
 					LOG.debug( "Not adding a mapping for facet " + facetMetadata.getFacetName() + " because of incomplete data", e );
@@ -431,37 +433,35 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
-	private void addFieldMapping(JsonObject payload, EntityIndexBinding binding, BridgeDefinedField bridgeDefinedField) {
-		String fieldName = bridgeDefinedField.getName();
-		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( fieldName );
-		if ( !SpatialHelper.isSpatialField( simpleFieldName ) ) {
+	private void addFieldMapping(ElasticsearchMappingBuilder mappingBuilder, BridgeDefinedField bridgeDefinedField) {
+		String fieldPath = bridgeDefinedField.getName();
+		if ( !SpatialHelper.isSpatialField( fieldPath ) ) {
 			JsonObject field = new JsonObject();
 
 			ElasticsearchFieldType fieldType = addTypeOptions( field, bridgeDefinedField );
 
-			addIndexOptions( field, binding, bridgeDefinedField.getSourceField().getSourceProperty(),
-					fieldName, fieldType, bridgeDefinedField.getIndex(), null );
+			addIndexOptions( field, mappingBuilder, bridgeDefinedField.getSourceField().getSourceProperty(),
+					fieldPath, fieldType, bridgeDefinedField.getIndex(), null );
 
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
-			JsonObject parent = getOrCreateProperties( payload, fieldName );
-			if ( !parent.has( simpleFieldName ) ) {
-				parent.add( simpleFieldName, field );
+			if ( !mappingBuilder.hasPropertyAbsolute( fieldPath ) ) {
+				mappingBuilder.setPropertyAbsolute( fieldPath, field );
 			}
 		}
 		else {
-			if ( SpatialHelper.isSpatialFieldLongitude( simpleFieldName ) ) {
+			if ( SpatialHelper.isSpatialFieldLongitude( fieldPath ) ) {
 				// we ignore the longitude field, we will create the geo_point mapping only once with the latitude field
 				return;
 			}
-			else if ( SpatialHelper.isSpatialFieldLatitude( simpleFieldName ) ) {
+			else if ( SpatialHelper.isSpatialFieldLatitude( fieldPath ) ) {
 				// we only add the geo_point for the latitude field
 				JsonObject field = new JsonObject();
 
 				field.addProperty( "type", ElasticsearchFieldType.GEO_POINT.getElasticsearchString() );
 
 				// in this case, the spatial field has precedence over an already defined field
-				getOrCreateProperties( payload, fieldName ).add( SpatialHelper.getSpatialFieldRootName( simpleFieldName ), field );
+				mappingBuilder.setPropertyAbsolute( SpatialHelper.getSpatialFieldRootName( fieldPath ), field );
 			}
 			else {
 				// the fields potentially created for the spatial hash queries
@@ -469,13 +469,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				field.addProperty( "type", ElasticsearchFieldType.STRING.getElasticsearchString() );
 				field.addProperty( "index", NOT_ANALYZED );
 
-				getOrCreateProperties( payload, fieldName ).add( fieldName, field );
+				mappingBuilder.setPropertyAbsolute( fieldPath, field );
 			}
 		}
 	}
 
-	private JsonObject addFieldMapping(JsonObject payload, FacetMetadata facetMetadata) {
-		String simpleFieldName = FieldHelper.getEmbeddedFieldPropertyName( facetMetadata.getFacetName() );
+	private JsonObject addFieldMapping(ElasticsearchMappingBuilder mappingBuilder, FacetMetadata facetMetadata) {
 		String fullFieldName = facetMetadata.getFacetName();
 
 		JsonObject field = new JsonObject();
@@ -483,14 +482,14 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		field.addProperty( "store", false );
 		field.addProperty( "index", NOT_ANALYZED );
 
-		getOrCreateProperties( payload, fullFieldName ).add( simpleFieldName, field );
+		mappingBuilder.setPropertyAbsolute( fullFieldName, field );
 		return field;
 	}
 
 	/**
 	 * Adds the main indexing-related options to the given field: "index", "doc_values", "analyzer", ...
 	 */
-	private void addIndexOptions(JsonObject field, EntityIndexBinding binding, PropertyMetadata sourceProperty,
+	private void addIndexOptions(JsonObject field, ElasticsearchMappingBuilder mappingBuilder, PropertyMetadata sourceProperty,
 			String fieldName, ElasticsearchFieldType fieldType, Field.Index index, AnalyzerReference analyzerReference) {
 		String elasticsearchIndex;
 		switch ( index ) {
@@ -516,7 +515,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 
 		if ( ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
-			String analyzerName = analyzerName( binding.getDocumentBuilder().getBeanClass(), fieldName, analyzerReference );
+			String analyzerName = mappingBuilder.getAnalyzerName( analyzerReference, fieldName );
 			if ( analyzerName != null ) {
 				field.addProperty( "analyzer", analyzerName );
 			}
@@ -680,64 +679,23 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		return gson.toJsonTree( convertedValue );
 	}
 
-	private JsonObject getOrCreateProperties(JsonObject mapping, String fieldName) {
-		if ( !FieldHelper.isEmbeddedField( fieldName ) ) {
-			return mapping.getAsJsonObject( "properties" );
-		}
-
-		JsonObject parentProperties = mapping.getAsJsonObject( "properties" );
-
-
-		String[] parts = fieldName.split( "\\." );
-		for ( int i = 0; i < parts.length - 1; i++ ) {
-			String part = parts[i];
-			JsonObject property = parentProperties.getAsJsonObject( part );
-			if ( property == null ) {
-				property = new JsonObject();
-
-				// TODO HSEARCH-2263 enable nested mapping as needed:
-				// * only needed for embedded *-to-many with more than one field
-				// * for these, the user should be able to opt out (nested would be the safe default mapping in this
-				// case, but they could want to opt out when only ever querying on single fields of the embeddable)
-
-//				property.addProperty( "type", ElasticsearchFieldType.NESTED.getElasticsearchString() );
-
-				JsonObject properties = new JsonObject();
-				property.add( "properties", properties );
-				parentProperties.add( part, property );
-				parentProperties = properties;
-			}
-			else {
-				parentProperties = property.getAsJsonObject( "properties" );
-			}
-		}
-
-		return parentProperties;
-	}
-
 	/**
-	 * Recursively collects all the bridge-defined fields for the given type and its embeddables.
+	 * Collects all the bridge-defined fields for the given type, excluding its embedded types.
 	 */
-	private Set<BridgeDefinedField> getAllBridgeDefinedFields(EntityIndexBinding binding) {
+	private Set<BridgeDefinedField> getNonEmbeddedBridgeDefinedFields(TypeMetadata type) {
 		Set<BridgeDefinedField> bridgeDefinedFields = new HashSet<>();
-		collectPropertyLevelBridgeDefinedFields( binding.getDocumentBuilder().getMetadata(), bridgeDefinedFields );
-		return bridgeDefinedFields;
-	}
 
-	private void collectPropertyLevelBridgeDefinedFields(TypeMetadata type, Set<BridgeDefinedField> allBridgeDefinedFields) {
-		allBridgeDefinedFields.addAll( type.getClassBridgeDefinedFields() );
+		bridgeDefinedFields.addAll( type.getClassBridgeDefinedFields() );
 
 		if ( type.getIdPropertyMetadata() != null ) {
-			allBridgeDefinedFields.addAll( type.getIdPropertyMetadata().getBridgeDefinedFields().values() );
+			bridgeDefinedFields.addAll( type.getIdPropertyMetadata().getBridgeDefinedFields().values() );
 		}
 
 		for ( PropertyMetadata property : type.getAllPropertyMetadata() ) {
-			allBridgeDefinedFields.addAll( property.getBridgeDefinedFields().values() );
+			bridgeDefinedFields.addAll( property.getBridgeDefinedFields().values() );
 		}
 
-		for ( TypeMetadata embeddedType : type.getEmbeddedTypeMetadata() ) {
-			collectPropertyLevelBridgeDefinedFields( embeddedType, allBridgeDefinedFields );
-		}
+		return bridgeDefinedFields;
 	}
 
 	// Getters

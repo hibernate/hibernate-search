@@ -22,6 +22,7 @@ enum ElasticsearchFieldType {
 	FLOAT("float"),
 	DATE("date"),
 	BOOLEAN("boolean"),
+	OBJECT("object"),
 
 	GEO_POINT("geo_point");
 

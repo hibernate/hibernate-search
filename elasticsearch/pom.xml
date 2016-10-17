@@ -277,9 +277,6 @@
                                 <!-- HSEARCH-2400 Support IndexingMonitor for the Elasticsearch backend -->
                                 <exclude>**/ProgressMonitorTest.java</exclude>
                                 
-                                <!-- HSEARCH-2401 Boosts are (erroneously) not applied to IndexedEmbeddeds -->
-                                <exclude>**/EmbeddedFieldBoostTest.java</exclude>
-                                
                                 <!-- HSEARCH-2404 Enable CollectionUpdateEventTest for Elasticsearch -->
                                 <exclude>**/CollectionUpdateEventTest.java</exclude><!-- Only fails on CI (Travis) -->
                             </excludes>

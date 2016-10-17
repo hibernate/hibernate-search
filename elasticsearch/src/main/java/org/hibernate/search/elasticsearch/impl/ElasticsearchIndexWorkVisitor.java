@@ -192,8 +192,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 	private JsonObject convertToJson(Document document, Class<?> entityType) {
 		EntityIndexBinding indexBinding = searchIntegrator.getIndexBinding( entityType );
-		JsonObject source = new JsonObject();
-		JsonTreeBuilder treeBuilder = new JsonTreeBuilder( source );
+		JsonObject root = new JsonObject();
+		JsonTreeBuilder treeBuilder = new JsonTreeBuilder( root );
 
 		NestingMarker nestingMarker = null;
 		for ( IndexableField field : document.getFields() ) {
@@ -368,7 +368,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 			}
 		}
 
-		return source;
+		return root;
 	}
 
 	private void addPropertyOfPotentiallyMultipleCardinality(JsonObject parent, String propertyName, JsonPrimitive value) {
