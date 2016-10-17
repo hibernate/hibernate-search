@@ -27,8 +27,8 @@ public class Magazine {
 	@Field
 	private String description;
 
-	@IndexedEmbedded(includePaths = { "value", "subTitle.value" })
-	@Boost(2.0F) // rank title hits twice as important as description
+	@IndexedEmbedded(includePaths = { "value", "subTitle.value", "localizedTitle.value" })
+	@Boost(4.0F) // rank title hits twice as important as description
 	private Title title;
 
 	Magazine() {
