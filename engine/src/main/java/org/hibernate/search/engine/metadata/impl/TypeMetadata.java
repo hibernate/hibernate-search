@@ -221,8 +221,7 @@ public class TypeMetadata {
 	 */
 	public Collection<DocumentFieldMetadata> getAllDocumentFieldMetadata() {
 		if ( embeddedTypeMetadata.isEmpty() ) {
-			//no need to wrap as unmodifiable collections, the instances are already safe.
-			return documentFieldNameToFieldMetadata.values();
+			return Collections.unmodifiableCollection( documentFieldNameToFieldMetadata.values() );
 		}
 		else {
 			Collection<DocumentFieldMetadata> allMetadata = new ArrayList<DocumentFieldMetadata>(
@@ -234,6 +233,10 @@ public class TypeMetadata {
 			allMetadata.addAll( documentFieldNameToFieldMetadata.values() );
 			return allMetadata;
 		}
+	}
+
+	public Collection<DocumentFieldMetadata> getNonEmbeddedDocumentFieldMetadata() {
+		return Collections.unmodifiableCollection( documentFieldNameToFieldMetadata.values() );
 	}
 
 	// TODO HSEARCH-1867 change return type to set
