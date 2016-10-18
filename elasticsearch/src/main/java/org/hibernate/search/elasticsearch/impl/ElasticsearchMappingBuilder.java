@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.impl;
 
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
+import org.hibernate.search.elasticsearch.impl.PathComponentExtractor.ConsumptionLimit;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -50,11 +51,17 @@ final class ElasticsearchMappingBuilder {
 	}
 
 	public ElasticsearchMappingBuilder createEmbedded(EmbeddedTypeMetadata embeddedTypeMetadata) {
-		PathComponentExtractor extractor = pathComponentExtractor.clone();
-		extractor.append( embeddedTypeMetadata.getEmbeddedFieldPrefix() );
+		PathComponentExtractor newExtractor = pathComponentExtractor.clone();
+		newExtractor.append( embeddedTypeMetadata.getEmbeddedFieldPrefix() );
 
+		JsonObject newMappingJson = getOrCreateParents( newExtractor );
+
+		return new ElasticsearchMappingBuilder( this, binding, embeddedTypeMetadata, newMappingJson, newExtractor );
+	}
+
+	private JsonObject getOrCreateParents(PathComponentExtractor extractor) {
 		JsonObject currentMappingJson = mappingJson;
-		String newPathComponent = extractor.next();
+		String newPathComponent = extractor.next( ConsumptionLimit.SECOND_BUT_LAST );
 		while ( newPathComponent != null ) {
 			/*
 			 * The property can already exist if we have both a @Field and @IndexedEmbedded
@@ -79,10 +86,10 @@ final class ElasticsearchMappingBuilder {
 			}
 
 			currentMappingJson = newProperty;
-			newPathComponent = extractor.next();
+			newPathComponent = extractor.next( ConsumptionLimit.SECOND_BUT_LAST );
 		}
 
-		return new ElasticsearchMappingBuilder( this, binding, embeddedTypeMetadata, currentMappingJson, extractor );
+		return currentMappingJson;
 	}
 
 	private static JsonObject getPropertyRelative(JsonObject parent, String name) {
@@ -105,14 +112,27 @@ final class ElasticsearchMappingBuilder {
 	}
 
 	public boolean hasPropertyAbsolute(String absolutePath) {
-		String relativePath = pathComponentExtractor.makeRelative( absolutePath );
-		JsonObject property = getPropertyRelative( mappingJson, relativePath );
-		return property != null;
+		/*
+		 * Handle cases where the field name contains dots (and therefore requires
+		 * creating containing properties).
+		 */
+		PathComponentExtractor newExtractor = this.pathComponentExtractor.clone();
+		newExtractor.appendRelativePart( absolutePath );
+		JsonObject parent = getOrCreateParents( newExtractor );
+		String propertyName = newExtractor.next( ConsumptionLimit.LAST );
+		return getPropertyRelative( parent, propertyName ) != null;
 	}
 
 	public void setPropertyAbsolute(String absolutePath, JsonObject property) {
-		String relativePath = pathComponentExtractor.makeRelative( absolutePath );
-		setPropertyRelative( mappingJson, relativePath, property );
+		/*
+		 * Handle cases where the field name contains dots (and therefore requires
+		 * creating containing properties).
+		 */
+		PathComponentExtractor newExtractor = this.pathComponentExtractor.clone();
+		newExtractor.appendRelativePart( absolutePath );
+		JsonObject parent = getOrCreateParents( newExtractor );
+		String propertyName = newExtractor.next( ConsumptionLimit.LAST );
+		setPropertyRelative( parent, propertyName, property );
 	}
 
 	public TypeMetadata getMetadata() {

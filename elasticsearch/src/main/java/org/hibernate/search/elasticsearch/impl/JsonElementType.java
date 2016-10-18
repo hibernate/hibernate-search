@@ -20,12 +20,12 @@ abstract class JsonElementType<T extends JsonElement> {
 
 		@Override
 		public JsonObject cast(JsonElement element) {
-			return element.getAsJsonObject();
+			return element == null || element.isJsonNull() ? null : element.getAsJsonObject();
 		}
 
 		@Override
 		public boolean isInstance(JsonElement element) {
-			return element.isJsonObject();
+			return element != null && element.isJsonObject();
 		}
 
 		@Override
@@ -42,12 +42,12 @@ abstract class JsonElementType<T extends JsonElement> {
 
 		@Override
 		public JsonArray cast(JsonElement element) {
-			return element.getAsJsonArray();
+			return element == null || element.isJsonNull() ? null : element.getAsJsonArray();
 		}
 
 		@Override
 		public boolean isInstance(JsonElement element) {
-			return element.isJsonArray();
+			return element != null && element.isJsonArray();
 		}
 
 		@Override

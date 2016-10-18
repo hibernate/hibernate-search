@@ -34,31 +34,53 @@ class PathComponentExtractor implements Cloneable {
 	}
 
 	/**
-	 * @return The next complete path component, or null if it cannot be determined yet.
+	 * Append to the path the part of {@code otherPath} that is relative to the current path.
+	 * <p>In other words, replace the current path with {@code otherPath} provided {@code otherPath}
+	 * denotes a child element of the current path, while preserving the memory of the previously
+	 * consumed path components.
+	 * @param otherPath A path that must start with the current path.
 	 */
-	public String next() {
+	public void appendRelativePart(String otherPath) {
+		String pathAsString = path.toString();
+		if ( !otherPath.startsWith( pathAsString ) ) {
+			throw new AssertionFailure( "The path '" + otherPath + "' is not contained within '" + pathAsString + "'" );
+		}
+
+		path.append( otherPath, path.length(), otherPath.length() );
+	}
+
+	public enum ConsumptionLimit {
+		SECOND_BUT_LAST,
+		LAST;
+	}
+
+	/**
+	 * Consumes one more component in the current path (if possible) and returns this component.
+	 *
+	 *<p>If this method reaches a incompletely qualified path component, i.e one that is not
+	 *followed by a dot but by the end of the path, it will return it only if {@code includeLast}
+	 *is {@code true}.
+	 *
+	 * @param includeLast Whether or not to return the last, incompletely qualified path component.
+	 * @return The next path component.
+	 * @throws AssertionFailure If there is nothing to consume in the path, or if there is more
+	 * than one component to consume.
+	 */
+	public String next(ConsumptionLimit consumeLimit) {
 		int nextSeparatorIndex = path.indexOf( PATH_COMPONENT_SEPARATOR, currentIndexInPath );
 		if ( nextSeparatorIndex >= 0 ) {
 			String childName = path.substring( currentIndexInPath, nextSeparatorIndex );
 			currentIndexInPath = nextSeparatorIndex + 1 /* skip the dot */;
 			return childName;
 		}
+		else if ( ConsumptionLimit.LAST.equals( consumeLimit ) && currentIndexInPath < path.length() ) {
+			String lastComponent = path.substring( currentIndexInPath );
+			currentIndexInPath = path.length();
+			return lastComponent;
+		}
 		else {
 			return null;
 		}
-	}
-
-	/**
-	 * @param otherPath A path to make relative.
-	 * @return The relative path from the currently consumed path (the components returned by {@link #next()}) to {@code otherPath}.
-	 */
-	public String makeRelative(String otherPath) {
-		String pathAsString = path.toString();
-		if ( !otherPath.startsWith( pathAsString ) ) {
-			throw new AssertionFailure( "The path '" + otherPath + "' is not contained within '" + pathAsString + "'" );
-		}
-
-		return otherPath.substring( currentIndexInPath );
 	}
 
 	public void reset() {
