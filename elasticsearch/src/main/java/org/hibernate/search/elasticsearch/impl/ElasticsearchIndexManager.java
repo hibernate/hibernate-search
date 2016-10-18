@@ -461,7 +461,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				field.addProperty( "type", ElasticsearchFieldType.GEO_POINT.getElasticsearchString() );
 
 				// in this case, the spatial field has precedence over an already defined field
-				mappingBuilder.setPropertyAbsolute( SpatialHelper.getSpatialFieldRootName( fieldPath ), field );
+				mappingBuilder.setPropertyAbsolute( SpatialHelper.stripSpatialFieldSuffix( fieldPath ), field );
 			}
 			else {
 				// the fields potentially created for the spatial hash queries
