@@ -42,6 +42,10 @@ public class DocumentIdMapping {
 		return new SortableFieldMapping( property.getName(), property, entity, mapping );
 	}
 
+	public SortableFieldMapping sortableField() {
+		return new SortableFieldMapping( property.getName(), property, entity, mapping );
+	}
+
 	public PropertySpatialMapping spatial() {
 		return new PropertySpatialMapping( property, entity, mapping );
 	}
