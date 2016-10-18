@@ -240,6 +240,19 @@ You can write custom field bridges and class bridges.
 For class bridges and field bridges creating multiple fields,
 make sure to make your bridge implementation also implement the `MetadataProvidingFieldBridge` contract.
 
+[CAUTION]
+====
+Creating sub-fields in custom field bridges is not supported.
+
+You create a sub-field when your `MetadataProvidingFieldBridge` registers a field whose name is the name of an existing field, with a dot and another string appended, like `name + ".mySubField"`.
+
+This lack of support is due to Elasticsearch not allowing a field to have multiple types. In the example above, the field would have both the `object` datatype and whatever datatype the original field has (`string` in the most common case).
+
+As an alternative, you may append a suffix to the original field name in order to create a *sibling* field, e.g. use `name + "_mySubField"` or `name + "_more.mySubField"` instead of `name + ".mySubField"`.
+
+This limitation is true in particular for field bridges applied to the `@DocumentId`: fields added to the document must not be in the form `name + ".mySubField"`, in order to avoid mapping conflicts with the ID field.
+==== 
+
 [source,java]
 --
 /**

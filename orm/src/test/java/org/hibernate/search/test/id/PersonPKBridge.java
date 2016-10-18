@@ -20,18 +20,21 @@ import org.hibernate.search.bridge.spi.FieldType;
  */
 public class PersonPKBridge implements TwoWayFieldBridge, MetadataProvidingFieldBridge {
 
+	private static final String FIRST_NAME_SUFFIX = "_content.firstName";
+	private static final String LAST_NAME_SUFFIX = "_content.lastName";
+
 	@Override
 	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
-		builder.field( name + ".firstName", FieldType.STRING )
-			.field( name + ".lastName", FieldType.STRING );
+		builder.field( name + FIRST_NAME_SUFFIX, FieldType.STRING )
+			.field( name + LAST_NAME_SUFFIX, FieldType.STRING );
 	}
 
 	@Override
 	public Object get(String name, Document document) {
 		PersonPK id = new PersonPK();
-		IndexableField field = document.getField( name + ".firstName" );
+		IndexableField field = document.getField( name + FIRST_NAME_SUFFIX );
 		id.setFirstName( field.stringValue() );
-		field = document.getField( name + ".lastName" );
+		field = document.getField( name + LAST_NAME_SUFFIX );
 		id.setLastName( field.stringValue() );
 		return id;
 	}
@@ -49,9 +52,9 @@ public class PersonPKBridge implements TwoWayFieldBridge, MetadataProvidingField
 		PersonPK id = (PersonPK) value;
 
 		//store each property in a unique field
-		luceneOptions.addFieldToDocument( name + ".firstName", id.getFirstName(), document );
+		luceneOptions.addFieldToDocument( name + FIRST_NAME_SUFFIX, id.getFirstName(), document );
 
-		luceneOptions.addFieldToDocument( name + ".lastName", id.getLastName(), document );
+		luceneOptions.addFieldToDocument( name + LAST_NAME_SUFFIX, id.getLastName(), document );
 
 		//store the unique string representation in the named field
 		luceneOptions.addFieldToDocument( name, objectToString( id ), document );

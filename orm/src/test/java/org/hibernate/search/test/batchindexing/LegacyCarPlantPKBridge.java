@@ -20,8 +20,8 @@ import org.hibernate.search.bridge.spi.FieldType;
  * @author Bayo Erinle
  */
 public class LegacyCarPlantPKBridge implements TwoWayFieldBridge, MetadataProvidingFieldBridge {
-	private static final String PLANT_ID = ".plantId";
-	private static final String CAR_ID = ".carId";
+	private static final String PLANT_ID = "_content.plantId";
+	private static final String CAR_ID = "_content.carId";
 
 	@Override
 	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
