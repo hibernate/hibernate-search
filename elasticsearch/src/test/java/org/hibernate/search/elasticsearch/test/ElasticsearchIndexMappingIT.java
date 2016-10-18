@@ -186,6 +186,11 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 						"'handicap':{" +
 							"'type':'double'" +
 						"}," +
+						"'id':{" +
+							"'type':'string'," +
+							"'index':'not_analyzed'," +
+							"'store':true" +
+						"}," +
 						"'lastName':{" +
 							"'type':'string'" +
 						"}," +
@@ -456,6 +461,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 					"\"driveWidth\": null," +
 					"\"firstName\": null," +
 					"\"handicap\": 0.0," + // not nullable
+					"\"id\": '3'," +
 					"\"puttingStrength\": \"0.0\"," + // not nullable
 					"\"lastName\": \"Kidd\"," +
 					"\"fullName\": \"Kidd\"," +

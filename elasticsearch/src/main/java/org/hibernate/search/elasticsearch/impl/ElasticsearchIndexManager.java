@@ -363,7 +363,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 		// normal document fields
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getNonEmbeddedDocumentFieldMetadata() ) {
-			if ( fieldMetadata.isId() || fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." )
+			if ( fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." )
 					|| fieldMetadata.isSpatial() ) {
 				continue;
 			}
