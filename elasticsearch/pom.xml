@@ -247,8 +247,6 @@
                                 <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude><!-- Projection constant __HSearch_Document -->
                                 <exclude>**/ProjectionQueryTest.java</exclude><!-- Projection constant __HSearch_Document -->
                                 <exclude>**/SortUsingEntityManagerTest.java</exclude><!-- Sort type LONG instead of STRING? -->
-                                <exclude>**/LazyM2OContainedInTest.java</exclude><!-- Use of TermQuery? -->
-                                <exclude>**/SearchAfterUninitializedProxyEntityLoadingTest.java</exclude><!-- Use of TermQuery? -->
                                 <exclude>**/LazyCollectionsUpdatingTest.java</exclude><!-- Use of TermQuery? -->
                                 <exclude>**/LuceneErrorHandlingTest.java</exclude><!-- LuceneErrorHandlingTest$NoOpLuceneWorkDelegate cannot be cast ... -->
                                 <exclude>**/SyncWorkerTest.java</exclude><!-- Use of QueryParser? -->
