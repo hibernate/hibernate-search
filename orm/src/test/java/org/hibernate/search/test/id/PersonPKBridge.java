@@ -10,12 +10,21 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * @author Emmanuel Bernard
  */
-public class PersonPKBridge implements TwoWayFieldBridge {
+public class PersonPKBridge implements TwoWayFieldBridge, MetadataProvidingFieldBridge {
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name + ".firstName", FieldType.STRING )
+			.field( name + ".lastName", FieldType.STRING );
+	}
 
 	@Override
 	public Object get(String name, Document document) {
@@ -46,7 +55,6 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 
 		//store the unique string representation in the named field
 		luceneOptions.addFieldToDocument( name, objectToString( id ), document );
-
 	}
 
 }

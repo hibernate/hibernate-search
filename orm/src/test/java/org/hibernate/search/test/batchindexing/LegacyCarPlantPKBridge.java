@@ -11,14 +11,23 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * @author Bayo Erinle
  */
-public class LegacyCarPlantPKBridge implements TwoWayFieldBridge {
+public class LegacyCarPlantPKBridge implements TwoWayFieldBridge, MetadataProvidingFieldBridge {
 	private static final String PLANT_ID = ".plantId";
 	private static final String CAR_ID = ".carId";
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name + PLANT_ID, FieldType.STRING )
+				.field( name + CAR_ID, FieldType.STRING );
+	}
 
 	@Override
 	public Object get(String name, Document document) {
