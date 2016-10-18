@@ -22,9 +22,11 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -106,6 +108,7 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category( ElasticsearchSupportInProgress.class ) // HSEARCH-2398 Improve field name/type validation when querying the Elasticsearch backend
 	public void testSortingOnSortableFieldNotIncludedByIndexEmbeddedException() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH000301" );
