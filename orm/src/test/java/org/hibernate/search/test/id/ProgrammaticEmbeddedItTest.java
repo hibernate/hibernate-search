@@ -48,7 +48,7 @@ public class ProgrammaticEmbeddedItTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "id.lastName", "Bernard" ) )
+				new TermQuery( new Term( "id_content.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
 		emmanuel = (PlainPerson) results.get( 0 );
@@ -58,7 +58,7 @@ public class ProgrammaticEmbeddedItTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "id.lastName", "Bernard" ) )
+				new TermQuery( new Term( "id_content.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
 		emmanuel = (PlainPerson) results.get( 0 );
