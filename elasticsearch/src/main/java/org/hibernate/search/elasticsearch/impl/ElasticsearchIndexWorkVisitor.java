@@ -242,7 +242,6 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 				}
 			}
 			else if ( !fieldPath.equals( ProjectionConstants.OBJECT_CLASS ) &&
-					!fieldPath.equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
 					!FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( fieldPath ) &&
 					!isDocValueField( field ) ) {
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata()
