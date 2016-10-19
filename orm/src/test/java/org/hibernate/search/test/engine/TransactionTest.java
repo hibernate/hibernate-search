@@ -6,21 +6,17 @@
  */
 package org.hibernate.search.test.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-
 import org.hibernate.Session;
-
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
@@ -78,13 +74,7 @@ public class TransactionTest extends SearchTestBase {
 	}
 
 	private int getDocumentNumber() throws IOException {
-		IndexReader reader = DirectoryReader.open( getDirectory( Document.class ) );
-		try {
-			return reader.numDocs();
-		}
-		finally {
-			reader.close();
-		}
+		return getNumberOfDocumentsInIndex( Document.class );
 	}
 
 	@Override

@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
-import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -30,8 +29,6 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.MultitenancyTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
@@ -158,14 +155,6 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			throw new IllegalStateException( "SessionFactory should be already defined at this point" );
 		}
 		return sessionFactory;
-	}
-
-	@Override
-	public Directory getDirectory(Class<?> clazz) {
-		ExtendedSearchIntegrator integrator = ContextHelper.getSearchIntegratorBySFI( sessionFactory );
-		IndexManager[] indexManagers = integrator.getIndexBinding( clazz ).getIndexManagers();
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
-		return indexManager.getDirectoryProvider().getDirectory();
 	}
 
 	@Override

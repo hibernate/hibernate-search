@@ -10,7 +10,6 @@ package org.hibernate.search.test;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.SearchFactory;
@@ -36,8 +35,6 @@ public interface TestResourceManager {
 	SearchFactory getSearchFactory();
 
 	ExtendedSearchIntegrator getExtendedSearchIntegrator();
-
-	Directory getDirectory(Class<?> clazz);
 
 	void ensureIndexesAreEmpty() throws IOException;
 
