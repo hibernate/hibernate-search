@@ -16,7 +16,7 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.junit.Test;
-
+import org.junit.experimental.categories.Category;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -24,12 +24,14 @@ import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
+@Category(SkipOnElasticsearch.class) // This optimization is specific to the Lucene backend
 public class DeleteByTermTest {
 
 	@Test
