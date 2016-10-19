@@ -32,9 +32,11 @@ import org.hibernate.search.Search;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.osjava.sj.memory.MemoryContext;
 
 import static org.junit.Assert.assertEquals;
@@ -81,6 +83,7 @@ public class IndexControlMBeanTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category( ElasticsearchSupportInProgress.class ) // HSEARCH-2421 Support statistics with Elasticsearch
 	public void testIndexAndPurge() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();

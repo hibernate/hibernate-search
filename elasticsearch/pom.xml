@@ -239,7 +239,6 @@
                                 <exclude>**/UpdateOperationsTest.java</exclude><!-- LeakingOptimizer -->
                                 <exclude>**/TransactionTest.java</exclude><!-- Directory -->
                                 <exclude>**/IndexingActionInterceptorTest.java</exclude><!-- Queries on the object's class -->
-                                <exclude>**/IndexControlMBeanTest.java</exclude><!-- IndexReader -->
                                 <exclude>**/ToStringTest.java</exclude><!-- Relies on the lucene query's toString(), should be the HSQuery's getQueryString? -->
                                 <exclude>**/DynamicBoostingTest.java</exclude><!-- Projection constant __HSearch_Explanation -->
                                 <exclude>**/IndexAndQueryNullTest.java</exclude><!-- Projection constant __HSearch_Document -->
