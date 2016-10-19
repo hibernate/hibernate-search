@@ -16,16 +16,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
@@ -173,19 +172,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestBase {
 	}
 
 	private boolean indexContainsField(String fieldName) throws IOException {
-		IndexReaderAccessor indexReaderAccessor = getSearchFactory().getIndexReaderAccessor();
-		IndexReader indexReader = indexReaderAccessor.open( WorkingPerson.class );
-		try {
-			for ( LeafReaderContext leave : indexReader.leaves() ) {
-				if ( leave.reader().terms( fieldName ) != null ) {
-					return true;
-				}
-			}
-			return false;
-		}
-		finally {
-			indexReaderAccessor.close( indexReader );
-		}
+		return countDocuments( fieldName ) > 0;
 	}
 
 	@Override
@@ -261,15 +248,32 @@ public class WorkDoneOnEntitiesTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( getSession() );
 		@SuppressWarnings("unchecked")
 		List<WorkingPerson> result = session
-			.createFullTextQuery( searchQuery( field, value, session ) )
+			.createFullTextQuery( searchQueryForValue( field, value, session ) )
 			.list();
 		return result;
 	}
 
-	private Query searchQuery(String field, String value, FullTextSession session) {
+	private Query searchQueryForValue(String field, String value, FullTextSession session) {
 		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder()
 				.forEntity( WorkingPerson.class ).get();
 		return queryBuilder.keyword().onField( field ).matching( value ).createQuery();
+	}
+
+	private int countDocuments(String field) {
+		FullTextSession session = Search.getFullTextSession( getSession() );
+		return session
+				/**
+				 * We must use a raw Lucene query, and not use the QueryBuilder,
+				 * because the field may not exist.
+				 */
+				.createFullTextQuery( new WildcardQuery( new Term( field, "*" ) ) )
+				.getResultSize();
+	}
+
+	private Query searchQueryWithWildcard(String field, FullTextSession session) {
+		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder()
+				.forEntity( WorkingPerson.class ).get();
+		return queryBuilder.keyword().wildcard().onField( field ).matching( "*" ).createQuery();
 	}
 
 	private void renamePerson(Integer id, String newName) {
