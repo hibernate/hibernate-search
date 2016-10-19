@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.interceptor;
 
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -27,6 +29,18 @@ public class Blog {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return getClass().equals( obj.getClass() )
+				&& id != null
+				&& Objects.equals( id, ((Blog) obj).id );
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
 	}
 
 	private Integer id;

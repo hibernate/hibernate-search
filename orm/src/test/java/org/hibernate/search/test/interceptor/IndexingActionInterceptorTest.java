@@ -12,15 +12,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
 import org.junit.Before;
@@ -70,8 +68,9 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 	public void testBlogAndArticleAreNotIndexedInDraftStatus() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
-		assertThat( getBlogEntriesFor( Blog.class ) ).as( "Blog is explicit intercepted" ).hasSize( 0 );
-		assertThat( getBlogEntriesFor( Article.class ) ).as( "Article is inherently intercepted" ).hasSize( 0 );
+		List<Blog> blogEntries = getBlogEntries();
+		assertThat( blogEntries ).as( "Blog is explicitly intercepted" ).excludes( blog );
+		assertThat( blogEntries ).as( "Article is inherently intercepted" ).excludes( article );
 
 		tx.commit();
 	}
@@ -79,8 +78,8 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 	@Test
 	public void testTotalArticleIsIndexedInDraftStatus() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
-		assertThat( getBlogEntriesFor( TotalArticle.class ) ).as( "TotalArticle is explicit not intercepted" )
-				.hasSize( 1 );
+		List<Blog> blogEntries = getBlogEntries();
+		assertThat( blogEntries ).as( "TotalArticle is explicitly not intercepted" ).contains( totalArticle );
 		tx.commit();
 	}
 
@@ -90,10 +89,10 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 		setAllBlogEntriesToStatus( BlogStatus.PUBLISHED );
 		Transaction tx = fullTextSession.beginTransaction();
 
-		assertThat( getBlogEntriesFor( Blog.class ) ).hasSize( 1 );
-		assertThat( getBlogEntriesFor( Article.class ) ).as( "Article is inherently intercepted" ).hasSize( 1 );
-		assertThat( getBlogEntriesFor( TotalArticle.class ) ).as( "TotalArticle is explicit not intercepted" )
-				.hasSize( 1 );
+		List<Blog> blogEntries = getBlogEntries();
+		assertThat( blogEntries ).contains( blog );
+		assertThat( blogEntries ).as( "Article is inherently intercepted" ).contains( article );
+		assertThat( blogEntries ).as( "TotalArticle is explicitly not intercepted" ).contains( totalArticle );
 
 		tx.commit();
 	}
@@ -104,8 +103,9 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 		setAllBlogEntriesToStatus( BlogStatus.REMOVED );
 		Transaction tx = fullTextSession.beginTransaction();
 
-		assertThat( getBlogEntriesFor( Blog.class ) ).hasSize( 0 );
-		assertThat( getBlogEntriesFor( Article.class ) ).as( "Article is inherently intercepted" ).hasSize( 0 );
+		List<Blog> blogEntries = getBlogEntries();
+		assertThat( blogEntries ).excludes( blog );
+		assertThat( blogEntries ).as( "Article is inherently intercepted" ).excludes( article );
 
 		tx.commit();
 	}
@@ -115,8 +115,8 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 		setAllBlogEntriesToStatus( BlogStatus.REMOVED );
 		Transaction tx = fullTextSession.beginTransaction();
 
-		assertThat( getBlogEntriesFor( TotalArticle.class ) ).as( "TotalArticle is explicit not intercepted" )
-				.hasSize( 1 );
+		List<Blog> blogEntries = getBlogEntries();
+		assertThat( blogEntries ).as( "TotalArticle is explicitly not intercepted" ).contains( totalArticle );
 
 		tx.commit();
 	}
@@ -126,9 +126,9 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 	public void testInterceptorWithMassIndexer() throws Exception {
 		setAllBlogEntriesToStatus( BlogStatus.PUBLISHED );
 
-		List<Blog> allEntries = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
-		assertEquals( "Wrong total number of entries", 3, allEntries.size() );
-		for ( Blog blog : allEntries ) {
+		List<Blog> blogEntries = getBlogEntries();
+		assertEquals( "Wrong total number of entries", 3, blogEntries.size() );
+		for ( Blog blog : blogEntries ) {
 			assertTrue( blog.getStatus().equals( BlogStatus.PUBLISHED ) );
 		}
 
@@ -140,8 +140,8 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 
 		tx.commit();
 
-		allEntries = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
-		assertEquals( "Wrong total number of entries. Index should be empty after purge.", 0, allEntries.size() );
+		blogEntries = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
+		assertEquals( "Wrong total number of entries. Index should be empty after purge.", 0, blogEntries.size() );
 
 		tx = fullTextSession.beginTransaction();
 		fullTextSession.createIndexer()
@@ -152,8 +152,8 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 				.startAndWait();
 		tx.commit();
 
-		allEntries = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
-		assertEquals( "Wrong total number of entries.", 3, allEntries.size() );
+		blogEntries = getBlogEntries();
+		assertEquals( "Wrong total number of entries.", 3, blogEntries.size() );
 	}
 
 	private void createPersistAndIndexTestData() {
@@ -196,9 +196,10 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 		fullTextSession.clear();
 	}
 
-	private List getBlogEntriesFor(Class<?> blogType) {
-		TermQuery query = new TermQuery( new Term( ProjectionConstants.OBJECT_CLASS, blogType.getName() ) );
-		return fullTextSession.createFullTextQuery( query ).list();
+	@SuppressWarnings("unchecked")
+	private List<Blog> getBlogEntries() {
+		Query query = new MatchAllDocsQuery();
+		return fullTextSession.createFullTextQuery( query, Blog.class ).list();
 	}
 
 	@Override
