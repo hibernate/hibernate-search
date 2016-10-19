@@ -234,7 +234,6 @@
                                 
                                 <!-- HSEARCH-2393 Remove depencies to Lucene in tests for features common to Lucene and Elasticsearch -->
                                 <exclude>**/ProgrammaticMappingTest.java</exclude><!-- Analyzers -->
-                                <exclude>**/TransactionTest.java</exclude><!-- Directory -->
                                 <exclude>**/IndexingActionInterceptorTest.java</exclude><!-- Queries on the object's class -->
                                 <exclude>**/ToStringTest.java</exclude><!-- Relies on the lucene query's toString(), should be the HSQuery's getQueryString? -->
                                 <exclude>**/DynamicBoostingTest.java</exclude><!-- Projection constant __HSearch_Explanation -->
