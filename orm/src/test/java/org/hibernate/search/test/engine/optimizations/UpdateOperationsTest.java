@@ -11,16 +11,24 @@ import java.util.List;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.optimizer.LeakingOptimizer;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
+ * Test that {@link AbstractWorkspaceImpl} uses
+ * {@link org.apache.lucene.index.IndexWriter#updateDocument(Term, Iterable<? extends IndexableField>)}
+ * for updating documents when possible.
+ *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
+@Category( SkipOnElasticsearch.class ) // This optimization is specific to the Lucene backend
 public class UpdateOperationsTest {
 
 	@Test
