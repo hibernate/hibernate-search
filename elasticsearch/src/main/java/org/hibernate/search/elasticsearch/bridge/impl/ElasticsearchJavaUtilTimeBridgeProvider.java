@@ -11,6 +11,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.FieldBridge;
@@ -36,20 +37,28 @@ class ElasticsearchJavaUtilTimeBridgeProvider extends ExtendedBridgeProvider {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
 
 		if ( Date.class.isAssignableFrom( context.getReturnType() ) ) {
-			Resolution resolution = getResolution( annotatedElement );
+			Resolution resolution = getDateResolution( annotatedElement );
 			return getDateFieldBridge( resolution );
 		}
 		else if ( Calendar.class.isAssignableFrom( context.getReturnType() ) ) {
-			Resolution resolution = getResolution( annotatedElement );
+			Resolution resolution = getCalendarResolution( annotatedElement );
 			return getCalendarFieldBridge( resolution );
 		}
 
 		return null;
 	}
 
-	private Resolution getResolution(AnnotatedElement annotatedElement) {
+	private Resolution getDateResolution(AnnotatedElement annotatedElement) {
 		if ( annotatedElement.isAnnotationPresent( DateBridge.class ) ) {
 			return annotatedElement.getAnnotation( DateBridge.class ).resolution();
+		}
+
+		return Resolution.MILLISECOND;
+	}
+
+	private Resolution getCalendarResolution(AnnotatedElement annotatedElement) {
+		if ( annotatedElement.isAnnotationPresent( CalendarBridge.class ) ) {
+			return annotatedElement.getAnnotation( CalendarBridge.class ).resolution();
 		}
 
 		return Resolution.MILLISECOND;

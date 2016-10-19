@@ -219,10 +219,6 @@
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
                                 <!-- Also, parts of NullEmbeddedTest -->
                                 
-                                <!-- HSEARCH-2402 Elasticsearch backend mistakes @DateBridge for @CalendarBridge -->
-                                <exclude>**/BridgeTest.java</exclude>
-                                <exclude>**/NumericEncodingQueriesTest.java</exclude>
-                                
                                 <!-- HSEARCH-2403 TwoWayFieldBridge exceptions are not wrapped properly when retrieving ES projection values -->
                                 <exclude>**/BridgeTest.java</exclude>
                                 
