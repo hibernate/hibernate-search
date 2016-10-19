@@ -14,7 +14,7 @@ import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 
 /**
  * Interface defining ORM and Search infrastructure methods a test base class needs to offer.
@@ -35,7 +35,7 @@ public interface TestResourceManager {
 
 	SearchFactory getSearchFactory();
 
-	SearchIntegrator getExtendedSearchIntegrator();
+	ExtendedSearchIntegrator getExtendedSearchIntegrator();
 
 	Directory getDirectory(Class<?> clazz);
 
