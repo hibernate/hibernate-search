@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.SearchFactory;
@@ -94,11 +93,6 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 	@Override
 	public Path getBaseIndexDir() {
 		return getTestResourceManager().getBaseIndexDir();
-	}
-
-	@Override
-	public Directory getDirectory(Class<?> clazz) {
-		return getTestResourceManager().getDirectory( clazz );
 	}
 
 	@Override

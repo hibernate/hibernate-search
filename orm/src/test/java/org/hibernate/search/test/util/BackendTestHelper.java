@@ -16,8 +16,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.IndexReaderAccessor;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.TestResourceManager;
 
 /**
@@ -72,9 +76,16 @@ public abstract class BackendTestHelper {
 			this.resourceManager = resourceManager;
 		}
 
+		public Directory getDirectory(Class<?> entityType) {
+			ExtendedSearchIntegrator integrator = resourceManager.getExtendedSearchIntegrator();
+			IndexManager[] indexManagers = integrator.getIndexBinding( entityType ).getIndexManagers();
+			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+			return indexManager.getDirectoryProvider().getDirectory();
+		}
+
 		@Override
 		public int getNumberOfDocumentsInIndex(Class<?> entityType) {
-			try ( IndexReader reader = DirectoryReader.open( resourceManager.getDirectory( entityType ) ) ) {
+			try ( IndexReader reader = DirectoryReader.open( getDirectory( entityType ) ) ) {
 				return reader.numDocs();
 			}
 			catch (IOException e) {

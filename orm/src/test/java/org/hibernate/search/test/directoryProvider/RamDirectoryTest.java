@@ -6,15 +6,13 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Session;
-
 import org.hibernate.search.Search;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
@@ -22,8 +20,6 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
@@ -80,13 +76,7 @@ public class RamDirectoryTest extends SearchTestBase {
 	}
 
 	private int getDocumentNbr() throws Exception {
-		IndexReader reader = DirectoryReader.open( getDirectory( Document.class ) );
-		try {
-			return reader.numDocs();
-		}
-		finally {
-			reader.close();
-		}
+		return getNumberOfDocumentsInIndex( Document.class );
 	}
 
 	@Override
