@@ -234,8 +234,6 @@
                                 
                                 <!-- HSEARCH-2393 Remove depencies to Lucene in tests for features common to Lucene and Elasticsearch -->
                                 <exclude>**/ProgrammaticMappingTest.java</exclude><!-- Analyzers -->
-                                <exclude>**/IndexAndQueryNullTest.java</exclude><!-- Projection constant __HSearch_Document -->
-                                <exclude>**/ProgrammaticIndexAndQueryNullTest.java</exclude><!-- Projection constant __HSearch_Document -->
                                 <exclude>**/ProjectionQueryTest.java</exclude><!-- Projection constant __HSearch_Document -->
                                 <exclude>**/SortUsingEntityManagerTest.java</exclude><!-- Sort type LONG instead of STRING? -->
                                 <exclude>**/LazyCollectionsUpdatingTest.java</exclude><!-- Use of TermQuery? -->
