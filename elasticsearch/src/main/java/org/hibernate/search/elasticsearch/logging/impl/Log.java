@@ -183,4 +183,10 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	SearchException backtrackingWindowOverflow(int backtrackingLimit, int windowStartIndex, int requestedIndex);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 32,
+			value = "@DynamicBoost is not supported with Elasticsearch. Ignoring boost strategy '%1$s' for entity '%2$s' (field path '%3$s')."
+	)
+	void unsupportedDynamicBoost(Class<?> boostStrategyType, Class<?> entityType, String fieldPath);
+
 }

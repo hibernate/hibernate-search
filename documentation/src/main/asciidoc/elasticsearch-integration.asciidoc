@@ -173,6 +173,10 @@ In order for your value to be understood by Hibernate Search (and Elasticsearch)
  * For booleans, use either `true` or `false`.
  * For dates, use the ISO-8601 format (`yyyy-MM-dd'T'HH:mm:ssZ`, for instance `2016-08-26T16:41:00+01:00`). The time and time zone may be omitted (if omitted, the time zone will be interpreted as the default JVM time zone).
 
+===== Dynamic boosting
+
+The `org.hibernate.search.annotations.DynamicBoost` annotation is not (and cannot be) supported with Elasticsearch, because the platform lacks per-document, index-time boosting capabilities. Static boosts (`@Boost`) are, however, supported.
+
 ==== [[elasticsearch-mapping-analyzer]] Analyzers
 
 WARNING: Analyzers are treated differently than in Lucene embedded mode.

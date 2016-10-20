@@ -46,10 +46,12 @@ import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -671,6 +673,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(SkipOnElasticsearch.class) // Dynamic boosting is not supported on Elasticsearch
 	public void testDynamicBoosts() throws Exception {
 
 		Session session = openSession();
