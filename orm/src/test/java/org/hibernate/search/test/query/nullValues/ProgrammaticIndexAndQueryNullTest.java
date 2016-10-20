@@ -7,34 +7,34 @@
 
 package org.hibernate.search.test.query.nullValues;
 
-import java.lang.annotation.ElementType;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Query;
-import org.hibernate.Transaction;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.annotations.Store;
-import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
-import org.hibernate.search.testsupport.TestConstants;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.annotation.ElementType;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
+import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.annotations.Store;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
+import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Test;
+
 /**
- * Tests for indexing and querying {@code null} values. See HSEARCh-115
+ * Tests for indexing and querying programmatically mapped {@code null} values.
  *
  * @author Hardy Ferentschik
  */
+@TestForIssue(jiraKey = "HSEARCH-115")
 public class ProgrammaticIndexAndQueryNullTest extends SearchTestBase {
 
 	@Test
@@ -49,32 +49,22 @@ public class ProgrammaticIndexAndQueryNullTest extends SearchTestBase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
-		parser.setAllowLeadingWildcard( true );
-		Query query = parser.parse( "*" );
+		Query query = new MatchAllDocsQuery();
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, ProgrammaticConfiguredValue.class );
 		fullTextQuery.setProjection(
 				"id",
-				"value",
-				FullTextQuery.DOCUMENT
+				"value"
 		);
 		fullTextQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
-		List mappedResults = fullTextQuery.list();
+		List<?> mappedResults = fullTextQuery.list();
 		assertTrue( "Wrong result size", mappedResults.size() == 1 );
 
-		Map map = (Map) mappedResults.get( 0 );
+		Map<?, ?> map = (Map<?, ?>) mappedResults.get( 0 );
 		Integer id = (Integer) map.get( "id" );
 		assertNotNull( id );
 
 		String value = (String) map.get( "value" );
 		assertEquals( "The null token should be converted back to null", null, value );
-
-		Document doc = (Document) map.get( FullTextQuery.DOCUMENT );
-		assertEquals(
-				"The programmatically configured null value should be in the document",
-				"@null@",
-				doc.getField( "value" ).stringValue()
-		);
 
 		tx.commit();
 		fullTextSession.close();
