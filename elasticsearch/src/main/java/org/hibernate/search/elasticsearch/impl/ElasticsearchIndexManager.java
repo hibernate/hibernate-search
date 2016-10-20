@@ -32,6 +32,8 @@ import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
+import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -409,6 +411,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 
 		field.addProperty( "boost", mappingBuilder.getBoost( fieldMetadata.getBoost() ) );
 
+		logDynamicBoostWarning( mappingBuilder, fieldMetadata.getSourceType().getDynamicBoost(), fieldPath );
+		PropertyMetadata sourceProperty = fieldMetadata.getSourceProperty();
+		if ( sourceProperty != null ) {
+			logDynamicBoostWarning( mappingBuilder, sourceProperty.getDynamicBoostStrategy(), fieldPath );
+		}
+
 		if ( fieldMetadata.indexNullAs() != null ) {
 			JsonElement nullValueJsonElement = getNullValue( fieldType, fieldMetadata );
 			field.add( "null_value", nullValueJsonElement );
@@ -427,6 +435,12 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 					LOG.debug( "Not adding a mapping for facet " + facetMetadata.getFacetName() + " because of incomplete data", e );
 				}
 			}
+		}
+	}
+
+	private void logDynamicBoostWarning(ElasticsearchMappingBuilder mappingBuilder, BoostStrategy dynamicBoostStrategy, String fieldPath) {
+		if ( dynamicBoostStrategy != null && !DefaultBoostStrategy.INSTANCE.equals( dynamicBoostStrategy ) ) {
+			LOG.unsupportedDynamicBoost( dynamicBoostStrategy.getClass(), mappingBuilder.getBeanClass(), fieldPath );
 		}
 	}
 

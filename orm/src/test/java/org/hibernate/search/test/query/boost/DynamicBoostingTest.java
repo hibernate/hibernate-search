@@ -18,13 +18,16 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@Category(SkipOnElasticsearch.class) // Dynamic boosting is not supported on Elasticsearch
 public class DynamicBoostingTest extends SearchTestBase {
 
 	private static final Log log = LoggerFactory.make();
