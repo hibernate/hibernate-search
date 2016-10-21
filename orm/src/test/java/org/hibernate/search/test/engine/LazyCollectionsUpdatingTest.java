@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.engine;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -23,8 +22,6 @@ import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReade
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
 import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -34,9 +31,6 @@ import static org.junit.Assert.fail;
  * TestCase for HSEARCH-178 (Search hitting HHH-2763)
  * Verifies that it's possible to index lazy loaded collections from
  * indexed entities even when no transactions are used.
- *
- * Additionally, it uses projection and verifies an optimal FieldSelector
- * is being applied (HSEARCH-690).
  *
  * @author Sanne Grinovero
  */
@@ -50,7 +44,6 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 			Transaction tx = fullTextSession.beginTransaction();
 			resetFieldSelector();
 			List list = fullTextSession.createCriteria( BusStop.class ).list();
-			assertFieldSelectorDisabled();
 			assertNotNull( list );
 			assertEquals( 4, list.size() );
 			BusStop busStop = (BusStop) list.get( 1 );
@@ -89,19 +82,12 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 
 	public void assertFindsByRoadName(String analyzedRoadname) {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		resetFieldSelector();
 		Transaction tx = fullTextSession.beginTransaction();
 		TermQuery ftQuery = new TermQuery( new Term( "stops.roadName", analyzedRoadname ) );
 		FullTextQuery query = fullTextSession.createFullTextQuery( ftQuery, BusLine.class );
 		query.setProjection( "busLineName" );
 		assertEquals( 1, query.list().size() );
 		List results = query.list();
-		try {
-			assertFieldSelectorEnabled( "busLineName" );
-		}
-		catch (IOException e) {
-			fail( "unexpected exception " + e );
-		}
 		String resultName = (String) ( (Object[]) results.get( 0 ) )[0];
 		assertEquals( "Linea 64", resultName );
 		tx.commit();
@@ -121,7 +107,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 			addBusStop( bus, "Stazione Termini" );
 			addBusStop( bus, "via Gregorio VII" );
 			addBusStop( bus, "via Alessandro III" );
-			addBusStop( bus, "via M.Buonarroti" );
+			addBusStop( bus, "via M. Buonarroti" );
 			getSession().persist( bus );
 			tx.commit();
 		}
