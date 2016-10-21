@@ -15,6 +15,9 @@ import java.util.TimeZone;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * Store the date in 3 different fields - year, month, day - to ease Range Query per
@@ -22,9 +25,20 @@ import org.hibernate.search.bridge.LuceneOptions;
  *
  * @author Emmanuel Bernard
  */
-public class DateSplitBridge implements FieldBridge {
+public class DateSplitBridge implements FieldBridge, MetadataProvidingFieldBridge {
 
 	private static final TimeZone GMT = TimeZone.getTimeZone( "GMT" );
+
+	private static final String YEAR_SUFFIX = "_year";
+	private static final String MONTH_SUFFIX = "_month";
+	private static final String DAY_SUFFIX = "_day";
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name + YEAR_SUFFIX, FieldType.STRING )
+				.field( name + MONTH_SUFFIX, FieldType.STRING )
+				.field( name + DAY_SUFFIX, FieldType.STRING );
+	}
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
@@ -36,14 +50,14 @@ public class DateSplitBridge implements FieldBridge {
 		int day = cal.get( Calendar.DAY_OF_MONTH );
 
 		// set year
-		luceneOptions.addFieldToDocument( name + ".year", String.valueOf( year ), document );
+		luceneOptions.addFieldToDocument( name + YEAR_SUFFIX, String.valueOf( year ), document );
 
 		// set month and pad it if needed
-		luceneOptions.addFieldToDocument( name + ".month",
+		luceneOptions.addFieldToDocument( name + MONTH_SUFFIX,
 				month < 10 ? "0" : "" + String.valueOf( month ), document );
 
 		// set day and pad it if needed
-		luceneOptions.addFieldToDocument( name + ".day",
+		luceneOptions.addFieldToDocument( name + DAY_SUFFIX,
 				day < 10 ? "0" : "" + String.valueOf( day ), document );
 	}
 }
