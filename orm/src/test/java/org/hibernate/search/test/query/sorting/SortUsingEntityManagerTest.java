@@ -16,13 +16,9 @@ import java.util.TimeZone;
 
 import javax.persistence.EntityTransaction;
 
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.FullTextQuery;
-import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
 import org.hibernate.search.test.query.ProductArticle;
 import org.junit.Test;
@@ -34,16 +30,12 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 
 	private static final TimeZone ENCODING_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
-	private static final boolean DESC = true;
-
 	private FullTextEntityManager em;
-	private QueryParser queryParser;
 
 	@Override
 	public void setUp() {
 		super.setUp();
 		em = org.hibernate.search.jpa.Search.getFullTextEntityManager( factory.createEntityManager() );
-		queryParser = new QueryParser( "header", TestConstants.stopAnalyzer );
 		createArticles();
 	}
 
@@ -69,8 +61,12 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	public void testResultOrderedByDateDescending() throws Exception {
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
-		Sort dateDescending = new Sort( new SortField( "creationDate", SortField.Type.LONG, DESC ) );
-		List<ProductArticle> result = query( "Hib*" ).setSort( dateDescending ).setFirstResult( 3 ).getResultList();
+
+		QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( ProductArticle.class ).get();
+		org.apache.lucene.search.Query query = builder.keyword().wildcard().onField( "header" ).matching( "hib*" ).createQuery();
+		Sort dateDescending = builder.sort().byField( "creationDate" ).desc().createSort();
+		List<ProductArticle> result = em.createFullTextQuery( query, ProductArticle.class )
+				.setSort( dateDescending ).setFirstResult( 3 ).getResultList();
 
 		assertThat( result ).as( "query result" ).hasSize( 3 );
 		assertThat( result.get( 0 ).getArticleId() ).as( "article id" ).isEqualTo( 3 );
@@ -78,11 +74,6 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 		assertThat( result.get( 2 ).getArticleId() ).as( "article id" ).isEqualTo( 1 );
 		tx.commit();
 		em.clear();
-	}
-
-	private FullTextQuery query(String q) throws ParseException {
-		org.apache.lucene.search.Query query = queryParser.parse( q );
-		return em.createFullTextQuery( query, ProductArticle.class );
 	}
 
 	private Date date(int day, int month, int year) {
@@ -100,7 +91,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	}
 
 	@Override
-	public Class[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { ProductArticle.class };
 	}
 
