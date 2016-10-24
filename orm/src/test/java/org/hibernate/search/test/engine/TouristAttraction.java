@@ -24,14 +24,14 @@ import org.hibernate.search.annotations.Store;
 public class TouristAttraction {
 
 	@Id
-	final int id;
+	int id;
 
 	@Fields({
 			@Field(name = "scoreNumeric", store = Store.YES),
 			@Field(name = "scoreString", store = Store.YES)
 	})
 	@NumericField(forField = "scoreNumeric")
-	final short score;
+	short score;
 
 	@Fields({
 			@Field(name = "ratingNumericPrecision1", store = Store.YES),
@@ -42,7 +42,11 @@ public class TouristAttraction {
 			@NumericField(forField = "ratingNumericPrecision1", precisionStep = 1),
 			@NumericField(forField = "ratingNumericPrecision2", precisionStep = 2)
 	})
-	final short rating;
+	short rating;
+
+	TouristAttraction() {
+		// empty
+	}
 
 	TouristAttraction(int id, short score, short rating) {
 		this.id = id;
