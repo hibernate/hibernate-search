@@ -890,20 +890,28 @@ The different reader strategies are described in <<search-architecture-readerstr
 box strategies are:
 
 
-* `shared`: share index readers across several queries. This strategy is the most efficient.
-* `not-shared`: create an index reader for each individual query
+* `shared`: share index readers across several queries. This strategy is very efficient.
+* `not-shared`: create an index reader for each individual query. Very simple implementation.
+* `async`: only opens a new index reader periodically. This is the most efficient implementation, but queries might return out of date values.
 
-The default reader strategy is `shared`. This can be adjusted:
+The default reader strategy is `shared`.
+
+You can pick the reader strategy by changing the `.reader.strategy` configuration property,
+scoped to the "default" index or to a specific index.
+
+For example:
 
 ====
 ----
-hibernate.search.[default|<indexname>].reader.strategy = not-shared
+hibernate.search.[default|<indexname>].reader.strategy = async
+hibernate.search.[default|<indexname>].reader.async_refresh_period_ms = 8000
 ----
 ====
 
-Adding this property switches to the `not-shared` strategy.
+Adding the above properties switches to the `async` strategy, and configures it to refresh
+the index reader each 8 seconds.
 
-Or if you have a custom reader strategy:
+Alternatively you can use a custom implementation of a `org.hibernate.search.indexes.spi.ReaderProvider`:
 
 ====
 ----
