@@ -11,16 +11,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,26 +85,19 @@ public class WorkerTestCase extends SearchTestBase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				ee = (Employee) s.get( Employee.class, ee.getId() );
-				ee.setName( "Emmanuel2" );
+				ee.setName( "John" );
 				tx.commit();
 				s.close();
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				er = (Employer) s.get( Employer.class, er.getId() );
-				er.setName( "RH2" );
+				er.setName( "JBoss" );
 				tx.commit();
 				s.close();
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
-				Query query;
-				try {
-					query = parser.parse( "name:emmanuel2" );
-				}
-				catch (ParseException e) {
-					throw new RuntimeException( e );
-				}
+				Query query = new TermQuery( new Term( "name", "john" ) );
 				boolean results = Search.getFullTextSession( s ).createFullTextQuery( query ).list().size() > 0;
 				// don't test because in case of async, it query happens before
 				// actual saving
