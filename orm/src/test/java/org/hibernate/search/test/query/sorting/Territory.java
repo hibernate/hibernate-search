@@ -12,9 +12,9 @@ import javax.persistence.Id;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.util.BytesRef;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.StringBridge;
@@ -26,13 +26,19 @@ import org.hibernate.search.bridge.spi.FieldType;
  */
 @Entity
 @Indexed
-@ClassBridge(impl = Territory.NameFieldBridge.class)
+@ClassBridge(analyze = Analyze.NO /* We sort on this field */, impl = Territory.NameFieldBridge.class)
 public class Territory {
 
 	/**
 	 * @author Yoann Rodiere
 	 */
-	public static class IdFieldBridge implements FieldBridge, StringBridge {
+	public static class IdFieldBridge implements MetadataProvidingFieldBridge, StringBridge {
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( name, FieldType.INTEGER )
+					.sortable( true );
+		}
 
 		@Override
 		public String objectToString(Object object) {
@@ -89,19 +95,21 @@ public class Territory {
 
 	public static class NameFieldBridge implements MetadataProvidingFieldBridge {
 
+		private static final String FIELD_SUFFIX = "territoryName";
+
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 			Territory territory = (Territory) value;
 
 			String territoryName = territory.getName();
-			luceneOptions.addFieldToDocument( "territoryName", territoryName, document );
-			document.add( new SortedDocValuesField( "territoryName", new BytesRef( territoryName ) ) );
+			luceneOptions.addFieldToDocument( name + FIELD_SUFFIX, territoryName, document );
+			document.add( new SortedDocValuesField( name + FIELD_SUFFIX, new BytesRef( territoryName ) ) );
 		}
 
 		@Override
 		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
 			builder
-				.field( "territoryName", FieldType.STRING )
+				.field( name + FIELD_SUFFIX, FieldType.STRING )
 					.sortable( true );
 		}
 	}
