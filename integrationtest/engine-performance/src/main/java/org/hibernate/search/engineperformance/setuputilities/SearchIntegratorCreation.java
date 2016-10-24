@@ -23,9 +23,9 @@ public class SearchIntegratorCreation {
 		//do not construct
 	}
 
-	public static SearchIntegrator createIntegrator(String backend, Path storagePath) {
+	public static SearchIntegrator createIntegrator(String directorytype, String readerStrategy, Path storagePath) {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
-		switch ( backend ) {
+		switch ( directorytype ) {
 			case "ram" :
 				cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 				break;
@@ -40,7 +40,17 @@ public class SearchIntegratorCreation {
 				cfg.addProperty( "hibernate.search.default.worker.backend", "blackhole" );
 				break;
 			default :
-				throw new RuntimeException( "Parameter 'backend'='" + backend + "' not recognized!" );
+				throw new RuntimeException( "Parameter 'directorytype'='" + directorytype + "' not recognized!" );
+		}
+		switch ( readerStrategy ) {
+			case "async" :
+				cfg.addProperty( "hibernate.search.default.reader.strategy", "async" );
+				break;
+			case "shared" :
+				cfg.addProperty( "hibernate.search.default.reader.strategy", "shared" );
+				break;
+			default :
+				throw new RuntimeException( "Parameter 'readerStrategy'='" + readerStrategy + "' not recognized!" );
 		}
 		cfg.addProperty( "hibernate.search.default.indexBase", storagePath.toString() );
 		cfg.addClass( BookEntity.class );
