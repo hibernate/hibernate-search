@@ -230,7 +230,6 @@
                                 <!-- HSEARCH-2393 Remove depencies to Lucene in tests for features common to Lucene and Elasticsearch -->
                                 <exclude>**/ProgrammaticMappingTest.java</exclude><!-- Analyzers -->
                                 <exclude>**/LuceneErrorHandlingTest.java</exclude><!-- LuceneErrorHandlingTest$NoOpLuceneWorkDelegate cannot be cast ... -->
-                                <exclude>**/NumericFieldTest.java</exclude><!-- Missing field metadata (should use MetadataProvidingFieldBridge) -->
                                 <exclude>**/SortOnFieldsFromCustomBridgeTest.java</exclude><!-- Missing field metadata (should use MetadataProvidingFieldBridge) -->
                                 <exclude>**/DirectoryProviderForQueryTest.java</exclude><!-- Full text filters must implement ElasticsearchFilter -->
                                 

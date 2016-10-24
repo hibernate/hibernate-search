@@ -15,8 +15,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.Session;
@@ -29,21 +27,28 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.ShortBridge;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
-import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class NumericFieldTest extends SearchTestBase {
@@ -119,7 +124,7 @@ public class NumericFieldTest extends SearchTestBase {
 			Query query = NumericFieldUtils.createNumericRangeQuery( "overriddenFieldName", 1, 6, true, true );
 			FullTextQuery fullTextQuery = fts
 					.createFullTextQuery( query, Location.class )
-					.setProjection( ProjectionConstants.DOCUMENT );
+					.setProjection( ProjectionConstants.ID );
 			assertEquals( "Check for deletion on index projection", 0, fullTextQuery.list().size() );
 
 			tx.commit();
@@ -128,6 +133,7 @@ public class NumericFieldTest extends SearchTestBase {
 
 	@TestForIssue(jiraKey = "HSEARCH-1193")
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2425 Projection on spatial coordinates returns a String instead of a number with Elasticsearch
 	public void testNumericFieldProjections() {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
@@ -205,29 +211,29 @@ public class NumericFieldTest extends SearchTestBase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1987")
 	public void testOneOfSeveralFieldsIsNumeric() {
-		try ( Session session = openSession() ) {
-			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			Transaction tx = fullTextSession.beginTransaction();
+		assertEquals(
+				NumericFieldBridge.SHORT_FIELD_BRIDGE,
+				getUnwrappedBridge( TouristAttraction.class , "scoreNumeric" )
+				);
 
-			QueryContextBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder();
-			Query query = queryBuilder.forEntity( TouristAttraction.class ).get().all().createQuery();
+		assertThat(
+				getUnwrappedBridge( TouristAttraction.class , "scoreString" ),
+				instanceOf( ShortBridge.class )
+				);
+	}
 
-			@SuppressWarnings("unchecked")
-			List<Object[]> list = fullTextSession.createFullTextQuery( query, TouristAttraction.class )
-					.setProjection( ProjectionConstants.DOCUMENT )
-					.list();
+	private Object getUnwrappedBridge(Class<?> clazz, String string) {
+		FieldBridge bridge = getExtendedSearchIntegrator().getIndexBinding( clazz ).getDocumentBuilder()
+				.getMetadata().getDocumentFieldMetadataFor( string ).getFieldBridge();
+		return unwrapBridge( bridge );
+	}
 
-			assertEquals( 1, list.size() );
-			Document document = (Document) list.iterator().next()[0];
-
-			IndexableField scoreNumeric = document.getField( "scoreNumeric" );
-			assertThat( scoreNumeric.numericValue() ).isEqualTo( 23 );
-
-			IndexableField scoreString = document.getField( "scoreString" );
-			assertThat( scoreString.numericValue() ).isNull();
-			assertThat( scoreString.stringValue() ).isEqualTo( "23" );
-
-			tx.commit();
+	private Object unwrapBridge(Object bridge) {
+		if ( bridge instanceof TwoWayString2FieldBridgeAdaptor ) {
+			return unwrapBridge( ((TwoWayString2FieldBridgeAdaptor) bridge).unwrap() );
+		}
+		else {
+			return bridge;
 		}
 	}
 
@@ -264,29 +270,15 @@ public class NumericFieldTest extends SearchTestBase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1987")
 	public void testNumericMappingOfEmbeddedFields() {
-		try ( Session session = openSession() ) {
-			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			Transaction tx = fullTextSession.beginTransaction();
+		assertEquals(
+				NumericFieldBridge.INT_FIELD_BRIDGE,
+				getUnwrappedBridge( ScoreBoard.class , "score_id" )
+				);
 
-			QueryContextBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder();
-			Query query = queryBuilder.forEntity( ScoreBoard.class ).get().all().createQuery();
-
-			@SuppressWarnings("unchecked")
-			List<Object[]> list = fullTextSession.createFullTextQuery( query, ScoreBoard.class )
-					.setProjection( ProjectionConstants.DOCUMENT )
-					.list();
-
-			assertEquals( 1, list.size() );
-			Document document = (Document) list.iterator().next()[0];
-
-			IndexableField scoreNumeric = document.getField( "score_id" );
-			assertThat( scoreNumeric.numericValue() ).isEqualTo( 1 );
-
-			IndexableField beta = document.getField( "score_beta" );
-			assertThat( beta.numericValue() ).isEqualTo( 100 );
-
-			tx.commit();
-		}
+		assertEquals(
+				NumericFieldBridge.INT_FIELD_BRIDGE,
+				getUnwrappedBridge( ScoreBoard.class , "score_beta" )
+				);
 	}
 
 	private boolean indexIsEmpty() {
@@ -401,6 +393,11 @@ public class NumericFieldTest extends SearchTestBase {
 			List<Position> positions = fullTextSession.createCriteria( Position.class ).list();
 			for ( Position position : positions ) {
 				fullTextSession.delete( position );
+			}
+
+			List<TouristAttraction> attractions = fullTextSession.createCriteria( TouristAttraction.class ).list();
+			for ( TouristAttraction attraction : attractions ) {
+				fullTextSession.delete( attraction );
 			}
 
 			List<ScoreBoard> scoreboards = fullTextSession.createCriteria( ScoreBoard.class ).list();
