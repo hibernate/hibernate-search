@@ -235,7 +235,6 @@
                                 <!-- HSEARCH-2393 Remove depencies to Lucene in tests for features common to Lucene and Elasticsearch -->
                                 <exclude>**/ProgrammaticMappingTest.java</exclude><!-- Analyzers -->
                                 <exclude>**/LuceneErrorHandlingTest.java</exclude><!-- LuceneErrorHandlingTest$NoOpLuceneWorkDelegate cannot be cast ... -->
-                                <exclude>**/DirectoryProviderForQueryTest.java</exclude><!-- Full text filters must implement ElasticsearchFilter -->
                                 
                                 <!-- HSEARCH-2395 Support MoreLikeThisQueries with the Elasticsearch backend -->
                                 <exclude>**/MoreLikeThisTest.java</exclude>
@@ -254,6 +253,12 @@
                                 
                                 <!-- HSEARCH-2400 Support IndexingMonitor for the Elasticsearch backend -->
                                 <exclude>**/ProgressMonitorTest.java</exclude>
+                                
+                                <!-- HSEARCH-2426 Remote analyzer initialization fails when using dynamic sharding on Elasticsearch -->
+                                <exclude>**/DirectoryProviderForQueryTest.java</exclude>
+                                <exclude>**/CustomerShardingStrategyTest.java</exclude>
+                                <exclude>**/DynamicShardingTest.java</exclude>
+                                <exclude>**/IdShardingStrategyTest.java</exclude>
                                 
                                 <!-- HSEARCH-2404 Enable CollectionUpdateEventTest for Elasticsearch -->
                                 <exclude>**/CollectionUpdateEventTest.java</exclude><!-- Only fails on CI (Travis) -->
