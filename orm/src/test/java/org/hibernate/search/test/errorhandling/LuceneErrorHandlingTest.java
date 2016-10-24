@@ -27,8 +27,10 @@ import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * Test to verify the configured ErrorHandler is used in the Lucene
@@ -39,6 +41,7 @@ import org.junit.Test;
  * @author Sanne Grinovero
  * @since 3.2
  */
+@Category(SkipOnElasticsearch.class) // This test is Lucene-specific. The equivalent for Elasticsearch is ElasticsearchExceptionHandlingIT
 public class LuceneErrorHandlingTest extends SearchTestBase {
 
 	static final AtomicInteger WORK_COUNTER = new AtomicInteger();
