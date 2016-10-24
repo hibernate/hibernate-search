@@ -50,9 +50,12 @@ public class Explorer {
 
 	@ManyToOne
 	@IndexedEmbedded
-	@Field(bridge = @FieldBridge(impl = Territory.IdFieldBridge.class))
-	@NumericField
-	@SortableField
+	/*
+	 * Don't store the id in "favoriteTerritory" directly as this could conflict
+	 * with the @IndexedEmbedded with the Elasticsearch backend
+	 */
+	@Field(name = "favoriteTerritory.idFromBridge", bridge = @FieldBridge(impl = Territory.IdFieldBridge.class))
+	@NumericField(forField = "favoriteTerritory.idFromBridge")
 	private Territory favoriteTerritory;
 
 	public Explorer() {

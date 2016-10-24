@@ -143,7 +143,7 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 		List<Book> result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Explorer.class )
 			.setSort(
 					new Sort(
-							new SortField( "favoriteTerritory", SortField.Type.INT )
+							new SortField( "favoriteTerritory.idFromBridge", SortField.Type.INT )
 					)
 			)
 			.list();
@@ -162,7 +162,7 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 
 		@SuppressWarnings("unchecked")
 		List<Book> result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Explorer.class )
-			.setSort( new Sort( new SortField( "territoryName", SortField.Type.STRING ) ) )
+			.setSort( new Sort( new SortField( "favoriteTerritory.territoryName", SortField.Type.STRING ) ) )
 			.list();
 
 		assertNotNull( result );
