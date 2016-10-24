@@ -23,6 +23,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  * to take measurements but rather to simplify debugging and developing.
  *
  * @author Gunnar Morling
+ * @author Sanne Grinovero
  */
 public class Launcher {
 
@@ -30,10 +31,12 @@ public class Launcher {
 		Options opts = new OptionsBuilder()
 			.include( ".*" )
 			.warmupIterations( 10 )
-			.measurementIterations( 20000 )
-			.param( "queryBackend", "fs" )
+			.measurementIterations( 10 )
+			.param( "directorytype", "fs" )
 			.param( "indexSize", "5000000" )
+			.param( "maxResults", "10" )
 			.exclude( "simple" )
+			.exclude( "query" )
 			.forks( 0 ) //To simplify debugging; Remember this implies JVM parameters via @Fork won't be applied.
 			.build();
 

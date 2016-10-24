@@ -22,7 +22,10 @@ public class QueryEngineHolder extends BaseIndexSetup {
 	public volatile SearchIntegrator si;
 
 	@Param( { "ram", "fs", "fs-nrt" } )
-	private String queryBackend;
+	private String directorytype;
+
+	@Param( { "async", "shared" } )
+	private String readerStrategy;
 
 	@Param( { "100", "5000000" } )
 	private int indexSize;
@@ -32,7 +35,7 @@ public class QueryEngineHolder extends BaseIndexSetup {
 
 	@Setup
 	public void initializeState() throws IOException {
-		si = SearchIntegratorCreation.createIntegrator( queryBackend, pickIndexStorageDirectory() );
+		si = SearchIntegratorCreation.createIntegrator( directorytype, readerStrategy, pickIndexStorageDirectory() );
 		SearchIntegratorCreation.preindexEntities( si, indexSize );
 	}
 
@@ -42,6 +45,10 @@ public class QueryEngineHolder extends BaseIndexSetup {
 
 	public int getMaxResults() {
 		return maxResults;
+	}
+
+	public boolean isQuerySync() {
+		return ! "async".equals( readerStrategy );
 	}
 
 	@TearDown
