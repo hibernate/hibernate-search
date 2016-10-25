@@ -16,9 +16,7 @@ import java.util.TimeZone;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.DateTools;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -38,6 +36,10 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.ShortBridge;
+import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -55,8 +57,10 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -103,41 +107,30 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 	@Test
 	public void testNumeric() throws Exception {
-		Item item = new Item();
-		item.setId( 1 );
-		item.setPrice( (short) 3454 );
+		assertEquals(
+				NumericFieldBridge.SHORT_FIELD_BRIDGE,
+				getUnwrappedBridge( Item.class , "price" )
+				);
 
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		s.persist( item );
-		tx.commit();
-		s.clear();
+		assertThat(
+				getUnwrappedBridge( Item.class , "price_string" ),
+				instanceOf( ShortBridge.class )
+				);
+	}
 
-		tx = s.beginTransaction();
+	private Object getUnwrappedBridge(Class<?> clazz, String string) {
+		FieldBridge bridge = getExtendedSearchIntegrator().getIndexBinding( clazz ).getDocumentBuilder()
+				.getMetadata().getDocumentFieldMetadataFor( string ).getFieldBridge();
+		return unwrapBridge( bridge );
+	}
 
-		Query q = s.getSearchFactory().buildQueryBuilder().forEntity( Item.class ).get().all().createQuery();
-		FullTextQuery query = s.createFullTextQuery( q, Item.class );
-
-		@SuppressWarnings("unchecked")
-		List<Object[]> result = query.setProjection( ProjectionConstants.DOCUMENT, ProjectionConstants.THIS )
-				.list();
-
-		assertEquals( "Numeric field via programmatic config", 1, query.getResultSize() );
-
-		Object[] row = result.iterator().next();
-		Document document = (Document) row[0];
-
-		IndexableField priceNumeric = document.getField( "price" );
-		assertThat( priceNumeric.numericValue() ).isEqualTo( 3454 );
-
-		IndexableField priceString = document.getField( "price_string" );
-		assertThat( priceString.numericValue() ).isNull();
-		assertThat( priceString.stringValue() ).isEqualTo( "3454" );
-
-		s.delete( row[1] );
-
-		tx.commit();
-		s.close();
+	private Object unwrapBridge(Object bridge) {
+		if ( bridge instanceof TwoWayString2FieldBridgeAdaptor ) {
+			return unwrapBridge( ((TwoWayString2FieldBridgeAdaptor) bridge).unwrap() );
+		}
+		else {
+			return bridge;
+		}
 	}
 
 	@Test
