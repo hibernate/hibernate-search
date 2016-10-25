@@ -16,19 +16,16 @@ import java.util.TimeZone;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.DateTools;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -44,6 +41,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
@@ -451,16 +449,14 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		Query luceneQuery = parser.parse( "Goat" );
 
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
-		//needs it. So we use plain Lucene
+		//needs it. So we use plain HSQuery
 
-		IndexReader indexReader = fullTextSession.getSearchFactory().getIndexReaderAccessor().open( ProvidedIdEntry.class );
-		IndexSearcher searcher = new IndexSearcher( indexReader );
-		TopDocs hits = searcher.search( luceneQuery, 1000 );
-		fullTextSession.getSearchFactory().getIndexReaderAccessor().close( indexReader );
+		HSQuery query = getExtendedSearchIntegrator().createHSQuery( luceneQuery, ProvidedIdEntry.class );
+
+		assertEquals( 3, query.queryResultSize() );
+
 		transaction.commit();
 		getSession().close();
-
-		assertEquals( 3, hits.totalHits );
 	}
 
 	@Test
