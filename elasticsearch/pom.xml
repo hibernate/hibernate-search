@@ -232,9 +232,6 @@
                                 <!-- HSEARCH-2392 Enable BridgeProviderTest for Elasticsearch -->
                                 <exclude>**/BridgeProviderTest.java</exclude>
                                 
-                                <!-- HSEARCH-2393 Remove depencies to Lucene in tests for features common to Lucene and Elasticsearch -->
-                                <exclude>**/ProgrammaticMappingTest.java</exclude><!-- Analyzers -->
-                                
                                 <!-- HSEARCH-2395 Support MoreLikeThisQueries with the Elasticsearch backend -->
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 
