@@ -263,7 +263,9 @@ class FieldHelper {
 	}
 
 	static DocumentFieldMetadata getFieldMetadata(EntityIndexBinding indexBinding, String fieldName) {
-		if ( indexBinding.getDocumentBuilder().getIdentifierName().equals( fieldName ) ) {
+		String identifierName = indexBinding.getDocumentBuilder().getIdentifierName();
+		// The identifier name may be null when using implicit provided IDs
+		if ( identifierName != null && identifierName.equals( fieldName ) ) {
 			return indexBinding.getDocumentBuilder()
 					.getTypeMetadata()
 					.getIdPropertyMetadata()
