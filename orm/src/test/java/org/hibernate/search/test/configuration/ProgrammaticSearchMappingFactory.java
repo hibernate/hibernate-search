@@ -82,7 +82,7 @@ public class ProgrammaticSearchMappingFactory {
 					.property( "street2", ElementType.METHOD )
 						.field().name( "idx_street2" ).store( Store.YES ).boost( 2 )
 				.entity( ProvidedIdEntry.class ).indexed()
-						.providedId().name( "providedidentry" ).bridge( LongBridge.class )
+						.providedId().name( "providedidentry.providedid" ).bridge( LongBridge.class )
 						.property( "name", ElementType.FIELD )
 							.field().name( "providedidentry.name" ).analyzer( EN_ANALYZER_NAME ).index( Index.YES ).store( Store.YES )
 						.property( "blurb", ElementType.FIELD )
