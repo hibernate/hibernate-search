@@ -85,6 +85,7 @@
                             <hibernateVersion>${hibernateVersion}</hibernateVersion>
                             <luceneVersion>${luceneVersion}</luceneVersion>
                             <infinispanVersion>${infinispanVersion}</infinispanVersion>
+                            <testElasticsearchVersion>${testElasticsearchVersion}</testElasticsearchVersion>
                         </attributes>
                     </configuration>
                 </plugin>
