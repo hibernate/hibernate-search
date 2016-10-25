@@ -26,31 +26,46 @@ import org.hibernate.search.cfg.SearchMapping;
 
 public class ProgrammaticSearchMappingFactory {
 
+	private static final String EN_ANALYZER_NAME = BlogEntry.EN_ANALYZER_NAME;
+	private static final String ENGLISH_ANALYZER_NAME =
+			"org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory" + "_english";
+	private static final String DEUTSCH_ANALYZER_NAME =
+			"org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory" + "_deutsch";
+	private static final String NGRAM_ANALYZER_NAME =
+			"org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory" + "_ngram";
+
 	@Factory
 	public SearchMapping build() {
 		SearchMapping mapping = new SearchMapping();
 
 		mapping.fullTextFilterDef( "security", SecurityFilterFactory.class ).cache( FilterCacheModeType.INSTANCE_ONLY )
-				.analyzerDef( "ngram", StandardTokenizerFactory.class )
+				/*
+				 * CAUTION: those analyzer definitions are duplicated in the elasticsearch.yml for test with Elasticsearch.
+				 * Any update here should be reflected there.
+				 */
+				.analyzerDef( NGRAM_ANALYZER_NAME, StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( NGramFilterFactory.class )
 						.param( "minGramSize", "3" )
 						.param( "maxGramSize", "3" )
-				.analyzerDef( "english", StandardTokenizerFactory.class )
+				.analyzerDef( ENGLISH_ANALYZER_NAME, StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( SnowballPorterFilterFactory.class )
-				.analyzerDef( "deutsch", StandardTokenizerFactory.class )
+				.analyzerDef( DEUTSCH_ANALYZER_NAME, StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( GermanStemFilterFactory.class )
+				/*
+				 * End of analyzer definitions that are duplicated in the elasticsearch.yml for test with Elasticsearch.
+				 */
 				.entity( Address.class )
 					.indexed()
 					.boost( 2 )
 					.classBridge( AddressClassBridge.class )
-					.analyzer( "english" )
+					.analyzer( ENGLISH_ANALYZER_NAME )
 					.property( "addressId", ElementType.FIELD ).documentId().name( "id" )
 					.property( "lastUpdated", ElementType.FIELD )
 						.field().name( "last-updated" )
-								.analyzer( "en" ).store( Store.YES )
+								.analyzer( EN_ANALYZER_NAME ).store( Store.YES )
 								.calendarBridge( Resolution.DAY )
 					.property( "dateCreated", ElementType.FIELD )
 						.field().name( "date-created" ).index( Index.YES )
@@ -60,7 +75,7 @@ public class ProgrammaticSearchMappingFactory {
 						.field()
 					.property( "street1", ElementType.FIELD )
 						.field()
-						.field().name( "street1_ngram" ).analyzer( "ngram" )
+						.field().name( "street1_ngram" ).analyzer( NGRAM_ANALYZER_NAME )
 						.field()
 							.name( "street1_abridged" )
 							.bridge( ConcatStringBridge.class ).param( ConcatStringBridge.SIZE, "4" )
@@ -69,16 +84,16 @@ public class ProgrammaticSearchMappingFactory {
 				.entity( ProvidedIdEntry.class ).indexed()
 						.providedId().name( "providedidentry" ).bridge( LongBridge.class )
 						.property( "name", ElementType.FIELD )
-							.field().name( "providedidentry.name" ).analyzer( "en" ).index( Index.YES ).store( Store.YES )
+							.field().name( "providedidentry.name" ).analyzer( EN_ANALYZER_NAME ).index( Index.YES ).store( Store.YES )
 						.property( "blurb", ElementType.FIELD )
-							.field().name( "providedidentry.blurb" ).analyzer( "en" ).index( Index.YES ).store( Store.YES )
+							.field().name( "providedidentry.blurb" ).analyzer( EN_ANALYZER_NAME ).index( Index.YES ).store( Store.YES )
 						.property( "age", ElementType.FIELD )
-							.field().name( "providedidentry.age" ).analyzer( "en" ).index( Index.YES ).store( Store.YES )
+							.field().name( "providedidentry.age" ).analyzer( EN_ANALYZER_NAME ).index( Index.YES ).store( Store.YES )
 				.entity( ProductCatalog.class ).indexed()
 					.boost( 2 )
 					.property( "id", ElementType.FIELD ).documentId().name( "id" )
 					.property( "name", ElementType.FIELD )
-						.field().name( "productCatalogName" ).index( Index.YES ).analyzer( "en" ).store( Store.YES )
+						.field().name( "productCatalogName" ).index( Index.YES ).analyzer( EN_ANALYZER_NAME ).store( Store.YES )
 					.property( "items", ElementType.FIELD )
 						.indexEmbedded()
 							.includeEmbeddedObjectId( true )
@@ -88,7 +103,7 @@ public class ProgrammaticSearchMappingFactory {
 						.documentId()
 							.sortableField()
 					.property( "description", ElementType.FIELD )
-						.field().name( "description" ).analyzer( "en" ).index( Index.YES ).store( Store.YES )
+						.field().name( "description" ).analyzer( EN_ANALYZER_NAME ).index( Index.YES ).store( Store.YES )
 					.property( "productCatalog", ElementType.FIELD )
 						.containedIn()
 					.property( "price", ElementType.FIELD )
@@ -163,7 +178,7 @@ public class ProgrammaticSearchMappingFactory {
 					.classBridgeInstance( new OrderLineClassBridge( "orderLineName" ) )
 					.classBridgeInstance( new OrderLineClassBridge( null ) )
 						.name( "orderLineName_ngram" )
-						.analyzer( "ngram" )
+						.analyzer( NGRAM_ANALYZER_NAME )
 					.classBridgeInstance( new OrderLineClassBridge( null ) )
 						.param( "fieldName", "orderLineNameViaParam" )
 		;

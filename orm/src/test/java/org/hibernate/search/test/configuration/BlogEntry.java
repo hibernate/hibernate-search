@@ -22,21 +22,26 @@ import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.exception.AssertionFailure;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
 @Indexed
+/*
+ * CAUTION: those analyzer definitions are duplicated in the elasticsearch.yml for test with Elasticsearch.
+ * Any update here should be reflected there.
+ */
 @AnalyzerDefs({
-		@AnalyzerDef(name = "en",
+		@AnalyzerDef(name = BlogEntry.EN_ANALYZER_NAME,
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 						@TokenFilterDef(factory = SnowballPorterFilterFactory.class
 						)
 				}),
-		@AnalyzerDef(name = "de",
+		@AnalyzerDef(name = BlogEntry.DE_ANALYZER_NAME,
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
@@ -44,6 +49,10 @@ import org.hibernate.search.annotations.TokenizerDef;
 				})
 })
 public class BlogEntry {
+
+	public static final String EN_ANALYZER_NAME = "org_hibernate_search_test_configuration_BlogEntry" + "_en";
+	public static final String DE_ANALYZER_NAME = "org_hibernate_search_test_configuration_BlogEntry" + "_de";
+
 	private Long id;
 	private String language;
 	private String title;
@@ -93,21 +102,35 @@ public class BlogEntry {
 	public static class BlogLangDiscriminator implements Discriminator {
 
 		@Override
-		public String getAnalyzerDefinitionName(Object value, Object entity, String field) {
-			if ( value == null ) {
+		public String getAnalyzerDefinitionName(Object language, Object entity, String field) {
+			if ( language == null ) {
 				return null;
 			}
-			if ( !( value instanceof String ) ) {
-				throw new IllegalArgumentException( "expecte string as value in language discriminator" );
+			if ( !( language instanceof String ) ) {
+				throw new IllegalArgumentException( "expected string as value in language discriminator" );
 			}
 			if ( "description".equals( field ) ) {
-				return (String) value;
+				return toAnalyzerName( (String) language );
 			}
 			else {
 				//"title" is not affected
 				return null;
 			}
 
+		}
+
+		private String toAnalyzerName(String language) {
+			if ( language == null ) {
+				return null;
+			}
+			switch ( language ) {
+				case "en":
+					return EN_ANALYZER_NAME;
+				case "de":
+					return DE_ANALYZER_NAME;
+				default:
+					throw new AssertionFailure( "Unexpected language:" + language );
+			}
 		}
 	}
 }
