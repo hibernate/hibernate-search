@@ -475,10 +475,11 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		s.persist( address );
 
 		address = new Address();
+
 		address.setStreet1( "Peachtnot Rd NE" );
 		address.setStreet2( "Peachtree Rd NE" );
 		address.setLastUpdated( c );
-		address.setOwner( "test2" );
+		address.setOwner( "testowner" );
 		s.persist( address );
 
 		tx.commit();
@@ -490,7 +491,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:Peachtnot" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
-		query.enableFullTextFilter( "security" ).setParameter( "ownerName", "test" );
+		query.enableFullTextFilter( "security" ).setParameter( "ownerName", "testowner" );
 		assertEquals( "expecting 1 results", 1, query.getResultSize() );
 
 		@SuppressWarnings( "unchecked" )
