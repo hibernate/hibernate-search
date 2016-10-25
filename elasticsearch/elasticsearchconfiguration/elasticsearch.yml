@@ -72,6 +72,26 @@ index.analysis:
       tokenizer: standard
       filter: [lowercase]
       char_filter: htmlStrip
+    org_hibernate_search_test_configuration_BlogEntry_en:
+      type: custom
+      tokenizer: standard
+      filter: [lowercase, snowballEnglish]
+    org_hibernate_search_test_configuration_BlogEntry_de:
+      type: custom
+      tokenizer: standard
+      filter: [lowercase, stemGerman]
+    org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory_ngram:
+      type: custom
+      tokenizer: standard
+      filter: [lowercase, ngram3]
+    org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory_english:
+      type: custom
+      tokenizer: standard
+      filter: [lowercase, snowballEnglish]
+    org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory_deutsch:
+      type: custom
+      tokenizer: standard
+      filter: [lowercase, stemGerman]
   filter:
     custom-filter:
       type : stop
@@ -87,6 +107,9 @@ index.analysis:
     snowballEnglish:
       type: snowball
       language: 'English'
+    stemGerman:
+      type : stemmer
+      name : 'german'
   char_filter:
     htmlStrip:
       type: html_strip
