@@ -1336,25 +1336,6 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>com.github.alexcojocaru</groupId>
-                    <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>${testElasticsearchMavenPluginVersion}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.elasticsearch</groupId>
-                            <artifactId>elasticsearch</artifactId>
-                            <version>${testElasticsearchVersion}</version>
-                        </dependency>
-                        
-                        <!-- The next is used to get ES log output into the Maven console -->
-                        <dependency>
-                            <groupId>org.hibernate</groupId>
-                            <artifactId>hibernate-search-sharedtestresources</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>3.0.0</version>
@@ -1521,6 +1502,31 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                 <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
                 <testElasticsearchVersion>2.0.0</testElasticsearchVersion>
             </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${testElasticsearchMavenPluginVersion}</version>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch</artifactId>
+                                    <version>${testElasticsearchVersion}</version>
+                                </dependency>
+                                
+                                <!-- The next is used to get ES log output into the Maven console -->
+                                <dependency>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
+                                    <version>${project.version}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
         
         <!-- Elasticsearch 2.2+ test environment (default) -->
@@ -1536,6 +1542,67 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                 <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
                 <testElasticsearchVersion>2.4.4</testElasticsearchVersion>
             </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${testElasticsearchMavenPluginVersion}</version>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.elasticsearch</groupId>
+                                    <artifactId>elasticsearch</artifactId>
+                                    <version>${testElasticsearchVersion}</version>
+                                </dependency>
+                                
+                                <!-- The next is used to get ES log output into the Maven console -->
+                                <dependency>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
+                                    <version>${project.version}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 5.x test environment -->
+        <profile>
+            <id>elasticsearch-5.0</id>
+            <properties>
+                <testElasticsearchMavenPluginVersion>5.7</testElasticsearchMavenPluginVersion>
+                <testElasticsearchVersion>5.2.1</testElasticsearchVersion>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${testElasticsearchMavenPluginVersion}</version>
+                            <configuration>
+                                <version>${testElasticsearchVersion}</version>
+                            </configuration>
+                            <dependencies>
+                                <!-- The next two are used to get ES log output into the Maven console -->
+                                <dependency>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-sharedtestresources</artifactId>
+                                    <version>${project.version}</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-core</artifactId>
+                                    <version>2.6.2</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
 
         <!-- =============================== -->
