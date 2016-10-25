@@ -47,6 +47,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -281,6 +282,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2428 Provide an alternative to org.hibernate.search.analyzer.Discriminator for Elasticsearch?
 	public void testAnalyzerDiscriminator() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();

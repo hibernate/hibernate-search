@@ -531,6 +531,7 @@ Please check with JIRA and the mailing lists for updates, but at the time of wri
 * MoreLikeThis queries: https://hibernate.atlassian.net/browse/HSEARCH-2395[HSEARCH-2395]
 * `@IndexedEmbedded.indexNullAs`: https://hibernate.atlassian.net/browse/HSEARCH-2389[HSEARCH-2389]
 * <<search-monitoring,Statistics>>: https://hibernate.atlassian.net/browse/HSEARCH-2421[HSEARCH-2421]
+* `@AnalyzerDiscriminator`: https://hibernate.atlassian.net/browse/HSEARCH-2428[HSEARCH-2428]
 * Mixing Lucene based indexes and Elasticsearch based indexes (partial support is here though)
 * Hibernate Search does not make use of nested objects nor parent child relationship mapping https://hibernate.atlassian.net/browse/HSEARCH-2263[HSEARCH-2263].
   This is largely mitigated by the fact that Hibernate Search does the denormalization itself and maintain data consistency when nested objects are updated.
