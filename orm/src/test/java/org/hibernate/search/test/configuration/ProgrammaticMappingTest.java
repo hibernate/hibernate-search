@@ -852,6 +852,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2429 Analyzers on ClassBridge are being ignored with Elasticsearch
 	public void testClassBridgeInstanceMapping() throws Exception {
 		OrderLine orderLine = new OrderLine();
 		orderLine.setName( "Sequoia" );
