@@ -182,13 +182,11 @@
         <commonsLangVersion>2.6</commonsLangVersion>
 
         <!-- Elasticsearch -->
-        <testElasticsearchMavenPluginVersion>2.0</testElasticsearchMavenPluginVersion>
+        <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
         <!-- In theory we're not coupled to a specific version of Elasticsearch; this property
-             controls which version is being used to run integration tests. When updating,
-             make sure to use the right JNA version, too
+             controls which version is being used to run integration tests.
         -->
         <testElasticsearchVersion>2.3.1</testElasticsearchVersion>
-        <testElasticsearchJnaVersion>4.1.0</testElasticsearchJnaVersion>
         <elasticsearchJestVersion>2.0.0</elasticsearchJestVersion>
         <elasticsearchCommonsLang3Version>3.4</elasticsearchCommonsLang3Version>
         <elasticsearchGsonVersion>2.4</elasticsearchGsonVersion>
@@ -1280,14 +1278,6 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                             <groupId>org.hibernate</groupId>
                             <artifactId>hibernate-search-sharedtestresources</artifactId>
                             <version>${project.version}</version>
-                        </dependency>
-
-                        <!-- JNA isn't part of the ES fat JAR; Adding it so ES doesn't complain 
-                             upon start-up -->
-                        <dependency>
-                            <groupId>net.java.dev.jna</groupId>
-                            <artifactId>jna</artifactId>
-                            <version>${testElasticsearchJnaVersion}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
