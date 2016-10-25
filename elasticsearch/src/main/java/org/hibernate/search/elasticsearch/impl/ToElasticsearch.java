@@ -572,6 +572,9 @@ public class ToElasticsearch {
 		else if ( luceneFilter instanceof CachingWrapperFilter ) {
 			return fromLuceneFilter( ( (CachingWrapperFilter) luceneFilter ).getCachedFilter() );
 		}
+		else if ( luceneFilter instanceof org.apache.lucene.search.CachingWrapperFilter ) {
+			return fromLuceneFilter( ( (org.apache.lucene.search.CachingWrapperFilter) luceneFilter ).getFilter() );
+		}
 		throw LOG.cannotTransformLuceneFilterIntoEsQuery( luceneFilter );
 	}
 
