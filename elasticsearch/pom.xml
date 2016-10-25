@@ -265,38 +265,6 @@
                 <artifactId>maven-processor-plugin</artifactId>
             </plugin>
             <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.elasticsearch.plugin</groupId>
-                                    <artifactId>delete-by-query</artifactId>
-                                    <version>${testElasticsearchVersion}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.elasticsearch.module</groupId>
-                                    <artifactId>lang-groovy</artifactId>
-                                    <version>${testElasticsearchVersion}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/_ES_PLUGINS_/lang-groovy</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
                 <configuration>
@@ -327,4 +295,108 @@
 
         </plugins>
     </build>
+    
+    <profiles>
+        <profile>
+            <id>elasticsearch-2.0</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
+                                        <artifactItem>
+                                            <groupId>org.elasticsearch.plugin</groupId>
+                                            <artifactId>delete-by-query</artifactId>
+                                            <version>${testElasticsearchVersion}</version>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- We must redeclare this plugin here, otherwise it will start before the plugins above are deployed  -->
+                    <plugin>
+                        <groupId>com.github.alexcojocaru</groupId>
+                        <artifactId>elasticsearch-maven-plugin</artifactId>
+                        <dependencies>
+                            <!-- Groovy is in a core module named "org.elasticsearch:elasticsearch-groovy" in Elasticsearch 2.0.x and 2.1.x
+                                 Also, in ES 2.0/2.1, core modules are not located in the plugin directory as with newer versions, but are
+                                 simply expected to be in the classpath.
+                            -->
+                            <dependency>
+                                <groupId>org.elasticsearch</groupId>
+                                <artifactId>elasticsearch-groovy</artifactId>
+                                <version>${testElasticsearchVersion}</version>
+                                <type>jar</type>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>elasticsearch-2.2</id>
+            <!-- Activation rules are not inherited from the profile definition in the parent, so we must copy them here -->
+            <activation>
+                <property>
+                    <name>!testElasticsearchVersion</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
+                                        <artifactItem>
+                                            <groupId>org.elasticsearch.plugin</groupId>
+                                            <artifactId>delete-by-query</artifactId>
+                                            <version>${testElasticsearchVersion}</version>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
+                                        </artifactItem>
+                                        <!-- Groovy is in a plugin named "org.elasticsearch.module:lang-groovy" in Elasticsearch 2.2+ -->
+                                        <artifactItem>
+                                            <groupId>org.elasticsearch.module</groupId>
+                                            <artifactId>lang-groovy</artifactId>
+                                            <version>${testElasticsearchVersion}</version>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/_ES_PLUGINS_/lang-groovy</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- We must redeclare this plugin here, otherwise it will start before the plugins above are deployed  -->
+                    <plugin>
+                        <groupId>com.github.alexcojocaru</groupId>
+                        <artifactId>elasticsearch-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

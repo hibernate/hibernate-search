@@ -182,11 +182,6 @@
         <commonsLangVersion>2.6</commonsLangVersion>
 
         <!-- Elasticsearch -->
-        <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
-        <!-- In theory we're not coupled to a specific version of Elasticsearch; this property
-             controls which version is being used to run integration tests.
-        -->
-        <testElasticsearchVersion>2.3.1</testElasticsearchVersion>
         <elasticsearchJestVersion>2.0.0</elasticsearchJestVersion>
         <elasticsearchCommonsLang3Version>3.4</elasticsearchCommonsLang3Version>
         <elasticsearchGsonVersion>2.4</elasticsearchGsonVersion>
@@ -573,6 +568,7 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4jVersion}</version>
             </dependency>
+            
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -1262,18 +1258,8 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                             <artifactId>elasticsearch</artifactId>
                             <version>${testElasticsearchVersion}</version>
                         </dependency>
-
-                        <!-- The next three are used to get ES log output into the Maven console -->
-                        <dependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-api</artifactId>
-                            <version>${slf4jVersion}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                            <version>${slf4jVersion}</version>
-                        </dependency>
+                        
+                        <!-- The next is used to get ES log output into the Maven console -->
                         <dependency>
                             <groupId>org.hibernate</groupId>
                             <artifactId>hibernate-search-sharedtestresources</artifactId>
@@ -1410,6 +1396,43 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             <id>perf</id>
             <properties>
                 <org.hibernate.search.enable_performance_tests>true</org.hibernate.search.enable_performance_tests>
+            </properties>
+        </profile>
+
+        <!-- =============================== -->
+        <!-- Elasticsearch IT profiles       -->
+        <!-- =============================== -->
+        <!--
+             Different profiles are needed to handle the environment setup (which is handled in Maven,
+             on contrary to the various database profiles).
+             
+             To run tests against a different version of Elasticsearch, use the appropriate profile
+             and provide the Elasticsearch version:
+             
+                 mvn clean test -Pelasticsearch5 -DtestElasticsearchVersion=5.0.0
+          -->
+        
+        <!-- Elasticsearch [2.0,2.2) test environment -->
+        <profile>
+            <id>elasticsearch-2.0</id>
+            <properties>
+                <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
+                <testElasticsearchVersion>2.0.0</testElasticsearchVersion>
+            </properties>
+        </profile>
+        
+        <!-- Elasticsearch 2.2+ test environment (default) -->
+        <profile>
+            <id>elasticsearch-2.2</id>
+            <activation>
+                <!-- Activate by default, i.e. if testElasticsearchVersion has not been defined explicitly -->
+                <property>
+                    <name>!testElasticsearchVersion</name>
+                </property>
+            </activation>
+            <properties>
+                <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
+                <testElasticsearchVersion>2.3.1</testElasticsearchVersion>
             </properties>
         </profile>
 
