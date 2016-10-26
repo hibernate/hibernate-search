@@ -20,7 +20,10 @@ cache:
   directories:
     - $HOME/.m2
 env:
-  - DB=h2
+  # for now, only test with the most recent version of ES for each major
+  #- DB=h2 ELASTICSEARCH=2.0
+  - DB=h2 ELASTICSEARCH=2.2
+  - DB=h2 ELASTICSEARCH=5.0
   # for now, let's test only with H2
   #- DB=pgsql
   #- DB=mariadb
@@ -33,9 +36,20 @@ install:
   # we run checkstyle first to fail fast if there is a styling error
   - ./mvnw -s settings-example.xml checkstyle:check
 before_script: 
-  - if [[ "$DB" == "pgsql" ]]; then psql -U postgres -f 'travis/pgsql.sql';fi 
-  - if [[ "$DB" == "mariadb" ]]; then mysql -u root < 'travis/mariadb.sql'; fi
+  - case $DB in
+    "h2") ;;
+    "pgsql") psql -U postgres -f 'travis/pgsql.sql' ;;
+    "mariadb") mysql -u root < 'travis/mariadb.sql' ;;
+    esac
 script:
-  - if [[ "$DB" == "h2" ]]; then ./mvnw -s settings-example.xml -Pdocs,dist clean install;fi
-  - if [[ "$DB" == "pgsql" ]]; then ./mvnw -s settings-example.xml -Pci-postgresql,docs,dist clean install;fi
-  - if [[ "$DB" == "mariadb" ]]; then ./mvnw -s settings-example.xml -Pci-mariadb,docs,dist clean install; fi
+  - case $DB in
+    "h2") ;;
+    "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;
+    "mariadb") BUILD_OPTIONS+=' -Pci-mariadb' ;;
+    esac
+  - case $ELASTICSEARCH in
+    2.0) BUILD_OPTIONS+=' -P!elasticsearch-2.2,elasticsearch-2.0' ;;
+    2.2) ;;
+    5.0) BUILD_OPTIONS+=' -P!elasticsearch-2.2,elasticsearch-5.0' ;;
+    esac
+  - ./mvnw -s settings-example.xml -Pdocs,dist $BUILD_OPTIONS clean install
