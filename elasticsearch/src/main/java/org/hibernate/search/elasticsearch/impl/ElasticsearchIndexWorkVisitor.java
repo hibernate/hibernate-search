@@ -152,13 +152,13 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 		if ( work.getTenantId() != null ) {
 			query = JsonBuilder.object()
 				.add( "query", JsonBuilder.object()
-					.add( "filtered", JsonBuilder.object()
+					.add( "bool", JsonBuilder.object()
 						.add( "filter", JsonBuilder.object()
 							.add( "term", JsonBuilder.object()
 								.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, work.getTenantId() )
 							)
 						)
-						.add( "query", convertedQuery )
+						.add( "must", convertedQuery )
 					)
 				)
 				.build();

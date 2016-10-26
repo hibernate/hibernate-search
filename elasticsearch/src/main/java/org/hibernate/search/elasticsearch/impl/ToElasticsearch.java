@@ -425,9 +425,9 @@ public class ToElasticsearch {
 
 	private static JsonObject convertFilteredQuery(FilteredQuery query) {
 		JsonObject filteredQuery = JsonBuilder.object()
-				.add( "filtered",
+				.add( "bool",
 						JsonBuilder.object()
-								.add( "query", fromLuceneQuery( query.getQuery() ) )
+								.add( "must", fromLuceneQuery( query.getQuery() ) )
 								.add( "filter", fromLuceneQuery( query.getFilter() ) )
 								.append( boostAppender( query ) )
 				).build();
@@ -455,8 +455,8 @@ public class ToElasticsearch {
 		Filter previousFilter = filter.getPreviousFilter();
 		if ( previousFilter instanceof SpatialHashFilter ) {
 			distanceQuery = JsonBuilder.object()
-					.add( "filtered", JsonBuilder.object()
-							.add( "query", distanceQuery )
+					.add( "bool", JsonBuilder.object()
+							.add( "must", distanceQuery )
 							.add( "filter", convertSpatialHashFilter( (SpatialHashFilter) previousFilter ) )
 					).build();
 		}

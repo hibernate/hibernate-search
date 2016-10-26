@@ -328,13 +328,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			this.idFieldName = queriedEntityIdFieldName;
 
 			// Query filters; always a type filter, possibly a tenant id filter;
-			JsonObject effectiveFilter = getEffectiveFilter( typeFilters );
+			JsonObject filteredQuery = getFilteredQuery( jsonQuery.get( "query" ), typeFilters );
 
 			JsonBuilder.Object completeQuery = JsonBuilder.object();
-
-			completeQuery.add( "query",
-					JsonBuilder.object()
-							.add( "filtered", JsonBuilder.object( jsonQuery ).add( "filter", effectiveFilter ) ) );
+			completeQuery.add( "query", filteredQuery );
 
 			if ( !getFacetManager().getFacetRequests().isEmpty() ) {
 				JsonBuilder.Object facets = JsonBuilder.object();
@@ -354,7 +351,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			completeQueryAsString = completeQuery.build().toString();
 		}
 
-		private JsonObject getEffectiveFilter(JsonArray typeFilters) {
+		private JsonObject getFilteredQuery(JsonElement originalQuery, JsonArray typeFilters) {
 			JsonArray filters = new JsonArray();
 
 			JsonObject tenantFilter = getTenantIdFilter();
@@ -384,8 +381,20 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 
-			// wrap filters into must if there is more than one
-			return ToElasticsearch.condition( "must", filters );
+			JsonBuilder.Object boolBuilder = JsonBuilder.object();
+
+			if ( originalQuery != null && !originalQuery.isJsonNull() ) {
+				boolBuilder.add( "must", originalQuery );
+			}
+
+			if ( filters.size() == 1 ) {
+				boolBuilder.add( "filter", filters.get( 0 ) );
+			}
+			else {
+				boolBuilder.add( "filter", filters );
+			}
+
+			return JsonBuilder.object().add( "bool", boolBuilder.build() ).build();
 		}
 
 		private JsonObject getEntityTypeFilter(Class<?> queriedEntityType) {
