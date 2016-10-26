@@ -40,6 +40,7 @@ public class SearchFactoryHolder extends ExternalResource {
 
 	private SearchIntegrator[] searchIntegrator;
 	private int numberOfSessionFactories = 1;
+	private boolean idProvidedImplicit = false;
 
 	public SearchFactoryHolder(Class<?>... entities) {
 		this( null, entities );
@@ -75,6 +76,7 @@ public class SearchFactoryHolder extends ExternalResource {
 		for ( Class<?> c : entities ) {
 			cfg.addClass( c );
 		}
+		cfg.setIdProvidedImplicit( idProvidedImplicit );
 		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 	}
 
@@ -90,6 +92,11 @@ public class SearchFactoryHolder extends ExternalResource {
 	public SearchFactoryHolder withProperty(String key, Object value) {
 		Assert.assertNull( "SearchIntegrator already initialized", searchIntegrator );
 		configuration.put( key, value );
+		return this;
+	}
+
+	public SearchFactoryHolder withIdProvidedImplicit(boolean value) {
+		this.idProvidedImplicit = value;
 		return this;
 	}
 
