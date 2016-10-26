@@ -683,7 +683,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		private Object getId(JsonObject hit, EntityIndexBinding binding, ConversionContext conversionContext) {
 			Document tmp = new Document();
-			tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO ) );
+			tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString(), tenantId ), Store.NO ) );
 
 			addIdBridgeDefinedFields( hit, binding, tmp, conversionContext );
 

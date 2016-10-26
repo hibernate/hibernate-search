@@ -21,8 +21,8 @@ public class DocumentIdHelper {
 		return work.getTenantId() == null ? work.getIdInString() : work.getTenantId() + "_" + work.getIdInString();
 	}
 
-	static String getEntityId(String documentId) {
-		if ( documentId.contains( "_" ) ) {
+	static String getEntityId(String documentId, String tenantId) {
+		if ( tenantId != null && documentId.contains( "_" ) ) {
 			documentId = documentId.substring( documentId.indexOf( "_" ) + 1 );
 		}
 
