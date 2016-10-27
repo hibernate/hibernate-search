@@ -24,8 +24,16 @@ public enum DataType {
 			return true;
 		}
 	},
+	/**
+	 * @deprecated Only used in Elasticsearch 2.x. Use TEXT or KEYWORD instead.
+	 */
 	@SerializedName("string")
+	@Deprecated
 	STRING,
+	@SerializedName("text")
+	TEXT,
+	@SerializedName("keyword")
+	KEYWORD,
 	@SerializedName("long")
 	LONG,
 	@SerializedName("integer")

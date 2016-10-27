@@ -59,10 +59,14 @@ public class PropertyMapping extends TypeMapping {
 	private Map<String, PropertyMapping> fields;
 
 	/*
-	 * String datatype
+	 * Text datatype
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/string.html
 	 */
+
 	private String analyzer;
+
+	@SerializedName("fielddata")
+	private FieldDataType fieldData;
 
 	/*
 	 * Date datatype
@@ -152,6 +156,14 @@ public class PropertyMapping extends TypeMapping {
 
 	public void setAnalyzer(String analyzer) {
 		this.analyzer = analyzer;
+	}
+
+	public FieldDataType getFieldData() {
+		return fieldData;
+	}
+
+	public void setFieldData(FieldDataType fieldData) {
+		this.fieldData = fieldData;
 	}
 
 	@Override

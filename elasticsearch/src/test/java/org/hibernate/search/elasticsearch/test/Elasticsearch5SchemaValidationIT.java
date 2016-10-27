@@ -37,10 +37,12 @@ import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch2;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -48,7 +50,8 @@ import org.junit.rules.ExpectedException;
  *
  * @author Yoann Rodiere
  */
-public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBase {
+@Category(SkipOnElasticsearch2.class)
+public class Elasticsearch5SchemaValidationIT extends SearchInitializationTestBase {
 
 	private static final String VALIDATION_FAILED_MESSAGE_ID = "HSEARCH400033";
 
@@ -76,18 +79,18 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed',"
+									+ "'index': true,"
 									+ "'ignore_malformed': true" // Ignored during validation
 							+ "},"
 							+ "'NOTmyField': {" // Ignored during validation
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed'"
+									+ "'index': true"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -98,17 +101,17 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'boolean',"
-									+ "'index': 'not_analyzed'"
+									+ "'index': true"
 							+ "},"
 							+ "'NOTmyField': {" // Ignored during validation
 									+ "'type': 'boolean',"
-									+ "'index': 'not_analyzed'"
+									+ "'index': true"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -119,24 +122,21 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed',"
 									+ "'ignore_malformed': true," // Ignored during validation
 									+ "'fields': {"
 											+ "'myField" + ToElasticsearch.FACET_FIELD_SUFFIX + "': {"
-													+ "'type': 'date',"
-													+ "'index': 'not_analyzed'"
+													+ "'type': 'date'"
 											+ "}"
 									+ "}"
 							+ "},"
 							+ "'NOTmyField': {" // Ignored during validation
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed'"
+									+ "'index': 'false'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -194,12 +194,12 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': 'true',"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
-									+ "'type': 'string',"
+									+ "'type': 'text',"
 									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
 							+ "}"
 					+ "}"
@@ -232,13 +232,13 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				"{"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed'"
+									+ "'index': true"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -262,13 +262,13 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': false,"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed'"
+									+ "'index': true"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -292,8 +292,8 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "}"
 					+ "}"
@@ -319,13 +319,13 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'NOTmyField': {"
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed'"
+									+ "'index': true"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -350,8 +350,8 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
@@ -380,13 +380,13 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'index': 'analyzed'"
+									+ "'index': false"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -396,7 +396,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "property 'myField'" )
-						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'NOT_ANALYZED', actual is 'ANALYZED'" )
+						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'TRUE', actual is 'FALSE'" )
 				.build()
 		);
 
@@ -411,8 +411,8 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
@@ -442,8 +442,8 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
@@ -474,8 +474,8 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
@@ -509,13 +509,13 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'long',"
-									+ "'index': 'analyzed',"
+									+ "'index': true,"
 									+ "'store': 'yes'"
 							+ "}"
 					+ "}"
@@ -533,12 +533,11 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': false,"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
-									+ "'type': 'string'"
+									+ "'type': 'keyword'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -548,10 +547,13 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage(
-								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity':"
+								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearch5schemavalidationit$simpledateentity',"
+								+ " mapping 'org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaValidationIT$SimpleDateEntity':"
 								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
-								+ "\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity', property 'myField':"
-								+ "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'STRING'"
+								+ "\nindex 'org.hibernate.search.elasticsearch.test.elasticsearch5schemavalidationit$simpledateentity'"
+								+ ", mapping 'org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaValidationIT$SimpleDateEntity',"
+								+ " property 'myField':"
+								+ "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'KEYWORD'"
 						)
 				.build()
 		);
@@ -567,12 +569,11 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': false,"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
-									+ "'type': 'string'"
+									+ "'type': 'keyword'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -583,8 +584,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': false,"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
@@ -600,7 +600,8 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 						isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage(
-								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simplebooleanentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleBooleanEntity':"
+								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearch5schemavalidationit$simplebooleanentity',"
+								+ " mapping 'org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaValidationIT$SimpleBooleanEntity':"
 								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
 						)
 						.build()
@@ -609,10 +610,13 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 						isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage(
-								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity':"
+								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearch5schemavalidationit$simpledateentity',"
+								+ " mapping 'org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaValidationIT$SimpleDateEntity':"
 								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
-								+ "\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity', property 'myField':"
-								+ "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'STRING'"
+								+ "\nindex 'org.hibernate.search.elasticsearch.test.elasticsearch5schemavalidationit$simpledateentity',"
+								+ " mapping 'org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaValidationIT$SimpleDateEntity',"
+								+ " property 'myField':"
+								+ "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'KEYWORD'"
 						)
 						.build()
 				)
@@ -630,13 +634,11 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'index': 'not_analyzed'"
+									+ "'type': 'date'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -661,17 +663,14 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed',"
 									+ "'fields': {"
 											+ "'NOTmyField" + ToElasticsearch.FACET_FIELD_SUFFIX + "': {"
-													+ "'type': 'date',"
-													+ "'index': 'not_analyzed'"
+													+ "'type': 'date'"
 											+ "}"
 									+ "}"
 							+ "}"
@@ -698,17 +697,17 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
+									+ "'type': 'keyword',"
+									+ "'index': 'true',"
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'index': 'not_analyzed',"
+									+ "'index': 'false',"
 									+ "'fields': {"
 											+ "'myField" + ToElasticsearch.FACET_FIELD_SUFFIX + "': {"
 													+ "'type': 'date',"
-													+ "'index': 'analyzed'"
+													+ "'index': 'false'"
 											+ "}"
 									+ "}"
 							+ "}"
@@ -720,7 +719,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "property 'myField', field 'myField" + ToElasticsearch.FACET_FIELD_SUFFIX + "'" )
-						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'NOT_ANALYZED', actual is 'ANALYZED'" )
+						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'TRUE', actual is 'FALSE'" )
 				.build()
 		);
 
@@ -1277,7 +1276,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 		@Id
 		Long id;
 
-		@Field(analyze = Analyze.NO)
+		@Field(index = Index.NO, analyze = Analyze.NO)
 		@Facet
 		Date myField;
 	}

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl.es2;
 
-import org.hibernate.search.elasticsearch.dialect.impl.DialectIndependentGsonProvider;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
+import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.nulls.impl.Elasticsearch2MissingValueStrategy;
 import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch2SchemaTranslator;
@@ -15,9 +15,15 @@ import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch2SchemaValida
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaAccessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
+import org.hibernate.search.elasticsearch.schema.impl.model.FieldDataType;
+import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
+import org.hibernate.search.elasticsearch.util.impl.gson.ES2FieldDataTypeJsonAdapter;
+import org.hibernate.search.elasticsearch.util.impl.gson.ES2IndexTypeJsonAdapter;
 import org.hibernate.search.elasticsearch.work.impl.factory.Elasticsearch2WorkFactory;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
+
+import com.google.gson.GsonBuilder;
 
 /**
  * @author Yoann Rodiere
@@ -26,7 +32,11 @@ public class Elasticsearch2Dialect implements ElasticsearchDialect {
 
 	@Override
 	public GsonProvider createGsonProvider() {
-		return DialectIndependentGsonProvider.INSTANCE;
+		return DefaultGsonProvider.create( () -> {
+			return new GsonBuilder()
+					.registerTypeAdapter( IndexType.class, new ES2IndexTypeJsonAdapter().nullSafe() )
+					.registerTypeAdapter( FieldDataType.class, new ES2FieldDataTypeJsonAdapter().nullSafe() );
+		} );
 	}
 
 	@Override

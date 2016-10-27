@@ -7,31 +7,17 @@
 package org.hibernate.search.elasticsearch.schema.impl.model;
 
 /**
- * An enum for Elasticsearch "index" attribute values.
+ * An enum for Elasticsearch "fielddata" attribute values.
  * <p>
- * Serialized using specific adapters for each version of ES.
+ * Values of this type are ignored in ES2, because field data isn't used
+ * (and configuration is more complex)
  * <p>
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index.html
  *
  * @author Yoann Rodiere
  */
-public enum IndexType {
+public enum FieldDataType {
 
-	/**
-	 * @deprecated ES2 only.
-	 */
-	@Deprecated
-	NOT_ANALYZED,
-	/**
-	 * @deprecated ES2 only.
-	 */
-	@Deprecated
-	ANALYZED,
-	/**
-	 * @deprecated ES2 only.
-	 */
-	@Deprecated
-	NO,
 	TRUE,
 	FALSE
 	;

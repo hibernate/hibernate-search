@@ -38,10 +38,12 @@ import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -53,7 +55,8 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Yoann Rodiere
  */
 @RunWith(Parameterized.class)
-public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase {
+@Category(SkipOnElasticsearch5.class)
+public class Elasticsearch2SchemaCreationIT extends SearchInitializationTestBase {
 
 	@Parameters(name = "With strategy {0}")
 	public static EnumSet<IndexSchemaManagementStrategy> strategies() {
@@ -71,7 +74,7 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 
 	private final IndexSchemaManagementStrategy strategy;
 
-	public ElasticsearchSchemaCreationIT(IndexSchemaManagementStrategy strategy) {
+	public Elasticsearch2SchemaCreationIT(IndexSchemaManagementStrategy strategy) {
 		super();
 		this.strategy = strategy;
 	}

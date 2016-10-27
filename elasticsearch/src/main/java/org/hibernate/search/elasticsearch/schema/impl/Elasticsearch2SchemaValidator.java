@@ -290,7 +290,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	 * Validate that two values are equal, using a given default value when null is encountered on either value.
 	 * <p>Useful to take into account the fact that Elasticsearch has default values for attributes.
 	 */
-	private static <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			T expectedValue, T actualValue, T defaultValueForNulls) {
 		Object defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Object defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -305,7 +305,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	/**
 	 * Variation of {@link #validateEqualWithDefault(ValidationErrorCollector, String, Object, Object, Object)} for floats.
 	 */
-	private static <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Float expectedValue, Float actualValue, float delta, Float defaultValueForNulls) {
 		Float defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Float defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -338,7 +338,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	/**
 	 * Variation of {@link #validateEqualWithDefault(ValidationErrorCollector, String, Object, Object, Object)} for doubles.
 	 */
-	private static <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Double expectedValue, Double actualValue, double delta, Double defaultValueForNulls) {
 		Double defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Double defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -373,7 +373,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	 * <li>Checks all expected formats are present in the actual value
 	 * </ul>
 	 */
-	private static <T> void validateFormatWithDefault(ValidationErrorCollector errorCollector,
+	protected <T> void validateFormatWithDefault(ValidationErrorCollector errorCollector,
 			String attributeName, List<String> expectedValue, List<String> actualValue, List<String> defaultValueForNulls) {
 		List<String> defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		List<String> defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -405,14 +405,18 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-
-	private static void validateJsonPrimitive(ValidationErrorCollector errorCollector,
+	protected final void validateJsonPrimitive(ValidationErrorCollector errorCollector,
 			DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
 		DataType defaultedType = type == null ? DataType.OBJECT : type;
+		doValidateJsonPrimitive( errorCollector, defaultedType, attributeName, expectedValue, actualValue );
+	}
 
+	@SuppressWarnings("deprecation")
+	protected void doValidateJsonPrimitive(ValidationErrorCollector errorCollector,
+			DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
 		// We can't just use equal, mainly because of floating-point numbers
 
-		switch ( defaultedType ) {
+		switch ( type ) {
 			case DOUBLE:
 				if ( expectedValue.isNumber() && actualValue.isNumber() ) {
 					validateEqualWithDefault( errorCollector, attributeName, expectedValue.getAsDouble(), actualValue.getAsDouble(),
@@ -457,7 +461,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	 * <p>
 	 * Unexpected elements are ignored, we only validate expected elements.
 	 */
-	private static <T> void validateAll(
+	protected <T> void validateAll(
 			ValidationErrorCollector errorCollector, ValidationContextType type, String messageIfMissing,
 			Validator<T> validator,
 			Map<String, T> expectedMap, Map<String, T> actualMap) {
@@ -487,7 +491,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	private static class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Validator<T> {
+	private class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Validator<T> {
 		private final AnalysisParameterEquivalenceRegistry equivalences;
 
 		public AnalysisDefinitionValidator(AnalysisParameterEquivalenceRegistry equivalences) {
@@ -530,7 +534,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	private static class AnalyzerDefinitionValidator extends AnalysisDefinitionValidator<AnalyzerDefinition> {
+	private class AnalyzerDefinitionValidator extends AnalysisDefinitionValidator<AnalyzerDefinition> {
 		public AnalyzerDefinitionValidator(AnalysisParameterEquivalenceRegistry equivalences) {
 			super( equivalences );
 		}
@@ -556,7 +560,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	private abstract static class AbstractTypeMappingValidator<T extends TypeMapping> implements Validator<T> {
+	private abstract class AbstractTypeMappingValidator<T extends TypeMapping> implements Validator<T> {
 		protected abstract Validator<PropertyMapping> getPropertyMappingValidator();
 
 		@Override
@@ -571,7 +575,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	private static class TypeMappingValidator extends AbstractTypeMappingValidator<TypeMapping> {
+	private class TypeMappingValidator extends AbstractTypeMappingValidator<TypeMapping> {
 		private final Validator<PropertyMapping> propertyMappingValidator;
 
 		public TypeMappingValidator(Validator<PropertyMapping> propertyMappingValidator) {
@@ -585,7 +589,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	private static class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapping> {
+	private class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapping> {
 
 		@Override
 		protected Validator<PropertyMapping> getPropertyMappingValidator() {
@@ -602,21 +606,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 
 			validateEqualWithDefault( errorCollector, "boost", expectedMapping.getBoost(), actualMapping.getBoost(), DEFAULT_FLOAT_DELTA, 1.0f );
 
-			IndexType expectedIndex = expectedMapping.getIndex();
-			if ( !IndexType.NO.equals( expectedIndex ) ) { // If we don't need an index, we don't care
-				// See Elasticsearch doc: this attribute's default value depends on the data type.
-				IndexType indexDefault = DataType.STRING.equals( expectedMapping.getType() ) ? IndexType.ANALYZED : IndexType.NOT_ANALYZED;
-				validateEqualWithDefault( errorCollector, "index", expectedIndex, actualMapping.getIndex(), indexDefault );
-			}
-
-			Boolean expectedDocValues = expectedMapping.getDocValues();
-			if ( Boolean.TRUE.equals( expectedDocValues ) ) { // If we don't need doc_values, we don't care
-				/*
-				 * Elasticsearch documentation (2.3) says doc_values is true by default on fields
-				 * supporting it, but tests show it's wrong.
-				 */
-				validateEqualWithDefault( errorCollector, "doc_values", expectedDocValues, actualMapping.getDocValues(), false );
-			}
+			validateIndexOptions( errorCollector, expectedMapping, actualMapping );
 
 			Boolean expectedStore = expectedMapping.getStore();
 			if ( Boolean.TRUE.equals( expectedStore ) ) { // If we don't need storage, we don't care
@@ -634,6 +624,26 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 			validateAll( errorCollector, ValidationContextType.MAPPING_PROPERTY_FIELD, MESSAGES.propertyFieldMissing(),
 					getPropertyMappingValidator(),
 					expectedMapping.getFields(), actualMapping.getFields() );
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	protected void validateIndexOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+		IndexType expectedIndex = expectedMapping.getIndex();
+		if ( !IndexType.NO.equals( expectedIndex ) ) { // If we don't need an index, we don't care
+			// See Elasticsearch doc: this attribute's default value depends on the data type.
+			IndexType indexDefault = DataType.STRING.equals( expectedMapping.getType() ) ? IndexType.ANALYZED : IndexType.NOT_ANALYZED;
+			validateEqualWithDefault( errorCollector, "index", expectedIndex, actualMapping.getIndex(), indexDefault );
+		}
+
+
+		Boolean expectedDocValues = expectedMapping.getDocValues();
+		if ( Boolean.TRUE.equals( expectedDocValues ) ) { // If we don't need doc_values, we don't care
+			/*
+			 * Elasticsearch documentation (2.3) says doc_values is true by default on fields
+			 * supporting it, but tests show it's wrong.
+			 */
+			validateEqualWithDefault( errorCollector, "doc_values", expectedDocValues, actualMapping.getDocValues(), false );
 		}
 	}
 

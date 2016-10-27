@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.spi.NullMarker;
@@ -56,6 +57,7 @@ import com.google.gson.JsonPrimitive;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
+@SuppressWarnings( "deprecation" )
 public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTranslator {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
@@ -88,15 +90,20 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		ElasticsearchMappingBuilder mappingBuilder = new ElasticsearchMappingBuilder( descriptor, root );
 
 		if ( executionOptions.isMultitenancyEnabled() ) {
-			PropertyMapping tenantId = new PropertyMapping();
-			tenantId.setType( DataType.STRING );
-			tenantId.setIndex( IndexType.NOT_ANALYZED );
+			PropertyMapping tenantId = generateTenantIdProperty();
 			mappingBuilder.setPropertyAbsolute( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
 		}
 
 		addMappings( mappingBuilder, settingsBuilder, executionOptions );
 
 		return root;
+	}
+
+	protected PropertyMapping generateTenantIdProperty() {
+		PropertyMapping tenantId = new PropertyMapping();
+		tenantId.setType( DataType.STRING );
+		tenantId.setIndex( IndexType.NOT_ANALYZED );
+		return tenantId;
 	}
 
 	private void addMappings(ElasticsearchMappingBuilder mappingBuilder, ElasticsearchIndexSettingsBuilder settingsBuilder,
@@ -149,13 +156,11 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 		if ( propertyMapping.getType() != DataType.OBJECT ) {
 			propertyMapping.setStore( fieldMetadata.getStore() == Store.NO ? false : true );
-		}
 
-		addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
-				fieldMetadata.getSourceProperty(), fieldMetadata.getAbsoluteName(),
-				fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
+			addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
+					fieldMetadata.getSourceProperty(), fieldMetadata.getAbsoluteName(),
+					fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
 
-		if ( propertyMapping.getType() != DataType.OBJECT ) {
 			propertyMapping.setBoost( mappingBuilder.getBoost( fieldMetadata.getBoost() ) );
 		}
 
@@ -214,9 +219,12 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			if ( !mappingBuilder.hasPropertyAbsolute( propertyPath ) ) {
 				PropertyMapping propertyMapping = new PropertyMapping();
 				addTypeOptions( propertyMapping, bridgeDefinedField );
-				addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
-						bridgeDefinedField.getSourceField().getSourceProperty(),
-						propertyPath, bridgeDefinedField.getIndex(), null );
+
+				if ( propertyMapping.getType() != DataType.OBJECT ) {
+					addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
+							bridgeDefinedField.getSourceField().getSourceProperty(),
+							propertyPath, bridgeDefinedField.getIndex(), null );
+				}
 
 				addDynamicOption( bridgeDefinedField, propertyMapping );
 				mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
@@ -235,7 +243,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		}
 	}
 
-	/*
+	/**
 	 * Adds an Elasticsearch "field" to an existing property for a facet.
 	 * <p>Note that "field" in ES has a very specific meaning, which is not the meaning it has in Lucene or Hibernate Search.
 	 */
@@ -244,39 +252,44 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 		PropertyMapping fieldMapping = new PropertyMapping();
 
-		addTypeOptions( fieldMapping, facetMetadata );
+		addTypeOptions( fieldMapping, facetMetadata, Field.Index.NOT_ANALYZED );
 		fieldMapping.setStore( false );
-		fieldMapping.setIndex( IndexType.NOT_ANALYZED );
+		addSubfieldIndexOptions( fieldMapping, facetMetadata );
 
 		// Do this last, when we're sure no exception will be thrown for this mapping
 		propertyMapping.addField( facetFieldName, fieldMapping );
 	}
 
 	/**
-	 * Adds the main indexing-related options to the given field: "index", "doc_values", "analyzer", ...
+	 * Adds the main indexing-related options to the given facet sub-field: "index", "doc_values", "analyzer", ...
 	 */
-	private void addIndexOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder,
+	protected void addSubfieldIndexOptions(PropertyMapping fieldMapping, FacetMetadata facetMetadata) {
+		fieldMapping.setIndex( IndexType.NOT_ANALYZED );
+	}
+
+	/**
+	 * Adds the main indexing-related options to the given property: "index", "doc_values", "analyzer", ...
+	 */
+	protected void addIndexOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder,
 			ElasticsearchIndexSettingsBuilder settingsBuilder, PropertyMetadata sourceProperty,
 			String propertyPath, Field.Index index, AnalyzerReference analyzerReference) {
-		if ( propertyMapping.getType() != DataType.OBJECT ) {
-			IndexType elasticsearchIndex = elasticsearchIndexType( propertyMapping, index );
-			propertyMapping.setIndex( elasticsearchIndex );
+		IndexType elasticsearchIndex = elasticsearchIndexType( propertyMapping, index );
+		propertyMapping.setIndex( elasticsearchIndex );
 
-			if ( IndexType.NO.equals( elasticsearchIndex ) && FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, propertyPath ) ) {
-				// We must use doc values in order to enable sorting on non-indexed fields
-				propertyMapping.setDocValues( true );
+		if ( IndexType.NO.equals( elasticsearchIndex ) && FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, propertyPath ) ) {
+			// We must use doc values in order to enable sorting on non-indexed fields
+			propertyMapping.setDocValues( true );
+		}
+
+		if ( IndexType.ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
+			if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
+				LOG.analyzerIsNotElasticsearch( mappingBuilder.getBeanClass(), propertyPath, analyzerReference );
 			}
-
-			if ( IndexType.ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
-				if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
-					LOG.analyzerIsNotElasticsearch( mappingBuilder.getBeanClass(), propertyPath, analyzerReference );
-				}
-				else {
-					ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
-					ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
-					String analyzerName = settingsBuilder.register( analyzer, propertyPath );
-					propertyMapping.setAnalyzer( analyzerName );
-				}
+			else {
+				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
+				ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
+				String analyzerName = settingsBuilder.register( analyzer, propertyPath );
+				propertyMapping.setAnalyzer( analyzerName );
 			}
 		}
 	}
@@ -303,7 +316,8 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 	}
 
 	private void addTypeOptions(PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
-		addTypeOptions( fieldMetadata.getAbsoluteName(), propertyMapping, FieldHelper.getType( fieldMetadata ) );
+		addTypeOptions( fieldMetadata.getAbsoluteName(), propertyMapping, FieldHelper.getType( fieldMetadata ),
+				fieldMetadata.getIndex() );
 	}
 
 	private void addTypeOptions(PropertyMapping propertyMapping, BridgeDefinedField bridgeDefinedField) {
@@ -313,10 +327,10 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getAbsoluteName() );
 		}
 
-		addTypeOptions( bridgeDefinedField.getAbsoluteName(), propertyMapping, type );
+		addTypeOptions( bridgeDefinedField.getAbsoluteName(), propertyMapping, type, bridgeDefinedField.getIndex() );
 	}
 
-	private void addTypeOptions(PropertyMapping fieldMapping, FacetMetadata facetMetadata) {
+	private void addTypeOptions(PropertyMapping fieldMapping, FacetMetadata facetMetadata, Field.Index index) {
 		ExtendedFieldType type;
 
 		if ( facetMetadata.isEncodingAuto() ) {
@@ -349,10 +363,11 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			}
 		}
 
-		addTypeOptions( facetMetadata.getAbsoluteName(), fieldMapping, type );
+		addTypeOptions( facetMetadata.getAbsoluteName(), fieldMapping, type, index );
 	}
 
-	private DataType addTypeOptions(String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType) {
+	private DataType addTypeOptions(String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType,
+			Field.Index index) {
 		DataType elasticsearchType;
 		List<String> formats = new ArrayList<>();
 
@@ -441,7 +456,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			case STRING:
 			case UNKNOWN:
 			default:
-				elasticsearchType = DataType.STRING;
+				elasticsearchType = getStringType( propertyMapping, index );
 				break;
 		}
 
@@ -456,6 +471,10 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		}
 
 		return elasticsearchType;
+	}
+
+	protected DataType getStringType(PropertyMapping propertyMapping, Index index) {
+		return DataType.STRING;
 	}
 
 	private void addNullValue(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {

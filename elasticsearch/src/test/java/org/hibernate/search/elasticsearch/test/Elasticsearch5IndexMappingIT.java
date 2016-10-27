@@ -21,6 +21,7 @@ import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.elasticsearch.testutil.JsonHelper;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch2;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
@@ -28,11 +29,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Gunnar Morling
  */
-public class ElasticsearchIndexMappingIT extends SearchTestBase {
+@Category(SkipOnElasticsearch2.class)
+public class Elasticsearch5IndexMappingIT extends SearchTestBase {
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
@@ -150,27 +153,26 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 							"'null_value':-1" +
 						"}," +
 						"'firstName':{" +
-							"'type':'string'," +
+							"'type':'text'," +
 							"'null_value':'<NULL>'" +
 						"}," +
 						"'fullName':{" +
-							"'type':'string'" +
+							"'type':'text'" +
 						"}," +
 						"'fullNameStored':{" +
-							"'type':'string'," +
-							"'index':'no'," +
+							"'type':'keyword'," +
+							"'index':false," +
 							"'store':true" +
 						"}," +
 						"'handicap':{" +
 							"'type':'double'" +
 						"}," +
 						"'id':{" +
-							"'type':'string'," +
-							"'index':'not_analyzed'," +
+							"'type':'keyword'," +
 							"'store':true" +
 						"}," +
 						"'lastName':{" +
-							"'type':'string'" +
+							"'type':'text'" +
 						"}," +
 						"'playedCourses':{" +
 							"'properties':{" +
@@ -185,7 +187,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 									"}" +
 								"}," +
 								"'name':{" +
-									"'type':'string'" +
+									"'type':'text'" +
 								"}," +
 								"'rating':{" +
 									"'type':'double'" +
@@ -193,17 +195,17 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 							"}" +
 						"}," +
 						"'puttingStrength':{" +
-							"'type':'string'" +
+							"'type':'text'" +
 						"}," +
 						"'ranking':{" +
 							"'properties':{" +
 									"'value':{" +
-										"'type':'string'" +
+										"'type':'text'" +
 									"}" +
 							"}" +
 						"}," +
 						"'strengths':{" +
-							"'type':'string'" +
+							"'type':'text'" +
 						"}," +
 						"'subscriptionEndDate':{" +
 							"'type':'date'," +
@@ -221,7 +223,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 							"}" +
 						"}," +
 						"'won_name':{" +
-							"'type':'string'" +
+							"'type':'text'" +
 						"}," +
 						"'won_rating':{" +
 							"'type':'double'" +

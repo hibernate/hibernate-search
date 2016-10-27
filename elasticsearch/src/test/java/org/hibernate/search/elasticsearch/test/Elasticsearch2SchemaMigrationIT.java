@@ -32,11 +32,13 @@ import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -44,7 +46,8 @@ import org.junit.rules.ExpectedException;
  *
  * @author Yoann Rodiere
  */
-public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase {
+@Category(SkipOnElasticsearch5.class)
+public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBase {
 
 	private static final String MERGE_FAILED_MESSAGE_ID = "HSEARCH400035";
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";

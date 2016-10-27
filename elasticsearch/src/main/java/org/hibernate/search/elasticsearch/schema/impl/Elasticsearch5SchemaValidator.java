@@ -6,6 +6,13 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
+import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
+import org.hibernate.search.elasticsearch.schema.impl.model.FieldDataType;
+import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
+import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
+
+import com.google.gson.JsonPrimitive;
+
 /**
  * An {@link ElasticsearchSchemaValidator} implementation for Elasticsearch 5.
  *
@@ -17,4 +24,41 @@ public class Elasticsearch5SchemaValidator extends Elasticsearch2SchemaValidator
 		super( schemaAccessor );
 	}
 
+	@Override
+	protected void doValidateJsonPrimitive(ValidationErrorCollector errorCollector,
+			DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
+		switch ( type ) {
+			case TEXT:
+			case KEYWORD:
+				validateEqualWithDefault( errorCollector, attributeName, expectedValue, actualValue, null );
+				break;
+			default:
+				super.doValidateJsonPrimitive( errorCollector, type, attributeName, expectedValue, actualValue );
+				break;
+		}
+	}
+
+	@Override
+	protected void validateIndexOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+		IndexType expectedIndex = expectedMapping.getIndex();
+		if ( IndexType.TRUE.equals( expectedIndex ) ) { // If we don't need an index, we don't care
+			// From ES 5.0 on, all indexable fields are indexed by default
+			IndexType indexDefault = IndexType.TRUE;
+			validateEqualWithDefault( errorCollector, "index", expectedIndex, actualMapping.getIndex(), indexDefault );
+		}
+
+		FieldDataType expectedFieldData = expectedMapping.getFieldData();
+		if ( FieldDataType.TRUE.equals( expectedFieldData ) ) { // If we don't need an index, we don't care
+			validateEqualWithDefault( errorCollector, "fielddata", expectedFieldData, actualMapping.getFieldData(), FieldDataType.FALSE );
+		}
+
+		Boolean expectedDocValues = expectedMapping.getDocValues();
+		if ( Boolean.TRUE.equals( expectedDocValues ) ) { // If we don't need doc_values, we don't care
+			/*
+			 * Elasticsearch documentation (2.3) says doc_values is true by default on fields
+			 * supporting it, but tests show it's wrong.
+			 */
+			validateEqualWithDefault( errorCollector, "doc_values", expectedDocValues, actualMapping.getDocValues(), false );
+		}
+	}
 }
