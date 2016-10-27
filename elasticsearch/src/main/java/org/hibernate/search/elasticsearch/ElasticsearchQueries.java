@@ -47,7 +47,7 @@ public class ElasticsearchQueries {
 		// { "query" : { "query_string" : { "query" : "abstract:Hibernate" } } }
 
 		JsonBuilder.Object query = JsonBuilder.object().add( "query",
-				JsonBuilder.object().add( "queryString",
+				JsonBuilder.object().add( "query_string",
 						JsonBuilder.object().addProperty( "query", queryStringQuery ) ) );
 
 		return new ElasticsearchJsonQueryDescriptor( query.build() );
