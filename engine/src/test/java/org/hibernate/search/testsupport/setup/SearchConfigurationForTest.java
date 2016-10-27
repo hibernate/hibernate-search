@@ -40,6 +40,7 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	private boolean indexMetadataComplete = true;
 	private boolean deleteByTermEnforced = false;
 	private boolean idProvidedImplicit = false;
+	private boolean multitenancyEnabled = false;
 	private ClassLoaderService classLoaderService;
 
 	public SearchConfigurationForTest() {
@@ -149,6 +150,16 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 
 	public SearchConfigurationForTest setIdProvidedImplicit(boolean idProvidedImplicit) {
 		this.idProvidedImplicit = idProvidedImplicit;
+		return this;
+	}
+
+	@Override
+	public boolean isMultitenancyEnabled() {
+		return multitenancyEnabled;
+	}
+
+	public SearchConfigurationForTest setMultitenancyEnabled(boolean multitenancyEnabled) {
+		this.multitenancyEnabled = multitenancyEnabled;
 		return this;
 	}
 
