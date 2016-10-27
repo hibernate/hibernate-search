@@ -41,6 +41,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	private SearchIntegrator[] searchIntegrator;
 	private int numberOfSessionFactories = 1;
 	private boolean idProvidedImplicit = false;
+	private boolean multitenancyEnabled = false;
 
 	public SearchFactoryHolder(Class<?>... entities) {
 		this( null, entities );
@@ -77,6 +78,7 @@ public class SearchFactoryHolder extends ExternalResource {
 			cfg.addClass( c );
 		}
 		cfg.setIdProvidedImplicit( idProvidedImplicit );
+		cfg.setMultitenancyEnabled( multitenancyEnabled );
 		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 	}
 
@@ -97,6 +99,11 @@ public class SearchFactoryHolder extends ExternalResource {
 
 	public SearchFactoryHolder withIdProvidedImplicit(boolean value) {
 		this.idProvidedImplicit = value;
+		return this;
+	}
+
+	public SearchFactoryHolder withMultitenancyEnabled(boolean value) {
+		this.multitenancyEnabled = value;
 		return this;
 	}
 
