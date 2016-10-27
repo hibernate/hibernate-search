@@ -240,7 +240,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( path ) ) {
-				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, configContext, parseContext, unprefixedAttributeName, path );
+				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder,
+						numericFields, configContext, parseContext, unprefixedAttributeName, path );
 			}
 		}
 
@@ -249,7 +250,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, PropertyMetadata.Builder propertyMetadataBuilder, NumericFieldsConfiguration numericFields, ConfigContext configContext, ParseContext parseContext, String unprefixedFieldName, String fieldName) {
+	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder, NumericFieldsConfiguration numericFields,
+			ConfigContext configContext, ParseContext parseContext, String unprefixedFieldName, String fieldName) {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 
@@ -427,37 +430,59 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return idAnnotation;
 	}
 
-	private void initializeProvidedIdMetadata(ProvidedId providedId, XClass clazz, TypeMetadata.Builder typeMetadataBuilder) {
-		PropertyMetadata propertyMetadata;
-		FieldBridge providedIdFieldBridge;
-		String providedIdFieldName;
+	private void initializeProvidedIdMetadata(String prefix, ProvidedId providedId, XClass clazz, TypeMetadata.Builder typeMetadataBuilder,
+			boolean isRoot, PathsContext pathsContext, ParseContext parseContext) {
+		FieldBridge providedIdFieldBridge = null;
+		String providedIdFieldPath;
 		if ( providedId != null ) {
-			providedIdFieldBridge = bridgeFactory.extractTwoWayType( providedId.bridge(), clazz, reflectionManager );
-			providedIdFieldName = providedId.name();
+			providedIdFieldPath = prefix + providedId.name();
 		}
 		else {
-			providedIdFieldBridge = new TwoWayString2FieldBridgeAdaptor( org.hibernate.search.bridge.builtin.StringBridge.INSTANCE );
-			providedIdFieldName = ProvidedId.defaultFieldName;
+			providedIdFieldPath = prefix + ProvidedId.defaultFieldName;
+		}
+
+		if ( !parseContext.includeEmbeddedObjectId() && pathsContext != null && !pathsContext.containsPath( providedIdFieldPath ) ) {
+			return;
+		}
+
+		if ( isRoot || !parseContext.skipFieldBridges() ) {
+			if ( providedId != null ) {
+				providedIdFieldBridge = bridgeFactory.extractTwoWayType( providedId.bridge(), clazz, reflectionManager );
+			}
+			else {
+				providedIdFieldBridge = new TwoWayString2FieldBridgeAdaptor( org.hibernate.search.bridge.builtin.StringBridge.INSTANCE );
+			}
 		}
 
 		PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( typeMetadataBuilder.getResultReference(), null, null );
 
-		DocumentFieldMetadata fieldMetadata =
+		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						providedIdFieldName,
+						providedIdFieldPath,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
 						Field.TermVector.NO
 				)
 						.fieldBridge( providedIdFieldBridge )
-						.boost( 1.0f )
-						.build();
+						.boost( 1.0f );
+
+		if ( !isRoot ) {
+			fieldMetadataBuilder.idInEmbedded();
+		}
+
+		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
 
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
-		propertyMetadata = propertyMetadataBuilder.build();
-		typeMetadataBuilder.idProperty( propertyMetadata );
+		PropertyMetadata propertyMetadata = propertyMetadataBuilder.build();
+
+		if ( isRoot ) {
+			typeMetadataBuilder.idProperty( propertyMetadata );
+		}
+		else {
+			typeMetadataBuilder.addProperty( propertyMetadata );
+		}
 	}
 
 	/**
@@ -517,7 +542,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		boolean isProvidedId = false;
 		if ( explicitProvidedIdAnnotation != null || configContext.isProvidedIdImplicit() ) {
-			initializeProvidedIdMetadata( explicitProvidedIdAnnotation, providedIdHostingClass, typeMetadataBuilder );
+			initializeProvidedIdMetadata( prefix, explicitProvidedIdAnnotation, providedIdHostingClass, typeMetadataBuilder,
+					isRoot, pathsContext, parseContext );
 			isProvidedId = true;
 		}
 
