@@ -35,11 +35,13 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
+import org.hibernate.search.elasticsearch.testutil.TestElasticsearch2Client;
+import org.hibernate.search.elasticsearch.testutil.junit.Elasticsearch2Specific;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -48,10 +50,11 @@ import com.google.gson.JsonObject;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class ElasticsearchJavaTimeIT extends SearchTestBase {
+@Category(Elasticsearch2Specific.class)
+public class Elasticsearch2JavaTimeIT extends SearchTestBase {
 
 	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	public TestElasticsearch2Client elasticsearchClient = new TestElasticsearch2Client();
 
 	@After
 	public void deleteEntity() {

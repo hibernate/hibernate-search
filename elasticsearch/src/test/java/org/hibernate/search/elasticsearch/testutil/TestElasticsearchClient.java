@@ -352,10 +352,10 @@ public class TestElasticsearchClient extends ExternalResource {
 		return result.get( "_source" ).getAsJsonObject();
 	}
 
-	private JsonElement getDocumentField(String indexName, String typeName, String id, String fieldName) throws IOException {
+	protected JsonElement getDocumentField(String indexName, String typeName, String id, String fieldName) throws IOException {
 		Response response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
-				.param( "fields", fieldName )
+				.param( "stored_fields", fieldName )
 				.build() );
 		JsonObject result = toJsonObject( response );
 		return result.get( "fields" ).getAsJsonObject().get( fieldName );
@@ -438,14 +438,14 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 	}
 
-	private Response performRequest(ElasticsearchRequest request) throws IOException {
+	protected Response performRequest(ElasticsearchRequest request) throws IOException {
 		return client.performRequest(
 				request.getMethod(), request.getPath(), request.getParameters(),
 				ElasticsearchClientUtils.toEntity( gson, request )
 				);
 	}
 
-	private JsonObject toJsonObject(Response response) throws IOException {
+	protected JsonObject toJsonObject(Response response) throws IOException {
 		HttpEntity entity = response.getEntity();
 		if ( entity == null ) {
 			return null;
