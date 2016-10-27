@@ -36,14 +36,6 @@ public class PropertyMetadata {
 	private final BoostStrategy dynamicBoostStrategy;
 	private final String propertyAccessorName;
 
-	/**
-	 * Fields explicitly declared by {@link org.hibernate.search.bridge.MetadataProvidingFieldBridge}s.
-	 * <p>
-	 * Note: This is only to be used for validation / schema creation in ES, don't use it to drive invocation of field
-	 * bridges at indexing time!
-	 */
-	private final Map<String, BridgeDefinedField> bridgeDefinedFields;
-
 	private PropertyMetadata(Builder builder) {
 		this.declaringType = builder.declaringType;
 		this.propertyAccessor = builder.propertyAccessor;
@@ -51,7 +43,6 @@ public class PropertyMetadata {
 		this.documentFieldMetadataList = Collections.unmodifiableSet( builder.fieldMetadataSet );
 		this.documentFieldMetadataMap = createDocumentFieldMetadataMap( builder.fieldMetadataSet );
 		this.sortableFieldMetadata = Collections.unmodifiableSet( builder.sortableFieldMetadata );
-		this.bridgeDefinedFields = Collections.unmodifiableMap( builder.bridgeDefinedFields );
 		this.propertyAccessorName = propertyAccessor == null ? null : propertyAccessor.getName();
 		if ( builder.dynamicBoostStrategy != null ) {
 			this.dynamicBoostStrategy = builder.dynamicBoostStrategy;
@@ -73,8 +64,8 @@ public class PropertyMetadata {
 	/**
 	 * @return The type declaring this property.
 	 */
-	public BackReference<TypeMetadata> getDeclaringType() {
-		return declaringType;
+	public TypeMetadata getDeclaringType() {
+		return declaringType.get();
 	}
 
 	public XProperty getPropertyAccessor() {
@@ -114,10 +105,6 @@ public class PropertyMetadata {
 		return sortableFieldMetadata;
 	}
 
-	public Map<String, BridgeDefinedField> getBridgeDefinedFields() {
-		return bridgeDefinedFields;
-	}
-
 	public BoostStrategy getDynamicBoostStrategy() {
 		return dynamicBoostStrategy;
 	}
@@ -131,7 +118,6 @@ public class PropertyMetadata {
 		private final Class<?> propertyClass;
 		private final Set<DocumentFieldMetadata> fieldMetadataSet;
 		private final Set<SortableFieldMetadata> sortableFieldMetadata;
-		private final Map<String, BridgeDefinedField> bridgeDefinedFields;
 
 		// optional parameters
 		private BoostStrategy dynamicBoostStrategy;
@@ -145,7 +131,6 @@ public class PropertyMetadata {
 			this.propertyClass = propertyClass;
 			this.fieldMetadataSet = new HashSet<>();
 			this.sortableFieldMetadata = new HashSet<>();
-			this.bridgeDefinedFields = new HashMap<>();
 		}
 
 		public Builder dynamicBoostStrategy(BoostStrategy boostStrategy) {
@@ -160,11 +145,6 @@ public class PropertyMetadata {
 
 		public Builder addSortableField(SortableFieldMetadata sortableField) {
 			this.sortableFieldMetadata.add( sortableField );
-			return this;
-		}
-
-		public Builder addBridgeDefinedField(BridgeDefinedField bridgeDefinedField) {
-			this.bridgeDefinedFields.put( bridgeDefinedField.getName(), bridgeDefinedField );
 			return this;
 		}
 

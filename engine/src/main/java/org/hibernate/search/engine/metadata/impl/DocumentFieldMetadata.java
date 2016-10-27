@@ -7,7 +7,9 @@
 package org.hibernate.search.engine.metadata.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.document.Field;
@@ -46,6 +48,14 @@ public class DocumentFieldMetadata {
 	private final NumericEncodingType numericEncodingType;
 	private final Set<FacetMetadata> facetMetadata;
 
+	/**
+	 * Fields explicitly declared by {@link org.hibernate.search.bridge.MetadataProvidingFieldBridge}s.
+	 * <p>
+	 * Note: This is only to be used for validation / schema creation in ES, don't use it to drive invocation of field
+	 * bridges at indexing time!
+	 */
+	private final Map<String, BridgeDefinedField> bridgeDefinedFields;
+
 	private DocumentFieldMetadata(Builder builder) {
 		this.sourceType = builder.sourceType;
 		this.sourceProperty = builder.sourceProperty;
@@ -65,6 +75,7 @@ public class DocumentFieldMetadata {
 		this.precisionStep = builder.precisionStep;
 		this.numericEncodingType = builder.numericEncodingType;
 		this.facetMetadata = Collections.unmodifiableSet( builder.facetMetadata );
+		this.bridgeDefinedFields = Collections.unmodifiableMap( builder.bridgeDefinedFields );
 	}
 
 	/**
@@ -152,6 +163,10 @@ public class DocumentFieldMetadata {
 		return facetMetadata;
 	}
 
+	public Map<String, BridgeDefinedField> getBridgeDefinedFields() {
+		return bridgeDefinedFields;
+	}
+
 	@Override
 	public String toString() {
 		return "DocumentFieldMetadata{" +
@@ -176,6 +191,8 @@ public class DocumentFieldMetadata {
 	}
 
 	public static class Builder {
+		protected final BackReference<DocumentFieldMetadata> resultReference = new BackReference<>();
+
 		// required parameters
 		private final BackReference<TypeMetadata> sourceType;
 		private final BackReference<PropertyMetadata> sourceProperty;
@@ -196,6 +213,7 @@ public class DocumentFieldMetadata {
 		private NumericEncodingType numericEncodingType;
 		private Set<FacetMetadata> facetMetadata;
 		private NullMarkerCodec nullMarkerCodec = NotEncodingCodec.SINGLETON;
+		private final Map<String, BridgeDefinedField> bridgeDefinedFields;
 
 		public Builder(BackReference<TypeMetadata> sourceType,
 				BackReference<PropertyMetadata> sourceProperty,
@@ -210,6 +228,11 @@ public class DocumentFieldMetadata {
 			this.index = index;
 			this.termVector = termVector;
 			this.facetMetadata = new HashSet<>( 1 ); // the most common case is a single facet
+			this.bridgeDefinedFields = new HashMap<>();
+		}
+
+		public String getFieldName() {
+			return fieldName;
 		}
 
 		public Builder fieldBridge(FieldBridge fieldBridge) {
@@ -267,8 +290,19 @@ public class DocumentFieldMetadata {
 			return this;
 		}
 
+		public Builder addBridgeDefinedField(BridgeDefinedField bridgeDefinedField) {
+			this.bridgeDefinedFields.put( bridgeDefinedField.getName(), bridgeDefinedField );
+			return this;
+		}
+
+		public BackReference<DocumentFieldMetadata> getResultReference() {
+			return resultReference;
+		}
+
 		public DocumentFieldMetadata build() {
-			return new DocumentFieldMetadata( this );
+			DocumentFieldMetadata result = new DocumentFieldMetadata( this );
+			resultReference.initialize( result );
+			return result;
 		}
 
 		@Override

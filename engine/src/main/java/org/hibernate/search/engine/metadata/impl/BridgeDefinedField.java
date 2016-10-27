@@ -16,12 +16,12 @@ import org.hibernate.search.bridge.spi.FieldType;
  */
 public class BridgeDefinedField {
 
-	private final DocumentFieldMetadata sourceField;
+	private final BackReference<DocumentFieldMetadata> sourceField;
 
 	private final String name;
 	private final FieldType type;
 
-	public BridgeDefinedField(DocumentFieldMetadata sourceField, String name, FieldType type) {
+	public BridgeDefinedField(BackReference<DocumentFieldMetadata> sourceField, String name, FieldType type) {
 		this.sourceField = sourceField;
 		this.name = name;
 		this.type = type;
@@ -31,11 +31,11 @@ public class BridgeDefinedField {
 	 * @return The {@link DocumentFieldMetadata} whose field bridge declared this field.
 	 */
 	public DocumentFieldMetadata getSourceField() {
-		return sourceField;
+		return sourceField.get();
 	}
 
 	public Field.Index getIndex() {
-		return sourceField.getIndex();
+		return getSourceField().getIndex();
 	}
 
 	public String getName() {

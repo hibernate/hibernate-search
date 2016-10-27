@@ -698,17 +698,9 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	 */
 	private Set<BridgeDefinedField> getNonEmbeddedBridgeDefinedFields(TypeMetadata type) {
 		Set<BridgeDefinedField> bridgeDefinedFields = new HashSet<>();
-
-		bridgeDefinedFields.addAll( type.getClassBridgeDefinedFields() );
-
-		if ( type.getIdPropertyMetadata() != null ) {
-			bridgeDefinedFields.addAll( type.getIdPropertyMetadata().getBridgeDefinedFields().values() );
+		for ( DocumentFieldMetadata documentFieldMetadata : type.getNonEmbeddedDocumentFieldMetadata() ) {
+			bridgeDefinedFields.addAll( documentFieldMetadata.getBridgeDefinedFields().values() );
 		}
-
-		for ( PropertyMetadata property : type.getAllPropertyMetadata() ) {
-			bridgeDefinedFields.addAll( property.getBridgeDefinedFields().values() );
-		}
-
 		return bridgeDefinedFields;
 	}
 

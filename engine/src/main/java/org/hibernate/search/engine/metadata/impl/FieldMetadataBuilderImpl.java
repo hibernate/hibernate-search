@@ -22,9 +22,9 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
 	private final Set<String> sortableFields = new HashSet<>();
 	private final Set<BridgeDefinedField> fields = new HashSet<>();
-	private final DocumentFieldMetadata fieldMetadata;
+	private final BackReference<DocumentFieldMetadata> fieldMetadata;
 
-	public FieldMetadataBuilderImpl(DocumentFieldMetadata fieldMetadata) {
+	public FieldMetadataBuilderImpl(BackReference<DocumentFieldMetadata> fieldMetadata) {
 		this.fieldMetadata = fieldMetadata;
 	}
 

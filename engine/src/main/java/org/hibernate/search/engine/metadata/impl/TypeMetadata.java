@@ -80,6 +80,11 @@ public class TypeMetadata {
 	private final Map<String, DocumentFieldMetadata> documentFieldNameToFieldMetadata;
 
 	/**
+	 * Metadata for a bridge-defined field keyed against the field name
+	 */
+	private final Map<String, BridgeDefinedField> bridgeDefinedFieldNameToFieldMetadata;
+
+	/**
 	 * Metadata for a Java property (field or getter) keyed  the property name
 	 */
 	private final Map<String, PropertyMetadata> propertyGetterNameToPropertyMetadata;
@@ -140,14 +145,6 @@ public class TypeMetadata {
 
 	private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata;
 
-	/**
-	 * Fields explicitly declared by {@link org.hibernate.search.bridge.MetadataProvidingFieldBridge}s.
-	 * <p>
-	 * Note: This is only to be used for validation / schema creation in ES, don't use it to drive invocation of field
-	 * bridges at indexing time!
-	 */
-	private final Set<BridgeDefinedField> classBridgeDefinedFields;
-
 	protected TypeMetadata(Builder builder) {
 		this.indexedType = builder.indexedType;
 		this.boost = builder.boost;
@@ -166,9 +163,9 @@ public class TypeMetadata {
 		this.propertyMetadata = Collections.unmodifiableSet( builder.propertyMetadataSet );
 		this.propertyGetterNameToPropertyMetadata = keyPropertyMetadata( builder.propertyMetadataSet );
 		this.documentFieldNameToFieldMetadata = keyFieldMetadata( builder.propertyMetadataSet );
+		this.bridgeDefinedFieldNameToFieldMetadata = keyBridgeDefinedFieldMetadata( documentFieldNameToFieldMetadata.values() );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
 		this.classBridgeSortableFieldMetadata = Collections.unmodifiableSet( builder.classBridgeSortableFieldMetadata );
-		this.classBridgeDefinedFields = Collections.unmodifiableSet( builder.classBridgeDefinedFields );
 	}
 
 	public Class<?> getType() {
@@ -195,10 +192,6 @@ public class TypeMetadata {
 		return classBridgeSortableFieldMetadata;
 	}
 
-	public Set<BridgeDefinedField> getClassBridgeDefinedFields() {
-		return classBridgeDefinedFields;
-	}
-
 	public DocumentFieldMetadata getDocumentFieldMetadataFor(String fieldName) {
 		DocumentFieldMetadata result = documentFieldNameToFieldMetadata.get( fieldName );
 		if ( result != null ) {
@@ -206,6 +199,20 @@ public class TypeMetadata {
 		}
 		for ( EmbeddedTypeMetadata element : embeddedTypeMetadata ) {
 			result = element.getDocumentFieldMetadataFor( fieldName );
+			if ( result != null ) {
+				return result;
+			}
+		}
+		return null;
+	}
+
+	public BridgeDefinedField getBridgeDefinedFieldMetadataFor(String fieldName) {
+		BridgeDefinedField result = bridgeDefinedFieldNameToFieldMetadata.get( fieldName );
+		if ( result != null ) {
+			return result;
+		}
+		for ( EmbeddedTypeMetadata element : embeddedTypeMetadata ) {
+			result = element.getBridgeDefinedFieldMetadataFor( fieldName );
 			if ( result != null ) {
 				return result;
 			}
@@ -396,6 +403,21 @@ public class TypeMetadata {
 		return Collections.unmodifiableMap( tmpMap );
 	}
 
+	private Map<String, BridgeDefinedField> keyBridgeDefinedFieldMetadata(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
+		Map<String, BridgeDefinedField> tmpMap = new HashMap<String, BridgeDefinedField>();
+		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
+			for ( BridgeDefinedField bridgeDefinedField : documentFieldMetadata.getBridgeDefinedFields().values() ) {
+				tmpMap.put( bridgeDefinedField.getName(), bridgeDefinedField );
+			}
+		}
+		for ( DocumentFieldMetadata documentFieldMetadata : classBridgeFields ) {
+			for ( BridgeDefinedField bridgeDefinedField : documentFieldMetadata.getBridgeDefinedFields().values() ) {
+				tmpMap.put( bridgeDefinedField.getName(), bridgeDefinedField );
+			}
+		}
+		return Collections.unmodifiableMap( tmpMap );
+	}
+
 	private Map<String, DocumentFieldMetadata> copyClassBridgeMetadata(Set<DocumentFieldMetadata> classBridgeFields) {
 		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
 		for ( DocumentFieldMetadata fieldMetadata : classBridgeFields ) {
@@ -427,7 +449,6 @@ public class TypeMetadata {
 		private PropertyMetadata idPropertyMetadata;
 		private XProperty jpaProperty;
 		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new HashSet<>();
-		private final Set<BridgeDefinedField> classBridgeDefinedFields = new HashSet<>();
 
 		public Builder(Class<?> indexedType, IndexManagerType indexManagerType, ConfigContext configContext) {
 			this( indexedType, buildScopedAnalyzerReferenceBuilder( indexManagerType, configContext ) );
@@ -581,12 +602,6 @@ public class TypeMetadata {
 		public void addClassBridgeSortableFields(Iterable<String> sortableFieldNames) {
 			for ( String sortableFieldName : sortableFieldNames ) {
 				classBridgeSortableFieldMetadata.add( new SortableFieldMetadata.Builder().fieldName( sortableFieldName ).build() );
-			}
-		}
-
-		public void addClassBridgeDefinedFields(Iterable<BridgeDefinedField> bridgeDefinedFields) {
-			for ( BridgeDefinedField field : bridgeDefinedFields ) {
-				classBridgeDefinedFields.add( field );
 			}
 		}
 

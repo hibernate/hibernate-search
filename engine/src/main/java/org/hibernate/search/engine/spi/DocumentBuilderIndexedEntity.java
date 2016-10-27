@@ -768,7 +768,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		for ( SortableFieldMetadata sortField : propertyMetadata.getSortableFieldMetadata() ) {
 			// field marked as sortable by custom bridge to allow sort field validation pass, but that bridge itself is
 			// in charge of adding the required field
-			if ( propertyMetadata.getBridgeDefinedFields().containsKey( sortField.getFieldName() ) ) {
+			if ( propertyMetadata.getDeclaringType().getBridgeDefinedFieldMetadataFor( sortField.getFieldName() ) != null ) {
 				continue;
 			}
 

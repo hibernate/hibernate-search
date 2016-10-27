@@ -29,6 +29,7 @@ public class ParseContext {
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
 	private boolean explicitDocumentId = false;
+	private String idFieldPath;
 	private boolean includeEmbeddedObjectId = false;
 
 	public IndexManagerType getIndexManagerType() {
@@ -117,6 +118,14 @@ public class ParseContext {
 
 	public void decrementLevel() {
 		this.level--;
+	}
+
+	public String getIdFieldPath() {
+		return idFieldPath;
+	}
+
+	public void setIdFieldPath(String idFieldPath) {
+		this.idFieldPath = idFieldPath;
 	}
 
 	public boolean isExplicitDocumentId() {

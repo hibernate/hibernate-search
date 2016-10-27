@@ -49,7 +49,6 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
-import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -696,7 +695,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		// Add to the document the additional fields created when indexing the id
 		private void addIdBridgeDefinedFields(JsonObject hit, EntityIndexBinding binding, Document tmp, ConversionContext conversionContext) {
 			Set<BridgeDefinedField> allBridgeDefinedFields = new HashSet<>();
-			allBridgeDefinedFields.addAll( binding.getDocumentBuilder().getMetadata().getIdPropertyMetadata().getBridgeDefinedFields().values() );
+			String idDocumentFieldName = binding.getDocumentBuilder().getIdKeywordName();
+			allBridgeDefinedFields.addAll( binding.getDocumentBuilder().getMetadata().getIdPropertyMetadata().getFieldMetadata( idDocumentFieldName )
+					.getBridgeDefinedFields().values() );
 			for ( BridgeDefinedField bridgeDefinedField : allBridgeDefinedFields ) {
 				Object fieldValue = getFieldValue( binding, hit, bridgeDefinedField.getName(), conversionContext );
 				tmp.add( new StringField( bridgeDefinedField.getName(), String.valueOf( fieldValue ), Store.NO ) );
@@ -708,7 +709,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		 * field bridge. In case this bridge is not a 2-way bridge, the unconverted value will be returned.
 		 */
 		private Object getFieldValue(EntityIndexBinding binding, JsonObject hit, String projectedField, ConversionContext conversionContext) {
-			DocumentFieldMetadata field = FieldHelper.getFieldMetadata( binding, projectedField );
+			DocumentFieldMetadata field = binding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( projectedField );
 
 			if ( field == null ) {
 				// We check if it is a field created by a field bridge
@@ -747,18 +748,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private boolean isBridgeDefinedField(EntityIndexBinding binding, String projectedField) {
-			BridgeDefinedField bridgeDefinedField = binding.getDocumentBuilder().getMetadata().getIdPropertyMetadata().getBridgeDefinedFields().get( projectedField );
-			if ( bridgeDefinedField != null ) {
-				return true;
-			}
-			Set<PropertyMetadata> allPropertyMetadata = binding.getDocumentBuilder().getMetadata().getAllPropertyMetadata();
-			for ( PropertyMetadata propertyMetadata : allPropertyMetadata ) {
-				bridgeDefinedField = propertyMetadata.getBridgeDefinedFields().get( projectedField );
-				if ( bridgeDefinedField != null && bridgeDefinedField.getName().equals( projectedField ) ) {
-					return true;
-				}
-			}
-			return false;
+			return binding.getDocumentBuilder().getTypeMetadata().getBridgeDefinedFieldMetadataFor( projectedField ) != null;
 		}
 
 		private Object convertFieldValue(EntityIndexBinding binding, DocumentFieldMetadata field, JsonElement value, ConversionContext conversionContext) {
