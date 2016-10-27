@@ -181,14 +181,14 @@
         <commonsLangVersion>2.6</commonsLangVersion>
 
         <!-- Elasticsearch -->
-        <testElasticsearchMavenPluginVersion>2.0</testElasticsearchMavenPluginVersion>
+        <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
         <!-- In theory we're not coupled to a specific version of Elasticsearch; this property
              controls which version is being used to run integration tests. When updating,
              make sure to use the right JNA version, too
         -->
-        <testElasticsearchVersion>2.3.1</testElasticsearchVersion>
+        <testElasticsearchVersion>2.4.1</testElasticsearchVersion>
         <testElasticsearchJnaVersion>4.1.0</testElasticsearchJnaVersion>
-        <elasticsearchJestVersion>2.0.0</elasticsearchJestVersion>
+        <elasticsearchJestVersion>2.0.3</elasticsearchJestVersion>
         <elasticsearchCommonsLang3Version>3.4</elasticsearchCommonsLang3Version>
         <elasticsearchGsonVersion>2.4</elasticsearchGsonVersion>
 
