@@ -9,7 +9,6 @@ package org.hibernate.search.elasticsearch.impl;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.bridge.FieldBridge;
@@ -21,7 +20,6 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
@@ -92,12 +90,9 @@ class FieldHelper {
 		NumericEncodingType numericEncodingType = field.getNumericEncodingType();
 
 		if ( numericEncodingType == NumericEncodingType.UNKNOWN ) {
-			PropertyMetadata hostingProperty = field.getSourceProperty();
-			if ( hostingProperty != null ) {
-				BridgeDefinedField bridgeDefinedField = hostingProperty.getBridgeDefinedFields().get( field.getName() );
-				if ( bridgeDefinedField != null ) {
-					numericEncodingType = getNumericEncodingType( bridgeDefinedField.getType() );
-				}
+			BridgeDefinedField bridgeDefinedField = field.getBridgeDefinedFields().get( field.getName() );
+			if ( bridgeDefinedField != null ) {
+				numericEncodingType = getNumericEncodingType( bridgeDefinedField.getType() );
 			}
 		}
 
@@ -233,23 +228,6 @@ class FieldHelper {
 	static String[] getFieldNameParts(String fieldName) {
 		boolean isEmbeddedField = isEmbeddedField( fieldName );
 		return isEmbeddedField ? DOT.split( fieldName ) : new String[]{ fieldName };
-	}
-
-	static DocumentFieldMetadata getFieldMetadata(EntityIndexBinding indexBinding, String fieldName) {
-		// This also addresses the ID case
-		DocumentFieldMetadata result = indexBinding.getDocumentBuilder().getMetadata().getDocumentFieldMetadataFor( fieldName );
-		if ( result != null ) {
-			return result;
-		}
-
-		Set<DocumentFieldMetadata> classBridgeMetadata = indexBinding.getDocumentBuilder().getMetadata().getClassBridgeMetadata();
-		for ( DocumentFieldMetadata documentFieldMetadata : classBridgeMetadata ) {
-			if ( documentFieldMetadata.getFieldName().equals( fieldName ) ) {
-				return documentFieldMetadata;
-			}
-		}
-
-		return null;
 	}
 
 	public static boolean isSortableField(TypeMetadata sourceType, PropertyMetadata sourceProperty, String fieldName) {

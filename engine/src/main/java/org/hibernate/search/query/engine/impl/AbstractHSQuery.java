@@ -23,8 +23,6 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
-import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
-import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.FullTextFilter;
@@ -344,48 +342,28 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		}
 	}
 
-	private BridgeDefinedField findBridgeDefinedField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String field) {
-		if ( field == null ) {
+	private BridgeDefinedField findBridgeDefinedField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String fieldPath) {
+		if ( fieldPath == null ) {
 			return null;
 		}
 		for ( Class<?> clazz : targetedEntities ) {
 			EntityIndexBinding indexBinding = extendedIntegrator.getIndexBinding( clazz );
 			TypeMetadata typeMetadata = indexBinding.getDocumentBuilder().getTypeMetadata();
-			Set<BridgeDefinedField> classBridgeDefinedFields = typeMetadata.getClassBridgeDefinedFields();
-			for ( BridgeDefinedField definedField : classBridgeDefinedFields ) {
-				if ( definedField.getName().equals( field ) ) {
-					return definedField;
-				}
-			}
-			List<EmbeddedTypeMetadata> embeddedTypeMetadatas = typeMetadata.getEmbeddedTypeMetadata();
-			for ( EmbeddedTypeMetadata embeddedMetadata : embeddedTypeMetadatas ) {
-				Set<BridgeDefinedField> embeddedBridgeDefinedFields = embeddedMetadata.getClassBridgeDefinedFields();
-				for ( BridgeDefinedField bridgeDefinedField : embeddedBridgeDefinedFields ) {
-					if ( bridgeDefinedField.getName().equals( field ) ) {
-						return bridgeDefinedField;
-					}
-				}
-			}
-			Set<PropertyMetadata> allPropertyMetadata = typeMetadata.getAllPropertyMetadata();
-			for ( PropertyMetadata propertyMetadata : allPropertyMetadata ) {
-				Map<String, BridgeDefinedField> bridgeDefinedFields = propertyMetadata.getBridgeDefinedFields();
-				for ( BridgeDefinedField bridgeDefinedField : bridgeDefinedFields.values() ) {
-					if ( bridgeDefinedField.getName().equals( field ) ) {
-						return bridgeDefinedField;
-					}
-				}
+			BridgeDefinedField bridgeDefinedField = typeMetadata.getBridgeDefinedFieldMetadataFor( fieldPath );
+			if ( bridgeDefinedField != null ) {
+				return bridgeDefinedField;
 			}
 		}
 		return null;
 	}
 
-	private DocumentFieldMetadata findFieldMetadata(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String field) {
-		if ( field == null ) {
+	private DocumentFieldMetadata findFieldMetadata(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String fieldPath) {
+		if ( fieldPath == null ) {
 			return null;
 		}
 		for ( Class<?> clazz : targetedEntities ) {
 			EntityIndexBinding indexBinding = extendedIntegrator.getIndexBinding( clazz );
-			DocumentFieldMetadata metadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field );
+			DocumentFieldMetadata metadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( fieldPath );
 			if ( metadata != null ) {
 				return metadata;
 			}
