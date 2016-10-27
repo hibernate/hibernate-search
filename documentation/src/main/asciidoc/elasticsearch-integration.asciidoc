@@ -101,18 +101,12 @@ Configuration is minimal.
 Add them to your `persistence.xml` or where you put the rest of your Hibernate Search configuration.
 
 Select Elasticsearch as the backend:: `hibernate.search.default.indexmanager elasticsearch`
-Hostname and port for Elasticsearch:: `hibernate.search.default.elasticsearch.host \http://127.0.0.1:9200`
-Selects the index creation strategy:: `hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE`
-Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000`
-Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red"):: `hibernate.search.default.elasticsearch.required_index_status green`
-Whether to perform an explicit refresh after a set of operations has been executed against a specific index (`true` or `false`):: `hibernate.search.default.elasticsearch.refresh_after_write false`
-When <<elasticsearch-scrolling,scrolling>>, the minimum number of previous results kept in memory at any time:: `hibernate.search.elasticsearch.scroll_backtracking_window_size`
-When <<elasticsearch-scrolling,scrolling>>, the number of results fetched by each Elasticsearch call:: `hibernate.search.elasticsearch.scroll_fetch_size`
-When <<elasticsearch-scrolling,scrolling>>, the maximum duration `ScrollableResults` will be usable if no other results are fetched from Elasticsearch, in seconds::
-`hibernate.search.elasticsearch.scroll_timeout`
-
+Hostname and port for Elasticsearch:: `hibernate.search.default.elasticsearch.host \http://127.0.0.1:9200` (default)
+Selects the index creation strategy::
+`hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE` (default)
++
 Let's see the options for the `index_schema_management_strategy` property:
-
++
 [options="header"]
 |===============
 |Value|Definition
@@ -122,6 +116,24 @@ Let's see the options for the `index_schema_management_strategy` property:
 |`RECREATE`|Indexed will be deleted if existing and then created. This will delete all content from the index!
 |`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
 |===============
+Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000` (default)
+Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red")::
+`hibernate.search.default.elasticsearch.required_index_status green` (default)
++
+Only operate if the index is at this level or safer.
+In development, set this value to `yellow` if the number of nodes started is below the number of expected replicas.
+Whether to perform an explicit refresh after a set of operations has been executed against a specific index (`true` or `false`)::
+`hibernate.search.default.elasticsearch.refresh_after_write false` (default)
++
+This is useful in unit tests to ensure that a write is visible by a query immediately without delay.
+This keeps unit tests simpler and faster.
+But you should not rely on the synchronous behaviour for your production code.
+Leave at `false` for optimal performance of your Elasticsearch cluster.
+When <<elasticsearch-scrolling,scrolling>>, the minimum number of previous results kept in memory at any time:: `hibernate.search.elasticsearch.scroll_backtracking_window_size 10000` (default)
+When <<elasticsearch-scrolling,scrolling>>, the number of results fetched by each Elasticsearch call:: `hibernate.search.elasticsearch.scroll_fetch_size 1000` (default)
+When <<elasticsearch-scrolling,scrolling>>, the maximum duration `ScrollableResults` will be usable if no other results are fetched from Elasticsearch, in seconds::
+`hibernate.search.elasticsearch.scroll_timeout 60` (default)
+
 
 Note that all properties prefixed with `hibernate.search.default` (besides `host`) can be given globally as shown above and/or be given for specific indexes:
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`.
@@ -133,9 +145,9 @@ There is no specific configuration required on the Elasticsearch side.
 However there are a few features that would benefit from a few changes:
 
 * you can only refer to analyzers that are already registered on Elasticsearch, see <<elasticsearch-mapping-analyzer>>
-* if you want to retrieve the distance in a geolocation query, install and enable the `lang-groovy` plugin,
+* if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
   see <<elasticsearch-query-spatial>>
-* if you want to be able to use the purge all Hibernate Search command,
+* if you want to be able to use the `purgeAll` Hibernate Search command,
   install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query`] plugin
 * if you want to use paging (as opposed to <<elasticsearch-scrolling,scrolling>>) on result sets larger than 10000 elements (for instance access the 10001st result), you may increase the value of the `index.max_result_window` property (default is 10000).
 
