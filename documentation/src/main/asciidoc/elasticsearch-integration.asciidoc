@@ -73,7 +73,7 @@ docker run -p 9200:9200 -d -v "$PWD/plugin_dir":/usr/share/elasticsearch/plugins
 [NOTE]
 .Elasticsearch version
 --
-Hibernate Search expects an Elasticsearch node version 2.0 at least.
+Hibernate Search expects an Elasticsearch node version 2.0 at least. 5.0 is not supported yet.
 Hibernate Search internal tests run against Elasticsearch {testElasticsearchVersion}.
 --
 
