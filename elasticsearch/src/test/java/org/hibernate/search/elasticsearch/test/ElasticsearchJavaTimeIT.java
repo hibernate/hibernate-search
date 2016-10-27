@@ -202,7 +202,7 @@ public class ElasticsearchJavaTimeIT extends SearchTestBase {
 		sample.zonedDateTime = value;
 
 		// The "fields" attribute only ever contains UTC date/times
-		assertThatFieldIsFormatted( sample, "zonedDateTime", "2011-10-30T02:50:00.007+01:00[CET]", "2011-10-30T01:50:00.007+00:00[UTC]" );
+		assertThatFieldIsFormatted( sample, "zonedDateTime", "2011-10-30T02:50:00.007+01:00-CET", "2011-10-30T01:50:00.007+00:00-UTC" );
 	}
 
 	@Test
@@ -218,7 +218,7 @@ public class ElasticsearchJavaTimeIT extends SearchTestBase {
 
 		// Elasticsearch only has millisecond-precision, so the "fields" value is missing the nanoseconds
 		// Also, the "fields" attribute only ever contains UTC date/times
-		assertThatFieldIsFormatted( sample, "zonedDateTime", "2011-10-30T02:50:00.000000007+01:00[CET]", "2011-10-30T01:50:00.000+00:00[UTC]" );
+		assertThatFieldIsFormatted( sample, "zonedDateTime", "2011-10-30T02:50:00.000000007+01:00-CET", "2011-10-30T01:50:00.000+00:00-UTC" );
 	}
 
 	@Test

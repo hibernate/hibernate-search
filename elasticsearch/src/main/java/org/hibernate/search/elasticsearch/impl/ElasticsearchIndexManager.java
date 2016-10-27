@@ -611,8 +611,8 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 				break;
 			case ZONED_DATE_TIME:
 				elasticsearchType = ElasticsearchFieldType.DATE;
-				formats.add( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'" );
-				formats.add( "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'" );
+				formats.add( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ-ZZZ" );
+				formats.add( "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ-ZZZ" );
 				break;
 			case YEAR:
 				elasticsearchType = ElasticsearchFieldType.DATE;
