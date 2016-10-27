@@ -509,7 +509,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 		}
 		field.addProperty( "index", elasticsearchIndex );
 
-		if ( NOT_INDEXED.equals( elasticsearchIndex ) && FieldHelper.isSortableField( sourceProperty, fieldName ) ) {
+		if ( NOT_INDEXED.equals( elasticsearchIndex ) && FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, fieldName ) ) {
 			// We must use doc values in order to enable sorting on non-indexed fields
 			field.addProperty( "doc_values", true );
 		}

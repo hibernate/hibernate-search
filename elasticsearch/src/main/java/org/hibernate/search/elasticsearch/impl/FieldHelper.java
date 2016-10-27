@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -19,6 +20,7 @@ import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
@@ -250,8 +252,10 @@ class FieldHelper {
 		return null;
 	}
 
-	public static boolean isSortableField(PropertyMetadata sourceProperty, String fieldName) {
-		for ( SortableFieldMetadata sortableField : sourceProperty.getSortableFieldMetadata() ) {
+	public static boolean isSortableField(TypeMetadata sourceType, PropertyMetadata sourceProperty, String fieldName) {
+		Collection<SortableFieldMetadata> sortableFields = sourceProperty != null ? sourceProperty.getSortableFieldMetadata()
+				: sourceType.getClassBridgeSortableFieldMetadata();
+		for ( SortableFieldMetadata sortableField : sortableFields ) {
 			if ( fieldName.equals( sortableField.getFieldName() ) ) {
 				return true;
 			}
