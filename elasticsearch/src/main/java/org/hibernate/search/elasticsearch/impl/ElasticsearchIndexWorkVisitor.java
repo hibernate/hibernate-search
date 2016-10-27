@@ -79,13 +79,13 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 	@Override
 	public BackendRequest<?> visitAddWork(AddLuceneWork work, Void p) {
-		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
+		Action<?> index = indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() );
 		return new BackendRequest<>( index, work, indexName, refreshAfterWrite );
 	}
 
 	@Override
 	public BackendRequest<?> visitDeleteWork(DeleteLuceneWork work, Void p) {
-		Delete delete = new Delete.Builder( DocumentIdHelper.getDocumentId( work ) )
+		Delete delete = new Delete.Builder( getDocumentId( work ) )
 			.index( indexName )
 			.type( work.getEntityClass().getName() )
 			.build();
@@ -127,7 +127,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 	@Override
 	public BackendRequest<?> visitUpdateWork(UpdateLuceneWork work, Void p) {
-		Action<?> index = indexDocument( DocumentIdHelper.getDocumentId( work ), work.getDocument(), work.getEntityClass() );
+		Action<?> index = indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() );
 		return new BackendRequest<>( index, work, indexName, refreshAfterWrite );
 	}
 
@@ -353,6 +353,10 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 		}
 
 		return root;
+	}
+
+	private String getDocumentId(LuceneWork work) {
+		return work.getTenantId() == null ? work.getIdInString() : work.getTenantId() + "_" + work.getIdInString();
 	}
 
 	private boolean isNumeric(IndexableField field) {

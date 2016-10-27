@@ -684,24 +684,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private Object getId(JsonObject hit, EntityIndexBinding binding, ConversionContext conversionContext) {
-			Document tmp = new Document();
-			tmp.add( new StringField( "id", DocumentIdHelper.getEntityId( hit.get( "_id" ).getAsString() ), Store.NO ) );
-
-			addIdBridgeDefinedFields( hit, binding, tmp, conversionContext );
-
-			return binding.getDocumentBuilder().getIdBridge().get( "id", tmp );
-		}
-
-		// Add to the document the additional fields created when indexing the id
-		private void addIdBridgeDefinedFields(JsonObject hit, EntityIndexBinding binding, Document tmp, ConversionContext conversionContext) {
-			Set<BridgeDefinedField> allBridgeDefinedFields = new HashSet<>();
-			String idDocumentFieldName = binding.getDocumentBuilder().getIdKeywordName();
-			allBridgeDefinedFields.addAll( binding.getDocumentBuilder().getMetadata().getIdPropertyMetadata().getFieldMetadata( idDocumentFieldName )
-					.getBridgeDefinedFields().values() );
-			for ( BridgeDefinedField bridgeDefinedField : allBridgeDefinedFields ) {
-				Object fieldValue = getFieldValue( binding, hit, bridgeDefinedField.getName(), conversionContext );
-				tmp.add( new StringField( bridgeDefinedField.getName(), String.valueOf( fieldValue ), Store.NO ) );
-			}
+			return getFieldValue( binding, hit, binding.getDocumentBuilder().getIdKeywordName(), conversionContext );
 		}
 
 		/**
@@ -711,87 +694,112 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private Object getFieldValue(EntityIndexBinding binding, JsonObject hit, String projectedField, ConversionContext conversionContext) {
 			DocumentFieldMetadata field = binding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( projectedField );
 
-			if ( field == null ) {
-				// We check if it is a field created by a field bridge
-				if ( !isBridgeDefinedField( binding, projectedField ) ) {
-					throw LOG.unknownFieldForProjection(
-							binding.getDocumentBuilder().getMetadata().getType().getName(),
-							projectedField );
-				}
-			}
-
-			JsonElement value;
-
-			if ( field != null && field.isId() ) {
-				value = hit.get( "_id" );
-			}
-			else {
-				value = getFieldValue( hit.get( "_source" ).getAsJsonObject(), projectedField );
-			}
-
-			if ( value == null || value.isJsonNull() ) {
-				return null;
-			}
-
 			if ( field != null ) {
 				conversionContext.pushProperty( field.getFieldName() );
 				try {
-					return convertFieldValue( binding, field, value, conversionContext );
+					return convertFieldValue( hit, binding, field, conversionContext );
 				}
 				finally {
 					conversionContext.popProperty();
 				}
 			}
 			else {
-				return convertPrimitiveValue( value );
+				// We check if it is a field created by a field bridge
+				BridgeDefinedField bridgeDefinedField = binding.getDocumentBuilder().getTypeMetadata().getBridgeDefinedFieldMetadataFor( projectedField );
+				if ( bridgeDefinedField == null ) {
+					throw LOG.unknownFieldForProjection(
+							binding.getDocumentBuilder().getMetadata().getType().getName(),
+							projectedField );
+				}
+				return convertFieldValue( hit, binding, bridgeDefinedField );
 			}
 		}
 
-		private boolean isBridgeDefinedField(EntityIndexBinding binding, String projectedField) {
-			return binding.getDocumentBuilder().getTypeMetadata().getBridgeDefinedFieldMetadataFor( projectedField ) != null;
-		}
-
-		private Object convertFieldValue(EntityIndexBinding binding, DocumentFieldMetadata field, JsonElement value, ConversionContext conversionContext) {
+		private Object convertFieldValue(JsonObject hit, EntityIndexBinding binding, DocumentFieldMetadata field, ConversionContext conversionContext) {
+			String fieldPath = field.getFieldName();
 			FieldBridge fieldBridge = field.getFieldBridge();
+			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), fieldPath );
 
 			ExtendedFieldType type = FieldHelper.getType( field );
 			if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
-				return value.getAsBoolean();
+				return jsonValue == null || jsonValue.isJsonNull() ? null : jsonValue.getAsBoolean();
 			}
 			else if ( fieldBridge instanceof TwoWayFieldBridge ) {
 				Document tmp = new Document();
 
-				switch ( type ) {
-					case INTEGER:
-						tmp.add( new IntField( field.getName(), value.getAsInt(), Store.NO ) );
-						break;
-					case LONG:
-						tmp.add( new LongField( field.getName(), value.getAsLong(), Store.NO ) );
-						break;
-					case FLOAT:
-						tmp.add( new FloatField( field.getName(), value.getAsFloat(), Store.NO ) );
-						break;
-					case DOUBLE:
-						tmp.add( new DoubleField( field.getName(), value.getAsDouble(), Store.NO ) );
-						break;
-					case UNKNOWN_NUMERIC:
-						throw LOG.unexpectedNumericEncodingType(
-								binding.getDocumentBuilder().getMetadata().getType().getName(),
-								field.getName() );
-					default:
-						tmp.add( new StringField( field.getName(), value.getAsString(), Store.NO ) );
-						break;
+				addDocumentField( tmp, binding, type, fieldPath, jsonValue );
+
+				// Add to the document the additional fields created when indexing the value
+				for ( BridgeDefinedField bridgeDefinedField : field.getBridgeDefinedFields().values() ) {
+					String bridgeDefinedFieldPath = bridgeDefinedField.getName();
+					ExtendedFieldType bridgeDefinedFieldType = FieldHelper.getType( bridgeDefinedField );
+
+					JsonElement bridgeDefinedFieldJsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), bridgeDefinedFieldPath );
+					addDocumentField( tmp, binding, bridgeDefinedFieldType, bridgeDefinedFieldPath, bridgeDefinedFieldJsonValue );
 				}
 
 				return conversionContext.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge ).get( field.getName(), tmp );
 			}
 			// Should only be the case for custom bridges
 			else {
-				return convertPrimitiveValue( value );
+				return convertPrimitiveValue( jsonValue );
+			}
+		}
+
+		private void addDocumentField(Document tmp, EntityIndexBinding binding, ExtendedFieldType fieldType, String fieldPath, JsonElement jsonValue) {
+			if ( jsonValue == null || jsonValue.isJsonNull() ) {
+				return;
+			}
+			switch ( fieldType ) {
+				case INTEGER:
+					tmp.add( new IntField( fieldPath, jsonValue.getAsInt(), Store.NO ) );
+					break;
+				case LONG:
+					tmp.add( new LongField( fieldPath, jsonValue.getAsLong(), Store.NO ) );
+					break;
+				case FLOAT:
+					tmp.add( new FloatField( fieldPath, jsonValue.getAsFloat(), Store.NO ) );
+					break;
+				case DOUBLE:
+					tmp.add( new DoubleField( fieldPath, jsonValue.getAsDouble(), Store.NO ) );
+					break;
+				case UNKNOWN_NUMERIC:
+					throw LOG.unexpectedNumericEncodingType(
+							binding.getDocumentBuilder().getMetadata().getType().getName(),
+							fieldPath );
+				default:
+					tmp.add( new StringField( fieldPath, jsonValue.getAsString(), Store.NO ) );
+					break;
+			}
+		}
+
+		private Object convertFieldValue(JsonObject hit, EntityIndexBinding binding, BridgeDefinedField bridgeDefinedField) {
+			String fieldPath = bridgeDefinedField.getName();
+			ExtendedFieldType fieldType = FieldHelper.getType( bridgeDefinedField );
+			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), fieldPath );
+			switch ( fieldType ) {
+				case INTEGER:
+					return jsonValue.getAsInt();
+				case LONG:
+					return jsonValue.getAsLong();
+				case FLOAT:
+					return jsonValue.getAsFloat();
+				case DOUBLE:
+					return jsonValue.getAsDouble();
+				case UNKNOWN_NUMERIC:
+					throw LOG.unexpectedNumericEncodingType(
+							binding.getDocumentBuilder().getMetadata().getType().getName(),
+							fieldPath );
+				default:
+					return jsonValue.getAsString();
 			}
 		}
 
 		private Object convertPrimitiveValue(JsonElement value) {
+			if ( value == null || value.isJsonNull() ) {
+				return null;
+			}
+
 			// TODO: HSEARCH-2255 should we do it?
 			if ( !value.isJsonPrimitive() ) {
 				throw LOG.unsupportedProjectionOfNonJsonPrimitiveFields( value );
@@ -816,7 +824,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 
-		private JsonElement getFieldValue(JsonObject parent, String projectedField) {
+		private JsonElement extractFieldValue(JsonObject parent, String projectedField) {
 			String field = projectedField;
 
 			if ( FieldHelper.isEmbeddedField( projectedField ) ) {
