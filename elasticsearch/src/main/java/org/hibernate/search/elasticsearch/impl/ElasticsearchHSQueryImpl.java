@@ -506,12 +506,15 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				// the results. If we don't sort by distance, we need to request for the distance using a script_field.
 				query.add( "script_fields",
 						JsonBuilder.object().add( SPATIAL_DISTANCE_FIELD, JsonBuilder.object()
+							.add( "script", JsonBuilder.object()
 								.add( "params",
 										JsonBuilder.object()
 												.addProperty( "lat", spatialSearchCenter.getLatitude() )
 												.addProperty( "lon", spatialSearchCenter.getLongitude() )
 								)
-								.addProperty( "script", "doc[\u0027" + spatialFieldName + "\u0027].arcDistanceInKm(lat,lon)" )
+								.addProperty( "inline", "doc['" + spatialFieldName + "'].arcDistanceInKm(lat,lon)" )
+								.addProperty( "lang", "groovy" )
+							)
 						)
 				);
 				// in this case, the _source field is not present in the Elasticsearch results
