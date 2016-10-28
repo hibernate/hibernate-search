@@ -175,15 +175,15 @@ In order for your value to be understood by Hibernate Search (and Elasticsearch)
 
 ==== [[elasticsearch-mapping-analyzer]] Analyzers
 
-CAUTION: Analyzers are treated differently than in Lucene embedded mode.
+WARNING: Analyzers are treated differently than in Lucene embedded mode.
 
 Using the `definition` attribute in the `@Analyzer` annotation, you can refer to the name of the
 built-in or custom analyzers registered on your Elasticsearch instances.
 
-This will work as long as there is not a local analyzer defined with the same name.
-If that's the case, Hibernate Search will ignore the analyzer when Elasticsearch
-is used as backend and log a warning.
-This might sound complicated but we are looking for ways to ease the experience.
+You should not define an analyzer definition with the same name (e.g. no `@AnalyzerDef`).
+If there is an analyzer definition, Hibernate Search will throw an exception.
+
+CAUTION: We are working on propagating simple analyzer definitions to Elasticsearch, stay tuned.
 
 More information on analyzers, in particular the already defined ones, can be found
 in link:https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html[the Elasticsearch documentation].
