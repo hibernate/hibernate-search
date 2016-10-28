@@ -64,7 +64,7 @@ public class ToElasticsearch {
 			JsonObject termsJsonQuery = JsonBuilder.object().add( "terms",
 					JsonBuilder.object()
 							.addProperty( "field", fieldName )
-							.addProperty( "size", facetingRequest.getMaxNumberOfFacets() == -1 ? 0 : facetingRequest.getMaxNumberOfFacets() )
+							.addProperty( "size", facetingRequest.getMaxNumberOfFacets() == -1 ? Integer.MAX_VALUE : facetingRequest.getMaxNumberOfFacets() )
 							.add( "order", fromFacetSortOrder( facetingRequest.getSort() ) )
 							.addProperty( "min_doc_count", facetingRequest.hasZeroCountsIncluded() ? 0 : 1 )
 					).build();
