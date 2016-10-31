@@ -9,7 +9,6 @@ package org.hibernate.search.elasticsearch.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -140,10 +139,10 @@ public class ElasticsearchDateCalendarBridgeIT extends SearchTestBase {
 		List<Object[]> results = fullTextSession.createFullTextQuery( query, GolfPlayer.class ).setProjection( "subscriptionEndDate" ).list();
 		assertEquals( 1, results.size() );
 
-		Date now = new Date();
+		long subscriptionEndDateTime = subscriptionEndDate.getTime().getTime();
 		assertEquals(
-				TimeZone.getTimeZone( "Europe/Paris" ).getOffset( now.getTime() ),
-				( (Calendar) results.iterator().next()[0] ).getTimeZone().getOffset( now.getTime() )
+				TimeZone.getTimeZone( "Europe/Paris" ).getOffset( subscriptionEndDateTime ),
+				( (Calendar) results.iterator().next()[0] ).getTimeZone().getOffset( subscriptionEndDateTime )
 		);
 
 		tx.commit();
