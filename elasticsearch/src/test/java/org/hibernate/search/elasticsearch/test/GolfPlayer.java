@@ -28,9 +28,11 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.builtin.DoubleBridge;
 
 /**
@@ -40,6 +42,7 @@ import org.hibernate.search.bridge.builtin.DoubleBridge;
 @Indexed(index = "golfplayer")
 @ClassBridges({
 		@ClassBridge(name = "fullName", impl = NameConcatenationBridge.class),
+		@ClassBridge(name = "fullNameStored", index = Index.NO, store = Store.YES, impl = NameConcatenationBridge.class),
 		@ClassBridge(name = "age", impl = AgeBridge.class)
 })
 public class GolfPlayer {

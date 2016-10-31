@@ -178,6 +178,11 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 						"'fullName':{" +
 							"'type':'string'" +
 						"}," +
+						"'fullNameStored':{" +
+							"'type':'string'," +
+							"'index':'no'," +
+							"'store':true" +
+						"}," +
 						"'handicap':{" +
 							"'type':'double'" +
 						"}," +
@@ -453,7 +458,8 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 					"\"handicap\": 0.0," + // not nullable
 					"\"puttingStrength\": \"0.0\"," + // not nullable
 					"\"lastName\": \"Kidd\"," +
-					"\"fullName\": \"Kidd\"" +
+					"\"fullName\": \"Kidd\"," +
+					"\"fullNameStored\": \"Kidd\"" +
 					// ranking.value is null but indexNullAs() has not been given, so it's
 					// not present in the index at all
 					// "\"ranking\": {" +
