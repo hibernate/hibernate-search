@@ -36,6 +36,7 @@ import org.hibernate.search.elasticsearch.test.model.StateCandidate;
 import org.hibernate.search.elasticsearch.test.model.Tower;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -435,6 +436,7 @@ public class ElasticsearchIT extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2253")
 	public void testSort() throws Exception {
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );

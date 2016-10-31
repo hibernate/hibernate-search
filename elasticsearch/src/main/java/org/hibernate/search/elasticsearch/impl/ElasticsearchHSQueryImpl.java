@@ -291,12 +291,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
 		private final Set<String> indexNames = new HashSet<>();
-		private final String idFieldName;
 		private final String completeQueryAsString;
 
 		private IndexSearcher() {
 			JsonArray typeFilters = new JsonArray();
-			String queriedEntityIdFieldName = null;
 			Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
 
 			for ( Class<?> queriedEntityType : queriedEntityTypes ) {
@@ -313,19 +311,12 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 						);
 					}
 
-					// TODO HSEARCH-2253 the id field name is used to detect if we should sort using the internal Elasticsearch id field
-					// as it's currently the only field in which we store the id of the entity.
-					// Thus the id fields must be consistent accross all the entity types when querying multiple ones.
-					queriedEntityIdFieldName = binding.getDocumentBuilder().getIdentifierName();
-
 					ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
 					indexNames.add( esIndexManager.getActualIndexName() );
 				}
 
 				typeFilters.add( getEntityTypeFilter( queriedEntityType ) );
 			}
-
-			this.idFieldName = queriedEntityIdFieldName;
 
 			// Query filters; always a type filter, possibly a tenant id filter;
 			JsonObject filteredQuery = getFilteredQuery( jsonQuery.get( "query" ), typeFilters );
@@ -430,7 +421,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 
-		private Sort getSort(SortField sortField, String idFieldName) {
+		private Sort getSort(SortField sortField) {
 			if ( sortField instanceof DistanceSortField ) {
 				DistanceSortField distanceSortField = (DistanceSortField) sortField;
 				return new DistanceSort( distanceSortField.getField(),
@@ -459,17 +450,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					}
 				}
 				else {
-					if ( sortField.getField().equals( idFieldName ) ) {
-						// It is not possible to sort on the _id field as this field is not indexed by Elasticsearch and there
-						// is no way to make it indexed in recent Elasticsearch versions.
-						// Thus, we use _uid which is stored as type#id even if it is not very satisfactory when
-						// we query multiple types.
-						// It is not recommended to sort by the @DocumentId field anyway.
-						sortFieldName = "_uid";
-					}
-					else {
-						sortFieldName = sortField.getField();
-					}
+					sortFieldName = sortField.getField();
 				}
 				return new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC );
 			}
@@ -565,7 +546,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			if ( sort != null ) {
 				validateSortFields( extendedIntegrator, getQueriedEntityTypes() );
 				for ( SortField sortField : sort.getSort() ) {
-					builder.addSort( getSort( sortField, idFieldName ) );
+					builder.addSort( getSort( sortField ) );
 				}
 			}
 			Search search = builder.build();
