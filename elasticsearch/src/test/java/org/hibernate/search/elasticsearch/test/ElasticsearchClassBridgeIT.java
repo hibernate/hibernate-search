@@ -20,6 +20,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,6 +110,27 @@ public class ElasticsearchClassBridgeIT extends SearchTestBase {
 		Object[] projection = (Object[]) result.iterator().next();
 		assertThat( projection[0] ).describedAs( "fullName" ).isEqualTo( "Klaus Hergesheimer" );
 		assertThat( ( (Number) projection[1] ).intValue() ).describedAs( "age" ).isEqualTo( 34 );
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2439")
+	public void testProjectionOnUnindexedClassBridgeField() {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "Hergesheimer" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+				.setProjection( "fullNameStored" )
+				.list();
+
+		assertThat( result ).hasSize( 1 );
+
+		Object[] projection = (Object[]) result.iterator().next();
+		assertThat( projection[0] ).describedAs( "fullNameStored" ).isEqualTo( "Klaus Hergesheimer" );
 
 		tx.commit();
 		s.close();
