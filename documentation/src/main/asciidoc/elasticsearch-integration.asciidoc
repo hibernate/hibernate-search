@@ -516,4 +516,6 @@ Please check with JIRA and the mailing lists for updates, but at the time of wri
 * Using custom field bridges for document IDs (for example on JPA's `@EmbeddedId`): https://hibernate.atlassian.net/browse/HSEARCH-2396[HSEARCH-2396]
 * <<search-monitoring,Statistics>>: https://hibernate.atlassian.net/browse/HSEARCH-2421[HSEARCH-2421]
 * Mixing Lucene based indexes and Elasticsearch based indexes (partial support is here though)
+* Hibernate Search does not make use of nested objects nor parent child relationship mapping https://hibernate.atlassian.net/browse/HSEARCH-2263[HSEARCH-2263].
+  This is largely mitigated by the fact that Hibernate Search does the denormalization itself and maintain data consistency when nested objects are updated.
 * There is room for improvements in the performances of the MassIndexer implementation
