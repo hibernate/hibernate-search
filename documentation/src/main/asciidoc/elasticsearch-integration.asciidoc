@@ -359,9 +359,14 @@ If your result set is bigger, you may take advantage of scrolling by using the `
 Limitations:
 
 * This method is not available in `org.hibernate.search.jpa.FullTextQuery`.
-* The Elasticsearch implementation has poor performance when an offset has been defined (i.e. `setFirstResult(int)` has been called on the query before calling `scroll()`). This is because Elasticsearch does not provide such feature, thus Hibernate Search has to scroll through every previous result under the hood.
-* The Elasticsearch implementation allows only limited backtracking. Calling `scrollableResylts.setRowNumber(4)` when currently positioned at index `1006`, for example, may result in a `SearchException` being thrown, because only 1000 previous elements had been kept in memory. You may work this around by tweaking the property: `hibernate.search.elasticsearch.scroll_backtracking_window_size` (see <<elasticsearch-integration-configuration>>).
-* The `ScrollableResults` will become stale and unusable after a given period of time spent without fetching results from Elasticsearch. You may work this around by tweaking two properties: `hibernate.search.elasticsearch.scroll_timeout` and `hibernate.search.elasticsearch.scroll_fetch_size` (see <<elasticsearch-integration-configuration>>). Typically, you will solve timeout issues by reducing the fetch size and/or increasing the timeout limit, but this will also increase the performance hit on Elasticsearch.
+* The Elasticsearch implementation has poor performance when an offset has been defined (i.e. `setFirstResult(int)` has been called on the query before calling `scroll()`).
+  This is because Elasticsearch does not provide such feature, thus Hibernate Search has to scroll through every previous result under the hood.
+* The Elasticsearch implementation allows only limited backtracking. Calling `scrollableResults.setRowNumber(4)` when currently positioned at index `1006`,
+  for example, may result in a `SearchException` being thrown, because only 1000 previous elements had been kept in memory.
+  You may work this around by tweaking the property: `hibernate.search.elasticsearch.scroll_backtracking_window_size` (see <<elasticsearch-integration-configuration>>).
+* The `ScrollableResults` will become stale and unusable after a given period of time spent without fetching results from Elasticsearch.
+  You may work this around by tweaking two properties: `hibernate.search.elasticsearch.scroll_timeout` and `hibernate.search.elasticsearch.scroll_fetch_size` (see <<elasticsearch-integration-configuration>>).
+  Typically, you will solve timeout issues by reducing the fetch size and/or increasing the timeout limit, but this will also increase the performance hit on Elasticsearch.
 
 ==== [[elasticsearch-query-sorting]]Sorting
 
