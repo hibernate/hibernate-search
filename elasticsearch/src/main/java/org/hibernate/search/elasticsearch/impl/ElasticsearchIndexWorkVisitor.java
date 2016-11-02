@@ -45,7 +45,6 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -193,12 +192,14 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 	private JsonObject convertToJson(Document document, Class<?> entityType) {
 		EntityIndexBinding indexBinding = searchIntegrator.getIndexBinding( entityType );
 		JsonObject root = new JsonObject();
-		JsonTreeBuilder treeBuilder = new JsonTreeBuilder( root );
 
 		NestingMarker nestingMarker = null;
+		JsonAccessorBuilder accessorBuilder = new JsonAccessorBuilder();
 		for ( IndexableField field : document.getFields() ) {
 			if ( field instanceof NestingMarker ) {
 				nestingMarker = (NestingMarker) field;
+				accessorBuilder.reset();
+				accessorBuilder.append( ((NestingMarker) field).getPath() );
 				continue; // Inspect the next field taking into account this metadata
 			}
 
@@ -212,8 +213,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 				// Exclude the last path component: it represents the null embedded
 				nestingPath = nestingPath.subList( 0, nestingPath.size() - 1 );
-				JsonObject parent = treeBuilder.getOrCreateParent( nestingPath );
-				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldPath );
+				accessorBuilder.reset();
+				accessorBuilder.append( nestingPath );
 
 				Container containerType = embeddedType.getEmbeddedContainer();
 
@@ -230,7 +231,8 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 						 * lead to conflicts when querying.
 						 */
 						String value = field.stringValue();
-						parent.add( jsonPropertyName, value != null ? new JsonPrimitive( value ) : null );
+
+						accessorBuilder.buildForPath( fieldPath ).set( root, value != null ? new JsonPrimitive( value ) : null );
 						break;
 					case OBJECT:
 						// TODO HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
@@ -240,66 +242,59 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 				}
 			}
 			else if ( !fieldPath.equals( ProjectionConstants.OBJECT_CLASS ) &&
-					!fieldPath.equals( indexBinding.getDocumentBuilder().getIdKeywordName() ) &&
 					!FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( fieldPath ) &&
 					!isDocValueField( field ) ) {
-				JsonObject parent = treeBuilder.getOrCreateParent( nestingPath );
-				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldPath );
-
-				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() );
+				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata()
+						.getDocumentFieldMetadataFor( field.name() );
 
 				if ( documentFieldMetadata == null ) {
-					if ( SpatialHelper.isSpatialField( jsonPropertyName ) ) {
-						if ( isNumeric( field ) && ( SpatialHelper.isSpatialFieldLatitude( jsonPropertyName ) ||
-								SpatialHelper.isSpatialFieldLongitude( jsonPropertyName ) ) ) {
+					if ( SpatialHelper.isSpatialField( fieldPath ) ) {
+						if ( isNumeric( field ) && ( SpatialHelper.isSpatialFieldLatitude( fieldPath ) ||
+								SpatialHelper.isSpatialFieldLongitude( fieldPath ) ) ) {
 							// work on the latitude/longitude fields
 							Number value = field.numericValue();
-							String spatialJsonPropertyName = SpatialHelper.getSpatialFieldRootName( jsonPropertyName );
-							JsonObject spatialParent;
+							String spatialPropertyPath = SpatialHelper.stripSpatialFieldSuffix( fieldPath );
 
-							if ( parent.get( spatialJsonPropertyName ) != null ) {
-								spatialParent = parent.get( spatialJsonPropertyName ).getAsJsonObject();
+							if ( SpatialHelper.isSpatialFieldLatitude( fieldPath ) ) {
+								accessorBuilder.buildForPath( spatialPropertyPath + ".lat" )
+										.add( root, value != null ? new JsonPrimitive( value ) : null );
 							}
-							else {
-								spatialParent = new JsonObject();
-								parent.add( spatialJsonPropertyName, spatialParent );
-							}
-
-							if ( SpatialHelper.isSpatialFieldLatitude( jsonPropertyName ) ) {
-								addPropertyOfPotentiallyMultipleCardinality( spatialParent, "lat",
-										value != null ? new JsonPrimitive( value ) : null );
-							}
-							else if ( SpatialHelper.isSpatialFieldLongitude( jsonPropertyName ) ) {
-								addPropertyOfPotentiallyMultipleCardinality( spatialParent, "lon",
-										value != null ? new JsonPrimitive( value ) : null );
+							else if ( SpatialHelper.isSpatialFieldLongitude( fieldPath ) ) {
+								accessorBuilder.buildForPath( spatialPropertyPath + ".lon" )
+										.add( root, value != null ? new JsonPrimitive( value ) : null );
 							}
 						}
 						else {
 							// here, we have the hash fields used for spatial hash indexing
 							String value = field.stringValue();
-							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-									value != null ? new JsonPrimitive( value ) : null );
+							accessorBuilder.buildForPath( fieldPath )
+									.add( root, value != null ? new JsonPrimitive( value ) : null );
 						}
 					}
 					else {
 						// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
+						JsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
 						String stringValue = field.stringValue();
+						Number numericValue = field.numericValue();
 						if ( stringValue != null ) {
-							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName, new JsonPrimitive( stringValue ) );
+							accessor.add( root, new JsonPrimitive( stringValue ) );
+						}
+						else if ( numericValue != null ) {
+							accessor.add( root, new JsonPrimitive( numericValue ) );
 						}
 						else {
-							addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-									field.numericValue() != null ? new JsonPrimitive( field.numericValue() ) : null );
+							accessor.add( root, null );
 						}
 					}
 				}
 				else {
+					JsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
 					ExtendedFieldType type = FieldHelper.getType( documentFieldMetadata );
 					if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 						FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
 						Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
-						addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-								value != null ? new JsonPrimitive( value ) : null );
+
+						accessor.add( root, value != null ? new JsonPrimitive( value ) : null );
 					}
 					// TODO HSEARCH-2261 falling back for now to checking actual Field type to cover numeric fields created by custom
 					// bridges
@@ -311,8 +306,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 							value = null;
 						}
 
-						addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-								value != null ? new JsonPrimitive( value ) : null );
+						accessor.add( root, value != null ? new JsonPrimitive( value ) : null );
 					}
 					else {
 						// If the value was initially null, explicitly propagate null and let ES handle the default token.
@@ -321,8 +315,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 							value = null;
 						}
 
-						addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-								value != null ? new JsonPrimitive( value ) : null );
+						accessor.add( root, value != null ? new JsonPrimitive( value ) : null );
 					}
 				}
 			}
@@ -333,19 +326,16 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 				if ( facetParts == null || facetParts.length != 2 ) {
 					continue;
 				}
-				String fieldName = facetParts[0];
+				String facetFieldPath = facetParts[0];
 				String value = facetParts[1];
 
 				// if it's not just a facet field, we ignore it as the field is going to be created by the standard
 				// mechanism
-				if ( indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( fieldName ) != null ) {
+				if ( indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( facetFieldPath ) != null ) {
 					continue;
 				}
 
-				JsonObject parent = treeBuilder.getOrCreateParent( nestingPath );
-				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldName );
-				addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-						value != null ? new JsonPrimitive( value ) : null );
+				accessorBuilder.buildForPath( facetFieldPath ).add( root, value != null ? new JsonPrimitive( value ) : null );
 			}
 			else if ( isDocValueField( field ) && field instanceof NumericDocValuesField ) {
 				// Numeric facet fields: we also get fields created for sorting so we need to exclude them.
@@ -361,28 +351,12 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 				else {
 					value = field.numericValue();
 				}
-				JsonObject parent = treeBuilder.getOrCreateParent( nestingPath );
-				String jsonPropertyName = FieldHelper.getEmbeddedFieldPropertyName( fieldPath );
-				addPropertyOfPotentiallyMultipleCardinality( parent, jsonPropertyName,
-						value != null ? new JsonPrimitive( value ) : null );
+
+				accessorBuilder.buildForPath( fieldPath ).add( root, value != null ? new JsonPrimitive( value ) : null );
 			}
 		}
 
 		return root;
-	}
-
-	private void addPropertyOfPotentiallyMultipleCardinality(JsonObject parent, String propertyName, JsonPrimitive value) {
-		JsonElement currentValue = parent.get( propertyName );
-		if ( currentValue == null ) {
-			JsonBuilder.object( parent ).add( propertyName, value );
-		}
-		else if ( !currentValue.isJsonArray() ) {
-			parent.remove( propertyName );
-			parent.add( propertyName, JsonBuilder.array().add( currentValue ).add( value ).build() );
-		}
-		else {
-			currentValue.getAsJsonArray().add( value );
-		}
 	}
 
 	private boolean isNumeric(IndexableField field) {

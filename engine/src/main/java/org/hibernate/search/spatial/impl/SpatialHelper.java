@@ -241,7 +241,7 @@ public abstract class SpatialHelper {
 		return fieldName.endsWith( SPATIAL_LONGITUDE_SUFFIX );
 	}
 
-	public static String getSpatialFieldRootName(String fieldName) {
+	public static String stripSpatialFieldSuffix(String fieldName) {
 		if ( !isSpatialField( fieldName ) ) {
 			throw new AssertionFailure( "The field " + fieldName + " is not a spatial field." );
 		}

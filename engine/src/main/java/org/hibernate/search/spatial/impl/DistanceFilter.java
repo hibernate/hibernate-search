@@ -129,7 +129,7 @@ public final class DistanceFilter extends Filter {
 			return coordinatesField;
 		}
 		else {
-			return SpatialHelper.getSpatialFieldRootName( latitudeField );
+			return SpatialHelper.stripSpatialFieldSuffix( latitudeField );
 		}
 	}
 
