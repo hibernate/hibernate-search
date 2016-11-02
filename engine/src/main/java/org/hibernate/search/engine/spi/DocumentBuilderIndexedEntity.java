@@ -766,12 +766,15 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 */
 	private void addSortFieldDocValues(Document document, PropertyMetadata propertyMetadata, float documentBoost, Object propertyValue) {
 		for ( SortableFieldMetadata sortField : propertyMetadata.getSortableFieldMetadata() ) {
-			DocumentFieldMetadata fieldMetaData = propertyMetadata.getFieldMetadata( sortField.getFieldName() );
-
 			// field marked as sortable by custom bridge to allow sort field validation pass, but that bridge itself is
 			// in charge of adding the required field
-			if ( fieldMetaData == null ) {
+			if ( propertyMetadata.getBridgeDefinedFields().containsKey( sortField.getFieldName() ) ) {
 				continue;
+			}
+
+			DocumentFieldMetadata fieldMetaData = propertyMetadata.getFieldMetadata( sortField.getFieldName() );
+			if ( fieldMetaData == null ) {
+				throw new AssertionFailure( "A sortable field did not match neither an @Field nor a bridge-defined field" );
 			}
 
 			IndexableField field;
