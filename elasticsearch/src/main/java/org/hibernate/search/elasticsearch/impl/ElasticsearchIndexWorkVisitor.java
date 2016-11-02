@@ -249,20 +249,17 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 				if ( documentFieldMetadata == null ) {
 					if ( SpatialHelper.isSpatialField( fieldPath ) ) {
-						if ( isNumeric( field ) && ( SpatialHelper.isSpatialFieldLatitude( fieldPath ) ||
-								SpatialHelper.isSpatialFieldLongitude( fieldPath ) ) ) {
-							// work on the latitude/longitude fields
+						if ( SpatialHelper.isSpatialFieldLatitude( fieldPath ) ) {
 							Number value = field.numericValue();
 							String spatialPropertyPath = SpatialHelper.stripSpatialFieldSuffix( fieldPath );
-
-							if ( SpatialHelper.isSpatialFieldLatitude( fieldPath ) ) {
-								accessorBuilder.buildForPath( spatialPropertyPath + ".lat" )
-										.add( root, value != null ? new JsonPrimitive( value ) : null );
-							}
-							else if ( SpatialHelper.isSpatialFieldLongitude( fieldPath ) ) {
-								accessorBuilder.buildForPath( spatialPropertyPath + ".lon" )
-										.add( root, value != null ? new JsonPrimitive( value ) : null );
-							}
+							accessorBuilder.buildForPath( spatialPropertyPath + ".lat" )
+									.add( root, value != null ? new JsonPrimitive( value ) : null );
+						}
+						else if ( SpatialHelper.isSpatialFieldLongitude( fieldPath ) ) {
+							Number value = field.numericValue();
+							String spatialPropertyPath = SpatialHelper.stripSpatialFieldSuffix( fieldPath );
+							accessorBuilder.buildForPath( spatialPropertyPath + ".lon" )
+									.add( root, value != null ? new JsonPrimitive( value ) : null );
 						}
 						else {
 							// here, we have the hash fields used for spatial hash indexing
@@ -296,26 +293,25 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 
 						accessor.add( root, value != null ? new JsonPrimitive( value ) : null );
 					}
-					// TODO HSEARCH-2261 falling back for now to checking actual Field type to cover numeric fields created by custom
-					// bridges
-					else if ( type.isNumeric() || isNumeric( field ) ) {
-						// If the value was initially null, explicitly propagate null and let ES handle the default token.
-						Number value = field.numericValue();
-
-						if ( value != null && value.toString().equals( documentFieldMetadata.indexNullAs() ) ) {
-							value = null;
-						}
-
-						accessor.add( root, value != null ? new JsonPrimitive( value ) : null );
-					}
 					else {
-						// If the value was initially null, explicitly propagate null and let ES handle the default token.
-						String value = field.stringValue();
-						if ( value != null && value.equals( documentFieldMetadata.indexNullAs() ) ) {
-							value = null;
-						}
+						Number numericValue = field.numericValue();
 
-						accessor.add( root, value != null ? new JsonPrimitive( value ) : null );
+						if ( numericValue != null ) {
+							// If the value was initially null, explicitly propagate null and let ES handle the default token.
+							if ( numericValue.toString().equals( documentFieldMetadata.indexNullAs() ) ) {
+								numericValue = null;
+							}
+							accessor.add( root, numericValue != null ? new JsonPrimitive( numericValue ) : null );
+						}
+						else {
+							String stringValue = field.stringValue();
+							// If the value was initially null, explicitly propagate null and let ES handle the default token.
+							if ( stringValue != null && stringValue.equals( documentFieldMetadata.indexNullAs() ) ) {
+								stringValue = null;
+							}
+
+							accessor.add( root, stringValue != null ? new JsonPrimitive( stringValue ) : null );
+						}
 					}
 				}
 			}
