@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.annotations.Analyze;
@@ -56,6 +57,7 @@ public class Territory {
 			}
 			int id = ( (Territory) value ).getId();
 			luceneOptions.addNumericFieldToDocument( name, id, document );
+			document.add( new NumericDocValuesField( name, id ) );
 		}
 
 	}

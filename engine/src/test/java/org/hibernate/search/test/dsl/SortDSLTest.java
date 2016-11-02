@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -23,14 +24,16 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -652,7 +655,13 @@ public class SortDSLTest {
 		}
 	}
 
-	public static class WrappedDoubleValueFieldBridge implements org.hibernate.search.bridge.FieldBridge, StringBridge {
+	public static class WrappedDoubleValueFieldBridge implements MetadataProvidingFieldBridge, StringBridge {
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( name, FieldType.DOUBLE )
+					.sortable( true );
+		}
 
 		@Override
 		public String objectToString(Object object) {
@@ -674,6 +683,7 @@ public class SortDSLTest {
 			}
 
 			luceneOptions.addNumericFieldToDocument( name, doubleValue, document );
+			document.add( new DoubleDocValuesField( name, doubleValue ) );
 		}
 
 	}
@@ -734,12 +744,9 @@ public class SortDSLTest {
 		Double uniqueNumericField;
 
 		@Field(bridge = @FieldBridge(impl = WrappedStringValueFieldBridge.class))
-		@SortableField
 		WrappedStringValue fieldBridgedStringField;
 
 		@Field(bridge = @FieldBridge(impl = WrappedDoubleValueFieldBridge.class))
-		@SortableField
-		@NumericField
 		WrappedDoubleValue fieldBridgedNumericField;
 
 		Double latitude;
