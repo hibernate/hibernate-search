@@ -253,6 +253,7 @@ public class JestClient implements Service, Startable, Stoppable {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append( "Operation: " ).append( action.getClass().getSimpleName() ).append( "\n" );
+		sb.append( "URI:" ).append( action.getURI() ).append( "\n" );
 
 		if ( action instanceof DocumentTargetedAction ) {
 			sb.append( "Index: " ).append( ( (DocumentTargetedAction<?>) action ).getIndex() ).append( "\n" );
