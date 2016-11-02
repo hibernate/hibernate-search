@@ -302,16 +302,16 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	}
 
 	private void validateCommonSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
-		DocumentFieldMetadata metadata = findFieldMetadata( extendedIntegrator, targetedEntities, sortField.getField() );
-		if ( metadata != null ) {
-			validateSortField( sortField, metadata );
+		// Inspect bridge-defined fields first, to allow them to override field metadata
+		BridgeDefinedField bridgeDefinedField = findBridgeDefinedField( extendedIntegrator, targetedEntities, sortField.getField() );
+		if ( bridgeDefinedField != null ) {
+			validateSortField( sortField, bridgeDefinedField );
 		}
 		else {
-			BridgeDefinedField bridgeDefinedField = findBridgeDefinedField( extendedIntegrator, targetedEntities, sortField.getField() );
-			if ( bridgeDefinedField != null ) {
-				validateSortField( sortField, bridgeDefinedField );
+			DocumentFieldMetadata metadata = findFieldMetadata( extendedIntegrator, targetedEntities, sortField.getField() );
+			if ( metadata != null ) {
+				validateSortField( sortField, metadata );
 			}
-			//else the field is not known. Custom fieldbridge? Not throwing an exception to improve backwards compatibility
 		}
 	}
 
