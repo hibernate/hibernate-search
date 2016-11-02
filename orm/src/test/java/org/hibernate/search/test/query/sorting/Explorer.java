@@ -22,7 +22,6 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
@@ -55,7 +54,6 @@ public class Explorer {
 	 * with the @IndexedEmbedded with the Elasticsearch backend
 	 */
 	@Field(name = "favoriteTerritory.idFromBridge", bridge = @FieldBridge(impl = Territory.IdFieldBridge.class))
-	@NumericField(forField = "favoriteTerritory.idFromBridge")
 	private Territory favoriteTerritory;
 
 	public Explorer() {
