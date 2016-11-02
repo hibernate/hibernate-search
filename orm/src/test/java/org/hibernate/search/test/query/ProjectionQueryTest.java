@@ -425,7 +425,6 @@ public class ProjectionQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2422 Error when projecting on the score while not sorting by relevance
 	public void testProjectionOnScoreWithoutRelevanceSort() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );

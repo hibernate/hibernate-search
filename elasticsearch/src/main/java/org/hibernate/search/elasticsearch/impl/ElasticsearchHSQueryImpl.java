@@ -334,6 +334,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				completeQuery.add( "aggregations", facets );
 			}
 
+			if ( projectedFields != null ) {
+				for ( String field : projectedFields ) {
+					if ( ElasticsearchProjectionConstants.SCORE.equals( field ) ) {
+						// Make sure to compute scores even if we don't sort by relevance
+						completeQuery.addProperty( "track_scores", true );
+						break;
+					}
+				}
+			}
+
 			// Initialize the sortByDistanceIndex to detect if the results are sorted by distance and the position
 			// of the sort
 			sortByDistanceIndex = getSortByDistanceIndex();
