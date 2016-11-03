@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -75,7 +77,17 @@ public class TypeMetadata {
 	private final Set<PropertyMetadata> propertyMetadata;
 
 	/**
-	 * Metadata for a document field keyed against the field name
+	 * Metadata for all document fields.
+	 * <p>This does not include document fields from embedded types.
+	 */
+	private final Set<DocumentFieldMetadata> documentFieldMetadata;
+
+	/**
+	 * Metadata for a document field keyed against the field name.
+	 * <p>This does not include document fields from embedded types.
+	 * <p><strong>Caution</strong>: this may not include every document metadata, most notably
+	 * because document fields generated for class bridges may not have a name, and there may
+	 * be multiple ones (so only the last one is present in the map).
 	 */
 	private final Map<String, DocumentFieldMetadata> documentFieldNameToFieldMetadata;
 
@@ -162,7 +174,8 @@ public class TypeMetadata {
 		this.classBridgeFields = Collections.unmodifiableSet( builder.classBridgeFields );
 		this.propertyMetadata = Collections.unmodifiableSet( builder.propertyMetadataSet );
 		this.propertyGetterNameToPropertyMetadata = keyPropertyMetadata( builder.propertyMetadataSet );
-		this.documentFieldNameToFieldMetadata = keyFieldMetadata( builder.propertyMetadataSet );
+		this.documentFieldMetadata = collectFieldMetadata( builder.propertyMetadataSet, builder.classBridgeFields, builder.idPropertyMetadata );
+		this.documentFieldNameToFieldMetadata = keyFieldMetadata( documentFieldMetadata );
 		this.bridgeDefinedFieldNameToFieldMetadata = keyBridgeDefinedFieldMetadata( documentFieldNameToFieldMetadata.values() );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
 		this.classBridgeSortableFieldMetadata = Collections.unmodifiableSet( builder.classBridgeSortableFieldMetadata );
@@ -228,22 +241,22 @@ public class TypeMetadata {
 	 */
 	public Collection<DocumentFieldMetadata> getAllDocumentFieldMetadata() {
 		if ( embeddedTypeMetadata.isEmpty() ) {
-			return Collections.unmodifiableCollection( documentFieldNameToFieldMetadata.values() );
+			return documentFieldMetadata;
 		}
 		else {
 			Collection<DocumentFieldMetadata> allMetadata = new ArrayList<DocumentFieldMetadata>(
-					documentFieldNameToFieldMetadata.size()
+					documentFieldMetadata.size()
 			);
 			for ( EmbeddedTypeMetadata element : embeddedTypeMetadata ) {
 				allMetadata.addAll( element.getAllDocumentFieldMetadata() );
 			}
-			allMetadata.addAll( documentFieldNameToFieldMetadata.values() );
+			allMetadata.addAll( documentFieldMetadata );
 			return allMetadata;
 		}
 	}
 
 	public Collection<DocumentFieldMetadata> getNonEmbeddedDocumentFieldMetadata() {
-		return Collections.unmodifiableCollection( documentFieldNameToFieldMetadata.values() );
+		return documentFieldMetadata;
 	}
 
 	// TODO HSEARCH-1867 change return type to set
@@ -373,31 +386,45 @@ public class TypeMetadata {
 		return Collections.unmodifiableMap( tmpMap );
 	}
 
-	private Map<String, DocumentFieldMetadata> keyFieldMetadata(Set<PropertyMetadata> propertyMetadataSet) {
-		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
+	private Set<DocumentFieldMetadata> collectFieldMetadata(Set<PropertyMetadata> propertyMetadataSet,
+			Set<DocumentFieldMetadata> classBridgeFields, PropertyMetadata idPropertyMetadata) {
+		Set<DocumentFieldMetadata> tmpSet = new LinkedHashSet<DocumentFieldMetadata>(); // Preserve order to make buildFieldMetadataMap deterministic
 		for ( PropertyMetadata propertyMetadata : propertyMetadataSet ) {
 			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
-				DocumentFieldMetadata oldFieldMetadata = tmpMap.put(
-						documentFieldMetadata.getName(),
-						documentFieldMetadata
-				);
-				if ( oldFieldMetadata != null ) {
-					if ( !documentFieldMetadata.getIndex().equals( oldFieldMetadata.getIndex() ) ) {
-						log.inconsistentFieldConfiguration(
-								propertyMetadata.getPropertyAccessor().getDeclaringClass().getName(),
-								documentFieldMetadata.getName() );
-					}
-				}
+				tmpSet.add( documentFieldMetadata );
 			}
 		}
 
 		for ( DocumentFieldMetadata documentFieldMetadata : classBridgeFields ) {
-			tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
+			tmpSet.add( documentFieldMetadata );
 		}
 
 		if ( idPropertyMetadata != null ) {
 			for ( DocumentFieldMetadata documentFieldMetadata : idPropertyMetadata.getFieldMetadataSet() ) {
-				tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
+				tmpSet.add( documentFieldMetadata );
+			}
+		}
+
+		return Collections.unmodifiableSet( tmpSet );
+	}
+
+	private Map<String, DocumentFieldMetadata> keyFieldMetadata(Set<DocumentFieldMetadata> documentFieldMetadataSet) {
+		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
+		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataSet ) {
+			String name = documentFieldMetadata.getName();
+			if ( StringHelper.isEmpty( name ) ) {
+				continue;
+			}
+			DocumentFieldMetadata oldFieldMetadata = tmpMap.put( name, documentFieldMetadata );
+			if ( oldFieldMetadata != null ) {
+				if ( !documentFieldMetadata.getIndex().equals( oldFieldMetadata.getIndex() ) ) {
+					// Try to use the actual declaring type, if possible
+					PropertyMetadata sourceProperty = documentFieldMetadata.getSourceProperty();
+					String sourceTypeName = sourceProperty != null
+							? sourceProperty.getPropertyAccessor().getDeclaringClass().getName()
+							: documentFieldMetadata.getSourceType().getType().getName();
+					log.inconsistentFieldConfiguration( sourceTypeName, name );
+				}
 			}
 		}
 		return Collections.unmodifiableMap( tmpMap );
