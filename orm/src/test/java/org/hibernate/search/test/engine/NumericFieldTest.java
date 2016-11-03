@@ -38,12 +38,10 @@ import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -133,7 +131,6 @@ public class NumericFieldTest extends SearchTestBase {
 
 	@TestForIssue(jiraKey = "HSEARCH-1193")
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2425 Projection on spatial coordinates returns a String instead of a number with Elasticsearch
 	public void testNumericFieldProjections() {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
