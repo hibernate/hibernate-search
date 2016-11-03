@@ -730,6 +730,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( classBridgeAnnotation.termVector() );
 
+		AnalyzerReference analyzerReference = null;
+		if ( !parseContext.skipAnalyzers() ) {
+			analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
+					classBridgeAnnotation.analyzer(),
+					configContext,
+					parseContext.isAnalyzerRemote() );
+			typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzerReference, index );
+		}
+
 		DocumentFieldMetadata fieldMetadata =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
@@ -737,20 +746,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						fieldName, store, index, termVector
 				)
 				.boost( classBridgeAnnotation.boost().value() )
+				.analyzerReference( analyzerReference )
 				.fieldBridge( fieldBridge )
 				.build();
 
 		typeMetadataBuilder.addClassBridgeField( fieldMetadata );
 
 		contributeClassBridgeDefinedFields( typeMetadataBuilder, fieldMetadata, fieldBridge );
-
-		if ( !parseContext.skipAnalyzers() ) {
-			AnalyzerReference analyzer = AnnotationProcessingHelper.getAnalyzerReference(
-					classBridgeAnnotation.analyzer(),
-					configContext,
-					parseContext.isAnalyzerRemote() );
-			typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzer, index );
-		}
 	}
 
 	private void bindSpatialAnnotation(Spatial spatialAnnotation,
