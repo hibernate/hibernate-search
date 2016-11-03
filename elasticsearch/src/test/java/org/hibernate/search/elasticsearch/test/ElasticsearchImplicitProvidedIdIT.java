@@ -122,7 +122,7 @@ public class ElasticsearchImplicitProvidedIdIT {
 	}
 
 	@Indexed
-	public static class User {
+	private static class User {
 
 		@Field
 		private int id;
@@ -141,7 +141,7 @@ public class ElasticsearchImplicitProvidedIdIT {
 	}
 
 	@Indexed
-	public static class UserWithAddress {
+	private static class UserWithAddress {
 
 		@Field(store = Store.YES, analyze = Analyze.NO)
 		@SortableField
@@ -166,7 +166,7 @@ public class ElasticsearchImplicitProvidedIdIT {
 		}
 	}
 
-	public static class Address {
+	private static class Address {
 
 		@Field(store = Store.YES, analyze = Analyze.NO)
 		private String street;
@@ -177,24 +177,12 @@ public class ElasticsearchImplicitProvidedIdIT {
 		@Field(store = Store.YES, analyze = Analyze.NO)
 		private int number;
 
-		public String getStreet() {
-			return street;
-		}
-
 		public void setStreet(String street) {
 			this.street = street;
 		}
 
-		public String getPostCode() {
-			return postCode;
-		}
-
 		public void setPostCode(String postCode) {
 			this.postCode = postCode;
-		}
-
-		public int getNumber() {
-			return number;
 		}
 
 		public void setNumber(int number) {
