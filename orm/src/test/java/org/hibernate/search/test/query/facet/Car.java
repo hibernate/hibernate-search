@@ -35,9 +35,13 @@ import org.hibernate.search.bridge.builtin.IntegerBridge;
  */
 @Entity
 @Indexed
+/*
+ * CAUTION: those analyzer definitions are duplicated in the elasticsearch.yml for test with Elasticsearch.
+ * Any update here should be reflected there.
+ */
 @AnalyzerDefs({
 	@AnalyzerDef(
-			name = "collatingAnalyzer",
+			name = Car.COLLATING_ANALYZER_NAME,
 			tokenizer = @TokenizerDef(factory = KeywordTokenizerFactory.class),
 			filters = {
 					@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
@@ -46,6 +50,9 @@ import org.hibernate.search.bridge.builtin.IntegerBridge;
 	)
 })
 public class Car {
+
+	public static final String COLLATING_ANALYZER_NAME = "org_hibernate_search_test_query_facet_Car" + "_collatingAnalyzer";
+
 	@Id
 	@GeneratedValue
 	private int id;
@@ -56,7 +63,7 @@ public class Car {
 
 	@Fields({
 		@Field(analyze = Analyze.NO, store = Store.YES),
-		@Field(name = "facetNameCollision", store = Store.YES, analyzer = @Analyzer(definition = "collatingAnalyzer"))
+		@Field(name = "facetNameCollision", store = Store.YES, analyzer = @Analyzer(definition = COLLATING_ANALYZER_NAME))
 	})
 	@Facets({
 		@Facet,
