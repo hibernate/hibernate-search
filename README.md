@@ -46,7 +46,7 @@ installation directory. Then read the documentation available in *docs/reference
     > cd hibernate-search
     > mvn clean install -s settings-example.xml
 
-#### Build options (profiles)
+#### Build options (profiles and properties)
 
 The documentation is based on [AsciiDoctor](http://asciidoctor.org/). Per default only the html
 output is enabled. To also generate the docbok output and build the documentation from there use:
@@ -59,6 +59,20 @@ To build the distribution bundle run:
 
 You can also build the above mentioned modules directly by changing into these directories and
 executing maven in the module directory.
+
+The Elasticsearch module tests against only one version of Elasticsearch at a time. You may
+redefine the version to use by specifying the right profile and using the
+`testElasticsearchVersion` property:
+
+    > mvn clean install -Pelasticsearch-2.0 -DtestElasticsearchVersion=2.1.0
+
+The following profiles are available:
+
+ * `elasticsearch-2.0` for 2.0.x and 2.1.x
+ * `elasticsearch-2.2` for 2.2.x and later 2.x (the default)
+
+A list of available versions for `testElasticsearchVersion` can be found on
+[Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.elasticsearch%22%20AND%20a%3A%22elasticsearch%22).
 
 ### Contributing
 
