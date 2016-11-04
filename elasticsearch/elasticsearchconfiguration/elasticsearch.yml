@@ -92,6 +92,10 @@ index.analysis:
       type: custom
       tokenizer: standard
       filter: [lowercase, stemGerman]
+    org_hibernate_search_test_query_facet_Car_collatingAnalyzer:
+      type: custom
+      tokenizer: keyword
+      filter: [asciifolding, lowercase]
   filter:
     custom-filter:
       type : stop
