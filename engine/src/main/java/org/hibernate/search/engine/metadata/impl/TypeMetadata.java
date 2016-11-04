@@ -173,10 +173,10 @@ public class TypeMetadata {
 		this.jpaIdUsedAsDocumentId = determineWhetherDocumentIdPropertyIsTheSameAsJpaIdProperty( builder.jpaProperty );
 		this.classBridgeFields = Collections.unmodifiableSet( builder.classBridgeFields );
 		this.propertyMetadata = Collections.unmodifiableSet( builder.propertyMetadataSet );
-		this.propertyGetterNameToPropertyMetadata = keyPropertyMetadata( builder.propertyMetadataSet );
+		this.propertyGetterNameToPropertyMetadata = buildPropertyMetadataMap( builder.propertyMetadataSet );
 		this.documentFieldMetadata = collectFieldMetadata( builder.propertyMetadataSet, builder.classBridgeFields, builder.idPropertyMetadata );
-		this.documentFieldNameToFieldMetadata = keyFieldMetadata( documentFieldMetadata );
-		this.bridgeDefinedFieldNameToFieldMetadata = keyBridgeDefinedFieldMetadata( documentFieldNameToFieldMetadata.values() );
+		this.documentFieldNameToFieldMetadata = buildFieldMetadataMap( documentFieldMetadata );
+		this.bridgeDefinedFieldNameToFieldMetadata = buildBridgeDefinedFieldMetadataMap( documentFieldNameToFieldMetadata.values() );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
 		this.classBridgeSortableFieldMetadata = Collections.unmodifiableSet( builder.classBridgeSortableFieldMetadata );
 	}
@@ -251,7 +251,7 @@ public class TypeMetadata {
 				allMetadata.addAll( element.getAllDocumentFieldMetadata() );
 			}
 			allMetadata.addAll( documentFieldMetadata );
-			return allMetadata;
+			return Collections.unmodifiableCollection( allMetadata );
 		}
 	}
 
@@ -261,7 +261,7 @@ public class TypeMetadata {
 
 	// TODO HSEARCH-1867 change return type to set
 	public List<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
-		return new ArrayList<EmbeddedTypeMetadata>( embeddedTypeMetadata );
+		return Collections.unmodifiableList( new ArrayList<EmbeddedTypeMetadata>( embeddedTypeMetadata ) );
 	}
 
 	public Set<ContainedInMetadata> getContainedInMetadata() {
@@ -378,7 +378,7 @@ public class TypeMetadata {
 		}
 	}
 
-	private Map<String, PropertyMetadata> keyPropertyMetadata(Set<PropertyMetadata> propertyMetadataSet) {
+	private Map<String, PropertyMetadata> buildPropertyMetadataMap(Set<PropertyMetadata> propertyMetadataSet) {
 		Map<String, PropertyMetadata> tmpMap = new HashMap<String, PropertyMetadata>();
 		for ( PropertyMetadata propertyMetadata : propertyMetadataSet ) {
 			tmpMap.put( propertyMetadata.getPropertyAccessorName(), propertyMetadata );
@@ -408,7 +408,7 @@ public class TypeMetadata {
 		return Collections.unmodifiableSet( tmpSet );
 	}
 
-	private Map<String, DocumentFieldMetadata> keyFieldMetadata(Set<DocumentFieldMetadata> documentFieldMetadataSet) {
+	private Map<String, DocumentFieldMetadata> buildFieldMetadataMap(Set<DocumentFieldMetadata> documentFieldMetadataSet) {
 		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataSet ) {
 			String name = documentFieldMetadata.getName();
@@ -430,7 +430,7 @@ public class TypeMetadata {
 		return Collections.unmodifiableMap( tmpMap );
 	}
 
-	private Map<String, BridgeDefinedField> keyBridgeDefinedFieldMetadata(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
+	private Map<String, BridgeDefinedField> buildBridgeDefinedFieldMetadataMap(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
 		Map<String, BridgeDefinedField> tmpMap = new HashMap<String, BridgeDefinedField>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
 			for ( BridgeDefinedField bridgeDefinedField : documentFieldMetadata.getBridgeDefinedFields().values() ) {
