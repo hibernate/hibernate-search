@@ -16,6 +16,7 @@ import org.apache.lucene.document.Field;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
@@ -148,16 +149,12 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 
 		addNullValue( propertyMapping, fieldMetadata );
 
-		// Create facet fields if needed: if the facet has the same name as the field, we don't need to create an
-		// extra field for it
 		for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
-			if ( !facetMetadata.getAbsoluteName().equals( fieldMetadata.getAbsoluteName() ) ) {
-				try {
-					addPropertyMapping( mappingBuilder, facetMetadata );
-				}
-				catch (IncompleteDataException e) {
-					LOG.debug( "Not adding a mapping for facet " + facetMetadata.getAbsoluteName() + " because of incomplete data", e );
-				}
+			try {
+				addSubfieldMapping( propertyMapping, mappingBuilder, facetMetadata );
+			}
+			catch (IncompleteDataException e) {
+				LOG.debug( "Not adding a mapping for facet " + facetMetadata.getAbsoluteName() + " because of incomplete data", e );
 			}
 		}
 
@@ -214,17 +211,21 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		}
 	}
 
-	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, FacetMetadata facetMetadata) {
-		String propertyPath = facetMetadata.getAbsoluteName();
+	/*
+	 * Adds an Elasticsearch "field" to an existing property for a facet.
+	 * <p>Note that "field" in ES has a very specific meaning, which is not the meaning it has in Lucene or Hibernate Search.
+	 */
+	private void addSubfieldMapping(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder, FacetMetadata facetMetadata) {
+		String facetFieldName = facetMetadata.getPath().getRelativeName() + ToElasticsearch.FACET_FIELD_SUFFIX;
 
-		PropertyMapping propertyMapping = new PropertyMapping();
+		PropertyMapping fieldMapping = new PropertyMapping();
 
-		addTypeOptions( propertyMapping, facetMetadata );
-		propertyMapping.setStore( false );
-		propertyMapping.setIndex( IndexType.NOT_ANALYZED );
+		addTypeOptions( fieldMapping, facetMetadata );
+		fieldMapping.setStore( false );
+		fieldMapping.setIndex( IndexType.NOT_ANALYZED );
 
 		// Do this last, when we're sure no exception will be thrown for this mapping
-		mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
+		propertyMapping.addField( facetFieldName, fieldMapping );
 	}
 
 	/**
@@ -279,7 +280,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		addTypeOptions( bridgeDefinedField.getAbsoluteName(), propertyMapping, type );
 	}
 
-	private void addTypeOptions(PropertyMapping propertyMapping, FacetMetadata facetMetadata) {
+	private void addTypeOptions(PropertyMapping fieldMapping, FacetMetadata facetMetadata) {
 		ExtendedFieldType type;
 
 		switch ( facetMetadata.getEncoding() ) {
@@ -303,7 +304,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 			}
 		}
 
-		addTypeOptions( facetMetadata.getAbsoluteName(), propertyMapping, type );
+		addTypeOptions( facetMetadata.getAbsoluteName(), fieldMapping, type );
 	}
 
 	private DataType addTypeOptions(String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType) {

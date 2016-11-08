@@ -11,14 +11,12 @@ import java.util.List;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 
 import static org.junit.Assert.assertEquals;
 
@@ -58,7 +56,6 @@ public class StringFacetingTest extends AbstractFacetTest {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2376")
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2451 StringFacetingTest.testStringFacetingWithNameCollision() fails randomly with Elasticsearch
 	public void testStringFacetingWithNameCollision() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( "manufacturer" )

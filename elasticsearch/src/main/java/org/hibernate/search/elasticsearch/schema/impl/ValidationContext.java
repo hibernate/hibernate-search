@@ -12,12 +12,14 @@ final class ValidationContext {
 	private final String indexName;
 	private final String mappingName;
 	private final String path;
+	private final String fieldName;
 
-	public ValidationContext(String indexName, String mappingName, String path) {
+	public ValidationContext(String indexName, String mappingName, String path, String fieldName) {
 		super();
 		this.indexName = indexName;
 		this.mappingName = mappingName;
 		this.path = path;
+		this.fieldName = fieldName;
 	}
 
 	public String getIndexName() {
@@ -32,13 +34,18 @@ final class ValidationContext {
 		return path;
 	}
 
+	public String getFieldName() {
+		return fieldName;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if ( obj != null && getClass().equals( obj.getClass() ) ) {
 			ValidationContext other = (ValidationContext) obj;
 			return Objects.equals( indexName, other.indexName )
 					&& Objects.equals( mappingName, other.mappingName )
-					&& Objects.equals( path, other.path );
+					&& Objects.equals( path, other.path )
+					&& Objects.equals( fieldName, other.fieldName );
 		}
 		return false;
 	}
@@ -50,6 +57,7 @@ final class ValidationContext {
 		result = prime * result + Objects.hashCode( indexName );
 		result = prime * result + Objects.hashCode( mappingName );
 		result = prime * result + Objects.hashCode( path );
+		result = prime * result + Objects.hashCode( fieldName );
 		return result;
 	}
 }

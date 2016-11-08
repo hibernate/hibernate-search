@@ -15,7 +15,9 @@ import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -23,6 +25,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
+import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.exception.SearchException;
@@ -106,8 +109,37 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "}"
 				+ "}"
 				);
+		elasticSearchClient.deleteAndCreateIndex( FacetedDateEntity.class );
+		elasticSearchClient.putMapping(
+				FacetedDateEntity.class,
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'date',"
+									+ "'index': 'not_analyzed',"
+									+ "'ignore_malformed': true," // Ignored during validation
+									+ "'fields': {"
+											+ "'myField" + ToElasticsearch.FACET_FIELD_SUFFIX + "': {"
+													+ "'type': 'date',"
+													+ "'index': 'not_analyzed'"
+											+ "}"
+									+ "}"
+							+ "},"
+							+ "'NOTmyField': {" // Ignored during validation
+									+ "'type': 'date',"
+									+ "'index': 'not_analyzed'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
 
-		init( SimpleDateEntity.class, SimpleBooleanEntity.class );
+		init( SimpleDateEntity.class, SimpleBooleanEntity.class, FacetedDateEntity.class );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
@@ -545,6 +577,115 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 		init( SimpleBooleanEntity.class, SimpleDateEntity.class );
 	}
 
+	@Test
+	public void property_fields_missing() throws Exception {
+		elasticSearchClient.deleteAndCreateIndex( FacetedDateEntity.class );
+		elasticSearchClient.putMapping(
+				FacetedDateEntity.class,
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'date',"
+									+ "'index': 'not_analyzed'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( ElasticsearchSchemaValidationException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+						.withMessage( "property 'myField', field 'myField" + ToElasticsearch.FACET_FIELD_SUFFIX + "'" )
+						.withMessage( "\n\tMissing field mapping" )
+				.build()
+		);
+
+		init( FacetedDateEntity.class );
+	}
+
+	@Test
+	public void property_field_missing() throws Exception {
+		elasticSearchClient.deleteAndCreateIndex( FacetedDateEntity.class );
+		elasticSearchClient.putMapping(
+				FacetedDateEntity.class,
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'date',"
+									+ "'index': 'not_analyzed',"
+									+ "'fields': {"
+											+ "'NOTmyField" + ToElasticsearch.FACET_FIELD_SUFFIX + "': {"
+													+ "'type': 'date',"
+													+ "'index': 'not_analyzed'"
+											+ "}"
+									+ "}"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( ElasticsearchSchemaValidationException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+						.withMessage( "property 'myField', field 'myField" + ToElasticsearch.FACET_FIELD_SUFFIX + "'" )
+						.withMessage( "\n\tMissing field mapping" )
+				.build()
+		);
+
+		init( FacetedDateEntity.class );
+	}
+
+	@Test
+	public void property_field_attribute_invalid() throws Exception {
+		elasticSearchClient.deleteAndCreateIndex( FacetedDateEntity.class );
+		elasticSearchClient.putMapping(
+				FacetedDateEntity.class,
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'date',"
+									+ "'index': 'not_analyzed',"
+									+ "'fields': {"
+											+ "'myField" + ToElasticsearch.FACET_FIELD_SUFFIX + "': {"
+													+ "'type': 'date',"
+													+ "'index': 'analyzed'"
+											+ "}"
+									+ "}"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( ElasticsearchSchemaValidationException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+						.withMessage( "property 'myField', field 'myField" + ToElasticsearch.FACET_FIELD_SUFFIX + "'" )
+						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'NOT_ANALYZED', actual is 'ANALYZED'" )
+				.build()
+		);
+
+		init( FacetedDateEntity.class );
+	}
+
+
 	@Indexed
 	@Entity
 	public static class SimpleBooleanEntity {
@@ -576,6 +717,18 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 
 		@Field(index = Index.NO, store = Store.NO)
 		Long myField;
+	}
+
+	@Indexed
+	@Entity
+	public static class FacetedDateEntity {
+		@DocumentId
+		@Id
+		Long id;
+
+		@Field(analyze = Analyze.NO)
+		@Facet
+		Date myField;
 	}
 
 }

@@ -50,6 +50,8 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.FacetMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -290,6 +292,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private class IndexSearcher {
 
 		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
+		private final Map<String, Class<?>> documentBuilderIndexedEntityByName = new HashMap<>();
 		private final Set<String> indexNames = new HashSet<>();
 		private final String completeQueryAsString;
 
@@ -328,7 +331,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				JsonBuilder.Object facets = JsonBuilder.object();
 
 				for ( Entry<String, FacetingRequest> facetRequestEntry : getFacetManager().getFacetRequests().entrySet() ) {
-					ToElasticsearch.addFacetingRequest( facets, facetRequestEntry.getValue() );
+					addFacetingRequest( facets, facetRequestEntry.getValue() );
 				}
 
 				completeQuery.add( "aggregations", facets );
@@ -429,6 +432,28 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			else {
 				return indexedTargetedEntities;
 			}
+		}
+
+		private void addFacetingRequest(JsonBuilder.Object facets, FacetingRequest facetingRequest) {
+			String facetFieldAbsoluteName = facetingRequest.getFieldName();
+			FacetMetadata facetMetadata = null;
+			for ( Class<?> entityType : getQueriedEntityTypes() ) {
+				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
+				TypeMetadata typeMetadata = binding.getDocumentBuilder().getTypeMetadata();
+				facetMetadata = typeMetadata.getFacetMetadataFor( facetFieldAbsoluteName );
+				if ( facetMetadata != null ) {
+					break;
+				}
+			}
+
+			if ( facetMetadata == null ) {
+				throw LOG.unknownFieldNameForFaceting( facetingRequest.getFacetingName(), facetingRequest.getFieldName() );
+			}
+
+			String sourceFieldAbsoluteName = facetMetadata.getSourceField().getAbsoluteName();
+			String facetSubfieldName = facetMetadata.getPath().getRelativeName();
+
+			ToElasticsearch.addFacetingRequest( facets, facetingRequest, sourceFieldAbsoluteName, facetSubfieldName );
 		}
 
 		private Sort getSort(SortField sortField) {

@@ -11,9 +11,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoubleDocValuesField;
-import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexableField;
@@ -244,9 +241,25 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 						throw new AssertionFailure( "Unexpected container type: " + containerType );
 				}
 			}
-			else if ( !fieldPath.equals( ProjectionConstants.OBJECT_CLASS ) &&
-					!FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( fieldPath ) &&
-					!isDocValueField( field ) ) {
+			else if ( FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( field.name() ) ) {
+				/*
+				 * Lucene-specific fields for facets.
+				 * Just ignore such fields: Elasticsearch handles that internally.
+				 */
+				continue;
+			}
+			else if ( isDocValueField( field ) ) {
+				/*
+				 * Doc value fields for facets or sorts.
+				 * Just ignore such fields: Elasticsearch handles that internally.
+				 */
+				continue;
+			}
+			else if ( fieldPath.equals( ProjectionConstants.OBJECT_CLASS ) ) {
+				// Object class: no need to index that in Elasticsearch, because documents are typed.
+				continue;
+			}
+			else {
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata()
 						.getDocumentFieldMetadataFor( field.name() );
 
@@ -317,41 +330,6 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 						}
 					}
 				}
-			}
-			else if ( FacetsConfig.DEFAULT_INDEX_FIELD_NAME.equals( field.name() )
-					&& field instanceof SortedSetDocValuesField ) {
-				// String facet fields
-				String[] facetParts = FacetsConfig.stringToPath( field.binaryValue().utf8ToString() );
-				if ( facetParts == null || facetParts.length != 2 ) {
-					continue;
-				}
-				String facetFieldPath = facetParts[0];
-				String value = facetParts[1];
-
-				// if it's not just a facet field, we ignore it as the field is going to be created by the standard
-				// mechanism
-				if ( indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( facetFieldPath ) != null ) {
-					continue;
-				}
-
-				accessorBuilder.buildForPath( facetFieldPath ).add( root, value != null ? new JsonPrimitive( value ) : null );
-			}
-			else if ( isDocValueField( field ) && field instanceof NumericDocValuesField ) {
-				// Numeric facet fields: we also get fields created for sorting so we need to exclude them.
-				if ( indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( field.name() ) != null ) {
-					continue;
-				}
-
-				Number value;
-				if ( field instanceof DoubleDocValuesField ) {
-					// double values are encoded so we need to decode them
-					value = Double.longBitsToDouble( field.numericValue().longValue() );
-				}
-				else {
-					value = field.numericValue();
-				}
-
-				accessorBuilder.buildForPath( fieldPath ).add( root, value != null ? new JsonPrimitive( value ) : null );
 			}
 		}
 
