@@ -1327,7 +1327,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				relativeFacetFieldName = relativeFieldName; // if not explicitly set the facet name is the same as the field name
 			}
 			DocumentFieldPath facetFieldPath = new DocumentFieldPath( prefix, relativeFacetFieldName );
-			FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder( facetFieldPath );
+			FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder(
+					fieldMetadataBuilder.getResultReference(), facetFieldPath
+					);
 			FacetEncodingType facetEncodingType = determineFacetEncodingType( member, facetAnnotation );
 			facetMetadataBuilder.setFacetEncoding( facetEncodingType );
 			fieldMetadataBuilder.addFacetMetadata( facetMetadataBuilder.build() );
