@@ -283,6 +283,15 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	private void addTypeOptions(PropertyMapping fieldMapping, FacetMetadata facetMetadata) {
 		ExtendedFieldType type;
 
+		if ( facetMetadata.isEncodingAuto() ) {
+			/*
+			 * If the user didn't ask for a specific encoding, just use the same datatype
+			 * as the source field.
+			 */
+			addTypeOptions( fieldMapping, facetMetadata.getSourceField() );
+			return;
+		}
+
 		switch ( facetMetadata.getEncoding() ) {
 			case DOUBLE:
 				type = ExtendedFieldType.DOUBLE;

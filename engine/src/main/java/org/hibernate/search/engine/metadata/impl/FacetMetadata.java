@@ -19,11 +19,14 @@ public class FacetMetadata {
 
 	private final DocumentFieldPath path;
 
+	private final boolean encodingAuto;
+
 	private final FacetEncodingType encoding;
 
 	private FacetMetadata(Builder builder) {
 		this.sourceField = builder.sourceField;
 		this.path = builder.path;
+		this.encodingAuto = builder.encodingAuto;
 		this.encoding = builder.encoding;
 	}
 
@@ -48,6 +51,10 @@ public class FacetMetadata {
 		return path;
 	}
 
+	public boolean isEncodingAuto() {
+		return encodingAuto;
+	}
+
 	public FacetEncodingType getEncoding() {
 		return encoding;
 	}
@@ -59,6 +66,7 @@ public class FacetMetadata {
 
 		// optional parameters
 		private FacetEncodingType encoding = FacetEncodingType.AUTO;
+		private boolean encodingAuto = true;
 
 		public Builder(BackReference<DocumentFieldMetadata> sourceField,
 				DocumentFieldPath path) {
@@ -68,6 +76,10 @@ public class FacetMetadata {
 
 		public void setFacetEncoding(FacetEncodingType encoding) {
 			this.encoding = encoding;
+		}
+
+		public void setFacetEncodingAuto(boolean encodingAuto) {
+			this.encodingAuto = encodingAuto;
 		}
 
 		public FacetMetadata build() {

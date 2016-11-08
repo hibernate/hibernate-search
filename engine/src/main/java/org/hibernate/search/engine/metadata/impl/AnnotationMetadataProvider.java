@@ -1332,6 +1332,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					);
 			FacetEncodingType facetEncodingType = determineFacetEncodingType( member, facetAnnotation );
 			facetMetadataBuilder.setFacetEncoding( facetEncodingType );
+			facetMetadataBuilder.setFacetEncodingAuto( facetAnnotation.encoding().equals( FacetEncodingType.AUTO ) );
 			fieldMetadataBuilder.addFacetMetadata( facetMetadataBuilder.build() );
 		}
 
