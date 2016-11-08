@@ -55,7 +55,8 @@ public class TikaBridgeTest {
 				new DocumentFieldMetadata.Builder(
 						new BackReference<TypeMetadata>(),
 						new BackReference<PropertyMetadata>(),
-						null, Store.YES, Field.Index.ANALYZED, Field.TermVector.NO
+						null, null, // No field name
+						Store.YES, Field.Index.ANALYZED, Field.TermVector.NO
 				)
 						.boost( 0F )
 						.build();

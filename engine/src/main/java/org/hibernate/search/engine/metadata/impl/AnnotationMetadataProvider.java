@@ -275,7 +275,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						absoluteFieldName, Store.YES, index, termVector
+						absoluteFieldName, relativeFieldName, Store.YES, index, termVector
 						)
 						.boost( AnnotationProcessingHelper.getBoost( member, null ) )
 						.fieldBridge( fieldBridge )
@@ -359,7 +359,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata.Builder idMetadataBuilder = new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						absoluteFieldName,
+						absoluteFieldName, relativeFieldName,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
 						termVector
@@ -467,7 +467,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						absoluteFieldName,
+						absoluteFieldName, relativeFieldName,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
 						Field.TermVector.NO
@@ -742,7 +742,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						BackReference.<PropertyMetadata>empty(), // Class bridge, there's no related property
-						absoluteFieldName, store, index, termVector
+						absoluteFieldName, relativeFieldName, store, index, termVector
 				)
 				.boost( classBridgeAnnotation.boost().value() )
 				.fieldBridge( fieldBridge );
@@ -793,7 +793,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						absoluteFieldName, store, index, termVector
+						absoluteFieldName, relativeFieldName, store, index, termVector
 				)
 				.boost( AnnotationProcessingHelper.getBoost( member, spatialAnnotation ) )
 				.fieldBridge( fieldBridge )
@@ -840,7 +840,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						BackReference.<PropertyMetadata>empty(), // Class-level spatial annotation, there's no related property
-						absoluteFieldName, store, index, termVector
+						absoluteFieldName, relativeFieldName, store, index, termVector
 				)
 				.boost( spatialAnnotation.boost().value() )
 				.fieldBridge( spatialBridge )
@@ -1289,7 +1289,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
 					typeMetadataBuilder.getResultReference(),
 					propertyMetadataBuilder.getResultReference(),
-					absoluteFieldName,
+					absoluteFieldName, relativeFieldName,
 					store,
 					Field.Index.NO.equals( index ) ? index : Field.Index.NOT_ANALYZED_NO_NORMS,
 					termVector
@@ -1305,7 +1305,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
 					typeMetadataBuilder.getResultReference(),
 					propertyMetadataBuilder.getResultReference(),
-					absoluteFieldName,
+					absoluteFieldName, relativeFieldName,
 					store,
 					index,
 					termVector
@@ -1323,14 +1323,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				throw log.attemptToFacetOnAnalyzedField( absoluteFieldName, member.getDeclaringClass().getName() );
 			}
 			String relativeFacetFieldName = facetAnnotation.name();
-			String absoluteFacetFieldName;
-			if ( facetAnnotation.name().isEmpty() ) {
-				absoluteFacetFieldName = absoluteFieldName; // if not explicitly set the facet name is the same as the field name
+			if ( relativeFacetFieldName.isEmpty() ) {
+				relativeFacetFieldName = relativeFieldName; // if not explicitly set the facet name is the same as the field name
 			}
-			else {
-				absoluteFacetFieldName = prefix + relativeFacetFieldName;
-			}
-			FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder( absoluteFacetFieldName );
+			String absoluteFacetFieldName = prefix + relativeFacetFieldName;
+			FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder(
+					absoluteFacetFieldName, relativeFacetFieldName
+					);
 			FacetEncodingType facetEncodingType = determineFacetEncodingType( member, facetAnnotation );
 			facetMetadataBuilder.setFacetEncoding( facetEncodingType );
 			fieldMetadataBuilder.addFacetMetadata( facetMetadataBuilder.build() );

@@ -17,10 +17,13 @@ public class FacetMetadata {
 
 	private final String absoluteName;
 
+	private final String relativeName;
+
 	private final FacetEncodingType encoding;
 
 	private FacetMetadata(Builder builder) {
 		this.absoluteName = builder.absoluteName;
+		this.relativeName = builder.relativeName;
 		this.encoding = builder.encoding;
 	}
 
@@ -31,6 +34,13 @@ public class FacetMetadata {
 		return absoluteName;
 	}
 
+	/**
+	 * @return The name of the facet field excluding any indexed-embedded prefix.
+	 */
+	public String getRelativeName() {
+		return relativeName;
+	}
+
 	public FacetEncodingType getEncoding() {
 		return encoding;
 	}
@@ -38,12 +48,14 @@ public class FacetMetadata {
 	public static class Builder {
 		// required parameters
 		private final String absoluteName;
+		private final String relativeName;
 
 		// optional parameters
 		private FacetEncodingType encoding = FacetEncodingType.AUTO;
 
-		public Builder(String absoluteName) {
+		public Builder(String absoluteName, String relativeName) {
 			this.absoluteName = absoluteName;
+			this.relativeName = relativeName;
 		}
 
 		public void setFacetEncoding(FacetEncodingType encoding) {
@@ -59,6 +71,7 @@ public class FacetMetadata {
 	public String toString() {
 		return "FacetMetadata{" +
 				"absoluteName='" + absoluteName + '\'' +
+				"relativeName='" + relativeName + '\'' +
 				", encoding=" + encoding +
 				'}';
 	}
