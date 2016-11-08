@@ -73,7 +73,7 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 
 				boolean isConfigured = false;
 				for ( SortableFieldMetadata sortFieldMetadata : sortableFieldsByType.get( entityType ) ) {
-					if ( sortFieldMetadata.getFieldName().equals( sortField.getField() ) ) {
+					if ( sortFieldMetadata.getAbsoluteName().equals( sortField.getField() ) ) {
 						isConfigured = true;
 						break;
 					}

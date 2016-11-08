@@ -13,35 +13,36 @@ package org.hibernate.search.engine.metadata.impl;
  */
 public class SortableFieldMetadata {
 
-	private final String fieldName;
+	private final String absoluteName;
 
 	private SortableFieldMetadata(String fieldName) {
-		this.fieldName = fieldName;
+		this.absoluteName = fieldName;
 	}
 
 	/**
-	 * @return the name of the field whose field bridge will be used to determine the value for the doc value field.
+	 * @return The full name of the field whose field bridge will be used to determine the value
+	 * for the doc value field, including any indexed-embedded prefix.
 	 */
-	public String getFieldName() {
-		return fieldName;
+	public String getAbsoluteName() {
+		return absoluteName;
 	}
 
 	@Override
 	public String toString() {
-		return "SortableFieldMetadata [fieldName=" + fieldName + "]";
+		return "SortableFieldMetadata [absoluteName=" + absoluteName + "]";
 	}
 
 	public static class Builder {
 
-		private String fieldName;
+		private String absoluteName;
 
-		public Builder fieldName(String fieldName) {
-			this.fieldName = fieldName;
+		public Builder fieldName(String absoluteName) {
+			this.absoluteName = absoluteName;
 			return this;
 		}
 
 		public SortableFieldMetadata build() {
-			return new SortableFieldMetadata( fieldName );
+			return new SortableFieldMetadata( absoluteName );
 		}
 	}
 }

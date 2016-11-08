@@ -18,12 +18,12 @@ public class BridgeDefinedField {
 
 	private final BackReference<DocumentFieldMetadata> sourceField;
 
-	private final String name;
+	private final String absoluteName;
 	private final FieldType type;
 
-	public BridgeDefinedField(BackReference<DocumentFieldMetadata> sourceField, String name, FieldType type) {
+	public BridgeDefinedField(BackReference<DocumentFieldMetadata> sourceField, String absoluteName, FieldType type) {
 		this.sourceField = sourceField;
-		this.name = name;
+		this.absoluteName = absoluteName;
 		this.type = type;
 	}
 
@@ -34,12 +34,15 @@ public class BridgeDefinedField {
 		return sourceField.get();
 	}
 
-	public Field.Index getIndex() {
-		return getSourceField().getIndex();
+	/**
+	 * @return The full name of this field, including any indexed-embedded prefix.
+	 */
+	public String getAbsoluteName() {
+		return absoluteName;
 	}
 
-	public String getName() {
-		return name;
+	public Field.Index getIndex() {
+		return getSourceField().getIndex();
 	}
 
 	public FieldType getType() {
@@ -48,6 +51,6 @@ public class BridgeDefinedField {
 
 	@Override
 	public String toString() {
-		return "BridgeDefinedField [name=" + name + ", type=" + type + "]";
+		return "BridgeDefinedField [name=" + absoluteName + ", type=" + type + "]";
 	}
 }

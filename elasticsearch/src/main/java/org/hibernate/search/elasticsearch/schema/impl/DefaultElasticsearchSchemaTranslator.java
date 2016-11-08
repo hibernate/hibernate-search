@@ -97,7 +97,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 				addPropertyMapping( mappingBuilder, fieldMetadata );
 			}
 			catch (IncompleteDataException e) {
-				LOG.debug( "Not adding a mapping for field " + fieldMetadata.getFieldName() + " because of incomplete data", e );
+				LOG.debug( "Not adding a mapping for field " + fieldMetadata.getAbsoluteName() + " because of incomplete data", e );
 			}
 		}
 
@@ -107,7 +107,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 				addPropertyMapping( mappingBuilder, bridgeDefinedField );
 			}
 			catch (IncompleteDataException e) {
-				LOG.debug( "Not adding a mapping for field " + bridgeDefinedField.getName() + " because of incomplete data", e );
+				LOG.debug( "Not adding a mapping for field " + bridgeDefinedField.getAbsoluteName() + " because of incomplete data", e );
 			}
 		}
 
@@ -122,12 +122,12 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	 * Adds a property mapping for the given field to the given type mapping.
 	 */
 	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {
-		if ( fieldMetadata.getFieldName().isEmpty() || fieldMetadata.getFieldName().endsWith( "." )
+		if ( fieldMetadata.getAbsoluteName().isEmpty() || fieldMetadata.getAbsoluteName().endsWith( "." )
 				|| fieldMetadata.isSpatial() ) {
 			return;
 		}
 
-		String propertyPath = fieldMetadata.getName();
+		String propertyPath = fieldMetadata.getAbsoluteName();
 
 		PropertyMapping propertyMapping = new PropertyMapping();
 
@@ -135,7 +135,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 
 		propertyMapping.setStore( fieldMetadata.getStore() == Store.NO ? false : true );
 
-		addIndexOptions( propertyMapping, mappingBuilder, fieldMetadata.getSourceProperty(), fieldMetadata.getFieldName(),
+		addIndexOptions( propertyMapping, mappingBuilder, fieldMetadata.getSourceProperty(), fieldMetadata.getAbsoluteName(),
 				fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
 
 		propertyMapping.setBoost( mappingBuilder.getBoost( fieldMetadata.getBoost() ) );
@@ -151,12 +151,12 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		// Create facet fields if needed: if the facet has the same name as the field, we don't need to create an
 		// extra field for it
 		for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
-			if ( !facetMetadata.getFacetName().equals( fieldMetadata.getFieldName() ) ) {
+			if ( !facetMetadata.getAbsoluteName().equals( fieldMetadata.getAbsoluteName() ) ) {
 				try {
 					addPropertyMapping( mappingBuilder, facetMetadata );
 				}
 				catch (IncompleteDataException e) {
-					LOG.debug( "Not adding a mapping for facet " + facetMetadata.getFacetName() + " because of incomplete data", e );
+					LOG.debug( "Not adding a mapping for facet " + facetMetadata.getAbsoluteName() + " because of incomplete data", e );
 				}
 			}
 		}
@@ -175,7 +175,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
 	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, BridgeDefinedField bridgeDefinedField) {
-		String propertyPath = bridgeDefinedField.getName();
+		String propertyPath = bridgeDefinedField.getAbsoluteName();
 
 		if ( !SpatialHelper.isSpatialField( propertyPath ) ) {
 			PropertyMapping propertyMapping = new PropertyMapping();
@@ -215,7 +215,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	}
 
 	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, FacetMetadata facetMetadata) {
-		String propertyPath = facetMetadata.getFacetName();
+		String propertyPath = facetMetadata.getAbsoluteName();
 
 		PropertyMapping propertyMapping = new PropertyMapping();
 
@@ -266,17 +266,17 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	}
 
 	private void addTypeOptions(PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
-		addTypeOptions( fieldMetadata.getFieldName(), propertyMapping, FieldHelper.getType( fieldMetadata ) );
+		addTypeOptions( fieldMetadata.getAbsoluteName(), propertyMapping, FieldHelper.getType( fieldMetadata ) );
 	}
 
 	private void addTypeOptions(PropertyMapping propertyMapping, BridgeDefinedField bridgeDefinedField) {
 		ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
 
 		if ( ExtendedFieldType.UNKNOWN.equals( type ) ) {
-			throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getName() );
+			throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getAbsoluteName() );
 		}
 
-		addTypeOptions( bridgeDefinedField.getName(), propertyMapping, type );
+		addTypeOptions( bridgeDefinedField.getAbsoluteName(), propertyMapping, type );
 	}
 
 	private void addTypeOptions(PropertyMapping propertyMapping, FacetMetadata facetMetadata) {
@@ -303,7 +303,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 			}
 		}
 
-		addTypeOptions( facetMetadata.getFacetName(), propertyMapping, type );
+		addTypeOptions( facetMetadata.getAbsoluteName(), propertyMapping, type );
 	}
 
 	private DataType addTypeOptions(String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType) {
@@ -413,7 +413,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		String indexNullAs = fieldMetadata.indexNullAs();
 		if ( indexNullAs != null ) {
 			Object convertedValue = ElasticSearchIndexNullAsHelper.getNullValue(
-					fieldMetadata.getName(), propertyMapping.getType(), indexNullAs
+					fieldMetadata.getAbsoluteName(), propertyMapping.getType(), indexNullAs
 					);
 			Gson gson = gsonService.getGson();
 			propertyMapping.setNullValue( gson.toJsonTree( convertedValue ).getAsJsonPrimitive() );

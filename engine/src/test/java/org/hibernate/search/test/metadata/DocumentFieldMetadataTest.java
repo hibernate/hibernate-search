@@ -66,39 +66,39 @@ public class DocumentFieldMetadataTest {
 	@Test
 	public void testStringFieldCanBeCOnfiguredForFaceting() {
 		FacetMetadata facetMetadata = getSingleFacetMetadata( Foo.class, "name" );
-		assertEquals( "Unexpected facet name", "name", facetMetadata.getFacetName() );
+		assertEquals( "Unexpected facet name", "name", facetMetadata.getAbsoluteName() );
 		assertEquals( "Unexpected encoding type", FacetEncodingType.STRING, facetMetadata.getEncoding() );
 	}
 
 	@Test
 	public void testDateFieldCanBeConfiguredForFaceting() {
 		FacetMetadata facetMetadata = getSingleFacetMetadata( Foobar.class, "date" );
-		assertEquals( "Unexpected facet name", "date", facetMetadata.getFacetName() );
+		assertEquals( "Unexpected facet name", "date", facetMetadata.getAbsoluteName() );
 		assertEquals( "Unexpected encoding type", FacetEncodingType.LONG, facetMetadata.getEncoding() );
 	}
 
 	@Test
 	public void testExplicitFacetName() {
 		FacetMetadata facetMetadata = getSingleFacetMetadata( Fubar.class, "name" );
-		assertEquals( "Unexpected facet name", "facet_name", facetMetadata.getFacetName() );
+		assertEquals( "Unexpected facet name", "facet_name", facetMetadata.getAbsoluteName() );
 		assertEquals( "Unexpected encoding type", FacetEncodingType.STRING, facetMetadata.getEncoding() );
 	}
 
 	@Test
 	public void testFacetFieldTargetsSpecificFieldAnnotation() {
 		FacetMetadata facetMetadata = getSingleFacetMetadata( Baz.class, "facet_value" );
-		assertEquals( "Unexpected facet name", "facet_value", facetMetadata.getFacetName() );
+		assertEquals( "Unexpected facet name", "facet_value", facetMetadata.getAbsoluteName() );
 		assertEquals( "Unexpected encoding type", FacetEncodingType.DOUBLE, facetMetadata.getEncoding() );
 	}
 
 	@Test
 	public void testMultipleFacetsAnnotation() {
 		FacetMetadata facetMetadata = getSingleFacetMetadata( Qux.class, "value" );
-		assertEquals( "Unexpected facet name", "value", facetMetadata.getFacetName() );
+		assertEquals( "Unexpected facet name", "value", facetMetadata.getAbsoluteName() );
 		assertEquals( "Unexpected encoding type", FacetEncodingType.DOUBLE, facetMetadata.getEncoding() );
 
 		facetMetadata = getSingleFacetMetadata( Qux.class, "facet_value" );
-		assertEquals( "Unexpected facet name", "facet_value", facetMetadata.getFacetName() );
+		assertEquals( "Unexpected facet name", "facet_value", facetMetadata.getAbsoluteName() );
 		assertEquals( "Unexpected encoding type", FacetEncodingType.STRING, facetMetadata.getEncoding() );
 	}
 

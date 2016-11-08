@@ -32,7 +32,7 @@ public class DocumentFieldMetadata {
 	private final BackReference<TypeMetadata> sourceType;
 	private final BackReference<PropertyMetadata> sourceProperty;
 
-	private final String fieldName;
+	private final String absoluteName;
 	private final Store store;
 	private final Field.Index index;
 	private final Field.TermVector termVector;
@@ -60,7 +60,7 @@ public class DocumentFieldMetadata {
 		this.sourceType = builder.sourceType;
 		this.sourceProperty = builder.sourceProperty;
 
-		this.fieldName = builder.fieldName;
+		this.absoluteName = builder.absoluteName;
 		this.store = builder.store;
 		this.index = builder.index;
 		this.termVector = builder.termVector;
@@ -95,8 +95,11 @@ public class DocumentFieldMetadata {
 		return sourceProperty.get();
 	}
 
-	public String getName() {
-		return fieldName;
+	/**
+	 * @return The full name of this field, including any indexed-embedded prefix.
+	 */
+	public String getAbsoluteName() {
+		return absoluteName;
 	}
 
 	public boolean isId() {
@@ -155,10 +158,6 @@ public class DocumentFieldMetadata {
 		return !facetMetadata.isEmpty();
 	}
 
-	public String getFieldName() {
-		return fieldName;
-	}
-
 	public Set<FacetMetadata> getFacetMetadata() {
 		return facetMetadata;
 	}
@@ -170,7 +169,7 @@ public class DocumentFieldMetadata {
 	@Override
 	public String toString() {
 		return "DocumentFieldMetadata{" +
-				"fieldName='" + fieldName + '\'' +
+				"fieldName='" + absoluteName + '\'' +
 				", sourceType='" + sourceType + '\'' +
 				", sourceProperty='" + sourceProperty + '\'' +
 				", store=" + store +
@@ -196,7 +195,7 @@ public class DocumentFieldMetadata {
 		// required parameters
 		private final BackReference<TypeMetadata> sourceType;
 		private final BackReference<PropertyMetadata> sourceProperty;
-		private final String fieldName;
+		private final String absoluteName;
 		private final Store store;
 		private final Field.Index index;
 		private final Field.TermVector termVector;
@@ -217,13 +216,13 @@ public class DocumentFieldMetadata {
 
 		public Builder(BackReference<TypeMetadata> sourceType,
 				BackReference<PropertyMetadata> sourceProperty,
-				String fieldName,
+				String absoluteName,
 				Store store,
 				Field.Index index,
 				Field.TermVector termVector) {
 			this.sourceType = sourceType;
 			this.sourceProperty = sourceProperty;
-			this.fieldName = fieldName;
+			this.absoluteName = absoluteName;
 			this.store = store;
 			this.index = index;
 			this.termVector = termVector;
@@ -231,8 +230,8 @@ public class DocumentFieldMetadata {
 			this.bridgeDefinedFields = new HashMap<>();
 		}
 
-		public String getFieldName() {
-			return fieldName;
+		public String getAbsoluteName() {
+			return absoluteName;
 		}
 
 		public Builder fieldBridge(FieldBridge fieldBridge) {
@@ -291,7 +290,7 @@ public class DocumentFieldMetadata {
 		}
 
 		public Builder addBridgeDefinedField(BridgeDefinedField bridgeDefinedField) {
-			this.bridgeDefinedFields.put( bridgeDefinedField.getName(), bridgeDefinedField );
+			this.bridgeDefinedFields.put( bridgeDefinedField.getAbsoluteName(), bridgeDefinedField );
 			return this;
 		}
 
@@ -308,7 +307,7 @@ public class DocumentFieldMetadata {
 		@Override
 		public String toString() {
 			return "Builder{" +
-					"fieldName='" + fieldName + '\'' +
+					"absoluteName='" + absoluteName + '\'' +
 					'}';
 		}
 	}

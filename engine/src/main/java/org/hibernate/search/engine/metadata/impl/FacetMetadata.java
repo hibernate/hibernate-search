@@ -15,17 +15,20 @@ import org.hibernate.search.annotations.FacetEncodingType;
  */
 public class FacetMetadata {
 
-	private final String facetName;
+	private final String absoluteName;
 
 	private final FacetEncodingType encoding;
 
 	private FacetMetadata(Builder builder) {
-		this.facetName = builder.facetName;
+		this.absoluteName = builder.absoluteName;
 		this.encoding = builder.encoding;
 	}
 
-	public String getFacetName() {
-		return facetName;
+	/**
+	 * @return The full name of the facet field, including any indexed-embedded prefix.
+	 */
+	public String getAbsoluteName() {
+		return absoluteName;
 	}
 
 	public FacetEncodingType getEncoding() {
@@ -34,13 +37,13 @@ public class FacetMetadata {
 
 	public static class Builder {
 		// required parameters
-		private final String facetName;
+		private final String absoluteName;
 
 		// optional parameters
 		private FacetEncodingType encoding = FacetEncodingType.AUTO;
 
-		public Builder(String facetName) {
-			this.facetName = facetName;
+		public Builder(String absoluteName) {
+			this.absoluteName = absoluteName;
 		}
 
 		public void setFacetEncoding(FacetEncodingType encoding) {
@@ -55,7 +58,7 @@ public class FacetMetadata {
 	@Override
 	public String toString() {
 		return "FacetMetadata{" +
-				"facetName='" + facetName + '\'' +
+				"absoluteName='" + absoluteName + '\'' +
 				", encoding=" + encoding +
 				'}';
 	}

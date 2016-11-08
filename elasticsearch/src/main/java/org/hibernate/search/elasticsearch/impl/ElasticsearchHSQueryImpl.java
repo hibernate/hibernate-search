@@ -696,7 +696,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			DocumentFieldMetadata field = binding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( projectedField );
 
 			if ( field != null ) {
-				conversionContext.pushProperty( field.getFieldName() );
+				conversionContext.pushProperty( field.getAbsoluteName() );
 				try {
 					return convertFieldValue( hit, binding, field, conversionContext );
 				}
@@ -717,7 +717,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private Object convertFieldValue(JsonObject hit, EntityIndexBinding binding, DocumentFieldMetadata field, ConversionContext conversionContext) {
-			String fieldPath = field.getFieldName();
+			String fieldPath = field.getAbsoluteName();
 			FieldBridge fieldBridge = field.getFieldBridge();
 			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), fieldPath );
 
@@ -732,14 +732,14 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 				// Add to the document the additional fields created when indexing the value
 				for ( BridgeDefinedField bridgeDefinedField : field.getBridgeDefinedFields().values() ) {
-					String bridgeDefinedFieldPath = bridgeDefinedField.getName();
+					String bridgeDefinedFieldPath = bridgeDefinedField.getAbsoluteName();
 					ExtendedFieldType bridgeDefinedFieldType = FieldHelper.getType( bridgeDefinedField );
 
 					JsonElement bridgeDefinedFieldJsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), bridgeDefinedFieldPath );
 					addDocumentField( tmp, binding, bridgeDefinedFieldType, bridgeDefinedFieldPath, bridgeDefinedFieldJsonValue );
 				}
 
-				return conversionContext.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge ).get( field.getName(), tmp );
+				return conversionContext.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge ).get( field.getAbsoluteName(), tmp );
 			}
 			// Should only be the case for custom bridges
 			else {
@@ -775,7 +775,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private Object convertFieldValue(JsonObject hit, EntityIndexBinding binding, BridgeDefinedField bridgeDefinedField) {
-			String fieldPath = bridgeDefinedField.getName();
+			String fieldPath = bridgeDefinedField.getAbsoluteName();
 			ExtendedFieldType fieldType = FieldHelper.getType( bridgeDefinedField );
 			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), fieldPath );
 			switch ( fieldType ) {
