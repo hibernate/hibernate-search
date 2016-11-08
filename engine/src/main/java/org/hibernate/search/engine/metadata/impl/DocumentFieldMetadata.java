@@ -33,6 +33,7 @@ public class DocumentFieldMetadata {
 	private final BackReference<PropertyMetadata> sourceProperty;
 
 	private final String absoluteName;
+	private final String relativeName;
 	private final Store store;
 	private final Field.Index index;
 	private final Field.TermVector termVector;
@@ -61,6 +62,7 @@ public class DocumentFieldMetadata {
 		this.sourceProperty = builder.sourceProperty;
 
 		this.absoluteName = builder.absoluteName;
+		this.relativeName = builder.relativeName;
 		this.store = builder.store;
 		this.index = builder.index;
 		this.termVector = builder.termVector;
@@ -100,6 +102,13 @@ public class DocumentFieldMetadata {
 	 */
 	public String getAbsoluteName() {
 		return absoluteName;
+	}
+
+	/**
+	 * @return The name of this field excluding any indexed-embedded prefix.
+	 */
+	public String getRelativeName() {
+		return relativeName;
 	}
 
 	public boolean isId() {
@@ -196,6 +205,7 @@ public class DocumentFieldMetadata {
 		private final BackReference<TypeMetadata> sourceType;
 		private final BackReference<PropertyMetadata> sourceProperty;
 		private final String absoluteName;
+		private final String relativeName;
 		private final Store store;
 		private final Field.Index index;
 		private final Field.TermVector termVector;
@@ -216,13 +226,14 @@ public class DocumentFieldMetadata {
 
 		public Builder(BackReference<TypeMetadata> sourceType,
 				BackReference<PropertyMetadata> sourceProperty,
-				String absoluteName,
+				String absoluteName, String relativeName,
 				Store store,
 				Field.Index index,
 				Field.TermVector termVector) {
 			this.sourceType = sourceType;
 			this.sourceProperty = sourceProperty;
 			this.absoluteName = absoluteName;
+			this.relativeName = relativeName;
 			this.store = store;
 			this.index = index;
 			this.termVector = termVector;
@@ -232,6 +243,10 @@ public class DocumentFieldMetadata {
 
 		public String getAbsoluteName() {
 			return absoluteName;
+		}
+
+		public String getRelativeName() {
+			return relativeName;
 		}
 
 		public Builder fieldBridge(FieldBridge fieldBridge) {
