@@ -97,6 +97,11 @@ public class TypeMetadata {
 	private final Map<String, BridgeDefinedField> bridgeDefinedFieldNameToFieldMetadata;
 
 	/**
+	 * Metadata for a facet keyed against the facet field name
+	 */
+	private final Map<String, FacetMetadata> facetFieldNameToFacetMetadata;
+
+	/**
 	 * Metadata for a Java property (field or getter) keyed against the property name.
 	 */
 	private final Map<String, PropertyMetadata> propertyGetterNameToPropertyMetadata;
@@ -177,6 +182,7 @@ public class TypeMetadata {
 		this.propertyGetterNameToPropertyMetadata = buildPropertyMetadataMap( builder.propertyMetadataSet );
 		this.documentFieldMetadata = collectFieldMetadata( builder.propertyMetadataSet, builder.classBridgeFields, builder.idPropertyMetadata );
 		this.documentFieldNameToFieldMetadata = buildFieldMetadataMap( documentFieldMetadata );
+		this.facetFieldNameToFacetMetadata = buildFacetMetadataMap( documentFieldMetadata );
 		this.bridgeDefinedFieldNameToFieldMetadata = buildBridgeDefinedFieldMetadataMap( documentFieldNameToFieldMetadata.values() );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
 		this.classBridgeSortableFieldMetadata = Collections.unmodifiableSet( builder.classBridgeSortableFieldMetadata );
@@ -227,6 +233,20 @@ public class TypeMetadata {
 		}
 		for ( EmbeddedTypeMetadata element : embeddedTypeMetadata ) {
 			result = element.getBridgeDefinedFieldMetadataFor( fieldName );
+			if ( result != null ) {
+				return result;
+			}
+		}
+		return null;
+	}
+
+	public FacetMetadata getFacetMetadataFor(String facetFieldName) {
+		FacetMetadata result = facetFieldNameToFacetMetadata.get( facetFieldName );
+		if ( result != null ) {
+			return result;
+		}
+		for ( EmbeddedTypeMetadata element : embeddedTypeMetadata ) {
+			result = element.getFacetMetadataFor( facetFieldName );
 			if ( result != null ) {
 				return result;
 			}
@@ -431,6 +451,17 @@ public class TypeMetadata {
 		return Collections.unmodifiableMap( tmpMap );
 	}
 
+	private Map<String, FacetMetadata> buildFacetMetadataMap(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
+		Map<String, FacetMetadata> tmpMap = new HashMap<String, FacetMetadata>();
+		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
+			for ( FacetMetadata facetMetadata : documentFieldMetadata.getFacetMetadata() ) {
+				tmpMap.put( facetMetadata.getAbsoluteName(), facetMetadata );
+			}
+		}
+		// Class bridge fields, etc. are already included in documentFieldMetadataCollection
+		return Collections.unmodifiableMap( tmpMap );
+	}
+
 	private Map<String, BridgeDefinedField> buildBridgeDefinedFieldMetadataMap(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
 		Map<String, BridgeDefinedField> tmpMap = new HashMap<String, BridgeDefinedField>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
@@ -438,11 +469,7 @@ public class TypeMetadata {
 				tmpMap.put( bridgeDefinedField.getAbsoluteName(), bridgeDefinedField );
 			}
 		}
-		for ( DocumentFieldMetadata documentFieldMetadata : classBridgeFields ) {
-			for ( BridgeDefinedField bridgeDefinedField : documentFieldMetadata.getBridgeDefinedFields().values() ) {
-				tmpMap.put( bridgeDefinedField.getAbsoluteName(), bridgeDefinedField );
-			}
-		}
+		// Class bridge fields, etc. are already included in documentFieldMetadataCollection
 		return Collections.unmodifiableMap( tmpMap );
 	}
 
