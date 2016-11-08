@@ -36,9 +36,8 @@ public class SortableFieldMetadata {
 
 		private String absoluteName;
 
-		public Builder fieldName(String absoluteName) {
+		public Builder(String absoluteName) {
 			this.absoluteName = absoluteName;
-			return this;
 		}
 
 		public SortableFieldMetadata build() {
