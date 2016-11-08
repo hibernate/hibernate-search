@@ -35,6 +35,11 @@ public interface ElasticsearchValidationMessages {
 	String errorIntro(String indexName, String mappingName, String path);
 
 	@Message(
+			value = "Index '%1$s', mapping '%2$s', property '%3$s', field '%4$s':"
+	)
+	String errorIntro(String indexName, String mappingName, String path, String field);
+
+	@Message(
 			value = "Missing type mapping"
 	)
 	String mappingMissing();
@@ -43,6 +48,11 @@ public interface ElasticsearchValidationMessages {
 			value = "Missing property mapping"
 	)
 	String propertyMissing();
+
+	@Message(
+			value = "Missing field mapping"
+	)
+	String propertyFieldMissing();
 
 	@Message(
 			value = "Invalid value for attribute '%1$s'. Expected '%2$s', actual is '%3$s'"

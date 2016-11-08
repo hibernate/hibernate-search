@@ -7,6 +7,8 @@
 package org.hibernate.search.elasticsearch.schema.impl.model;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.google.gson.JsonPrimitive;
 import com.google.gson.annotations.JsonAdapter;
@@ -49,6 +51,11 @@ public class PropertyMapping extends TypeMapping {
 	 */
 	@SerializedName("null_value")
 	private JsonPrimitive nullValue;
+
+	/**
+	 * Must be null when we don't want to include it in JSON serialization.
+	 */
+	private Map<String, PropertyMapping> fields;
 
 	/*
 	 * String datatype
@@ -117,6 +124,25 @@ public class PropertyMapping extends TypeMapping {
 
 	public void setNullValue(JsonPrimitive nullValue) {
 		this.nullValue = nullValue;
+	}
+
+	public Map<String, PropertyMapping> getFields() {
+		return fields;
+	}
+
+	private Map<String, PropertyMapping> getInitializedFields() {
+		if ( fields == null ) {
+			fields = new TreeMap<>();
+		}
+		return fields;
+	}
+
+	public void addField(String name, PropertyMapping mapping) {
+		getInitializedFields().put(name, mapping);
+	}
+
+	public void removeField(String name) {
+		getInitializedFields().remove( name );
 	}
 
 	public String getAnalyzer() {

@@ -103,7 +103,10 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	}
 
 	private Object formatIntro(ValidationContext context) {
-		if ( StringHelper.isNotEmpty( context.getPath() ) ) {
+		if ( StringHelper.isNotEmpty( context.getFieldName() ) ) {
+			return MESSAGES.errorIntro( context.getIndexName(), context.getMappingName(), context.getPath(), context.getFieldName() );
+		}
+		else if ( StringHelper.isNotEmpty( context.getPath() ) ) {
 			return MESSAGES.errorIntro( context.getIndexName(), context.getMappingName(), context.getPath() );
 		}
 		else if ( StringHelper.isNotEmpty( context.getMappingName() ) ) {
@@ -325,7 +328,39 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 				expectedMapping.getNullValue(), actualMapping.getNullValue() );
 
 		validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), null );
+
 		validateTypeMapping( errorCollector, expectedMapping, actualMapping );
+
+		validatePropertyMappingFields( errorCollector, expectedMapping, actualMapping );
+	}
+
+	private void validatePropertyMappingFields(ValidationErrorCollector errorCollector,
+			PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+		// Unknown fields are ignored, we only validate expected fields
+		Map<String, PropertyMapping> expectedFieldMappings = expectedMapping.getFields();
+		Map<String, PropertyMapping> actualFieldMappings = actualMapping.getFields();
+		if ( expectedFieldMappings != null ) {
+			for ( Map.Entry<String, PropertyMapping> entry : expectedFieldMappings.entrySet() ) {
+				String fieldName = entry.getKey();
+				PropertyMapping expectedFieldMapping = entry.getValue();
+
+				PropertyMapping actualFieldMapping = actualFieldMappings == null ?
+						null : actualFieldMappings.get( fieldName );
+
+				errorCollector.setFieldName( fieldName );
+				try {
+					if ( actualFieldMapping == null ) {
+						errorCollector.addError( MESSAGES.propertyFieldMissing() );
+						continue;
+					}
+					// Validate with the same method as properties, since the content is about the same
+					validatePropertyMapping( errorCollector, expectedFieldMapping, actualFieldMapping );
+				}
+				catch (ElasticsearchSchemaValidationException e) {
+					errorCollector.setFieldName( null );
+				}
+			}
+		}
 	}
 
 	private static void validateJsonPrimitive(ValidationErrorCollector errorCollector,

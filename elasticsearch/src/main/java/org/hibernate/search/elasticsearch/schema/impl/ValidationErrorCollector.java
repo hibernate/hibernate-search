@@ -20,6 +20,7 @@ final class ValidationErrorCollector {
 	private String indexName;
 	private String mappingName;
 	private final Deque<String> currentPath = new ArrayDeque<String>();
+	private String fieldName;
 
 	private final Map<ValidationContext, List<String>> messagesByContext = new LinkedHashMap<>();
 
@@ -39,6 +40,10 @@ final class ValidationErrorCollector {
 		currentPath.removeLast();
 	}
 
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
+
 	public void addError(String errorMessage) {
 		ValidationContext context = createContext();
 		List<String> messages = messagesByContext.get( context );
@@ -50,7 +55,7 @@ final class ValidationErrorCollector {
 	}
 
 	private ValidationContext createContext() {
-		return new ValidationContext( indexName, mappingName, StringHelper.join( currentPath, "." ) );
+		return new ValidationContext( indexName, mappingName, StringHelper.join( currentPath, "." ), fieldName );
 	}
 
 	/**
