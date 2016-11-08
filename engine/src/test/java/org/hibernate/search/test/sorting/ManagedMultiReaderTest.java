@@ -57,8 +57,8 @@ public class ManagedMultiReaderTest {
 			.setEntityType( Person.class )
 			.addSortableFields(
 					Arrays.asList(
-							new SortableFieldMetadata.Builder().fieldName( "ageForIntSorting" ).build(),
-							new SortableFieldMetadata.Builder().fieldName( "ageForStringSorting" ).build()
+							new SortableFieldMetadata.Builder( "ageForIntSorting" ).build(),
+							new SortableFieldMetadata.Builder( "ageForStringSorting" ).build()
 					)
 			)
 			.build();
@@ -88,7 +88,7 @@ public class ManagedMultiReaderTest {
 			.setEntityType( Person.class )
 			.addSortableFields(
 					Arrays.asList(
-							new SortableFieldMetadata.Builder().fieldName( "ageForStringSorting" ).build()
+							new SortableFieldMetadata.Builder( "ageForStringSorting" ).build()
 					)
 			)
 			.build();
@@ -119,14 +119,14 @@ public class ManagedMultiReaderTest {
 			.setIndex( "person" )
 				.setEntityType( Person.class )
 					.addSortableFields(
-							Arrays.asList( new SortableFieldMetadata.Builder().fieldName( "ageForStringSorting" ).build() )
+							Arrays.asList( new SortableFieldMetadata.Builder( "ageForStringSorting" ).build() )
 					)
 			.setIndex( "customer" )
 				.setEntityType( Customer.class )
 					.addSortableFields(
 							Arrays.asList(
-									new SortableFieldMetadata.Builder().fieldName( "ageForStringSorting" ).build(),
-									new SortableFieldMetadata.Builder().fieldName( "ageForIntSorting" ).build()
+									new SortableFieldMetadata.Builder( "ageForStringSorting" ).build(),
+									new SortableFieldMetadata.Builder( "ageForIntSorting" ).build()
 							)
 					)
 			.build();

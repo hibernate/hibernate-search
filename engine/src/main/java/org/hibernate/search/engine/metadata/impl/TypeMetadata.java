@@ -629,7 +629,7 @@ public class TypeMetadata {
 
 		public void addClassBridgeSortableFields(Iterable<String> sortableFieldsAbsoluteNames) {
 			for ( String sortableFieldAbsoluteName : sortableFieldsAbsoluteNames ) {
-				classBridgeSortableFieldMetadata.add( new SortableFieldMetadata.Builder().fieldName( sortableFieldAbsoluteName ).build() );
+				classBridgeSortableFieldMetadata.add( new SortableFieldMetadata.Builder( sortableFieldAbsoluteName ).build() );
 			}
 		}
 

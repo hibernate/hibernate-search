@@ -975,9 +975,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			throw log.sortableFieldRefersToUndefinedField( typeMetadataBuilder.getIndexedType(), propertyMetadataBuilder.getPropertyAccessor().getName(), sortedFieldAbsoluteName );
 		}
 
-		SortableFieldMetadata fieldMetadata = new SortableFieldMetadata.Builder()
-			.fieldName( sortedFieldAbsoluteName )
-			.build();
+		SortableFieldMetadata fieldMetadata = new SortableFieldMetadata.Builder( sortedFieldAbsoluteName ).build();
 
 		propertyMetadataBuilder.addSortableField( fieldMetadata );
 	}
@@ -1344,9 +1342,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					fieldMetadataBuilder, metadataProvidingFieldBridge );
 
 			for ( String sortableFieldAbsoluteName : bridgeContributedMetadata.getSortableFieldsAbsoluteNames() ) {
-				SortableFieldMetadata sortableFieldMetadata = new SortableFieldMetadata.Builder()
-					.fieldName( sortableFieldAbsoluteName )
-					.build();
+				SortableFieldMetadata sortableFieldMetadata = new SortableFieldMetadata.Builder( sortableFieldAbsoluteName ).build();
 				propertyMetadataBuilder.addSortableField( sortableFieldMetadata );
 			}
 
