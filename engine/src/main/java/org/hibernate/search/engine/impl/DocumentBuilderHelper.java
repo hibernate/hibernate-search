@@ -162,7 +162,7 @@ public final class DocumentBuilderHelper {
 		//process base fields
 		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
 			for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
-				final String fieldName = fieldMetadata.getName();
+				final String fieldName = fieldMetadata.getAbsoluteName();
 				int matchingPosition = getFieldPosition( fields, fieldName );
 				if ( matchingPosition != -1 && result[matchingPosition] == NOT_SET ) {
 					contextualBridge.pushProperty( fieldName );
@@ -202,10 +202,10 @@ public final class DocumentBuilderHelper {
 
 		//process class bridges
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
-			int matchingPosition = getFieldPosition( fields, fieldMetadata.getName() );
+			int matchingPosition = getFieldPosition( fields, fieldMetadata.getAbsoluteName() );
 			if ( matchingPosition != -1 && result[matchingPosition] == NOT_SET ) {
 				populateResult(
-						fieldMetadata.getName(),
+						fieldMetadata.getAbsoluteName(),
 						fieldMetadata.getFieldBridge(),
 						fieldMetadata.getStore(),
 						result,

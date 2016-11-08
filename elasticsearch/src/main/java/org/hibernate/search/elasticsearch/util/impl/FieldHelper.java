@@ -90,7 +90,7 @@ public class FieldHelper {
 		NumericEncodingType numericEncodingType = field.getNumericEncodingType();
 
 		if ( numericEncodingType == NumericEncodingType.UNKNOWN ) {
-			BridgeDefinedField bridgeDefinedField = field.getBridgeDefinedFields().get( field.getName() );
+			BridgeDefinedField bridgeDefinedField = field.getBridgeDefinedFields().get( field.getAbsoluteName() );
 			if ( bridgeDefinedField != null ) {
 				numericEncodingType = getNumericEncodingType( bridgeDefinedField.getType() );
 			}
@@ -234,7 +234,7 @@ public class FieldHelper {
 		Collection<SortableFieldMetadata> sortableFields = sourceProperty != null ? sourceProperty.getSortableFieldMetadata()
 				: sourceType.getClassBridgeSortableFieldMetadata();
 		for ( SortableFieldMetadata sortableField : sortableFields ) {
-			if ( fieldName.equals( sortableField.getFieldName() ) ) {
+			if ( fieldName.equals( sortableField.getAbsoluteName() ) ) {
 				return true;
 			}
 		}

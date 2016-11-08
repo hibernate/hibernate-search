@@ -224,8 +224,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
-		final String unprefixedAttributeName = getIdAttributeName( member, idAnnotation );
-		final String path = prefix + unprefixedAttributeName;
+		final String relativeFieldName = getIdAttributeName( member, idAnnotation );
+		final String absoluteFieldName = prefix + relativeFieldName;
 		if ( isRoot ) {
 			createIdPropertyMetadata(
 					member,
@@ -234,25 +234,25 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					configContext,
 					parseContext,
 					idAnnotation,
-					path,
-					unprefixedAttributeName
+					absoluteFieldName,
+					relativeFieldName
 			);
 		}
 		else {
-			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( path ) ) {
+			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( absoluteFieldName ) ) {
 				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder,
-						numericFields, configContext, parseContext, unprefixedAttributeName, path );
+						numericFields, configContext, parseContext, absoluteFieldName, relativeFieldName );
 			}
 		}
 
 		if ( pathsContext != null ) {
-			pathsContext.markEncounteredPath( path );
+			pathsContext.markEncounteredPath( absoluteFieldName );
 		}
 	}
 
 	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder,
 			PropertyMetadata.Builder propertyMetadataBuilder, NumericFieldsConfiguration numericFields,
-			ConfigContext configContext, ParseContext parseContext, String unprefixedFieldName, String fieldName) {
+			ConfigContext configContext, ParseContext parseContext, String absoluteFieldName, String relativeFieldName) {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 
@@ -264,7 +264,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			fieldBridge = bridgeFactory.buildFieldBridge(
 					member,
 					true,
-					numericFields.isNumericField( unprefixedFieldName ),
+					numericFields.isNumericField( relativeFieldName ),
 					parseContext.getIndexManagerType(),
 					reflectionManager,
 					configContext.getServiceManager()
@@ -275,7 +275,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						fieldName, Store.YES, index, termVector
+						absoluteFieldName, Store.YES, index, termVector
 						)
 						.boost( AnnotationProcessingHelper.getBoost( member, null ) )
 						.fieldBridge( fieldBridge )
@@ -297,7 +297,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			if ( analyzerReference == null ) {
 				throw new AssertionFailure( "Analyzer should not be undefined" );
 			}
-			typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzerReference, index );
+			typeMetadataBuilder.addToScopedAnalyzerReference( absoluteFieldName, analyzerReference, index );
 		}
 	}
 
@@ -307,8 +307,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ConfigContext configContext,
 			ParseContext parseContext,
 			Annotation idAnnotation,
-			String path,
-			String unprefixedAttributeName) {
+			String absoluteFieldName,
+			String relativeFieldName) {
 		if ( parseContext.isExplicitDocumentId() ) {
 			if ( idAnnotation instanceof DocumentId ) {
 				throw log.duplicateDocumentIdFound( typeMetadataBuilder.getIndexedType().getName() );
@@ -322,7 +322,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			parseContext.setExplicitDocumentId( true );
 		}
 
-		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( unprefixedAttributeName );
+		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( relativeFieldName );
 
 		// Don't apply @NumericField if it is given with the default name and there is another custom @Field
 		if ( numericFieldAnnotation != null && numericFieldAnnotation.forField().isEmpty()
@@ -359,7 +359,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata.Builder idMetadataBuilder = new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						path,
+						absoluteFieldName,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
 						termVector
@@ -368,7 +368,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				.boost( AnnotationProcessingHelper.getBoost( member, null ) )
 				.fieldBridge( idBridge );
 
-		parseContext.setIdFieldPath( path );
+		parseContext.setIdFieldPath( absoluteFieldName );
 
 		NumericEncodingType numericEncodingType = determineNumericFieldEncoding( idBridge );
 		if ( numericEncodingType != NumericEncodingType.UNKNOWN ) {
@@ -437,15 +437,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void initializeProvidedIdMetadata(String prefix, ProvidedId providedId, XClass clazz, TypeMetadata.Builder typeMetadataBuilder,
 			boolean isRoot, PathsContext pathsContext, ParseContext parseContext) {
 		FieldBridge providedIdFieldBridge = null;
-		String providedIdFieldPath;
+
+		String relativeFieldName;
 		if ( providedId != null ) {
-			providedIdFieldPath = prefix + providedId.name();
+			relativeFieldName = providedId.name();
 		}
 		else {
-			providedIdFieldPath = prefix + ProvidedId.defaultFieldName;
+			relativeFieldName = ProvidedId.defaultFieldName;
 		}
 
-		if ( !parseContext.includeEmbeddedObjectId() && pathsContext != null && !pathsContext.containsPath( providedIdFieldPath ) ) {
+		String absoluteFieldName = prefix + relativeFieldName;
+
+		if ( !parseContext.includeEmbeddedObjectId() && pathsContext != null && !pathsContext.containsPath( absoluteFieldName ) ) {
 			return;
 		}
 
@@ -464,7 +467,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						providedIdFieldPath,
+						absoluteFieldName,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
 						Field.TermVector.NO
@@ -725,7 +728,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ParseContext parseContext) {
 		bridgeFactory.injectParameters( classBridgeAnnotation, fieldBridge );
 
-		String fieldName = prefix + classBridgeAnnotation.name();
+		String relativeFieldName = classBridgeAnnotation.name();
+		String absoluteFieldName = prefix + relativeFieldName;
 		Store store = classBridgeAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex(
 				classBridgeAnnotation.index(),
@@ -738,7 +742,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						BackReference.<PropertyMetadata>empty(), // Class bridge, there's no related property
-						fieldName, store, index, termVector
+						absoluteFieldName, store, index, termVector
 				)
 				.boost( classBridgeAnnotation.boost().value() )
 				.fieldBridge( fieldBridge );
@@ -751,7 +755,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					classBridgeAnnotation.analyzer(),
 					configContext,
 					parseContext.isAnalyzerRemote() );
-			typeMetadataBuilder.addToScopedAnalyzerReference( fieldName, analyzerReference, index );
+			typeMetadataBuilder.addToScopedAnalyzerReference( absoluteFieldName, analyzerReference, index );
 			fieldMetadataBuilder.analyzerReference( analyzerReference );
 		}
 
@@ -771,7 +775,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		parseContext.markSpatialNameAsUsed( spatialAnnotation.name() );
 
-		String fieldName = prefix + ReflectionHelper.getAttributeName( member, spatialAnnotation.name() );
+		String relativeFieldName = ReflectionHelper.getAttributeName( member, spatialAnnotation.name() );
+		String absoluteFieldName = prefix + relativeFieldName;
 		Store store = spatialAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		Field.TermVector termVector = Field.TermVector.NO;
@@ -788,7 +793,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
-						fieldName, store, index, termVector
+						absoluteFieldName, store, index, termVector
 				)
 				.boost( AnnotationProcessingHelper.getBoost( member, spatialAnnotation ) )
 				.fieldBridge( fieldBridge )
@@ -815,18 +820,16 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			String prefix,
 			TypeMetadata.Builder typeMetadataBuilder,
 			ParseContext parseContext) {
-		String fieldName;
-		if ( !spatialAnnotation.name().isEmpty() ) {
-			fieldName = prefix + spatialAnnotation.name();
-		}
-		else {
-			fieldName = Spatial.COORDINATES_DEFAULT_FIELD;
+		String relativeFieldName = spatialAnnotation.name();
+		if ( relativeFieldName.isEmpty() ) {
+			relativeFieldName = Spatial.COORDINATES_DEFAULT_FIELD;
 		}
 
-		if ( parseContext.isSpatialNameUsed( spatialAnnotation.name() ) ) {
+		String absoluteFieldName = prefix + relativeFieldName;
+		if ( parseContext.isSpatialNameUsed( absoluteFieldName ) ) {
 			throw log.cannotHaveTwoSpatialsWithDefaultOrSameName( parseContext.getCurrentClass().getName() );
 		}
-		parseContext.markSpatialNameAsUsed( spatialAnnotation.name() );
+		parseContext.markSpatialNameAsUsed( absoluteFieldName );
 
 		Store store = spatialAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
@@ -837,7 +840,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						BackReference.<PropertyMetadata>empty(), // Class-level spatial annotation, there's no related property
-						fieldName, store, index, termVector
+						absoluteFieldName, store, index, termVector
 				)
 				.boost( spatialAnnotation.boost().value() )
 				.fieldBridge( spatialBridge )
@@ -954,25 +957,26 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			boolean isIdProperty,
 			ParseContext parseContext) {
 
-		String sortedFieldName = prefix + ReflectionHelper.getAttributeName( member, sortableFieldAnnotation.forField() );
+		String sortedFieldRelativeName = ReflectionHelper.getAttributeName( member, sortableFieldAnnotation.forField() );
+		String sortedFieldAbsoluteName = prefix + sortedFieldRelativeName;
 		String idFieldPath = parseContext.getIdFieldPath();
 
 		// Make sure a sort on the id field is only added to the idPropertyMetadata
-		if ( isIdProperty && !sortedFieldName.equals( idFieldPath )
-				|| !isIdProperty && sortedFieldName.equalsIgnoreCase( idFieldPath ) ) {
+		if ( isIdProperty && !sortedFieldAbsoluteName.equals( idFieldPath )
+				|| !isIdProperty && sortedFieldAbsoluteName.equalsIgnoreCase( idFieldPath ) ) {
 			return;
 		}
 
-		if ( !sortedFieldName.equals( idFieldPath ) && !containsField( propertyMetadataBuilder, sortedFieldName ) ) {
+		if ( !sortedFieldAbsoluteName.equals( idFieldPath ) && !containsField( propertyMetadataBuilder, sortedFieldAbsoluteName ) ) {
 			if ( parseContext.getLevel() != 0 ) {
 				// Sortable defined on a property not indexed when the entity is embedded. We can skip it.
 				return;
 			}
-			throw log.sortableFieldRefersToUndefinedField( typeMetadataBuilder.getIndexedType(), propertyMetadataBuilder.getPropertyAccessor().getName(), sortedFieldName );
+			throw log.sortableFieldRefersToUndefinedField( typeMetadataBuilder.getIndexedType(), propertyMetadataBuilder.getPropertyAccessor().getName(), sortedFieldAbsoluteName );
 		}
 
 		SortableFieldMetadata fieldMetadata = new SortableFieldMetadata.Builder()
-			.fieldName( sortedFieldName )
+			.fieldName( sortedFieldAbsoluteName )
 			.build();
 
 		propertyMetadataBuilder.addSortableField( fieldMetadata );
@@ -980,7 +984,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private boolean containsField(PropertyMetadata.Builder propertyMetadataBuilder, String fieldName) {
 		for ( DocumentFieldMetadata field : propertyMetadataBuilder.getFieldMetadata() ) {
-			if ( field.getName().equals( fieldName ) ) {
+			if ( field.getAbsoluteName().equals( fieldName ) ) {
 				return true;
 			}
 		}
@@ -1237,8 +1241,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			typeMetadataBuilder.disableStateInspectionOptimization();
 		}
 
-		final String unPrefixedFieldName = ReflectionHelper.getAttributeName( member, fieldAnnotation.name() );
-		final String fieldName = prefix + unPrefixedFieldName;
+		final String relativeFieldName = ReflectionHelper.getAttributeName( member, fieldAnnotation.name() );
+		final String absoluteFieldName = prefix + relativeFieldName;
 		Store store = fieldAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex(
 				fieldAnnotation.index(),
@@ -1247,7 +1251,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( fieldAnnotation.termVector() );
 
-		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( unPrefixedFieldName );
+		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( relativeFieldName );
 
 		FieldBridge fieldBridge;
 		if ( parseContext.skipFieldBridges() ) {
@@ -1266,7 +1270,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		final NumericEncodingType numericEncodingType = determineNumericFieldEncoding( fieldBridge );
-		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldAnnotation, configContext, numericEncodingType, fieldName );
+		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldAnnotation, configContext, numericEncodingType, absoluteFieldName );
 		if ( nullTokenCodec != NotEncodingCodec.SINGLETON && fieldBridge instanceof TwoWayFieldBridge ) {
 			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
 		}
@@ -1274,7 +1278,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		// adjust the type analyzer
 		analyzerReference = typeMetadataBuilder.addToScopedAnalyzerReference(
-				fieldName,
+				absoluteFieldName,
 				analyzerReference,
 				index
 		);
@@ -1287,7 +1291,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
 					typeMetadataBuilder.getResultReference(),
 					propertyMetadataBuilder.getResultReference(),
-					fieldName,
+					absoluteFieldName,
 					store,
 					Field.Index.NO.equals( index ) ? index : Field.Index.NOT_ANALYZED_NO_NORMS,
 					termVector
@@ -1303,7 +1307,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
 					typeMetadataBuilder.getResultReference(),
 					propertyMetadataBuilder.getResultReference(),
-					fieldName,
+					absoluteFieldName,
 					store,
 					index,
 					termVector
@@ -1318,16 +1322,17 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		for ( Facet facetAnnotation : facetAnnotations ) {
 			if ( Analyze.YES.equals( fieldAnnotation.analyze() ) ) {
-				throw log.attemptToFacetOnAnalyzedField( fieldName, member.getDeclaringClass().getName() );
+				throw log.attemptToFacetOnAnalyzedField( absoluteFieldName, member.getDeclaringClass().getName() );
 			}
-			String facetName;
+			String relativeFacetFieldName = facetAnnotation.name();
+			String absoluteFacetFieldName;
 			if ( facetAnnotation.name().isEmpty() ) {
-				facetName = fieldName; // if not explicitly set the facet name is the same as the field name
+				absoluteFacetFieldName = absoluteFieldName; // if not explicitly set the facet name is the same as the field name
 			}
 			else {
-				facetName = prefix + facetAnnotation.name();
+				absoluteFacetFieldName = prefix + relativeFacetFieldName;
 			}
-			FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder( facetName );
+			FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder( absoluteFacetFieldName );
 			FacetEncodingType facetEncodingType = determineFacetEncodingType( member, facetAnnotation );
 			facetMetadataBuilder.setFacetEncoding( facetEncodingType );
 			fieldMetadataBuilder.addFacetMetadata( facetMetadataBuilder.build() );
@@ -2004,7 +2009,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private FieldMetadataBuilderImpl getBridgeContributedFieldMetadata(DocumentFieldMetadata.Builder fieldMetadataBuilder,
 			MetadataProvidingFieldBridge metadataProvidingFieldBridge) {
 		FieldMetadataBuilderImpl builder = new FieldMetadataBuilderImpl( fieldMetadataBuilder.getResultReference() );
-		metadataProvidingFieldBridge.configureFieldMetadata( fieldMetadataBuilder.getFieldName(), builder );
+		metadataProvidingFieldBridge.configureFieldMetadata( fieldMetadataBuilder.getAbsoluteName(), builder );
 		return builder;
 	}
 

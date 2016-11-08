@@ -102,7 +102,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 			boolean isStored = fieldMetadata.getStore() != Store.NO;
 			boolean isIdOrEmbeddedId = fieldMetadata.isId() || fieldMetadata.isIdInEmbedded();
 			if ( ( hasTermVector || isStored ) && !isIdOrEmbeddedId ) {
-				fieldNames.add( fieldMetadata.getName() );
+				fieldNames.add( fieldMetadata.getAbsoluteName() );
 			}
 		}
 		if ( fieldNames.size() == 0 ) {
