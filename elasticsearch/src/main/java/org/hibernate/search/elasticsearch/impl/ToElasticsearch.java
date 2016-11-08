@@ -50,6 +50,11 @@ import com.google.gson.JsonObject;
  */
 public class ToElasticsearch {
 
+	/*
+	 * A specific suffix for facet fields that avoids conflicts with existing names.
+	 */
+	public static final String FACET_FIELD_SUFFIX = "__HSearch_Facet";
+
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final int DEFAULT_SLOP = 0;
@@ -59,22 +64,24 @@ public class ToElasticsearch {
 	private ToElasticsearch() {
 	}
 
-	public static void addFacetingRequest(JsonBuilder.Object jsonQuery, FacetingRequest facetingRequest) {
-		String fieldName = facetingRequest.getFieldName();
+	public static void addFacetingRequest(JsonBuilder.Object jsonQuery, FacetingRequest facetingRequest,
+			String sourceFieldAbsoluteName, String facetRelativeName) {
+		String aggregationFieldName = sourceFieldAbsoluteName + "." + facetRelativeName + FACET_FIELD_SUFFIX;
+
 		if ( facetingRequest instanceof DiscreteFacetRequest ) {
 			JsonObject termsJsonQuery = JsonBuilder.object().add( "terms",
 					JsonBuilder.object()
-							.addProperty( "field", fieldName )
+							.addProperty( "field", aggregationFieldName )
 							.addProperty( "size", facetingRequest.getMaxNumberOfFacets() == -1 ? Integer.MAX_VALUE : facetingRequest.getMaxNumberOfFacets() )
 							.add( "order", fromFacetSortOrder( facetingRequest.getSort() ) )
 							.addProperty( "min_doc_count", facetingRequest.hasZeroCountsIncluded() ? 0 : 1 )
 					).build();
 
-			if ( isNested( fieldName ) ) {
+			if ( isNested( sourceFieldAbsoluteName ) ) {
 				JsonBuilder.Object facetJsonQuery = JsonBuilder.object();
 				facetJsonQuery.add( "nested", JsonBuilder.object()
-								.addProperty( "path", FieldHelper.getEmbeddedFieldPath( fieldName ) ) );
-				facetJsonQuery.add( "aggregations", JsonBuilder.object().add( facetingRequest.getFacetingName(), termsJsonQuery ) );
+								.addProperty( "path", FieldHelper.getEmbeddedFieldPath( sourceFieldAbsoluteName ) + "." + facetRelativeName + FACET_FIELD_SUFFIX ) );
+				facetJsonQuery.add( "aggregations", JsonBuilder.object().add( aggregationFieldName, termsJsonQuery ) );
 				jsonQuery.add( facetingRequest.getFacetingName(), facetJsonQuery );
 			}
 			else {
@@ -92,9 +99,9 @@ public class ToElasticsearch {
 					comparisonFragment.addProperty( facetRange.isMaxIncluded() ? "lte" : "lt", facetRange.getMax() );
 				}
 
-				JsonObject rangeQuery = wrapQueryForNestedIfRequired( fieldName,
+				JsonObject rangeQuery = wrapQueryForNestedIfRequired( aggregationFieldName,
 						JsonBuilder.object().add( "range",
-								JsonBuilder.object().add( fieldName, comparisonFragment ) ).build() );
+								JsonBuilder.object().add( aggregationFieldName, comparisonFragment ) ).build() );
 
 				jsonQuery.add( facetingRequest.getFacetingName() + "-" + facetRange.getIdentifier(),
 						JsonBuilder.object().add( "filter", rangeQuery ) );
