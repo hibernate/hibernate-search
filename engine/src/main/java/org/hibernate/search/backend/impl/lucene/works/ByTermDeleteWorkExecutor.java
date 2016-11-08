@@ -67,11 +67,11 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 		TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 		termDeleteQueryBuilder.add( tenantTermQuery, Occur.FILTER );
 		if ( isIdNumeric( builder ) ) {
-			Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
+			Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id );
 			termDeleteQueryBuilder.add( exactMatchQuery, Occur.FILTER );
 		}
 		else {
-			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+			Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
 			termDeleteQueryBuilder.add( new TermQuery( idTerm ), Occur.FILTER );
 		}
 		BooleanQuery termDeleteQuery = termDeleteQueryBuilder.build();
@@ -80,10 +80,10 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 
 	private void deleteWithoutTenant(LuceneWork work, IndexWriterDelegate delegate, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
 		if ( isIdNumeric( builder ) ) {
-			delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
+			delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id ) );
 		}
 		else {
-			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+			Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
 			//The point to this class is to avoid using a Query to perform the delete operation!
 			delegate.deleteDocuments( idTerm );
 		}

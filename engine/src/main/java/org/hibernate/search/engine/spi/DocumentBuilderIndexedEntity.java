@@ -127,10 +127,14 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 */
 	private boolean idProvided;
 
-	private final String identifierName;
+	/**
+	 * The name of the property holding the document id.
+	 * <p>Null if the id is {@link ProvidedId provided}.
+	 */
+	private final String idPropertyName;
 
 	/**
-	 * The document field name of the document id
+	 * The document field name of the document id.
 	 */
 	private final String idFieldName;
 
@@ -179,7 +183,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			);
 		}
 		this.entityState = EntityState.INDEXED;
-		this.identifierName = idProvided ? null : idPropertyMetadata.getPropertyAccessor().getName();
+		this.idPropertyName = idProvided ? null : idPropertyMetadata.getPropertyAccessor().getName();
 
 		this.nestingContextFactory = getNestingContextFactory( context );
 	}
@@ -949,8 +953,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 	}
 
-	public String getIdentifierName() {
-		return identifierName;
+	public String getIdPropertyName() {
+		return idPropertyName;
 	}
 
 	public boolean allowFieldSelectionInProjection() {
@@ -971,7 +975,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return (TwoWayFieldBridge) idPropertyMetadata.getFieldMetadata( idFieldName ).getFieldBridge();
 	}
 
-	public String getIdKeywordName() {
+	public String getIdFieldName() {
 		return idPropertyMetadata.getFieldMetadata( idFieldName ).getAbsoluteName();
 	}
 
@@ -998,8 +1002,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			throw new AssertionFailure( "Field name should not be null" );
 		}
 
-		final DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
-		final FieldBridge bridge = fieldName.equals( idFieldMetaData.getAbsoluteName() ) ?
+		final FieldBridge bridge = fieldName.equals( getIdFieldName() ) ?
 				getIdBridge() :
 				getBridge( getMetadata(), fieldName );
 

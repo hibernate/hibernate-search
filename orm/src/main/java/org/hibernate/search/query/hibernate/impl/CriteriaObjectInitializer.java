@@ -165,7 +165,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 				entityInfos.iterator().next().getClazz(),
 				objectInitializationContext.getExtendedSearchIntegrator()
 		);
-		String idName = documentBuilder.getIdentifierName();
+		String idName = documentBuilder.getIdPropertyName();
 		Disjunction disjunction = Restrictions.disjunction();
 
 		int maxResults = entityInfos.size();

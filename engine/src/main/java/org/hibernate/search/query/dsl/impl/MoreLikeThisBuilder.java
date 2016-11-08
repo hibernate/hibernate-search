@@ -162,7 +162,7 @@ public class MoreLikeThisBuilder<T> {
 		if ( id == null ) {
 			return null;
 		}
-		findById = new TermQuery( new Term( documentBuilder.getIdKeywordName(), id ) );
+		findById = new TermQuery( new Term( documentBuilder.getIdFieldName(), id ) );
 		HSQuery query = queryContext.getFactory().createHSQuery( findById, queryContext.getEntityType() );
 		List<EntityInfo> entityInfos = query
 				.maxResults( 1 )

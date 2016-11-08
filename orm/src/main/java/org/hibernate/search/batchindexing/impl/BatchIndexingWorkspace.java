@@ -85,7 +85,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		this.tenantId = tenantId;
 		this.idNameOfIndexedType = extendedIntegrator.getIndexBinding( entityType )
 				.getDocumentBuilder()
-				.getIdentifierName();
+				.getIdPropertyName();
 		this.sessionFactory = sessionFactory;
 
 		//thread pool sizing:
