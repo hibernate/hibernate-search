@@ -83,7 +83,7 @@ public class TypeMetadata {
 	private final Set<DocumentFieldMetadata> documentFieldMetadata;
 
 	/**
-	 * Metadata for a document field keyed against the field name.
+	 * Metadata for a document field keyed against the field absolute name.
 	 * <p>This does not include document fields from embedded types.
 	 * <p><strong>Caution</strong>: this may not include every document metadata, most notably
 	 * because document fields generated for class bridges may not have a name, and there may
@@ -92,7 +92,7 @@ public class TypeMetadata {
 	private final Map<String, DocumentFieldMetadata> documentFieldNameToFieldMetadata;
 
 	/**
-	 * Metadata for a bridge-defined field keyed against the field name
+	 * Metadata for a bridge-defined field keyed against the field absolute name.
 	 */
 	private final Map<String, BridgeDefinedField> bridgeDefinedFieldNameToFieldMetadata;
 
@@ -112,7 +112,8 @@ public class TypeMetadata {
 	private final Set<DocumentFieldMetadata> classBridgeFields;
 
 	/**
-	 * Document field metadata keyed against the field name. These fields are contributed by class bridges
+	 * Document field metadata keyed against the field absolute name.
+	 * <p>These fields are contributed by class bridges.
 	 */
 	private final Map<String, DocumentFieldMetadata> classBridgeFieldNameToDocumentFieldMetadata;
 
@@ -411,7 +412,7 @@ public class TypeMetadata {
 	private Map<String, DocumentFieldMetadata> buildFieldMetadataMap(Set<DocumentFieldMetadata> documentFieldMetadataSet) {
 		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataSet ) {
-			String name = documentFieldMetadata.getName();
+			String name = documentFieldMetadata.getAbsoluteName();
 			if ( StringHelper.isEmpty( name ) ) {
 				continue;
 			}
@@ -434,12 +435,12 @@ public class TypeMetadata {
 		Map<String, BridgeDefinedField> tmpMap = new HashMap<String, BridgeDefinedField>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
 			for ( BridgeDefinedField bridgeDefinedField : documentFieldMetadata.getBridgeDefinedFields().values() ) {
-				tmpMap.put( bridgeDefinedField.getName(), bridgeDefinedField );
+				tmpMap.put( bridgeDefinedField.getAbsoluteName(), bridgeDefinedField );
 			}
 		}
 		for ( DocumentFieldMetadata documentFieldMetadata : classBridgeFields ) {
 			for ( BridgeDefinedField bridgeDefinedField : documentFieldMetadata.getBridgeDefinedFields().values() ) {
-				tmpMap.put( bridgeDefinedField.getName(), bridgeDefinedField );
+				tmpMap.put( bridgeDefinedField.getAbsoluteName(), bridgeDefinedField );
 			}
 		}
 		return Collections.unmodifiableMap( tmpMap );
@@ -448,7 +449,7 @@ public class TypeMetadata {
 	private Map<String, DocumentFieldMetadata> copyClassBridgeMetadata(Set<DocumentFieldMetadata> classBridgeFields) {
 		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
 		for ( DocumentFieldMetadata fieldMetadata : classBridgeFields ) {
-			tmpMap.put( fieldMetadata.getName(), fieldMetadata );
+			tmpMap.put( fieldMetadata.getAbsoluteName(), fieldMetadata );
 		}
 		return Collections.unmodifiableMap( tmpMap );
 	}
@@ -527,9 +528,9 @@ public class TypeMetadata {
 		public Builder addProperty(PropertyMetadata propertyMetadata) {
 			if ( idPropertyMetadata != null && idPropertyMetadata.getPropertyAccessorName() != null ) {
 				// the id property is always a single field
-				String idFieldName = idPropertyMetadata.getFieldMetadataSet().iterator().next().getName();
+				String idFieldName = idPropertyMetadata.getFieldMetadataSet().iterator().next().getAbsoluteName();
 				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
-					if ( idFieldName.equals( fieldMetadata.getName() ) ) {
+					if ( idFieldName.equals( fieldMetadata.getAbsoluteName() ) ) {
 						throw log.fieldTriesToOverrideIdFieldSettings(
 								propertyMetadata.getPropertyAccessor().getDeclaringClass().getName(),
 								propertyMetadata.getPropertyAccessor().getName()

@@ -168,7 +168,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			throw log.noDocumentIdFoundException( clazz.getName() );
 		}
 
-		idFieldName = idPropertyMetadata.getFieldMetadataSet().iterator().next().getName();
+		idFieldName = idPropertyMetadata.getFieldMetadataSet().iterator().next().getAbsoluteName();
 
 		checkAllowFieldSelection();
 		if ( log.isDebugEnabled() ) {
@@ -214,7 +214,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	@Override
 	public void addWorkToQueue(String tenantId, Class<?> entityClass, Object entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
 		DocumentFieldMetadata idFieldMetadata = idPropertyMetadata.getFieldMetadata( idFieldName );
-		String idInString = objectToString( getIdBridge(), idFieldMetadata.getName(), id, contextualBridge );
+		String idInString = objectToString( getIdBridge(), idFieldMetadata.getAbsoluteName(), id, contextualBridge );
 		if ( delete && !add ) {
 			queue.add( new DeleteLuceneWork( tenantId, id, idInString, entityClass ) );
 		}
@@ -363,10 +363,10 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			LuceneOptions luceneOptions = new LuceneOptionsImpl( idFieldMetaData, idFieldMetaData.getBoost(), documentLevelBoost );
 			final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( getIdBridge() );
 			conversionContext.setClass( entityType );
-			conversionContext.pushProperty( idFieldMetaData.getName() );
+			conversionContext.pushProperty( idFieldMetaData.getAbsoluteName() );
 
 			try {
-				contextualizedBridge.set( idFieldMetaData.getName(), id, doc, luceneOptions );
+				contextualizedBridge.set( idFieldMetaData.getAbsoluteName(), id, doc, luceneOptions );
 				addSortFieldDocValues( doc, idPropertyMetadata, documentLevelBoost, id );
 			}
 			finally {
@@ -631,7 +631,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 					final FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
-					final String fieldName = fieldMetadata.getName();
+					final String fieldName = fieldMetadata.getAbsoluteName();
 					final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext(
 							fieldBridge
 					);
@@ -651,7 +651,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						faceting.enableFacetProcessing();
 						for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
 							if ( multiValued ) {
-								faceting.setMultiValued( facetMetadata.getFacetName() );
+								faceting.setMultiValued( facetMetadata.getAbsoluteName() );
 							}
 							addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
 						}
@@ -687,13 +687,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				if ( stringValue.isEmpty() ) {
 					return;
 				}
-				facetField = new SortedSetDocValuesFacetField( facetMetadata.getFacetName(), stringValue );
+				facetField = new SortedSetDocValuesFacetField( facetMetadata.getAbsoluteName(), stringValue );
 				break;
 			}
 			case LONG: {
 				if ( value instanceof Number ) {
 					facetField = new NumericDocValuesField(
-							facetMetadata.getFacetName(),
+							facetMetadata.getAbsoluteName(),
 							( (Number) value ).longValue()
 					);
 				}
@@ -705,23 +705,23 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						NumericEncodingDateBridge dateBridge = (NumericEncodingDateBridge) fieldBridge;
 						long numericDateValue = DateTools.round( date.getTime(), dateBridge.getResolution() );
 
-						facetField = new NumericDocValuesField( facetMetadata.getFacetName(), numericDateValue );
+						facetField = new NumericDocValuesField( facetMetadata.getAbsoluteName(), numericDateValue );
 					}
 					else if ( fieldBridge instanceof TwoWayFieldBridge ) {
 						// Date might be stored in String for specific backends (Elasticsearch for instance).
-						facetField = new SortedSetDocValuesFacetField( facetMetadata.getFacetName(),
+						facetField = new SortedSetDocValuesFacetField( facetMetadata.getAbsoluteName(),
 								( (TwoWayFieldBridge) fieldBridge ).objectToString( value ) );
 					}
 					else {
 						throw log.numericDateFacetForNonNumericField(
-								facetMetadata.getFacetName(),
-								fieldMetadata.getFieldName() );
+								facetMetadata.getAbsoluteName(),
+								fieldMetadata.getAbsoluteName() );
 					}
 				}
 				else if ( Calendar.class.isAssignableFrom( value.getClass() ) ) {
 					Calendar calendar = (Calendar) value;
 					facetField = new NumericDocValuesField(
-							facetMetadata.getFacetName(),
+							facetMetadata.getAbsoluteName(),
 							calendar.getTime().getTime()
 					);
 				}
@@ -733,7 +733,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			case DOUBLE: {
 				if ( value instanceof Number ) {
 					facetField = new DoubleDocValuesField(
-							facetMetadata.getFacetName(),
+							facetMetadata.getAbsoluteName(),
 							( (Number) value ).doubleValue()
 					);
 				}
@@ -768,11 +768,11 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		for ( SortableFieldMetadata sortField : propertyMetadata.getSortableFieldMetadata() ) {
 			// field marked as sortable by custom bridge to allow sort field validation pass, but that bridge itself is
 			// in charge of adding the required field
-			if ( propertyMetadata.getDeclaringType().getBridgeDefinedFieldMetadataFor( sortField.getFieldName() ) != null ) {
+			if ( propertyMetadata.getDeclaringType().getBridgeDefinedFieldMetadataFor( sortField.getAbsoluteName() ) != null ) {
 				continue;
 			}
 
-			DocumentFieldMetadata fieldMetaData = propertyMetadata.getFieldMetadata( sortField.getFieldName() );
+			DocumentFieldMetadata fieldMetaData = propertyMetadata.getFieldMetadata( sortField.getAbsoluteName() );
 			if ( fieldMetaData == null ) {
 				throw new AssertionFailure( "A sortable field did not match neither an @Field nor a bridge-defined field" );
 			}
@@ -804,7 +804,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				field = dummy.getField( "dummy" );
 			}
 			else {
-				field = document.getField( sortField.getFieldName() );
+				field = document.getField( sortField.getAbsoluteName() );
 			}
 
 			if ( field != null ) {
@@ -812,13 +812,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 				if ( numericValue != null ) {
 					if ( numericValue instanceof Double ) {
-						document.add( new DoubleDocValuesField( sortField.getFieldName(), (double) numericValue ) );
+						document.add( new DoubleDocValuesField( sortField.getAbsoluteName(), (double) numericValue ) );
 					}
 					else if ( numericValue instanceof Float ) {
-						document.add( new FloatDocValuesField( sortField.getFieldName(), (float) numericValue ) );
+						document.add( new FloatDocValuesField( sortField.getAbsoluteName(), (float) numericValue ) );
 					}
 					else {
-						document.add( new NumericDocValuesField( sortField.getFieldName(), numericValue.longValue() ) );
+						document.add( new NumericDocValuesField( sortField.getAbsoluteName(), numericValue.longValue() ) );
 					}
 				}
 				else {
@@ -832,10 +832,10 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						 * Analysis is skipped altogether when the analyzer is remote. It's up to the backend to handle it.
 						 */
 						Analyzer analyzer = analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
-						value = InternalAnalyzerUtils.analyzeSortableValue( analyzer, sortField.getFieldName(), value );
+						value = InternalAnalyzerUtils.analyzeSortableValue( analyzer, sortField.getAbsoluteName(), value );
 					}
 					if ( value != null ) {
-						document.add( new SortedDocValuesField( sortField.getFieldName(), new BytesRef( value ) ) );
+						document.add( new SortedDocValuesField( sortField.getAbsoluteName(), new BytesRef( value ) ) );
 					}
 				}
 			}
@@ -847,7 +847,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			ConversionContext conversionContext, float documentBoost, Object unproxiedInstance) {
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
 			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
-			final String fieldName = fieldMetadata.getName();
+			final String fieldName = fieldMetadata.getAbsoluteName();
 			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
 			conversionContext.pushProperty( fieldName );
 			try {
@@ -972,7 +972,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	public String getIdKeywordName() {
-		return idPropertyMetadata.getFieldMetadata( idFieldName ).getName();
+		return idPropertyMetadata.getFieldMetadata( idFieldName ).getAbsoluteName();
 	}
 
 	/**
@@ -999,7 +999,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 
 		final DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
-		final FieldBridge bridge = fieldName.equals( idFieldMetaData.getName() ) ?
+		final FieldBridge bridge = fieldName.equals( idFieldMetaData.getAbsoluteName() ) ?
 				getIdBridge() :
 				getBridge( getMetadata(), fieldName );
 

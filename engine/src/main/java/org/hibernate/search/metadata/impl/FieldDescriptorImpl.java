@@ -42,7 +42,7 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 	private final Type fieldType;
 
 	public FieldDescriptorImpl(DocumentFieldMetadata documentFieldMetadata) {
-		this.name = documentFieldMetadata.getName();
+		this.name = documentFieldMetadata.getAbsoluteName();
 		this.index = determineIndexType( documentFieldMetadata.getIndex() );
 		this.analyze = determineAnalyzeType( documentFieldMetadata.getIndex() );
 		this.store = documentFieldMetadata.getStore();

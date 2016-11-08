@@ -55,7 +55,7 @@ public class PropertyMetadata {
 	private Map<String, DocumentFieldMetadata> createDocumentFieldMetadataMap(Set<DocumentFieldMetadata> fieldMetadataSet) {
 		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<>();
 		for ( DocumentFieldMetadata documentFieldMetadata : fieldMetadataSet ) {
-			tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
+			tmpMap.put( documentFieldMetadata.getAbsoluteName(), documentFieldMetadata );
 		}
 		return Collections.unmodifiableMap( tmpMap );
 	}
