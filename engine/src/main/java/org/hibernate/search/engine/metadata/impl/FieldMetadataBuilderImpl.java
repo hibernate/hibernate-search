@@ -20,8 +20,8 @@ import org.hibernate.search.bridge.spi.FieldType;
  */
 class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
-	private final Set<String> sortableFields = new HashSet<>();
-	private final Set<BridgeDefinedField> fields = new HashSet<>();
+	private final Set<String> sortableFieldsAbsoluteNames = new HashSet<>();
+	private final Set<BridgeDefinedField> bridgeDefinedFields = new HashSet<>();
 	private final BackReference<DocumentFieldMetadata> fieldMetadata;
 
 	public FieldMetadataBuilderImpl(BackReference<DocumentFieldMetadata> fieldMetadata) {
@@ -33,12 +33,12 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 		return new FieldMetadataCreationContextImpl( name, type );
 	}
 
-	public Set<String> getSortableFields() {
-		return sortableFields;
+	public Set<String> getSortableFieldsAbsoluteNames() {
+		return sortableFieldsAbsoluteNames;
 	}
 
-	public Set<BridgeDefinedField> getFields() {
-		return fields;
+	public Set<BridgeDefinedField> getBridgeDefinedFields() {
+		return bridgeDefinedFields;
 	}
 
 	private class FieldMetadataCreationContextImpl implements FieldMetadataCreationContext {
@@ -47,7 +47,7 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
 		public FieldMetadataCreationContextImpl(String name, FieldType type) {
 			this.absoluteFieldName = name;
-			fields.add( new BridgeDefinedField( fieldMetadata, name, type ) );
+			bridgeDefinedFields.add( new BridgeDefinedField( fieldMetadata, name, type ) );
 		}
 
 		@Override
@@ -57,7 +57,7 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
 		@Override
 		public FieldMetadataCreationContext sortable(boolean sortable) {
-			sortableFields.add( absoluteFieldName );
+			sortableFieldsAbsoluteNames.add( absoluteFieldName );
 			return this;
 		}
 	}

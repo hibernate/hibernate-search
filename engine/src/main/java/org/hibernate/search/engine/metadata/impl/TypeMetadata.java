@@ -627,9 +627,9 @@ public class TypeMetadata {
 			return "TypeMetadata.Builder{indexedType=" + indexedType + "}";
 		}
 
-		public void addClassBridgeSortableFields(Iterable<String> sortableFieldNames) {
-			for ( String sortableFieldName : sortableFieldNames ) {
-				classBridgeSortableFieldMetadata.add( new SortableFieldMetadata.Builder().fieldName( sortableFieldName ).build() );
+		public void addClassBridgeSortableFields(Iterable<String> sortableFieldsAbsoluteNames) {
+			for ( String sortableFieldAbsoluteName : sortableFieldsAbsoluteNames ) {
+				classBridgeSortableFieldMetadata.add( new SortableFieldMetadata.Builder().fieldName( sortableFieldAbsoluteName ).build() );
 			}
 		}
 
