@@ -69,10 +69,10 @@ public interface ConversionContext {
 	 * All invocations to a push need to cleanup with a {@link #popProperty()},
 	 * especially after exceptions.
 	 *
-	 * @param property the property which is being followed for embedded indexing
+	 * @param propertyName the name of the property which is being followed for embedded indexing
 	 * @return this for method chaining.
 	 */
-	ConversionContext pushProperty(String property);
+	ConversionContext pushProperty(String propertyName);
 
 	/**
 	 * Pops the last pushed property from the stack. See {@link #pushIdentifierProperty()}

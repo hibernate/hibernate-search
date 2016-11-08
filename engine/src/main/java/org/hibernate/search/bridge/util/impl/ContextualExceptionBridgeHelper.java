@@ -49,8 +49,8 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	}
 
 	@Override
-	public ConversionContext pushProperty(String property) {
-		path.add( property );
+	public ConversionContext pushProperty(String propertyName) {
+		path.add( propertyName );
 		return this;
 	}
 
