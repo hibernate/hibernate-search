@@ -165,7 +165,7 @@ public final class DocumentBuilderHelper {
 				final String fieldName = fieldMetadata.getAbsoluteName();
 				int matchingPosition = getFieldPosition( fields, fieldName );
 				if ( matchingPosition != -1 && result[matchingPosition] == NOT_SET ) {
-					contextualBridge.pushProperty( fieldName );
+					contextualBridge.pushProperty( propertyMetadata.getPropertyAccessorName() );
 					try {
 						populateResult(
 								fieldName,

@@ -52,8 +52,7 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
 			String expectedErrorMessage = "Exception while calling bridge#set\n" +
-					"\tclass: org.hibernate.search.test.bridge.BridgeConversionErrorTest$ClassBridged\n" +
-					"\tpath: test";
+					"\tclass: org.hibernate.search.test.bridge.BridgeConversionErrorTest$ClassBridged";
 			assertEquals( "Wrong error message", expectedErrorMessage, cause.getMessage() );
 		}
 	}

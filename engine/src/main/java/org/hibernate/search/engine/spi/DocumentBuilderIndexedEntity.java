@@ -367,14 +367,19 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			LuceneOptions luceneOptions = new LuceneOptionsImpl( idFieldMetaData, idFieldMetaData.getBoost(), documentLevelBoost );
 			final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( getIdBridge() );
 			conversionContext.setClass( entityType );
-			conversionContext.pushProperty( idFieldMetaData.getAbsoluteName() );
+
+			if ( idPropertyName != null ) {
+				conversionContext.pushProperty( idPropertyName );
+			}
 
 			try {
 				contextualizedBridge.set( idFieldMetaData.getAbsoluteName(), id, doc, luceneOptions );
 				addSortFieldDocValues( doc, idPropertyMetadata, documentLevelBoost, id );
 			}
 			finally {
-				conversionContext.popProperty();
+				if ( idPropertyName != null ) {
+					conversionContext.popProperty();
+				}
 			}
 		}
 
@@ -853,18 +858,12 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
 			final String fieldName = fieldMetadata.getAbsoluteName();
 			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
-			conversionContext.pushProperty( fieldName );
-			try {
-				oneWayConversionContext.set(
-						fieldName,
-						unproxiedInstance,
-						doc,
-						typeMetadata.getClassLuceneOptions( fieldMetadata, documentBoost )
-				);
-			}
-			finally {
-				conversionContext.popProperty();
-			}
+			oneWayConversionContext.set(
+					fieldName,
+					unproxiedInstance,
+					doc,
+					typeMetadata.getClassLuceneOptions( fieldMetadata, documentBoost )
+			);
 		}
 	}
 
