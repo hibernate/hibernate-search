@@ -97,7 +97,7 @@ public class TypeMetadata {
 	private final Map<String, BridgeDefinedField> bridgeDefinedFieldNameToFieldMetadata;
 
 	/**
-	 * Metadata for a Java property (field or getter) keyed  the property name
+	 * Metadata for a Java property (field or getter) keyed against the property name.
 	 */
 	private final Map<String, PropertyMetadata> propertyGetterNameToPropertyMetadata;
 
