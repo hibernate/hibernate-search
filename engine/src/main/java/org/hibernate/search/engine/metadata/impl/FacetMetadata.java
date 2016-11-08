@@ -15,13 +15,23 @@ import org.hibernate.search.annotations.FacetEncodingType;
  */
 public class FacetMetadata {
 
+	private final BackReference<DocumentFieldMetadata> sourceField;
+
 	private final DocumentFieldPath path;
 
 	private final FacetEncodingType encoding;
 
 	private FacetMetadata(Builder builder) {
+		this.sourceField = builder.sourceField;
 		this.path = builder.path;
 		this.encoding = builder.encoding;
+	}
+
+	/**
+	 * @return The {@link DocumentFieldMetadata} to which the facet applies.
+	 */
+	public DocumentFieldMetadata getSourceField() {
+		return sourceField.get();
 	}
 
 	/**
@@ -44,12 +54,15 @@ public class FacetMetadata {
 
 	public static class Builder {
 		// required parameters
+		private final BackReference<DocumentFieldMetadata> sourceField;
 		private final DocumentFieldPath path;
 
 		// optional parameters
 		private FacetEncodingType encoding = FacetEncodingType.AUTO;
 
-		public Builder(DocumentFieldPath path) {
+		public Builder(BackReference<DocumentFieldMetadata> sourceField,
+				DocumentFieldPath path) {
+			this.sourceField = sourceField;
 			this.path = path;
 		}
 
@@ -65,6 +78,7 @@ public class FacetMetadata {
 	@Override
 	public String toString() {
 		return "FacetMetadata{" +
+				"sourceField='" + sourceField + '\'' +
 				"path='" + path + '\'' +
 				", encoding=" + encoding +
 				'}';
