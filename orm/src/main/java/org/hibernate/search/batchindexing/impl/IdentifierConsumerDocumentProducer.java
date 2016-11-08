@@ -264,7 +264,10 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 
 		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
-		conversionContext.pushProperty( docBuilder.getIdFieldName() );
+		String idPropertyName = docBuilder.getIdPropertyName();
+		if ( idPropertyName != null ) {
+			conversionContext.pushProperty( idPropertyName );
+		}
 		String idInString = null;
 		try {
 			idInString = conversionContext
@@ -273,7 +276,9 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 					.objectToString( id );
 		}
 		finally {
-			conversionContext.popProperty();
+			if ( idPropertyName != null ) {
+				conversionContext.popProperty();
+			}
 		}
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
