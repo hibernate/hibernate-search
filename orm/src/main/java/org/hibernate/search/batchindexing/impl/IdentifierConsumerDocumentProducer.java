@@ -264,7 +264,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 
 		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
-		conversionContext.pushProperty( docBuilder.getIdKeywordName() );
+		conversionContext.pushProperty( docBuilder.getIdFieldName() );
 		String idInString = null;
 		try {
 			idInString = conversionContext

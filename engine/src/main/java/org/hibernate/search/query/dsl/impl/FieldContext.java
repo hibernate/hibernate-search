@@ -25,7 +25,7 @@ public class FieldContext {
 	public FieldContext(String field, QueryBuildingContext queryContext) {
 		this.field = field;
 		this.fieldCustomizer = new QueryCustomizer();
-		isIdField = queryContext.getDocumentBuilder().getIdKeywordName().equals( field );
+		isIdField = queryContext.getDocumentBuilder().getIdFieldName().equals( field );
 	}
 
 	public String getField() {

@@ -61,7 +61,7 @@ public final class DocumentBuilderHelper {
 				clazz
 		);
 		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
-		final String fieldName = builderIndexedEntity.getIdKeywordName();
+		final String fieldName = builderIndexedEntity.getIdFieldName();
 		try {
 			return (Serializable) conversionContext
 					.setClass( clazz )
@@ -76,7 +76,7 @@ public final class DocumentBuilderHelper {
 
 	public static String getDocumentIdName(ExtendedSearchIntegrator extendedIntegrator, Class<?> clazz) {
 		DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder( extendedIntegrator, clazz );
-		return documentBuilder.getIdentifierName();
+		return documentBuilder.getIdPropertyName();
 	}
 
 	public static Object[] getDocumentFields(ExtendedSearchIntegrator extendedIntegrator, Class<?> clazz, Document document, String[] fields, ConversionContext conversionContext) {
@@ -85,8 +85,8 @@ public final class DocumentBuilderHelper {
 		Object[] result = new Object[fieldNbr];
 		Arrays.fill( result, NOT_SET );
 		conversionContext.setClass( clazz );
-		if ( builderIndexedEntity.getIdKeywordName() != null ) {
-			final String fieldName = builderIndexedEntity.getIdKeywordName();
+		if ( builderIndexedEntity.getIdFieldName() != null ) {
+			final String fieldName = builderIndexedEntity.getIdFieldName();
 			int matchingPosition = getFieldPosition( fields, fieldName );
 			if ( matchingPosition != -1 ) {
 				conversionContext.pushProperty( fieldName );

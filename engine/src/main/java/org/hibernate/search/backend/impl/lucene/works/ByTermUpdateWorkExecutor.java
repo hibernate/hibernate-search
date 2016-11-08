@@ -60,7 +60,7 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 						managedType,
 						id
 				);
-				Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
+				Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id );
 				BooleanQuery.Builder deleteDocumentsQueryBuilder = new BooleanQuery.Builder();
 				deleteDocumentsQueryBuilder.add( exactMatchQuery, Occur.FILTER );
 				if ( tenantId != null ) {
@@ -73,7 +73,7 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 			}
 			else {
 				log.tracef( "Updating %s#%s by id using an IndexWriter#updateDocument.", managedType, id );
-				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+				Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
 				Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
 				ScopedAnalyzerReference analyzerReference = builder.getAnalyzerReference();
 				analyzerReference = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzerReference, fieldToAnalyzerMap );

@@ -56,10 +56,10 @@ class DeleteWorkExecutor implements LuceneWorkExecutor {
 
 		Query idQueryTerm;
 		if ( isIdNumeric( builder ) ) {
-			idQueryTerm = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
+			idQueryTerm = NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id );
 		}
 		else {
-			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+			Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
 			idQueryTerm = new TermQuery( idTerm );
 		}
 		entityDeletionQueryBuilder.add( idQueryTerm, BooleanClause.Occur.FILTER );

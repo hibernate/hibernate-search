@@ -58,13 +58,13 @@ public final class UpdateExtWorkExecutor extends UpdateWorkExecutor {
 		try {
 			if ( idIsNumeric ) {
 				log.tracef( "Deleting %s#%s by query using an IndexWriter#updateDocument as id is Numeric", managedType, id );
-				delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
+				delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id ) );
 				// no need to log the Add operation as we'll log in the delegate
 				this.addDelegate.performWork( work, delegate, monitor );
 			}
 			else {
 				log.tracef( "Updating %s#%s by id using an IndexWriter#updateDocument.", managedType, id );
-				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+				Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
 				Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
 				ScopedAnalyzerReference analyzerReference = builder.getAnalyzerReference();
 				analyzerReference = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzerReference, fieldToAnalyzerMap );
