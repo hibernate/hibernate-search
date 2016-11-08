@@ -49,10 +49,10 @@ public final class DeleteExtWorkExecutor extends DeleteWorkExecutor {
 		log.tracef( "Removing %s#%s by id using an IndexWriter.", managedType, id );
 		try {
 			if ( idIsNumeric ) {
-				delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
+				delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id ) );
 			}
 			else {
-				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+				Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
 				delegate.deleteDocuments( idTerm );
 			}
 			workspace.notifyWorkApplied( work );

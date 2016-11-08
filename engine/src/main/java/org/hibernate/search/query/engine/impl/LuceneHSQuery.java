@@ -415,8 +415,8 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			for ( EntityIndexBinding entityIndexBinding : indexBindings.values() ) {
 				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
-				if ( builder.getIdKeywordName() != null ) {
-					idFieldNames.add( builder.getIdKeywordName() );
+				if ( builder.getIdFieldName() != null ) {
+					idFieldNames.add( builder.getIdFieldName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 
@@ -444,8 +444,8 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
 				}
 				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
-				if ( builder.getIdKeywordName() != null ) {
-					idFieldNames.add( builder.getIdKeywordName() );
+				if ( builder.getIdFieldName() != null ) {
+					idFieldNames.add( builder.getIdFieldName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 

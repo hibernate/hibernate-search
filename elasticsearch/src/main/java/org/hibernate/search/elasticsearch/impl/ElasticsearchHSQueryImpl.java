@@ -681,11 +681,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 
-			return new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdentifierName(), (Serializable) id, projections );
+			return new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdPropertyName(), (Serializable) id, projections );
 		}
 
 		private Object getId(JsonObject hit, EntityIndexBinding binding, ConversionContext conversionContext) {
-			return getFieldValue( binding, hit, binding.getDocumentBuilder().getIdKeywordName(), conversionContext );
+			return getFieldValue( binding, hit, binding.getDocumentBuilder().getIdFieldName(), conversionContext );
 		}
 
 		/**
