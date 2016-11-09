@@ -62,7 +62,7 @@ final class LuceneBackendQueueTask implements Runnable {
 	private void handleException(Exception e) {
 		ErrorContextBuilder builder = new ErrorContextBuilder();
 		builder.allWorkToBeDone( workList );
-		builder.errorThatOccurred( e );
+		builder.errorThatOccurred( e ).indexManager( resources.getIndexManager() );
 		resources.getErrorHandler().handle( builder.createErrorContext() );
 	}
 
@@ -75,6 +75,7 @@ final class LuceneBackendQueueTask implements Runnable {
 		AbstractWorkspaceImpl workspace = resources.getWorkspace();
 
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
+		errorContextBuilder.indexManager( resources.getIndexManager() );
 		errorContextBuilder.allWorkToBeDone( workList );
 
 		IndexWriterDelegate delegate = workspace.getIndexWriterDelegate( errorContextBuilder );
@@ -96,7 +97,7 @@ final class LuceneBackendQueueTask implements Runnable {
 			someFailureHappened = false;
 		}
 		catch (RuntimeException re) {
-			errorContextBuilder.errorThatOccurred( re );
+			errorContextBuilder.errorThatOccurred( re ).indexManager( resources.getIndexManager() );
 			if ( currentOperation != null ) {
 				errorContextBuilder.addWorkThatFailed( currentOperation );
 			}

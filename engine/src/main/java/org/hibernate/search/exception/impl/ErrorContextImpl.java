@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.ErrorContext;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * @author Amin Mohammed-Coleman
@@ -23,6 +24,8 @@ class ErrorContextImpl implements ErrorContext {
 	private LuceneWork operationAtFault;
 
 	private Throwable throwable;
+
+	private IndexManager indexManager;
 
 	@Override
 	public List<LuceneWork> getFailingOperations() {
@@ -57,6 +60,15 @@ class ErrorContextImpl implements ErrorContext {
 	@Override
 	public boolean hasErrors() {
 		return failingOperations != null && failingOperations.size() > 0;
+	}
+
+	@Override
+	public IndexManager getIndexManager() {
+		return indexManager;
+	}
+
+	public void setIndexManager(IndexManager indexManager) {
+		this.indexManager = indexManager;
 	}
 
 }

@@ -20,6 +20,7 @@ import org.hibernate.search.backend.impl.lucene.works.LuceneWorkExecutor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
@@ -40,6 +41,7 @@ public final class LuceneBackendResources {
 	private final ErrorHandler errorHandler;
 	private final int maxQueueLength;
 	private final String indexName;
+	private final IndexManager indexManager;
 
 	private final ReadLock readLock;
 	private final WriteLock writeLock;
@@ -48,6 +50,7 @@ public final class LuceneBackendResources {
 
 	LuceneBackendResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, Properties props, AbstractWorkspaceImpl workspace) {
 		this.indexName = indexManager.getIndexName();
+		this.indexManager = indexManager;
 		this.errorHandler = context.getErrorHandler();
 		this.workspace = workspace;
 		this.maxQueueLength = PropertiesParseHelper.extractMaxQueueSize( indexName, props );
@@ -57,6 +60,7 @@ public final class LuceneBackendResources {
 	}
 
 	private LuceneBackendResources(LuceneBackendResources previous) {
+		this.indexManager = previous.indexManager;
 		this.indexName = previous.indexName;
 		this.errorHandler = previous.errorHandler;
 		this.workspace = previous.workspace;
@@ -93,6 +97,10 @@ public final class LuceneBackendResources {
 
 	public String getIndexName() {
 		return indexName;
+	}
+
+	public IndexManager getIndexManager() {
+		return indexManager;
 	}
 
 	public IndexWorkVisitor<Void, LuceneWorkExecutor> getWorkVisitor() {
