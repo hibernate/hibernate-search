@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.impl.nullencoding;
 
+import org.hibernate.search.engine.metadata.impl.DocumentFieldPath;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
@@ -22,7 +23,8 @@ public class NumericNullEncodersHelper {
 		// not to be instantiated
 	}
 
-	public static NullMarkerCodec createNumericNullMarkerCodec(NumericEncodingType numericEncodingType, String indexNullAs, String fieldName) {
+	public static NullMarkerCodec createNumericNullMarkerCodec(NumericEncodingType numericEncodingType, String indexNullAs, DocumentFieldPath fieldPath) {
+		String fieldName = fieldPath.getAbsoluteName(); // For use in exception messages
 		switch ( numericEncodingType ) {
 			case DOUBLE:
 				return new NumericDoubleNullCodec( toDouble( indexNullAs, fieldName ) );

@@ -59,6 +59,7 @@ import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.FacetHandling;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldPath;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
@@ -102,7 +103,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				new DocumentFieldMetadata.Builder(
 						BackReference.<TypeMetadata>empty(),
 						BackReference.<PropertyMetadata>empty(),
-						null, null, // No field name
+						new DocumentFieldPath( "", "" ), // No field path
 						Store.NO,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
 						Field.TermVector.NO

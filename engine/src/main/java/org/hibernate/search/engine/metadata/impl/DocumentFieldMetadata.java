@@ -32,8 +32,7 @@ public class DocumentFieldMetadata {
 	private final BackReference<TypeMetadata> sourceType;
 	private final BackReference<PropertyMetadata> sourceProperty;
 
-	private final String absoluteName;
-	private final String relativeName;
+	private final DocumentFieldPath path;
 	private final Store store;
 	private final Field.Index index;
 	private final Field.TermVector termVector;
@@ -61,8 +60,7 @@ public class DocumentFieldMetadata {
 		this.sourceType = builder.sourceType;
 		this.sourceProperty = builder.sourceProperty;
 
-		this.absoluteName = builder.absoluteName;
-		this.relativeName = builder.relativeName;
+		this.path = builder.path;
 		this.store = builder.store;
 		this.index = builder.index;
 		this.termVector = builder.termVector;
@@ -98,17 +96,17 @@ public class DocumentFieldMetadata {
 	}
 
 	/**
-	 * @return The full name of this field, including any indexed-embedded prefix.
+	 * @return The full name of this field, including any indexed-embedded prefix. Equivalent to {@code #getPath().getAbsoluteName()}.
 	 */
 	public String getAbsoluteName() {
-		return absoluteName;
+		return path.getAbsoluteName();
 	}
 
 	/**
-	 * @return The name of this field excluding any indexed-embedded prefix.
+	 * @return The path from the document root to this field.
 	 */
-	public String getRelativeName() {
-		return relativeName;
+	public DocumentFieldPath getPath() {
+		return path;
 	}
 
 	public boolean isId() {
@@ -178,7 +176,7 @@ public class DocumentFieldMetadata {
 	@Override
 	public String toString() {
 		return "DocumentFieldMetadata{" +
-				"fieldName='" + absoluteName + '\'' +
+				"path='" + path + '\'' +
 				", sourceType='" + sourceType + '\'' +
 				", sourceProperty='" + sourceProperty + '\'' +
 				", store=" + store +
@@ -204,8 +202,7 @@ public class DocumentFieldMetadata {
 		// required parameters
 		private final BackReference<TypeMetadata> sourceType;
 		private final BackReference<PropertyMetadata> sourceProperty;
-		private final String absoluteName;
-		private final String relativeName;
+		private final DocumentFieldPath path;
 		private final Store store;
 		private final Field.Index index;
 		private final Field.TermVector termVector;
@@ -226,14 +223,13 @@ public class DocumentFieldMetadata {
 
 		public Builder(BackReference<TypeMetadata> sourceType,
 				BackReference<PropertyMetadata> sourceProperty,
-				String absoluteName, String relativeName,
+				DocumentFieldPath path,
 				Store store,
 				Field.Index index,
 				Field.TermVector termVector) {
 			this.sourceType = sourceType;
 			this.sourceProperty = sourceProperty;
-			this.absoluteName = absoluteName;
-			this.relativeName = relativeName;
+			this.path = path;
 			this.store = store;
 			this.index = index;
 			this.termVector = termVector;
@@ -242,11 +238,11 @@ public class DocumentFieldMetadata {
 		}
 
 		public String getAbsoluteName() {
-			return absoluteName;
+			return path.getAbsoluteName();
 		}
 
 		public String getRelativeName() {
-			return relativeName;
+			return path.getRelativeName();
 		}
 
 		public Builder fieldBridge(FieldBridge fieldBridge) {
@@ -322,7 +318,7 @@ public class DocumentFieldMetadata {
 		@Override
 		public String toString() {
 			return "Builder{" +
-					"absoluteName='" + absoluteName + '\'' +
+					"path='" + path + '\'' +
 					'}';
 		}
 	}

@@ -42,10 +42,10 @@ class NumericFieldsConfiguration {
 	 * @param unprefixedFieldName The name of the field of interest, without any prefixes it may inherited from the
 	 * parent in case it's part of an embedded entity
 	 */
-	NumericField getNumericFieldAnnotation(final String unprefixedFieldName) {
-		fieldsOfProperty.add( unprefixedFieldName );
+	NumericField getNumericFieldAnnotation(final DocumentFieldPath path) {
+		fieldsOfProperty.add( path.getRelativeName() );
 
-		NumericField numericFieldAnnotation = fieldsMarkedAsNumeric.get( unprefixedFieldName );
+		NumericField numericFieldAnnotation = fieldsMarkedAsNumeric.get( path.getRelativeName() );
 
 		if ( numericFieldAnnotation == null ) {
 			numericFieldAnnotation = fieldsMarkedAsNumeric.get( "" );
@@ -54,8 +54,8 @@ class NumericFieldsConfiguration {
 		return numericFieldAnnotation;
 	}
 
-	boolean isNumericField(String unprefixedFieldName) {
-		return getNumericFieldAnnotation( unprefixedFieldName ) != null;
+	boolean isNumericField(DocumentFieldPath path) {
+		return getNumericFieldAnnotation( path ) != null;
 	}
 
 	/**

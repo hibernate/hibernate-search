@@ -20,16 +20,16 @@ public class PathsContext {
 
 	private final Map<String, Boolean> pathsEncounteredState = new HashMap<>();
 
-	public boolean containsPath(String path) {
-		return pathsEncounteredState.keySet().contains( path );
-	}
-
-	public void addPath(String path) {
+	public void addIncludedPath(String path) {
 		pathsEncounteredState.put( path, Boolean.FALSE );
 	}
 
-	public void markEncounteredPath(String path) {
-		pathsEncounteredState.put( path, Boolean.TRUE );
+	public boolean isIncluded(DocumentFieldPath path) {
+		return pathsEncounteredState.keySet().contains( path.getAbsoluteName() );
+	}
+
+	public void markEncounteredPath(DocumentFieldPath path) {
+		pathsEncounteredState.put( path.getAbsoluteName(), Boolean.TRUE );
 	}
 
 	public Set<String> getEncounteredPaths() {

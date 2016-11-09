@@ -29,7 +29,7 @@ public class ParseContext {
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
 	private boolean explicitDocumentId = false;
-	private String idFieldPath;
+	private DocumentFieldPath idFieldPath;
 	private boolean includeEmbeddedObjectId = false;
 
 	public IndexManagerType getIndexManagerType() {
@@ -80,12 +80,12 @@ public class ParseContext {
 		processedClasses.remove( processedClass );
 	}
 
-	boolean isSpatialNameUsed(String name) {
-		return spatialNames.contains( name );
+	boolean isSpatialNameUsed(DocumentFieldPath path) {
+		return spatialNames.contains( path.getAbsoluteName() );
 	}
 
-	void markSpatialNameAsUsed(String name) {
-		spatialNames.add( name );
+	void markSpatialNameAsUsed(DocumentFieldPath path) {
+		spatialNames.add( path.getAbsoluteName() );
 	}
 
 	public XClass getCurrentClass() {
@@ -120,11 +120,11 @@ public class ParseContext {
 		this.level--;
 	}
 
-	public String getIdFieldPath() {
+	public DocumentFieldPath getIdFieldPath() {
 		return idFieldPath;
 	}
 
-	public void setIdFieldPath(String idFieldPath) {
+	public void setIdFieldPath(DocumentFieldPath idFieldPath) {
 		this.idFieldPath = idFieldPath;
 	}
 
