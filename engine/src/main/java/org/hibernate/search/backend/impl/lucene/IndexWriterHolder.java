@@ -27,6 +27,7 @@ import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -40,6 +41,7 @@ class IndexWriterHolder {
 	private final ErrorHandler errorHandler;
 	private final ParameterSet indexParameters;
 	private final DirectoryProvider directoryProvider;
+	private final IndexManager indexManager;
 	private final String indexName;
 
 	// variable state:
@@ -64,6 +66,7 @@ class IndexWriterHolder {
 
 	IndexWriterHolder(ErrorHandler errorHandler, DirectoryBasedIndexManager indexManager) {
 		this.errorHandler = errorHandler;
+		this.indexManager = indexManager;
 		this.indexName = indexManager.getIndexName();
 		this.luceneParameters = indexManager.getIndexingParameters();
 		this.indexParameters = luceneParameters.getIndexParameters();
@@ -250,7 +253,7 @@ class IndexWriterHolder {
 		}
 		final ErrorContext errorContext;
 		if ( errorContextBuilder != null ) {
-			errorContext = errorContextBuilder.errorThatOccurred( ioe ).createErrorContext();
+			errorContext = errorContextBuilder.errorThatOccurred( ioe ).indexManager( indexManager ).createErrorContext();
 			this.errorHandler.handle( errorContext );
 		}
 		else {
