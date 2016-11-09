@@ -18,6 +18,10 @@ public class BridgeDefinedField {
 
 	private final BackReference<DocumentFieldMetadata> sourceField;
 
+	/*
+	 * Here we cannot use DocumentFieldPath because metadata-providing field bridges
+	 * only provide the absolute name, without telling the prefix from the relative name.
+	 */
 	private final String absoluteName;
 	private final FieldType type;
 

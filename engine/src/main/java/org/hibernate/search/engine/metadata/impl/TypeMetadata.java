@@ -563,19 +563,19 @@ public class TypeMetadata {
 		}
 
 		@SuppressWarnings( "deprecation" )
-		public AnalyzerReference addToScopedAnalyzerReference(String fieldName, AnalyzerReference analyzerReference, Field.Index index) {
+		public AnalyzerReference addToScopedAnalyzerReference(DocumentFieldPath fieldPath, AnalyzerReference analyzerReference, Field.Index index) {
 			if ( analyzerReference == null ) {
 				analyzerReference = scopedAnalyzerReferenceBuilder.getGlobalAnalyzerReference();
 			}
 
 			if ( Field.Index.ANALYZED.equals( index ) || Field.Index.ANALYZED_NO_NORMS.equals( index ) ) {
 				if ( analyzerReference != null ) {
-					scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldName, analyzerReference );
+					scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldPath.getAbsoluteName(), analyzerReference );
 				}
 			}
 			else {
 				// no analyzer is used, add a fake one for queries
-				scopedAnalyzerReferenceBuilder.addPassThroughAnalyzerReference( fieldName );
+				scopedAnalyzerReferenceBuilder.addPassThroughAnalyzerReference( fieldPath.getAbsoluteName() );
 			}
 			return analyzerReference;
 		}
