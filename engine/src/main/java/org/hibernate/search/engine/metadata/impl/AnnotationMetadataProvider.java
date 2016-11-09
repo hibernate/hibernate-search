@@ -963,7 +963,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		// Make sure a sort on the id field is only added to the idPropertyMetadata
 		if ( isIdProperty && !sortedFieldAbsoluteName.equals( idFieldPath )
-				|| !isIdProperty && sortedFieldAbsoluteName.equalsIgnoreCase( idFieldPath ) ) {
+				|| !isIdProperty && sortedFieldAbsoluteName.equals( idFieldPath ) ) {
 			return;
 		}
 
