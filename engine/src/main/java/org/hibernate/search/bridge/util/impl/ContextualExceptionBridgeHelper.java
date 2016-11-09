@@ -17,6 +17,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.util.StringHelper;
 
 /**
  * Wrap the exception with an exception provide contextual feedback.
@@ -37,7 +38,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	private TwoWayFieldBridge twoWayBridge;
 
 	//Reused helpers:
-	private final ArrayList<String> path = new ArrayList<String>( 5 ); //half of usual increment size as I don't expect much
+	private final ArrayList<String> propertyPath = new ArrayList<String>( 5 ); //half of usual increment size as I don't expect much
 	private final OneWayConversionContextImpl oneWayAdapter = new OneWayConversionContextImpl();
 	private final TwoWayConversionContextImpl twoWayAdapter = new TwoWayConversionContextImpl();
 	private final StringConversionContextImpl stringAdapter = new StringConversionContextImpl();
@@ -50,16 +51,16 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 
 	@Override
 	public ConversionContext pushProperty(String propertyName) {
-		path.add( propertyName );
+		propertyPath.add( propertyName );
 		return this;
 	}
 
 	@Override
 	public ConversionContext popProperty() {
-		if ( path.size() == 0 ) {
+		if ( propertyPath.size() == 0 ) {
 			throw new IllegalStateException( "Trying to pop a property from an empty conversion context" );
 		}
-		path.remove( path.size() - 1 );
+		propertyPath.remove( propertyPath.size() - 1 );
 		return this;
 	}
 
@@ -69,19 +70,42 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 		return this;
 	}
 
-	protected BridgeException buildBridgeException(Exception e, String method) {
-		StringBuilder error = new StringBuilder( "Exception while calling bridge#" ).append( method );
+	protected BridgeException buildBridgeException(Exception e, String method, String fieldName, Object bridge) {
+		StringBuilder errorMessage = new StringBuilder( "Exception while calling bridge#" ).append( method );
 		if ( clazz != null ) {
-			error.append( "\n\tclass: " ).append( clazz.getName() );
+			errorMessage.append( "\n\tentity class: " ).append( clazz.getName() );
 		}
-		if ( path.size() > 0 ) {
-			error.append( "\n\tpath: " );
-			for ( String pathNode : path ) {
-				error.append( pathNode ).append( "." );
+		if ( propertyPath.size() > 0 ) {
+			errorMessage.append( "\n\tentity property path: " );
+			for ( String pathNode : propertyPath ) {
+				errorMessage.append( pathNode ).append( "." );
 			}
-			error.deleteCharAt( error.length() - 1 );
+			errorMessage.deleteCharAt( errorMessage.length() - 1 );
 		}
-		throw new BridgeException( error.toString(), e );
+		if ( StringHelper.isNotEmpty( fieldName ) ) {
+			errorMessage.append( "\n\tdocument field name: " ).append( fieldName );
+		}
+
+		Throwable exceptionWhenBuildingBridgeString = null;
+		if ( bridge != null ) {
+			String bridgeAsString = null;
+			try {
+				bridgeAsString = bridge.toString();
+			}
+			catch (Exception e2) {
+				// Make sure we support failing toString() implementations (field bridges may be custom)
+				exceptionWhenBuildingBridgeString = e;
+				bridgeAsString = "<toString() on the fieldbridge thrown " + e.getClass() + ">";
+			}
+			errorMessage.append( "\n\tfield bridge: " ).append( bridgeAsString );
+		}
+
+		BridgeException exception = new BridgeException( errorMessage.toString(), e );
+		if ( exceptionWhenBuildingBridgeString != null ) {
+			exception.addSuppressed( exceptionWhenBuildingBridgeString );
+		}
+
+		throw exception;
 	}
 
 	@Override
@@ -110,7 +134,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 				oneWayBridge.set( name, value, document, luceneOptions );
 			}
 			catch (RuntimeException e) {
-				throw buildBridgeException( e, "set" );
+				throw buildBridgeException( e, "set", name, oneWayBridge );
 			}
 		}
 	}
@@ -123,7 +147,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 				return twoWayBridge.get( name, document );
 			}
 			catch (RuntimeException e) {
-				throw buildBridgeException( e, "get" );
+				throw buildBridgeException( e, "get", name, twoWayBridge );
 			}
 		}
 
@@ -133,7 +157,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 				return twoWayBridge.objectToString( object );
 			}
 			catch (RuntimeException e) {
-				throw buildBridgeException( e, "objectToString" );
+				throw buildBridgeException( e, "objectToString", null, twoWayBridge );
 			}
 		}
 
@@ -143,7 +167,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 				twoWayBridge.set( name, value, document, luceneOptions );
 			}
 			catch (RuntimeException e) {
-				throw buildBridgeException( e, "set" );
+				throw buildBridgeException( e, "set", name, twoWayBridge );
 			}
 		}
 	}
@@ -156,7 +180,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 				return stringBridge.objectToString( object );
 			}
 			catch (RuntimeException e) {
-				throw buildBridgeException( e, "objectToString" );
+				throw buildBridgeException( e, "objectToString", null, stringBridge );
 			}
 		}
 	}

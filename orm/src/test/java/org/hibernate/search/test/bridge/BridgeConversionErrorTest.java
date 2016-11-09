@@ -51,8 +51,10 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 		catch (Exception e) {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
-			String expectedErrorMessage = "Exception while calling bridge#set\n" +
-					"\tclass: org.hibernate.search.test.bridge.BridgeConversionErrorTest$ClassBridged";
+			String expectedErrorMessage = "Exception while calling bridge#set"
+					+ "\n\tentity class: org.hibernate.search.test.bridge.BridgeConversionErrorTest$ClassBridged"
+					+ "\n\tdocument field name: test"
+					+ "\n\tfield bridge: <result of ExceptionThrowingBridge.toString()>";
 			assertEquals( "Wrong error message", expectedErrorMessage, cause.getMessage() );
 		}
 	}
@@ -70,9 +72,11 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 		catch (Exception e) {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
-			String expectedErrorMessage = "Exception while calling bridge#set\n" +
-					"\tclass: org.hibernate.search.test.bridge.BridgeConversionErrorTest$SimpleEntity\n" +
-					"\tpath: name";
+			String expectedErrorMessage = "Exception while calling bridge#set"
+					+ "\n\tentity class: org.hibernate.search.test.bridge.BridgeConversionErrorTest$SimpleEntity"
+					+ "\n\tentity property path: name"
+					+ "\n\tdocument field name: overriddenFieldName"
+					+ "\n\tfield bridge: <result of ExceptionThrowingBridge.toString()>";
 			assertEquals( "Wrong error message", expectedErrorMessage, cause.getMessage() );
 		}
 	}
@@ -92,9 +96,11 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 		catch (Exception e) {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
-			String expectedErrorMessage = "Exception while calling bridge#set\n" +
-					"\tclass: org.hibernate.search.test.bridge.BridgeConversionErrorTest$SimpleEntity\n" +
-					"\tpath: embedded.name";
+			String expectedErrorMessage = "Exception while calling bridge#set"
+					+ "\n\tentity class: org.hibernate.search.test.bridge.BridgeConversionErrorTest$SimpleEntity"
+					+ "\n\tentity property path: embedded.name"
+					+ "\n\tdocument field name: overriddenEmbeddedPrefix.overriddenEmbeddedFieldName"
+					+ "\n\tfield bridge: <result of ExceptionThrowingBridge.toString()>";
 			assertEquals( "Wrong error message", expectedErrorMessage, cause.getMessage() );
 		}
 	}
@@ -115,9 +121,11 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 		catch (Exception e) {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
-			String expectedErrorMessage = "Exception while calling bridge#set\n" +
-					"\tclass: org.hibernate.search.test.bridge.BridgeConversionErrorTest$SimpleEntity\n" +
-					"\tpath: embedded.embeddedEmbedded.name";
+			String expectedErrorMessage = "Exception while calling bridge#set"
+					+ "\n\tentity class: org.hibernate.search.test.bridge.BridgeConversionErrorTest$SimpleEntity"
+					+ "\n\tentity property path: embedded.embeddedEmbedded.name"
+					+ "\n\tdocument field name: overriddenEmbeddedPrefix.overriddenEmbeddedEmbeddedPrefix.overriddenEmbeddedEmbeddedFieldName"
+					+ "\n\tfield bridge: <result of ExceptionThrowingBridge.toString()>";
 			assertEquals( "Wrong error message", expectedErrorMessage, cause.getMessage() );
 		}
 	}
@@ -139,6 +147,11 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 				throw new RuntimeException( "boom" );
 			}
 		}
+
+		@Override
+		public String toString() {
+			return "<result of ExceptionThrowingBridge.toString()>";
+		}
 	}
 
 	@Entity
@@ -159,11 +172,11 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 		@GeneratedValue
 		private long id;
 
-		@Field
+		@Field(name = "overriddenFieldName")
 		@org.hibernate.search.annotations.FieldBridge(impl = ExceptionThrowingBridge.class)
 		private String name;
 
-		@IndexedEmbedded
+		@IndexedEmbedded(prefix = "overriddenEmbeddedPrefix.")
 		@OneToOne(cascade = CascadeType.ALL)
 		private EmbeddedEntity embedded;
 
@@ -186,7 +199,7 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 		@GeneratedValue
 		private long id;
 
-		@Field
+		@Field(name = "overriddenEmbeddedFieldName")
 		@org.hibernate.search.annotations.FieldBridge(impl = ExceptionThrowingBridge.class)
 		private String name;
 
@@ -197,7 +210,7 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 		public EmbeddedEntity() {
 		}
 
-		@IndexedEmbedded
+		@IndexedEmbedded(prefix = "overriddenEmbeddedEmbeddedPrefix.")
 		@OneToOne(cascade = CascadeType.ALL)
 		private EmbeddedEmbeddedEntity embeddedEmbedded;
 
@@ -213,7 +226,7 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 		@GeneratedValue
 		private long id;
 
-		@Field
+		@Field(name = "overriddenEmbeddedEmbeddedFieldName")
 		@org.hibernate.search.annotations.FieldBridge(impl = ExceptionThrowingBridge.class)
 		private String name;
 
