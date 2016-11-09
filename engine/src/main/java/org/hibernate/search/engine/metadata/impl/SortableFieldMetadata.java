@@ -13,6 +13,11 @@ package org.hibernate.search.engine.metadata.impl;
  */
 public class SortableFieldMetadata {
 
+	/*
+	 * Here we cannot use DocumentFieldPath because sortable fields can be
+	 * contributed by metadata-providing field bridges, and those only provide
+	 * the absolute name, without telling the prefix from the relative name.
+	 */
 	private final String absoluteName;
 
 	private SortableFieldMetadata(String fieldName) {

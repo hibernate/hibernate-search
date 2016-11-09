@@ -15,30 +15,27 @@ import org.hibernate.search.annotations.FacetEncodingType;
  */
 public class FacetMetadata {
 
-	private final String absoluteName;
-
-	private final String relativeName;
+	private final DocumentFieldPath path;
 
 	private final FacetEncodingType encoding;
 
 	private FacetMetadata(Builder builder) {
-		this.absoluteName = builder.absoluteName;
-		this.relativeName = builder.relativeName;
+		this.path = builder.path;
 		this.encoding = builder.encoding;
 	}
 
 	/**
-	 * @return The full name of the facet field, including any indexed-embedded prefix.
+	 * @return The full name of the facet field, including any indexed-embedded prefix. Equivalent to {@code #getPath().getAbsoluteName()}.
 	 */
 	public String getAbsoluteName() {
-		return absoluteName;
+		return path.getAbsoluteName();
 	}
 
 	/**
-	 * @return The name of the facet field excluding any indexed-embedded prefix.
+	 * @return The path from the document root to this field.
 	 */
-	public String getRelativeName() {
-		return relativeName;
+	public DocumentFieldPath getPath() {
+		return path;
 	}
 
 	public FacetEncodingType getEncoding() {
@@ -47,15 +44,13 @@ public class FacetMetadata {
 
 	public static class Builder {
 		// required parameters
-		private final String absoluteName;
-		private final String relativeName;
+		private final DocumentFieldPath path;
 
 		// optional parameters
 		private FacetEncodingType encoding = FacetEncodingType.AUTO;
 
-		public Builder(String absoluteName, String relativeName) {
-			this.absoluteName = absoluteName;
-			this.relativeName = relativeName;
+		public Builder(DocumentFieldPath path) {
+			this.path = path;
 		}
 
 		public void setFacetEncoding(FacetEncodingType encoding) {
@@ -70,8 +65,7 @@ public class FacetMetadata {
 	@Override
 	public String toString() {
 		return "FacetMetadata{" +
-				"absoluteName='" + absoluteName + '\'' +
-				"relativeName='" + relativeName + '\'' +
+				"path='" + path + '\'' +
 				", encoding=" + encoding +
 				'}';
 	}
