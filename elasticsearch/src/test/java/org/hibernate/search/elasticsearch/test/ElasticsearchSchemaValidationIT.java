@@ -40,14 +40,8 @@ import org.junit.rules.ExpectedException;
 public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBase {
 
 	private static final String VALIDATION_FAILED_MESSAGE_ID = "HSEARCH400033";
-	private static final String MISSING_MAPPINGS_MESSAGE_ID = "HSEARCH400035";
-	private static final String MISSING_MAPPING_MESSAGE_ID = "HSEARCH400036";
-	private static final String INVALID_MAPPING_MESSAGE_ID = "HSEARCH400037";
-	private static final String MISSING_PROPERTY_MESSAGE_ID = "HSEARCH400038";
-	private static final String INVALID_PROPERTY_MESSAGE_ID = "HSEARCH400039";
-	private static final String INVALID_ATTRIBUTE_MESSAGE_ID = "HSEARCH400040";
-	private static final String INVALID_OUTPUT_FORMAT_MESSAGE_ID = "HSEARCH400041";
-	private static final String INVALID_INPUT_FORMAT_MESSAGE_ID = "HSEARCH400042";
+	private static final String MAPPINGS_RETRIEVAL_FAILED_MESSAGE_ID = "HSEARCH400034";
+	private static final String ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID = "HSEARCH400007";
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -119,12 +113,13 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	}
 
 	@Test
-	public void mappings_missing() throws Exception {
+	public void index_missing() throws Exception {
 		thrown.expect(
 				isException( SearchException.class )
-					.withMessage( MISSING_MAPPINGS_MESSAGE_ID )
+						.withMessage( MAPPINGS_RETRIEVAL_FAILED_MESSAGE_ID )
+				.causedBy( SearchException.class )
+						.withMessage( ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID )
 				.build()
-
 		);
 
 		init( SimpleDateEntity.class );
@@ -135,12 +130,10 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( MISSING_MAPPING_MESSAGE_ID )
+						.withMessage( "\n\tMissing type mapping" )
 				.build()
-
 		);
 
 		init( SimpleDateEntity.class );
@@ -167,13 +160,9 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_ATTRIBUTE_MESSAGE_ID )
-						.withMessage( "dynamic" )
+						.withMessage( "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'null'" )
 				.build()
 		);
 
@@ -202,13 +191,9 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_ATTRIBUTE_MESSAGE_ID )
-						.withMessage( "dynamic" )
+						.withMessage( "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'" )
 				.build()
 		);
 
@@ -233,12 +218,10 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( MISSING_PROPERTY_MESSAGE_ID )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tMissing property mapping" )
 				.build()
 		);
 
@@ -267,12 +250,10 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( MISSING_PROPERTY_MESSAGE_ID )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tMissing property mapping" )
 				.build()
 		);
 
@@ -300,16 +281,10 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_PROPERTY_MESSAGE_ID )
-						.withMessage( "myField" )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_ATTRIBUTE_MESSAGE_ID )
-						.withMessage( "type" )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'OBJECT'" )
 				.build()
 		);
 
@@ -338,16 +313,10 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_PROPERTY_MESSAGE_ID )
-						.withMessage( "myField" )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_ATTRIBUTE_MESSAGE_ID )
-						.withMessage( "index" )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'NOT_ANALYZED', actual is 'ANALYZED'" )
 				.build()
 		);
 
@@ -376,16 +345,10 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_PROPERTY_MESSAGE_ID )
-						.withMessage( "myField" )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_OUTPUT_FORMAT_MESSAGE_ID )
-						.withMessage( "format" )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tThe output format (the first format in the 'format' attribute) is invalid. Expected 'strict_date_optional_time', actual is 'epoch_millis'" )
 				.build()
 		);
 
@@ -414,16 +377,11 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_PROPERTY_MESSAGE_ID )
-						.withMessage( "myField" )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_INPUT_FORMAT_MESSAGE_ID )
-						.withMessage( "format" )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tInvalid formats for attribute 'format'" )
+						.withMessage( "missing elements are '[epoch_millis]'" )
 				.build()
 		);
 
@@ -452,16 +410,11 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		thrown.expect(
-				isException( SearchException.class )
+				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_MAPPING_MESSAGE_ID )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_PROPERTY_MESSAGE_ID )
-						.withMessage( "myField" )
-				.causedBy( ElasticsearchSchemaValidationException.class )
-						.withMessage( INVALID_INPUT_FORMAT_MESSAGE_ID )
-						.withMessage( "format" )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tInvalid formats for attribute 'format'" )
+						.withMessage( "unexpected elements are '[yyyy]'" )
 				.build()
 		);
 
@@ -494,6 +447,41 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				);
 
 		init( SimpleLenientEntity.class );
+	}
+
+	@Test
+	public void multipleErrors() throws Exception {
+		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
+		elasticSearchClient.putMapping(
+				SimpleDateEntity.class,
+				"{"
+					+ "'dynamic': false,"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'string'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( ElasticsearchSchemaValidationException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+						.withMessage(
+								"\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity':"
+								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
+								+ "\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity', property 'myField':"
+								+ "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'STRING'"
+						)
+				.build()
+		);
+
+		init( SimpleDateEntity.class );
 	}
 
 	@Indexed

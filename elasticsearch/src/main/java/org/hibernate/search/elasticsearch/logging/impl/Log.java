@@ -191,60 +191,16 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	void unsupportedDynamicBoost(Class<?> boostStrategyType, Class<?> entityType, String fieldPath);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 33,
-			value = "Validation failed for schema of index '%1$s'"
+			value = "An Elasticsearch schema validation failed: %1$s"
 	)
-	SearchException schemaValidationFailed(String indexName, @Cause Exception cause);
+	ElasticsearchSchemaValidationException schemaValidationFailed(String message);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 34,
-			value = "No mappings available from Elasticsearch for validation of index '%1$s'. Either the index hasn't been defined yet, or no type mappings have been defined on this index yet."
-	)
-	SearchException mappingsMissing(String indexName);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 35,
 			value = "Could not retrieve the mappings from Elasticsearch for validation"
 	)
 	SearchException elasticsearchMappingRetrievalForValidationFailed(@Cause Exception cause);
 
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 36,
-			value = "Missing mapping for entity type '%1$s'"
-	)
-	ElasticsearchSchemaValidationException mappingMissing(String mappingName);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 37,
-			value = "Invalid mapping '%1$s'"
-	)
-
-	ElasticsearchSchemaValidationException mappingInvalid(String mappingName, @Cause Exception cause);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 38,
-			value = "Missing property mapping for property '%1$s'"
-	)
-	ElasticsearchSchemaValidationException mappingPropertyMissing(String propertyName);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 39,
-			value = "Invalid property '%1$s'"
-	)
-	ElasticsearchSchemaValidationException mappingPropertyInvalid(String propertyName, @Cause Exception e);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 40,
-			value = "Invalid value for attribute '%1$s'. Expected '%2$s', actual is '%3$s'"
-	)
-	ElasticsearchSchemaValidationException mappingInvalidAttributeValue(String string, Object expectedValue, Object actualValue);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 41,
-			value = "The output format (the first format in the '%1$s' attribute) is invalid. Expected '%2$s', actual is '%3$s'"
-	)
-	ElasticsearchSchemaValidationException mappingInvalidOutputFormat(String string, String expectedValue, String actualValue);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 42,
-			value = "Invalid formats for attribute '%1$s'. Every required formats must be in the list,"
-			+ " though it's not required to provide them in the same order, and the list must not contain unexpected formats."
-			+ " Expected '%2$s', actual is '%3$s', missing elements are '%4$s', unexpected elements are '%5$s'."
-	)
-	ElasticsearchSchemaValidationException mappingInvalidInputFormat(String string, List<String> expectedValue,
-			List<String> actualValue, List<String> missingFormats, List<String> unexpectedFormats);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 43,
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 35,
 			value = "Could not merge mappings in index '%1$s'"
 	)
 	SearchException schemaMergeFailed(String indexName, @Cause Exception cause);
