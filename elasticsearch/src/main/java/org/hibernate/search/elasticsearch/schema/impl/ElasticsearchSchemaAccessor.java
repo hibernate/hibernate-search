@@ -27,6 +27,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import io.searchbox.action.AbstractAction;
@@ -110,18 +111,21 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 		try {
 			JestResult result = jestClient.executeRequest( getMapping );
+			JsonObject resultJson = result.getJsonObject();
 			JsonElement index = result.getJsonObject().get( indexName );
 			if ( index == null || !index.isJsonObject() ) {
-				throw LOG.mappingsMissing( indexName );
+				throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + resultJson );
 			}
 			JsonElement mappings = index.getAsJsonObject().get( "mappings" );
-			if ( mappings == null ) {
-				throw LOG.mappingsMissing( indexName );
-			}
-			Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
+
 			IndexMetadata indexMetadata = new IndexMetadata();
 			indexMetadata.setName( indexName );
-			indexMetadata.setMappings( gsonService.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType ) );
+
+			if ( mappings != null ) {
+					Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
+					indexMetadata.setMappings( gsonService.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType ) );
+			}
+
 			return indexMetadata;
 		}
 		catch (RuntimeException e) {

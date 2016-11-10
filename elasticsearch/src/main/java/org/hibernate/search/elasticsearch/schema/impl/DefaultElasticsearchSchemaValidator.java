@@ -20,12 +20,14 @@ import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.jboss.logging.Messages;
 
 import com.google.gson.JsonPrimitive;
 
@@ -39,6 +41,8 @@ import com.google.gson.JsonPrimitive;
 public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaValidator, Startable, Stoppable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
+	private static final ElasticsearchValidationMessages MESSAGES = Messages.getBundle( ElasticsearchValidationMessages.class );
 
 	private static final double DEFAULT_DOUBLE_DELTA = 0.001;
 	private static final float DEFAULT_FLOAT_DELTA = 0.001f;
@@ -70,62 +74,97 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	@Override
 	public void validate(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
 		String indexName = expectedIndexMetadata.getName();
+		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
+
+		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
+		errorCollector.setIndexName( indexName );
 		try {
-			IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
-			validate( expectedIndexMetadata, actualIndexMetadata );
+			validate( errorCollector, expectedIndexMetadata, actualIndexMetadata );
 		}
-		catch (ElasticsearchSchemaValidationException e) {
-			throw LOG.schemaValidationFailed( indexName, e );
+		finally {
+			errorCollector.setIndexName( null );
+		}
+
+		Map<ValidationContext, List<String>> messagesByContext = errorCollector.getMessagesByContext();
+		if ( messagesByContext.isEmpty() ) {
+			return;
+		}
+		StringBuilder builder = new StringBuilder();
+		for ( Map.Entry<ValidationContext, List<String>> entry : messagesByContext.entrySet() ) {
+			ValidationContext context = entry.getKey();
+			List<String> messages = entry.getValue();
+
+			builder.append( "\n" ).append( formatIntro( context ) );
+			for ( String message : messages ) {
+				builder.append( "\n\t" ).append( message );
+			}
+		}
+		throw LOG.schemaValidationFailed( builder.toString() );
+	}
+
+	private Object formatIntro(ValidationContext context) {
+		if ( StringHelper.isNotEmpty( context.getPath() ) ) {
+			return MESSAGES.errorIntro( context.getIndexName(), context.getMappingName(), context.getPath() );
+		}
+		else if ( StringHelper.isNotEmpty( context.getMappingName() ) ) {
+			return MESSAGES.errorIntro( context.getIndexName(), context.getMappingName() );
+		}
+		else {
+			return MESSAGES.errorIntro( context.getIndexName() );
 		}
 	}
 
-	private void validate(IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
+	private void validate(ValidationErrorCollector errorCollector, IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
 		// Unknown mappings are ignored, we only validate expected mappings
 		for ( Map.Entry<String, TypeMapping> entry : expectedIndexMetadata.getMappings().entrySet() ) {
 			String mappingName = entry.getKey();
 			TypeMapping expectedTypeMapping = entry.getValue();
 			TypeMapping actualTypeMapping = actualIndexMetadata.getMappings().get( mappingName );
 
-			if ( actualTypeMapping == null ) {
-				throw LOG.mappingMissing( mappingName );
-			}
-
+			errorCollector.setMappingName( mappingName );
 			try {
-				validateTypeMapping( expectedTypeMapping, actualTypeMapping );
+				if ( actualTypeMapping == null ) {
+					errorCollector.addError( MESSAGES.mappingMissing() );
+					continue;
+				}
+
+				validateTypeMapping( errorCollector, expectedTypeMapping, actualTypeMapping );
 			}
-			catch (ElasticsearchSchemaValidationException e) {
-				throw LOG.mappingInvalid( mappingName, e );
+			finally {
+				errorCollector.setMappingName( null );
 			}
 		}
 	}
 
-	private void validateTypeMapping(TypeMapping expectedMapping, TypeMapping actualMapping) {
+	private void validateTypeMapping(ValidationErrorCollector errorCollector, TypeMapping expectedMapping, TypeMapping actualMapping) {
 		DynamicType expectedDynamic = expectedMapping.getDynamic();
 		if ( expectedDynamic != null ) { // If not provided, we don't care
-			validateEqualWithDefault( "dynamic", expectedDynamic, actualMapping.getDynamic(), DynamicType.TRUE );
+			validateEqualWithDefault( errorCollector, "dynamic", expectedDynamic, actualMapping.getDynamic(), DynamicType.TRUE );
 		}
-		validateTypeMappingProperties( expectedMapping, actualMapping );
+		validateTypeMappingProperties( errorCollector, expectedMapping, actualMapping );
 	}
 
 	/**
 	 * Validate that two values are equal, using a given default value when null is encountered on either value.
 	 * <p>Useful to take into account the fact that Elasticsearch has default values for attributes.
 	 */
-	private static <T> void validateEqualWithDefault(String attributeName, T expectedValue, T actualValue,
-			T defaultValueForNulls) {
+	private static <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+			T expectedValue, T actualValue, T defaultValueForNulls) {
 		Object defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Object defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
 		if ( ! Objects.equals( defaultedExpectedValue, defaultedActualValue ) ) {
 			// Don't show the defaulted actual value, this might confuse users
-			throw LOG.mappingInvalidAttributeValue( attributeName, defaultedExpectedValue, actualValue );
+			errorCollector.addError( MESSAGES.invalidAttributeValue(
+					attributeName, defaultedExpectedValue, actualValue
+					) );
 		}
 	}
 
 	/**
 	 * Variation of {@link #validateEqualWithDefault(String, Object, Object, Object)} for floats.
 	 */
-	private static <T> void validateEqualWithDefault(String attributeName, Float expectedValue, Float actualValue,
-			float delta, Float defaultValueForNulls) {
+	private static <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+			Float expectedValue, Float actualValue, float delta, Float defaultValueForNulls) {
 		Float defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Float defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
 		if ( defaultedExpectedValue == null || defaultedActualValue == null ) {
@@ -136,7 +175,9 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 			else {
 				// One null and one non-null
 				// Don't show the defaulted actual value, this might confuse users
-				throw LOG.mappingInvalidAttributeValue( attributeName, defaultedExpectedValue, actualValue );
+				errorCollector.addError( MESSAGES.invalidAttributeValue(
+						attributeName, defaultedExpectedValue, actualValue
+						) );
 			}
 		}
 		else {
@@ -145,7 +186,9 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 			}
 			if ( Math.abs( defaultedExpectedValue - defaultedActualValue ) > delta ) {
 				// Don't show the defaulted actual value, this might confuse users
-				throw LOG.mappingInvalidAttributeValue( attributeName, defaultedExpectedValue, actualValue );
+				errorCollector.addError( MESSAGES.invalidAttributeValue(
+						attributeName, defaultedExpectedValue, actualValue
+						) );
 			}
 		}
 	}
@@ -153,8 +196,8 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	/**
 	 * Variation of {@link #validateEqualWithDefault(String, Object, Object, Object)} for doubles.
 	 */
-	private static <T> void validateEqualWithDefault(String attributeName, Double expectedValue, Double actualValue,
-			double delta, Double defaultValueForNulls) {
+	private static <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+			Double expectedValue, Double actualValue, double delta, Double defaultValueForNulls) {
 		Double defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Double defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
 		if ( defaultedExpectedValue == null || defaultedActualValue == null ) {
@@ -165,7 +208,9 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 			else {
 				// One null and one non-null
 				// Don't show the defaulted actual value, this might confuse users
-				throw LOG.mappingInvalidAttributeValue( attributeName, defaultedExpectedValue, actualValue );
+				errorCollector.addError( MESSAGES.invalidAttributeValue(
+						attributeName, defaultedExpectedValue, actualValue
+						) );
 			}
 		}
 		if ( Double.compare( defaultedExpectedValue, defaultedActualValue ) == 0 ) {
@@ -173,7 +218,9 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		}
 		if ( Math.abs( defaultedExpectedValue - defaultedActualValue ) > delta ) {
 			// Don't show the defaulted actual value, this might confuse users
-			throw LOG.mappingInvalidAttributeValue( attributeName, defaultedExpectedValue, actualValue );
+			errorCollector.addError( MESSAGES.invalidAttributeValue(
+					attributeName, defaultedExpectedValue, actualValue
+					) );
 		}
 	}
 
@@ -184,8 +231,8 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	 * <li>Checks all expected formats are present in the actual value
 	 * </ul>
 	 */
-	private static <T> void validateFormatWithDefault(String attributeName, List<String> expectedValue,
-			List<String> actualValue, List<String> defaultValueForNulls) {
+	private static <T> void validateFormatWithDefault(ValidationErrorCollector errorCollector,
+			String attributeName, List<String> expectedValue, List<String> actualValue, List<String> defaultValueForNulls) {
 		List<String> defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		List<String> defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
 		if ( defaultedExpectedValue.isEmpty() ) {
@@ -196,7 +243,9 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		String actualOutputFormat = defaultedActualValue.isEmpty() ? null : defaultedActualValue.get( 0 );
 		if ( ! Objects.equals( expectedOutputFormat, actualOutputFormat ) ) {
 			// Don't show the defaulted actual value, this might confuse users
-			throw LOG.mappingInvalidOutputFormat( attributeName, expectedOutputFormat, actualOutputFormat );
+			errorCollector.addError( MESSAGES.invalidOutputFormat(
+					attributeName, expectedOutputFormat, actualOutputFormat
+					) );
 		}
 
 		List<String> missingFormats = new ArrayList<>();
@@ -208,12 +257,14 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		unexpectedFormats.removeAll( defaultedExpectedValue );
 
 		if ( !missingFormats.isEmpty() || !unexpectedFormats.isEmpty() ) {
-			throw LOG.mappingInvalidInputFormat( attributeName, defaultedExpectedValue, defaultedActualValue,
-					missingFormats, unexpectedFormats );
+			errorCollector.addError( MESSAGES.invalidInputFormat(
+					attributeName, defaultedExpectedValue, defaultedActualValue, missingFormats, unexpectedFormats
+					) );
 		}
 	}
 
-	private void validateTypeMappingProperties(TypeMapping expectedMapping, TypeMapping actualMapping) {
+	private void validateTypeMappingProperties(ValidationErrorCollector errorCollector,
+			TypeMapping expectedMapping, TypeMapping actualMapping) {
 		// Unknown properties are ignored, we only validate expected properties
 		Map<String, PropertyMapping> expectedPropertyMappings = expectedMapping.getProperties();
 		Map<String, PropertyMapping> actualPropertyMappings = actualMapping.getProperties();
@@ -221,40 +272,39 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 			for ( Map.Entry<String, PropertyMapping> entry : expectedPropertyMappings.entrySet() ) {
 				String propertyName = entry.getKey();
 				PropertyMapping expectedPropertyMapping = entry.getValue();
+				PropertyMapping actualPropertyMapping = actualPropertyMappings == null ?
+						null : actualPropertyMappings.get( propertyName );
 
-				if ( actualPropertyMappings == null ) {
-					throw LOG.mappingPropertyMissing( propertyName );
-				}
-
-				PropertyMapping actualPropertyMapping = actualPropertyMappings.get( propertyName );
-				if ( actualPropertyMapping == null ) {
-					throw LOG.mappingPropertyMissing( propertyName );
-				}
-
+				errorCollector.pushPropertyName( propertyName );
 				try {
-					validatePropertyMapping( expectedPropertyMapping, actualPropertyMapping );
+					if ( actualPropertyMapping == null ) {
+						errorCollector.addError( MESSAGES.propertyMissing() );
+						continue;
+					}
+					validatePropertyMapping( errorCollector, expectedPropertyMapping, actualPropertyMapping );
 				}
-				catch (ElasticsearchSchemaValidationException e) {
-					throw LOG.mappingPropertyInvalid( propertyName, e );
+				finally {
+					errorCollector.popPropertyName();
 				}
 			}
 		}
 	}
 
-	private void validatePropertyMapping(PropertyMapping expectedMapping, PropertyMapping actualMapping) {
-		validateEqualWithDefault( "type", expectedMapping.getType(), actualMapping.getType(), DataType.OBJECT );
+	private void validatePropertyMapping(ValidationErrorCollector errorCollector,
+			PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+		validateEqualWithDefault( errorCollector, "type", expectedMapping.getType(), actualMapping.getType(), DataType.OBJECT );
 
 		List<String> formatDefault = DataType.DATE.equals( expectedMapping.getType() )
 				? DEFAULT_DATE_FORMAT : Collections.<String>emptyList();
-		validateFormatWithDefault( "format", expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault );
+		validateFormatWithDefault( errorCollector, "format", expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault );
 
-		validateEqualWithDefault( "boost", expectedMapping.getBoost(), actualMapping.getBoost(), DEFAULT_FLOAT_DELTA, 1.0f );
+		validateEqualWithDefault( errorCollector, "boost", expectedMapping.getBoost(), actualMapping.getBoost(), DEFAULT_FLOAT_DELTA, 1.0f );
 
 		IndexType expectedIndex = expectedMapping.getIndex();
 		if ( !IndexType.NO.equals( expectedIndex ) ) { // If we don't need an index, we don't care
 			// See Elasticsearch doc: this attribute's default value depends on the data type.
 			IndexType indexDefault = DataType.STRING.equals( expectedMapping.getType() ) ? IndexType.ANALYZED : IndexType.NOT_ANALYZED;
-			validateEqualWithDefault( "index", expectedIndex, actualMapping.getIndex(), indexDefault );
+			validateEqualWithDefault( errorCollector, "index", expectedIndex, actualMapping.getIndex(), indexDefault );
 		}
 
 		Boolean expectedDocValues = expectedMapping.getDocValues();
@@ -263,21 +313,23 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 			 * Elasticsearch documentation (2.3) says doc_values is true by default on fields
 			 * supporting it, but tests show it's wrong.
 			 */
-			validateEqualWithDefault( "doc_values", expectedDocValues, actualMapping.getDocValues(), false );
+			validateEqualWithDefault( errorCollector, "doc_values", expectedDocValues, actualMapping.getDocValues(), false );
 		}
 
 		Boolean expectedStore = expectedMapping.getStore();
 		if ( Boolean.TRUE.equals( expectedStore ) ) { // If we don't need storage, we don't care
-			validateEqualWithDefault( "store", expectedStore, actualMapping.getStore(), false );
+			validateEqualWithDefault( errorCollector, "store", expectedStore, actualMapping.getStore(), false );
 		}
 
-		validateJsonPrimitive( expectedMapping.getType(), "null_value", expectedMapping.getNullValue(), actualMapping.getNullValue() );
+		validateJsonPrimitive( errorCollector, expectedMapping.getType(), "null_value",
+				expectedMapping.getNullValue(), actualMapping.getNullValue() );
 
-		validateEqualWithDefault( "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), null );
-		validateTypeMapping( expectedMapping, actualMapping );
+		validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), null );
+		validateTypeMapping( errorCollector, expectedMapping, actualMapping );
 	}
 
-	private static void validateJsonPrimitive(DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
+	private static void validateJsonPrimitive(ValidationErrorCollector errorCollector,
+			DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
 		DataType defaultedType = type == null ? DataType.OBJECT : type;
 
 		// We can't just use equal, mainly because of floating-point numbers
@@ -285,20 +337,24 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		switch ( defaultedType ) {
 			case DOUBLE:
 				if ( expectedValue.isNumber() && actualValue.isNumber() ) {
-					validateEqualWithDefault( attributeName, expectedValue.getAsDouble(), actualValue.getAsDouble(),
+					validateEqualWithDefault( errorCollector, attributeName, expectedValue.getAsDouble(), actualValue.getAsDouble(),
 							DEFAULT_DOUBLE_DELTA, null );
 				}
 				else {
-					throw LOG.mappingInvalidAttributeValue( attributeName, expectedValue, actualValue );
+					errorCollector.addError( MESSAGES.invalidAttributeValue(
+							attributeName, expectedValue, actualValue
+							) );
 				}
 				break;
 			case FLOAT:
 				if ( expectedValue.isNumber() && actualValue.isNumber() ) {
-					validateEqualWithDefault( attributeName, expectedValue.getAsFloat(), actualValue.getAsFloat(),
+					validateEqualWithDefault( errorCollector, attributeName, expectedValue.getAsFloat(), actualValue.getAsFloat(),
 							DEFAULT_FLOAT_DELTA, null );
 				}
 				else {
-					throw LOG.mappingInvalidAttributeValue( attributeName, expectedValue, actualValue );
+					errorCollector.addError( MESSAGES.invalidAttributeValue(
+							attributeName, expectedValue, actualValue
+							) );
 				}
 				break;
 			case INTEGER:
@@ -309,7 +365,7 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 			case OBJECT:
 			case GEO_POINT:
 			default:
-				validateEqualWithDefault( attributeName, expectedValue, actualValue, null );
+				validateEqualWithDefault( errorCollector, attributeName, expectedValue, actualValue, null );
 				break;
 		}
 	}

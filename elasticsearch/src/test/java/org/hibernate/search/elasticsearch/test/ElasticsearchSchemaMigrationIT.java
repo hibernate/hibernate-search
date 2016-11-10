@@ -37,7 +37,7 @@ import org.junit.rules.ExpectedException;
  */
 public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase {
 
-	private static final String MERGE_FAILED_MESSAGE_ID = "HSEARCH400043";
+	private static final String MERGE_FAILED_MESSAGE_ID = "HSEARCH400035";
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";
 	private static final String ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID = "HSEARCH400007";
 
