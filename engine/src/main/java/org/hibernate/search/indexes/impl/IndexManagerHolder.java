@@ -186,8 +186,22 @@ public class IndexManagerHolder {
 	 * @param factory the new SearchIntegrator to set on each IndexManager.
 	 */
 	public void setActiveSearchIntegrator(ExtendedSearchIntegratorWithShareableState factory) {
+		SearchException exception = null;
 		for ( IndexManager indexManager : getIndexManagers() ) {
-			indexManager.setSearchFactory( factory );
+			try {
+				indexManager.setSearchFactory( factory );
+			}
+			catch (SearchException e) {
+				if ( exception == null ) {
+					exception = e;
+				}
+				else {
+					exception.addSuppressed( e );
+				}
+			}
+		}
+		if ( exception != null ) {
+			throw exception;
 		}
 	}
 

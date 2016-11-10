@@ -9,6 +9,7 @@ package org.hibernate.search.test.util.impl;
 import static org.hamcrest.CoreMatchers.containsString;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hamcrest.CoreMatchers;
@@ -27,8 +28,15 @@ public class ExceptionMatcherBuilder {
 
 	private final List<Matcher<? extends Throwable>> matchers = new ArrayList<>();
 
+	private final List<Matcher<? extends Throwable>> suppressedMatchers = new ArrayList<>();
+
 	private ExceptionMatcherBuilder(Class<? extends Throwable> clazz) {
 		matchers.add( CoreMatchers.<Throwable>instanceOf( clazz ) );
+	}
+
+	public ExceptionMatcherBuilder withSuppressed(Matcher<? extends Throwable> matcher) {
+		suppressedMatchers.add( matcher );
+		return this;
 	}
 
 	public ExceptionMatcherBuilder causedBy(Class<? extends Throwable> clazz) {
@@ -36,10 +44,16 @@ public class ExceptionMatcherBuilder {
 	}
 
 	public Matcher<? extends Throwable> build() {
-		if ( matchers.size() == 1 ) {
+		if ( matchers.size() == 1 && suppressedMatchers.isEmpty() ) {
 			return matchers.get( 0 );
 		}
 		else {
+			if ( !suppressedMatchers.isEmpty() ) {
+				@SuppressWarnings("unchecked")
+				Matcher<? super Throwable>[] suppressedMatchersAsArray = castedSuppressedMatchers().toArray( new Matcher[suppressedMatchers.size()] );
+				ExceptionMatcherBuilder.this.matching( hasSuppressed( CoreMatchers.hasItems( suppressedMatchersAsArray ) ) );
+				suppressedMatchers.clear();
+			}
 			return CoreMatchers.allOf( castedMatchers() );
 		}
 	}
@@ -47,6 +61,11 @@ public class ExceptionMatcherBuilder {
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Same hack as in JUnit's internal ExpectedExceptionMatcherBuilder
 	private List<Matcher<? super Throwable>> castedMatchers() {
 		return new ArrayList<Matcher<? super Throwable>>( (List) matchers );
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // Same hack as in JUnit's internal ExpectedExceptionMatcherBuilder
+	private List<Matcher<? super Throwable>> castedSuppressedMatchers() {
+		return new ArrayList<Matcher<? super Throwable>>( (List) suppressedMatchers );
 	}
 
 	public ExceptionMatcherBuilder matching(final Matcher<? extends Throwable> messageMatcher) {
@@ -146,4 +165,33 @@ public class ExceptionMatcherBuilder {
 		return new ThrowableCauseMatcher( matcher );
 	}
 
+	public static class ThrowableSuppressedMatcher extends TypeSafeMatcher<Throwable> {
+
+		private final Matcher<? extends Iterable<? extends Throwable>> fMatcher;
+
+		public ThrowableSuppressedMatcher(Matcher<? extends Iterable<? extends Throwable>> matcher) {
+			fMatcher = matcher;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText( "exception with suppressed " );
+			description.appendDescriptionOf( fMatcher );
+		}
+
+		@Override
+		protected boolean matchesSafely(Throwable item) {
+			return fMatcher.matches( Arrays.asList( item.getSuppressed() ) );
+		}
+
+		@Override
+		protected void describeMismatchSafely(Throwable item, Description description) {
+			description.appendText( "suppressed " );
+			fMatcher.describeMismatch( Arrays.asList( item.getSuppressed() ), description );
+		}
+	}
+
+	private static <T extends Throwable> Matcher<Throwable> hasSuppressed(Matcher<? extends Iterable<T>> matcher) {
+		return new ThrowableSuppressedMatcher( matcher );
+	}
 }
