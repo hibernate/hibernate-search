@@ -450,7 +450,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	}
 
 	@Test
-	public void multipleErrors() throws Exception {
+	public void multipleErrors_singleIndexManagers() throws Exception {
 		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
 		elasticSearchClient.putMapping(
 				SimpleDateEntity.class,
@@ -482,6 +482,67 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 		);
 
 		init( SimpleDateEntity.class );
+	}
+
+	@Test
+	public void multipleErrors_multipleIndexManagers() throws Exception {
+		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
+		elasticSearchClient.putMapping(
+				SimpleDateEntity.class,
+				"{"
+					+ "'dynamic': false,"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'string'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+		elasticSearchClient.deleteAndCreateIndex( SimpleBooleanEntity.class );
+		elasticSearchClient.putMapping(
+				SimpleBooleanEntity.class,
+				"{"
+					+ "'dynamic': false,"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'boolean'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( ElasticsearchSchemaValidationException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+						.withMessage(
+								"\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simplebooleanentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleBooleanEntity':"
+								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
+						)
+				.withSuppressed(
+						isException( ElasticsearchSchemaValidationException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+						.withMessage(
+								"\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity':"
+								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
+								+ "\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity', property 'myField':"
+								+ "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'STRING'"
+						)
+						.build()
+				)
+				.build()
+		);
+
+		init( SimpleBooleanEntity.class, SimpleDateEntity.class );
 	}
 
 	@Indexed
