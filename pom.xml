@@ -1016,6 +1016,8 @@
                                      <excludes>
                                          <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
                                          <exclude>**/Log_$logger.class</exclude>
+                                         <!-- JBoss message bundles format messages -->
+                                         <exclude>**/*_$bundle.class</exclude>
                                      </excludes>
                                      <bundledSignatures>
                                          <!-- This will automatically choose the right signatures based on 'targetVersion': -->
