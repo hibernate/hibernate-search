@@ -66,7 +66,7 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	 * The default implementation will perform delete and purge operations on all known indexes.
 	 */
 	@Override
-	public final Set<String> getShardIdentifiersForDeletion(Class<?> entity, Serializable id, String idInString) {
+	public Set<String> getShardIdentifiersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return getAllShardIdentifiers();
 	}
 
