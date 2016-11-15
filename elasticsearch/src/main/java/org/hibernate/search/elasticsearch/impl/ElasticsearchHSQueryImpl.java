@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -292,6 +293,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private class IndexSearcher {
 
 		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
+		private final Map<Class<?>, FieldProjection> idProjectionByEntityType = new HashMap<>();
+		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
 		private final Set<String> indexNames = new HashSet<>();
 		private final String completeQueryAsString;
 
@@ -326,6 +329,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			JsonBuilder.Object completeQuery = JsonBuilder.object();
 			completeQuery.add( "query", filteredQuery );
 
+			addProjections( completeQuery );
+
 			if ( !getFacetManager().getFacetRequests().isEmpty() ) {
 				JsonBuilder.Object facets = JsonBuilder.object();
 
@@ -334,16 +339,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 
 				completeQuery.add( "aggregations", facets );
-			}
-
-			if ( projectedFields != null ) {
-				for ( String field : projectedFields ) {
-					if ( ElasticsearchProjectionConstants.SCORE.equals( field ) ) {
-						// Make sure to compute scores even if we don't sort by relevance
-						completeQuery.addProperty( "track_scores", true );
-						break;
-					}
-				}
 			}
 
 			// Initialize the sortByDistanceIndex to detect if the results are sorted by distance and the position
@@ -431,6 +426,146 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			else {
 				return indexedTargetedEntities;
 			}
+		}
+
+		private void addProjections(JsonBuilder.Object completeQuery) {
+			boolean includeAllSource = false;
+			JsonBuilder.Array builder = JsonBuilder.array();
+
+			Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
+
+			/*
+			 * IDs are always projected: always initialize their projections regardless of the
+			 * "projectedFields" attribute.
+			 */
+			for ( Class<?> entityType : queriedEntityTypes ) {
+				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
+				DocumentBuilderIndexedEntity documentBuilder = binding.getDocumentBuilder();
+				String idFieldName = documentBuilder.getIdFieldName();
+				TypeMetadata typeMetadata = documentBuilder.getTypeMetadata();
+				FieldProjection projection = createProjection( builder, typeMetadata, idFieldName );
+				idProjectionByEntityType.put( entityType, projection );
+			}
+
+			if ( projectedFields != null ) {
+				for ( int i = 0 ; i < projectedFields.length ; ++i ) {
+					String projectedField = projectedFields[i];
+					if ( projectedField == null ) {
+						continue;
+					}
+					switch ( projectedField ) {
+						case ElasticsearchProjectionConstants.SOURCE:
+							includeAllSource = true;
+							break;
+						case ElasticsearchProjectionConstants.SCORE:
+							// Make sure to compute scores even if we don't sort by relevance
+							completeQuery.addProperty( "track_scores", true );
+							break;
+						case ElasticsearchProjectionConstants.ID:
+						case ElasticsearchProjectionConstants.THIS:
+						case ElasticsearchProjectionConstants.OBJECT_CLASS:
+						case ElasticsearchProjectionConstants.SPATIAL_DISTANCE:
+						case ElasticsearchProjectionConstants.TOOK:
+						case ElasticsearchProjectionConstants.TIMED_OUT:
+							// Ignore: no impact on source filtering
+							break;
+						default:
+							for ( Class<?> entityType : queriedEntityTypes ) {
+								EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
+								TypeMetadata typeMetadata = binding.getDocumentBuilder().getTypeMetadata();
+								FieldProjection projection = createProjection( builder, typeMetadata, projectedField );
+								FieldProjection[] projectionsForType = fieldProjectionsByEntityType.get( entityType );
+								if ( projectionsForType == null ) {
+									projectionsForType = new FieldProjection[projectedFields.length];
+									fieldProjectionsByEntityType.put( entityType, projectionsForType );
+								}
+								projectionsForType[i] = projection;
+							}
+							break;
+					}
+				}
+			}
+
+			JsonElement filter;
+			if ( includeAllSource ) {
+				filter = new JsonPrimitive( "*" );
+			}
+			else {
+				JsonArray array = builder.build();
+				if ( array.size() > 0 ) {
+					filter = array;
+				}
+				else {
+					// Projecting only on score or other document-independent values
+					filter = new JsonPrimitive( false );
+				}
+			}
+
+			completeQuery.add( "_source", filter );
+		}
+
+		private FieldProjection createProjection(JsonBuilder.Array sourceFilterCollector, TypeMetadata rootTypeMetadata, String projectedField) {
+			DocumentFieldMetadata fieldMetadata = rootTypeMetadata.getDocumentFieldMetadataFor( projectedField );
+			if ( fieldMetadata != null ) {
+				return createProjection( sourceFilterCollector, rootTypeMetadata, fieldMetadata );
+			}
+			else {
+				// We check if it is a field created by a field bridge
+				BridgeDefinedField bridgeDefinedField = rootTypeMetadata.getBridgeDefinedFieldMetadataFor( projectedField );
+				if ( bridgeDefinedField == null ) {
+					/*
+					 * Don't fail immediately: this entity type may not be present in the results, in which case
+					 * we don't need to be able to project on this field for this exact entity type.
+					 * Just make sure we *will* ultimately fail if we encounter this entity type.
+					 */
+					return new FailingUnknownFieldProjection( rootTypeMetadata, projectedField );
+				}
+				return createProjection( sourceFilterCollector, rootTypeMetadata, bridgeDefinedField );
+			}
+		}
+
+		private FieldProjection createProjection(JsonBuilder.Array sourceFilterCollector, TypeMetadata rootTypeMetadata,
+				DocumentFieldMetadata fieldMetadata) {
+			String absoluteName = fieldMetadata.getAbsoluteName();
+			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
+			ExtendedFieldType type = FieldHelper.getType( fieldMetadata );
+
+			sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
+
+			if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
+				return new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
+			}
+			else if ( fieldBridge instanceof TwoWayFieldBridge ) {
+				PrimitiveProjection defaultFieldProjection = new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
+
+				Collection<BridgeDefinedField> bridgeDefinedFields = fieldMetadata.getBridgeDefinedFields().values();
+				List<PrimitiveProjection> bridgeDefinedFieldsProjections = CollectionHelper.newArrayList( bridgeDefinedFields.size() );
+				for ( BridgeDefinedField bridgeDefinedField : bridgeDefinedFields ) {
+					PrimitiveProjection primitiveProjection = createProjection( sourceFilterCollector, rootTypeMetadata, bridgeDefinedField );
+					bridgeDefinedFieldsProjections.add( primitiveProjection );
+				}
+				return new TwoWayFieldBridgeProjection(
+						absoluteName, (TwoWayFieldBridge) fieldBridge, defaultFieldProjection, bridgeDefinedFieldsProjections
+						);
+			}
+			else {
+				/*
+				 * TODO yrodiere: check whether this is really needed... this is supposed to provide support
+				 * for custom field bridges, but if users want to project on the fields created by such
+				 * bridges, why wouldn't they implement TwoWayFieldBridge?
+				 */
+				return new JsonDrivenProjection( absoluteName );
+			}
+		}
+
+		private PrimitiveProjection createProjection(JsonBuilder.Array sourceFilterCollector, TypeMetadata rootTypeMetadata,
+				BridgeDefinedField bridgeDefinedField) {
+			String absoluteName = bridgeDefinedField.getAbsoluteName();
+			ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
+
+			sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
+
+			return new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
 		}
 
 		private void addFacetingRequest(JsonBuilder.Object facets, FacetingRequest facetingRequest) {
@@ -653,7 +788,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( clazz );
 			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 			conversionContext.setClass( clazz );
-			Object id = getId( hit, binding, conversionContext );
+			FieldProjection idProjection = idProjectionByEntityType.get( clazz );
+			Object id = idProjection.convertHit( hit, conversionContext );
 			Object[] projections = null;
 
 			if ( projectedFields != null ) {
@@ -715,7 +851,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							projections[i] = EntityInfo.ENTITY_PLACEHOLDER;
 							break;
 						default:
-							projections[i] = getFieldValue( binding, hit, field, conversionContext );
+							FieldProjection projection = fieldProjectionsByEntityType.get( clazz )[i];
+							projections[i] = projection.convertHit( hit, conversionContext );
 					}
 				}
 			}
@@ -723,100 +860,122 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdPropertyName(), (Serializable) id, projections );
 		}
 
-		private Object getId(JsonObject hit, EntityIndexBinding binding, ConversionContext conversionContext) {
-			return getFieldValue( binding, hit, binding.getDocumentBuilder().getIdFieldName(), conversionContext );
-		}
+	}
+
+	private abstract static class FieldProjection {
 
 		/**
-		 * Returns the value of the given field as retrieved from the ES result and converted using the corresponding
+		 * Returns the value of the projected field as retrieved from the ES result and converted using the corresponding
 		 * field bridge. In case this bridge is not a 2-way bridge, the unconverted value will be returned.
 		 */
-		private Object getFieldValue(EntityIndexBinding binding, JsonObject hit, String projectedField, ConversionContext conversionContext) {
-			DocumentFieldMetadata field = binding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( projectedField );
+		public abstract Object convertHit(JsonObject hit, ConversionContext conversionContext);
 
-			if ( field != null ) {
-				conversionContext.pushProperty( field.getAbsoluteName() );
-				try {
-					return convertFieldValue( hit, binding, field, conversionContext );
-				}
-				finally {
-					conversionContext.popProperty();
+		protected final JsonElement extractFieldValue(JsonObject parent, String projectedField) {
+			String field = projectedField;
+
+			if ( FieldHelper.isEmbeddedField( projectedField ) ) {
+				String[] parts = DOT.split( projectedField );
+				field = parts[parts.length - 1];
+
+				for ( int i = 0; i < parts.length - 1; i++ ) {
+					JsonElement newParent = parent.get( parts[i] );
+					if ( newParent == null ) {
+						return null;
+					}
+
+					parent = newParent.getAsJsonObject();
 				}
 			}
-			else {
-				// We check if it is a field created by a field bridge
-				BridgeDefinedField bridgeDefinedField = binding.getDocumentBuilder().getTypeMetadata().getBridgeDefinedFieldMetadataFor( projectedField );
-				if ( bridgeDefinedField == null ) {
-					throw LOG.unknownFieldForProjection(
-							binding.getDocumentBuilder().getMetadata().getType().getName(),
-							projectedField );
-				}
-				return convertFieldValue( hit, binding, bridgeDefinedField );
-			}
+
+			return parent.getAsJsonObject().get( field );
 		}
 
-		private Object convertFieldValue(JsonObject hit, EntityIndexBinding binding, DocumentFieldMetadata field, ConversionContext conversionContext) {
-			String fieldPath = field.getAbsoluteName();
-			FieldBridge fieldBridge = field.getFieldBridge();
-			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), fieldPath );
+	}
 
-			ExtendedFieldType type = FieldHelper.getType( field );
-			if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
-				return jsonValue == null || jsonValue.isJsonNull() ? null : jsonValue.getAsBoolean();
-			}
-			else if ( fieldBridge instanceof TwoWayFieldBridge ) {
-				Document tmp = new Document();
+	private static class TwoWayFieldBridgeProjection extends FieldProjection {
 
-				addDocumentField( tmp, binding, type, fieldPath, jsonValue );
+		private final String absoluteName;
+		private final TwoWayFieldBridge bridge;
+		private final PrimitiveProjection defaultFieldProjection;
+		private final List<PrimitiveProjection> bridgeDefinedFieldsProjections;
 
-				// Add to the document the additional fields created when indexing the value
-				for ( BridgeDefinedField bridgeDefinedField : field.getBridgeDefinedFields().values() ) {
-					String bridgeDefinedFieldPath = bridgeDefinedField.getAbsoluteName();
-					ExtendedFieldType bridgeDefinedFieldType = FieldHelper.getType( bridgeDefinedField );
-
-					JsonElement bridgeDefinedFieldJsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), bridgeDefinedFieldPath );
-					addDocumentField( tmp, binding, bridgeDefinedFieldType, bridgeDefinedFieldPath, bridgeDefinedFieldJsonValue );
-				}
-
-				return conversionContext.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge ).get( field.getAbsoluteName(), tmp );
-			}
-			// Should only be the case for custom bridges
-			else {
-				return convertPrimitiveValue( jsonValue );
-			}
+		public TwoWayFieldBridgeProjection(String absoluteName,
+				TwoWayFieldBridge bridge,
+				PrimitiveProjection defaultFieldProjection,
+				List<PrimitiveProjection> bridgeDefinedFieldsProjections) {
+			super();
+			this.absoluteName = absoluteName;
+			this.bridge = bridge;
+			this.defaultFieldProjection = defaultFieldProjection;
+			this.bridgeDefinedFieldsProjections = bridgeDefinedFieldsProjections;
 		}
 
-		private void addDocumentField(Document tmp, EntityIndexBinding binding, ExtendedFieldType fieldType, String fieldPath, JsonElement jsonValue) {
+		@Override
+		public Object convertHit(JsonObject hit, ConversionContext conversionContext) {
+			return convertFieldValue( hit, conversionContext );
+		}
+
+		private Object convertFieldValue(JsonObject hit, ConversionContext conversionContext) {
+			Document tmp = new Document();
+
+			defaultFieldProjection.addDocumentField( tmp, hit, conversionContext );
+
+			// Add to the document the additional fields created when indexing the value
+			for ( PrimitiveProjection subProjection : bridgeDefinedFieldsProjections ) {
+				subProjection.addDocumentField( tmp, hit, conversionContext );
+			}
+
+			return conversionContext.twoWayConversionContext( bridge ).get( absoluteName, tmp );
+		}
+	}
+
+	private static class PrimitiveProjection extends FieldProjection {
+		private final TypeMetadata rootTypeMetadata;
+		private final String absoluteName;
+		private final ExtendedFieldType fieldType;
+
+		public PrimitiveProjection(TypeMetadata rootTypeMetadata, String absoluteName, ExtendedFieldType fieldType) {
+			super();
+			this.rootTypeMetadata = rootTypeMetadata;
+			this.absoluteName = absoluteName;
+			this.fieldType = fieldType;
+		}
+
+		public void addDocumentField(Document tmp, JsonObject hit, ConversionContext conversionContext) {
+			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), absoluteName );
 			if ( jsonValue == null || jsonValue.isJsonNull() ) {
 				return;
 			}
 			switch ( fieldType ) {
 				case INTEGER:
-					tmp.add( new IntField( fieldPath, jsonValue.getAsInt(), Store.NO ) );
+					tmp.add( new IntField( absoluteName, jsonValue.getAsInt(), Store.NO ) );
 					break;
 				case LONG:
-					tmp.add( new LongField( fieldPath, jsonValue.getAsLong(), Store.NO ) );
+					tmp.add( new LongField( absoluteName, jsonValue.getAsLong(), Store.NO ) );
 					break;
 				case FLOAT:
-					tmp.add( new FloatField( fieldPath, jsonValue.getAsFloat(), Store.NO ) );
+					tmp.add( new FloatField( absoluteName, jsonValue.getAsFloat(), Store.NO ) );
 					break;
 				case DOUBLE:
-					tmp.add( new DoubleField( fieldPath, jsonValue.getAsDouble(), Store.NO ) );
+					tmp.add( new DoubleField( absoluteName, jsonValue.getAsDouble(), Store.NO ) );
 					break;
 				case UNKNOWN_NUMERIC:
-					throw LOG.unexpectedNumericEncodingType(
-							binding.getDocumentBuilder().getMetadata().getType().getName(),
-							fieldPath );
+					throw LOG.unexpectedNumericEncodingType( rootTypeMetadata.getType().getName(), absoluteName );
+				case BOOLEAN:
+					tmp.add( new StringField( absoluteName, String.valueOf( jsonValue.getAsBoolean() ), Store.NO ) );
+					break;
 				default:
-					tmp.add( new StringField( fieldPath, jsonValue.getAsString(), Store.NO ) );
+					tmp.add( new StringField( absoluteName, jsonValue.getAsString(), Store.NO ) );
 					break;
 			}
 		}
 
-		private Object convertFieldValue(JsonObject hit, EntityIndexBinding binding, BridgeDefinedField bridgeDefinedField) {
-			String fieldPath = bridgeDefinedField.getAbsoluteName();
-			ExtendedFieldType fieldType = FieldHelper.getType( bridgeDefinedField );
-			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), fieldPath );
+		@Override
+		public Object convertHit(JsonObject hit, ConversionContext conversionContext) {
+			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), absoluteName );
+			if ( jsonValue == null || jsonValue.isJsonNull() ) {
+				return null;
+			}
 			switch ( fieldType ) {
 				case INTEGER:
 					return jsonValue.getAsInt();
@@ -827,15 +986,26 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				case DOUBLE:
 					return jsonValue.getAsDouble();
 				case UNKNOWN_NUMERIC:
-					throw LOG.unexpectedNumericEncodingType(
-							binding.getDocumentBuilder().getMetadata().getType().getName(),
-							fieldPath );
+					throw LOG.unexpectedNumericEncodingType( rootTypeMetadata.getType().getName(), absoluteName );
+				case BOOLEAN:
+					return jsonValue.getAsBoolean();
 				default:
 					return jsonValue.getAsString();
 			}
 		}
+	}
 
-		private Object convertPrimitiveValue(JsonElement value) {
+	private static class JsonDrivenProjection extends FieldProjection {
+		private final String absoluteName;
+
+		public JsonDrivenProjection(String absoluteName) {
+			super();
+			this.absoluteName = absoluteName;
+		}
+
+		@Override
+		public Object convertHit(JsonObject hit, ConversionContext conversionContext) {
+			JsonElement value = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), absoluteName );
 			if ( value == null || value.isJsonNull() ) {
 				return null;
 			}
@@ -863,25 +1033,26 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				return primitive.toString();
 			}
 		}
+	}
 
-		private JsonElement extractFieldValue(JsonObject parent, String projectedField) {
-			String field = projectedField;
+	/**
+	 * A projection used whenever a given type is missing a projected field.
+	 *
+	 * @author Yoann Rodiere
+	 */
+	private static class FailingUnknownFieldProjection extends FieldProjection {
+		private final TypeMetadata rootTypeMetadata;
+		private final String absoluteName;
 
-			if ( FieldHelper.isEmbeddedField( projectedField ) ) {
-				String[] parts = DOT.split( projectedField );
-				field = parts[parts.length - 1];
+		public FailingUnknownFieldProjection(TypeMetadata rootTypeMetadata, String absoluteName) {
+			super();
+			this.rootTypeMetadata = rootTypeMetadata;
+			this.absoluteName = absoluteName;
+		}
 
-				for ( int i = 0; i < parts.length - 1; i++ ) {
-					JsonElement newParent = parent.get( parts[i] );
-					if ( newParent == null ) {
-						return null;
-					}
-
-					parent = newParent.getAsJsonObject();
-				}
-			}
-
-			return parent.getAsJsonObject().get( field );
+		@Override
+		public Object convertHit(JsonObject hit, ConversionContext conversionContext) {
+			throw LOG.unknownFieldForProjection( rootTypeMetadata.getType().getName(), absoluteName );
 		}
 	}
 
