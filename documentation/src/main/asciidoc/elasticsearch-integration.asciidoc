@@ -102,6 +102,12 @@ Add them to your `persistence.xml` or where you put the rest of your Hibernate S
 
 Select Elasticsearch as the backend:: `hibernate.search.default.indexmanager elasticsearch`
 Hostname and port for Elasticsearch:: `hibernate.search.default.elasticsearch.host \http://127.0.0.1:9200` (default)
++
+You may also select multiple hosts (separated by whitespace characters), so that they are assigned requests in turns (load balancing):
++
+`hibernate.search.default.elasticsearch.host \http://es1.mycompany.com:9200 \http://es2.mycompany.com:9200`
++
+In the example above, the first request will go to `es1`, the second to `es2`, the third to `es1`, and so on.
 Selects the index creation strategy::
 `hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE` (default)
 +
@@ -536,3 +542,4 @@ Please check with JIRA and the mailing lists for updates, but at the time of wri
 * Hibernate Search does not make use of nested objects nor parent child relationship mapping https://hibernate.atlassian.net/browse/HSEARCH-2263[HSEARCH-2263].
   This is largely mitigated by the fact that Hibernate Search does the denormalization itself and maintain data consistency when nested objects are updated.
 * There is room for improvements in the performances of the MassIndexer implementation
+* There is no failover to the next host when multiple hosts are configured and one host happens to fail: https://hibernate.atlassian.net/browse/HSEARCH-2469[HSEARCH-2469]

@@ -8,6 +8,8 @@ package org.hibernate.search.elasticsearch.client.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -74,15 +76,17 @@ public class JestClient implements Service, Startable, Stoppable {
 
 		JestClientFactory factory = new JestClientFactory();
 
-		String serverUri = ConfigurationParseHelper.getString(
+		String serverUrisString = ConfigurationParseHelper.getString(
 				properties,
 				SERVER_URI_PROP_PREFIX + ElasticsearchEnvironment.SERVER_URI,
 				ElasticsearchEnvironment.Defaults.SERVER_URI
 		);
 
+		Collection<String> serverUris = Arrays.asList( serverUrisString.trim().split( "\\s" ) );
+
 		// TODO HSEARCH-2062 Make timeouts configurable
 		factory.setHttpClientConfig(
-			new HttpClientConfig.Builder( serverUri )
+			new HttpClientConfig.Builder( serverUris )
 				.multiThreaded( true )
 				.readTimeout( 60000 )
 				.connTimeout( 2000 )

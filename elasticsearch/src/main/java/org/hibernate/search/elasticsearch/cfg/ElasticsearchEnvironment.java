@@ -29,12 +29,14 @@ public final class ElasticsearchEnvironment {
 	}
 
 	/**
-	 * Property for specifying the host name of the Elasticsearch server to connect to. Only a single server (which may
-	 * be part of a cluster) is supported at this point.
+	 * Property for specifying the host names and HTTP ports of the Elasticsearch servers to connect to.
 	 * <p>
-	 * An URI such as http://myeshost.com:9200 is expected.
+	 * URIs such as http://myeshost.com:9200 are expected, separated by whitespace characters.
 	 * <p>
 	 * Defaults to {@link Defaults#SERVER_URI}.
+	 * <p>
+	 * Multiple servers may be specified for load-balancing: requests will be assigned to each host in turns.
+	 * Failover is not supported yet.
 	 * <p>
 	 * Can only be given <b>globally</b> (e.g.
 	 * {@code hibernate.search.default.elasticsearch.host=http://myeshost.com:9200}), i.e. only a single Elasticsearch
