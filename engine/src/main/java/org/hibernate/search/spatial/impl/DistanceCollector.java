@@ -18,6 +18,7 @@ import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Scorer;
+import org.apache.lucene.util.Bits;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spatial.Coordinates;
 
@@ -41,7 +42,7 @@ public class DistanceCollector implements Collector {
 		this.longitudeField = SpatialHelper.formatLongitude( fieldname );
 	}
 
-	public double getDistance(final int index) {
+	public Double getDistance(final int index) {
 		return distances.get( index, center );
 	}
 
@@ -61,19 +62,40 @@ public class DistanceCollector implements Collector {
 	 * Also take the opportunity to lazily calculate the actual distance: only store
 	 * latitude and longitude coordinates.
 	 */
-	private static class HitEntry {
+	private static abstract class HitEntry {
 		int documentId;
+
+		private HitEntry(int documentId) {
+			this.documentId = documentId;
+		}
+
+		abstract double getDistance(final Point center);
+	}
+
+	private static final class CompleteHitEntry extends HitEntry {
 		double latitude;
 		double longitude;
 
-		private HitEntry(int documentId, double latitude, double longitude) {
-			this.documentId = documentId;
+		private CompleteHitEntry(int documentId, double latitude, double longitude) {
+			super( documentId );
 			this.latitude = latitude;
 			this.longitude = longitude;
 		}
 
+		@Override
 		double getDistance(final Point center) {
 			return center.getDistanceTo( latitude, longitude );
+		}
+	}
+
+	private static final class IncompleteHitEntry extends HitEntry {
+		private IncompleteHitEntry(int documentId) {
+			super(documentId);
+		}
+
+		@Override
+		double getDistance(final Point center) {
+			return Double.MAX_VALUE;
 		}
 	}
 
@@ -123,18 +145,26 @@ public class DistanceCollector implements Collector {
 		}
 
 		void put(int documentId, double latitude, double longitude) {
-			orderedEntries.add( new HitEntry( documentId, latitude, longitude ) );
+			orderedEntries.add( new CompleteHitEntry( documentId, latitude, longitude ) );
+		}
+
+		void putIncomplete(int documentId) {
+			orderedEntries.add( new IncompleteHitEntry( documentId ) );
 		}
 	}
 
 	private class DistanceLeafCollector implements LeafCollector {
 
 		private final int docBase;
+		private final Bits docsWithLatitude;
+		private final Bits docsWithLongitude;
 		private final NumericDocValues latitudeValues;
 		private final NumericDocValues longitudeValues;
 
 		DistanceLeafCollector(LeafReaderContext context) throws IOException {
 			final LeafReader atomicReader = context.reader();
+			this.docsWithLatitude = DocValues.getDocsWithField( atomicReader, latitudeField );
+			this.docsWithLongitude = DocValues.getDocsWithField( atomicReader, longitudeField );
 			this.latitudeValues = DocValues.getNumeric( atomicReader, latitudeField );
 			this.longitudeValues = DocValues.getNumeric( atomicReader, longitudeField );
 			this.docBase = context.docBase;
@@ -147,9 +177,13 @@ public class DistanceCollector implements Collector {
 		@Override
 		public void collect(int doc) throws IOException {
 			final int absolute = docBase + doc;
-			double lat = coordinate( latitudeValues, doc );
-			double lon = coordinate( longitudeValues, doc );
-			distances.put( absolute, lat, lon );
+			if ( docsWithLatitude.get( doc ) && docsWithLongitude.get( doc ) ) {
+				double lat = coordinate( latitudeValues, doc );
+				double lon = coordinate( longitudeValues, doc );
+				distances.put( absolute, lat, lon );
+			} else {
+				distances.putIncomplete( absolute );
+			}
 		}
 	}
 }

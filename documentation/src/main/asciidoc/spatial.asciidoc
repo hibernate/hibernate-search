@@ -314,13 +314,8 @@ The default (field) name in case `@Spatial` is placed on the entity level is `or
 [NOTE]
 .Distance projection and null values
 ====
-Using distance projection on non `@Spatial` enabled entities and/or with a non spatial Query will have
-unexpected results as entities not spatially indexed and/or having `null` values for latitude or
-longitude will be considered to be at (0,0)/(lat,0)/(0,long).
-
-Using distance projection with a spatial query on spatially indexed entities having, eventually,
-`null` values for latitude and/or longitude is safe as they will not be found by the spatial query
-and won't have distance calculated.
+When a spatial field on an entity has a `null` value for either its latitude or longitude (or both),
+the resulting projected distance will always be `Double.MAX_VALUE` (`1.7976931348623157e+308`).
 ====
 
 [[spatial-distance-sort]]
@@ -367,13 +362,13 @@ repetition is needed to allow you to define Queries with any tool.
 [NOTE]
 .Sorting and null values
 ====
-Using distance sort on non `@Spatial` enabled entities and/or with a non spatial Query will have also
-unexpected results as entities non spatially indexed and/or with null values for latitude or
-longitude will be considered to be at (0,0)/(lat,0)/(0,long)
+When a spatial field on an entity has a `null` value for either its latitude or longitude (or both):
 
-Using distance sort with a spatial query on spatially indexed entities having, potentially, `null`
-values for latitude and/or longitude is safe as they will not be found by the spatial query and so
-won't be sorted
+ * if you are filtering the results using a distance query, the entity with missing coordinates
+   will not appear in the query results and its rank in the sort is irrelevant.
+ * otherwise, the resulting distance will always be `Double.MAX_VALUE` (`1.7976931348623157e+308`),
+   and the entity will be ranked accordingly:
+   last if the sort is ascending, or first if the sort is descending.
 ====
 
 Alternatively, you may also use a `DistanceSortField` directly, as it was done before the introduction of Hibernate Search sort DSL:
