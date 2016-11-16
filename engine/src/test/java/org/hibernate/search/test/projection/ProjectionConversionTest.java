@@ -21,10 +21,12 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.LongBridge;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -36,6 +38,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * This test verifies the correct projection rules (like which FieldBridge)
@@ -51,6 +54,9 @@ import org.junit.Test;
 public class ProjectionConversionTest {
 
 	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+	@Rule
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( ExampleEntity.class );
 
 	@Before
@@ -60,13 +66,17 @@ public class ProjectionConversionTest {
 		entity.id = 1l;
 		entity.someInteger = 5;
 		entity.longEncodedAsText = 20l;
+		entity.unstoredField = "unstoredField";
 		entity.customBridgedKeyword = "lowercase-keyword";
+		entity.customOneWayBridgedKeyword = "lowercase-keyword";
 
 		ExampleEntity embedded = new ExampleEntity();
 		embedded.id = 2l;
 		embedded.someInteger = 6;
 		embedded.longEncodedAsText = 21l;
+		embedded.unstoredField = "unstoredFieldEmbedded";
 		embedded.customBridgedKeyword = "another-lowercase-keyword";
+		embedded.customOneWayBridgedKeyword = "another-lowercase-keyword";
 
 		ConflictingMappedType second = new ConflictingMappedType();
 		second.id = "a string";
@@ -107,8 +117,27 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
+	public void projectingUnstoredField() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000323" );
+		thrown.expectMessage( "unstoredField" );
+
+		projectionTestHelper( "unstoredField", null );
+	}
+
+	@Test
 	public void projectionWithCustomBridge() {
 		projectionTestHelper( "customBridgedKeyword", "lowercase-keyword" );
+	}
+
+	@Test
+	public void projectionWithCustomOneWayBridge() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000324" );
+		thrown.expectMessage( "customOneWayBridgedKeyword" );
+		thrown.expectMessage( CustomOneWayBridge.class.getName() );
+
+		projectionTestHelper( "customOneWayBridgedKeyword", "lowercase-keyword" );
 	}
 
 	@Test
@@ -124,6 +153,16 @@ public class ProjectionConversionTest {
 	@Test
 	public void projectingEmbeddedWithCustomBridge() {
 		projectionTestHelper( "embedded.customBridgedKeyword", "another-lowercase-keyword" );
+	}
+
+	@Test
+	public void projectingEmbeddedWithCustomOneWayBridge() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000324" );
+		thrown.expectMessage( "embedded.customOneWayBridgedKeyword" );
+		thrown.expectMessage( CustomOneWayBridge.class.getName() );
+
+		projectionTestHelper( "embedded.customOneWayBridgedKeyword", "another-lowercase-keyword" );
 	}
 
 	@Test
@@ -194,10 +233,17 @@ public class ProjectionConversionTest {
 		@Field(store = Store.YES) @FieldBridge(impl = LongBridge.class)
 		Long longEncodedAsText;
 
+		@Field(store = Store.NO)
+		String unstoredField;
+
 		@Field(store = Store.YES) @FieldBridge(impl = CustomTwoWayBridge.class)
 		String customBridgedKeyword;
 
-		@IndexedEmbedded(includePaths = { "id", "stringTypedId", "customBridgedKeyword" }, includeEmbeddedObjectId = true)
+		@Field(store = Store.YES) @FieldBridge(impl = CustomOneWayBridge.class)
+		String customOneWayBridgedKeyword;
+
+		@IndexedEmbedded(includePaths = { "id", "stringTypedId", "customBridgedKeyword", "customOneWayBridgedKeyword" },
+				includeEmbeddedObjectId = true)
 		ExampleEntity embedded;
 
 		@IndexedEmbedded(includeEmbeddedObjectId = true)
@@ -228,6 +274,20 @@ public class ProjectionConversionTest {
 			IndexableField field = document.getField( name );
 			String stringValue = field.stringValue();
 			return stringValue.toLowerCase( Locale.ENGLISH );
+		}
+
+		@Override
+		public String objectToString(Object object) {
+			return String.valueOf( object );
+		}
+
+	}
+
+	public static class CustomOneWayBridge implements org.hibernate.search.bridge.FieldBridge, StringBridge {
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			luceneOptions.addFieldToDocument( name, String.valueOf( value ).toUpperCase( Locale.ENGLISH ), document );
 		}
 
 		@Override
