@@ -160,7 +160,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 							"'null_value':false" +
 						"}," +
 						"'age':{" +
-							"'type':'string'" +
+							"'type':'integer'" +
 						"}," +
 						"'dateOfBirth':{" +
 							"'type':'date'," +
