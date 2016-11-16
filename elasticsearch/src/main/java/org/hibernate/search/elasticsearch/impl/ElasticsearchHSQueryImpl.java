@@ -523,15 +523,17 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			else {
 				// We check if it is a field created by a field bridge
 				BridgeDefinedField bridgeDefinedField = rootTypeMetadata.getBridgeDefinedFieldMetadataFor( projectedField );
-				if ( bridgeDefinedField == null ) {
-					/*
-					 * Don't fail immediately: this entity type may not be present in the results, in which case
-					 * we don't need to be able to project on this field for this exact entity type.
-					 * Just make sure we *will* ultimately fail if we encounter this entity type.
-					 */
-					return new FailingUnknownFieldProjection( rootTypeMetadata, projectedField );
+				if ( bridgeDefinedField != null ) {
+					return createProjection( sourceFilterCollector, rootTypeMetadata, bridgeDefinedField );
 				}
-				return createProjection( sourceFilterCollector, rootTypeMetadata, bridgeDefinedField );
+				else {
+					/*
+					 * No metadata: fall back to dynamically converting the resulting
+					 * JSON to the most appropriate Java type.
+					 */
+					sourceFilterCollector.add( new JsonPrimitive( projectedField ) );
+					return new JsonDrivenProjection( projectedField );
+				}
 			}
 		}
 
@@ -1043,27 +1045,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				// TODO HSEARCH-2255 Better raise an exception?
 				return primitive.toString();
 			}
-		}
-	}
-
-	/**
-	 * A projection used whenever a given type is missing a projected field.
-	 *
-	 * @author Yoann Rodiere
-	 */
-	private static class FailingUnknownFieldProjection extends FieldProjection {
-		private final TypeMetadata rootTypeMetadata;
-		private final String absoluteName;
-
-		public FailingUnknownFieldProjection(TypeMetadata rootTypeMetadata, String absoluteName) {
-			super();
-			this.rootTypeMetadata = rootTypeMetadata;
-			this.absoluteName = absoluteName;
-		}
-
-		@Override
-		public Object convertHit(JsonObject hit, ConversionContext conversionContext) {
-			throw LOG.unknownFieldForProjection( rootTypeMetadata.getType().getName(), absoluteName );
 		}
 	}
 

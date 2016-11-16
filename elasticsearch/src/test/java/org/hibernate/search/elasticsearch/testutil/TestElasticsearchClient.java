@@ -32,6 +32,7 @@ import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.Health.Builder;
+import io.searchbox.core.Index;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.GetMapping;
@@ -56,8 +57,16 @@ public class TestElasticsearchClient extends ExternalResource {
 		putMapping( mappedAndRootClass, mappedAndRootClass, mappingJson );
 	}
 
+	public void putMapping(String indexName, Class<?> mappedClass, String mappingJson) throws IOException {
+		putMapping( indexName, mappedClass.getName(), mappingJson );
+	}
+
 	public void putMapping(Class<?> rootClass, Class<?> mappedClass, String mappingJson) throws IOException {
 		putMapping( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), mappingJson );
+	}
+
+	public String getMapping(String indexName, Class<?> mappedClass) throws IOException {
+		return getMapping( indexName, mappedClass.getName() );
 	}
 
 	public String getMapping(Class<?> mappedAndRootClass) throws IOException {
@@ -107,12 +116,7 @@ public class TestElasticsearchClient extends ExternalResource {
 	}
 
 	public void putMapping(String indexName, String mappingName, String mappingJson) throws IOException {
-		/*
-		 * Convert to JsonElement first, so that some Elasticsearch peculiarities (such as the fact that
-		 * single quotes are not accepted as a substitute for single quotes) can be worked around.
-		 * In tests, single quotes are way easier to include in JSON strings, because we don't have to escape them.
-		 */
-		JsonElement mappingJsonElement = new JsonParser().parse( mappingJson );
+		JsonElement mappingJsonElement = toJsonElement( mappingJson );
 
 		JestResult result = client.execute( new PutMapping.Builder( indexName, mappingName, mappingJsonElement ).build() );
 		if ( !result.isSucceeded() ) {
@@ -140,6 +144,33 @@ public class TestElasticsearchClient extends ExternalResource {
 			return new JsonObject().toString();
 		}
 		return mapping.toString();
+	}
+
+	public void index(String indexName, Class<?> mappedClass, String id, String jsonDocument) throws IOException {
+		index( indexName, mappedClass.getName(), id, jsonDocument );
+	}
+
+	public void index(Class<?> mappedAndRootClass, String id, String jsonDocument) throws IOException {
+		index( mappedAndRootClass, mappedAndRootClass, id, jsonDocument );
+	}
+
+	public void index(Class<?> rootClass, Class<?> mappedClass, String id, String jsonDocument) throws IOException {
+		index( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), id, jsonDocument );
+	}
+
+	public void index(String indexName, String typeName, String id, String jsonDocument) throws IOException {
+		JsonElement documentJsonElement = toJsonElement( jsonDocument );
+
+		JestResult result = client.execute( new Index.Builder( documentJsonElement )
+				.index( indexName )
+				.type( typeName )
+				.id( id )
+				.refresh( true )
+				.build() );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while indexing '" + jsonDocument
+					+ "' on index '" + indexName + "' for tests:" + result.getErrorMessage() );
+		}
 	}
 
 	@Override
@@ -179,6 +210,15 @@ public class TestElasticsearchClient extends ExternalResource {
 		catch (IOException | RuntimeException e) {
 			LOG.warnf( e, "Error while trying to delete index '%s' as part of test cleanup", indexName );
 		}
+	}
+
+	/*
+	 * Convert provided JSON to JsonElement, so that some Elasticsearch peculiarities (such as the fact that
+	 * single quotes are not accepted as a substitute for single quotes) can be worked around.
+	 * In tests, single quotes are way easier to include in JSON strings, because we don't have to escape them.
+	 */
+	private JsonElement toJsonElement(String jsonAsString) {
+		return new JsonParser().parse( jsonAsString );
 	}
 
 }

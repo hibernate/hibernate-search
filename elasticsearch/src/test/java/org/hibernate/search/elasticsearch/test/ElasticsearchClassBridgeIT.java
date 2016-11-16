@@ -18,17 +18,22 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
+import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Gunnar Morling
  */
 public class ElasticsearchClassBridgeIT extends SearchTestBase {
+
+	@Rule
+	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
 	@Before
 	public void setupTestData() {
@@ -131,6 +136,30 @@ public class ElasticsearchClassBridgeIT extends SearchTestBase {
 
 		Object[] projection = (Object[]) result.iterator().next();
 		assertThat( projection[0] ).describedAs( "fullNameStored" ).isEqualTo( "Klaus Hergesheimer" );
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testProjectionOnUnknownBridgeField() throws Exception {
+		// Add an additional field to the ES mapping, unknown to Hibernate Search
+		elasticsearchClient.putMapping( "golfplayer", GolfPlayer.class, "{'properties': {'fieldNotInMapping': {'type':'integer'}}}" );
+		elasticsearchClient.index( "golfplayer", GolfPlayer.class, "9999", "{'id':9999,'fieldNotInMapping':42}" );
+
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "fieldNotInMapping:42" );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+				.setProjection( "fieldNotInMapping" )
+				.list();
+
+		assertThat( result ).hasSize( 1 );
+
+		Object[] projection = (Object[]) result.iterator().next();
+		assertThat( ( (Number) projection[0] ).intValue() ).describedAs( "fieldNotInMapping" ).isEqualTo( 42 );
 
 		tx.commit();
 		s.close();
