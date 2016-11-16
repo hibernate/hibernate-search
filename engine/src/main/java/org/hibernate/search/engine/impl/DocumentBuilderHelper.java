@@ -129,10 +129,10 @@ public final class DocumentBuilderHelper {
 		}
 		else {
 			if ( store == Store.NO ) {
-				throw new SearchException( "Projecting an unstored field: " + fieldName );
+				throw log.projectingNonStoredField( fieldName );
 			}
 			else {
-				throw new SearchException( "FieldBridge is not a TwoWayFieldBridge: " + fieldBridge.getClass() );
+				throw log.projectingFieldWithoutTwoWayFieldBridge( fieldName, fieldBridge.getClass() );
 			}
 		}
 	}
