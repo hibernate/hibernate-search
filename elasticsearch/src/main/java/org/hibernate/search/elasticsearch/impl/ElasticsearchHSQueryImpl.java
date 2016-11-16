@@ -204,11 +204,19 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				.getAsJsonObject();
 
 		try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
+			/*
+			 * Do not add every property of the original query: some properties, such as "_source", do not have the same syntax
+			 * and are not necessary to the explanation.
+			 */
+			JsonObject explainQuery = JsonBuilder.object()
+					.add( "query", searcher.completeQuery.get( "query" ) )
+					.build();
+
 			Explain request = new Explain.Builder(
 					hit.get( "_index" ).getAsString(),
 					hit.get( "_type" ).getAsString(),
 					hit.get( "_id" ).getAsString(),
-					searcher.completeQueryAsString
+					explainQuery
 				)
 				.build();
 
@@ -297,6 +305,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private final Map<Class<?>, FieldProjection> idProjectionByEntityType = new HashMap<>();
 		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
 		private final Set<String> indexNames = new HashSet<>();
+		private final JsonObject completeQuery;
 		private final String completeQueryAsString;
 
 		private IndexSearcher() {
@@ -347,6 +356,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			sortByDistanceIndex = getSortByDistanceIndex();
 			addScriptFields( completeQuery );
 
+			this.completeQuery = completeQuery.build();
 			completeQueryAsString = completeQuery.build().toString();
 		}
 
