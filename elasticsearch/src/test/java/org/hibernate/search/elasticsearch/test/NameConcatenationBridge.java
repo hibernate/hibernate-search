@@ -7,18 +7,27 @@
 package org.hibernate.search.elasticsearch.test;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
  * @author Gunnar Morling
  */
-public class NameConcatenationBridge implements FieldBridge {
+public class NameConcatenationBridge implements TwoWayFieldBridge {
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		GolfPlayer player = (GolfPlayer) value;
+		luceneOptions.addFieldToDocument( name, objectToString( value ), document );
+	}
 
+	@Override
+	public Object get(String name, Document document) {
+		return document.get( name );
+	}
+
+	@Override
+	public String objectToString(Object object) {
+		GolfPlayer player = (GolfPlayer) object;
 		StringBuilder names = new StringBuilder();
 		if ( player.getFirstName() != null ) {
 			names.append( player.getFirstName() ).append( " " );
@@ -26,7 +35,6 @@ public class NameConcatenationBridge implements FieldBridge {
 		if ( player.getLastName() != null ) {
 			names.append( player.getLastName() );
 		}
-
-		luceneOptions.addFieldToDocument( name, names.toString(), document );
+		return names.toString();
 	}
 }

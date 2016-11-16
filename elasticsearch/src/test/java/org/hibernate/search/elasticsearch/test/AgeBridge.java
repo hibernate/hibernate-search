@@ -7,20 +7,52 @@
 package org.hibernate.search.elasticsearch.test;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.bridge.FieldBridge;
+import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * @author Gunnar Morling
  */
-public class AgeBridge implements FieldBridge {
+public class AgeBridge implements TwoWayFieldBridge, MetadataProvidingFieldBridge {
+
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name, FieldType.INTEGER );
+	}
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		GolfPlayer player = (GolfPlayer) value;
+		Integer age = getAge( value );
+
+		if ( age != null ) {
+			luceneOptions.addNumericFieldToDocument( name, age, document );
+		}
+	}
+
+	@Override
+	public Object get(String name, Document document) {
+		IndexableField field = document.getField( name );
+		return field == null ? null : field.numericValue();
+	}
+
+	private Integer getAge(Object object) {
+		GolfPlayer player = (GolfPlayer) object;
 
 		if ( player.getDateOfBirth() != null ) {
-			luceneOptions.addNumericFieldToDocument( name, Integer.valueOf( 34 ), document );
+			return Integer.valueOf( 34 );
 		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	public String objectToString(Object object) {
+		Integer age = getAge(object);
+		return age == null ? null : age.toString();
 	}
 }
