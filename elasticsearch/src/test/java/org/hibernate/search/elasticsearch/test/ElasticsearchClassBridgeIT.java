@@ -114,7 +114,7 @@ public class ElasticsearchClassBridgeIT extends SearchTestBase {
 
 		Object[] projection = (Object[]) result.iterator().next();
 		assertThat( projection[0] ).describedAs( "fullName" ).isEqualTo( "Klaus Hergesheimer" );
-		assertThat( ( (Number) projection[1] ).intValue() ).describedAs( "age" ).isEqualTo( 34 );
+		assertThat( (Integer) projection[1] ).describedAs( "age" ).isEqualTo( 34 );
 
 		tx.commit();
 		s.close();

@@ -543,12 +543,14 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
 			ExtendedFieldType type = FieldHelper.getType( fieldMetadata );
 
-			sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
-
 			if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
+				sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
+
 				return new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
 			}
 			else if ( fieldBridge instanceof TwoWayFieldBridge ) {
+				sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
+
 				PrimitiveProjection defaultFieldProjection = new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
 
 				Collection<BridgeDefinedField> bridgeDefinedFields = fieldMetadata.getBridgeDefinedFields().values();
@@ -563,11 +565,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 			else {
 				/*
-				 * TODO yrodiere: check whether this is really needed... this is supposed to provide support
-				 * for custom field bridges, but if users want to project on the fields created by such
-				 * bridges, why wouldn't they implement TwoWayFieldBridge?
+				 * Don't fail immediately: this entity type may not be present in the results, in which case
+				 * we don't need to be able to project on this field for this exact entity type.
+				 * Just make sure we *will* ultimately fail if we encounter this entity type.
 				 */
-				return new JsonDrivenProjection( absoluteName );
+				return new FailingOneWayFieldBridgeProjection( absoluteName, fieldBridge.getClass() );
 			}
 		}
 
@@ -1045,6 +1047,26 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				// TODO HSEARCH-2255 Better raise an exception?
 				return primitive.toString();
 			}
+		}
+	}
+	/**
+	 * A projection used whenever a given type has a one-way field bridge, which is forbidden.
+	 *
+	 * @author Yoann Rodiere
+	 */
+	private static class FailingOneWayFieldBridgeProjection extends FieldProjection {
+		private final String absoluteName;
+		private final Class<?> fieldBridgeClass;
+
+		public FailingOneWayFieldBridgeProjection(String absoluteName, Class<?> fieldBridgeClass) {
+			super();
+			this.absoluteName = absoluteName;
+			this.fieldBridgeClass = fieldBridgeClass;
+		}
+
+		@Override
+		public Object convertHit(JsonObject hit, ConversionContext conversionContext) {
+			throw LOG.projectingFieldWithoutTwoWayFieldBridge( absoluteName, fieldBridgeClass );
 		}
 	}
 
