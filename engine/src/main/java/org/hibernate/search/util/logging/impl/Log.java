@@ -994,4 +994,10 @@ public interface Log extends BasicLogger {
 			+ "gracefully for index '%s'.")
 	void timedOutWaitingShutdownOfReaderProvider(String indexName);
 
+	@Message(id = 323, value = "The field '%1$s' is not stored.")
+	SearchException projectingNonStoredField(String fieldName);
+
+	@Message(id = 324, value = "The fieldBridge for field '%1$s' is an instance of '%2$s', which does not implement TwoWayFieldBridge. Projected fields must have a TwoWayFieldBridge.")
+	SearchException projectingFieldWithoutTwoWayFieldBridge(String fieldName, Class<?> fieldBridgeClass);
+
 }
