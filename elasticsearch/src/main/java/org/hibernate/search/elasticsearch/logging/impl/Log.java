@@ -123,11 +123,6 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	SearchException unexpectedNumericEncodingType(String fieldType, String fieldName);
 
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 19,
-			value = "Cannot project field '%2$s' for entity %1$s: unknown field"
-	)
-	SearchException unknownFieldForProjection(String entityType, String fieldName);
-
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 20,
 			value = "Could not create mapping for entity type %1$s"
 	)
