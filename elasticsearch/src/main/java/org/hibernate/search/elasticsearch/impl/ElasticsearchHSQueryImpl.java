@@ -242,6 +242,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	protected void clearCachedResults() {
+		searcher = null;
 		searchResult = null;
 		resultSize = null;
 	}

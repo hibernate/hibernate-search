@@ -156,6 +156,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 			}
 			this.hasThisProjection = hasThis;
 		}
+		clearCachedResults();
 		return this;
 	}
 
