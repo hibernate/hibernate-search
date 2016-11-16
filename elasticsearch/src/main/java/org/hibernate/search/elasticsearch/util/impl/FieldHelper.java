@@ -131,6 +131,12 @@ public class FieldHelper {
 	}
 
 	public static ExtendedFieldType getType(DocumentFieldMetadata fieldMetadata) {
+		// Always use user-provided type in priority
+		BridgeDefinedField overriddenField = fieldMetadata.getBridgeDefinedFields().get( fieldMetadata.getAbsoluteName() );
+		if ( overriddenField != null ) {
+			return getType( overriddenField );
+		}
+
 		PropertyMetadata propertyMetata = fieldMetadata.getSourceProperty();
 		Class<?> propertyClass = propertyMetata == null ? null : propertyMetata.getPropertyClass();
 		if ( propertyClass == null ) {
