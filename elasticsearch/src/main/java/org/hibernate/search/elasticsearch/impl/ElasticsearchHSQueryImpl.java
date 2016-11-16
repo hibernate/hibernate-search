@@ -205,18 +205,18 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
 			/*
-			 * Do not add every property of the original query: some properties, such as "_source", do not have the same syntax
+			 * Do not add every property of the original payload: some properties, such as "_source", do not have the same syntax
 			 * and are not necessary to the explanation.
 			 */
-			JsonObject explainQuery = JsonBuilder.object()
-					.add( "query", searcher.completeQuery.get( "query" ) )
+			JsonObject explainPayload = JsonBuilder.object()
+					.add( "query", searcher.payload.get( "query" ) )
 					.build();
 
 			Explain request = new Explain.Builder(
 					hit.get( "_index" ).getAsString(),
 					hit.get( "_type" ).getAsString(),
 					hit.get( "_id" ).getAsString(),
-					explainQuery
+					explainPayload
 				)
 				.build();
 
@@ -305,8 +305,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private final Map<Class<?>, FieldProjection> idProjectionByEntityType = new HashMap<>();
 		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
 		private final Set<String> indexNames = new HashSet<>();
-		private final JsonObject completeQuery;
-		private final String completeQueryAsString;
+		private final JsonObject payload;
+		private final String payloadAsString;
 
 		private IndexSearcher() {
 			JsonArray typeFilters = new JsonArray();
@@ -336,10 +336,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			// Query filters; always a type filter, possibly a tenant id filter;
 			JsonObject filteredQuery = getFilteredQuery( jsonQuery.get( "query" ), typeFilters );
 
-			JsonBuilder.Object completeQuery = JsonBuilder.object();
-			completeQuery.add( "query", filteredQuery );
+			JsonBuilder.Object payloadBuilder = JsonBuilder.object();
+			payloadBuilder.add( "query", filteredQuery );
 
-			addProjections( completeQuery );
+			addProjections( payloadBuilder );
 
 			if ( !getFacetManager().getFacetRequests().isEmpty() ) {
 				JsonBuilder.Object facets = JsonBuilder.object();
@@ -348,16 +348,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					addFacetingRequest( facets, facetRequestEntry.getValue() );
 				}
 
-				completeQuery.add( "aggregations", facets );
+				payloadBuilder.add( "aggregations", facets );
 			}
 
 			// Initialize the sortByDistanceIndex to detect if the results are sorted by distance and the position
 			// of the sort
 			sortByDistanceIndex = getSortByDistanceIndex();
-			addScriptFields( completeQuery );
+			addScriptFields( payloadBuilder );
 
-			this.completeQuery = completeQuery.build();
-			completeQueryAsString = completeQuery.build().toString();
+			this.payload = payloadBuilder.build();
+			payloadAsString = payloadBuilder.build().toString();
 		}
 
 		private JsonObject getFilteredQuery(JsonElement originalQuery, JsonArray typeFilters) {
@@ -439,7 +439,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 
-		private void addProjections(JsonBuilder.Object completeQuery) {
+		private void addProjections(JsonBuilder.Object payloadBuilder) {
 			boolean includeAllSource = false;
 			JsonBuilder.Array builder = JsonBuilder.array();
 
@@ -470,7 +470,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							break;
 						case ElasticsearchProjectionConstants.SCORE:
 							// Make sure to compute scores even if we don't sort by relevance
-							completeQuery.addProperty( "track_scores", true );
+							payloadBuilder.addProperty( "track_scores", true );
 							break;
 						case ElasticsearchProjectionConstants.ID:
 						case ElasticsearchProjectionConstants.THIS:
@@ -512,7 +512,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 
-			completeQuery.add( "_source", filter );
+			payloadBuilder.add( "_source", filter );
 		}
 
 		private FieldProjection createProjection(JsonBuilder.Array sourceFilterCollector, TypeMetadata rootTypeMetadata, String projectedField) {
@@ -662,11 +662,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return sortByDistanceIndex >= 0;
 		}
 
-		private void addScriptFields(JsonBuilder.Object query) {
+		private void addScriptFields(JsonBuilder.Object payloadBuilder) {
 			if ( isPartOfProjectedFields( ElasticsearchProjectionConstants.SPATIAL_DISTANCE ) && !isSortedByDistance() ) {
 				// when the results are sorted by distance, Elasticsearch returns the distance in a "sort" field in
 				// the results. If we don't sort by distance, we need to request for the distance using a script_field.
-				query.add( "script_fields",
+				payloadBuilder.add( "script_fields",
 						JsonBuilder.object().add( SPATIAL_DISTANCE_FIELD, JsonBuilder.object()
 							.add( "script", JsonBuilder.object()
 								.add( "params",
@@ -681,7 +681,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				);
 				// in this case, the _source field is not present in the Elasticsearch results
 				// we need to ask for it explicitely
-				query.add( "fields", JsonBuilder.array().add( new JsonPrimitive( "_source" ) ) );
+				payloadBuilder.add( "fields", JsonBuilder.array().add( new JsonPrimitive( "_source" ) ) );
 			}
 		}
 
@@ -694,7 +694,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private SearchResult search(boolean enableScrolling) {
-			Search.Builder builder = new Search.Builder( completeQueryAsString );
+			Search.Builder builder = new Search.Builder( payloadAsString );
 			builder.addIndex( indexNames );
 
 			if ( enableScrolling ) {
