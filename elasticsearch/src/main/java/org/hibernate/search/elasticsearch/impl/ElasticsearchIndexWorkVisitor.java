@@ -12,10 +12,6 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleDocValuesField;
-import org.apache.lucene.document.DoubleField;
-import org.apache.lucene.document.FloatField;
-import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.facet.FacetsConfig;
@@ -364,10 +360,6 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	private String getDocumentId(LuceneWork work) {
 		return work.getTenantId() == null ? work.getIdInString() : work.getTenantId() + "_" + work.getIdInString();
-	}
-
-	private boolean isNumeric(IndexableField field) {
-		return field instanceof IntField || field instanceof LongField || field instanceof FloatField || field instanceof DoubleField;
 	}
 
 	private boolean isDocValueField(IndexableField field) {
