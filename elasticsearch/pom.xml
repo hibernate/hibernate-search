@@ -229,9 +229,6 @@
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
                                 <!-- Also, parts of NullEmbeddedTest -->
                                 
-                                <!-- HSEARCH-2392 Enable BridgeProviderTest for Elasticsearch -->
-                                <exclude>**/BridgeProviderTest.java</exclude>
-                                
                                 <!-- HSEARCH-2395 Support MoreLikeThisQueries with the Elasticsearch backend -->
                                 <exclude>**/MoreLikeThisTest.java</exclude>
                                 
