@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.junit.Assert;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
 import org.hibernate.search.cfg.SearchMapping;
@@ -20,13 +19,17 @@ import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TestDefaults;
+import org.junit.Assert;
 import org.junit.rules.ExternalResource;
 
 /**
- * TestingSearchFactoryHolder.
+ * Testing SearchFactoryHolder.
+ *
+ * <p>Automatically retrieves configuration options from the classpath file "/test-defaults.properties".
  *
  * @author Sanne Grinovero
  * @since 4.1
@@ -50,7 +53,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	public SearchFactoryHolder(SearchMapping buildMappingDefinition, Class<?>... entities) {
 		this.buildMappingDefinition = buildMappingDefinition;
 		this.entities = entities;
-		this.configuration = new Properties();
+		this.configuration = TestDefaults.getProperties();
 	}
 
 	public ExtendedSearchIntegrator getSearchFactory() {

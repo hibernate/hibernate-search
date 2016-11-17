@@ -20,9 +20,6 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -48,13 +45,7 @@ public class ElasticsearchScrollingIT {
 	private static final int DEFAULT_MAX_RESULT_WINDOW = 10000;
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedObject.class )
-			.withProperty(
-					"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-					IndexSchemaManagementStrategy.RECREATE_DELETE.name()
-					)
-			.withProperty( "hibernate.search.default." + Environment.INDEX_MANAGER_IMPL_NAME, "elasticsearch" )
-			.withProperty( "hibernate.search.default." + ElasticsearchEnvironment.REFRESH_AFTER_WRITE, "true" );
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedObject.class );
 
 	@Test
 	public void searchBeforeMaxResultWindow() throws Exception {

@@ -16,9 +16,6 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -34,10 +31,6 @@ public class ElasticsearchMultitenancyIT {
 
 	@Rule
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( User.class )
-			.withProperty( "hibernate.search.default." + Environment.INDEX_MANAGER_IMPL_NAME, "elasticsearch" )
-			.withProperty( "hibernate.search.default." + ElasticsearchEnvironment.REFRESH_AFTER_WRITE, "true" )
-			.withProperty( "hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-					IndexSchemaManagementStrategy.RECREATE_DELETE.name() )
 			.withMultitenancyEnabled( true );
 
 	@Test
