@@ -25,8 +25,6 @@ import org.hibernate.search.testsupport.TestConstants;
 /**
  * Manually defines the configuration.
  *
- * Classes and properties are the only implemented options at the moment
- *
  * @author Emmanuel Bernard
  */
 public class SearchConfigurationForTest extends SearchConfigurationBase implements SearchConfiguration {
@@ -50,7 +48,7 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	public SearchConfigurationForTest(InstanceInitializer init) {
 		this.initializer = init;
 		this.classes = new HashMap<String, Class<?>>();
-		this.properties = new Properties();
+		this.properties = TestDefaults.getProperties();
 		this.providedServices = new HashMap<Class<? extends Service>, Object>();
 		this.classLoaderService = new DefaultClassLoaderService();
 		addProperty( "hibernate.search.default.directory_provider", "ram" );
