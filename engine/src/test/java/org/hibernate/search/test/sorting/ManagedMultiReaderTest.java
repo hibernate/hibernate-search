@@ -25,8 +25,10 @@ import org.hibernate.search.query.engine.impl.SortConfigurations;
 import org.hibernate.search.reader.impl.ManagedMultiReader;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -35,6 +37,7 @@ import static org.fest.assertions.Assertions.assertThat;
  *
  * @author Gunnar Morling
  */
+@Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class ManagedMultiReaderTest {
 
 	@Rule

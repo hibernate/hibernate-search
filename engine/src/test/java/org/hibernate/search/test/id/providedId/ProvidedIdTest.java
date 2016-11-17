@@ -28,9 +28,11 @@ import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -40,6 +42,7 @@ import static org.junit.Assert.assertTrue;
  * @author Navin Surtani
  * @author Sanne Grinovero
  */
+@Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class ProvidedIdTest {
 
 	@Rule

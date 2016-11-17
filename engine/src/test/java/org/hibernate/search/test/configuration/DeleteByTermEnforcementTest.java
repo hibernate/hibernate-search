@@ -7,9 +7,11 @@
 package org.hibernate.search.test.configuration;
 
 import org.hibernate.search.engine.impl.MutableSearchFactory;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertTrue;
 
@@ -18,6 +20,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author gustavonalle
  */
+@Category(SkipOnElasticsearch.class) // The DeleteByTerm matter is specific to Lucene
 public class DeleteByTermEnforcementTest extends BaseConfigurationTest {
 
 	@Test

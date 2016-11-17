@@ -13,8 +13,10 @@ import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
 import org.hibernate.search.backend.impl.lucene.SharedIndexCommitPolicy;
 import org.hibernate.search.test.configuration.mutablefactory.A;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy.DEFAULT_DELAY_MS;
 import static org.junit.Assert.assertEquals;
@@ -25,6 +27,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author gustavonalle
  */
+@Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class CommitPolicyConfigurationTest {
 
 	@Rule
