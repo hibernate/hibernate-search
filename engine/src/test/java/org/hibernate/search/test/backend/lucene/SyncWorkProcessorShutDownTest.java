@@ -9,11 +9,13 @@ package org.hibernate.search.test.backend.lucene;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 /**
@@ -23,6 +25,7 @@ import org.junit.runner.RunWith;
  * @author gustavonalle
  */
 @RunWith(BMUnitRunner.class)
+@Category(SkipOnElasticsearch.class) // SyncWorkProcessor is specific to Lucene
 public class SyncWorkProcessorShutDownTest {
 
 	@Rule

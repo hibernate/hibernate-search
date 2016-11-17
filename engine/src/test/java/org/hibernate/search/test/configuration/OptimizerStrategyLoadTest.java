@@ -18,8 +18,10 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.ExplicitOnlyOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 
 /**
@@ -28,6 +30,7 @@ import org.junit.Test;
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
+@Category(SkipOnElasticsearch.class) // Optimizer strategies are specific to the Lucene backend
 public class OptimizerStrategyLoadTest {
 
 	@Test

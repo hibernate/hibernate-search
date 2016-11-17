@@ -39,6 +39,7 @@ import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
@@ -50,6 +51,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.junit.experimental.categories.Category;
 
 /**
  * This tests verifies the different sharding configuration options
@@ -233,6 +235,7 @@ public class ShardingConfigurationTest {
 	}
 
 	@Test
+	@Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 	public void testConfiguringDynamicallyCreatedShardViaConfiguration() {
 		Map<String, String> shardingProperties = new HashMap<String, String>();
 		shardingProperties.put(

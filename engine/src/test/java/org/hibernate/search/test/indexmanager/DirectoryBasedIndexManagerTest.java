@@ -21,18 +21,21 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author gustavonalle
  */
 @TestForIssue(jiraKey = "HSEARCH-2012")
-public class IndexManagerTest {
+@Category(SkipOnElasticsearch.class) // DirectoryBasedIndexManager is specific to Lucene
+public class DirectoryBasedIndexManagerTest {
 
 	@Rule
 	public SearchFactoryHolder sfh = new SearchFactoryHolder( Entity.class );

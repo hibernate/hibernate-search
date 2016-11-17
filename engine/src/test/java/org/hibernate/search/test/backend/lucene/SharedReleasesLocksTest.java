@@ -8,8 +8,6 @@ package org.hibernate.search.test.backend.lucene;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.annotations.DocumentId;
@@ -19,13 +17,16 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 /**
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith;
  */
 @TestForIssue(jiraKey = "HSEARCH-1320")
 @RunWith(BMUnitRunner.class)
+@Category(SkipOnElasticsearch.class) // IndexWriters are specific to Lucene
 public class SharedReleasesLocksTest {
 
 	@Rule

@@ -15,9 +15,11 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.EmptyQueryException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 
@@ -35,6 +37,7 @@ public class EmptyQueryExceptionTest {
 	public ExpectedException exceptions = ExpectedException.none();
 
 	@Test
+	@Category(SkipOnElasticsearch.class) // This isn't relevant when using Elasticsearch, since analysis is remote
 	public void verifyExceptionOnNonMeaningfullQueries() {
 		final ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 
