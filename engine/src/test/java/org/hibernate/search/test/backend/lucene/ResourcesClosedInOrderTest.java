@@ -12,6 +12,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.CountingErrorHandler;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
@@ -20,6 +21,7 @@ import org.jboss.byteman.contrib.bmunit.BMRules;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
@@ -56,6 +58,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Sanne Grinovero (C) 2015 Red Hat Inc.
  */
+@Category(SkipOnElasticsearch.class) // IndexWriters are Lucene-specific
 public class ResourcesClosedInOrderTest {
 
 	private static final int NUMBER_ENTITIES = 2;

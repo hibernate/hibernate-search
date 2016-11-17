@@ -22,15 +22,18 @@ import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.leakdetection.FileMonitoringDirectory;
 import org.hibernate.search.testsupport.leakdetection.FileMonitoringDirectoryProvider;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * Test for HSEARCH-1090: IndexReader leaks file handles on close
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
+@Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class AllFilesClosedTest {
 
 	private SearchIntegrator searchIntegrator;

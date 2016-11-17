@@ -17,10 +17,12 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.logging.impl.LogCategory;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * We already have plenty of tests verifying the parsing of configuration properties,
@@ -30,6 +32,7 @@ import org.junit.Test;
  * @author Sanne Grinovero
  */
 @TestForIssue(jiraKey = "HSEARCH-1508")
+@Category(SkipOnElasticsearch.class) // IndexWriters are specific to Lucene
 public class IndexWriterTuningAppliedTest {
 
 	@Rule

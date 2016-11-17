@@ -16,10 +16,11 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.junit.Test;
-
+import org.junit.experimental.categories.Category;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,6 +29,7 @@ import static org.junit.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-1744")
+@Category(SkipOnElasticsearch.class) // There's no need to re-execute this test with Elasticsearch, and it fails anyway due to the filesystem magic in #getClasses
 public class TwoWayFieldBridgeTest {
 
 	@Test

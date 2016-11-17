@@ -45,9 +45,11 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -144,6 +146,7 @@ public class SortingTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2376")
+	@Category(SkipOnElasticsearch.class) // Elasticsearch handles sorts on multi-value fields differently (the default is unclear, but it provides "sort modes" like min, max, avg, etc.)
 	public void testSortingOnTokenizedString() {
 		// Index all testData:
 		storeTestingData(
