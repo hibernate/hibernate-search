@@ -9,8 +9,11 @@ package org.hibernate.search.elasticsearch.client.impl;
 import java.util.Collections;
 import java.util.Set;
 
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
+
+import io.searchbox.client.JestResult;
 
 /**
  * A single, non-bulkable request.
@@ -31,8 +34,16 @@ public class SingleRequest implements ExecutableRequest {
 
 	@Override
 	public void execute() {
+		doExecute( request );
+	}
+
+	private <T extends JestResult> void doExecute(BackendRequest<T> request) {
 		try {
-			jestClient.executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
+			T result = jestClient.executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
+			IndexingMonitor monitor = request.getIndexingMonitor();
+			if ( monitor != null ) {
+				request.getSuccessReporter().report( result, monitor );
+			}
 		}
 		catch (Exception e) {
 			ErrorContextBuilder builder = new ErrorContextBuilder();

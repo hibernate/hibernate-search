@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 
 import io.searchbox.action.Action;
@@ -28,12 +29,18 @@ public class BackendRequest<T extends JestResult> {
 	private final Set<Integer> ignoredErrorStatuses;
 	private final LuceneWork luceneWork;
 	private final String indexName;
+	private final IndexingMonitor indexingMonitor;
+	private final BackendRequestSuccessReporter<? super T> successReporter;
 	private final boolean refreshAfterWrite;
 
-	public BackendRequest(Action<T> action, LuceneWork luceneWork, String indexName, boolean refreshAfterWrite, int... ignoredErrorStatuses) {
+	public BackendRequest(Action<T> action, LuceneWork luceneWork, String indexName,
+			IndexingMonitor indexingMonitor, BackendRequestSuccessReporter<? super T> successReporter,
+			boolean refreshAfterWrite, int... ignoredErrorStatuses) {
 		this.action = action;
 		this.luceneWork = luceneWork;
 		this.indexName = indexName;
+		this.indexingMonitor = indexingMonitor;
+		this.successReporter = successReporter;
 		this.refreshAfterWrite = refreshAfterWrite;
 		this.ignoredErrorStatuses = asSet( ignoredErrorStatuses );
 	}
@@ -69,6 +76,14 @@ public class BackendRequest<T extends JestResult> {
 
 	public String getIndexName() {
 		return indexName;
+	}
+
+	public IndexingMonitor getIndexingMonitor() {
+		return indexingMonitor;
+	}
+
+	public BackendRequestSuccessReporter<? super T> getSuccessReporter() {
+		return successReporter;
 	}
 
 	/**

@@ -285,7 +285,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	public void performOperations(List<LuceneWork> workList, IndexingMonitor monitor) {
 		List<BackendRequest<?>> requests = new ArrayList<>( workList.size() );
 		for ( LuceneWork luceneWork : workList ) {
-			requests.add( luceneWork.acceptIndexWorkVisitor( visitor, null ) );
+			requests.add( luceneWork.acceptIndexWorkVisitor( visitor, monitor ) );
 		}
 
 		requestProcessor.executeSync( requests );
@@ -297,7 +297,7 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 			requestProcessor.awaitAsyncProcessingCompletion();
 		}
 		else {
-			BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, null );
+			BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
 
 			if ( request != null ) {
 				requestProcessor.executeAsync( request );
