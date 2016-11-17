@@ -10,10 +10,17 @@ import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.runner.RunWith;
 
 /**
- * Helper for running specific tests from the "orm" module in the context of the ES backend module. Adapt the classname
- * filter as needed to run a single test or an entire test package.
+ * Helper for running specific tests from the "orm" or "engine" module in the context
+ * of the Elasticsearch module.
  *
- * Running such tests from the IDE will require having an Elasticsearch
+ * <p>The main difference with running tests directly is that those tests will use
+ * configuration files from the Elasticsearch module (see
+ * <code>src/test/resources/hibernate.properties</code> and
+ * <code>src/test/resources/searchfactoryholder-defaults.properties</code>).
+ *
+ *<p>Adapt the classname filter as needed to run a single test or an entire test package.
+ *
+ * <p>Running such tests from the IDE will require having an Elasticsearch
  * node running. You can easily start one by running 'mvn elasticsearch:run'
  * from the elasticsearch module in this project.
  *
@@ -22,5 +29,5 @@ import org.junit.runner.RunWith;
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({ ".*ProjectionQueryTest" })
 // @ClasspathSuite.ClassnameFilters({ "org.hibernate.search.test.*" })
-public class OrmTestRunner {
+public class ImportedTestRunner {
 }
