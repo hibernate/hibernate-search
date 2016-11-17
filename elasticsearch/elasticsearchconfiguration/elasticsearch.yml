@@ -96,6 +96,13 @@ index.analysis:
       type: custom
       tokenizer: keyword
       filter: [asciifolding, lowercase]
+    org_hibernate_search_test_sorting_SortingTest_Person_collatingAnalyzer:
+      type: custom
+      tokenizer: keyword
+      filter: [asciifolding, lowercase]
+    org_hibernate_search_test_sorting_SortingTest_Person_tokenizingAnalyzer:
+      type: custom
+      tokenizer: whitespace
   filter:
     custom-filter:
       type : stop

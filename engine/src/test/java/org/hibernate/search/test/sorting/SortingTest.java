@@ -389,7 +389,7 @@ public class SortingTest {
 
 	@AnalyzerDefs({
 		@AnalyzerDef(
-				name = "collatingAnalyzer",
+				name = Person.COLLATING_ANALYZER_NAME,
 				tokenizer = @TokenizerDef(factory = KeywordTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
@@ -397,12 +397,15 @@ public class SortingTest {
 				}
 		),
 		@AnalyzerDef(
-				name = "tokenizingAnalyzer",
+				name = Person.TOKENIZING_ANALYZER_NAME,
 				tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class)
 		)
 	})
 	@Indexed
 	private class Person {
+
+		public static final String COLLATING_ANALYZER_NAME = "org_hibernate_search_test_sorting_SortingTest_Person_collatingAnalyzer";
+		public static final String TOKENIZING_ANALYZER_NAME = "org_hibernate_search_test_sorting_SortingTest_Person_tokenizingAnalyzer";
 
 		@DocumentId
 		final int id;
@@ -425,8 +428,8 @@ public class SortingTest {
 		})
 		@Fields({
 				@Field(name = "name", store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN),
-				@Field(name = "collatedName", store = Store.YES, analyzer = @Analyzer(definition = "collatingAnalyzer")),
-				@Field(name = "tokenizedName", store = Store.YES, analyzer = @Analyzer(definition = "tokenizingAnalyzer"))
+				@Field(name = "collatedName", store = Store.YES, analyzer = @Analyzer(definition = COLLATING_ANALYZER_NAME)),
+				@Field(name = "tokenizedName", store = Store.YES, analyzer = @Analyzer(definition = TOKENIZING_ANALYZER_NAME))
 		})
 		final String name;
 
