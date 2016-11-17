@@ -242,9 +242,6 @@
                                 <exclude>**/JPATimeoutTest.java</exclude>
                                 <exclude>**/TimeoutTest.java</exclude>
                                 
-                                <!-- HSEARCH-2400 Support IndexingMonitor for the Elasticsearch backend -->
-                                <exclude>**/ProgressMonitorTest.java</exclude>
-                                
                                 <!-- HSEARCH-2426 Remote analyzer initialization fails when using dynamic sharding on Elasticsearch -->
                                 <exclude>**/DirectoryProviderForQueryTest.java</exclude>
                                 <exclude>**/CustomerShardingStrategyTest.java</exclude>

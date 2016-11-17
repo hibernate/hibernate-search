@@ -23,6 +23,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -165,8 +166,8 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		try {
 			jestClient.executeRequest( refreshBuilder.build() );
 		}
-		catch (BulkRequestFailedException brfe) {
-			errorHandler.handleException( "Refresh failed", brfe );
+		catch (SearchException e) {
+			errorHandler.handleException( "Refresh failed", e );
 		}
 	}
 

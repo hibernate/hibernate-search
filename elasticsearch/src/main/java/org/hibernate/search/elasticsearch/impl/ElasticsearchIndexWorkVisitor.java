@@ -25,6 +25,7 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexWorkVisitor;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
@@ -50,7 +51,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
 import io.searchbox.core.DeleteByQuery;
 import io.searchbox.core.DocumentResult;
@@ -63,7 +63,7 @@ import io.searchbox.indices.Optimize;
  *
  * @author Gunnar Morling
  */
-class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendRequest<?>> {
+class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor, BackendRequest<?>> {
 
 	private static final String DELETE_ALL_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"match_all\" : { } } } } }";
 	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
@@ -79,23 +79,25 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 	}
 
 	@Override
-	public BackendRequest<?> visitAddWork(AddLuceneWork work, Void p) {
-		Action<?> index = indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() );
-		return new BackendRequest<>( index, work, indexName, refreshAfterWrite );
+	public BackendRequest<?> visitAddWork(AddLuceneWork work, IndexingMonitor monitor) {
+		Action<DocumentResult> index = indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() );
+		return new BackendRequest<>( index, work, indexName,
+				monitor, DocumentAddedBackendRequestSuccessReporter.INSTANCE, refreshAfterWrite );
 	}
 
 	@Override
-	public BackendRequest<?> visitDeleteWork(DeleteLuceneWork work, Void p) {
+	public BackendRequest<?> visitDeleteWork(DeleteLuceneWork work, IndexingMonitor monitor) {
 		Delete delete = new Delete.Builder( getDocumentId( work ) )
 			.index( indexName )
 			.type( work.getEntityClass().getName() )
 			.build();
 
-		return new BackendRequest<DocumentResult>( delete, work, indexName, refreshAfterWrite, 404 );
+		return new BackendRequest<>( delete, work, indexName,
+				monitor, NoopBackendRequestSuccessHandler.INSTANCE, refreshAfterWrite, 404 );
 	}
 
 	@Override
-	public BackendRequest<?> visitOptimizeWork(OptimizeLuceneWork work, Void p) {
+	public BackendRequest<?> visitOptimizeWork(OptimizeLuceneWork work, IndexingMonitor monitor) {
 		/*
 		 * As of ES 2.1, the Optimize API has been renamed to ForceMerge,
 		 * but Jest still does not provide commands for the ForceMerge API as of
@@ -106,11 +108,12 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 				.addIndex( indexName )
 				.build();
 
-		return new BackendRequest<JestResult>( optimize, work, indexName, refreshAfterWrite );
+		return new BackendRequest<>( optimize, work, indexName,
+				monitor, NoopBackendRequestSuccessHandler.INSTANCE, refreshAfterWrite );
 	}
 
 	@Override
-	public BackendRequest<?> visitPurgeAllWork(PurgeAllLuceneWork work, Void p) {
+	public BackendRequest<?> visitPurgeAllWork(PurgeAllLuceneWork work, IndexingMonitor monitor) {
 		String query = work.getTenantId() != null ?
 				String.format( Locale.ENGLISH, DELETE_ALL_FOR_TENANT_QUERY, work.getTenantId() ) :
 				DELETE_ALL_QUERY;
@@ -123,23 +126,25 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 			builder.addType( typeToDelete.getName() );
 		}
 
-		return new BackendRequest<>( builder.build(), work, indexName, refreshAfterWrite );
+		return new BackendRequest<>( builder.build(), work, indexName,
+				monitor, NoopBackendRequestSuccessHandler.INSTANCE, refreshAfterWrite );
 	}
 
 	@Override
-	public BackendRequest<?> visitUpdateWork(UpdateLuceneWork work, Void p) {
-		Action<?> index = indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() );
-		return new BackendRequest<>( index, work, indexName, refreshAfterWrite );
+	public BackendRequest<?> visitUpdateWork(UpdateLuceneWork work, IndexingMonitor monitor) {
+		Action<DocumentResult> index = indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() );
+		return new BackendRequest<>( index, work, indexName,
+				monitor, DocumentAddedBackendRequestSuccessReporter.INSTANCE, refreshAfterWrite );
 	}
 
 	@Override
-	public BackendRequest<?> visitFlushWork(FlushLuceneWork work, Void p) {
+	public BackendRequest<?> visitFlushWork(FlushLuceneWork work, IndexingMonitor monitor) {
 		// Nothing to do
 		return null;
 	}
 
 	@Override
-	public BackendRequest<?> visitDeleteByQueryWork(DeleteByQueryLuceneWork work, Void p) {
+	public BackendRequest<?> visitDeleteByQueryWork(DeleteByQueryLuceneWork work, IndexingMonitor monitor) {
 		JsonObject convertedQuery = ToElasticsearch.fromDeletionQuery(
 				searchIntegrator.getIndexBinding( work.getEntityClass() ).getDocumentBuilder(),
 				work.getDeletionQuery()
@@ -174,10 +179,11 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<Void, BackendReq
 			.addType( type )
 			.build();
 
-		return new BackendRequest<>( deleteByQuery, work, indexName, refreshAfterWrite );
+		return new BackendRequest<>( deleteByQuery, work, indexName,
+				monitor, NoopBackendRequestSuccessHandler.INSTANCE, refreshAfterWrite );
 	}
 
-	private Action<?> indexDocument(String id, Document document, Class<?> entityType) {
+	private Action<DocumentResult> indexDocument(String id, Document document, Class<?> entityType) {
 		JsonObject source = convertToJson( document, entityType );
 		String type = entityType.getName();
 

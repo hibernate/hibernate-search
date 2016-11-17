@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.logging.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
@@ -28,6 +29,7 @@ import org.jboss.logging.annotations.Param;
 import com.google.gson.JsonElement;
 
 import io.searchbox.client.JestResult;
+import io.searchbox.core.BulkResult.BulkResultItem;
 
 /**
  * Hibernate Search log abstraction for the Elasticsearch integration.
@@ -66,10 +68,12 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	SearchException elasticsearchRequestFailed(String request, String response, @Cause Exception cause);
 
+	// The bounds on wildcards below are necessary for the logger code generation to work
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 8,
 			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
 	)
-	BulkRequestFailedException elasticsearchBulkRequestFailed(String request, String response, @Param List<BackendRequest<? extends JestResult>> erroneousItems);
+	BulkRequestFailedException elasticsearchBulkRequestFailed(String request, String response,
+			@Param Map<BackendRequest<? extends JestResult>, BulkResultItem> successfulItems, @Param List<BackendRequest<? extends JestResult>> erroneousItems);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,

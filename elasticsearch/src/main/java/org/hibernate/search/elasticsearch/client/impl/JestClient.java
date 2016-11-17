@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -152,12 +153,12 @@ public class JestClient implements Service, Startable, Stoppable {
 	/**
 	 * Creates a bulk action from the given list and executes it.
 	 */
-	public void executeBulkRequest(List<BackendRequest<?>> actions, boolean refresh) {
+	public Map<BackendRequest<?>, BulkResultItem> executeBulkRequest(List<BackendRequest<?>> backendRequests, boolean refresh) {
 		Builder bulkBuilder = new Bulk.Builder()
 				.setParameter( Parameters.REFRESH, refresh );
 
-		for ( BackendRequest<?> action : actions ) {
-			bulkBuilder.addAction( (BulkableAction<?>) action.getAction() );
+		for ( BackendRequest<?> backendRequest : backendRequests ) {
+			bulkBuilder.addAction( (BulkableAction<?>) backendRequest.getAction() );
 		}
 
 		Bulk request = bulkBuilder.build();
@@ -165,17 +166,38 @@ public class JestClient implements Service, Startable, Stoppable {
 		try {
 			BulkResult response = client.execute( request );
 
-			// Ideally I could just check on the status of the bulk, but for some reason the ES response is not
-			// always set to erroneous also if there is an erroneous item; I suppose that's a bug in ES? For now we are
-			// examining the result items and check if there is any erroneous
-			List<BackendRequest<?>> erroneousItems = getErroneousItems( actions, response );
+			Map<BackendRequest<?>, BulkResultItem> successfulItems =
+					CollectionHelper.newHashMap( backendRequests.size() );
+
+			/*
+			 * We can't rely on the status of the bulk, since each backend request may consider specific
+			 * status codes as a success regardless of their usual meaning, which Elasticsearch doesn't
+			 * know about when computing the status of the bulk.
+			 */
+			List<BackendRequest<?>> erroneousItems = new ArrayList<>();
+			int i = 0;
+			for ( BulkResultItem resultItem : response.getItems() ) {
+				BackendRequest<?> backendRequest = backendRequests.get( i );
+
+				if ( isErrored( backendRequest, resultItem ) ) {
+					erroneousItems.add( backendRequest );
+				}
+				else {
+					successfulItems.put( backendRequest, resultItem );
+				}
+				++i;
+			}
 
 			if ( !erroneousItems.isEmpty() ) {
 				throw LOG.elasticsearchBulkRequestFailed(
 						requestToString( request ),
 						resultToString( response ),
+						successfulItems,
 						erroneousItems
 				);
+			}
+			else {
+				return successfulItems;
 			}
 		}
 		catch (IOException e) {
@@ -183,23 +205,10 @@ public class JestClient implements Service, Startable, Stoppable {
 		}
 	}
 
-	private List<BackendRequest<?>> getErroneousItems(List<BackendRequest<?>> actions, BulkResult response) {
-		int i = 0;
-
-		List<BackendRequest<?>> erroneousItems = new ArrayList<>();
-
-		for ( BulkResultItem resultItem : response.getItems() ) {
-			// When getting a 404 for a DELETE, the error is null :(, so checking both
-			if ( resultItem.error != null || resultItem.status >= 400 ) {
-				BackendRequest<?> action = actions.get( i );
-				if ( !action.getIgnoredErrorStatuses().contains( resultItem.status ) ) {
-					erroneousItems.add( action );
-				}
-			}
-			i++;
-		}
-
-		return erroneousItems;
+	private boolean isErrored(BackendRequest<?> backendRequest, BulkResultItem resultItem) {
+		// When getting a 404 for a DELETE, the error is null :(, so checking both
+		return (resultItem.error != null || resultItem.status >= 400 )
+			&& !isResponseCode( resultItem.status, backendRequest.getIgnoredErrorStatuses() );
 	}
 
 	private boolean isResponseCode(int responseCode, Set<Integer> codes) {
