@@ -250,21 +250,14 @@ public class MutableFactoryTest {
 			}
 			poolExecutor.shutdown();
 
-			boolean inProgress;
-			do {
-				Thread.sleep( 100 );
-				inProgress = false;
-				for ( DoAddClasses runnable : runnables ) {
-					inProgress = inProgress || runnable.isFailure() == null;
-				}
-			} while ( inProgress );
-
-			for ( DoAddClasses runnable : runnables ) {
-				assertNotNull( "Threads not run # " + runnable.getWorkNumber(), runnable.isFailure() );
-				assertFalse( "thread failed #" + runnable.getWorkNumber() + " Failure: " + runnable.getFailureInfo(), runnable.isFailure() );
+			if ( !poolExecutor.awaitTermination( 1, TimeUnit.MINUTES ) ) {
+				poolExecutor.shutdownNow();
+				fail( "The thread pool didn't finish executing after 1 minute" );
 			}
 
-			poolExecutor.awaitTermination( 1, TimeUnit.MINUTES );
+			for ( DoAddClasses runnable : runnables ) {
+				assertFalse( "thread failed #" + runnable.getWorkNumber() + " Failure: " + runnable.getFailureInfo(), runnable.isFailure() );
+			}
 
 			for ( int i = 0; i < nbrOfThread * nbrOfClassesPerThread; i++ ) {
 				Query luceneQuery = parser.parse( "Emmanuel" + i );
@@ -291,14 +284,14 @@ public class MutableFactoryTest {
 		private final int factorOfClassesPerThread;
 		private final QueryParser parser;
 		private final int nbrOfClassesPerThread;
-		private volatile Boolean failure = false;
+		private volatile boolean failure = false;
 		private volatile String failureInfo;
 
 		public String getFailureInfo() {
 			return failureInfo;
 		}
 
-		public Boolean isFailure() {
+		public boolean isFailure() {
 			return failure;
 		}
 
