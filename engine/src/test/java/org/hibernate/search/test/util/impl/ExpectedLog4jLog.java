@@ -40,6 +40,8 @@ public class ExpectedLog4jLog implements TestRule {
 
 	private List<Matcher<?>> expectations = new ArrayList<>();
 
+	private List<Matcher<?>> absenceExpectations = new ArrayList<>();
+
 	private ExpectedLog4jLog() {
 	}
 
@@ -56,6 +58,13 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
+	 * Verify that your code <strong>doesn't</strong> produce a log event matching the given matcher.
+	 */
+	public void expectEventMissing(Matcher<? extends LoggingEvent> matcher) {
+		absenceExpectations.add( matcher );
+	}
+
+	/**
 	 * Verify that your code produces a log message containing the given string.
 	 */
 	public void expectMessage(String containedString) {
@@ -63,24 +72,47 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
+	 * Verify that your code <strong>doesn't</strong> produce a log message containing the given string.
+	 */
+	public void expectMessageMissing(String containedString) {
+		expectMessageMissing( CoreMatchers.containsString( containedString ) );
+	}
+
+	/**
 	 * Verify that your code produces a log message containing all of the given string.
 	 */
 	public void expectMessage(String containedString, String... otherContainedStrings) {
+		expectMessage( containsAllStrings( containedString, otherContainedStrings ) );
+	}
+
+	/**
+	 * Verify that your code <strong>doesn't</strong> produce a log message containing all of the given string.
+	 */
+	public void expectMessageMissing(String containedString, String... otherContainedStrings) {
+		expectMessageMissing( containsAllStrings( containedString, otherContainedStrings ) );
+	}
+
+	/**
+	 * Verify that your code produces a log message matches the given Hamcrest matcher.
+	 */
+	public void expectMessage(Matcher<String> matcher) {
+		expectEvent( eventMessageMatcher( matcher ) );
+	}
+
+	/**
+	 * Verify that your code <strong>doesn't</strong> produce a log message matches the given Hamcrest matcher.
+	 */
+	public void expectMessageMissing(Matcher<String> matcher) {
+		expectEventMissing( eventMessageMatcher( matcher ) );
+	}
+
+	private Matcher<String> containsAllStrings(String containedString, String... otherContainedStrings) {
 		Collection<Matcher<? super String>> matchers = new ArrayList<>();
 		matchers.add( CoreMatchers.containsString( containedString ) );
 		for ( String otherContainedString : otherContainedStrings ) {
 			matchers.add( CoreMatchers.containsString( otherContainedString ) );
 		}
-		expectMessage( CoreMatchers.<String>allOf( matchers ) );
-	}
-
-	/**
-	 * Verify that your code produces a log message matches the given Hamcrest matcher.
-	 *
-	 * @return An expectation setter, for specifying the number of expected matching events (if different from one).
-	 */
-	public void expectMessage(Matcher<String> matcher) {
-		expectEvent( eventMessageMatcher( matcher ) );
+		return CoreMatchers.<String>allOf( matchers );
 	}
 
 	private Matcher<LoggingEvent> eventMessageMatcher(final Matcher<String> messageMatcher) {
@@ -101,6 +133,7 @@ public class ExpectedLog4jLog implements TestRule {
 
 	private class TestAppender extends AppenderSkeleton {
 		private final Set<Matcher<?>> expectationsMet = new HashSet<>();
+		private final Set<LoggingEvent> unexpectedEvents = new HashSet<>();
 
 		@Override
 		public void close() {
@@ -118,6 +151,11 @@ public class ExpectedLog4jLog implements TestRule {
 					expectationsMet.add( expectation );
 				}
 			}
+			for ( Matcher<?> absenceExpectation : ExpectedLog4jLog.this.absenceExpectations ) {
+				if ( absenceExpectation.matches( event ) ) {
+					unexpectedEvents.add( event );
+				}
+			}
 		}
 
 		public Set<Matcher<?>> getExpectationsNotMet() {
@@ -125,6 +163,10 @@ public class ExpectedLog4jLog implements TestRule {
 			expectationsNotMet.addAll( expectations );
 			expectationsNotMet.removeAll( expectationsMet );
 			return expectationsNotMet;
+		}
+
+		public Set<LoggingEvent> getUnexpectedEvents() {
+			return unexpectedEvents;
 		}
 
 	}
@@ -149,18 +191,29 @@ public class ExpectedLog4jLog implements TestRule {
 				logger.removeAppender( appender );
 			}
 			Set<Matcher<?>> expectationsNotMet = appender.getExpectationsNotMet();
-			if ( !expectationsNotMet.isEmpty() ) {
-				fail( buildFailureMessage( expectationsNotMet ) );
+			Set<LoggingEvent> unexpectedEvents = appender.getUnexpectedEvents();
+			if ( !expectationsNotMet.isEmpty() || !unexpectedEvents.isEmpty() ) {
+				fail( buildFailureMessage( expectationsNotMet, unexpectedEvents ) );
 			}
 		}
 	}
 
-	private static String buildFailureMessage(Set<Matcher<?>> expectationsNotMet) {
+	private static String buildFailureMessage(Set<Matcher<?>> missingSet, Set<LoggingEvent> unexpectedEvents) {
 		Description description = new StringDescription();
-		description.appendText( "Some logs were missing:" );
-		for ( Matcher<?> expectationNotMet : expectationsNotMet ) {
-			description.appendText( "\n" );
-			expectationNotMet.describeTo( description );
+		description.appendText( "Produced logs did not meet the expectations." );
+		if ( !missingSet.isEmpty() ) {
+			description.appendText( "\nMissing logs:" );
+			for ( Matcher<?> missing : missingSet ) {
+				description.appendText( "\n\t" );
+				missing.describeTo( description );
+			}
+		}
+		if ( !unexpectedEvents.isEmpty() ) {
+			description.appendText( "\nUnexpected logs:" );
+			for ( LoggingEvent unexpected : unexpectedEvents ) {
+				description.appendText( "\n\t" );
+				description.appendText( unexpected.getRenderedMessage() );
+			}
 		}
 		return description.toString();
 	}
