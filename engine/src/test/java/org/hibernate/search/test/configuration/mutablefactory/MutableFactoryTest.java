@@ -31,6 +31,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
@@ -38,6 +39,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -156,6 +158,7 @@ public class MutableFactoryTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2421 Support statistics with Elasticsearch
 	public void testAddingClassSimpleAPIwithJMX() throws Exception {
 		SearchIntegrator sf = new SearchIntegratorBuilder()
 				.configuration(
@@ -230,6 +233,7 @@ public class MutableFactoryTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2480 Adding classes to the SearchIntegrator concurrently fails with Elasticsearch
 	public void testMultiThreadedAddClasses() throws Exception {
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
@@ -318,6 +322,7 @@ public class MutableFactoryTest {
 							i,
 							extendedIntegrator.getServiceManager()
 					);
+					System.err.println( "Creating index #" + i + " for class " + aClass );
 					extendedIntegrator.addClasses( aClass );
 					Object entity = aClass.getConstructor( Integer.class, String.class )
 							.newInstance( i, "Emmanuel" + i );
