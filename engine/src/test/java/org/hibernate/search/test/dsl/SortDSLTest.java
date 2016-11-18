@@ -41,11 +41,13 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Emmanuel Bernard
@@ -108,6 +110,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2475 Elasticsearch score sorts are reversed
 	public void score() throws Exception {
 		Query query = builder().keyword()
 				.onField( "textField" )
@@ -173,6 +176,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -206,6 +210,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_missingValue_use() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -240,10 +245,9 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_stringFieldBridge() throws Exception {
 		Query query = builder().all().createQuery();
-
-		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
 				.byField( "fieldBridgedStringField" )
@@ -281,6 +285,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_numericFieldBridge() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -314,6 +319,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_numericFieldBridge_missingValue_use() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -348,6 +354,7 @@ public class SortDSLTest {
 	}
 
 	@Test(expected = ClassCastException.class)
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_numericFieldBridge_missingValue_use_nonRaw() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -359,6 +366,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_missingValue_sortFirst() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -393,6 +401,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_missingValue_sortLast() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -427,6 +436,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void multipleFields() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -498,6 +508,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void nativeLucene() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -529,6 +540,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2475 Elasticsearch score sorts are reversed
 	public void fieldThenScore() throws Exception {
 		Query query = builder().keyword()
 				.onField( "textField" )
@@ -566,6 +578,7 @@ public class SortDSLTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2475 Elasticsearch score sorts are reversed
 	public void scoreThenField() throws Exception {
 		Query query = builder().keyword()
 				.onField( "textField" )

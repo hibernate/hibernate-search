@@ -225,6 +225,8 @@
                                 <exclude>**/AnalyzerTest.java</exclude>
                                 <exclude>**/DoubleAnalyzerTest.java</exclude>
                                 <exclude>**/AnalyzerInheritanceTest.java</exclude>
+                                <exclude>**/AnalyzerDefsAnnotationTest.java</exclude>
+                                <exclude>**/AnalyzerDefAnnotationTest.java</exclude>
                                 
                                 <!-- HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch -->
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>

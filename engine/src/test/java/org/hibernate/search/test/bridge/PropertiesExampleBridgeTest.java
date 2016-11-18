@@ -15,10 +15,12 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Sanne Grinovero (C) 2013 Red Hat Inc.
@@ -29,6 +31,7 @@ public class PropertiesExampleBridgeTest {
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( DynamicIndexedValueHolder.class );
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2387 Configurable dynamic mapping settings
 	public void testPropertiesIndexing() {
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Assert.assertNotNull( searchFactory.getIndexManagerHolder().getIndexManager( "all" ) );

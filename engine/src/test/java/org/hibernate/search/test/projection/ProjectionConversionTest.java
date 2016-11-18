@@ -32,12 +32,14 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -117,6 +119,7 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2423 Projecting an unstored field should raise an exception
 	public void projectingUnstoredField() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH000323" );
@@ -181,6 +184,7 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2484 Concurrent projections fails randomly with Elasticsearch due to service access issues
 	public void concurrentMixedProjections() throws Exception {
 		//The point of this test is to "simultaneously" project multiple different types
 		new ConcurrentRunner( 1000, 20,
