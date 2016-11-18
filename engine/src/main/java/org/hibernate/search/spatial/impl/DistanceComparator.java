@@ -67,7 +67,8 @@ public final class DistanceComparator extends SimpleFieldComparator<Double> {
 					coordinate( latitudeValues, doc ),
 					coordinate( longitudeValues, doc )
 			);
-		} else {
+		}
+		else {
 			return Double.MAX_VALUE;
 		}
 	}
