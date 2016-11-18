@@ -16,16 +16,10 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.testsupport.BytemanHelper;
+import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
-import org.jboss.byteman.contrib.bmunit.BMRule;
-import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -33,19 +27,13 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Hardy Ferentschik
  */
-@RunWith(BMUnitRunner.class)
 public class TokenizationTest {
 	private static final String DEFAULT_FIELD_NAME = "default";
 
 	@Rule
-	public BytemanAccessor byteman = BytemanHelper.createAccessor();
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
-			targetMethod = "inconsistentFieldConfiguration",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
-			action = "countInvocation()",
-			name = "testWarningLoggedForInconsistentFieldConfiguration")
 	public void testWarningLoggedForInconsistentFieldConfiguration() throws Exception {
 		Configuration config = new Configuration();
 		config.addAnnotatedClass( Product.class );
@@ -53,9 +41,9 @@ public class TokenizationTest {
 		config.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
 		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
 
-		config.buildSessionFactory();
+		logged.expectMessage( "HSEARCH000120", Product.class.getName(), DEFAULT_FIELD_NAME );
 
-		assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
+		config.buildSessionFactory();
 	}
 
 	@Entity

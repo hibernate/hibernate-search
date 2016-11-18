@@ -14,17 +14,12 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.jboss.byteman.contrib.bmunit.BMRule;
-import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -33,35 +28,25 @@ import static org.junit.Assert.fail;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-1312")
-@RunWith(BMUnitRunner.class)
 public class IndexedEmbeddedWithAbstractClassTest {
 
 	@Rule
-	public BytemanAccessor byteman = BytemanHelper.createAccessor();
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
-			targetMethod = "abstractClassesCannotInsertDocuments",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
-			action = "countInvocation()",
-			name = "testAbstractClassAnnotatedWithIndexedLogsWarning")
 	public void testAbstractClassAnnotatedWithIndexedLogsWarning() {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addClass( A.class )
 				.addClass( AbstractA.class )
 				.addClass( D.class );
 
+		logged.expectMessage( "HSEARCH000044", "@Indexed", AbstractA.class.getName() );
+
 		SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 		searchIntegrator.close();
-		Assert.assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
 	}
 
 	@Test
-	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
-			targetMethod = "abstractClassesCannotInsertDocuments",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
-			action = "countInvocation()",
-			name = "testAbstractClassAnnotatedWithIndexedLogsWarning")
 	public void testInvalidConfiguredPathThrowsException() {
 		try {
 			SearchConfigurationForTest configuration = new SearchConfigurationForTest()
@@ -69,21 +54,17 @@ public class IndexedEmbeddedWithAbstractClassTest {
 					.addClass( AbstractB.class )
 					.addClass( D.class );
 
+			logged.expectMessageMissing( "HSEARCH000044", "@Indexed", AbstractB.class.getName() );
+
 			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 			fail( "Invalid configuration should throw an exception" );
 		}
 		catch (SearchException e) {
 			assertTrue( "Invalid exception code", e.getMessage().startsWith( "HSEARCH000216" ) );
 		}
-		Assert.assertEquals( "Wrong invocation count", 0, byteman.getAndResetInvocationCount() );
 	}
 
 	@Test
-	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
-			targetMethod = "abstractClassesCannotInsertDocuments",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
-			action = "countInvocation()",
-			name = "testAbstractClassAnnotatedWithIndexedLogsWarning")
 	public void testInvalidConfiguredPathThrowsExceptionAndIndexedAbstractClassLogsWarning() {
 		try {
 			SearchConfigurationForTest configuration = new SearchConfigurationForTest()
@@ -91,13 +72,14 @@ public class IndexedEmbeddedWithAbstractClassTest {
 					.addClass( AbstractC.class )
 					.addClass( D.class );
 
+			logged.expectMessage( "HSEARCH000044", "@Indexed", AbstractC.class.getName() );
+
 			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 			fail( "Invalid configuration should throw an exception" );
 		}
 		catch (SearchException e) {
 			assertTrue( "Invalid exception code", e.getMessage().startsWith( "HSEARCH000216" ) );
 		}
-		Assert.assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
 	}
 
 	@Indexed

@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.test.configuration.sharding;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
@@ -35,22 +39,13 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.store.impl.NotShardedStrategy;
-import org.hibernate.search.testsupport.BytemanHelper;
+import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.jboss.byteman.contrib.bmunit.BMRule;
-import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import org.junit.experimental.categories.Category;
 
 /**
@@ -59,11 +54,10 @@ import org.junit.experimental.categories.Category;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-472")
-@RunWith(BMUnitRunner.class)
 public class ShardingConfigurationTest {
 
 	@Rule
-	public BytemanAccessor byteman = BytemanHelper.createAccessor();
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
 	public void testNoShardingIsUsedPerDefault() {
@@ -137,14 +131,11 @@ public class ShardingConfigurationTest {
 	}
 
 	@Test
-	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
-			targetMethod = "idHashShardingWithSingleShard",
-			helper = "org.hibernate.search.testsupport.BytemanHelper",
-			action = "countInvocation()",
-			name = "testSettingIdHashShardingStrategyWithoutNumberOfShards")
 	public void testSettingIdHashShardingStrategyWithoutNumberOfShards() {
 		Map<String, String> shardingProperties = new HashMap<String, String>();
 		shardingProperties.put( "hibernate.search.default.sharding_strategy", IdHashShardingStrategy.class.getName() );
+
+		logged.expectMessage( "HSEARCH000193", "IdHashShardingStrategy" );
 
 		EntityIndexBinding entityIndexBinding = getSearchFactory( shardingProperties ).getIndexBinding( Foo.class );
 
@@ -153,8 +144,6 @@ public class ShardingConfigurationTest {
 				"Without specifying number of shards, 1 should be assumed",
 				entityIndexBinding.getSelectionStrategy().getIndexManagersForAllShards().length == 1
 		);
-
-		Assert.assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
 	}
 
 	@Test
