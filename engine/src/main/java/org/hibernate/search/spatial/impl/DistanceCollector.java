@@ -62,7 +62,7 @@ public class DistanceCollector implements Collector {
 	 * Also take the opportunity to lazily calculate the actual distance: only store
 	 * latitude and longitude coordinates.
 	 */
-	private static abstract class HitEntry {
+	private abstract static class HitEntry {
 		int documentId;
 
 		private HitEntry(int documentId) {
@@ -90,7 +90,7 @@ public class DistanceCollector implements Collector {
 
 	private static final class IncompleteHitEntry extends HitEntry {
 		private IncompleteHitEntry(int documentId) {
-			super(documentId);
+			super( documentId );
 		}
 
 		@Override
@@ -181,7 +181,8 @@ public class DistanceCollector implements Collector {
 				double lat = coordinate( latitudeValues, doc );
 				double lon = coordinate( longitudeValues, doc );
 				distances.put( absolute, lat, lon );
-			} else {
+			}
+			else {
 				distances.putIncomplete( absolute );
 			}
 		}

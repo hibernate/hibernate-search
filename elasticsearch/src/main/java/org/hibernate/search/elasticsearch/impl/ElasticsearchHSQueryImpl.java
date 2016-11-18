@@ -528,7 +528,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 												.addProperty( "lat", spatialSearchCenter.getLatitude() )
 												.addProperty( "lon", spatialSearchCenter.getLongitude() )
 								)
-								.addProperty( "inline", "doc['" + spatialFieldName + "'].arcDistanceInKm(lat,lon)" )
+								.addProperty( "inline", "doc['" + spatialFieldName + "'] ? doc['" + spatialFieldName + "'].arcDistanceInKm(lat,lon) : Double.MAX_VALUE" )
 								.addProperty( "lang", "groovy" )
 							)
 						)
