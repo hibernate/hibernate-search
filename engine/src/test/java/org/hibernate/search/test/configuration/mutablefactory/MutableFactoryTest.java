@@ -6,44 +6,37 @@
  */
 package org.hibernate.search.test.configuration.mutablefactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TopDocs;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.impl.RAMDirectoryProvider;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
-import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.engine.spi.EntityInfo;
-
+import org.hibernate.search.util.impl.Executors;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Emmanuel Bernard
@@ -77,12 +70,9 @@ public class MutableFactoryTest {
 		);
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		IndexReader indexReader = searchIntegrator.getIndexReaderAccessor().open( A.class );
-		IndexSearcher searcher = new IndexSearcher( indexReader );
-		TopDocs hits = searcher.search( luceneQuery, 1000 );
-		assertEquals( 1, hits.totalHits );
-
-		searchIntegrator.getIndexReaderAccessor().close( indexReader );
+		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, A.class );
+		int size = hsQuery.queryResultSize();
+		assertEquals( 1, size );
 
 		searchIntegrator = builder.currentSearchIntegrator( searchIntegrator )
 				.addClass( B.class )
@@ -96,12 +86,9 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		indexReader = searchIntegrator.getIndexReaderAccessor().open( B.class );
-		searcher = new IndexSearcher( indexReader );
-		hits = searcher.search( luceneQuery, 1000 );
-		assertEquals( 1, hits.totalHits );
-
-		searchIntegrator.getIndexReaderAccessor().close( indexReader );
+		hsQuery = searchIntegrator.createHSQuery( luceneQuery, B.class );
+		size = hsQuery.queryResultSize();
+		assertEquals( 1, size );
 
 		searchIntegrator.close();
 	}
@@ -121,12 +108,9 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		IndexReader indexReader = sf.getIndexReaderAccessor().open( A.class );
-		IndexSearcher searcher = new IndexSearcher( indexReader );
-		TopDocs hits = searcher.search( luceneQuery, 1000 );
-		assertEquals( 1, hits.totalHits );
-
-		sf.getIndexReaderAccessor().close( indexReader );
+		HSQuery hsQuery = sf.createHSQuery( luceneQuery, A.class );
+		int size = hsQuery.queryResultSize();
+		assertEquals( 1, size );
 
 		sf.addClasses( B.class, C.class );
 
@@ -139,20 +123,15 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		indexReader = sf.getIndexReaderAccessor().open( B.class );
-		searcher = new IndexSearcher( indexReader );
-		hits = searcher.search( luceneQuery, 1000 );
-		assertEquals( 1, hits.totalHits );
-		sf.getIndexReaderAccessor().close( indexReader );
+		hsQuery = sf.createHSQuery( luceneQuery, B.class );
+		size = hsQuery.queryResultSize();
+		assertEquals( 1, size );
 
 		luceneQuery = parser.parse( "Vincent" );
 
-		indexReader = sf.getIndexReaderAccessor().open( C.class );
-		searcher = new IndexSearcher( indexReader );
-		hits = searcher.search( luceneQuery, 1000 );
-		assertEquals( 1, hits.totalHits );
-
-		sf.getIndexReaderAccessor().close( indexReader );
+		hsQuery = sf.createHSQuery( luceneQuery, C.class );
+		size = hsQuery.queryResultSize();
+		assertEquals( 1, size );
 
 		sf.close();
 	}
@@ -262,11 +241,9 @@ public class MutableFactoryTest {
 			for ( int i = 0; i < nbrOfThread * nbrOfClassesPerThread; i++ ) {
 				Query luceneQuery = parser.parse( "Emmanuel" + i );
 				final Class<?> classByNumber = getClassByNumber( i, sf.getServiceManager() );
-				IndexReader indexReader = sf.getIndexReaderAccessor().open( classByNumber );
-				IndexSearcher searcher = new IndexSearcher( indexReader );
-				TopDocs hits = searcher.search( luceneQuery, 1000 );
-				assertEquals( 1, hits.totalHits );
-				sf.getIndexReaderAccessor().close( indexReader );
+				HSQuery hsQuery = sf.createHSQuery( luceneQuery, classByNumber );
+				int size = hsQuery.queryResultSize();
+				assertEquals( "Expected 1 document for class " + classByNumber, 1, size );
 			}
 		}
 	}
@@ -327,24 +304,15 @@ public class MutableFactoryTest {
 					assertNotNull( indexBindingForEntity );
 					IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 					assertEquals( 1, indexManagers.length );
-					DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
-					DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();
-
-					if ( !( directoryProvider instanceof RAMDirectoryProvider ) ) {
-						// can't use Assertion in a separate thread
-						throw new SearchException( "Configuration lost: expected RAM directory" );
-					}
 
 					Query luceneQuery = parser.parse( "Emmanuel" + i );
-					IndexReader indexReader = extendedIntegrator.getIndexReaderAccessor().open( aClass );
-					IndexSearcher searcher = new IndexSearcher( indexReader );
-					TopDocs hits = searcher.search( luceneQuery, 1000 );
-					if ( hits.totalHits != 1 ) {
+					HSQuery hsQuery = extendedIntegrator.createHSQuery( luceneQuery, aClass );
+					int size = hsQuery.queryResultSize();
+					if ( size != 1 ) {
 						failure = true;
 						failureInfo = "failure: Emmanuel" + i + " for " + aClass.getName();
 						return;
 					}
-					extendedIntegrator.getIndexReaderAccessor().close( indexReader );
 				}
 			}
 			catch (Exception e) {
