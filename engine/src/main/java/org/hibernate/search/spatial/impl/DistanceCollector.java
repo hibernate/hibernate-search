@@ -69,7 +69,7 @@ public class DistanceCollector implements Collector {
 			this.documentId = documentId;
 		}
 
-		abstract double getDistance(final Point center);
+		abstract Double getDistance(final Point center);
 	}
 
 	private static final class CompleteHitEntry extends HitEntry {
@@ -83,7 +83,7 @@ public class DistanceCollector implements Collector {
 		}
 
 		@Override
-		double getDistance(final Point center) {
+		Double getDistance(final Point center) {
 			return center.getDistanceTo( latitude, longitude );
 		}
 	}
@@ -94,8 +94,8 @@ public class DistanceCollector implements Collector {
 		}
 
 		@Override
-		double getDistance(final Point center) {
-			return Double.MAX_VALUE;
+		Double getDistance(final Point center) {
+			return null;
 		}
 	}
 
@@ -118,7 +118,7 @@ public class DistanceCollector implements Collector {
 			orderedEntries = new ArrayList<HitEntry>( size );
 		}
 
-		public double get(int index, Point center) {
+		public Double get(int index, Point center) {
 			//Optimize for an iteration having a monotonic index:
 			int startingPoint = currentIterator;
 			for ( ; currentIterator < orderedEntries.size(); currentIterator++ ) {

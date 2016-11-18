@@ -148,9 +148,9 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
 		Object[] thirdResult = (Object[]) results.get( 2 );
-		Assert.assertEquals( Double.MAX_VALUE, (Double) firstResult[1], 0.01 );
-		Assert.assertEquals( Double.MAX_VALUE, (Double) secondResult[1], 0.01 );
-		Assert.assertEquals( Double.MAX_VALUE, (Double) thirdResult[1], 0.01 );
+		Assert.assertNull( firstResult[1] );
+		Assert.assertNull( secondResult[1] );
+		Assert.assertNull( thirdResult[1] );
 
 		em.close();
 	}
@@ -311,14 +311,14 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
 		Assert.assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
-		Assert.assertEquals( Double.MAX_VALUE, (Double) secondResult[1], 0.01 );
+		Assert.assertNull( secondResult[1] );
 
 		distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
 		hibQuery.setSort( distanceSort );
 		results = hibQuery.getResultList();
 		firstResult = (Object[]) results.get( 0 );
 		secondResult = (Object[]) results.get( 1 );
-		Assert.assertEquals( Double.MAX_VALUE, (Double) firstResult[1], 0.01 );
+		Assert.assertNull( firstResult[1] );
 		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
 
 		em.close();
@@ -361,14 +361,14 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
 		Assert.assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
-		Assert.assertEquals( Double.MAX_VALUE, (Double) secondResult[1], 0.01 );
+		Assert.assertNull( secondResult[1] );
 
 		distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
 		hibQuery.setSort( distanceSort );
 		results = hibQuery.getResultList();
 		firstResult = (Object[]) results.get( 0 );
 		secondResult = (Object[]) results.get( 1 );
-		Assert.assertEquals( Double.MAX_VALUE, (Double) firstResult[1], 0.01 );
+		Assert.assertNull( firstResult[1] );
 		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
 
 		em.close();
