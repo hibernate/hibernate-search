@@ -32,10 +32,12 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * The example scenario: a system which indexes log messages of some periodic event
@@ -70,6 +72,7 @@ public class LogRotationExampleTest {
 		.withProperty( "hibernate.search.logs.sharding_strategy", LogMessageShardingStrategy.class.getName() );
 
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2477 Shard filtering doesn't work with Elasticsearch queries
 	public void filtersTest() {
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Assert.assertNotNull( searchFactory.getIndexManagerHolder() );

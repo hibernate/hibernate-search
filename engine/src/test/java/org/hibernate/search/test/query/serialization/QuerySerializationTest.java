@@ -19,12 +19,14 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.serialization.SerializationTestHelper;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 
 /**
@@ -33,6 +35,7 @@ import org.junit.Test;
  *
  * @author Sanne Grinovero
  */
+@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2478 ElasticsearchHSQueryImpl is not serializable
 public class QuerySerializationTest {
 
 	@Rule
