@@ -69,7 +69,7 @@ public class TikaBridgeTest {
 
 	@Test
 	public void testPdfToString() throws Exception {
-		URI pdfUri = TikaBridgeTest.class.getResource( TEST_DOCUMENT_PDF ).toURI();
+		URI pdfUri = testDocumentPdf.get().toURI();
 		bridgeUnderTest.set( testFieldName, pdfUri, testDocument, options );
 		assertEquals(
 				"Wrong extracted text",
