@@ -47,7 +47,13 @@ public class ExpectedLog4jLog implements TestRule {
 
 	@Override
 	public Statement apply(Statement base, org.junit.runner.Description description) {
-		return new ExpectedLogStatement( base );
+		if ( !expectations.isEmpty() || !absenceExpectations.isEmpty() ) {
+			return new ExpectedLogStatement( base );
+		}
+		else {
+			// Don't mess with loggers if we don't have anything to check
+			return base;
+		}
 	}
 
 	/**
