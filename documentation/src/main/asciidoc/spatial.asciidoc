@@ -315,7 +315,7 @@ The default (field) name in case `@Spatial` is placed on the entity level is `or
 .Distance projection and null values
 ====
 When a spatial field on an entity has a `null` value for either its latitude or longitude (or both),
-the resulting projected distance will always be `Double.MAX_VALUE` (`1.7976931348623157e+308`).
+the resulting projected distance will always be `null`.
 ====
 
 [[spatial-distance-sort]]
@@ -366,9 +366,9 @@ When a spatial field on an entity has a `null` value for either its latitude or 
 
  * if you are filtering the results using a distance query, the entity with missing coordinates
    will not appear in the query results and its rank in the sort is irrelevant.
- * otherwise, the resulting distance will always be `Double.MAX_VALUE` (`1.7976931348623157e+308`),
-   and the entity will be ranked accordingly:
-   last if the sort is ascending, or first if the sort is descending.
+ * otherwise, the resulting distance will always be the greatest possible value,
+   which means the entity will be ranked last if the sort is ascending, or
+   first if the sort is descending.
 ====
 
 Alternatively, you may also use a `DistanceSortField` directly, as it was done before the introduction of Hibernate Search sort DSL:

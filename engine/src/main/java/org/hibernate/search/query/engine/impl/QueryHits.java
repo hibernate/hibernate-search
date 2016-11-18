@@ -184,7 +184,7 @@ public class QueryHits {
 		if ( spatialSearchCenter == null ) {
 			return null;
 		}
-		return Double.valueOf( distanceCollector.getDistance( docId( index ) ) );
+		return distanceCollector.getDistance( docId( index ) );
 	}
 
 	public Explanation explain(int index) throws IOException {
