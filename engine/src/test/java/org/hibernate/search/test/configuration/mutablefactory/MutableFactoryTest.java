@@ -216,8 +216,8 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
 			List<DoAddClasses> runnables = new ArrayList<DoAddClasses>( 10 );
-			final int nbrOfThread = 10;
-			final int nbrOfClassesPerThread = 10;
+			final int nbrOfThread = 5;
+			final int nbrOfClassesPerThread = 5;
 			for ( int i = 0; i < nbrOfThread; i++ ) {
 				runnables.add( new DoAddClasses( sf, i, nbrOfClassesPerThread ) );
 			}
@@ -293,7 +293,7 @@ public class MutableFactoryTest {
 		@Override
 		public void run() {
 			try {
-				for ( int index = 0; index < 10; index++ ) {
+				for ( int index = 0; index < nbrOfClassesPerThread; index++ ) {
 					final int i = factorOfClassesPerThread * nbrOfClassesPerThread + index;
 					String name = "Emmanuel" + i;
 					final Class<?> aClass = MutableFactoryTest.getClassByNumber(
