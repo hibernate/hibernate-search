@@ -17,6 +17,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -88,7 +91,12 @@ public class NumericTypeGuessedTest {
 		String textEncodedInt;
 	}
 
-	public static class NumericEncodingCustom implements org.hibernate.search.bridge.FieldBridge {
+	public static class NumericEncodingCustom implements org.hibernate.search.bridge.FieldBridge, MetadataProvidingFieldBridge {
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( "customField", FieldType.INTEGER );
+		}
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
