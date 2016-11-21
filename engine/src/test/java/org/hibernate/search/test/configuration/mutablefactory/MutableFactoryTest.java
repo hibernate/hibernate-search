@@ -7,7 +7,6 @@
 package org.hibernate.search.test.configuration.mutablefactory;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -234,8 +233,21 @@ public class MutableFactoryTest {
 				fail( "The thread pool didn't finish executing after 1 minute" );
 			}
 
+			AssertionError reportedError = null;
 			for ( DoAddClasses runnable : runnables ) {
-				assertFalse( "thread failed #" + runnable.getWorkNumber() + " Failure: " + runnable.getFailureInfo(), runnable.isFailure() );
+				Throwable throwableFromCurrentRunnable = runnable.getThrowable();
+				if ( throwableFromCurrentRunnable != null ) {
+					if ( reportedError == null ) {
+						reportedError = new AssertionError( "Unexpected failure on thread #" + runnable.getWorkNumber(), throwableFromCurrentRunnable );
+					}
+					else {
+						reportedError.addSuppressed( throwableFromCurrentRunnable );
+					}
+				}
+			}
+
+			if ( reportedError != null ) {
+				throw reportedError;
 			}
 
 			for ( int i = 0; i < nbrOfThread * nbrOfClassesPerThread; i++ ) {
@@ -261,15 +273,10 @@ public class MutableFactoryTest {
 		private final int factorOfClassesPerThread;
 		private final QueryParser parser;
 		private final int nbrOfClassesPerThread;
-		private volatile boolean failure = false;
-		private volatile String failureInfo;
+		private volatile Throwable throwable;
 
-		public String getFailureInfo() {
-			return failureInfo;
-		}
-
-		public boolean isFailure() {
-			return failure;
+		public Throwable getThrowable() {
+			return throwable;
 		}
 
 		public int getWorkNumber() {
@@ -288,6 +295,7 @@ public class MutableFactoryTest {
 			try {
 				for ( int index = 0; index < 10; index++ ) {
 					final int i = factorOfClassesPerThread * nbrOfClassesPerThread + index;
+					String name = "Emmanuel" + i;
 					final Class<?> aClass = MutableFactoryTest.getClassByNumber(
 							i,
 							extendedIntegrator.getServiceManager()
@@ -295,7 +303,7 @@ public class MutableFactoryTest {
 					System.err.println( "Creating index #" + i + " for class " + aClass );
 					extendedIntegrator.addClasses( aClass );
 					Object entity = aClass.getConstructor( Integer.class, String.class )
-							.newInstance( i, "Emmanuel" + i );
+							.newInstance( i, name );
 					TransactionContextForTest context = new TransactionContextForTest();
 					MutableFactoryTest.doIndexWork( entity, i, extendedIntegrator, context );
 					context.end();
@@ -305,20 +313,13 @@ public class MutableFactoryTest {
 					IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 					assertEquals( 1, indexManagers.length );
 
-					Query luceneQuery = parser.parse( "Emmanuel" + i );
+					Query luceneQuery = parser.parse( name );
 					HSQuery hsQuery = extendedIntegrator.createHSQuery( luceneQuery, aClass );
-					int size = hsQuery.queryResultSize();
-					if ( size != 1 ) {
-						failure = true;
-						failureInfo = "failure: Emmanuel" + i + " for " + aClass.getName();
-						return;
-					}
+					assertEquals( "Should have exactly one result for '" + name + "'", 1, hsQuery.queryResultSize() );
 				}
 			}
-			catch (Exception e) {
-				this.failure = true;
-				e.printStackTrace();
-				failureInfo = "failure: Emmanuel" + factorOfClassesPerThread + " exception: " + e.toString();
+			catch (Exception | AssertionError t) {
+				this.throwable = t;
 			}
 		}
 	}
