@@ -34,14 +34,14 @@ public class DefinitionsOnHotRebootTest {
 
 	@Test
 	public void notForgettingDefinedFilters() {
-		SearchIntegratorBuilder emptySearchBuilder = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() );
+		SearchIntegratorBuilder emptySearchBuilder = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest().addClass( A.class ) );
 		try ( SearchIntegrator sf = emptySearchBuilder.buildSearchIntegrator() ) {
-			assertEquals( 0, countFilters( sf ) );
-			sf.addClasses( A.class );
-			assertEquals( 1, countFilters( sf ) );
-			assertTrue( filterExists( sf, "anyFilter" ) );
+			int defaultFilterCount = countFilters( sf );
 			sf.addClasses( B.class );
-			assertEquals( 2, countFilters( sf ) );
+			assertEquals( defaultFilterCount + 1, countFilters( sf ) );
+			assertTrue( filterExists( sf, "anyFilter" ) );
+			sf.addClasses( C.class );
+			assertEquals( defaultFilterCount + 2, countFilters( sf ) );
 			assertTrue( filterExists( sf, "anyFilter" ) );
 			assertTrue( filterExists( sf, "anotherFilter" ) );
 		}
@@ -49,14 +49,14 @@ public class DefinitionsOnHotRebootTest {
 
 	@Test
 	public void notForgettingDefinedAnalyzers() {
-		SearchIntegratorBuilder emptySearchBuilder = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() );
+		SearchIntegratorBuilder emptySearchBuilder = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest().addClass( A.class ) );
 		try ( SearchIntegrator sf = emptySearchBuilder.buildSearchIntegrator() ) {
-			assertEquals( 0, countAnalyzers( sf ) );
-			sf.addClasses( A.class );
-			assertEquals( 1, countAnalyzers( sf ) );
-			assertTrue( analyzerExists( sf, "anAnalyzer" ) );
+			int defaultAnalyzerCount = countAnalyzers( sf );
 			sf.addClasses( B.class );
-			assertEquals( 2, countAnalyzers( sf ) );
+			assertEquals( defaultAnalyzerCount + 1, countAnalyzers( sf ) );
+			assertTrue( analyzerExists( sf, "anAnalyzer" ) );
+			sf.addClasses( C.class );
+			assertEquals( defaultAnalyzerCount + 2, countAnalyzers( sf ) );
 			assertTrue( analyzerExists( sf, "anAnalyzer" ) );
 			assertTrue( analyzerExists( sf, "anotherAnalyzer" ) );
 		}
@@ -81,16 +81,21 @@ public class DefinitionsOnHotRebootTest {
 	}
 
 	@Indexed
+	static class A {
+		@DocumentId Long id;
+	}
+
+	@Indexed
 	@FullTextFilterDef( name = "anyFilter", impl = ShardSensitiveOnlyFilter.class )
 	@AnalyzerDef(name = "anAnalyzer", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class))
-	static class A {
+	static class B {
 		@DocumentId Long id;
 	}
 
 	@Indexed
 	@FullTextFilterDef( name = "anotherFilter", impl = ShardSensitiveOnlyFilter.class )
 	@AnalyzerDef(name = "anotherAnalyzer", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class))
-	static class B {
+	static class C {
 		@DocumentId Long id;
 	}
 
