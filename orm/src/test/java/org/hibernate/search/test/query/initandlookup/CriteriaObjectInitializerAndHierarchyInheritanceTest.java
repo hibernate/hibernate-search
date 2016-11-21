@@ -36,8 +36,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.BytemanHelper;
-import org.hibernate.search.testsupport.BytemanHelperStateCleanup;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Rule;
@@ -48,7 +48,7 @@ import org.junit.runner.RunWith;
 public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends SearchTestBase {
 
 	@Rule
-	public BytemanHelperStateCleanup bytemanState = new BytemanHelperStateCleanup();
+	public BytemanAccessor byteman = BytemanHelper.createAccessor();
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
@@ -98,30 +98,30 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 
 		List<?> results = getResults( session, AAA.class );
 		assertThat( results ).onProperty( "name" ).containsOnly( "A AA AAA" );
-		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( AAA.class.getName() );
+		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( AAA.class.getName() );
 
 		results = getResults( session, AAA.class, AAB.class );
 		assertThat( results ).onProperty( "name" ).containsOnly( "A AA AAA", "A AA AAB" );
-		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( AA.class.getName() );
+		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( AA.class.getName() );
 
 		results = getResults( session, AAA.class, AB.class );
 		assertThat( results ).onProperty( "name" ).containsOnly( "A AA AAA", "A AB", "A AB ABA" );
-		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( A.class.getName() );
+		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( A.class.getName() );
 
 		results = getResults( session, AAA.class, BA.class );
 		assertThat( results ).onProperty( "name" ).containsOnly( "A AA AAA", "B BA" );
 		// here, we have 2 Criterias returned: we only test the first one
-		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isIn( AAA.class.getName(), BA.class.getName() );
+		assertThat( byteman.consumeNextRecordedEvent() ).isIn( AAA.class.getName(), BA.class.getName() );
 
 		results = getResultsFiltered( session, new MatchAllDocsQuery(), A.class );
-		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( A.class.getName() );
+		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( A.class.getName() );
 
 		// and finally we verify that if the full-text query is narrowing results to a subset of types,
 		// only these are being targeted by the loading criteria.
 		// First the simple case, narrowing down to a single type:
 		final TermQuery termQueryAAA = new TermQuery( new Term( "name", "aaa" ) );
 		results = getResultsFiltered( session, termQueryAAA, A.class );
-		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( AAA.class.getName() );
+		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( AAA.class.getName() );
 
 		// And then when it narrows down to two types, use a Join Criteria on the first upper shared type:
 		BooleanQuery.Builder bqb = new BooleanQuery.Builder();
@@ -129,7 +129,7 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 		bqb.add( termQueryAAA, Occur.SHOULD );
 		bqb.add( termQueryAAB, Occur.SHOULD );
 		results = getResultsFiltered( session, bqb.build(), A.class );
-		assertThat( BytemanHelper.consumeNextRecordedEvent() ).isEqualTo( AA.class.getName() );
+		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( AA.class.getName() );
 
 		s.close();
 	}

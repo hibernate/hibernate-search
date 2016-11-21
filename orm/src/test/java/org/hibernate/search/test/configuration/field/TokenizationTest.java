@@ -18,8 +18,10 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,6 +36,9 @@ import static org.junit.Assert.assertEquals;
 @RunWith(BMUnitRunner.class)
 public class TokenizationTest {
 	private static final String DEFAULT_FIELD_NAME = "default";
+
+	@Rule
+	public BytemanAccessor byteman = BytemanHelper.createAccessor();
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
@@ -50,7 +55,7 @@ public class TokenizationTest {
 
 		config.buildSessionFactory();
 
-		assertEquals( "Wrong invocation count", 1, BytemanHelper.getAndResetInvocationCount() );
+		assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
 	}
 
 	@Entity
