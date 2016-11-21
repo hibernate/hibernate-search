@@ -42,7 +42,7 @@ public class QuerySerializationTest {
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class );
 
 	@Test
-	public void verifyExceptionOnNonMeaningfullQueries() throws ClassNotFoundException, IOException {
+	public void serializeDeserializeLuceneHSQuery() throws ClassNotFoundException, IOException {
 		final ExtendedSearchIntegrator integrator = sfHolder.getSearchFactory();
 
 		Book book = new Book();
