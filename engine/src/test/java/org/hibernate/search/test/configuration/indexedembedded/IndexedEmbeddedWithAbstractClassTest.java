@@ -17,10 +17,12 @@ import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,6 +35,9 @@ import static org.junit.Assert.fail;
 @TestForIssue(jiraKey = "HSEARCH-1312")
 @RunWith(BMUnitRunner.class)
 public class IndexedEmbeddedWithAbstractClassTest {
+
+	@Rule
+	public BytemanAccessor byteman = BytemanHelper.createAccessor();
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
@@ -48,7 +53,7 @@ public class IndexedEmbeddedWithAbstractClassTest {
 
 		SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 		searchIntegrator.close();
-		Assert.assertEquals( "Wrong invocation count", 1, BytemanHelper.getAndResetInvocationCount() );
+		Assert.assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
 	}
 
 	@Test
@@ -70,7 +75,7 @@ public class IndexedEmbeddedWithAbstractClassTest {
 		catch (SearchException e) {
 			assertTrue( "Invalid exception code", e.getMessage().startsWith( "HSEARCH000216" ) );
 		}
-		Assert.assertEquals( "Wrong invocation count", 0, BytemanHelper.getAndResetInvocationCount() );
+		Assert.assertEquals( "Wrong invocation count", 0, byteman.getAndResetInvocationCount() );
 	}
 
 	@Test
@@ -92,7 +97,7 @@ public class IndexedEmbeddedWithAbstractClassTest {
 		catch (SearchException e) {
 			assertTrue( "Invalid exception code", e.getMessage().startsWith( "HSEARCH000216" ) );
 		}
-		Assert.assertEquals( "Wrong invocation count", 1, BytemanHelper.getAndResetInvocationCount() );
+		Assert.assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
 	}
 
 	@Indexed
