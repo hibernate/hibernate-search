@@ -43,7 +43,7 @@ public class NumericTypeGuessedTest {
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( CustomBridgedNumbers.class );
 
 	@Test
-	public void verifyExceptionOnNonMeaningfullQueries() {
+	public void numericRangeQueryOnCustomField() {
 		final ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 
 		storeData( "title-one", "1" );
