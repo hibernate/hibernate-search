@@ -203,7 +203,10 @@ public class FreshReadersProvidedTest {
 
 		@Override
 		public String toString(String fieldName) {
-			return toString();
+			return new StringBuilder( "RecordingFilter(" )
+					.append( this.fieldName )
+					.append( ")" )
+					.toString();
 		}
 	}
 
