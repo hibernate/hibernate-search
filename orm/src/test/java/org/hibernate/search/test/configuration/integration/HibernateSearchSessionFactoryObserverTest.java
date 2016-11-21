@@ -11,10 +11,12 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.testsupport.BytemanHelper;
+import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMRules;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,6 +28,9 @@ import static org.junit.Assert.fail;
  */
 @RunWith(BMUnitRunner.class)
 public class HibernateSearchSessionFactoryObserverTest {
+
+	@Rule
+	public BytemanAccessor byteman = BytemanHelper.createAccessor();
 
 	@Test
 	@BMRules(rules = {
@@ -48,7 +53,7 @@ public class HibernateSearchSessionFactoryObserverTest {
 			fail( "ByteMan should have forced an exception" );
 		}
 		catch (RuntimeException e) {
-			assertEquals( "Wrong invocation count", 1, BytemanHelper.getAndResetInvocationCount() );
+			assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
 		}
 	}
 

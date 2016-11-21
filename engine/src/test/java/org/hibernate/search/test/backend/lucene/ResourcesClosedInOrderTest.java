@@ -10,7 +10,8 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
-import org.hibernate.search.testsupport.BytemanHelperStateCleanup;
+import org.hibernate.search.testsupport.BytemanHelper;
+import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.setup.CountingErrorHandler;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
@@ -21,8 +22,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.hibernate.search.testsupport.BytemanHelper.isEventStackEmpty;
-import static org.hibernate.search.testsupport.BytemanHelper.consumeNextRecordedEvent;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -62,7 +61,7 @@ public class ResourcesClosedInOrderTest {
 	private static final int NUMBER_ENTITIES = 2;
 
 	@Rule
-	public BytemanHelperStateCleanup bytemanState = new BytemanHelperStateCleanup();
+	public BytemanAccessor byteman = BytemanHelper.createAccessor();
 
 	@Test
 	public void asyncExclusiveIndexResourcesOrderedShutdown() {
@@ -108,10 +107,10 @@ public class ResourcesClosedInOrderTest {
 		//Now the SearchIntegrator was closed, let's unwind the recorder events and compare them with expectations:
 		for ( int i = 0; i < expectedStack.length; i++ ) {
 			//Check the events have been fired in the expected order
-			assertEquals( expectedStack[i], consumeNextRecordedEvent() );
+			assertEquals( expectedStack[i], byteman.consumeNextRecordedEvent() );
 		}
 		//And no more events than those expected exist
-		assertTrue( isEventStackEmpty() );
+		assertTrue( byteman.isEventStackEmpty() );
 	}
 
 	private void writeData(SearchIntegrator searchIntegrator, int numberEntities) {

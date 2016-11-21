@@ -13,7 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jboss.byteman.rule.Rule;
 import org.jboss.byteman.rule.helper.Helper;
-
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -56,10 +58,6 @@ public class BytemanHelper extends Helper {
 		counter.incrementAndGet();
 	}
 
-	public static int getAndResetInvocationCount() {
-		return counter.getAndSet( 0 );
-	}
-
 	/**
 	 * Adds a label to a concurrent queue.
 	 * Useful to "tag" events to verify they are issued in a specific order,
@@ -71,29 +69,75 @@ public class BytemanHelper extends Helper {
 	}
 
 	/**
-	 * Gets the first event label from the concurrent queue,
-	 * and removes it.
-	 * The next invocation will return the next one from the queue.
-	 * @return the first
+	 * @return A utility to be referenced in the test as a {@link org.junit.Rule JUnit rule}, that allows
+	 * access to information resulting from Byteman rules.
 	 */
-	public static String consumeNextRecordedEvent() {
-		try {
-			return concurrentStack.removeFirst();
-		}
-		catch (java.util.NoSuchElementException nse) {
-			throw new IllegalStateException( "Attempted to consume an event, while no events are left on the stack. If it is the first call to this method, check if the Byteman rules are actually being triggered?" );
-		}
+	public static BytemanAccessor createAccessor() {
+		return new BytemanAccessor();
 	}
 
-	public static boolean isEventStackEmpty() {
-		return concurrentStack.isEmpty();
-	}
+	public static class BytemanAccessor implements TestRule {
 
-	/**
-	 * Removes all state from the concurrent queue
-	 * used to track events.
-	 */
-	static void resetEventStack() {
-		concurrentStack.clear();
+		/*
+		 * We use this attribute to check that the accessor is being used
+		 * as a JUnit rule (as it should be).
+		 */
+		private boolean runningAsJUnitRule = false;
+
+		public boolean isEventStackEmpty() {
+			ensureRunningAsJUnitRule();
+			return concurrentStack.isEmpty();
+		}
+
+		/**
+		 * Gets the first event label from the concurrent queue,
+		 * and removes it.
+		 * The next invocation will return the next one from the queue.
+		 * @return the first
+		 */
+		public String consumeNextRecordedEvent() {
+			ensureRunningAsJUnitRule();
+			try {
+				return concurrentStack.removeFirst();
+			}
+			catch (java.util.NoSuchElementException nse) {
+				throw new IllegalStateException( "Attempted to consume an event, while no events are left on the stack."
+						+ " If it is the first call to this method, check if the Byteman rules are actually being triggered?" );
+			}
+		}
+
+		public int getAndResetInvocationCount() {
+			ensureRunningAsJUnitRule();
+			return counter.getAndSet( 0 );
+		}
+
+		private void ensureRunningAsJUnitRule() {
+			if ( ! runningAsJUnitRule ) {
+				throw new IllegalStateException( "Error in test setup: the byteman accessor obtained"
+						+ " through BytemanHelper.createAccessor() must be used as a JUnit Rule (see org.junit.Rule)." );
+			}
+		}
+
+		@Override
+		public Statement apply(final Statement base, Description description) {
+			return new Statement() {
+				@Override
+				public void evaluate() throws Throwable {
+					runningAsJUnitRule = true;
+					try {
+						base.evaluate();
+					}
+					finally {
+						runningAsJUnitRule = false;
+						reset();
+					}
+				}
+			};
+		}
+
+		private void reset() {
+			concurrentStack.clear();
+			counter.set( 0 );
+		}
 	}
 }

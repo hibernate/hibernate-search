@@ -38,10 +38,12 @@ import org.hibernate.search.store.impl.NotShardedStrategy;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -57,6 +59,9 @@ import static org.junit.Assert.fail;
 @TestForIssue(jiraKey = "HSEARCH-472")
 @RunWith(BMUnitRunner.class)
 public class ShardingConfigurationTest {
+
+	@Rule
+	public BytemanAccessor byteman = BytemanHelper.createAccessor();
 
 	@Test
 	public void testNoShardingIsUsedPerDefault() {
@@ -147,7 +152,7 @@ public class ShardingConfigurationTest {
 				entityIndexBinding.getSelectionStrategy().getIndexManagersForAllShards().length == 1
 		);
 
-		Assert.assertEquals( "Wrong invocation count", 1, BytemanHelper.getAndResetInvocationCount() );
+		Assert.assertEquals( "Wrong invocation count", 1, byteman.getAndResetInvocationCount() );
 	}
 
 	@Test
