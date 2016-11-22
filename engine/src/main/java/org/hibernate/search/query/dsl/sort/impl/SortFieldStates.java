@@ -43,7 +43,7 @@ public class SortFieldStates {
 		initScalarMinMax( SortField.Type.INT, Integer.MIN_VALUE, Integer.MAX_VALUE );
 	}
 
-	private static void initScalarMinMax(Type type, double minValue, double maxValue) {
+	private static void initScalarMinMax(Type type, Object minValue, Object maxValue) {
 		SCALAR_MINIMUMS.put( type, minValue );
 		SCALAR_MAXIMUMS.put( type, maxValue );
 	}
