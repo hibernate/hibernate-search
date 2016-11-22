@@ -18,12 +18,14 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
@@ -35,6 +37,7 @@ import static org.junit.Assert.assertEquals;
  */
 @TestForIssue(jiraKey = "HSEARCH-704")
 @RunWith(BMUnitRunner.class)
+@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 public class ObjectLoaderHelperTest extends SearchTestBase {
 
 	@Rule

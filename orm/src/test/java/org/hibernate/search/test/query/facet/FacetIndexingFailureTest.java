@@ -12,6 +12,7 @@ import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
@@ -19,6 +20,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.DefaultInstanceInitializer;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 
 import static org.junit.Assert.assertTrue;
@@ -28,6 +30,7 @@ import static org.junit.Assert.fail;
  * @author Hardy Ferentschik
  */
 @RunWith(BMUnitRunner.class)
+@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 public class FacetIndexingFailureTest {
 	@Rule
 	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Car.class );
