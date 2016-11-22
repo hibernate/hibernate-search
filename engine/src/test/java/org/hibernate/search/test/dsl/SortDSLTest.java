@@ -176,7 +176,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -210,7 +209,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_missingValue_use() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -245,7 +243,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_stringFieldBridge() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -285,7 +282,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_numericFieldBridge() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -319,7 +315,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_numericFieldBridge_missingValue_use() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -354,7 +349,6 @@ public class SortDSLTest {
 	}
 
 	@Test(expected = ClassCastException.class)
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_numericFieldBridge_missingValue_use_nonRaw() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -366,7 +360,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_missingValue_sortFirst() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -401,7 +394,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void singleField_missingValue_sortLast() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -436,7 +428,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void multipleFields() throws Exception {
 		Query query = builder().all().createQuery();
 
@@ -508,7 +499,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
 	public void nativeLucene() throws Exception {
 		Query query = builder().all().createQuery();
 
