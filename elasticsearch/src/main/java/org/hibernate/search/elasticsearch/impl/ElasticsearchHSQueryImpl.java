@@ -39,8 +39,6 @@ import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.client.impl.ArbitrarySort;
-import org.hibernate.search.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -61,7 +59,6 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
-import org.hibernate.search.query.dsl.sort.impl.NativeSortField;
 import org.hibernate.search.query.engine.impl.AbstractHSQuery;
 import org.hibernate.search.query.engine.impl.EntityInfoImpl;
 import org.hibernate.search.query.engine.impl.FacetComparators;
@@ -91,8 +88,6 @@ import io.searchbox.core.Explain;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.SearchScroll;
-import io.searchbox.core.search.sort.Sort;
-import io.searchbox.core.search.sort.Sort.Sorting;
 import io.searchbox.params.Parameters;
 
 /**
@@ -605,42 +600,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			ToElasticsearch.addFacetingRequest( facets, facetingRequest, sourceFieldAbsoluteName, facetSubfieldName );
 		}
 
-		private Sort getSort(SortField sortField) {
-			if ( sortField instanceof DistanceSortField ) {
-				DistanceSortField distanceSortField = (DistanceSortField) sortField;
-				DistanceSort esSort = new DistanceSort( distanceSortField.getField(),
-						distanceSortField.getCenter(),
-						distanceSortField.getReverse() ? Sorting.DESC : Sorting.ASC );
-				return esSort;
-			}
-			else if ( sortField instanceof NativeSortField ) {
-				NativeSortField nativeSortField = (NativeSortField) sortField;
-				String sortFieldName = nativeSortField.getField();
-				String sortDescriptionAsString = nativeSortField.getNativeSortDescription();
-				JsonElement sortDescription = JSON_PARSER.parse( sortDescriptionAsString );
-				return new ArbitrarySort( sortFieldName, sortDescription );
-			}
-			else {
-				String sortFieldName;
-				if ( sortField.getField() == null ) {
-					switch ( sortField.getType() ) {
-						case DOC:
-							sortFieldName = "_uid";
-							break;
-						case SCORE:
-							sortFieldName = "_score";
-							break;
-						default:
-							throw LOG.cannotUseThisSortTypeWithNullSortFieldName( sortField.getType() );
-					}
-				}
-				else {
-					sortFieldName = sortField.getField();
-				}
-				return new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC );
-			}
-		}
-
 		/**
 		 * Returns the index of the DistanceSortField in the Sort array.
 		 *
@@ -731,7 +690,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			if ( sort != null ) {
 				validateSortFields( extendedIntegrator, getQueriedEntityTypes() );
 				for ( SortField sortField : sort.getSort() ) {
-					builder.addSort( getSort( sortField ) );
+					builder.addSort( ToElasticsearch.fromLuceneSortField( sortField ) );
 				}
 			}
 			Search search = builder.build();
