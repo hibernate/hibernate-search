@@ -666,11 +666,20 @@ public class ToElasticsearch {
 				sortFieldName = sortField.getField();
 			}
 
-			Sort sort = new Sort( sortFieldName, sortField.getReverse() ? Sorting.DESC : Sorting.ASC );
-
-			sort.setMissing( fromLuceneSortFieldMissing( sortFieldType, sortField.missingValue, sortField.getReverse() ) );
+			boolean reverse = sortField.getReverse();
+			Sort sort = new Sort( sortFieldName, fromLuceneSortFieldOrder( sortFieldType, reverse ) );
+			sort.setMissing( fromLuceneSortFieldMissing( sortFieldType, sortField.missingValue, reverse ) );
 
 			return sort;
+		}
+	}
+
+	private static Sorting fromLuceneSortFieldOrder(Type sortFieldType, boolean reverse) {
+		switch ( sortFieldType ) {
+			case SCORE:
+				return reverse ? Sorting.ASC : Sorting.DESC;
+			default:
+				return reverse ? Sorting.DESC : Sorting.ASC;
 		}
 	}
 
