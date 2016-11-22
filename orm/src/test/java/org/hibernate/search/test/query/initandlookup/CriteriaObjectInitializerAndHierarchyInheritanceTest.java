@@ -38,13 +38,16 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 @RunWith(BMUnitRunner.class)
+@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends SearchTestBase {
 
 	@Rule
