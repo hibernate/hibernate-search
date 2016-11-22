@@ -41,13 +41,11 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * @author Emmanuel Bernard
@@ -110,7 +108,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2475 Elasticsearch score sorts are reversed
 	public void score() throws Exception {
 		Query query = builder().keyword()
 				.onField( "textField" )
@@ -530,7 +527,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2475 Elasticsearch score sorts are reversed
 	public void fieldThenScore() throws Exception {
 		Query query = builder().keyword()
 				.onField( "textField" )
@@ -568,7 +564,6 @@ public class SortDSLTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2475 Elasticsearch score sorts are reversed
 	public void scoreThenField() throws Exception {
 		Query query = builder().keyword()
 				.onField( "textField" )
