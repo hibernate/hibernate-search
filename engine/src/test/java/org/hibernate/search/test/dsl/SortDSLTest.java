@@ -60,10 +60,14 @@ public class SortDSLTest {
 	public void prepareTestData() {
 		storeData(
 				new IndexedEntry( 0 )
-				.setMainData(
-						"infrequent1 infrequent2 infrequent1 inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores inMultipleDocsWithVariousScores",
-						1, 2d
+				.setTextField(
+						"infrequent1 infrequent2 infrequent1"
+						+ " inMultipleDocsWithUniqueScores"
+						+ " inMultipleDocsWithVariousScores inMultipleDocsWithVariousScores"
 				)
+				.setNonUniqueIntgerField( 1 )
+				.setUniqueIntegerField( 3 )
+				.setUniqueDoubleField( 2d )
 				/*
 				 * Distances:
 				 * - to (24,32) with arc method: 10.16km
@@ -73,10 +77,13 @@ public class SortDSLTest {
 		);
 		storeData(
 				new IndexedEntry( 1 )
-				.setMainData(
-						"inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores",
-						2, 1d
+				.setTextField(
+						"inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores"
+						+ " inMultipleDocsWithVariousScores"
 				)
+				.setNonUniqueIntgerField( 2 )
+				.setUniqueIntegerField( 1 )
+				.setUniqueDoubleField( 1d )
 				/*
 				 * Distances:
 				 * - to (24,32) with arc method: 11.12km
@@ -86,14 +93,18 @@ public class SortDSLTest {
 		);
 		storeData(
 				new IndexedEntry( 2 )
-				.setMainData( null, 1, null)
+				.setNonUniqueIntgerField( 1 )
 		);
 		storeData(
 				new IndexedEntry( 3 )
-				.setMainData(
-						"infrequent1 inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithVariousScores",
-						1, 3d
+				.setTextField(
+						"infrequent1"
+						+ " inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores"
+						+ " inMultipleDocsWithVariousScores"
 				)
+				.setNonUniqueIntgerField( 1 )
+				.setUniqueIntegerField( 4 )
+				.setUniqueDoubleField( 3d )
 				/*
 				 * Distances:
 				 * - to (24,32) with arc method: 15.06km
@@ -179,7 +190,7 @@ public class SortDSLTest {
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -187,7 +198,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.asc()
 				.createSort();
 		assertThat(
@@ -196,7 +207,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.desc()
 				.createSort();
 		assertThat(
@@ -206,11 +217,11 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField_missingValue_use() throws Exception {
+	public void singleField_double_missingValue_use() throws Exception {
 		Query query = builder().all().createQuery();
 
 		Sort sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.onMissingValue().use( 1.5d )
 				.createSort();
 		assertThat(
@@ -219,7 +230,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.asc()
 						.onMissingValue().use( 1.5d )
 				.createSort();
@@ -229,9 +240,43 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.desc()
 						.onMissingValue().use( 1.5d )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 3, 0, 2, 1 )
+		);
+	}
+
+	@Test
+	public void singleField_integer_missingValue_use() throws Exception {
+		Query query = builder().all().createQuery();
+
+		Sort sort = builder().sort()
+				.byField( "uniqueIntegerField" )
+						.onMissingValue().use( 1 )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 1, 2, 0, 3 )
+		);
+
+		sort = builder().sort()
+				.byField( "uniqueIntegerField" )
+						.asc()
+						.onMissingValue().use( 2 )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 1, 2, 0, 3 )
+		);
+
+		sort = builder().sort()
+				.byField( "uniqueIntegerField" )
+						.desc()
+						.onMissingValue().use( 2 )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -357,11 +402,11 @@ public class SortDSLTest {
 	}
 
 	@Test
-	public void singleField_missingValue_sortFirst() throws Exception {
+	public void singleField_double_missingValue_sortFirst() throws Exception {
 		Query query = builder().all().createQuery();
 
 		Sort sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.onMissingValue().sortFirst()
 				.createSort();
 		assertThat(
@@ -370,7 +415,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.asc()
 						.onMissingValue().sortFirst()
 				.createSort();
@@ -380,7 +425,41 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
+						.desc()
+						.onMissingValue().sortFirst()
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 2, 3, 0, 1 )
+		);
+	}
+
+	@Test
+	public void singleField_integer_missingValue_sortFirst() throws Exception {
+		Query query = builder().all().createQuery();
+
+		Sort sort = builder().sort()
+				.byField( "uniqueIntegerField" )
+						.onMissingValue().sortFirst()
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 2, 1, 0, 3 )
+		);
+
+		sort = builder().sort()
+				.byField( "uniqueIntegerField" )
+						.asc()
+						.onMissingValue().sortFirst()
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 2, 1, 0, 3 )
+		);
+
+		sort = builder().sort()
+				.byField( "uniqueIntegerField" )
 						.desc()
 						.onMissingValue().sortFirst()
 				.createSort();
@@ -395,7 +474,7 @@ public class SortDSLTest {
 		Query query = builder().all().createQuery();
 
 		Sort sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.onMissingValue().sortLast()
 				.createSort();
 		assertThat(
@@ -404,7 +483,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.asc()
 						.onMissingValue().sortLast()
 				.createSort();
@@ -414,7 +493,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "uniqueNumericField" )
+				.byField( "uniqueDoubleField" )
 						.desc()
 						.onMissingValue().sortLast()
 				.createSort();
@@ -429,8 +508,8 @@ public class SortDSLTest {
 		Query query = builder().all().createQuery();
 
 		Sort sort = builder().sort()
-				.byField( "nonUniqueNumericField" )
-				.andByField( "uniqueNumericField" )
+				.byField( "nonUniqueIntegerField" )
+				.andByField( "uniqueDoubleField" )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -438,8 +517,8 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "nonUniqueNumericField" )
-				.andByField( "uniqueNumericField" )
+				.byField( "nonUniqueIntegerField" )
+				.andByField( "uniqueDoubleField" )
 						.asc()
 				.createSort();
 		assertThat(
@@ -448,8 +527,8 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "nonUniqueNumericField" )
-				.andByField( "uniqueNumericField" )
+				.byField( "nonUniqueIntegerField" )
+				.andByField( "uniqueDoubleField" )
 				.desc()
 				.createSort();
 		assertThat(
@@ -502,7 +581,7 @@ public class SortDSLTest {
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
-				.byNative( new SortField( "uniqueNumericField", SortField.Type.DOUBLE ) )
+				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE ) )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -510,7 +589,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byNative( new SortField( "uniqueNumericField", SortField.Type.DOUBLE, false ) )
+				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE, false ) )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -518,7 +597,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byNative( new SortField( "uniqueNumericField", SortField.Type.DOUBLE, true ) )
+				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE, true ) )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -534,7 +613,7 @@ public class SortDSLTest {
 				.createQuery();
 
 		Sort sort = builder().sort()
-				.byField( "nonUniqueNumericField" )
+				.byField( "nonUniqueIntegerField" )
 				.andByScore()
 				.createSort();
 		assertThat(
@@ -543,7 +622,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "nonUniqueNumericField" )
+				.byField( "nonUniqueIntegerField" )
 						.asc()
 				.andByScore()
 				.createSort();
@@ -553,7 +632,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "nonUniqueNumericField" )
+				.byField( "nonUniqueIntegerField" )
 						.desc()
 				.andByScore()
 				.createSort();
@@ -572,7 +651,7 @@ public class SortDSLTest {
 
 		Sort sort = builder().sort()
 				.byScore()
-				.andByField( "uniqueNumericField" )
+				.andByField( "uniqueDoubleField" )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -582,7 +661,7 @@ public class SortDSLTest {
 		sort = builder().sort()
 				.byScore()
 						.asc()
-				.andByField( "uniqueNumericField" )
+				.andByField( "uniqueDoubleField" )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -592,7 +671,7 @@ public class SortDSLTest {
 		sort = builder().sort()
 				.byScore()
 						.desc()
-				.andByField( "uniqueNumericField" )
+				.andByField( "uniqueDoubleField" )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -735,11 +814,15 @@ public class SortDSLTest {
 
 		@Field
 		@SortableField
-		Integer nonUniqueNumericField;
+		Integer nonUniqueIntegerField;
 
 		@Field
 		@SortableField
-		Double uniqueNumericField;
+		Double uniqueDoubleField;
+
+		@Field
+		@SortableField
+		Integer uniqueIntegerField;
 
 		@Field(bridge = @FieldBridge(impl = WrappedStringValueFieldBridge.class))
 		WrappedStringValue fieldBridgedStringField;
@@ -769,14 +852,27 @@ public class SortDSLTest {
 			return longitude;
 		}
 
-		public IndexedEntry setMainData(String textField, Integer nonUniqueNumericField, Double uniqueNumericField) {
+		public IndexedEntry setTextField(String textField) {
 			this.textField = textField;
-			this.nonUniqueNumericField = nonUniqueNumericField;
-			this.uniqueNumericField = uniqueNumericField;
-			this.fieldBridgedNumericField = new WrappedDoubleValue( uniqueNumericField );
+			return this;
+		}
+
+		public IndexedEntry setNonUniqueIntgerField(Integer nonUniqueIntegerField) {
+			this.nonUniqueIntegerField = nonUniqueIntegerField;
+			return this;
+		}
+
+		public IndexedEntry setUniqueIntegerField(Integer uniqueIntegerField) {
+			this.uniqueIntegerField = uniqueIntegerField;
+			return this;
+		}
+
+		public IndexedEntry setUniqueDoubleField(Double uniqueDoubleField) {
+			this.uniqueDoubleField = uniqueDoubleField;
 			this.fieldBridgedStringField = new WrappedStringValue(
-					uniqueNumericField == null ? null : String.valueOf( uniqueNumericField )
+					uniqueDoubleField == null ? null : String.valueOf( uniqueDoubleField )
 			);
+			this.fieldBridgedNumericField = new WrappedDoubleValue( uniqueDoubleField );
 			return this;
 		}
 
