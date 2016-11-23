@@ -45,7 +45,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -340,10 +340,10 @@ public final class ConfigContext {
 			return;
 		}
 
-		Collection<IndexManager> indexManagers = indexesFactory.getIndexManagers();
-		for ( IndexManager indexManager : indexManagers ) {
-			if ( indexManager instanceof RemoteAnalyzerProvider ) {
-				final RemoteAnalyzer remoteAnalyzer = ( (RemoteAnalyzerProvider) indexManager ).getRemoteAnalyzer( lazyAnalyzer.getName() );
+		Collection<IndexManagerType> indexManagerTypes = indexesFactory.getIndexManagerTypes();
+		for ( IndexManagerType indexManagerType : indexManagerTypes ) {
+			if ( indexManagerType instanceof RemoteAnalyzerProvider ) {
+				final RemoteAnalyzer remoteAnalyzer = ( (RemoteAnalyzerProvider) indexManagerType ).getRemoteAnalyzer( lazyAnalyzer.getName() );
 				lazyAnalyzer.setDelegate( remoteAnalyzer );
 				initializedAnalyzers.put( lazyAnalyzer.getName(), new RemoteAnalyzerReference( remoteAnalyzer ) );
 				break;

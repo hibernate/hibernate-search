@@ -14,8 +14,6 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -51,7 +49,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Gunnar Morling
  */
-public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerProvider {
+public class ElasticsearchIndexManager implements IndexManager {
 
 	static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -313,11 +311,6 @@ public class ElasticsearchIndexManager implements IndexManager, RemoteAnalyzerPr
 	@Override
 	public String toString() {
 		return "ElasticsearchIndexManager [actualIndexName=" + actualIndexName + "]";
-	}
-
-	@Override
-	public RemoteAnalyzer getRemoteAnalyzer(String name) {
-		return new RemoteAnalyzer( name );
 	}
 
 	@Override
