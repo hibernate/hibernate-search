@@ -548,7 +548,6 @@ Here is a list of known limitations.
 
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
-* Mapping `java.time.ZonedDateTime` won't work with Elasticsearch 2.4.1 and 5.0.0 because of https://github.com/elastic/elasticsearch/issues/20911[a pending bug in Elasticsearch]: https://hibernate.atlassian.net/browse/HSEARCH-2414[HSEARCH-2414]. A temporary workaround would be to index a `java.time.OffsetDateTime` instead (if it's enough for your needs) or to use an earlier version of Elasticsearch.
 * Defining analyzers with `@AnalyzerDef`, analyzers have to be defined in the Elasticsearch configuration: https://hibernate.atlassian.net/browse/HSEARCH-2417[HSEARCH-2417]
 * Query timeouts: https://hibernate.atlassian.net/browse/HSEARCH-2399[HSEARCH-2399]
 * MoreLikeThis queries: https://hibernate.atlassian.net/browse/HSEARCH-2395[HSEARCH-2395]
@@ -560,3 +559,12 @@ Please check with JIRA and the mailing lists for updates, but at the time of wri
   This is largely mitigated by the fact that Hibernate Search does the denormalization itself and maintain data consistency when nested objects are updated.
 * There is room for improvements in the performances of the MassIndexer implementation
 * There is no failover to the next host when multiple hosts are configured and one host happens to fail: https://hibernate.atlassian.net/browse/HSEARCH-2469[HSEARCH-2469]
+
+=== Known bugs in Elasticsearch
+
+Depending on the Elasticsearch version you use, you may encounter bugs that are specific to that version.
+Here is a list of known Elasticsearch bugs, and what to do about it.
+
+* Mapping `java.time.ZonedDateTime` won't work with Elasticsearch 2.4.1 because of https://github.com/elastic/elasticsearch/issues/20911[a JodaTime bug affecting Elasticsearch]: https://hibernate.atlassian.net/browse/HSEARCH-2414[HSEARCH-2414].
++
+*Fix:* Upgrade to Elasticsearch 2.4.2.
