@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.analyzer.impl;
 
+import org.hibernate.search.indexes.spi.IndexManagerType;
+
 /**
- * Applies to index managers that are bound to backends supporting built-in analyzer definitions.
+ * Applies to {@link IndexManagerType}s that are bound to backends supporting built-in analyzer definitions.
  * <p>
  * For example, Elasticsearch comes with whitespace and languages analyzers without a definition in the classpath.
  *

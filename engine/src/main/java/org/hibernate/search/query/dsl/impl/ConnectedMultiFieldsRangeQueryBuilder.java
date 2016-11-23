@@ -16,13 +16,14 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**
@@ -129,7 +130,10 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 
 		String lowerTerm;
 		String upperTerm;
-		if ( queryContext.getFactory().getIndexBinding( queryContext.getEntityType() ).getIndexManagers()[0] instanceof RemoteAnalyzerProvider ) {
+
+		IndexManagerType indexManagerType = queryContext.getFactory().getIndexBinding( queryContext.getEntityType() ).getIndexManagers()[0].getIndexManagerType();
+		AnalyzerExecutionStrategy analyzerExecutionStrategy = indexManagerType.getAnalyzerExecutionStrategy();
+		if ( AnalyzerExecutionStrategy.REMOTE.equals( analyzerExecutionStrategy ) ) {
 			lowerTerm = fromString == null ? null : fromString;
 			upperTerm = toString == null ? null : toString;
 		}

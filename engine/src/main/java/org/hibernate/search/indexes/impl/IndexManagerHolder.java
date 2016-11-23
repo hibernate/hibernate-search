@@ -602,4 +602,8 @@ public class IndexManagerHolder {
 		indexManagerImplementationsRegistry.put( indexManagerImplementationKey, indexManagerType );
 		return indexManagerType;
 	}
+
+	public Collection<IndexManagerType> getIndexManagerTypes() {
+		return indexManagerImplementationsRegistry.values();
+	}
 }
