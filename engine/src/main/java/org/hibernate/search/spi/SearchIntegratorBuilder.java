@@ -48,7 +48,6 @@ import org.hibernate.search.engine.impl.ReflectionReplacingSearchConfiguration;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -58,7 +57,6 @@ import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchMappingHelper;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
@@ -91,6 +89,7 @@ public class SearchIntegratorBuilder {
 	private SearchConfiguration cfg;
 	private MutableSearchFactory rootFactory;
 	private final List<Class<?>> classes = new ArrayList<Class<?>>();
+	private final ErrorHandlerFactory errorHandlerFactory = new ErrorHandlerFactory();
 
 	public SearchIntegratorBuilder configuration(SearchConfiguration configuration) {
 		this.cfg = configuration;
@@ -287,7 +286,7 @@ public class SearchIntegratorBuilder {
 					)
 			);
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
-			factoryState.setErrorHandler( createErrorHandler( cfg ) );
+			factoryState.setErrorHandler( errorHandlerFactory.createErrorHandler( cfg ) );
 			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
 			factoryState.setTimingSource( new DefaultTimingSource() );
 			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );
@@ -497,37 +496,6 @@ public class SearchIntegratorBuilder {
 	private static IndexingMode defineIndexingMode(SearchConfiguration cfg) {
 		String indexingStrategy = cfg.getProperties().getProperty( Environment.INDEXING_STRATEGY, IndexingMode.EVENT.toExternalRepresentation() );
 		return IndexingMode.fromExternalRepresentation( indexingStrategy );
-	}
-
-	private ErrorHandler createErrorHandler(SearchConfiguration searchConfiguration) {
-		Object configuredErrorHandler = searchConfiguration.getProperties().get( Environment.ERROR_HANDLER );
-
-		if ( configuredErrorHandler == null ) {
-			return new LogErrorHandler();
-		}
-		if ( configuredErrorHandler instanceof String ) {
-			return createErrorHandlerFromString( (String) configuredErrorHandler, searchConfiguration.getClassLoaderService() );
-		}
-		else if ( configuredErrorHandler instanceof ErrorHandler ) {
-			return (ErrorHandler) configuredErrorHandler;
-		}
-		else {
-			throw log.unsupportedErrorHandlerConfigurationValueType( configuredErrorHandler.getClass() );
-		}
-	}
-
-	private ErrorHandler createErrorHandlerFromString(String errorHandlerClassName, ClassLoaderService classLoaderService) {
-		if ( StringHelper.isEmpty( errorHandlerClassName ) || ErrorHandler.LOG.equals( errorHandlerClassName.trim() ) ) {
-			return new LogErrorHandler();
-		}
-		else {
-			Class<?> errorHandlerClass = classLoaderService.classForName( errorHandlerClassName );
-			return ClassLoaderHelper.instanceFromClass(
-					ErrorHandler.class,
-					errorHandlerClass,
-					"Error Handler"
-			);
-		}
 	}
 
 	/**
