@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.testsupport.concurrency;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Assert;
 
@@ -28,7 +30,7 @@ public class ConcurrentRunner {
 	public static final int DEFAULT_REPEAT = 300;
 	public static final int DEFAULT_THREADS = 30;
 
-	private final AtomicBoolean somethingFailed = new AtomicBoolean( false );
+	private final ConcurrentMap<Integer, Throwable> failures = new ConcurrentHashMap<>( 0 );
 	private final ExecutorService executor;
 	private final CountDownLatch startLatch = new CountDownLatch( 1 );
 	private final CountDownLatch endLatch;
@@ -62,13 +64,13 @@ public class ConcurrentRunner {
 	/**
 	 * Invokes the {@link TaskFactory} and runs all the built tasks in
 	 * an Executor.
-	 * @throws Exception if interrupted, any exception is thrown by the tasks,
-	 * or any exception is thrown during the creation of tasks.
+	 * @throws Exception if any exception is thrown during the creation of tasks.
+	 * @throws AssertionError if interrupted or any exception is thrown by the tasks.
 	 */
-	public void execute() throws Exception {
+	public void execute() throws Exception, AssertionError {
 		for ( int i = 0; i < repetitions; i++ ) {
 			Runnable userRunnable = factory.createRunnable( i );
-			executor.execute( new WrapRunnable( startLatch, endLatch, userRunnable ) );
+			executor.execute( new WrapRunnable( startLatch, endLatch, i, userRunnable ) );
 		}
 		executor.shutdown();
 		startLatch.countDown();
@@ -80,18 +82,33 @@ public class ConcurrentRunner {
 			e.printStackTrace();
 			Assert.fail( "Interrupted while awaiting for end of execution" );
 		}
-		Assert.assertFalse( somethingFailed.get() );
+
+		AssertionError reportedError = null;
+		for ( Map.Entry<Integer, Throwable> entry : failures.entrySet() ) {
+			if ( reportedError == null ) {
+				reportedError = new AssertionError( "Unexpected failure on task #" + entry.getKey(), entry.getValue() );
+			}
+			else {
+				reportedError.addSuppressed( entry.getValue() );
+			}
+		}
+
+		if ( reportedError != null ) {
+			throw reportedError;
+		}
 	}
 
 	private class WrapRunnable implements Runnable {
 
 		private final CountDownLatch startLatch;
 		private final CountDownLatch endLatch;
+		private final Integer taskIndex;
 		private final Runnable userRunnable;
 
-		public WrapRunnable(CountDownLatch startLatch, CountDownLatch endLatch, Runnable userRunnable) {
+		public WrapRunnable(CountDownLatch startLatch, CountDownLatch endLatch, Integer taskIndex, Runnable userRunnable) {
 			this.startLatch = startLatch;
 			this.endLatch = endLatch;
+			this.taskIndex = taskIndex;
 			this.userRunnable = userRunnable;
 		}
 
@@ -100,13 +117,12 @@ public class ConcurrentRunner {
 			try {
 				startLatch.await(); // Maximize chances of working concurrently on the Serializer
 				//Prevent more work to be scheduled if something failed already
-				if ( somethingFailed.get() == false ) {
+				if ( failures.isEmpty() ) {
 					userRunnable.run();
 				}
 			}
 			catch (InterruptedException | RuntimeException | AssertionError e) {
-				e.printStackTrace();
-				somethingFailed.set( true );
+				failures.put( taskIndex, e );
 			}
 			endLatch.countDown();
 		}
