@@ -20,6 +20,7 @@ import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.spatial.DoubleIndexedPOI;
 import org.hibernate.search.test.spatial.POI;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,8 +34,29 @@ import static org.hamcrest.CoreMatchers.not;
  */
 public class SpatialQueryingJPATest extends JPATestCase {
 
+	@After
+	public void cleanup() {
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+		try {
+			em.getTransaction().begin();
+			List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
+			for ( Object entity : pois ) {
+				em.remove( entity );
+			}
+
+			pois = em.createQuery( "from " + DoubleIndexedPOI.class.getName() ).getResultList();
+			for ( Object entity : pois ) {
+				em.remove( entity );
+			}
+			em.getTransaction().commit();
+		}
+		finally {
+			em.close();
+		}
+	}
+
 	@Test
-	public void testDistanceProjection() throws Exception {
+	public void testDistanceProjectionWithoutSort() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
 		POI poi3 = new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
@@ -55,6 +77,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		em.persist( poi5 );
 		em.persist( poi6 );
 		em.getTransaction().commit();
+		em.clear();
 
 		em.getTransaction().begin();
 		double centerLatitude = 24.0d;
@@ -69,6 +92,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.getResultList();
+		Assert.assertEquals( 6, results.size() );
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
 		Object[] thirdResult = (Object[]) results.get( 2 );
@@ -82,11 +106,52 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
 		Assert.assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
 
-		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
-		for ( Object entity : pois ) {
-			em.remove( entity );
-		}
+		em.close();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2324")
+	public void testDistanceProjectionWithoutSortMissingCoordinates() throws Exception {
+		POI poi1 = new POI( 1, "Distance to 24,32 : unknown (incomplete coordinates)", null, 32d, "" );
+		POI poi2 = new POI( 2, "Distance to 24,32 : unknown (incomplete coordinates)", 24d, null, "" );
+		POI poi3 = new POI( 3, "Distance to 23,32 : unknown (incomplete coordinates)", null, null, "" );
+
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+
+		em.getTransaction().begin();
+		em.persist( poi1 );
+		em.persist( poi2 );
+		em.persist( poi3 );
 		em.getTransaction().commit();
+		em.clear();
+
+		em.getTransaction().begin();
+		double centerLatitude = 24.0d;
+		double centerLongitude = 32.0d;
+
+		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )
+				.within( Double.MAX_VALUE, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		List results = hibQuery.getResultList();
+		Assert.assertEquals( "Missing coordinates should never appear in spatial query results", 0, results.size() );
+
+		hibQuery = em.createFullTextQuery( builder.all().createQuery(), POI.class );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		results = hibQuery.getResultList();
+		Assert.assertEquals( 3, results.size() );
+		Object[] firstResult = (Object[]) results.get( 0 );
+		Object[] secondResult = (Object[]) results.get( 1 );
+		Object[] thirdResult = (Object[]) results.get( 2 );
+		Assert.assertNull( firstResult[1] );
+		Assert.assertNull( secondResult[1] );
+		Assert.assertNull( thirdResult[1] );
+
 		em.close();
 	}
 
@@ -156,11 +221,6 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( 10.1582, (Double) fifthResult[1], 0.01 );
 		Assert.assertEquals( 0.0, (Double) sixthResult[1], 0.01 );
 
-		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
-		for ( Object entity : pois ) {
-			em.remove( entity );
-		}
-		em.getTransaction().commit();
 		em.close();
 	}
 
@@ -218,11 +278,49 @@ public class SpatialQueryingJPATest extends JPATestCase {
 			Assert.assertThat( message, ( (Double) result[1] ).doubleValue(), is( not( 0.0 ) ) );
 		}
 
-		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
-		for ( Object entity : pois ) {
-			em.remove( entity );
-		}
+		em.close();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2324")
+	public void testDistanceSortMissingCoordinates() throws Exception {
+		POI poi = new POI( 0, "Distance to 24,32 : 10.16km", 24.0d, 31.9d, "" );
+		POI poi2 = new POI( 1, "Distance to 24,32 : unknown, 4361.00km if interpreted as 0,0", null, null, "" );
+
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+
+		em.getTransaction().begin();
+		em.persist( poi );
+		em.persist( poi2 );
 		em.getTransaction().commit();
+
+		em.getTransaction().begin();
+		double centerLatitude = 24.0d;
+		double centerLongitude = 32.0d;
+
+		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
+
+		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
+		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+		hibQuery.setSort( distanceSort );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		List results = hibQuery.getResultList();
+		Object[] firstResult = (Object[]) results.get( 0 );
+		Object[] secondResult = (Object[]) results.get( 1 );
+		Assert.assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
+		Assert.assertNull( secondResult[1] );
+
+		distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
+		hibQuery.setSort( distanceSort );
+		results = hibQuery.getResultList();
+		firstResult = (Object[]) results.get( 0 );
+		secondResult = (Object[]) results.get( 1 );
+		Assert.assertNull( firstResult[1] );
+		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
+
 		em.close();
 	}
 
@@ -263,31 +361,16 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
 		Assert.assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
-		/*
-		 * ElasticSearch returns a distance of Double.MAX_VALUE while Lucene just
-		 * returns the distance to (0,0).
-		 * See HSEARCH-2324
-		 */
-		Assert.assertTrue( "Expected a great distance", ((Double)secondResult[1]) > 4000.0 );
+		Assert.assertNull( secondResult[1] );
 
 		distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
 		hibQuery.setSort( distanceSort );
 		results = hibQuery.getResultList();
 		firstResult = (Object[]) results.get( 0 );
 		secondResult = (Object[]) results.get( 1 );
-		/*
-		 * ElasticSearch returns a distance of Double.MAX_VALUE while Lucene just
-		 * returns the distance to (0,0).
-		 * See HSEARCH-2324
-		 */
-		Assert.assertTrue( "Expected a great distance", ((Double)firstResult[1]) > 4000.0 );
+		Assert.assertNull( firstResult[1] );
 		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
 
-		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
-		for ( Object entity : pois ) {
-			em.remove( entity );
-		}
-		em.getTransaction().commit();
 		em.close();
 	}
 
@@ -337,11 +420,6 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
 		Assert.assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
 
-		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
-		for ( Object entity : pois ) {
-			em.remove( entity );
-		}
-		em.getTransaction().commit();
 		em.close();
 	}
 
@@ -416,12 +494,6 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( (Double) fifthResult[1], 22.239, 0.02 );
 		Assert.assertEquals( (Double) sixthResult[1], 24.446, 0.02 );
 
-
-		List<?> pois = em.createQuery( "from " + DoubleIndexedPOI.class.getName() ).getResultList();
-		for ( Object entity : pois ) {
-			em.remove( entity );
-		}
-		em.getTransaction().commit();
 		em.close();
 	}
 

@@ -15,6 +15,7 @@ import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.SimpleFieldComparator;
+import org.apache.lucene.util.Bits;
 
 //FIXME don't extend SimpleFieldComparator
 public final class DistanceComparator extends SimpleFieldComparator<Double> {
@@ -23,6 +24,8 @@ public final class DistanceComparator extends SimpleFieldComparator<Double> {
 	private final String latitudeField;
 	private final String longitudeField;
 	private double[] distances;
+	private Bits docsWithLatitude;
+	private Bits docsWithLongitude;
 	private NumericDocValues latitudeValues;
 	private NumericDocValues longitudeValues;
 	private Double bottomDistance;
@@ -54,16 +57,20 @@ public final class DistanceComparator extends SimpleFieldComparator<Double> {
 	public int compareBottom(final int doc) throws IOException {
 		return Double.compare(
 				bottomDistance,
-				center.getDistanceTo( latitude( doc ), longitude( doc ) )
+				distanceTo( doc )
 		);
 	}
 
-	private double longitude(final int doc) {
-		return coordinate( longitudeValues, doc );
-	}
-
-	private double latitude(final int doc) {
-		return coordinate( latitudeValues, doc );
+	private double distanceTo(final int doc) {
+		if ( docsWithLatitude.get( doc ) && docsWithLongitude.get( doc ) ) {
+			return center.getDistanceTo(
+					coordinate( latitudeValues, doc ),
+					coordinate( longitudeValues, doc )
+			);
+		}
+		else {
+			return Double.MAX_VALUE;
+		}
 	}
 
 	@Override
@@ -72,21 +79,20 @@ public final class DistanceComparator extends SimpleFieldComparator<Double> {
 			return 1; //we consider any doc "higher" than null
 		}
 
-		final double distanceTo = center.getDistanceTo( latitude( doc ), longitude( doc ) );
+		final double distanceTo = distanceTo( doc );
 		return Double.compare( distanceTo, topValue );
 	}
 
 	@Override
 	public void copy(final int slot, final int doc) throws IOException {
-		distances[slot] = center.getDistanceTo(
-				latitude( doc ),
-				longitude( doc )
-		);
+		distances[slot] = distanceTo( doc );
 	}
 
 	@Override
 	public void doSetNextReader(final LeafReaderContext context) throws IOException {
 		final LeafReader atomicReader = context.reader();
+		docsWithLatitude = DocValues.getDocsWithField( atomicReader, latitudeField );
+		docsWithLongitude = DocValues.getDocsWithField( atomicReader, longitudeField );
 		latitudeValues = DocValues.getNumeric( atomicReader, latitudeField );
 		longitudeValues = DocValues.getNumeric( atomicReader, longitudeField );
 	}

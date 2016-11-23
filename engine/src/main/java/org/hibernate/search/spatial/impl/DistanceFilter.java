@@ -106,20 +106,23 @@ public final class DistanceFilter extends Filter {
 			return null;
 		}
 
+		final Bits docsWithLatitude = DocValues.getDocsWithField( atomicReader, getLatitudeField() );
+		final Bits docsWithLongitude = DocValues.getDocsWithField( atomicReader, getLongitudeField() );
 		final NumericDocValues latitudeValues = DocValues.getNumeric( atomicReader, getLatitudeField() );
 		final NumericDocValues longitudeValues = DocValues.getNumeric( atomicReader, getLongitudeField() );
 
 		return new FilteredDocIdSet( docs ) {
 			@Override
 			protected boolean match(int documentIndex) {
-				double lat = coordinate( latitudeValues, documentIndex );
-				double lon = coordinate( longitudeValues, documentIndex );
-				if ( center.getDistanceTo( lat, lon ) <= radius ) {
-					return true;
+				if ( docsWithLatitude.get( documentIndex ) && docsWithLongitude.get( documentIndex ) ) {
+					double lat = coordinate( latitudeValues, documentIndex );
+					double lon = coordinate( longitudeValues, documentIndex );
+					if ( center.getDistanceTo( lat, lon ) <= radius ) {
+						return true;
+					}
 				}
-				else {
-					return false;
-				}
+
+				return false;
 			}
 		};
 	}
