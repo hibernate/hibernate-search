@@ -89,7 +89,6 @@ public class SearchIntegratorBuilder {
 	private SearchConfiguration cfg;
 	private MutableSearchFactory rootFactory;
 	private final List<Class<?>> classes = new ArrayList<Class<?>>();
-	private final ErrorHandlerFactory errorHandlerFactory = new ErrorHandlerFactory();
 
 	public SearchIntegratorBuilder configuration(SearchConfiguration configuration) {
 		this.cfg = configuration;
@@ -286,7 +285,7 @@ public class SearchIntegratorBuilder {
 					)
 			);
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
-			factoryState.setErrorHandler( errorHandlerFactory.createErrorHandler( cfg ) );
+			factoryState.setErrorHandler( ErrorHandlerFactory.createErrorHandler( cfg ) );
 			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
 			factoryState.setTimingSource( new DefaultTimingSource() );
 			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );

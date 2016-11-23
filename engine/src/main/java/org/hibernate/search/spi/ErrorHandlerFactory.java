@@ -13,20 +13,26 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Factory of {@link org.hibernate.search.exception.ErrorHandler}.
+ * Some helper methods are exposed so that some integrating frameworks can wrap the
+ * ErrorHandler with some custom decoration, while still leaving it
+ * up to the user to choose which ErrorHandler to use within the decorator.
+ *
+ * @since 5.6
  */
-public class ErrorHandlerFactory {
+public final class ErrorHandlerFactory {
 
-	private static final Log log = LoggerFactory.make();
+	private ErrorHandlerFactory() {
+		//Not to be invoked: we only expose static methods.
+	}
 
 	/**
 	 * @return Default ErrorHandler in case none is explicitly configured.
 	 */
-	public ErrorHandler getDefault() {
+	public static ErrorHandler getDefault() {
 		return new LogErrorHandler();
 	}
 
@@ -34,7 +40,7 @@ public class ErrorHandlerFactory {
 	 * @param searchConfiguration
 	 * @return ErrorHandler specified in the {@link SearchConfiguration} or the default one in case not specified.
 	 */
-	public ErrorHandler createErrorHandler(SearchConfiguration searchConfiguration) {
+	public static ErrorHandler createErrorHandler(SearchConfiguration searchConfiguration) {
 		Object configuredErrorHandler = searchConfiguration.getProperties().get( Environment.ERROR_HANDLER );
 
 		if ( configuredErrorHandler == null ) {
@@ -50,11 +56,11 @@ public class ErrorHandlerFactory {
 			return (ErrorHandler) configuredErrorHandler;
 		}
 		else {
-			throw log.unsupportedErrorHandlerConfigurationValueType( configuredErrorHandler.getClass() );
+			throw LoggerFactory.make().unsupportedErrorHandlerConfigurationValueType( configuredErrorHandler.getClass() );
 		}
 	}
 
-	private ErrorHandler createErrorHandlerFromString(
+	private static ErrorHandler createErrorHandlerFromString(
 			String errorHandlerClassName,
 			ClassLoaderService classLoaderService) {
 		if ( StringHelper.isEmpty( errorHandlerClassName ) || ErrorHandler.LOG.equals( errorHandlerClassName.trim() ) ) {
