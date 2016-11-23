@@ -1411,7 +1411,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
              To run tests against a different version of Elasticsearch, use the appropriate profile
              and provide the Elasticsearch version:
              
-                 mvn clean test -Pelasticsearch5 -DtestElasticsearchVersion=5.0.0
+                 mvn clean test -Pelasticsearch-2.0 -DtestElasticsearchVersion=2.1.0
           -->
         
         <!-- Elasticsearch [2.0,2.2) test environment -->
