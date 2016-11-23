@@ -56,7 +56,7 @@ final class AsyncWorkProcessor implements WorkProcessor {
 				resources,
 				monitor
 		);
-		resources.getAsynchIndexingExecutor().execute( luceneBackendQueueProcessor );
+		resources.submitToAsyncIndexingExecutor( luceneBackendQueueProcessor );
 	}
 
 	@Override
