@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.elasticsearch.spi;
 
+import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 
-public final class ElasticsearchIndexManagerType implements IndexManagerType {
+public final class ElasticsearchIndexManagerType implements IndexManagerType, RemoteAnalyzerProvider {
 
 	public static final ElasticsearchIndexManagerType INSTANCE = new ElasticsearchIndexManagerType();
 
@@ -20,5 +22,10 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType {
 	@Override
 	public AnalyzerExecutionStrategy getAnalyzerExecutionStrategy() {
 		return AnalyzerExecutionStrategy.REMOTE;
+	}
+
+	@Override
+	public RemoteAnalyzer getRemoteAnalyzer(String name) {
+		return new RemoteAnalyzer( name );
 	}
 }
