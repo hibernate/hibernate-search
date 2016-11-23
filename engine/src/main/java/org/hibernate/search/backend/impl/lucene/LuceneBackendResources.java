@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -22,9 +20,6 @@ import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.impl.Executors;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Collects all resources needed to apply changes to one index,
@@ -34,29 +29,36 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class LuceneBackendResources {
 
-	private static final Log log = LoggerFactory.make();
-
-	private volatile IndexWorkVisitor<Void, LuceneWorkExecutor> workVisitor;
 	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
-	private final int maxQueueLength;
 	private final String indexName;
 	private final IndexManager indexManager;
+	private final LazyExecutorHolder asynchExecutor;
 
+	/**
+	 * Lazily initialized; no need for locking as multiple instances can
+	 * simply be discarded.
+	 */
+	private volatile IndexWorkVisitor<Void, LuceneWorkExecutor> workVisitor;
+
+	/**
+	 * Externally exposed Read/Write locks used by FSMasterDirectoryProvider
+	 * to be able to make copies of a locked (immutable) index.
+	 * TODO: explore if that could use a better snapshotting technique
+	 */
 	private final ReadLock readLock;
 	private final WriteLock writeLock;
-
-	private volatile ExecutorService asyncIndexingExecutor;
 
 	LuceneBackendResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, Properties props, AbstractWorkspaceImpl workspace) {
 		this.indexName = indexManager.getIndexName();
 		this.indexManager = indexManager;
 		this.errorHandler = context.getErrorHandler();
 		this.workspace = workspace;
-		this.maxQueueLength = PropertiesParseHelper.extractMaxQueueSize( indexName, props );
-		ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-		readLock = readWriteLock.readLock();
-		writeLock = readWriteLock.writeLock();
+		final ReentrantReadWriteLock indexReadWriteLock = new ReentrantReadWriteLock();
+		this.readLock = indexReadWriteLock.readLock();
+		this.writeLock = indexReadWriteLock.writeLock();
+		final int maxQueueLength = PropertiesParseHelper.extractMaxQueueSize( indexName, props );
+		this.asynchExecutor = new LazyExecutorHolder( maxQueueLength, indexName, "Index updates queue processor for index " + indexName );
 	}
 
 	private LuceneBackendResources(LuceneBackendResources previous) {
@@ -64,35 +66,13 @@ public final class LuceneBackendResources {
 		this.indexName = previous.indexName;
 		this.errorHandler = previous.errorHandler;
 		this.workspace = previous.workspace;
-		this.maxQueueLength = previous.maxQueueLength;
-		this.asyncIndexingExecutor = previous.asyncIndexingExecutor;
 		this.readLock = previous.readLock;
 		this.writeLock = previous.writeLock;
-	}
-
-	public ExecutorService getAsynchIndexingExecutor() {
-		ExecutorService executor = asyncIndexingExecutor;
-		if ( executor != null ) {
-			return executor;
-		}
-		else {
-			return getAsynchIndexingExecutorSynchronized();
-		}
-	}
-
-	private synchronized ExecutorService getAsynchIndexingExecutorSynchronized() {
-		ExecutorService executor = asyncIndexingExecutor;
-		if ( executor != null ) {
-			return executor;
-		}
-		else {
-			this.asyncIndexingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
-			return this.asyncIndexingExecutor;
-		}
+		this.asynchExecutor = previous.asynchExecutor;
 	}
 
 	public int getMaxQueueLength() {
-		return maxQueueLength;
+		return asynchExecutor.getMaxQueueLength();
 	}
 
 	public String getIndexName() {
@@ -117,28 +97,11 @@ public final class LuceneBackendResources {
 	public void shutdown() {
 		//need to close them in this specific order:
 		try {
-			flushCloseExecutor();
+			asynchExecutor.flushCloseExecutor();
 		}
 		finally {
 			workspace.shutDownNow();
 		}
-	}
-
-	private void flushCloseExecutor() {
-		if ( asyncIndexingExecutor == null ) {
-			return;
-		}
-		asyncIndexingExecutor.shutdown();
-		try {
-			asyncIndexingExecutor.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
-		}
-		catch (InterruptedException e) {
-			log.interruptedWhileWaitingForIndexActivity( e );
-		}
-		if ( ! asyncIndexingExecutor.isTerminated() ) {
-			log.unableToShutdownAsynchronousIndexingByTimeout( indexName );
-		}
-		asyncIndexingExecutor = null;
 	}
 
 	public ErrorHandler getErrorHandler() {
@@ -167,8 +130,12 @@ public final class LuceneBackendResources {
 	}
 
 	public void flushAndReleaseResources() {
-		flushCloseExecutor();
+		asynchExecutor.flushCloseExecutor();
 		workspace.getCommitPolicy().onClose();
 		workspace.closeIndexWriter();
+	}
+
+	public void submitToAsyncIndexingExecutor(LuceneBackendQueueTask luceneBackendQueueProcessor) {
+		asynchExecutor.submitTask( luceneBackendQueueProcessor );
 	}
 }
