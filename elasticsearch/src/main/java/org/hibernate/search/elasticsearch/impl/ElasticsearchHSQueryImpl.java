@@ -292,7 +292,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private class IndexSearcher {
 
 		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
-		private final Map<String, Class<?>> documentBuilderIndexedEntityByName = new HashMap<>();
 		private final Set<String> indexNames = new HashSet<>();
 		private final String completeQueryAsString;
 
