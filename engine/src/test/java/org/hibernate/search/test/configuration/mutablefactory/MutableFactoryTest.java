@@ -8,13 +8,12 @@ package org.hibernate.search.test.configuration.mutablefactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.spi.Work;
@@ -30,10 +29,11 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
+import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.util.impl.Executors;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -215,42 +215,20 @@ public class MutableFactoryTest {
 	public void testMultiThreadedAddClasses() throws Exception {
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
-			List<DoAddClasses> runnables = new ArrayList<DoAddClasses>( 10 );
-			final int nbrOfThread = 5;
-			final int nbrOfClassesPerThread = 5;
-			for ( int i = 0; i < nbrOfThread; i++ ) {
-				runnables.add( new DoAddClasses( sf, i, nbrOfClassesPerThread ) );
-			}
-			final ThreadPoolExecutor poolExecutor = Executors.newFixedThreadPool( nbrOfThread, "SFI classes addition" );
-			poolExecutor.prestartAllCoreThreads();
-			for ( Runnable runnable : runnables ) {
-				poolExecutor.execute( runnable );
-			}
-			poolExecutor.shutdown();
-
-			if ( !poolExecutor.awaitTermination( 1, TimeUnit.MINUTES ) ) {
-				poolExecutor.shutdownNow();
-				fail( "The thread pool didn't finish executing after 1 minute" );
-			}
-
-			AssertionError reportedError = null;
-			for ( DoAddClasses runnable : runnables ) {
-				Throwable throwableFromCurrentRunnable = runnable.getThrowable();
-				if ( throwableFromCurrentRunnable != null ) {
-					if ( reportedError == null ) {
-						reportedError = new AssertionError( "Unexpected failure on thread #" + runnable.getWorkNumber(), throwableFromCurrentRunnable );
+			int numberOfClasses = 25;
+			int numberOfThreads = 5;
+			new ConcurrentRunner( numberOfClasses, numberOfThreads,
+					new TaskFactory() {
+						@Override
+						public Runnable createRunnable(int i) throws Exception {
+							return new DoAddClass( sf, i );
+						}
 					}
-					else {
-						reportedError.addSuppressed( throwableFromCurrentRunnable );
-					}
-				}
-			}
+				)
+				.setTimeout( 1, TimeUnit.MINUTES )
+				.execute();
 
-			if ( reportedError != null ) {
-				throw reportedError;
-			}
-
-			for ( int i = 0; i < nbrOfThread * nbrOfClassesPerThread; i++ ) {
+			for ( int i = 0; i < numberOfClasses; i++ ) {
 				Query luceneQuery = parser.parse( "Emmanuel" + i );
 				final Class<?> classByNumber = getClassByNumber( i, sf.getServiceManager() );
 				HSQuery hsQuery = sf.createHSQuery( luceneQuery, classByNumber );
@@ -268,58 +246,48 @@ public class MutableFactoryTest {
 		return clazz;
 	}
 
-	private static class DoAddClasses implements Runnable {
+	private static class DoAddClass implements Runnable {
 		private final ExtendedSearchIntegrator extendedIntegrator;
-		private final int factorOfClassesPerThread;
+		private final int index;
 		private final QueryParser parser;
-		private final int nbrOfClassesPerThread;
-		private volatile Throwable throwable;
 
-		public Throwable getThrowable() {
-			return throwable;
-		}
-
-		public int getWorkNumber() {
-			return factorOfClassesPerThread;
-		}
-
-		public DoAddClasses(SearchIntegrator si, int factorOfClassesPerThread, int nbrOfClassesPerThread) {
+		public DoAddClass(SearchIntegrator si, int index) {
 			this.extendedIntegrator = si.unwrap( ExtendedSearchIntegrator.class );
-			this.factorOfClassesPerThread = factorOfClassesPerThread;
+			this.index = index;
 			this.parser = new QueryParser( "name", TestConstants.standardAnalyzer );
-			this.nbrOfClassesPerThread = nbrOfClassesPerThread;
 		}
 
 		@Override
 		public void run() {
 			try {
-				for ( int index = 0; index < nbrOfClassesPerThread; index++ ) {
-					final int i = factorOfClassesPerThread * nbrOfClassesPerThread + index;
-					String name = "Emmanuel" + i;
-					final Class<?> aClass = MutableFactoryTest.getClassByNumber(
-							i,
-							extendedIntegrator.getServiceManager()
-					);
-					System.err.println( "Creating index #" + i + " for class " + aClass );
-					extendedIntegrator.addClasses( aClass );
-					Object entity = aClass.getConstructor( Integer.class, String.class )
-							.newInstance( i, name );
-					TransactionContextForTest context = new TransactionContextForTest();
-					MutableFactoryTest.doIndexWork( entity, i, extendedIntegrator, context );
-					context.end();
+				String name = "Emmanuel" + index;
+				final Class<?> aClass = MutableFactoryTest.getClassByNumber(
+						index,
+						extendedIntegrator.getServiceManager()
+				);
+				System.err.println( "Creating index #" + index + " for class " + aClass );
+				extendedIntegrator.addClasses( aClass );
+				Object entity = aClass.getConstructor( Integer.class, String.class )
+						.newInstance( index, name );
+				TransactionContextForTest context = new TransactionContextForTest();
+				MutableFactoryTest.doIndexWork( entity, index, extendedIntegrator, context );
+				context.end();
 
-					EntityIndexBinding indexBindingForEntity = extendedIntegrator.getIndexBinding( aClass );
-					assertNotNull( indexBindingForEntity );
-					IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
-					assertEquals( 1, indexManagers.length );
+				EntityIndexBinding indexBindingForEntity = extendedIntegrator.getIndexBinding( aClass );
+				assertNotNull( indexBindingForEntity );
+				IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
+				assertEquals( 1, indexManagers.length );
 
-					Query luceneQuery = parser.parse( name );
-					HSQuery hsQuery = extendedIntegrator.createHSQuery( luceneQuery, aClass );
-					assertEquals( "Should have exactly one result for '" + name + "'", 1, hsQuery.queryResultSize() );
-				}
+				Query luceneQuery = parser.parse( name );
+				HSQuery hsQuery = extendedIntegrator.createHSQuery( luceneQuery, aClass );
+				assertEquals( "Should have exactly one result for '" + name + "'", 1, hsQuery.queryResultSize() );
 			}
-			catch (Exception | AssertionError t) {
-				this.throwable = t;
+			catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException
+					| IllegalAccessException | InstantiationException e) {
+				throw new IllegalStateException( "Unexpected exception while manipulating dynamically created classes", e );
+			}
+			catch (ParseException e) {
+				throw new IllegalStateException( "Unexpected exception while parsing query", e );
 			}
 		}
 	}
