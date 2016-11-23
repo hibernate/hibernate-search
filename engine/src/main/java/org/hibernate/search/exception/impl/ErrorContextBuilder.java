@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.ErrorContext;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * @author Amin Mohammed-Coleman
@@ -23,6 +24,7 @@ public class ErrorContextBuilder {
 	private Iterable<LuceneWork> workToBeDone;
 	private List<LuceneWork> failingOperations;
 	private List<LuceneWork> operationsThatWorked;
+	private IndexManager indexManager;
 
 	public ErrorContextBuilder errorThatOccurred(Throwable th) {
 		this.th = th;
@@ -43,6 +45,11 @@ public class ErrorContextBuilder {
 		this.getOperationsThatWorked().add( luceneWork );
 		return this;
 
+	}
+
+	public ErrorContextBuilder indexManager(IndexManager indexName) {
+		this.indexManager = indexName;
+		return this;
 	}
 
 	public ErrorContextBuilder allWorkToBeDone(Iterable<LuceneWork> workOnWriter) {
@@ -71,6 +78,7 @@ public class ErrorContextBuilder {
 			}
 		}
 		context.setFailingOperations( getFailingOperations() );
+		context.setIndexManager( indexManager );
 		return context;
 	}
 

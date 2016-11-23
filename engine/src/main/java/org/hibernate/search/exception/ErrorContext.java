@@ -9,6 +9,7 @@ package org.hibernate.search.exception;
 import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * @author Amin Mohammed-Coleman
@@ -23,5 +24,7 @@ public interface ErrorContext {
 	Throwable getThrowable();
 
 	boolean hasErrors();
+
+	IndexManager getIndexManager();
 
 }

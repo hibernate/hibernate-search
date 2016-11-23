@@ -87,6 +87,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 		Assert.assertEquals( expectedErrorMessage.toString() , errorMessage );
 		Assert.assertTrue( exception instanceof SearchException );
 		Assert.assertEquals( "failed work message", exception.getMessage() );
+		Assert.assertEquals( indexManager, mockErrorHandler.getIndexManager() );
 	}
 
 	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
