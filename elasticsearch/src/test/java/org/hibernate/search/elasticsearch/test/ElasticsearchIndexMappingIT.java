@@ -154,34 +154,41 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 					"'properties':{" +
 						"'active':{" +
 							"'type':'boolean'," +
+							"'store':true," +
 							"'null_value':false" +
 						"}," +
 						"'age':{" +
-							"'type':'integer'" +
+							"'type':'integer'," +
+							"'store':true" +
 						"}," +
 						"'dateOfBirth':{" +
 							"'type':'date'," +
 							"'format':'strict_date_optional_time||epoch_millis'," +
-							"'null_value': '" + toElasticsearchDateHelperDateString("1970-01-01+00:00") + "'" +
+							"'store':true," +
+							"'null_value':'" + toElasticsearchDateHelperDateString("1970-01-01+00:00") + "'" +
 						"}," +
 						"'driveWidth':{" +
 							"'type':'integer'," +
+							"'store':true," +
 							"'null_value':-1" +
 						"}," +
 						"'firstName':{" +
 							"'type':'string'," +
+							"'store':true," +
 							"'null_value':'<NULL>'" +
 						"}," +
 						"'fullName':{" +
-							"'type':'string'" +
+							"'type':'string'," +
+							"'store':true" +
 						"}," +
-						"'fullNameStored':{" +
+						"'fullNameNotIndexed':{" +
 							"'type':'string'," +
 							"'index':'no'," +
 							"'store':true" +
 						"}," +
 						"'handicap':{" +
-							"'type':'double'" +
+							"'type':'double'," +
+							"'store':true" +
 						"}," +
 						"'id':{" +
 							"'type':'string'," +
@@ -189,7 +196,8 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 							"'store':true" +
 						"}," +
 						"'lastName':{" +
-							"'type':'string'" +
+							"'type':'string'," +
+							"'store':true" +
 						"}," +
 						"'playedCourses':{" +
 							"'properties':{" +
@@ -212,12 +220,14 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 							"}" +
 						"}," +
 						"'puttingStrength':{" +
-							"'type':'string'" +
+							"'type':'string'," +
+							"'store':true" +
 						"}," +
 						"'ranking':{" +
 							"'properties':{" +
 									"'value':{" +
-										"'type':'string'" +
+										"'type':'string'," +
+										"'store':true" +
 									"}" +
 							"}" +
 						"}," +
@@ -227,7 +237,8 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 						"'subscriptionEndDate':{" +
 							"'type':'date'," +
 							"'format':'strict_date_optional_time||epoch_millis'," +
-							"'null_value': '" + toElasticsearchDateHelperDateString("1970-01-01+00:00") + "'" +
+							"'store':true," +
+							"'null_value':'" + toElasticsearchDateHelperDateString("1970-01-01+00:00") + "'" +
 						"}," +
 						"'won_holes':{" +
 							"'properties':{" +
@@ -462,7 +473,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 					"\"puttingStrength\": \"0.0\"," + // not nullable
 					"\"lastName\": \"Kidd\"," +
 					"\"fullName\": \"Kidd\"," +
-					"\"fullNameStored\": \"Kidd\"" +
+					"\"fullNameNotIndexed\": \"Kidd\"" +
 					// ranking.value is null but indexNullAs() has not been given, so it's
 					// not present in the index at all
 					// "\"ranking\": {" +
