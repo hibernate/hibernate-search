@@ -587,6 +587,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			String absoluteName = bridgeDefinedField.getAbsoluteName();
 			ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
 
+			if ( !org.hibernate.search.annotations.Store.YES.equals( bridgeDefinedField.getSourceField().getStore() ) ) {
+				throw LOG.projectingNonStoredField( absoluteName );
+			}
+
 			sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
 
 			return new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
