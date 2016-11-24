@@ -29,17 +29,19 @@ public enum IndexSchemaManagementStrategy {
 
 	/**
 	 * Upon session factory initialization, index mappings will be merged with existing ones, causing an exception if a
-	 * mapping to be merged is not compatible with the existing one. Missing indexes and mappings will be created.
+	 * mapping to be merged is not compatible with the existing one.
+	 * <p>Missing indexes will be created along with their mappings. Missing mappings on existing indexes will be created.
 	 */
 	MERGE,
 
 	/**
-	 * Existing indexes will not be altered, missing indexes will be created.
+	 * Existing indexes will not be altered, missing indexes will be created along with their mappings.
 	 */
 	CREATE,
 
 	/**
-	 * Indexes - and all their contents - will be deleted and newly created upon session factory initialization.
+	 * Indexes - and all their contents - will be deleted and newly created (along with their mappings) upon
+	 * session factory initialization.
 	 */
 	RECREATE,
 
