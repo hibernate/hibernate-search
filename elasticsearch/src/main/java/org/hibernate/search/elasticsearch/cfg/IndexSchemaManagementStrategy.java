@@ -42,6 +42,9 @@ public enum IndexSchemaManagementStrategy {
 	/**
 	 * Indexes - and all their contents - will be deleted and newly created (along with their mappings) upon
 	 * session factory initialization.
+	 *
+	 * <p>Note that whenever a search factory is altered after initialization (i.e. new entities are mapped),
+	 * the index will <strong>not</strong> be deleted again: new mappings will simply be added to the index.
 	 */
 	RECREATE,
 

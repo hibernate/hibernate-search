@@ -40,7 +40,7 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 	}
 
 	@Override
-	public void create(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+	public void createIndex(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
 		String indexName = indexMetadata.getName();
 
 		schemaAccessor.createIndex( indexName, executionOptions );
@@ -55,23 +55,31 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 	}
 
 	@Override
-	public void createIfAbsent(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+	public boolean createIndexIfAbsent(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
 		String indexName = indexMetadata.getName();
 
 		boolean created = false;
 
 		if ( !schemaAccessor.indexExists( indexName ) ) {
 			created = schemaAccessor.createIndexIfAbsent( indexName, executionOptions );
+
+			if ( created ) {
+				schemaAccessor.waitForIndexStatus( indexName, executionOptions );
+			}
 		}
 
-		if ( created ) {
-			schemaAccessor.waitForIndexStatus( indexName, executionOptions );
+		return created;
+	}
 
-			for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
-				String mappingName = entry.getKey();
-				TypeMapping mapping = entry.getValue();
-				schemaAccessor.putMapping( indexName, mappingName, mapping );
-			}
+	@Override
+	public void createMappings(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+		String indexName = indexMetadata.getName();
+
+		for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
+			String mappingName = entry.getKey();
+			TypeMapping mapping = entry.getValue();
+
+			schemaAccessor.putMapping( indexName, mappingName, mapping );
 		}
 	}
 

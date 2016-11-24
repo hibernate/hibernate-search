@@ -18,12 +18,11 @@ import org.hibernate.search.exception.SearchException;
 public interface ElasticsearchSchemaMigrator extends Service {
 
 	/**
-	 * Merge metadata with the existing schema:
-	 * <ul>
-	 * <li>Create the index if it doesn't exist
-	 * <li>For each mapping, merge the existing mapping with the expected one, throwing {@link SearchException}
-	 * if an incompatible attribute is detected.
-	 * </ul>
+	 * Merge metadata with the existing schema: for each mapping, merge the existing mapping
+	 * with the expected one, throwing {@link SearchException} if an incompatible attribute
+	 * is detected.
+	 *
+	 * <p>The index is expected to already exist.
 	 *
 	 * @param indexMetadata The expected index metadata.
 	 * @throws SearchException If an error occurs.
