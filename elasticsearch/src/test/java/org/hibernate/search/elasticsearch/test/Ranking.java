@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import javax.persistence.Embeddable;
 
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Gunnar Morling
@@ -18,7 +19,7 @@ import org.hibernate.search.annotations.Field;
 @Embeddable
 public class Ranking {
 
-	@Field
+	@Field(store = Store.YES)
 	private BigInteger value;
 
 	Ranking() {

@@ -41,9 +41,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * Tests several aspects of projection queries.
@@ -572,7 +570,6 @@ public class ProjectionQueryTest extends SearchTestBase {
 	}
 
 	@Test(expected = SearchException.class)
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2423 Projecting an unstored field should raise an exception
 	public void testProjectionOnUnstoredField() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();

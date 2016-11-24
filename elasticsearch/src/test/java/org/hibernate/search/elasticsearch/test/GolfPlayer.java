@@ -39,9 +39,9 @@ import org.hibernate.search.bridge.builtin.DoubleBridge;
  */
 @Entity
 @Indexed(index = "golfplayer")
-@ClassBridge(name = "fullName", impl = NameConcatenationBridge.class)
+@ClassBridge(name = "fullName", store = Store.YES, impl = NameConcatenationBridge.class)
 @ClassBridge(name = "fullNameStored", index = Index.NO, store = Store.YES, impl = NameConcatenationBridge.class)
-@ClassBridge(name = "age", impl = AgeBridge.class)
+@ClassBridge(name = "age", store = Store.YES, impl = AgeBridge.class)
 public class GolfPlayer {
 
 	@Id
@@ -54,30 +54,30 @@ public class GolfPlayer {
 	@DocumentId
 	private Long id;
 
-	@Field(indexNullAs = "<NULL>")
+	@Field(indexNullAs = "<NULL>", store = Store.YES)
 	private String firstName;
 
-	@Field
+	@Field(store = Store.YES)
 	private String lastName;
 
-	@Field(indexNullAs = "false")
+	@Field(indexNullAs = "false", store = Store.YES)
 	private Boolean active;
 
-	@Field(indexNullAs = "1970-01-01+00:00")
+	@Field(indexNullAs = "1970-01-01+00:00", store = Store.YES)
 	@DateBridge(resolution = Resolution.DAY)
 	private Date dateOfBirth;
 
-	@Field(indexNullAs = "1970-01-01+00:00")
+	@Field(indexNullAs = "1970-01-01+00:00", store = Store.YES)
 	@CalendarBridge(resolution = Resolution.DAY)
 	private Calendar subscriptionEndDate;
 
-	@Field
+	@Field(store = Store.YES)
 	private double handicap;
 
-	@Field(bridge = @FieldBridge(impl = DoubleBridge.class))
+	@Field(bridge = @FieldBridge(impl = DoubleBridge.class), store = Store.YES)
 	private double puttingStrength;
 
-	@Field(indexNullAs = "-1")
+	@Field(indexNullAs = "-1", store = Store.YES)
 	private Integer driveWidth;
 
 	@IndexedEmbedded

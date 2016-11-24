@@ -544,6 +544,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
 			ExtendedFieldType type = FieldHelper.getType( fieldMetadata );
 
+			if ( !org.hibernate.search.annotations.Store.YES.equals( fieldMetadata.getStore() ) ) {
+				throw LOG.projectingNonStoredField( absoluteName );
+			}
+
 			if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 				sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
 
