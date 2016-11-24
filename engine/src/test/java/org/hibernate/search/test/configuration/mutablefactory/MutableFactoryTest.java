@@ -214,8 +214,8 @@ public class MutableFactoryTest {
 	public void testMultiThreadedAddClasses() throws Exception {
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
-			int numberOfClasses = 25;
-			int numberOfThreads = 5;
+			int numberOfClasses = 100;
+			int numberOfThreads = 10;
 			new ConcurrentRunner( numberOfClasses, numberOfThreads,
 					new TaskFactory() {
 						@Override
