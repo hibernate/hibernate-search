@@ -121,6 +121,9 @@ Let's see the options for the `index_schema_management_strategy` property:
 |`MERGE`|Missing indexes and mappings will be created, existing mappings will be updated if there are no conflicts.
 |`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created along with their mappings.
 |`RECREATE`|Indexes will be deleted if existing and then created along with their mappings. This will delete all content from the indexes!
++
+Note that whenever a search factory is altered after initialization (i.e. new entities are mapped),
+the index will *not* be deleted again: new mappings will simply be added to the index.
 |`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
 |===============
 +
