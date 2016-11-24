@@ -211,7 +211,6 @@ public class MutableFactoryTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2480 Adding classes to the SearchIntegrator concurrently fails with Elasticsearch
 	public void testMultiThreadedAddClasses() throws Exception {
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {

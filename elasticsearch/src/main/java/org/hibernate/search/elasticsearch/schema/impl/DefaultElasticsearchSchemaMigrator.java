@@ -49,12 +49,6 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 		String indexName = indexMetadata.getName();
 
 		try {
-			if ( !schemaAccessor.indexExists( indexName ) ) {
-				schemaAccessor.createIndexIfAbsent( indexName, executionOptions );
-			}
-
-			schemaAccessor.waitForIndexStatus( indexName, executionOptions );
-
 			for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
 				String mappingName = entry.getKey();
 				TypeMapping mapping = entry.getValue();

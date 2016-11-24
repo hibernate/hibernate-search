@@ -11,26 +11,37 @@ import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.exception.SearchException;
 
 /**
- * An object responsible for creating an index based on provided metadata.
+ * An object responsible for creating an index and its mappings based on provided metadata.
  *
  * @author Yoann Rodiere
  */
 public interface ElasticsearchSchemaCreator extends Service {
 
 	/**
-	 * Create an index and populates mappings.
+	 * Create an index.
 	 *
 	 * @param indexMetadata The expected index metadata.
 	 * @throws SearchException If an error occurs.
 	 */
-	void create(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+	void createIndex(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
 
 	/**
-	 * Create an index and populates mappings, but only if the index doesn't already exist.
+	 * Create an index, but only if the index doesn't already exist.
+	 *
+	 * @param indexMetadata The expected index metadata.
+	 * @return {@code true} if the index had to be created, {@code false} otherwise.
+	 * @throws SearchException If an error occurs.
+	 */
+	boolean createIndexIfAbsent(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+
+	/**
+	 * Create mappings on a supposedly existing index.
+	 *
+	 * <p>Mappings are supposed to be absent from the index.
 	 *
 	 * @param indexMetadata The expected index metadata.
 	 * @throws SearchException If an error occurs.
 	 */
-	void createIfAbsent(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+	void createMappings(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
 
 }
