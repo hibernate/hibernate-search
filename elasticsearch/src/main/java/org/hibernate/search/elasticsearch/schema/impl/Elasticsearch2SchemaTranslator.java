@@ -148,7 +148,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		addTypeOptions( propertyMapping, fieldMetadata );
 
 		if ( propertyMapping.getType() != DataType.OBJECT ) {
-			propertyMapping.setStore( fieldMetadata.getStore() == Store.NO ? false : true );
+			propertyMapping.setStore( fieldMetadata.getStore() != Store.NO );
 		}
 
 		addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
@@ -192,12 +192,16 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, ElasticsearchIndexSettingsBuilder settingsBuilder,
 			BridgeDefinedField bridgeDefinedField) {
 		String propertyPath = bridgeDefinedField.getAbsoluteName();
+		DocumentFieldMetadata sourceFieldMetadata = bridgeDefinedField.getSourceField();
+
+		PropertyMapping propertyMapping = new PropertyMapping();
+
+		propertyMapping.setStore( sourceFieldMetadata.getStore() != Store.NO );
 
 		if ( !SpatialHelper.isSpatialField( propertyPath ) ) {
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
 			if ( !mappingBuilder.hasPropertyAbsolute( propertyPath ) ) {
-				PropertyMapping propertyMapping = new PropertyMapping();
 				addTypeOptions( propertyMapping, bridgeDefinedField );
 				addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
 						bridgeDefinedField.getSourceField().getSourceProperty(),
@@ -207,8 +211,8 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 				mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
 			}
 			else {
-				TypeMapping propertyMapping = mappingBuilder.getPropertyAbsolute( propertyPath );
-				addDynamicOption( bridgeDefinedField, propertyMapping );
+				TypeMapping existingPropertyMapping = mappingBuilder.getPropertyAbsolute( propertyPath );
+				addDynamicOption( bridgeDefinedField, existingPropertyMapping );
 			}
 		}
 		else {
@@ -218,8 +222,6 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			}
 			else if ( SpatialHelper.isSpatialFieldLatitude( propertyPath ) ) {
 				// we only add the geo_point for the latitude field
-				PropertyMapping propertyMapping = new PropertyMapping();
-
 				propertyMapping.setType( DataType.GEO_POINT );
 
 				// in this case, the spatial field has precedence over an already defined field
@@ -227,7 +229,6 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			}
 			else {
 				// the fields potentially created for the spatial hash queries
-				PropertyMapping propertyMapping = new PropertyMapping();
 				propertyMapping.setType( DataType.STRING );
 				propertyMapping.setIndex( IndexType.NOT_ANALYZED );
 
