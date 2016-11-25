@@ -77,14 +77,16 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 
 		root.setDynamic( DynamicType.STRICT );
 
+		ElasticsearchMappingBuilder builder = new ElasticsearchMappingBuilder( descriptor, root );
+
 		if ( executionOptions.isMultitenancyEnabled() ) {
 			PropertyMapping tenantId = new PropertyMapping();
 			tenantId.setType( DataType.STRING );
 			tenantId.setIndex( IndexType.NOT_ANALYZED );
-			root.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
+			builder.setPropertyAbsolute( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
 		}
 
-		addMappings( new ElasticsearchMappingBuilder( descriptor, root ) );
+		addMappings( builder );
 
 		return root;
 	}
