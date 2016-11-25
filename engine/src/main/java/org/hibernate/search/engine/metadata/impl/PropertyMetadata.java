@@ -8,8 +8,8 @@ package org.hibernate.search.engine.metadata.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +53,7 @@ public class PropertyMetadata {
 	}
 
 	private Map<String, DocumentFieldMetadata> createDocumentFieldMetadataMap(Set<DocumentFieldMetadata> fieldMetadataSet) {
-		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<>();
+		Map<String, DocumentFieldMetadata> tmpMap = new LinkedHashMap<>();
 		for ( DocumentFieldMetadata documentFieldMetadata : fieldMetadataSet ) {
 			tmpMap.put( documentFieldMetadata.getAbsoluteName(), documentFieldMetadata );
 		}
@@ -129,8 +129,8 @@ public class PropertyMetadata {
 			}
 			this.propertyAccessor = propertyAccessor;
 			this.propertyClass = propertyClass;
-			this.fieldMetadataSet = new HashSet<>();
-			this.sortableFieldMetadata = new HashSet<>();
+			this.fieldMetadataSet = new LinkedHashSet<>();
+			this.sortableFieldMetadata = new LinkedHashSet<>();
 		}
 
 		public Builder dynamicBoostStrategy(BoostStrategy boostStrategy) {

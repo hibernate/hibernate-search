@@ -9,8 +9,7 @@ package org.hibernate.search.engine.metadata.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -400,7 +399,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, PropertyMetadata> buildPropertyMetadataMap(Set<PropertyMetadata> propertyMetadataSet) {
-		Map<String, PropertyMetadata> tmpMap = new HashMap<String, PropertyMetadata>();
+		Map<String, PropertyMetadata> tmpMap = new LinkedHashMap<String, PropertyMetadata>();
 		for ( PropertyMetadata propertyMetadata : propertyMetadataSet ) {
 			tmpMap.put( propertyMetadata.getPropertyAccessorName(), propertyMetadata );
 		}
@@ -430,7 +429,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, DocumentFieldMetadata> buildFieldMetadataMap(Set<DocumentFieldMetadata> documentFieldMetadataSet) {
-		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
+		Map<String, DocumentFieldMetadata> tmpMap = new LinkedHashMap<String, DocumentFieldMetadata>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataSet ) {
 			String name = documentFieldMetadata.getAbsoluteName();
 			if ( StringHelper.isEmpty( name ) ) {
@@ -452,7 +451,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, FacetMetadata> buildFacetMetadataMap(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
-		Map<String, FacetMetadata> tmpMap = new HashMap<String, FacetMetadata>();
+		Map<String, FacetMetadata> tmpMap = new LinkedHashMap<String, FacetMetadata>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
 			for ( FacetMetadata facetMetadata : documentFieldMetadata.getFacetMetadata() ) {
 				tmpMap.put( facetMetadata.getAbsoluteName(), facetMetadata );
@@ -463,7 +462,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, BridgeDefinedField> buildBridgeDefinedFieldMetadataMap(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
-		Map<String, BridgeDefinedField> tmpMap = new HashMap<String, BridgeDefinedField>();
+		Map<String, BridgeDefinedField> tmpMap = new LinkedHashMap<String, BridgeDefinedField>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
 			for ( BridgeDefinedField bridgeDefinedField : documentFieldMetadata.getBridgeDefinedFields().values() ) {
 				tmpMap.put( bridgeDefinedField.getAbsoluteName(), bridgeDefinedField );
@@ -474,7 +473,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, DocumentFieldMetadata> copyClassBridgeMetadata(Set<DocumentFieldMetadata> classBridgeFields) {
-		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
+		Map<String, DocumentFieldMetadata> tmpMap = new LinkedHashMap<String, DocumentFieldMetadata>();
 		for ( DocumentFieldMetadata fieldMetadata : classBridgeFields ) {
 			tmpMap.put( fieldMetadata.getAbsoluteName(), fieldMetadata );
 		}
@@ -495,15 +494,15 @@ public class TypeMetadata {
 		private Discriminator discriminator;
 		private XMember discriminatorGetter;
 		private boolean stateInspectionOptimizationsEnabled = true;
-		private final Set<PropertyMetadata> propertyMetadataSet = new HashSet<>();
-		private final Set<DocumentFieldMetadata> classBridgeFields = new HashSet<DocumentFieldMetadata>();
-		private final Set<EmbeddedTypeMetadata> embeddedTypeMetadata = new HashSet<EmbeddedTypeMetadata>();
-		private final Set<ContainedInMetadata> containedInMetadata = new HashSet<ContainedInMetadata>();
-		private final Set<XClass> optimizationClassList = new HashSet<XClass>();
+		private final Set<PropertyMetadata> propertyMetadataSet = new LinkedHashSet<>();
+		private final Set<DocumentFieldMetadata> classBridgeFields = new LinkedHashSet<DocumentFieldMetadata>();
+		private final Set<EmbeddedTypeMetadata> embeddedTypeMetadata = new LinkedHashSet<EmbeddedTypeMetadata>();
+		private final Set<ContainedInMetadata> containedInMetadata = new LinkedHashSet<ContainedInMetadata>();
+		private final Set<XClass> optimizationClassList = new LinkedHashSet<XClass>();
 		private final Set<String> collectionRoles = new TreeSet<String>();
 		private PropertyMetadata idPropertyMetadata;
 		private XProperty jpaProperty;
-		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new HashSet<>();
+		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new LinkedHashSet<>();
 
 		public Builder(Class<?> indexedType, IndexManagerType indexManagerType, ConfigContext configContext) {
 			this( indexedType, buildScopedAnalyzerReferenceBuilder( indexManagerType, configContext ) );

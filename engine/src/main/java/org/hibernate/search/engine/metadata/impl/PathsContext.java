@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class PathsContext {
 
-	private final Map<String, Boolean> pathsEncounteredState = new HashMap<>();
+	private final Map<String, Boolean> pathsEncounteredState = new LinkedHashMap<>();
 
 	public void addIncludedPath(String path) {
 		pathsEncounteredState.put( path, Boolean.FALSE );
@@ -37,7 +37,7 @@ public class PathsContext {
 	}
 
 	public Set<String> getUnEncounteredPaths() {
-		Set<String> unEncounteredPaths = new HashSet<>();
+		Set<String> unEncounteredPaths = new LinkedHashSet<>();
 		for ( String path : pathsEncounteredState.keySet() ) {
 			if ( notEncountered( path ) ) {
 				unEncounteredPaths.add( path );

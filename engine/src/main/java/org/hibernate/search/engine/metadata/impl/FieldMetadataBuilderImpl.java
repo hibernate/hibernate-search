@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
@@ -20,8 +20,8 @@ import org.hibernate.search.bridge.spi.FieldType;
  */
 class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
-	private final Set<String> sortableFieldsAbsoluteNames = new HashSet<>();
-	private final Set<BridgeDefinedField> bridgeDefinedFields = new HashSet<>();
+	private final Set<String> sortableFieldsAbsoluteNames = new LinkedHashSet<>();
+	private final Set<BridgeDefinedField> bridgeDefinedFields = new LinkedHashSet<>();
 	private final BackReference<DocumentFieldMetadata> fieldMetadata;
 
 	public FieldMetadataBuilderImpl(BackReference<DocumentFieldMetadata> fieldMetadata) {
