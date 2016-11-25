@@ -7,8 +7,8 @@
 package org.hibernate.search.engine.metadata.impl;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -233,8 +233,8 @@ public class DocumentFieldMetadata {
 			this.store = store;
 			this.index = index;
 			this.termVector = termVector;
-			this.facetMetadata = new HashSet<>( 1 ); // the most common case is a single facet
-			this.bridgeDefinedFields = new HashMap<>();
+			this.facetMetadata = new LinkedHashSet<>( 1 ); // the most common case is a single facet
+			this.bridgeDefinedFields = new LinkedHashMap<>();
 		}
 
 		public String getAbsoluteName() {
