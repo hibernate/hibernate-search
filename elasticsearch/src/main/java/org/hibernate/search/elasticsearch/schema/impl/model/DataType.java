@@ -18,7 +18,12 @@ import com.google.gson.annotations.SerializedName;
 public enum DataType {
 
 	@SerializedName("object")
-	OBJECT,
+	OBJECT {
+		@Override
+		public boolean isComposite() {
+			return true;
+		}
+	},
 	@SerializedName("string")
 	STRING,
 	@SerializedName("long")
@@ -36,4 +41,8 @@ public enum DataType {
 	@SerializedName("geo_point")
 	GEO_POINT
 	;
+
+	public boolean isComposite() {
+		return false;
+	}
 }

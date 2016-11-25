@@ -89,6 +89,10 @@ final class ElasticsearchMappingBuilder {
 				currentElasticsearchMapping.addProperty( newPathComponent, childPropertyMapping );
 			}
 
+			if ( ! DataType.OBJECT.equals( childPropertyMapping.getType() ) ) {
+				throw LOG.fieldIsBothCompositeAndConcrete( getBeanClass(), extractor.getLastComponentAbsolutePath() );
+			}
+
 			currentElasticsearchMapping = childPropertyMapping;
 			newPathComponent = extractor.next( ConsumptionLimit.SECOND_BUT_LAST );
 		}
@@ -127,6 +131,21 @@ final class ElasticsearchMappingBuilder {
 		newExtractor.appendRelativePart( absolutePath );
 		TypeMapping parent = getOrCreateParents( newExtractor );
 		String propertyName = newExtractor.next( ConsumptionLimit.LAST );
+
+		Map<String, PropertyMapping> parentProperties = parent.getProperties();
+		if ( parentProperties != null && parentProperties.containsKey( propertyName ) ) {
+			// Report a name conflict
+			PropertyMapping conflictingProperty = parentProperties.get( propertyName );
+			DataType conflictingPropertyType = conflictingProperty.getType();
+			DataType newPropertyType = propertyMapping.getType();
+			if ( conflictingPropertyType.isComposite() != newPropertyType.isComposite() ) {
+				throw LOG.fieldIsBothCompositeAndConcrete( getBeanClass(), absolutePath );
+			}
+			/*
+			 * Other conflicts are ignored because the users *may* make them work if
+			 * fields are defined approximately the same way.
+			 */
+		}
 		parent.addProperty( propertyName, propertyMapping );
 	}
 
