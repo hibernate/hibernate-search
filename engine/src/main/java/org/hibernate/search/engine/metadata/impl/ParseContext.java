@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -20,9 +20,9 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
  * @author Hardy Ferentschik
  */
 public class ParseContext {
-	private final Set<XClass> processedClasses = new HashSet<>();
+	private final Set<XClass> processedClasses = new LinkedHashSet<>();
 	private final Set<String> spatialNames = new TreeSet<>();
-	private final Set<String> unqualifiedCollectedCollectionRoles = new HashSet<>();
+	private final Set<String> unqualifiedCollectedCollectionRoles = new LinkedHashSet<>();
 
 	private IndexManagerType indexManagerType;
 	private XClass currentClass;

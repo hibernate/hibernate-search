@@ -15,8 +15,8 @@ import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1133,7 +1133,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			String prefix,
 			PathsContext pathsContext,
 			ParseContext parseContext) {
-		Map<String, NumericField> fieldsMarkedAsNumeric = new HashMap<>();
+		Map<String, NumericField> fieldsMarkedAsNumeric = new LinkedHashMap<>();
 
 		NumericField numericFieldAnnotation = member.getAnnotation( NumericField.class );
 		if ( numericFieldAnnotation != null ) {
@@ -1205,7 +1205,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return Collections.emptySet();
 		}
 
-		Set<Facet> matchingFacetAnnotations = new HashSet<>( 1 );
+		Set<Facet> matchingFacetAnnotations = new LinkedHashSet<>( 1 );
 
 		if ( facetAnnotation != null && facetAnnotation.forField().equals( fieldName ) ) {
 			matchingFacetAnnotations.add( facetAnnotation );

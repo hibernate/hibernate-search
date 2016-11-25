@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,7 +27,7 @@ class NumericFieldsConfiguration {
 	private final Class<?> indexedType;
 	private final XProperty member;
 	private final Map<String, NumericField> fieldsMarkedAsNumeric;
-	private final Set<String> fieldsOfProperty = new HashSet<>();
+	private final Set<String> fieldsOfProperty = new LinkedHashSet<>();
 
 	NumericFieldsConfiguration(Class<?> indexedType, XProperty member, Map<String, NumericField> fieldsMarkedAsNumeric) {
 		this.indexedType = indexedType;
