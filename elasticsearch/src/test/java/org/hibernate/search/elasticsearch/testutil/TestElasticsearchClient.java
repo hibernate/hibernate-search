@@ -53,6 +53,10 @@ public class TestElasticsearchClient extends ExternalResource {
 		deleteAndCreateIndex( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
 	}
 
+	public void registerForCleanup(Class<?> rootClass) {
+		createdIndicesNames.add( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
+	}
+
 	public void putMapping(Class<?> mappedAndRootClass, String mappingJson) throws IOException {
 		putMapping( mappedAndRootClass, mappedAndRootClass, mappingJson );
 	}
@@ -82,12 +86,16 @@ public class TestElasticsearchClient extends ExternalResource {
 		tryDeleteESIndex( indexName );
 
 		JestResult result = client.execute( new CreateIndex.Builder( indexName ).build() );
-		createdIndicesNames.add( indexName );
+		registerForCleanup( indexName );
 		if ( !result.isSucceeded() ) {
 			throw new AssertionFailure( "Error while creating index '" + indexName + "' for tests:" + result.getErrorMessage() );
 		}
 
 		waitForIndexCreation( indexName );
+	}
+
+	public void registerForCleanup(String indexName) {
+		createdIndicesNames.add( indexName );
 	}
 
 	private void waitForIndexCreation(final String indexNameToWaitFor) throws IOException {
