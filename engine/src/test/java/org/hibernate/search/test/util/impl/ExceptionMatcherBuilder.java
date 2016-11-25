@@ -26,15 +26,15 @@ public class ExceptionMatcherBuilder {
 		return new ExceptionMatcherBuilder( clazz );
 	}
 
-	private final List<Matcher<? extends Throwable>> matchers = new ArrayList<>();
+	private final List<Matcher<?>> matchers = new ArrayList<>();
 
-	private final List<Matcher<? extends Throwable>> suppressedMatchers = new ArrayList<>();
+	private final List<Matcher<?>> suppressedMatchers = new ArrayList<>();
 
 	private ExceptionMatcherBuilder(Class<? extends Throwable> clazz) {
 		matchers.add( CoreMatchers.<Throwable>instanceOf( clazz ) );
 	}
 
-	public ExceptionMatcherBuilder withSuppressed(Matcher<? extends Throwable> matcher) {
+	public ExceptionMatcherBuilder withSuppressed(Matcher<?> matcher) {
 		suppressedMatchers.add( matcher );
 		return this;
 	}
@@ -43,9 +43,9 @@ public class ExceptionMatcherBuilder {
 		return new NestedExceptionCauseMatcherBuilder( clazz );
 	}
 
-	public Matcher<? extends Throwable> build() {
+	public Matcher<? super Throwable> build() {
 		if ( matchers.size() == 1 && suppressedMatchers.isEmpty() ) {
-			return matchers.get( 0 );
+			return castedMatchers().get( 0 );
 		}
 		else {
 			if ( !suppressedMatchers.isEmpty() ) {
@@ -68,7 +68,7 @@ public class ExceptionMatcherBuilder {
 		return new ArrayList<Matcher<? super Throwable>>( (List) suppressedMatchers );
 	}
 
-	public ExceptionMatcherBuilder matching(final Matcher<? extends Throwable> messageMatcher) {
+	public ExceptionMatcherBuilder matching(final Matcher<?> messageMatcher) {
 		matchers.add( messageMatcher );
 		return this;
 	}
@@ -90,8 +90,8 @@ public class ExceptionMatcherBuilder {
 		}
 
 		@Override
-		public Matcher<? extends Throwable> build() {
-			Matcher<? extends Throwable> myMatcher = super.build();
+		public Matcher<? super Throwable> build() {
+			Matcher<? super Throwable> myMatcher = super.build();
 			ExceptionMatcherBuilder.this.matching( hasCause( myMatcher ) );
 			return ExceptionMatcherBuilder.this.build();
 		}
@@ -137,61 +137,61 @@ public class ExceptionMatcherBuilder {
 	 */
 	public static class ThrowableCauseMatcher extends TypeSafeMatcher<Throwable> {
 
-		private final Matcher<? extends Throwable> fMatcher;
+		private final Matcher<?> causeMatcher;
 
-		public ThrowableCauseMatcher(Matcher<? extends Throwable> matcher) {
-			fMatcher = matcher;
+		public ThrowableCauseMatcher(Matcher<?> causeMatcher) {
+			this.causeMatcher = causeMatcher;
 		}
 
 		@Override
 		public void describeTo(Description description) {
 			description.appendText( "exception with cause " );
-			description.appendDescriptionOf( fMatcher );
+			description.appendDescriptionOf( causeMatcher );
 		}
 
 		@Override
 		protected boolean matchesSafely(Throwable item) {
-			return fMatcher.matches( item.getCause() );
+			return causeMatcher.matches( item.getCause() );
 		}
 
 		@Override
 		protected void describeMismatchSafely(Throwable item, Description description) {
 			description.appendText( "cause " );
-			fMatcher.describeMismatch( item.getCause(), description );
+			causeMatcher.describeMismatch( item.getCause(), description );
 		}
 	}
 
-	private static <T extends Throwable> Matcher<Throwable> hasCause(final Matcher<T> matcher) {
+	private static Matcher<Throwable> hasCause(final Matcher<?> matcher) {
 		return new ThrowableCauseMatcher( matcher );
 	}
 
 	public static class ThrowableSuppressedMatcher extends TypeSafeMatcher<Throwable> {
 
-		private final Matcher<? extends Iterable<? extends Throwable>> fMatcher;
+		private final Matcher<?> suppressedMatcher;
 
-		public ThrowableSuppressedMatcher(Matcher<? extends Iterable<? extends Throwable>> matcher) {
-			fMatcher = matcher;
+		public ThrowableSuppressedMatcher(Matcher<?> suppressedMatcher) {
+			this.suppressedMatcher = suppressedMatcher;
 		}
 
 		@Override
 		public void describeTo(Description description) {
 			description.appendText( "exception with suppressed " );
-			description.appendDescriptionOf( fMatcher );
+			description.appendDescriptionOf( suppressedMatcher );
 		}
 
 		@Override
 		protected boolean matchesSafely(Throwable item) {
-			return fMatcher.matches( Arrays.asList( item.getSuppressed() ) );
+			return suppressedMatcher.matches( Arrays.asList( item.getSuppressed() ) );
 		}
 
 		@Override
 		protected void describeMismatchSafely(Throwable item, Description description) {
 			description.appendText( "suppressed " );
-			fMatcher.describeMismatch( Arrays.asList( item.getSuppressed() ), description );
+			suppressedMatcher.describeMismatch( Arrays.asList( item.getSuppressed() ), description );
 		}
 	}
 
-	private static <T extends Throwable> Matcher<Throwable> hasSuppressed(Matcher<? extends Iterable<T>> matcher) {
-		return new ThrowableSuppressedMatcher( matcher );
+	private static Matcher<Throwable> hasSuppressed(Matcher<?> suppressedMatcher) {
+		return new ThrowableSuppressedMatcher( suppressedMatcher );
 	}
 }
