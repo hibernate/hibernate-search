@@ -204,4 +204,15 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	SearchException schemaMergeFailed(String indexName, @Cause Exception cause);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 36,
+			value = "Mapping conflict detected for field '%2$s' on entity '%1$s'."
+					+ " The current mapping would require the field to be mapped to  both a composite field"
+					+ " ('object' datatype) and a \"concrete\" field ('integer', 'date', etc.) holding a value,"
+					+ " which Elasticsearch does not allow. If you're seeing this issue, you probably added both"
+					+ " an @IndexedEmbedded annotation and a @Field (or similar) annotation on the same property:"
+					+ " if that's the case, please set either @IndexedEmbedded.prefix or @Field.name to a custom value"
+					+ " different from the default to resolve the conflict."
+	)
+	SearchException fieldIsBothCompositeAndConcrete(Class<?> entityType, String fieldPath);
+
 }
