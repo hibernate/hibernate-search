@@ -88,6 +88,14 @@ public class PathComponentExtractor implements Cloneable {
 		currentIndexInPath = 0;
 	}
 
+	/**
+	 * @return The absolute path of the last non-null path component returned by {@link #next(ConsumptionLimit)},
+	 * or {@code null} if {@link #next(ConsumptionLimit)} hasn't returned such a component yet.
+	 */
+	public String getLastComponentAbsolutePath() {
+		return currentIndexInPath == 0 ? null : path.substring( 0, currentIndexInPath - 1 );
+	}
+
 	@Override
 	public PathComponentExtractor clone() {
 		try {
