@@ -59,7 +59,9 @@ public abstract class SearchInitializationTestBase {
 	@After
 	public void tearDown() throws Exception {
 		try {
-			testResourceManager.defaultTearDown();
+			if ( testResourceManager != null ) {
+				testResourceManager.defaultTearDown();
+			}
 		}
 		finally {
 			testResourceManager = null;
