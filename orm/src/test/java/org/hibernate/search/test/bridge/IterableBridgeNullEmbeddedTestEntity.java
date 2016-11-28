@@ -6,12 +6,8 @@
  */
 package org.hibernate.search.test.bridge;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -22,10 +18,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -34,19 +29,17 @@ import org.hibernate.search.annotations.Store;
 @Entity
 @Indexed
 @Table(name = "IBT_Entity")
-public class IterableBridgeTestEntity {
+public class IterableBridgeNullEmbeddedTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
 	static final String NULL_NUMERIC_TOKEN = "-555";
+	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
+	static final String NULL_EMBEDDED_NUMERIC = "-666";
 
 	private Long id;
 	private String name;
 	private Set<Language> nullIndexed = new HashSet<Language>();
-	private List<String> nullNotIndexed = new ArrayList<String>();
 	private Set<Integer> numericNullIndexed = new HashSet<Integer>();
-	private List<Long> numericNullNotIndexed = new ArrayList<Long>();
-
-	private List<Date> dates = new ArrayList<Date>();
 
 	public enum Language {
 		ITALIAN, ENGLISH, PIRATE, KLINGON
@@ -75,6 +68,11 @@ public class IterableBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
 	public Set<Language> getNullIndexed() {
@@ -91,6 +89,11 @@ public class IterableBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(prefix = "embeddedNum.", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
 	public Set<Integer> getNumericNullIndexed() {
@@ -105,58 +108,9 @@ public class IterableBridgeTestEntity {
 		this.numericNullIndexed.add( number );
 	}
 
-	@Field(store = Store.YES)
-	@ElementCollection
-	@CollectionTable(name = "NullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
-	@Column(name = "nullNotIndexed")
-	public List<String> getNullNotIndexed() {
-		return nullNotIndexed;
-	}
-
-	public void setNullNotIndexed(List<String> skipNullCollection) {
-		this.nullNotIndexed = skipNullCollection;
-	}
-
-	public void addNullNotIndexed(String value) {
-		this.nullNotIndexed.add( value );
-	}
-
-	@Field(store = Store.YES)
-	@ElementCollection
-	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
-	@Column(name = "numericNullNotIndexed")
-	public List<Long> getNumericNullNotIndexed() {
-		return numericNullNotIndexed;
-	}
-
-	public void setNumericNullNotIndexed(List<Long> numericSkipNullCollection) {
-		this.numericNullNotIndexed = numericSkipNullCollection;
-	}
-
-	public void addNumericNullNotIndexed(Long value) {
-		this.numericNullNotIndexed.add( value );
-	}
-
-	@Field(analyze = Analyze.NO, store = Store.YES)
-	@ElementCollection
-	@DateBridge(resolution = Resolution.SECOND)
-	@CollectionTable(name = "Dates", joinColumns = @JoinColumn(name = "iterable_id"))
-	@Column(name = "dates")
-	public List<Date> getDates() {
-		return dates;
-	}
-
-	public void setDates(List<Date> dates) {
-		this.dates = dates;
-	}
-
-	public void addDate(Date value) {
-		this.dates.add( value );
-	}
-
 	@Override
 	public String toString() {
-		return IterableBridgeTestEntity.class.getSimpleName() + "[id=" + id + ", name=" + name + "]";
+		return IterableBridgeNullEmbeddedTestEntity.class.getSimpleName() + "[id=" + id + ", name=" + name + "]";
 	}
 
 }
