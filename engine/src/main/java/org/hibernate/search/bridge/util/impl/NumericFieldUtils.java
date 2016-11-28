@@ -11,10 +11,10 @@ import java.util.Date;
 
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
+import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.time.impl.NumericTimeBridge;
 import org.hibernate.search.bridge.impl.JavaTimeBridgeProvider;
 import org.hibernate.search.util.logging.impl.Log;
@@ -149,11 +149,21 @@ public final class NumericFieldUtils {
 	 * @return true if the considered {@code FieldBridge} is a numeric {@code FieldBridge}
 	 */
 	public static boolean isNumericFieldBridge(FieldBridge fieldBridge) {
-		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
-			fieldBridge = ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap();
-		}
-		return fieldBridge instanceof NumericFieldBridge
-				|| fieldBridge instanceof NumericTimeBridge
-				|| fieldBridge instanceof NumericEncodingDateBridge;
+		return BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, NumericFieldBridge.class ) != null
+				|| BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, NumericTimeBridge.class ) != null
+				|| BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, NumericEncodingDateBridge.class ) != null;
+	}
+
+	/**
+	 * Indicates whether the considered {@code FieldBridge}, or its {@link ContainerBridge#getElementBridge() element bridge},
+	 * is a numeric one.
+	 *
+	 * @param fieldBridge the considered {@code FieldBridge}
+	 * @return true if the considered {@code FieldBridge} is a numeric {@code FieldBridge}
+	 */
+	public static boolean isNumericContainerOrNumericFieldBridge(FieldBridge fieldBridge) {
+		return BridgeAdaptorUtils.unwrapAdaptorAndContainer( fieldBridge, NumericFieldBridge.class ) != null
+				|| BridgeAdaptorUtils.unwrapAdaptorAndContainer( fieldBridge, NumericTimeBridge.class ) != null
+				|| BridgeAdaptorUtils.unwrapAdaptorAndContainer( fieldBridge, NumericEncodingDateBridge.class ) != null;
 	}
 }

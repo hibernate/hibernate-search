@@ -13,6 +13,7 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
 import org.hibernate.search.engine.impl.nullencoding.NullMarkerCodec;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -20,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Hardy Ferentschik
  */
-public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
+public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge, BridgeAdaptor {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -58,6 +59,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 		}
 	}
 
+	@Override
 	public TwoWayFieldBridge unwrap() {
 		return fieldBridge;
 	}
