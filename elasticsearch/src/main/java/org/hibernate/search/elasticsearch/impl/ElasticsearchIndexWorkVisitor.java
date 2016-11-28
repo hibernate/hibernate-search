@@ -28,6 +28,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -39,7 +40,9 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spatial.impl.SpatialHelper;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -57,6 +60,8 @@ import io.searchbox.indices.Optimize;
  * @author Gunnar Morling
  */
 class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor, BackendRequest<?>> {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final String DELETE_ALL_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"match_all\" : { } } } } }";
 	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
@@ -177,7 +182,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 	}
 
 	private Action<DocumentResult> indexDocument(String id, Document document, Class<?> entityType) {
-		JsonObject source = convertToJson( document, entityType );
+		JsonObject source = convertDocumentToJson( document, entityType );
 		String type = entityType.getName();
 
 		Index index = new Index.Builder( source )
@@ -189,7 +194,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 		return index;
 	}
 
-	private JsonObject convertToJson(Document document, Class<?> entityType) {
+	private JsonObject convertDocumentToJson(Document document, Class<?> entityType) {
 		EntityIndexBinding indexBinding = searchIntegrator.getIndexBinding( entityType );
 		JsonObject root = new JsonObject();
 
@@ -203,6 +208,17 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				continue; // Inspect the next field taking into account this metadata
 			}
 
+			convertFieldToJson( root, accessorBuilder, indexBinding, nestingMarker, document, field );
+		}
+
+		return root;
+	}
+
+	private void convertFieldToJson(
+			JsonObject root, JsonAccessorBuilder accessorBuilder,
+			EntityIndexBinding indexBinding, NestingMarker nestingMarker, Document document, IndexableField field
+			) {
+		try {
 			String fieldPath = field.name();
 			List<NestingPathComponent> nestingPath = nestingMarker == null ? null : nestingMarker.getPath();
 			NestingPathComponent lastPathComponent = nestingPath == null ? null : nestingPath.get( nestingPath.size() - 1 );
@@ -246,18 +262,18 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				 * Lucene-specific fields for facets.
 				 * Just ignore such fields: Elasticsearch handles that internally.
 				 */
-				continue;
+				return;
 			}
 			else if ( isDocValueField( field ) ) {
 				/*
 				 * Doc value fields for facets or sorts.
 				 * Just ignore such fields: Elasticsearch handles that internally.
 				 */
-				continue;
+				return;
 			}
 			else if ( fieldPath.equals( ProjectionConstants.OBJECT_CLASS ) ) {
 				// Object class: no need to index that in Elasticsearch, because documents are typed.
-				continue;
+				return;
 			}
 			else {
 				DocumentFieldMetadata documentFieldMetadata = indexBinding.getDocumentBuilder().getTypeMetadata()
@@ -332,8 +348,19 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				}
 			}
 		}
+		catch (UnexpectedJsonElementTypeException e) {
+			List<JsonElementType<?>> expectedTypes = e.getExpectedTypes();
+			JsonAccessor accessor = e.getAccessor();
+			JsonElement actualValue = e.getActualElement();
 
-		return root;
+			if ( expectedTypes.contains( JsonElementType.OBJECT ) || JsonElementType.OBJECT.isInstance( actualValue ) ) {
+				throw LOG.fieldIsBothCompositeAndConcrete( indexBinding.getDocumentBuilder().getBeanClass(), accessor.getStaticAbsolutePath() );
+			}
+			else {
+				throw new AssertionFailure( "Unexpected field naming conflict when indexing;"
+						+ " this kind of issue should have been detected when building the metadata.", e );
+			}
+		}
 	}
 
 	private String getDocumentId(LuceneWork work) {
