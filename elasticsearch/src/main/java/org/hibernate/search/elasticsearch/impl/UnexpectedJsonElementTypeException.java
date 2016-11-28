@@ -28,7 +28,7 @@ public class UnexpectedJsonElementTypeException extends Exception /** Non-runtim
 
 	public UnexpectedJsonElementTypeException(JsonAccessor accessor, List<? extends JsonElementType<?>> expectedTypes, JsonElement actualElement) {
 		this.accessor = accessor;
-		this.expectedTypes = Collections.unmodifiableList( new ArrayList<>( expectedTypes ) );
+		this.expectedTypes = Collections.unmodifiableList( new ArrayList<JsonElementType<?>>( expectedTypes ) );
 		this.actualElement = actualElement;
 	}
 
