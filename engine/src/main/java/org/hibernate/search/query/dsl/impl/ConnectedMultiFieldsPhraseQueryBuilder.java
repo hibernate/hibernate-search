@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -82,7 +82,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			 */
 			TokenStream stream = null;
 			boolean isMultiPhrase = false;
-			Map<Integer, List<Term>> termsPerPosition = new HashMap<Integer, List<Term>>();
+			Map<Integer, List<Term>> termsPerPosition = new TreeMap<Integer, List<Term>>();
 			try {
 				Reader reader = new StringReader( sentence );
 				stream = analyzer.tokenStream( fieldName, reader );
