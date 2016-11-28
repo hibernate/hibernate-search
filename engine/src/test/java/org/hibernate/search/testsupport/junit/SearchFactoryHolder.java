@@ -11,8 +11,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.WorkspaceHolder;
+import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.Service;
@@ -23,6 +25,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TestDefaults;
+
 import org.junit.Assert;
 import org.junit.rules.ExternalResource;
 
@@ -45,6 +48,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	private int numberOfSessionFactories = 1;
 	private boolean idProvidedImplicit = false;
 	private boolean multitenancyEnabled = false;
+	private DefaultBatchBackend batchBackend;
 
 	public SearchFactoryHolder(Class<?>... entities) {
 		this( null, entities );
@@ -139,6 +143,13 @@ public class SearchFactoryHolder extends ExternalResource {
 		}
 		this.numberOfSessionFactories = clusterNodes;
 		return this;
+	}
+
+	public BatchBackend getBatchBackend() {
+		if ( batchBackend == null ) {
+			batchBackend = new DefaultBatchBackend( getSearchFactory(), null );
+		}
+		return batchBackend;
 	}
 
 }
