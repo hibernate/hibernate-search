@@ -17,7 +17,9 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,6 +39,7 @@ public class DirectoryProviderForQueryTest extends SearchTestBase {
 	 * Test that you can filter by shard
 	 */
 	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2477: Shard filtering doesn't work with Elasticsearch queries
 	public void testDirectoryProviderForQuery() throws Exception {
 
 		Session s = openSession( );
