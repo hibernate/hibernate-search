@@ -45,6 +45,7 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 		}
 	}
 
+	@Override
 	public TwoWayStringBridge unwrap() {
 		return stringBridge;
 	}

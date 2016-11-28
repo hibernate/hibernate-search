@@ -19,7 +19,7 @@ import org.hibernate.search.bridge.StringBridge;
  * @author Emmanuel Bernard (C) 2011 Red Hat Inc.
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge, AppliedOnTypeAwareBridge {
+public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge, AppliedOnTypeAwareBridge, BridgeAdaptor {
 	private final StringBridge stringBridge;
 
 	public String2FieldBridgeAdaptor(StringBridge stringBridge) {
@@ -51,5 +51,10 @@ public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge, App
 		if ( stringBridge instanceof AppliedOnTypeAwareBridge ) {
 			( (AppliedOnTypeAwareBridge) stringBridge ).setAppliedOnType( returnType );
 		}
+	}
+
+	@Override
+	public Object unwrap() {
+		return stringBridge;
 	}
 }
