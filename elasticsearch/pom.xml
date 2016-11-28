@@ -477,6 +477,7 @@
                         <artifactId>elasticsearch-maven-plugin</artifactId>
                         <configuration>
                             <pathConf>${project.build.directory}/test-classes/elasticsearch/5.0/configuration/</pathConf>
+                            <pathInitScript>${project.build.directory}/test-classes/elasticsearch/5.0/init/lightweight_indexes_template.script</pathInitScript>
                         </configuration>
                         <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                         <executions>
