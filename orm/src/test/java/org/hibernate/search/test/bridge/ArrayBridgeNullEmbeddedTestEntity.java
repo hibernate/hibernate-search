@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.bridge;
 
-import java.util.Date;
-
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -19,10 +17,9 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -31,19 +28,18 @@ import org.hibernate.search.annotations.Store;
 @Entity
 @Indexed
 @Table(name = "ABT_Entity")
-public class ArrayBridgeTestEntity {
+public class ArrayBridgeNullEmbeddedTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
 	static final String NULL_NUMERIC_TOKEN = "-555";
+	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
+
+	static final String NULL_EMBEDDED_NUMERIC = "-666";
 
 	private Long id;
 	private String name;
 	private Language[] nullIndexed = new Language[0];
-	private String[] nullNotIndexed = new String[0];
 	private Integer[] numericNullIndexed = new Integer[0];
-	private Long[] numericNullNotIndexed = new Long[0];
-
-	private Date[] dates = new Date[0];
 
 	public enum Language {
 		ITALIAN, ENGLISH, PIRATE, KLINGON
@@ -72,6 +68,11 @@ public class ArrayBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@OrderColumn
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "array_id"))
 	@Column(name = "nullIndexed")
@@ -85,6 +86,11 @@ public class ArrayBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(prefix = "embeddedNum.", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@OrderColumn
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "array_id"))
 	@Column(name = "numericNullIndexed")
@@ -96,49 +102,9 @@ public class ArrayBridgeTestEntity {
 		this.numericNullIndexed = phoneNumbers;
 	}
 
-	@Field(store = Store.YES)
-	@ElementCollection
-	@OrderColumn
-	@CollectionTable(name = "NullNotIndexed", joinColumns = @JoinColumn(name = "array_id"))
-	@Column(name = "nullNotIndexed")
-	public String[] getNullNotIndexed() {
-		return nullNotIndexed;
-	}
-
-	public void setNullNotIndexed(String[] skipNullCollection) {
-		this.nullNotIndexed = skipNullCollection;
-	}
-
-	@Field(store = Store.YES)
-	@ElementCollection
-	@OrderColumn
-	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "array_id"))
-	@Column(name = "numericNullNotIndexed")
-	public Long[] getNumericNullNotIndexed() {
-		return numericNullNotIndexed;
-	}
-
-	public void setNumericNullNotIndexed(Long[] numericSkipNullCollection) {
-		this.numericNullNotIndexed = numericSkipNullCollection;
-	}
-
-	@Field(analyze = Analyze.NO, store = Store.YES)
-	@ElementCollection
-	@DateBridge(resolution = Resolution.SECOND)
-	@OrderColumn
-	@CollectionTable(name = "Dates", joinColumns = @JoinColumn(name = "array_id"))
-	@Column(name = "dates")
-	public Date[] getDates() {
-		return dates;
-	}
-
-	public void setDates(Date[] dates) {
-		this.dates = dates;
-	}
-
 	@Override
 	public String toString() {
-		return ArrayBridgeTestEntity.class.getSimpleName() + "[id=" + id + ", name=" + name + "]";
+		return ArrayBridgeNullEmbeddedTestEntity.class.getSimpleName() + "[id=" + id + ", name=" + name + "]";
 	}
 
 }
