@@ -54,26 +54,31 @@ public class FieldHelper {
 		YEAR_MONTH,
 		MONTH_DAY,
 		INTEGER {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
 		},
 		LONG {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
 		},
 		FLOAT {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
 		},
 		DOUBLE {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
 		},
 		UNKNOWN_NUMERIC {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
