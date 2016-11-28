@@ -8,7 +8,9 @@ package org.hibernate.search.elasticsearch.impl;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 abstract class JsonElementType<T extends JsonElement> {
 
@@ -53,6 +55,50 @@ abstract class JsonElementType<T extends JsonElement> {
 		@Override
 		public String toString() {
 			return JsonArray.class.getSimpleName();
+		}
+	};
+
+	public static final JsonElementType<JsonPrimitive> PRIMITIVE = new JsonElementType<JsonPrimitive>() {
+		@Override
+		public JsonPrimitive newInstance() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public JsonPrimitive cast(JsonElement element) {
+			return element == null || element.isJsonNull() ? null : element.getAsJsonPrimitive();
+		}
+
+		@Override
+		public boolean isInstance(JsonElement element) {
+			return element != null && element.isJsonPrimitive();
+		}
+
+		@Override
+		public String toString() {
+			return JsonPrimitive.class.getSimpleName();
+		}
+	};
+
+	public static final JsonElementType<JsonNull> NULL = new JsonElementType<JsonNull>() {
+		@Override
+		public JsonNull newInstance() {
+			return JsonNull.INSTANCE;
+		}
+
+		@Override
+		public JsonNull cast(JsonElement element) {
+			return element == null ? null : element.getAsJsonNull();
+		}
+
+		@Override
+		public boolean isInstance(JsonElement element) {
+			return element != null && element.isJsonNull();
+		}
+
+		@Override
+		public String toString() {
+			return JsonNull.class.getSimpleName();
 		}
 	};
 

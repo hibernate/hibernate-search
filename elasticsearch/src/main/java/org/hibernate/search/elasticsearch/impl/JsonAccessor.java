@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.impl;
 
+import java.util.Arrays;
+
 import org.hibernate.search.exception.AssertionFailure;
 
 import com.google.gson.JsonArray;
@@ -35,10 +37,10 @@ abstract class JsonAccessor {
 	 *
 	 * @param root The root to be accessed.
 	 * @param newValue The value to set.
-	 * @throws AssertionFailure If an element in the path has unexpected type, preventing
+	 * @throws UnexpectedJsonElementTypeException If an element in the path has unexpected type, preventing
 	 * access to the element this accessor points to.
 	 */
-	public abstract void set(JsonObject root, JsonElement newValue);
+	public abstract void set(JsonObject root, JsonElement newValue) throws UnexpectedJsonElementTypeException;
 
 	/**
 	 * Add the given primitive value to the element this accessor points to for the
@@ -47,18 +49,20 @@ abstract class JsonAccessor {
 	 * <p>This method differs from {@link #set(JsonObject, JsonElement)}:
 	 * <ul>
 	 * <li>If there is currently no value, the given value is simply
-	 * {@link #set(JsonObject, JsonElement) set}
-	 * <li>If there is an array value, the given value is added to this array
-	 * <li>Otherwise, the current value is replaced by an array containing the current
-	 * value followed by the given value.
+	 * {@link #set(JsonObject, JsonElement) set}.
+	 * <li>If the current value is an array, the given value is added to this array.
+	 * <li>If the current value is a primitive or {@link JsonNull}, the current value
+	 * is replaced by an array containing the current value followed by the given value.
+	 * <li>Otherwise (i.e. if the current value is an object), an
+	 * {@link UnexpectedJsonElementTypeException} is thrown.
 	 * </ul>
 	 *
 	 * @param root The root to be accessed.
 	 * @param newValue The value to add.
-	 * @throws AssertionFailure If an element in the path has unexpected type, preventing
-	 * access to the element this accessor points to.
+	 * @throws UnexpectedJsonElementTypeException If an element in the path has unexpected type, preventing
+	 * write access to the element this accessor points to.
 	 */
-	public abstract void add(JsonObject root, JsonPrimitive newValue);
+	public abstract void add(JsonObject root, JsonPrimitive newValue) throws UnexpectedJsonElementTypeException;
 
 	/**
 	 * Get the current value of the lement this accessor points to for the given {@code root},
@@ -68,11 +72,17 @@ abstract class JsonAccessor {
 	 * @param type The expected {@link JsonElementType}.
 	 * @return The current value pointed to by this accessor on the {@code root}, always non-null
 	 * and typed according to {@code type}.
-	 * @throws AssertionFailure if the element already exists and is not of type {@code type}, or
+	 * @throws UnexpectedJsonElementTypeException if the element already exists and is not of type {@code type}, or
 	 * if an element in the path has unexpected type, preventing access to the element this accessor
 	 * points to.
 	 */
-	public abstract <T extends JsonElement> T getOrCreate(JsonObject root, JsonElementType<T> type);
+	public abstract <T extends JsonElement> T getOrCreate(JsonObject root, JsonElementType<T> type) throws UnexpectedJsonElementTypeException;
+
+	/**
+	 * @return The absolute path representing this accessor, excluding runtime details such as array indices.
+	 * {@code null} for the root accessor.
+	 */
+	public abstract String getStaticAbsolutePath();
 
 	public static JsonAccessor root() {
 		return ROOT;
@@ -106,6 +116,11 @@ abstract class JsonAccessor {
 		public String toString() {
 			return "root";
 		}
+
+		@Override
+		public String getStaticAbsolutePath() {
+			return null;
+		}
 	};
 
 	private abstract static class NonRootAccessor<P extends JsonElement> extends JsonAccessor {
@@ -114,10 +129,6 @@ abstract class JsonAccessor {
 		public NonRootAccessor(JsonAccessor parentAccessor) {
 			super();
 			this.parentAccessor = parentAccessor;
-		}
-
-		protected JsonAccessor getParentAccessor() {
-			return parentAccessor;
 		}
 
 		protected abstract JsonElementType<P> getExpectedParentType();
@@ -134,7 +145,7 @@ abstract class JsonAccessor {
 		protected abstract JsonElement doGet(P parent);
 
 		@Override
-		public void set(JsonObject root, JsonElement newValue) {
+		public void set(JsonObject root, JsonElement newValue) throws UnexpectedJsonElementTypeException {
 			P parent = parentAccessor.getOrCreate( root, getExpectedParentType() );
 			doSet( parent, newValue );
 		}
@@ -142,7 +153,7 @@ abstract class JsonAccessor {
 		protected abstract void doSet(P parent, JsonElement newValue);
 
 		@Override
-		public <T extends JsonElement> T getOrCreate(JsonObject root, JsonElementType<T> type) {
+		public <T extends JsonElement> T getOrCreate(JsonObject root, JsonElementType<T> type) throws UnexpectedJsonElementTypeException {
 			P parent = parentAccessor.getOrCreate( root, getExpectedParentType() );
 			JsonElement currentValue = doGet( parent );
 			if ( currentValue == null || currentValue.isJsonNull() ) {
@@ -151,10 +162,7 @@ abstract class JsonAccessor {
 				return result;
 			}
 			else if ( !type.isInstance( currentValue ) ) {
-				throw new AssertionFailure(
-						"Unexpected type at '" + this + "'. Expected '"
-						+ type + "', got '" + currentValue + "'"
-						);
+				throw new UnexpectedJsonElementTypeException( this, type, currentValue );
 			}
 			else {
 				return type.cast( currentValue );
@@ -162,19 +170,61 @@ abstract class JsonAccessor {
 		}
 
 		@Override
-		public void add(JsonObject root, JsonPrimitive newValue) {
+		public void add(JsonObject root, JsonPrimitive newValue) throws UnexpectedJsonElementTypeException {
 			P parent = parentAccessor.getOrCreate( root, getExpectedParentType() );
 			JsonElement currentValue = doGet( parent );
 			if ( currentValue == null ) { // Do not overwrite JsonNull, because it might be there on purpose
 				doSet( parent, newValue );
 			}
-			else if ( currentValue.isJsonArray() ) {
+			else if ( JsonElementType.ARRAY.isInstance( currentValue ) ) {
 				currentValue.getAsJsonArray().add( newValue );
 			}
-			else {
+			else if ( JsonElementType.PRIMITIVE.isInstance( currentValue )
+					|| JsonElementType.NULL.isInstance( currentValue ) ) {
 				doSet( parent, JsonBuilder.array().add( currentValue ).add( newValue ).build() );
 			}
+			else {
+				throw new UnexpectedJsonElementTypeException(
+						this,
+						Arrays.asList( JsonElementType.ARRAY, JsonElementType.PRIMITIVE, JsonElementType.NULL ),
+						currentValue );
+			}
 		}
+
+		@Override
+		public String toString() {
+			StringBuilder path = new StringBuilder();
+
+			if ( parentAccessor != ROOT ) {
+				path.append( parentAccessor.toString() );
+			}
+
+			appendRuntimeRelativePath( path );
+
+			return path.toString();
+		}
+
+		protected abstract void appendRuntimeRelativePath(StringBuilder path);
+
+		@Override
+		public String getStaticAbsolutePath() {
+			StringBuilder path = new StringBuilder();
+			boolean isFirst;
+
+			if ( parentAccessor == ROOT ) {
+				isFirst = true;
+			}
+			else {
+				isFirst = false;
+				path.append( parentAccessor.getStaticAbsolutePath() );
+			}
+
+			appendStaticRelativePath( path, isFirst );
+
+			return path.toString();
+		}
+
+		protected abstract void appendStaticRelativePath(StringBuilder path, boolean first);
 	}
 
 	public static JsonAccessor objectProperty(JsonAccessor parentAccessor, String propertyName) {
@@ -205,11 +255,16 @@ abstract class JsonAccessor {
 		}
 
 		@Override
-		public String toString() {
-			return new StringBuilder()
-					.append( getParentAccessor() )
-					.append( "." ).append( propertyName )
-					.toString();
+		protected void appendRuntimeRelativePath(StringBuilder path) {
+			path.append( "." ).append( propertyName );
+		}
+
+		@Override
+		protected void appendStaticRelativePath(StringBuilder path, boolean isFirst) {
+			if ( !isFirst ) {
+				path.append( "." );
+			}
+			path.append( propertyName );
 		}
 	}
 
@@ -253,11 +308,13 @@ abstract class JsonAccessor {
 		}
 
 		@Override
-		public String toString() {
-			return new StringBuilder()
-					.append( getParentAccessor() )
-					.append( "[" ).append( index ).append( "]" )
-					.toString();
+		protected void appendRuntimeRelativePath(StringBuilder path) {
+			path.append( "[" ).append( index ).append( "]" );
+		}
+
+		@Override
+		protected void appendStaticRelativePath(StringBuilder path, boolean first) {
+			// Nothing to do
 		}
 	}
 
