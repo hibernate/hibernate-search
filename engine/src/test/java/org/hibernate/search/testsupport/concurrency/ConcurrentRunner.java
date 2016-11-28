@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 
@@ -37,6 +38,9 @@ public class ConcurrentRunner {
 	private final TaskFactory factory;
 	private final int repetitions;
 
+	private Long timeoutValue;
+	private TimeUnit timeoutUnit;
+
 	/**
 	 * Provide a source for {@link Runnable} instances to run concurrently.
 	 * This is meant to simplify collection and creation of such tasks.
@@ -61,6 +65,12 @@ public class ConcurrentRunner {
 		endLatch = new CountDownLatch( repetitions );
 	}
 
+	public ConcurrentRunner setTimeout(long timeoutValue, TimeUnit timeoutUnit) {
+		this.timeoutValue = timeoutValue;
+		this.timeoutUnit = timeoutUnit;
+		return this;
+	}
+
 	/**
 	 * Invokes the {@link TaskFactory} and runs all the built tasks in
 	 * an Executor.
@@ -74,8 +84,18 @@ public class ConcurrentRunner {
 		}
 		executor.shutdown();
 		startLatch.countDown();
+
+		boolean timedOut = false;
 		try {
-			endLatch.await();
+			if ( timeoutValue != null ) {
+				if ( ! endLatch.await( timeoutValue, timeoutUnit ) ) {
+					executor.shutdownNow();
+					timedOut = true;
+				}
+			}
+			else {
+				endLatch.await();
+			}
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -84,6 +104,12 @@ public class ConcurrentRunner {
 		}
 
 		AssertionError reportedError = null;
+
+		if ( timedOut ) {
+			reportedError = new AssertionError( "The thread pool didn't finish executing after " + timeoutValue + " " + timeoutUnit );
+			// Go on and also add errors (if any) as suppressed exceptions
+		}
+
 		for ( Map.Entry<Integer, Throwable> entry : failures.entrySet() ) {
 			if ( reportedError == null ) {
 				reportedError = new AssertionError( "Unexpected failure on task #" + entry.getKey(), entry.getValue() );

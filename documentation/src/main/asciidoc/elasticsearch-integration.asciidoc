@@ -118,16 +118,19 @@ Let's see the options for the `index_schema_management_strategy` property:
 |Value|Definition
 |`NONE`|Indexes and their mappings will not be created, deleted nor altered.
 |`VALIDATE`|Existing indexes and mappings will be checked for conflicts with Hibernate Search's metamodel. Indexes and their mappings will not be created, deleted nor altered.
-|`MERGE`|Missing indexes and mappings will be created, mappings will be updated if there are no conflicts.
-|`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created.
-|`RECREATE`|Indexed will be deleted if existing and then created. This will delete all content from the index!
+|`MERGE`|Missing indexes and mappings will be created, existing mappings will be updated if there are no conflicts.
+|`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created along with their mappings.
+|`RECREATE`|Indexes will be deleted if existing and then created along with their mappings. This will delete all content from the indexes!
++
+Note that whenever a search factory is altered after initialization (i.e. new entities are mapped),
+the index will *not* be deleted again: new mappings will simply be added to the index.
 |`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
 |===============
 +
 [CAUTION]
 .Strategies in production environments
 ====
-It is strongly recommended to use either `NONE` or `VALIDATE` in a production environment. `CREATE` and `CREATE_DELETE` are obviously unsuitable in this context (unless you want to reindex everything upon every startup), and `MERGE` may leave your mapping half-merged in case of conflict.
+It is strongly recommended to use either `NONE` or `VALIDATE` in a production environment. `RECREATE` and `RECREATE_DELETE` are obviously unsuitable in this context (unless you want to reindex everything upon every startup), and `MERGE` may leave your mapping half-merged in case of conflict.
 
 To be precise, if your mapping changed in an incompatible way, such as a field having its type changed, merging may be impossible. In this case, the `MERGE` strategy will prevent Hibernate Search from starting, but it may already have successfully merged another index, making a rollback difficult at best.
 

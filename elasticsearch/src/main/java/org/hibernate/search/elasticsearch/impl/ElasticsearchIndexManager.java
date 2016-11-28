@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -36,6 +37,7 @@ import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
@@ -63,6 +65,10 @@ public class ElasticsearchIndexManager implements IndexManager {
 
 	private ExtendedSearchIntegrator searchIntegrator;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
+
+	private boolean indexInitialized = false;
+	private boolean indexCreatedByHibernateSearch = false;
+	private final Set<Class<?>> initializedContainedEntityTypes = new HashSet<>();
 
 	private ServiceManager serviceManager;
 
@@ -194,32 +200,113 @@ public class ElasticsearchIndexManager implements IndexManager {
 	}
 
 	private void initializeIndex() {
+		if ( !indexInitialized ) {
+			/*
+			 * The value of this variable is only used for the "CREATE" schema management
+			 * strategy, but we store it in any case, just to be consistent.
+			 */
+			indexCreatedByHibernateSearch = initializeIndex( containedEntityTypes );
+			indexInitialized = true;
+			initializedContainedEntityTypes.addAll( containedEntityTypes );
+		}
+		else {
+			Set<Class<?>> notYetInitializedContainedEntityTypes = new HashSet<>( containedEntityTypes );
+			notYetInitializedContainedEntityTypes.removeAll( initializedContainedEntityTypes );
+
+			if ( notYetInitializedContainedEntityTypes.isEmpty() ) {
+				return; // Nothing to do
+			}
+
+			reinitializeIndex( notYetInitializedContainedEntityTypes );
+			initializedContainedEntityTypes.addAll( notYetInitializedContainedEntityTypes );
+		}
+	}
+
+	/**
+	 * Called only the first time we must initialize the index.
+	 *
+	 * @param entityTypesToInitialize The entity types whose mapping will be added to the index
+	 * (if it's part of the schema management strategy).
+	 * @return {@code true} if the index had to be created, {@code false} otherwise.
+	 */
+	private boolean initializeIndex(Set<Class<?>> entityTypesToInitialize) {
+		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
+			return false;
+		}
+
+		boolean createdIndex;
+
+		IndexMetadata indexMetadata = createIndexMetadata( entityTypesToInitialize );
 		switch ( schemaManagementStrategy ) {
-			case NONE:
-				break;
 			case CREATE:
-				schemaCreator.createIfAbsent( createIndexMetadata(), schemaManagementExecutionOptions );
+				createdIndex = schemaCreator.createIndexIfAbsent( indexMetadata, schemaManagementExecutionOptions );
+				if ( createdIndex ) {
+					schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
+				}
 				break;
 			case RECREATE:
 			case RECREATE_DELETE:
 				schemaDropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
-				schemaCreator.create( createIndexMetadata(), schemaManagementExecutionOptions );
+				schemaCreator.createIndex( indexMetadata, schemaManagementExecutionOptions );
+				schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
+				createdIndex = true;
 				break;
 			case MERGE:
-				schemaMigrator.merge( createIndexMetadata(), schemaManagementExecutionOptions );
+				createdIndex = schemaCreator.createIndexIfAbsent( indexMetadata, schemaManagementExecutionOptions );
+				schemaMigrator.merge( indexMetadata, schemaManagementExecutionOptions );
 				break;
 			case VALIDATE:
-				schemaValidator.validate( createIndexMetadata(), schemaManagementExecutionOptions );
+				schemaValidator.validate( indexMetadata, schemaManagementExecutionOptions );
+				createdIndex = false;
 				break;
 			default:
+				throw new AssertionFailure( "Unexpected schema management strategy: " + schemaManagementStrategy );
+		}
+
+		return createdIndex;
+	}
+
+	/**
+	 * Called for any initialization following the {@link #initialize(String, Properties, Similarity, WorkerBuildContext) first one}
+	 * (upon subsequent search factory changes).
+	 *
+	 * <p>This method only may add new mappings to the existing index (depending on the strategy), but will never
+	 * create or drop the index (since it's supposed to have been created by Hibernate Search already, if necessary).
+	 *
+	 * @param indexCreatedByHibernateSearch If the index was created by Hibernate Search in {@link #initializeIndex(Set)}.
+	 * @param entityTypesToInitialize The entity types whose mapping will be added to the index
+	 * (if it's part of the schema management strategy).
+	 */
+	private void reinitializeIndex(Set<Class<?>> entityTypesToInitialize) {
+		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
+			return;
+		}
+		IndexMetadata indexMetadata = createIndexMetadata( entityTypesToInitialize );
+		switch ( schemaManagementStrategy ) {
+			case CREATE:
+				if ( indexCreatedByHibernateSearch ) { // Don't alter a pre-existing index
+					schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
+				}
 				break;
+			case RECREATE:
+			case RECREATE_DELETE:
+				schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
+				break;
+			case MERGE:
+				schemaMigrator.merge( indexMetadata, schemaManagementExecutionOptions );
+				break;
+			case VALIDATE:
+				schemaValidator.validate( indexMetadata, schemaManagementExecutionOptions );
+				break;
+			default:
+				throw new AssertionFailure( "Unexpected schema management strategy: " + schemaManagementStrategy );
 		}
 	}
 
-	private IndexMetadata createIndexMetadata() {
+	private IndexMetadata createIndexMetadata(Collection<Class<?>> classes) {
 		IndexMetadata index = new IndexMetadata();
 		index.setName( actualIndexName );
-		for ( Class<?> entityType : containedEntityTypes ) {
+		for ( Class<?> entityType : classes ) {
 			String entityName = entityType.getName();
 			EntityIndexBinding descriptor = searchIntegrator.getIndexBinding( entityType );
 			index.putMapping( entityName, schemaTranslator.translate( descriptor, schemaManagementExecutionOptions ) );
