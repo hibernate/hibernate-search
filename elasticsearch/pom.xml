@@ -247,12 +247,6 @@
                                 <exclude>**/JPATimeoutTest.java</exclude>
                                 <exclude>**/TimeoutTest.java</exclude>
                                 
-                                <!-- HSEARCH-2426 Remote analyzer initialization fails when using dynamic sharding on Elasticsearch -->
-                                <exclude>**/DirectoryProviderForQueryTest.java</exclude>
-                                <exclude>**/CustomerShardingStrategyTest.java</exclude>
-                                <exclude>**/DynamicShardingTest.java</exclude>
-                                <exclude>**/IdShardingStrategyTest.java</exclude>
-                                
                                 <!-- HSEARCH-2404 Enable CollectionUpdateEventTest for Elasticsearch -->
                                 <exclude>**/CollectionUpdateEventTest.java</exclude><!-- Only fails on CI (Travis) -->
                             </excludes>
