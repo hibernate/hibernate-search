@@ -15,7 +15,6 @@ import javax.persistence.MapKeyColumn;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
  * @author Hardy Ferentschik
@@ -26,7 +25,6 @@ public class EmbeddableCategories {
 	private Map<Long, String> categories;
 
 	@ElementCollection
-	@IndexedEmbedded
 	@MapKeyColumn
 	@Field(bridge = @FieldBridge(impl = CategoriesBridge.class))
 	public Map<Long, String> getCategories() {

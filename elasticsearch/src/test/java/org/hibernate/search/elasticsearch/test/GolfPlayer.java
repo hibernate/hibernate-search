@@ -88,7 +88,6 @@ public class GolfPlayer {
 
 	@ElementCollection
 	@Field
-	@IndexedEmbedded
 	private Set<String> strengths;
 
 	@ManyToMany
