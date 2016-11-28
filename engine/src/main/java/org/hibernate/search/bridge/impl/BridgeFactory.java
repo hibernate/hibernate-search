@@ -19,7 +19,6 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
@@ -275,9 +274,6 @@ public final class BridgeFactory {
 	}
 
 	private ContainerType getContainerType(XMember member, ReflectionManager reflectionManager) {
-		if ( ! member.isAnnotationPresent( IndexedEmbedded.class ) ) {
-			return ContainerType.SINGLE;
-		}
 		if ( member.isArray() ) {
 			return ContainerType.ARRAY;
 		}
@@ -288,8 +284,6 @@ public final class BridgeFactory {
 		if ( member.isCollection() && Map.class.equals( member.getCollectionClass() ) ) {
 			return ContainerType.MAP;
 		}
-		// marked @IndexedEmbedded but not a container
-		// => probably a @Field @IndexedEmbedded Foo foo;
 		return ContainerType.SINGLE;
 	}
 
