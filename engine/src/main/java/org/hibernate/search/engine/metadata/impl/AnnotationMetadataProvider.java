@@ -1388,16 +1388,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private boolean isNumericField(NumericField numericFieldAnnotation, FieldBridge fieldBridge) {
-		if ( fieldBridge instanceof ContainerBridge ) {
-			fieldBridge = ( (ContainerBridge) fieldBridge ).getElementBridge();
-		}
-		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
-			fieldBridge = ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap();
-		}
-
 		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
 		// field bridge
-		return numericFieldAnnotation != null || NumericFieldUtils.isNumericFieldBridge( fieldBridge );
+		return numericFieldAnnotation != null || NumericFieldUtils.isNumericContainerOrNumericFieldBridge( fieldBridge );
 	}
 
 	private NumericEncodingType determineNumericFieldEncoding(FieldBridge fieldBridge) {
