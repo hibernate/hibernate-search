@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * An enum for Elasticsearch "index" attribute values.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index.html
+ * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index.html
  * @author Yoann Rodiere
  */
 public enum IndexType {

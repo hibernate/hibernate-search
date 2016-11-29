@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName;
  * An enum for Elasticsearch data types.
  * <p>Only provides values for the types we actually use.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+ * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
  * @author Yoann Rodiere
  */
 public enum DataType {

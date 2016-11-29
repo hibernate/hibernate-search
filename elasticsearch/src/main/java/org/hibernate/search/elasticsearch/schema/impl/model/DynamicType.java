@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * An enum for Elasticsearch "dynamic" attribute values.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic.html
+ * See https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic.html
  * @author Yoann Rodiere
  */
 public enum DynamicType {

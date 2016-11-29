@@ -17,7 +17,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * An object representing Elasticsearch property mappings, i.e. the mappings of properties inside a type mapping.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
+ * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  * @author Yoann Rodiere
  */
 public class PropertyMapping extends TypeMapping {
