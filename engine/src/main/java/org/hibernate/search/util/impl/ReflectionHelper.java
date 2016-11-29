@@ -115,13 +115,41 @@ public abstract class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the specified class contains any Search specific annotations.
+	 * Checks whether the specified class contains any Search-specific annotations.
+	 *
+	 * <p>This method will return {@code true} if such an annotation is detected
+	 * in the class itself or in one of its superclass, either applied directly on the class,
+	 * on a field, or on a method.
 	 *
 	 * @param mappedClass the {@code XClass} to check for Search annotations
 	 *
 	 * @return Returns {@code true} if the class contains at least one Search annotation, {@code false} otherwise
 	 */
 	public static boolean containsSearchAnnotations(XClass mappedClass) {
+		List<XClass> hierarchy = createXClassHierarchy( mappedClass );
+
+		for ( XClass clazz : hierarchy ) {
+			if ( containsLocalSearchAnnotation( clazz ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks whether the specified class contains any locally-declared, Search-specific annotations.
+	 *
+	 * <p>This method will return {@code true} if such an annotation is detected
+	 * in the class itself, either applied directly on the class, on a field, or on a method.
+	 * <p>Only fields and methods declared by the specified class are taken into account:
+	 * inherited fields and methods are ignored.
+	 *
+	 * @param mappedClass the {@code XClass} to check for Search annotations
+	 *
+	 * @return Returns {@code true} if the class contains at least one Search annotation, {@code false} otherwise
+	 */
+	private static boolean containsLocalSearchAnnotation(XClass mappedClass) {
 		// check the type annotations
 		if ( containsSearchAnnotation( mappedClass.getAnnotations() ) ) {
 			return true;
