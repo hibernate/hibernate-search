@@ -13,7 +13,7 @@ import java.util.TreeMap;
 /**
  * An object representic Elasticsearch type mappings.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
+ * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
  * @author Yoann Rodiere
  */
 public class TypeMapping {
