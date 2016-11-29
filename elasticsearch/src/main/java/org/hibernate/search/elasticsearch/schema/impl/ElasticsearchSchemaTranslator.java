@@ -21,8 +21,6 @@ public interface ElasticsearchSchemaTranslator extends Service {
 	/**
 	 * Translates index metadata, throwing an exception if translation fails.
 	 *
-	 * @param indexName The index name.
-	 * @param indexName The index name.
 	 * @throws SearchException If an error occurs.
 	 */
 	TypeMapping translate(EntityIndexBinding descriptor, ExecutionOptions executionOptions);
