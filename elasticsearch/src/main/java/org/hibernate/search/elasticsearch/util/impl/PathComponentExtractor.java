@@ -25,7 +25,7 @@ public class PathComponentExtractor implements Cloneable {
 	private int currentIndexInPath = 0;
 
 	/**
-	 * Append a string to the path for later consumption through {@link #next()}.
+	 * Append a string to the path for later consumption through {@link #next(ConsumptionLimit)}.
 	 * @param pathPart A string that may or may not include path component
 	 * separators (dots).
 	 */
@@ -61,7 +61,6 @@ public class PathComponentExtractor implements Cloneable {
 	 *followed by a dot but by the end of the path, it will return it only if {@code includeLast}
 	 *is {@code true}.
 	 *
-	 * @param includeLast Whether or not to return the last, incompletely qualified path component.
 	 * @return The next path component.
 	 * @throws AssertionFailure If there is nothing to consume in the path, or if there is more
 	 * than one component to consume.
