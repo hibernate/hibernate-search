@@ -1,6 +1,69 @@
 Hibernate Search Changelog
 ==========================
 
+5.7.0.Beta1 (29-11-2016)
+-------------------------
+
+** Bug
+    * HSEARCH-2495 The javadoc @see tag is illegal on URLs
+    * HSEARCH-2482 Sort DSL fails with ClassCastException when using missing values on numeric non-double fields
+    * HSEARCH-2480 Adding classes to the SearchIntegrator concurrently fails with Elasticsearch
+    * HSEARCH-2475 Elasticsearch score sorts are reversed
+    * HSEARCH-2474 Elasticsearch sorts ignore the "missing value" property
+    * HSEARCH-2468 method getShardIdentifiersForDeletion in ShardIdentifierProviderTemplate should not be final
+    * HSEARCH-2451 StringFacetingTest.testStringFacetingWithNameCollision() fails randomly with Elasticsearch
+    * HSEARCH-2442 AsyncExecutor blocks forever on shutdown
+    * HSEARCH-2439 NPE when generating mapping for unindexed class bridge fields with Elasticsearch
+    * HSEARCH-2438 Tests failing following daylight saving time change
+    * HSEARCH-2433 AssertionFailure with providedId in embeddeds
+    * HSEARCH-2432 Entity Ids containing underscore lost when querying 
+    * HSEARCH-2431 NPE with projections and Elasticsearch
+    * HSEARCH-2429 Analyzers on ClassBridge are being ignored with Elasticsearch
+    * HSEARCH-2426 Remote analyzer initialization fails when using dynamic sharding on Elasticsearch
+    * HSEARCH-2425 Projection on spatial coordinates returns a String instead of a number with Elasticsearch
+    * HSEARCH-2422 Error when projecting on the score while not sorting by relevance
+    * HSEARCH-2420 Tenant IDs containing underscores are not supported with ES
+    * HSEARCH-2419 Using array/iterable/map field bridges requires the @IndexedEmbedded annotation
+    * HSEARCH-2409 Parent prefix gets ignored on @IndexedEmbedded @ElementCollection
+    * HSEARCH-2408 @IndexedEmbedded.prefix, .depth, etc. don't work on @ElementCollection anymore
+    * HSEARCH-2403 TwoWayFieldBridge exceptions are not wrapped properly when retrieving ES projection values
+    * HSEARCH-2402 Elasticsearch backend mistakes @DateBridge for @CalendarBridge
+    * HSEARCH-2401 Boosts are (erroneously) not applied to IndexedEmbeddeds
+    * HSEARCH-2386 TikaMetadataProcessor cannot add sortable fields (or fields usable in Elasticsearch)
+    * HSEARCH-2330 MetadataProvidingFieldBridge cannot override metadata on annotation-generated field
+    * HSEARCH-2324 Distance computation is inconsistent between the Lucene and the ElasticSearch backend
+    * HSEARCH-2314 TokenStream contract violation during serialization of index on slave node in a JMS cluster
+    * HSEARCH-2119 ManualIndexingStrategyTest is unreliable when run on Elasticsearch
+
+** Improvement
+    * HSEARCH-2450 In internal metadata, provide access to BridgeDefinedFields through their source document field
+    * HSEARCH-2448 Throw exceptions with clear messages when there are field type conflicts with Elasticsearch
+    * HSEARCH-2445 Improve error handling
+    * HSEARCH-2435 Improve Elasticsearch documentation
+    * HSEARCH-2412 Add the target URL in Elasticsearch error messages
+    * HSEARCH-2375 Document the supported Elasticsearch versions in the reference documentation
+    * HSEARCH-2360 Elasticsearch queries should use source filtering
+    * HSEARCH-2313 Drop the experimental flag of More Like This queries
+
+** New Feature
+    * HSEARCH-2471 Add support for projection on unmapped fields with Elasticsearch
+    * HSEARCH-2400 Support IndexingMonitor for the Elasticsearch backend
+    * HSEARCH-2396 Support custom field bridges with the Elasticsearch backend (for EmbeddedIds for instance)
+    * HSEARCH-2235 Allow to configure several hosts of an Elasticsearch cluster
+    * HSEARCH-402 Provide a ReaderProvider to cap the number of index reopenings to a fixed rate
+
+** Patch
+    * HSEARCH-2493 Generics usage needs to be stricter to make the Java9 compiler happy
+
+** Task
+    * HSEARCH-2483 Upgrade Elasticsearch used for testing to 2.4.2
+    * HSEARCH-2470 Drop support for projection on fields with a one-way bridge in Elasticsearch
+    * HSEARCH-2457 Clean up confusions between relative field name, absolute field name and property name
+    * HSEARCH-2437 Prepare the support for Elasticsearch 5
+    * HSEARCH-2436 Reference HSEARCH-2414 in the Elasticsearch doc
+    * HSEARCH-2427 Introduce JMH tests for query execution via the engine component only
+    * HSEARCH-2416 Add links to the JIRA tickets for missing features in the Elasticsearch doc
+
 5.7.0.Alpha1 (05-10-2016)
 -------------------------
 
