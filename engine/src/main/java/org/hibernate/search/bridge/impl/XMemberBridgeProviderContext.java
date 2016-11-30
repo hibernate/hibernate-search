@@ -22,6 +22,7 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 
 	private final AnnotatedElement annotatedElement;
 	private final Class<?> returnTypeElement;
+	private final Class<?> returnType;
 	private final String memberName;
 	private final ServiceManager serviceManager;
 	private final boolean isId;
@@ -35,6 +36,7 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 		this.annotatedElement = new XMemberToAnnotatedElementAdaptor( member );
 		// For arrays and collection, return the type of the contained elements
 		this.returnTypeElement = reflectionManager.toClass( member.getElementClass() );
+		this.returnType = reflectionManager.toClass( member.getType() );
 		this.memberName = member.getName();
 		this.serviceManager = serviceManager;
 		this.isId = isId;
@@ -44,6 +46,11 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 	@Override
 	public Class<?> getReturnType() {
 		return returnTypeElement;
+	}
+
+	@Override
+	public Class<?> getElementOrContainerReturnType() {
+		return returnType;
 	}
 
 	@Override
