@@ -13,8 +13,8 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
-import org.hibernate.search.engine.impl.nullencoding.NullMarkerCodec;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

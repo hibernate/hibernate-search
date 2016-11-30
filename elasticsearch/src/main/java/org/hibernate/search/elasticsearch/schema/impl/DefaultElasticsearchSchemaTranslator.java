@@ -9,13 +9,16 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.builtin.nullencoding.impl.NotEncodingCodec;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
@@ -33,43 +36,23 @@ import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spatial.impl.SpatialHelper;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonPrimitive;
 
 /**
  * The default {@link ElasticsearchSchemaTranslator} implementation.
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchemaTranslator, Startable, Stoppable {
+public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchemaTranslator {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
-
-	private ServiceManager serviceManager;
-	private GsonService gsonService;
-
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		serviceManager = context.getServiceManager();
-		gsonService = serviceManager.requestService( GsonService.class );
-	}
-
-	@Override
-	public void stop() {
-		gsonService = null;
-		serviceManager.releaseService( GsonService.class );
-		serviceManager = null;
-	}
 
 	@Override
 	public TypeMapping translate(EntityIndexBinding descriptor, ExecutionOptions executionOptions) {
@@ -422,13 +405,54 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	}
 
 	private void addNullValue(PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
-		String indexNullAs = fieldMetadata.indexNullAs();
-		if ( indexNullAs != null ) {
-			Object convertedValue = ElasticSearchIndexNullAsHelper.getNullValue(
-					fieldMetadata.getAbsoluteName(), propertyMapping.getType(), indexNullAs
-					);
-			Gson gson = gsonService.getGson();
-			propertyMapping.setNullValue( gson.toJsonTree( convertedValue ).getAsJsonPrimitive() );
+		NullMarkerCodec nullMarkerCodec = fieldMetadata.getNullMarkerCodec();
+
+		if ( nullMarkerCodec != NotEncodingCodec.SINGLETON ) { // XXX NotEncodingCodec is not accessible...
+			JsonPrimitive nullTokenJson = retrieveNullTokenAsJson( propertyMapping.getType(), fieldMetadata, nullMarkerCodec );
+
+			propertyMapping.setNullValue( nullTokenJson );
+		}
+	}
+
+	private JsonPrimitive retrieveNullTokenAsJson(DataType dataType, DocumentFieldMetadata fieldMetadata, NullMarkerCodec nullMarkerCodec) {
+		Document dummyDocument = new Document();
+		LuceneOptions luceneOptions =
+				fieldMetadata.getSourceType().getFieldLuceneOptions( fieldMetadata.getSourceProperty(), fieldMetadata, null, 1.0f );
+
+		nullMarkerCodec.encodeNullValue( fieldMetadata.getAbsoluteName(), dummyDocument, luceneOptions );
+
+		List<IndexableField> fields = dummyDocument.getFields();
+
+		if ( fields.size() > 1 ) {
+			throw new AssertionFailure( "Expected only one field" );
+		}
+
+		if ( !fields.isEmpty() ) {
+			IndexableField field = fields.iterator().next();
+			return convertNullTokenFieldToJson( dataType, field );
+		}
+		else {
+			return null;
+		}
+	}
+
+	private JsonPrimitive convertNullTokenFieldToJson(DataType dataType, IndexableField field) {
+		Number numericValue = field.numericValue();
+		String stringValue = field.stringValue();
+		if ( numericValue != null ) {
+			return new JsonPrimitive( numericValue );
+		}
+		else if ( stringValue != null ) {
+			if ( DataType.BOOLEAN.equals( dataType ) ) {
+				// Parse the string so we send the proper type to Elasticsearch
+				return new JsonPrimitive( Boolean.parseBoolean( stringValue ) );
+			}
+			else {
+				return new JsonPrimitive( stringValue );
+			}
+		}
+		else {
+			return null;
 		}
 	}
 

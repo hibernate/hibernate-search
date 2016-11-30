@@ -65,7 +65,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		this.storeType = fieldMetadata.getStore();
 		this.storeCompressed = this.storeType.equals( Store.COMPRESS );
 		this.storeUncompressed = this.storeType.equals( Store.YES );
-		this.indexNullAs = fieldMetadata.indexNullAs();
+		this.indexNullAs = fieldMetadata.getNullMarkerCodec().nullRepresentedAsString();
 	}
 
 	public LuceneOptionsImpl(Index indexMode, TermVector termVector, Store store, String indexNullAs, float fieldLevelBoost, float inheritedBoost) {

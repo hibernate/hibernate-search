@@ -4,22 +4,23 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.impl.nullencoding;
+package org.hibernate.search.bridge.builtin.nullencoding.impl;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
 
 /**
  * @author Sanne Grinovero
  */
-class NumericFloatNullCodec implements NullMarkerCodec {
+public class NumericDoubleNullCodec implements NullMarkerCodec {
 
-	private final Float indexNullAs;
+	private final Double indexNullAs;
 
-	NumericFloatNullCodec(final Float indexNullAs) {
+	public NumericDoubleNullCodec(final Double indexNullAs) throws NumberFormatException {
 		if ( indexNullAs == null ) {
 			throw new NullPointerException( "The constructor parameter is mandatory" );
 		}
@@ -38,7 +39,7 @@ class NumericFloatNullCodec implements NullMarkerCodec {
 
 	@Override
 	public Query createNullMatchingQuery(String fieldName) {
-		return NumericRangeQuery.newFloatRange( fieldName, indexNullAs, indexNullAs, true, true );
+		return NumericRangeQuery.newDoubleRange( fieldName, indexNullAs, indexNullAs, true, true );
 	}
 
 	@Override

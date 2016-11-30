@@ -330,7 +330,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 						if ( numericValue != null ) {
 							// If the value was initially null, explicitly propagate null and let ES handle the default token.
-							if ( numericValue.toString().equals( documentFieldMetadata.indexNullAs() ) ) {
+							if ( documentFieldMetadata.getNullMarkerCodec().representsNullValue( field ) ) {
 								numericValue = null;
 							}
 							accessor.add( root, numericValue != null ? new JsonPrimitive( numericValue ) : null );
@@ -338,7 +338,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 						else {
 							String stringValue = field.stringValue();
 							// If the value was initially null, explicitly propagate null and let ES handle the default token.
-							if ( stringValue != null && stringValue.equals( documentFieldMetadata.indexNullAs() ) ) {
+							if ( documentFieldMetadata.getNullMarkerCodec().representsNullValue( field ) ) {
 								stringValue = null;
 							}
 

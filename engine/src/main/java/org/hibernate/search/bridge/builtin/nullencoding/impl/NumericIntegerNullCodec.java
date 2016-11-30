@@ -4,22 +4,23 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.impl.nullencoding;
+package org.hibernate.search.bridge.builtin.nullencoding.impl;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
 
 /**
  * @author Sanne Grinovero
  */
-class NumericIntegerNullCodec implements NullMarkerCodec {
+public class NumericIntegerNullCodec implements NullMarkerCodec {
 
 	private final Integer indexNullAs;
 
-	NumericIntegerNullCodec(final Integer indexNullAs) {
+	public NumericIntegerNullCodec(final Integer indexNullAs) throws NumberFormatException {
 		if ( indexNullAs == null ) {
 			throw new NullPointerException( "The constructor parameter is mandatory" );
 		}
