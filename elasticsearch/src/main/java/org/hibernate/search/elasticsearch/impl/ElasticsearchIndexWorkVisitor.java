@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import io.searchbox.indices.Flush;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.index.DocValuesType;
@@ -138,8 +139,18 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	@Override
 	public BackendRequest<?> visitFlushWork(FlushLuceneWork work, IndexingMonitor monitor) {
-		// Nothing to do
-		return null;
+		Flush flush = new Flush.Builder().setParameter( "wait_if_ongoing", "true" )
+				.addIndex( indexName )
+				.refresh( true )
+				.build();
+		return new BackendRequest<>(
+				flush,
+				work,
+				indexName,
+				monitor,
+				NoopBackendRequestSuccessHandler.INSTANCE,
+				false
+		);
 	}
 
 	@Override
