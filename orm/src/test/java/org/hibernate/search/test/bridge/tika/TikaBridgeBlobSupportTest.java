@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.bridge.tika;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,14 +27,12 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
@@ -52,26 +52,26 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testDefaultTikaBridgeWithBlobData() throws Exception {
-		Session session = openSession();
+	public void testDefaultTikaBridgeWithBlob() throws Exception {
+		try ( Session session = openSession() ) {
+			Blob content = dataAsBlob( new File(PATH_TO_TEST_DOCUMENT_PDF), session );
 
-		persistBook( session, getBlobData( PATH_TO_TEST_DOCUMENT_PDF, session ) );
-		persistBook( session, null );
+			persistBook( session, new Book( content ) );
+			persistBook( session, new Book() );
 
-		// we have to index manually. Using the Blob (streaming approach) the indexing would try to re-read the
-		// input stream of the blob after it was persisted into the database
-		indexBook( session );
-		searchBook( session );
-
-		session.close();
+			// we have to index manually. Using the Blob (streaming approach) the indexing would try to re-read the
+			// input stream of the blob after it was persisted into the database
+			indexBook( session );
+			searchBook( session, "contentAsBlob" );
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void searchBook(Session session) throws ParseException {
+	private void searchBook(Session session, String field) throws ParseException {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		Transaction transaction = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser(
-				"content",
+				field,
 				TestConstants.standardAnalyzer
 		);
 		Query query = parser.parse( "foo" );
@@ -96,12 +96,8 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 		fullTextSession.clear();
 	}
 
-	private void persistBook(Session session, Blob data) throws IOException {
+	private void persistBook(Session session, Book book) throws IOException {
 		Transaction tx = session.beginTransaction();
-
-		Book book = new Book();
-		book.setContent( data );
-
 		session.save( book );
 		session.flush();
 		tx.commit();
@@ -147,8 +143,7 @@ public class TikaBridgeBlobSupportTest extends SearchTestBase {
 		cfg.put( Environment.INDEXING_STRATEGY, "manual" );
 	}
 
-	private Blob getBlobData(String fileName, Session session) throws IOException {
-		File file = new File( fileName );
+	private Blob dataAsBlob(File file, Session session) throws IOException {
 		FileInputStream in = FileUtils.openInputStream( file );
 		return session.getLobHelper().createBlob( in, file.length() );
 	}
