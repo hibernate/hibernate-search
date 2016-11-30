@@ -26,6 +26,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.builtin.TikaBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinArrayBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
@@ -295,6 +296,9 @@ public final class BridgeFactory {
 		FieldBridge bridge = bridgeProvider.provideFieldBridge( context );
 		if ( bridge == null ) {
 			return null;
+		}
+		if ( bridge instanceof TikaBridge ) {
+			return bridge;
 		}
 		populateReturnType( context.getReturnType(), bridge.getClass(), bridge );
 		switch ( containerType ) {
