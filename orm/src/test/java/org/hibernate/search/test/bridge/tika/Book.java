@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.bridge.tika;
 
+import java.net.URI;
 import java.sql.Blob;
 
 import javax.persistence.Basic;
@@ -29,6 +30,7 @@ public class Book {
 	private Integer id;
 	private Blob contentAsBlob;
 	private byte[] contentAsBytes;
+	private URI contentAsURI;
 
 	public Book() {
 	}
@@ -39,6 +41,10 @@ public class Book {
 
 	public Book(byte[] content) {
 		this.contentAsBytes = content;
+	}
+
+	public Book(URI content) {
+		this.contentAsURI = content;
 	}
 
 	@Id
@@ -73,5 +79,17 @@ public class Book {
 
 	public void setContentAsBytes(byte[] contentAsBytes) {
 		this.contentAsBytes = contentAsBytes;
+	}
+
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+	@Field(indexNullAs = "<NULL>")
+	@TikaBridge
+	public URI getContentAsURI() {
+		return contentAsURI;
+	}
+
+	public void setContentAsURI(URI contentAsURI) {
+		this.contentAsURI = contentAsURI;
 	}
 }

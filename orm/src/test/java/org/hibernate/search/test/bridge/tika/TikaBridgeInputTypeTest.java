@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.sql.Blob;
 import java.util.List;
@@ -70,6 +71,19 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 
 			indexBook( session );
 			searchBook( session, "contentAsBytes" );
+		}
+	}
+
+	@Test
+	public void testDefaultTikaBridgeWithURI() throws Exception {
+		try ( Session session = openSession() ) {
+			URI content = testDocumentPdf.get().toURI();
+
+			persistBook( session, new Book( content ) );
+			persistBook( session, new Book() );
+
+			indexBook( session );
+			searchBook( session, "contentAsURI" );
 		}
 	}
 
