@@ -8,13 +8,12 @@ package org.hibernate.search.elasticsearch.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -45,6 +44,9 @@ import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.similarities.Similarity;
 
 /**
  * An {@link IndexManager} applying indexing work to an Elasticsearch server.
@@ -378,14 +380,23 @@ public class ElasticsearchIndexManager implements IndexManager {
 
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
-		if ( singleOperation == FlushLuceneWork.INSTANCE ) {
+		BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
+		if ( singleOperation instanceof FlushLuceneWork ) {
 			requestProcessor.awaitAsyncProcessingCompletion();
+			executeBackendRequest( request, true );
 		}
 		else {
-			BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
+			executeBackendRequest( request, false );
+		}
+	}
 
-			if ( request != null ) {
-				requestProcessor.executeAsync( request );
+	private void executeBackendRequest(BackendRequest<?> backendRequest, boolean sync) {
+		if ( backendRequest != null ) {
+			if ( sync ) {
+				requestProcessor.executeSync( Collections.<BackendRequest<?>>singletonList( backendRequest ) );
+			}
+			else {
+				requestProcessor.executeAsync( backendRequest );
 			}
 		}
 	}
