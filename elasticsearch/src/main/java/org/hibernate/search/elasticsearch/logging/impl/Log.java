@@ -214,4 +214,69 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	SearchException fieldIsBothCompositeAndConcrete(Class<?> entityType, String fieldPath);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 37,
+			value = "The 'indexNullAs' property for Period fields must represent a date interval in ISO-8601"
+					+ " format (for instance P3Y2M1D for 3 years, 2 months and 1 day)." )
+	IllegalArgumentException invalidNullMarkerForPeriod(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 38,
+			value = "The 'indexNullAs' property for Duration fields must represent a duration in ISO-8601"
+					+ " format (for instance P1DT2H3M4.007S for 1 day, 2 hours, 3 minutes, 4 seconds and 7 miliseconds)." )
+	IllegalArgumentException invalidNullMarkerForDuration(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 39,
+			value = "The 'indexNullAs' property for Instant fields must represent a date/time in ISO-8601"
+					+ " format (yyyy-MM-dd'T'HH:mm:ssZ[ZZZ])." )
+	IllegalArgumentException invalidNullMarkerForInstant(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 40,
+			value = "The 'indexNullAs' property for LocalDateTime fields must represent a local date/time in ISO-8601"
+					+ " format (yyyy-MM-dd'T'HH:mm:ss)." )
+	IllegalArgumentException invalidNullMarkerForLocalDateTime(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 41,
+			value = "The 'indexNullAs' property for LocalDate fields must represent a local date in ISO-8601"
+					+ " format (yyyy-MM-dd)." )
+	IllegalArgumentException invalidNullMarkerForLocalDate(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 42,
+			value = "The 'indexNullAs' property for LocalTime fields must represent a local time in ISO-8601"
+					+ " format (HH:mm:ss)." )
+	IllegalArgumentException invalidNullMarkerForLocalTime(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 43,
+			value = "The 'indexNullAs' property for OffsetDateTime fields must represent an offset date/time in ISO-8601"
+					+ " format (yyyy-MM-dd'T'HH:mm:ssZ)." )
+	IllegalArgumentException invalidNullMarkerForOffsetDateTime(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 44,
+			value = "The 'indexNullAs' property for OffsetTime fields must represent an offset time in ISO-8601"
+					+ " format (HH:mm:ssZ)." )
+	IllegalArgumentException invalidNullMarkerForOffsetTime(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 45,
+			value = "The 'indexNullAs' property for ZonedDateTime fields must represent a zoned date/time in ISO-8601"
+					+ " format (yyyy-MM-dd'T'HH:mm:ss[ZZZ])." )
+	IllegalArgumentException invalidNullMarkerForZonedDateTime(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 46,
+			value = "The 'indexNullAs' property for ZonedTime fields must represent a zoned time in ISO-8601"
+					+ " format (HH:mm:ss[ZZZ])." )
+	IllegalArgumentException invalidNullMarkerForZonedTime(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 47,
+			value = "The 'indexNullAs' property for Year fields must represent a year in ISO-8601"
+					+ " format (for instance 2014)." )
+	IllegalArgumentException invalidNullMarkerForYear(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 48,
+			value = "The 'indexNullAs' property for YearMonth fields must represent a year/month in ISO-8601"
+					+ " format (yyyy-MM-dd)." )
+	IllegalArgumentException invalidNullMarkerForYearMonth(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 49,
+			value = "The 'indexNullAs' property for MonthDay fields must represent a month/day in ISO-8601"
+					+ " format (--MM-dd)." )
+	IllegalArgumentException invalidNullMarkerForMonthDay(@Cause Exception e);
+
 }

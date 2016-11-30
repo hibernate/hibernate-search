@@ -8,12 +8,15 @@ package org.hibernate.search.elasticsearch.bridge.builtin.time.impl;
 
 import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
+
+import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Converts a {@link LocalDate} to a {@link String} in Elasticsearch's "strict_date" format.
@@ -24,6 +27,8 @@ import java.util.Locale;
  * @author Yoann Rodiere
  */
 public class ElasticsearchLocalDateBridge extends ElasticsearchTemporalAccessorStringBridge<LocalDate> {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.append( ElasticsearchYearMonthBridge.FORMATTER )
@@ -39,7 +44,12 @@ public class ElasticsearchLocalDateBridge extends ElasticsearchTemporalAccessorS
 	}
 
 	@Override
-	LocalDate parse(DateTimeFormatter formatter, String stringValue) throws DateTimeParseException {
+	LocalDate parse(DateTimeFormatter formatter, String stringValue) throws DateTimeException {
 		return LocalDate.parse( stringValue, formatter );
+	}
+
+	@Override
+	protected IllegalArgumentException createInvalidIndexNullAsException(String indexNullAs, DateTimeException e) {
+		return LOG.invalidNullMarkerForLocalDate( e );
 	}
 }

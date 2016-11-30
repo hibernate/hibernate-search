@@ -194,7 +194,15 @@ In order for your value to be understood by Hibernate Search (and Elasticsearch)
  * For string values, no particular format is required.
  * For numeric values, use formats accepted by `Double.parseDouble`, `Integer.parseInteger`, etc., depending on the actual type of your field.
  * For booleans, use either `true` or `false`.
- * For dates, use the ISO-8601 format (`yyyy-MM-dd'T'HH:mm:ssZ`, for instance `2016-08-26T16:41:00+01:00`). The time and time zone may be omitted (if omitted, the time zone will be interpreted as the default JVM time zone).
+ * For dates (`java.util.Calendar`, `java.util.Date`, `java.time.*`), use the ISO-8601 format.
++
+The full format is `yyyy-MM-dd'T'HH:mm:ss.nZ[ZZZ]` (for instance `2016-11-26T16:41:00.006+01:00[CET]`).
+Please keep in mind that part of this format must be left out depending on the type of your field, though.
+For a `java.time.LocalDateTime` field, for instance,
+the provided string must not include the zone offset (`+01:00`) or the zone ID (`[UTC]`), because those don't make sense.
++
+Even when they make sense for the type of your field, the time and time zone may be omitted
+ (if omitted, the time zone will be interpreted as the default JVM time zone).
 
 ===== Dynamic boosting
 
