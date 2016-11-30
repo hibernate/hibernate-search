@@ -8,12 +8,15 @@ package org.hibernate.search.elasticsearch.bridge.builtin.time.impl;
 
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 
+import java.time.DateTimeException;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
+
+import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Converts a {@link YearMonth} to a {@link String} in ISO-8601 extended format (9 digits for the year instead of 4).
@@ -24,6 +27,8 @@ import java.util.Locale;
  * @author Yoann Rodiere
  */
 public class ElasticsearchYearMonthBridge extends ElasticsearchTemporalAccessorStringBridge<YearMonth> {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.append( ElasticsearchYearBridge.FORMATTER )
@@ -39,7 +44,12 @@ public class ElasticsearchYearMonthBridge extends ElasticsearchTemporalAccessorS
 	}
 
 	@Override
-	YearMonth parse(DateTimeFormatter formatter, String stringValue) throws DateTimeParseException {
+	YearMonth parse(DateTimeFormatter formatter, String stringValue) throws DateTimeException {
 		return YearMonth.parse( stringValue, formatter );
+	}
+
+	@Override
+	protected IllegalArgumentException createInvalidIndexNullAsException(String indexNullAs, DateTimeException e) {
+		return LOG.invalidNullMarkerForYearMonth( e );
 	}
 }

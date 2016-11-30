@@ -11,12 +11,15 @@ import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static java.time.temporal.ChronoField.NANO_OF_SECOND;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 
+import java.time.DateTimeException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
+
+import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Converts a {@link LocalTime} to a {@link String} in Elasticsearch's "strict_hour_minute_second_fraction" format.
@@ -27,6 +30,8 @@ import java.util.Locale;
  * @author Yoann Rodiere
  */
 public class ElasticsearchLocalTimeBridge extends ElasticsearchTemporalAccessorStringBridge<LocalTime> {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( HOUR_OF_DAY, 2 )
@@ -47,7 +52,12 @@ public class ElasticsearchLocalTimeBridge extends ElasticsearchTemporalAccessorS
 	}
 
 	@Override
-	LocalTime parse(DateTimeFormatter formatter, String stringValue) throws DateTimeParseException {
+	LocalTime parse(DateTimeFormatter formatter, String stringValue) throws DateTimeException {
 		return LocalTime.parse( stringValue, formatter );
+	}
+
+	@Override
+	protected IllegalArgumentException createInvalidIndexNullAsException(String indexNullAs, DateTimeException e) {
+		return LOG.invalidNullMarkerForLocalTime( e );
 	}
 }

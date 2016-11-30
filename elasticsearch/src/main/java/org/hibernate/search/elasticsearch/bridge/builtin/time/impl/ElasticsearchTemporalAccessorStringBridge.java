@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.bridge.builtin.time.impl;
 
+import java.time.DateTimeException;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
+import org.hibernate.search.bridge.util.impl.EncodingStringBridge;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -21,6 +24,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Yoann Rodiere
  */
 public abstract class ElasticsearchTemporalAccessorStringBridge<T extends TemporalAccessor>
+		extends EncodingStringBridge<T>
 		implements TwoWayStringBridge, IgnoreAnalyzerBridge {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
@@ -29,9 +33,17 @@ public abstract class ElasticsearchTemporalAccessorStringBridge<T extends Tempor
 
 	private final Class<T> type;
 
+	private final DateTimeFormatter indexNullAsFormatter;
+
 	ElasticsearchTemporalAccessorStringBridge(DateTimeFormatter formatter, Class<T> type) {
+		this( formatter, type, formatter );
+	}
+
+
+	ElasticsearchTemporalAccessorStringBridge(DateTimeFormatter formatter, Class<T> type, DateTimeFormatter indexNullAsFormatter) {
 		this.formatter = formatter;
 		this.type = type;
+		this.indexNullAsFormatter = indexNullAsFormatter;
 	}
 
 	@Override
@@ -62,5 +74,22 @@ public abstract class ElasticsearchTemporalAccessorStringBridge<T extends Tempor
 		return formatter.format( object );
 	}
 
-	abstract T parse(DateTimeFormatter formatter, String stringValue) throws Exception;
+	abstract T parse(DateTimeFormatter formatter, String stringValue) throws DateTimeException;
+
+	@Override
+	public NumericEncodingType getEncodingType() {
+		return NumericEncodingType.UNKNOWN;
+	}
+
+	@Override
+	protected T parseIndexNullAs(String indexNullAs) throws IllegalArgumentException {
+		try {
+			return parse( indexNullAsFormatter, indexNullAs );
+		}
+		catch (DateTimeException e) {
+			throw createInvalidIndexNullAsException( indexNullAs, e );
+		}
+	}
+
+	protected abstract IllegalArgumentException createInvalidIndexNullAsException(String indexNullAs, DateTimeException e);
 }
