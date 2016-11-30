@@ -744,7 +744,7 @@ public class DSLTest extends SearchTestBase {
 
 		transaction.commit();
 	}
-	
+
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2479")
 	public void testPhraseQueryTermCreation() throws Exception {
