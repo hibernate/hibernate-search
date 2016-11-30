@@ -17,8 +17,8 @@ import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.engine.impl.nullencoding.NotEncodingCodec;
-import org.hibernate.search.engine.impl.nullencoding.NullMarkerCodec;
+import org.hibernate.search.bridge.builtin.nullencoding.impl.NotEncodingCodec;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
 
 import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
@@ -141,8 +141,8 @@ public class DocumentFieldMetadata {
 		return analyzerReference;
 	}
 
-	public String indexNullAs() {
-		return nullMarkerCodec.nullRepresentedAsString();
+	public NullMarkerCodec getNullMarkerCodec() {
+		return nullMarkerCodec;
 	}
 
 	public boolean isNumeric() {

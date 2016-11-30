@@ -159,14 +159,13 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException facetingRequestHasUnsupportedType(String facetingRequestType);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 27,
-			value = "The 'indexNullAs' property for field '%2$s' needs to represent a Boolean to match the field type of the index. "
-					+ "Please change value from '%1$s' to represent a Boolean." )
-	SearchException nullMarkerNeedsToRepresentABoolean(String proposedTokenValue, String fieldName);
+			value = "The 'indexNullAs' property for Boolean fields must represent a Boolean ('true' or 'false')." )
+	IllegalArgumentException invalidNullMarkerForBoolean();
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 28,
-			value = "The 'indexNullAs' property for field '%2$s' needs to represent a Date to match the field type of the index. "
-					+ "Please change value from '%1$s' to represent a Date." )
-	SearchException nullMarkerNeedsToRepresentADate(String proposedTokenValue, String fieldName);
+			value = "The 'indexNullAs' property for Calendar and Date fields must represent a date/time in ISO-8601"
+					+ " format (yyyy-MM-dd'T'HH:mm:ssZ)." )
+	IllegalArgumentException invalidNullMarkerForCalendarAndDate(@Cause Exception e);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 29,
 			value = "Cannot use an offset ('from', 'firstResult') when scrolling through Elasticsearch results"

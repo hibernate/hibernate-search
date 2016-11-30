@@ -30,9 +30,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.gson.GsonBuilder;
-
-import io.searchbox.client.AbstractJestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.mapping.GetMapping;
 
@@ -165,7 +162,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 						"'dateOfBirth':{" +
 							"'type':'date'," +
 							"'format':'strict_date_optional_time||epoch_millis'," +
-							"'null_value':" + toGsonDateString("1970-01-01+00:00") +
+							"'null_value': '" + toElasticsearchDateHelperDateString("1970-01-01+00:00") + "'" +
 						"}," +
 						"'driveWidth':{" +
 							"'type':'integer'," +
@@ -230,7 +227,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 						"'subscriptionEndDate':{" +
 							"'type':'date'," +
 							"'format':'strict_date_optional_time||epoch_millis'," +
-							"'null_value':" + toGsonDateString("1970-01-01+00:00") +
+							"'null_value': '" + toElasticsearchDateHelperDateString("1970-01-01+00:00") + "'" +
 						"}," +
 						"'won_holes':{" +
 							"'properties':{" +
@@ -282,13 +279,13 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 	}
 
 	/*
-	 * Allows generating a date exactly as it would be outputed by GSON. GSON
-	 * internally uses the JVM's timezone to format dates, so the actual output
+	 * Allows generating a date exactly as it would be outputed by the Elasticsearch date Helper.
+	 * This helper internally uses the JVM's timezone to format dates, so the actual output
 	 * depends on the platform and cannot be stored as a constant string.
 	 */
-	private String toGsonDateString(String string) {
+	private String toElasticsearchDateHelperDateString(String string) {
 		Date date = ElasticsearchDateHelper.stringToDate( string );
-		return new GsonBuilder().setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT ).create().toJsonTree( date ).toString();
+		return ElasticsearchDateHelper.dateToString( date );
 	}
 
 	@Test

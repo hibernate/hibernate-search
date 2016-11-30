@@ -11,14 +11,22 @@ import java.time.Year;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericIntegerNullCodec;
+import org.hibernate.search.bridge.spi.EncodingBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Converts a {@link Year} to a {@link Integer}.
  *
  * @author Davide D'Alto
  */
-public class YearBridge implements NumericTimeBridge, TwoWayFieldBridge {
+public class YearBridge implements IgnoreAnalyzerBridge, EncodingBridge, TwoWayFieldBridge {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	public static final YearBridge INSTANCE = new YearBridge();
 
@@ -47,6 +55,16 @@ public class YearBridge implements NumericTimeBridge, TwoWayFieldBridge {
 	@Override
 	public NumericEncodingType getEncodingType() {
 		return NumericEncodingType.INTEGER;
+	}
+
+	@Override
+	public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws NumberFormatException {
+		try {
+			return new NumericIntegerNullCodec( Integer.parseInt( indexNullAs ) );
+		}
+		catch (NumberFormatException e) {
+			throw LOG.invalidNullMarkerForInteger( e );
+		}
 	}
 
 }
