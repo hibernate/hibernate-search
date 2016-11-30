@@ -27,7 +27,14 @@ import org.hibernate.search.annotations.TikaBridge;
 public class Book {
 
 	private Integer id;
-	private Blob content;
+	private Blob contentAsBlob;
+
+	public Book() {
+	}
+
+	public Book(Blob content) {
+		this.contentAsBlob = content;
+	}
 
 	@Id
 	@GeneratedValue
@@ -43,11 +50,11 @@ public class Book {
 	@Basic(fetch = FetchType.LAZY)
 	@Field(indexNullAs = "<NULL>")
 	@TikaBridge
-	public Blob getContent() {
-		return content;
+	public Blob getContentAsBlob() {
+		return contentAsBlob;
 	}
 
-	public void setContent(Blob content) {
-		this.content = content;
+	public void setContentAsBlob(Blob contentAsBlob) {
+		this.contentAsBlob = contentAsBlob;
 	}
 }
