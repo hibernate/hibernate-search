@@ -4,51 +4,48 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.impl.nullencoding;
+package org.hibernate.search.bridge.builtin.nullencoding.impl;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
 
 /**
  * @author Sanne Grinovero
  */
-public class KeywordBasedNullCodec implements NullMarkerCodec {
+public class NumericLongNullCodec implements NullMarkerCodec {
 
-	private final String indexNullAs;
-	private final BytesRef encodedToken;
+	private final Long indexNullAs;
 
-	public KeywordBasedNullCodec(final String indexNullAs) {
+	public NumericLongNullCodec(final Long indexNullAs) throws NumberFormatException {
 		if ( indexNullAs == null ) {
 			throw new NullPointerException( "The constructor parameter is mandatory" );
 		}
 		this.indexNullAs = indexNullAs;
-		this.encodedToken = new BytesRef( indexNullAs );
 	}
 
 	@Override
 	public String nullRepresentedAsString() {
-		return indexNullAs;
+		return indexNullAs.toString();
 	}
 
 	@Override
 	public void encodeNullValue(String name, Document document, LuceneOptions luceneOptions) {
-		luceneOptions.addFieldToDocument( name, indexNullAs, document );
+		luceneOptions.addNumericFieldToDocument( name, indexNullAs, document );
 	}
 
 	@Override
 	public Query createNullMatchingQuery(String fieldName) {
-		return new TermQuery( new Term( fieldName, encodedToken ) );
+		return NumericRangeQuery.newLongRange( fieldName, indexNullAs, indexNullAs, true, true );
 	}
 
 	@Override
 	public boolean representsNullValue(IndexableField field) {
-		String stringValue = field.stringValue();
-		return indexNullAs.equals( stringValue );
+		Number numericValue = field.numericValue();
+		return indexNullAs.equals( numericValue );
 	}
 
 }

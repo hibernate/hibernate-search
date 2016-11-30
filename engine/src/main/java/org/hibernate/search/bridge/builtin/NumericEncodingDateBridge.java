@@ -19,7 +19,13 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
+import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericLongNullCodec;
+import org.hibernate.search.bridge.spi.EncodingBridge;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Bridge a {@code java.util.Date} truncated to the specified resolution to a numerically indexed {@code long}.
@@ -38,7 +44,9 @@ import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class NumericEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
+public class NumericEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge, EncodingBridge {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	public static final TwoWayFieldBridge DATE_YEAR = new NumericEncodingDateBridge( Resolution.YEAR );
 	public static final TwoWayFieldBridge DATE_MONTH = new NumericEncodingDateBridge( Resolution.MONTH );
@@ -95,4 +103,19 @@ public class NumericEncodingDateBridge implements TwoWayFieldBridge, Parameteriz
 	public DateTools.Resolution getResolution() {
 		return resolution;
 	}
+	@Override
+	public NumericEncodingType getEncodingType() {
+		return NumericEncodingType.LONG;
+	}
+
+	@Override
+	public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
+		try {
+			return new NumericLongNullCodec( Long.parseLong( indexNullAs ) );
+		}
+		catch (NumberFormatException e) {
+			throw LOG.invalidNullMarkerForLong( e );
+		}
+	}
+
 }

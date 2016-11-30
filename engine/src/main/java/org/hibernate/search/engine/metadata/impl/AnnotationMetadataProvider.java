@@ -61,28 +61,25 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
-import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
-import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
-import org.hibernate.search.bridge.builtin.time.impl.NumericTimeBridge;
+import org.hibernate.search.bridge.builtin.nullencoding.impl.KeywordBasedNullCodec;
+import org.hibernate.search.bridge.builtin.nullencoding.impl.NotEncodingCodec;
 import org.hibernate.search.bridge.impl.BridgeFactory;
+import org.hibernate.search.bridge.spi.EncodingBridge;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
-import org.hibernate.search.engine.impl.nullencoding.KeywordBasedNullCodec;
-import org.hibernate.search.engine.impl.nullencoding.NotEncodingCodec;
-import org.hibernate.search.engine.impl.nullencoding.NullMarkerCodec;
-import org.hibernate.search.engine.impl.nullencoding.NumericNullEncodersHelper;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManagerType;
@@ -1268,7 +1265,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		final NumericEncodingType numericEncodingType = determineNumericFieldEncoding( fieldBridge );
-		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldAnnotation, configContext, numericEncodingType, fieldPath );
+		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldBridge, fieldAnnotation, configContext, fieldPath );
 		if ( nullTokenCodec != NotEncodingCodec.SINGLETON && fieldBridge instanceof TwoWayFieldBridge ) {
 			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
 		}
@@ -1394,46 +1391,19 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private NumericEncodingType determineNumericFieldEncoding(FieldBridge fieldBridge) {
-		if ( fieldBridge instanceof ContainerBridge ) {
-			fieldBridge = ( (ContainerBridge) fieldBridge ).getElementBridge();
-		}
+		EncodingBridge encodingBridge = BridgeAdaptorUtils.unwrapAdaptorAndContainer( fieldBridge, EncodingBridge.class );
 
-		if ( fieldBridge instanceof NumericFieldBridge ) {
-			NumericFieldBridge numericFieldBridge = (NumericFieldBridge) fieldBridge;
-			switch ( numericFieldBridge ) {
-				case BYTE_FIELD_BRIDGE:
-				case SHORT_FIELD_BRIDGE:
-				case INT_FIELD_BRIDGE: {
-					return NumericEncodingType.INTEGER;
-				}
-				case LONG_FIELD_BRIDGE: {
-					return NumericEncodingType.LONG;
-				}
-				case DOUBLE_FIELD_BRIDGE: {
-					return NumericEncodingType.DOUBLE;
-				}
-				case FLOAT_FIELD_BRIDGE: {
-					return NumericEncodingType.FLOAT;
-				}
-				default: {
-					return NumericEncodingType.UNKNOWN;
-				}
-			}
+		if ( encodingBridge != null ) {
+			return encodingBridge.getEncodingType();
 		}
-
-		if ( fieldBridge instanceof NumericEncodingDateBridge ) {
-			return NumericEncodingType.LONG;
+		else {
+			return NumericEncodingType.UNKNOWN;
 		}
-
-		if ( fieldBridge instanceof NumericTimeBridge ) {
-			return ( (NumericTimeBridge) fieldBridge ).getEncodingType();
-		}
-
-		return NumericEncodingType.UNKNOWN;
 	}
 
-	private NullMarkerCodec determineNullMarkerCodec(org.hibernate.search.annotations.Field fieldAnnotation,
-			ConfigContext context, NumericEncodingType numericEncodingType, DocumentFieldPath fieldPath) {
+	private NullMarkerCodec determineNullMarkerCodec(FieldBridge fieldBridge,
+			org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context,
+			DocumentFieldPath fieldPath) {
 		if ( fieldAnnotation == null ) {
 			// The option of null-markers is not being used
 			return NotEncodingCodec.SINGLETON;
@@ -1444,24 +1414,30 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			// The option is explicitly disabled
 			return NotEncodingCodec.SINGLETON;
 		}
-		else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN )
-				&& numericEncodingType == NumericEncodingType.UNKNOWN ) {
-			// Keyword based, using the default null-token keyword
-			return new KeywordBasedNullCodec( context.getDefaultNullToken() );
-		}
-		else if ( numericEncodingType == NumericEncodingType.UNKNOWN ) {
-			// Keyword based, with a selected custom null-token keyword
-			return new KeywordBasedNullCodec( indexNullAs );
-		}
 		else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
-			// A Numeric Encoding, but still using the default token
-			// this will require the global default to be configured to use a numeric-encodeable value
-			return NumericNullEncodersHelper.createNumericNullMarkerCodec( numericEncodingType, context.getDefaultNullToken(), fieldPath );
+			// Use the default null token
+			// This will require the global default to be an encodable value
+			return createNullMarkerCodec( fieldBridge, context.getDefaultNullToken(), fieldPath );
 		}
 		else {
-			// In this last remaining case, a Numeric Encoding is being used.
-			// this will require a numeric-encodeable value for 'indexNullAs'
-			return NumericNullEncodersHelper.createNumericNullMarkerCodec( numericEncodingType, indexNullAs, fieldPath );
+			// Use the default null token
+			// This will require 'indexNullAs' to be an encodable value
+			return createNullMarkerCodec( fieldBridge, indexNullAs, fieldPath );
+		}
+	}
+
+	private NullMarkerCodec createNullMarkerCodec(FieldBridge fieldBridge, String marker, DocumentFieldPath path) {
+		EncodingBridge encodingBridge = BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, EncodingBridge.class );
+		if ( encodingBridge != null ) {
+			try {
+				return encodingBridge.createNullMarkerCodec( marker );
+			}
+			catch (IllegalArgumentException e) {
+				throw log.nullMarkerInvalidFormat( marker, path.getAbsoluteName(), e.getLocalizedMessage(), e );
+			}
+		}
+		else {
+			return new KeywordBasedNullCodec( marker );
 		}
 	}
 
