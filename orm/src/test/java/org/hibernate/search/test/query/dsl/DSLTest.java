@@ -744,6 +744,25 @@ public class DSLTest extends SearchTestBase {
 
 		transaction.commit();
 	}
+	
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2479")
+	public void testPhraseQueryTermCreation() throws Exception {
+		String testCaseText = "Test the Test test of your test test to test test test of test and Test budgeting.";
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb
+				.phrase()
+					.onField( "mythology" )
+					.sentence( testCaseText )
+					.createQuery();
+
+		assertEquals( "test term ordering", 0, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+		
+		transaction.commit();
+	}
 
 	@Test
 	public void testPhraseQueryWithStopWords() throws Exception {
