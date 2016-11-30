@@ -36,7 +36,7 @@ class TikaBridgeProvider extends ExtendedBridgeProvider {
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
 		if ( annotatedElement.isAnnotationPresent( TikaBridge.class ) ) {
-			Class<?> returnType = context.getReturnType();
+			Class<?> returnType = context.getElementOrContainerReturnType();
 			if ( ! Blob.class.isAssignableFrom( returnType )
 					&& ! byte[].class.isAssignableFrom( returnType )
 					&& ! String.class.isAssignableFrom( returnType )

@@ -58,5 +58,13 @@ public abstract class ExtendedBridgeProvider implements BridgeProvider {
 		 * not.
 		 */
 		boolean isExplicitlyMarkedAsNumeric();
+
+		/**
+		 * Returns the type of the indexed member/property; it works for arrays and collections too.
+		 *
+		 * @see #getReturnType()
+		 * @return the type of the indexed member
+		 */
+		Class<?> getElementOrContainerReturnType();
 	}
 }
