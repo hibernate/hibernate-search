@@ -34,7 +34,8 @@ public interface BridgeProvider {
 	interface BridgeProviderContext {
 
 		/**
-		 * Returns the type of the indexed member/property.
+		 * Returns the type of the indexed member/property;
+		 * for arrays and collections, returns the type of the contained elements.
 		 *
 		 * @return the type of the indexed member
 		 */
