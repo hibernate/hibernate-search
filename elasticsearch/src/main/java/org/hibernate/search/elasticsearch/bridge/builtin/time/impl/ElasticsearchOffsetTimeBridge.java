@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.elasticsearch.bridge.builtin.time.impl;
 
+import java.time.DateTimeException;
 import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
+
+import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Converts a {@link OffsetTime} to a {@link String} in Elasticsearch's "strict_time" format.
@@ -22,6 +25,8 @@ import java.util.Locale;
  * @author Yoann Rodiere
  */
 public class ElasticsearchOffsetTimeBridge extends ElasticsearchTemporalAccessorStringBridge<OffsetTime> {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.append( ElasticsearchLocalTimeBridge.FORMATTER )
@@ -36,7 +41,12 @@ public class ElasticsearchOffsetTimeBridge extends ElasticsearchTemporalAccessor
 	}
 
 	@Override
-	OffsetTime parse(DateTimeFormatter formatter, String stringValue) throws DateTimeParseException {
+	OffsetTime parse(DateTimeFormatter formatter, String stringValue) throws DateTimeException {
 		return OffsetTime.parse( stringValue, formatter );
+	}
+
+	@Override
+	protected IllegalArgumentException createInvalidIndexNullAsException(String indexNullAs, DateTimeException e) {
+		return LOG.invalidNullMarkerForOffsetTime( e );
 	}
 }
