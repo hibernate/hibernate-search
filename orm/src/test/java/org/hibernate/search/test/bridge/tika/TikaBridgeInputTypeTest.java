@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  * @author Hardy Ferentschik
  */
-public class TikaBridgeBlobSupportTest extends SearchTestBase {
+public class TikaBridgeInputTypeTest extends SearchTestBase {
 	private static final String TEST_DOCUMENT_PDF = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
 
 	@Rule
