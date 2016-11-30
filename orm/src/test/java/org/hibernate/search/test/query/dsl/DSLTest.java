@@ -760,7 +760,7 @@ public class DSLTest extends SearchTestBase {
 					.createQuery();
 
 		assertEquals( "test term ordering", 0, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-		
+
 		transaction.commit();
 	}
 
