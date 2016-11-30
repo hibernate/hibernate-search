@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Blob;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,19 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 			// input stream of the blob after it was persisted into the database
 			indexBook( session );
 			searchBook( session, "contentAsBlob" );
+		}
+	}
+
+	@Test
+	public void testDefaultTikaBridgeWithByteArray() throws Exception {
+		try ( Session session = openSession() ) {
+			byte[] content = dataAsBytes( testDocumentPdf.get() );
+
+			persistBook( session, new Book( content ) );
+			persistBook( session, new Book() );
+
+			indexBook( session );
+			searchBook( session, "contentAsBytes" );
 		}
 	}
 
@@ -139,5 +153,9 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 	private Blob dataAsBlob(File file, Session session) throws IOException {
 		FileInputStream in = FileUtils.openInputStream( file );
 		return session.getLobHelper().createBlob( in, file.length() );
+	}
+
+	private byte[] dataAsBytes(File file) throws IOException {
+		return Files.readAllBytes( file.toPath() );
 	}
 }

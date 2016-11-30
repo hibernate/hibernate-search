@@ -28,12 +28,17 @@ public class Book {
 
 	private Integer id;
 	private Blob contentAsBlob;
+	private byte[] contentAsBytes;
 
 	public Book() {
 	}
 
 	public Book(Blob content) {
 		this.contentAsBlob = content;
+	}
+
+	public Book(byte[] content) {
+		this.contentAsBytes = content;
 	}
 
 	@Id
@@ -56,5 +61,17 @@ public class Book {
 
 	public void setContentAsBlob(Blob contentAsBlob) {
 		this.contentAsBlob = contentAsBlob;
+	}
+
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+	@Field(indexNullAs = "<NULL>")
+	@TikaBridge
+	public byte[] getContentAsBytes() {
+		return contentAsBytes;
+	}
+
+	public void setContentAsBytes(byte[] contentAsBytes) {
+		this.contentAsBytes = contentAsBytes;
 	}
 }
