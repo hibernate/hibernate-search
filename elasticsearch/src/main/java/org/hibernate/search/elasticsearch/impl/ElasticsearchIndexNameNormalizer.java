@@ -20,12 +20,6 @@ public class ElasticsearchIndexNameNormalizer {
 
 	public static String getElasticsearchIndexName(String indexName) {
 		String esIndexName = indexName.toLowerCase( Locale.ENGLISH );
-		if ( !esIndexName.equals( indexName ) ) {
-			// TODO LOG (not sure a log is useful if we validate everything at bootstrap.)
-			// TODO HSEARCH-2258 if index lowercasing introduces a possible ambiguity in the ES case, maybe we should validate for this
-			// at the root of all IndexManagers during bootstrap?
-		}
-
 		return esIndexName;
 	}
 }
