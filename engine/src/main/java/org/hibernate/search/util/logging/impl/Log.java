@@ -1003,4 +1003,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 326, value = "Index names collision detected. Different index managers will point to the same actual index: %1$s")
 	SearchException indexNamesCollisionDetected(String string);
 
+	@Message(id = 327, value = "Unsupported indexNullAs token type '%3$s' on field '%2$s' of entity '%1$s'." )
+	SearchException unsupportedNullTokenType(Class<?> entityType, String fieldName, Class<?> tokenType);
+
 }

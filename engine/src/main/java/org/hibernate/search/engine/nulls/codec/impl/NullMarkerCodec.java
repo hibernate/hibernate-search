@@ -4,12 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.bridge.spi;
+package org.hibernate.search.engine.nulls.codec.impl;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.spi.NullMarker;
 
 /**
  * Contract to manage coding and decoding (querying) of null values.
@@ -20,18 +21,13 @@ import org.hibernate.search.bridge.LuceneOptions;
  * Also the strategy to find a match for such a null-encoded value might vary.
  *
  * @author Sanne Grinovero
- * @hsearch.experimental This contract is currently under active development and may be altered in future releases,
- * breaking existing users.
  */
 public interface NullMarkerCodec {
 
 	/**
-	 * This is mostly a requirement for integration with other old-style
-	 * contracts which expect a strongly String based strategy.
-	 *
-	 * @return a string representation of the null-marker, or null if no marker is used.
+	 * @return The null marker used by this codec.
 	 */
-	String nullRepresentedAsString();
+	NullMarker getNullMarker();
 
 	/**
 	 * Store the null marker in the Document.
@@ -44,19 +40,19 @@ public interface NullMarkerCodec {
 	void encodeNullValue(String fieldName, Document document, LuceneOptions luceneOptions);
 
 	/**
-	 * Create a Query to find all documents which have a 'null' value encoded in the specified field
-	 *
-	 * @param fieldName the field to target with the Query
-	 * @return a new Lucene Query
-	 */
-	Query createNullMatchingQuery(String fieldName);
-
-	/**
 	 * Check if the field represents the encoding for a null element
 	 *
 	 * @param field the fields to check
 	 * @return true if the field argument is representing the encoding for a null element.
 	 */
 	boolean representsNullValue(IndexableField field);
+
+	/**
+	 * Create a Query to find all documents which have a 'null' value encoded in the specified field
+	 *
+	 * @param fieldName the field to target with the Query
+	 * @return a new Lucene Query
+	 */
+	Query createNullMatchingQuery(String fieldName);
 
 }

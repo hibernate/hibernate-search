@@ -51,6 +51,16 @@ public class ParseContext {
 	}
 
 	/**
+	 * If the {@code IndexManager} type is not defined, we skip the {@code NullMarkerCodec} construction.
+	 *
+	 * Typically the {@code IndexManager} type is not defined when building the metadata for {@code ContainedIn}
+	 * entities. See {@link MetadataProvider#getTypeMetadataForContainedIn(Class)} for more information.
+	 */
+	boolean skipNullMarkerCodec() {
+		return indexManagerType == null;
+	}
+
+	/**
 	 * If the {@code IndexManager} type is not defined, we skip the {@code Analyzer} construction.
 	 *
 	 * Typically the {@code IndexManager} type is not defined when building the metadata for {@code ContainedIn}
