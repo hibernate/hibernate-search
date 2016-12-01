@@ -267,7 +267,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			);
 		}
 
-		DocumentFieldMetadata fieldMetadata =
+		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
 						propertyMetadataBuilder.getResultReference(),
@@ -275,8 +275,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						)
 						.boost( AnnotationProcessingHelper.getBoost( member, null ) )
 						.fieldBridge( fieldBridge )
-						.idInEmbedded()
-						.build();
+						.idInEmbedded();
+
+		NumericEncodingType numericEncodingType = determineNumericFieldEncoding( fieldBridge );
+		if ( numericEncodingType != NumericEncodingType.UNKNOWN ) {
+			fieldMetadataBuilder.numeric();
+			fieldMetadataBuilder.numericEncodingType( numericEncodingType );
+		}
+
+		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
 
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
