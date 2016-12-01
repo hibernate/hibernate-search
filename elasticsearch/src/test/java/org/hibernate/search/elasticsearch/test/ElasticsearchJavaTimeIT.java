@@ -35,7 +35,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.elasticsearch.impl.IndexNameNormalizer;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
@@ -269,7 +269,7 @@ public class ElasticsearchJavaTimeIT extends SearchTestBase {
 				JestClient client = reference.get();
 				SearchResult result = client.executeRequest(
 						new io.searchbox.core.Search.Builder( "{\"query\":{\"match_all\":{}},\"fields\":[\"_source\", \"" + field + "\"]}" )
-								.addIndex( IndexNameNormalizer.getElasticsearchIndexName( Sample.class.getName() ) )
+								.addIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( Sample.class.getName() ) )
 								.build()
 						);
 

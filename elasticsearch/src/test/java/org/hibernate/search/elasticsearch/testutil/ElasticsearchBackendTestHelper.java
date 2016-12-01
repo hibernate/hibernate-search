@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
-import org.hibernate.search.elasticsearch.impl.IndexNameNormalizer;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -66,7 +66,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
 			Count request = new Count.Builder()
-					.addIndex( IndexNameNormalizer.getElasticsearchIndexName( indexName ) )
+					.addIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.build();
 
 			CountResult response = client.get().executeRequest( request );
@@ -82,7 +82,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
 			Count request = new Count.Builder()
-					.addIndex( IndexNameNormalizer.getElasticsearchIndexName( indexName ) )
+					.addIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.query( "{ \"query\" : { \"" + query + "\" : { \"" + fieldName + "\" : \"" + value + "\" } } }" )
 					.build();
 

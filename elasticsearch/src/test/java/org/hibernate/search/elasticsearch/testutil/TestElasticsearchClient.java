@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.impl.DefaultGsonService;
-import org.hibernate.search.elasticsearch.impl.IndexNameNormalizer;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -50,11 +50,11 @@ public class TestElasticsearchClient extends ExternalResource {
 	private final List<String> createdIndicesNames = Lists.newArrayList();
 
 	public void deleteAndCreateIndex(Class<?> rootClass) throws IOException {
-		deleteAndCreateIndex( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
+		deleteAndCreateIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
 	}
 
 	public void registerForCleanup(Class<?> rootClass) {
-		createdIndicesNames.add( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
+		createdIndicesNames.add( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
 	}
 
 	public void putMapping(Class<?> mappedAndRootClass, String mappingJson) throws IOException {
@@ -66,7 +66,7 @@ public class TestElasticsearchClient extends ExternalResource {
 	}
 
 	public void putMapping(Class<?> rootClass, Class<?> mappedClass, String mappingJson) throws IOException {
-		putMapping( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), mappingJson );
+		putMapping( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), mappingJson );
 	}
 
 	public String getMapping(String indexName, Class<?> mappedClass) throws IOException {
@@ -78,7 +78,7 @@ public class TestElasticsearchClient extends ExternalResource {
 	}
 
 	public String getMapping(Class<?> rootClass, Class<?> mappedClass) throws IOException {
-		return getMapping( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName() );
+		return getMapping( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName() );
 	}
 
 	public void deleteAndCreateIndex(String indexName) throws IOException {
@@ -163,7 +163,7 @@ public class TestElasticsearchClient extends ExternalResource {
 	}
 
 	public void index(Class<?> rootClass, Class<?> mappedClass, String id, String jsonDocument) throws IOException {
-		index( IndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), id, jsonDocument );
+		index( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), id, jsonDocument );
 	}
 
 	public void index(String indexName, String typeName, String id, String jsonDocument) throws IOException {
