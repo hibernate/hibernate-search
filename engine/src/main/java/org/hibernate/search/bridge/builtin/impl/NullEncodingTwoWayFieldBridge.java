@@ -13,9 +13,10 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
+import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -53,7 +54,8 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge, BridgeA
 	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {
-			return nullTokenCodec.nullRepresentedAsString();
+			NullMarker marker = nullTokenCodec.getNullMarker();
+			return marker == null ? null : marker.nullRepresentedAsString();
 		}
 		else {
 			return fieldBridge.objectToString( object );

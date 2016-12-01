@@ -19,10 +19,10 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericLongNullCodec;
 import org.hibernate.search.bridge.spi.EncodingBridge;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.bridge.util.impl.ToStringNullMarker;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -109,9 +109,9 @@ public class NumericEncodingDateBridge implements TwoWayFieldBridge, Parameteriz
 	}
 
 	@Override
-	public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
+	public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
 		try {
-			return new NumericLongNullCodec( Long.parseLong( indexNullAs ) );
+			return new ToStringNullMarker( Long.parseLong( indexNullAs ) );
 		}
 		catch (NumberFormatException e) {
 			throw LOG.invalidNullMarkerForLong( e );

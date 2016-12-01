@@ -7,9 +7,8 @@
 package org.hibernate.search.bridge.util.impl;
 
 import org.hibernate.search.bridge.StringBridge;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.KeywordBasedNullCodec;
 import org.hibernate.search.bridge.spi.EncodingBridge;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 
@@ -34,12 +33,12 @@ public abstract class EncodingStringBridge<T> implements EncodingBridge, StringB
 	protected abstract T parseIndexNullAs(String indexNullAs) throws IllegalArgumentException;
 
 	@Override
-	public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
+	public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
 		// Parse the given "indexNullAs" string
 		T typedValue = parseIndexNullAs( indexNullAs );
 		// Convert the resulting date to the format used when indexing.
 		String encodedValue = objectToString( typedValue );
-		return new KeywordBasedNullCodec( encodedValue );
+		return new ToStringNullMarker( encodedValue );
 	}
 
 }

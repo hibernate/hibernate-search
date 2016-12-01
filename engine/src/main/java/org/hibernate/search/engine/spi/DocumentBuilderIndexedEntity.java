@@ -53,6 +53,7 @@ import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.StringEncodingDateBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.ConfigContext;
@@ -794,11 +795,12 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			if ( fieldMetaData.getIndex() == Index.NO && fieldMetaData.getStore() == Store.NO ) {
 				FieldBridge fieldBridge = fieldMetaData.getFieldBridge();
 
+				NullMarker nullMarker = fieldMetaData.getNullMarkerCodec().getNullMarker();
 				LuceneOptionsImpl luceneOptions = new LuceneOptionsImpl(
 						Index.NOT_ANALYZED,
 						fieldMetaData.getTermVector(),
 						fieldMetaData.getStore(),
-						fieldMetaData.getNullMarkerCodec().nullRepresentedAsString(),
+						nullMarker == null ? null : nullMarker.nullRepresentedAsString(),
 						fieldMetaData.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( propertyValue ),
 						documentBoost
 				);

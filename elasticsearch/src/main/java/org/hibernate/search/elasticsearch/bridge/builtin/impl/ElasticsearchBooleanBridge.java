@@ -7,9 +7,12 @@
 package org.hibernate.search.elasticsearch.bridge.builtin.impl;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.EncodingBridge;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
-import org.hibernate.search.bridge.util.impl.EncodingStringBridge;
+import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.bridge.util.impl.ToStringNullMarker;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -22,7 +25,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sylvain Vieujot
  * @author Yoann Rodiere
  */
-public class ElasticsearchBooleanBridge extends EncodingStringBridge<Boolean> implements TwoWayStringBridge, IgnoreAnalyzerBridge {
+public class ElasticsearchBooleanBridge implements EncodingBridge, TwoWayStringBridge, IgnoreAnalyzerBridge {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -48,6 +51,10 @@ public class ElasticsearchBooleanBridge extends EncodingStringBridge<Boolean> im
 	}
 
 	@Override
+	public NumericEncodingType getEncodingType() {
+		return NumericEncodingType.UNKNOWN;
+	}
+
 	protected Boolean parseIndexNullAs(String indexNullAs) throws IllegalArgumentException {
 		if ( Boolean.TRUE.toString().equals( indexNullAs ) ) {
 			return Boolean.TRUE;
@@ -58,5 +65,11 @@ public class ElasticsearchBooleanBridge extends EncodingStringBridge<Boolean> im
 		else {
 			throw LOG.invalidNullMarkerForBoolean();
 		}
+	}
+
+	@Override
+	public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
+		Boolean booleanValue = parseIndexNullAs( indexNullAs );
+		return new ToStringNullMarker( booleanValue );
 	}
 }

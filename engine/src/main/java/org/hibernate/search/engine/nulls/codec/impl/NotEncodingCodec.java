@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.bridge.builtin.nullencoding.impl;
+package org.hibernate.search.engine.nulls.codec.impl;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.spi.NullMarker;
 
 /**
  * Implementation of NullMarkerCodec which implements the no-op strategy
@@ -20,14 +20,19 @@ import org.hibernate.search.bridge.spi.NullMarkerCodec;
  */
 public class NotEncodingCodec implements NullMarkerCodec {
 
-	public static final NotEncodingCodec SINGLETON = new NotEncodingCodec();
+	public static final NotEncodingCodec SINGLETON = new NotEncodingCodec() {
+		@Override
+		public String toString() {
+			return getClass().getSimpleName() + ".SINGLETON";
+		}
+	};
 
 	private NotEncodingCodec() {
 		// do not instantiate, use the SINGLETON
 	}
 
 	@Override
-	public String nullRepresentedAsString() {
+	public NullMarker getNullMarker() {
 		return null;
 	}
 
