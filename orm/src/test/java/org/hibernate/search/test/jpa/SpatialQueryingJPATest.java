@@ -105,6 +105,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( 15.0636, (Double) fourthResult[1], 0.01 );
 		Assert.assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
 		Assert.assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
+		em.getTransaction().commit();
 
 		em.close();
 	}
@@ -151,7 +152,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertNull( firstResult[1] );
 		Assert.assertNull( secondResult[1] );
 		Assert.assertNull( thirdResult[1] );
-
+		em.getTransaction().commit();
 		em.close();
 	}
 
@@ -221,6 +222,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( 10.1582, (Double) fifthResult[1], 0.01 );
 		Assert.assertEquals( 0.0, (Double) sixthResult[1], 0.01 );
 
+		em.getTransaction().commit();
 		em.close();
 	}
 
@@ -247,7 +249,6 @@ public class SpatialQueryingJPATest extends JPATestCase {
 			++cnt;
 		}
 		em.getTransaction().commit();
-
 
 		em.getTransaction().begin();
 		double centerLatitude = 50.7753455;
@@ -278,6 +279,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 			Assert.assertThat( message, ( (Double) result[1] ).doubleValue(), is( not( 0.0 ) ) );
 		}
 
+		em.getTransaction().commit();
 		em.close();
 	}
 
@@ -320,6 +322,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		secondResult = (Object[]) results.get( 1 );
 		Assert.assertNull( firstResult[1] );
 		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
+		em.getTransaction().commit();
 
 		em.close();
 	}
@@ -371,6 +374,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertNull( firstResult[1] );
 		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
 
+		em.getTransaction().commit();
 		em.close();
 	}
 
@@ -420,6 +424,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( 10.1582, (Double) secondResult[1], 0.01 );
 		Assert.assertEquals( 11.1195, (Double) thirdResult[1], 0.01 );
 
+		em.getTransaction().commit();
 		em.close();
 	}
 
@@ -494,6 +499,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		Assert.assertEquals( (Double) fifthResult[1], 22.239, 0.02 );
 		Assert.assertEquals( (Double) sixthResult[1], 24.446, 0.02 );
 
+		em.getTransaction().commit();
 		em.close();
 	}
 
