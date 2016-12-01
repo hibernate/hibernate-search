@@ -10,7 +10,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -18,6 +17,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchEntityHelper;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata.Container;
@@ -26,8 +26,6 @@ import org.hibernate.search.engine.nesting.impl.NestingContextFactory;
 import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.engine.nesting.impl.NoOpNestingContext;
 import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.impl.CollectionHelper;
 
@@ -59,28 +57,12 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 			ContextCreationStrategy strategy = strategies.get( indexedEntityType.getName() );
 
 			if ( strategy == null ) {
-				strategy = isMappedToElasticsearch( indexedEntityType ) ? ContextCreationStrategy.ES : ContextCreationStrategy.NO_OP;
+				strategy = ElasticsearchEntityHelper.isMappedToElasticsearch( searchIntegrator, indexedEntityType )
+						? ContextCreationStrategy.ES : ContextCreationStrategy.NO_OP;
 				strategies.putIfAbsent( indexedEntityType.getName(), strategy );
 			}
 
 			return strategy.create();
-		}
-
-		private boolean isMappedToElasticsearch(Class<?> entityType) {
-			Set<Class<?>> queriedEntityTypesWithSubTypes = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
-
-			for ( Class<?> queriedEntityType : queriedEntityTypesWithSubTypes ) {
-				EntityIndexBinding binding = searchIntegrator.getIndexBinding( queriedEntityType );
-				IndexManager[] indexManagers = binding.getIndexManagers();
-
-				for ( IndexManager indexManager : indexManagers ) {
-					if ( indexManager instanceof ElasticsearchIndexManager ) {
-						return true;
-					}
-				}
-			}
-
-			return false;
 		}
 	}
 
