@@ -41,6 +41,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.indexes.spi.IndexNameNormalizer;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -51,7 +52,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Gunnar Morling
  */
-public class ElasticsearchIndexManager implements IndexManager {
+public class ElasticsearchIndexManager implements IndexManager, IndexNameNormalizer {
 
 	static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -356,6 +357,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 		// no-op
 	}
 
+	@Override
 	public String getActualIndexName() {
 		return actualIndexName;
 	}

@@ -1000,4 +1000,7 @@ public interface Log extends BasicLogger {
 			+ " Could not parse '%1$s'." )
 	SearchException nullMarkerInvalidFormat(String proposedTokenValue, String fieldName, String invalidFormatMessage, @Cause Exception e);
 
+	@Message(id = 326, value = "Index names collision detected. Different index managers will point to the same actual index: %1$s")
+	SearchException indexNamesCollisionDetected(String string);
+
 }
