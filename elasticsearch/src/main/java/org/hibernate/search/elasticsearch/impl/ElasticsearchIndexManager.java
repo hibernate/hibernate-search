@@ -114,7 +114,7 @@ public class ElasticsearchIndexManager implements IndexManager {
 		this.schemaValidator = serviceManager.requestService( ElasticsearchSchemaValidator.class );
 		this.schemaTranslator = serviceManager.requestService( ElasticsearchSchemaTranslator.class );
 
-		this.actualIndexName = IndexNameNormalizer.getElasticsearchIndexName( this.indexName );
+		this.actualIndexName = ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( this.indexName );
 		this.refreshAfterWrite = getRefreshAfterWrite( properties );
 
 		this.similarity = similarity;

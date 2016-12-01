@@ -13,9 +13,9 @@ import java.util.Locale;
  *
  * @author Gunnar Morling
  */
-public class IndexNameNormalizer {
+public class ElasticsearchIndexNameNormalizer {
 
-	private IndexNameNormalizer() {
+	private ElasticsearchIndexNameNormalizer() {
 	}
 
 	public static String getElasticsearchIndexName(String indexName) {
