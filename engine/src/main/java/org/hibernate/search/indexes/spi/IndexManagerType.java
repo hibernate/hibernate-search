@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.indexes.spi;
 
+import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
+
 /**
  * Since Hibernate Search supports different types of indexing and query technologies,
  * such as embedding Apache Lucene or remote via Elasticsearch, the type of
@@ -32,4 +34,9 @@ public interface IndexManagerType {
 	 * The strategy of analyzer execution employed by index managers of this family.
 	 */
 	AnalyzerExecutionStrategy getAnalyzerExecutionStrategy();
+
+	/**
+	 * The strategy for missing values employed by index managers of this family.
+	 */
+	MissingValueStrategy getMissingValueStrategy();
 }

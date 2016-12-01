@@ -26,11 +26,11 @@ public interface MetadataProvider {
 	/**
 	 * Returns the {@code ContainedIn} related metadata for the specified type.
 	 *
-	 * The metadata for {@code ContainedIn} are not comprehensive: they do not
-	 * contain the information about the FieldBridges and the analyzers.
-	 * We can't build these information because classes only marked with
+	 * <p>The metadata for {@code ContainedIn} are not comprehensive: they do not
+	 * contain the information about the FieldBridges, the analyzers or the NullMarkerCodecs.
+	 * <p>We can't build these information because classes only marked with
 	 * {@code ContainedIn} are not tied to an {@code IndexManager}.
-	 * It's of no use for {@code ContainedIn} resolution anyway.
+	 * <p>It's of no use for {@code ContainedIn} resolution anyway.
 	 *
 	 * @param clazz The type of interest.
 	 *

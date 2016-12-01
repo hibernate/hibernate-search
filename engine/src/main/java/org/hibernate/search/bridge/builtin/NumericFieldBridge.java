@@ -11,13 +11,10 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericDoubleNullCodec;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericFloatNullCodec;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericIntegerNullCodec;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericLongNullCodec;
 import org.hibernate.search.bridge.spi.EncodingBridge;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.bridge.util.impl.ToStringNullMarker;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -51,8 +48,8 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, Encodi
 		}
 
 		@Override
-		public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
-			return INT_FIELD_BRIDGE.createNullMarkerCodec( indexNullAs );
+		public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
+			return INT_FIELD_BRIDGE.createNullMarker( indexNullAs );
 		}
 	},
 	/**
@@ -76,8 +73,8 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, Encodi
 		}
 
 		@Override
-		public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
-			return INT_FIELD_BRIDGE.createNullMarkerCodec( indexNullAs );
+		public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
+			return INT_FIELD_BRIDGE.createNullMarker( indexNullAs );
 		}
 	},
 	/**
@@ -90,9 +87,9 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, Encodi
 		}
 
 		@Override
-		public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
+		public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
 			try {
-				return new NumericIntegerNullCodec( Integer.parseInt( indexNullAs ) );
+				return new ToStringNullMarker( Integer.parseInt( indexNullAs ) );
 			}
 			catch (NumberFormatException e) {
 				throw LOG.invalidNullMarkerForInteger( e );
@@ -109,9 +106,9 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, Encodi
 		}
 
 		@Override
-		public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
+		public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
 			try {
-				return new NumericFloatNullCodec( Float.parseFloat( indexNullAs ) );
+				return new ToStringNullMarker( Float.parseFloat( indexNullAs ) );
 			}
 			catch (NumberFormatException e) {
 				throw LOG.invalidNullMarkerForFloat( e );
@@ -128,9 +125,9 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, Encodi
 		}
 
 		@Override
-		public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
+		public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
 			try {
-				return new NumericDoubleNullCodec( Double.parseDouble( indexNullAs ) );
+				return new ToStringNullMarker( Double.parseDouble( indexNullAs ) );
 			}
 			catch (NumberFormatException e) {
 				throw LOG.invalidNullMarkerForDouble( e );
@@ -147,9 +144,9 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge, Encodi
 		}
 
 		@Override
-		public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
+		public NullMarker createNullMarker(String indexNullAs) throws IllegalArgumentException {
 			try {
-				return new NumericLongNullCodec( Long.parseLong( indexNullAs ) );
+				return new ToStringNullMarker( Long.parseLong( indexNullAs ) );
 			}
 			catch (NumberFormatException e) {
 				throw LOG.invalidNullMarkerForLong( e );

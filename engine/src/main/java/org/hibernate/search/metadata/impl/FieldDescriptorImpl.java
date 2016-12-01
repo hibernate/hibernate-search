@@ -15,6 +15,7 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.FieldDescriptor;
@@ -49,7 +50,8 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		this.termVector = determineTermVectorType( documentFieldMetadata.getTermVector() );
 		this.norms = determineNormsType( documentFieldMetadata.getIndex() );
 		this.boost = documentFieldMetadata.getBoost();
-		this.indexNullAs = documentFieldMetadata.getNullMarkerCodec().nullRepresentedAsString();
+		NullMarker nullMarker = documentFieldMetadata.getNullMarkerCodec().getNullMarker();
+		this.indexNullAs = nullMarker == null ? null : nullMarker.nullRepresentedAsString();
 		this.analyzer = initAnalyzer( documentFieldMetadata );
 		this.fieldBridge = documentFieldMetadata.getFieldBridge();
 		this.fieldType = determineFieldType( documentFieldMetadata );

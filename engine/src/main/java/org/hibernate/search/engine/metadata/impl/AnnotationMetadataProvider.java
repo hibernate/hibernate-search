@@ -68,18 +68,20 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.KeywordBasedNullCodec;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NotEncodingCodec;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.spi.EncodingBridge;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.bridge.util.impl.ToStringNullMarker;
 import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
+import org.hibernate.search.engine.nulls.codec.impl.NotEncodingCodec;
+import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
+import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManagerType;
@@ -1272,7 +1274,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		final NumericEncodingType numericEncodingType = determineNumericFieldEncoding( fieldBridge );
-		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldBridge, fieldAnnotation, configContext, fieldPath );
+		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldBridge, fieldAnnotation, configContext,
+				parseContext, typeMetadataBuilder.getIndexedType(), fieldPath );
 		if ( nullTokenCodec != NotEncodingCodec.SINGLETON && fieldBridge instanceof TwoWayFieldBridge ) {
 			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
 		}
@@ -1410,7 +1413,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private NullMarkerCodec determineNullMarkerCodec(FieldBridge fieldBridge,
 			org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context,
-			DocumentFieldPath fieldPath) {
+			ParseContext parseContext, Class<?> indexedType, DocumentFieldPath fieldPath) {
+		if ( parseContext.skipNullMarkerCodec() ) {
+			return NotEncodingCodec.SINGLETON;
+		}
+
 		if ( fieldAnnotation == null ) {
 			// The option of null-markers is not being used
 			return NotEncodingCodec.SINGLETON;
@@ -1421,30 +1428,38 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			// The option is explicitly disabled
 			return NotEncodingCodec.SINGLETON;
 		}
-		else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
-			// Use the default null token
-			// This will require the global default to be an encodable value
-			return createNullMarkerCodec( fieldBridge, context.getDefaultNullToken(), fieldPath );
-		}
 		else {
-			// Use the default null token
-			// This will require 'indexNullAs' to be an encodable value
-			return createNullMarkerCodec( fieldBridge, indexNullAs, fieldPath );
+			NullMarker nullMarker;
+			if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
+				// Use the default null token
+				// This will require the global default to be an encodable value
+				nullMarker = createNullMarker( fieldBridge, context.getDefaultNullToken(), fieldPath );
+			}
+			else {
+				// Use the default null token
+				// This will require 'indexNullAs' to be an encodable value
+				nullMarker = createNullMarker( fieldBridge, indexNullAs, fieldPath );
+			}
+
+			IndexManagerType indexManagerType = parseContext.getIndexManagerType();
+			MissingValueStrategy missingValueStrategy = indexManagerType.getMissingValueStrategy();
+
+			return missingValueStrategy.createNullMarkerCodec( indexedType, fieldPath, nullMarker );
 		}
 	}
 
-	private NullMarkerCodec createNullMarkerCodec(FieldBridge fieldBridge, String marker, DocumentFieldPath path) {
+	private NullMarker createNullMarker(FieldBridge fieldBridge, String marker, DocumentFieldPath path) {
 		EncodingBridge encodingBridge = BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, EncodingBridge.class );
 		if ( encodingBridge != null ) {
 			try {
-				return encodingBridge.createNullMarkerCodec( marker );
+				return encodingBridge.createNullMarker( marker );
 			}
 			catch (IllegalArgumentException e) {
 				throw log.nullMarkerInvalidFormat( marker, path.getAbsoluteName(), e.getLocalizedMessage(), e );
 			}
 		}
 		else {
-			return new KeywordBasedNullCodec( marker );
+			return new ToStringNullMarker( marker );
 		}
 	}
 
