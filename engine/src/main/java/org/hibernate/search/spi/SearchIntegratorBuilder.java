@@ -8,12 +8,14 @@
 package org.hibernate.search.spi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +63,9 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.indexes.spi.IndexNameNormalizer;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
@@ -356,6 +360,8 @@ public class SearchIntegratorBuilder {
 
 		IndexManagerHolder indexesFactory = factoryState.getAllIndexesManager();
 
+		detectIndexNamesCollisions( indexesFactory.getIndexManagers() );
+
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
 			Class mappedClass = classMappings.get( mappedXClass );
@@ -392,6 +398,8 @@ public class SearchIntegratorBuilder {
 			documentBuildersIndexedEntities.put( mappedClass, entityIndexBinding );
 		}
 
+		detectIndexNamesCollisions( indexesFactory.getIndexManagers() );
+
 		disableBlackListedTypesOptimization(
 				classMappings,
 				optimizationBlackListedTypes,
@@ -401,6 +409,51 @@ public class SearchIntegratorBuilder {
 
 		factoryState.addFilterDefinitions( configContext.initFilters() );
 		factoryState.addAnalyzerReferences( configContext.initLazyAnalyzerReferences( indexesFactory ) );
+	}
+
+	private void detectIndexNamesCollisions(Collection<IndexManager> indexManagers) {
+		Map<String, Set<String>> indexNames = collectIndexNames( indexManagers );
+		validateIndexNames( indexNames );
+	}
+
+	/*
+	 * Returns a map containing the set of index names (as value) that generates the same normalized index name (as key).
+	 */
+	private Map<String, Set<String>> collectIndexNames(Collection<IndexManager> indexManagers) {
+		Map<String, Set<String>> indexNames = new HashMap<>();
+		for ( IndexManager indexManager : indexManagers ) {
+			if ( indexManager instanceof IndexNameNormalizer ) {
+				IndexNameNormalizer normalizer = (IndexNameNormalizer) indexManager;
+				if ( !indexNames.containsKey( normalizer.getActualIndexName() ) ) {
+					indexNames.put( normalizer.getActualIndexName(), new HashSet<String>( 2 ) );
+				}
+				indexNames.get( normalizer.getActualIndexName() ).add( indexManager.getIndexName() );
+			}
+		}
+		return indexNames;
+	}
+
+	/*
+	 * The map contains the set of index names (as value) that generates the same normalized index name (as key).
+	 */
+	private void validateIndexNames(Map<String, Set<String>> indexNames) {
+		StringBuilder builder = new StringBuilder();
+		String separator = "";
+		for ( Entry<String, Set<String>> entry : indexNames.entrySet() ) {
+			if ( entry.getValue().size() > 1 ) {
+				builder.append( separator );
+				builder.append( "(" );
+				builder.append( entry.getValue() );
+				builder.append( " --> " );
+				builder.append( entry.getKey() );
+				builder.append( ")" );
+				separator = ", ";
+			}
+		}
+
+		if ( builder.length() > 0 ) {
+			throw log.indexNamesCollisionDetected( builder.toString() );
+		}
 	}
 
 	/**
