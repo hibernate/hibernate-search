@@ -10,10 +10,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.search.Query;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchEntityHelper;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.spi.BuildContext;
@@ -50,25 +49,7 @@ public class ElasticsearchLuceneQueryTranslator implements LuceneQueryTranslator
 	@Override
 	public boolean conversionRequired(Class<?>... entities) {
 		Set<Class<?>> queriedEntityTypes = getQueriedEntityTypes( entities );
-		Set<Class<?>> queriedEntityTypesWithSubTypes = extendedIntegrator.getIndexedTypesPolymorphic( queriedEntityTypes.toArray( new Class<?>[queriedEntityTypes.size()] ) );
-
-		for ( Class<?> queriedEntityType : queriedEntityTypesWithSubTypes ) {
-			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
-
-			if ( binding == null ) {
-				continue;
-			}
-
-			IndexManager[] indexManagers = binding.getIndexManagers();
-
-			for ( IndexManager indexManager : indexManagers ) {
-				if ( indexManager instanceof ElasticsearchIndexManager ) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return ElasticsearchEntityHelper.isAnyMappedToElasticsearch( extendedIntegrator, queriedEntityTypes );
 	}
 
 	private Set<Class<?>> getQueriedEntityTypes(Class<?>... indexedTargetedEntities) {
