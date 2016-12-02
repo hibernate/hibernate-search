@@ -74,8 +74,10 @@ import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -100,6 +102,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private static final JsonParser JSON_PARSER = new JsonParser();
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, LogCategory.QUERY );
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
 
@@ -295,7 +298,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	 * Stores all information required to execute the query: query string, relevant indices, query parameters, ...
 	 */
 	private class IndexSearcher {
-
 		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
 		private final Map<Class<?>, FieldProjection> idProjectionByEntityType = new HashMap<>();
 		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
@@ -694,6 +696,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 			Search search = builder.build();
+
+			if ( QUERY_LOG.isDebugEnabled() ) {
+				try ( ServiceReference<GsonService> gsonService =
+						extendedIntegrator.getServiceManager().requestReference( GsonService.class ) ) {
+					Gson gson = gsonService.get().getGson();
+					// We use getURI(), but the name is confusing: it's actually the path + query parts of the URL
+					QUERY_LOG.executingElasticsearchQuery( search.getURI(), search.getData( gson ) );
+				}
+			}
+
 			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
 				return client.get().executeRequest( search );
 			}
