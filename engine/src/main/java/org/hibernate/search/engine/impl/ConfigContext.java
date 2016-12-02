@@ -375,7 +375,7 @@ public final class ConfigContext {
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {
 		try {
-			return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion, serviceManager );
+			return AnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion, serviceManager );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Could not initialize Analyzer definition " + analyzerDef, e );
