@@ -40,23 +40,57 @@ import org.junit.Test;
  * @author Hardy Ferentschik
  */
 public class TikaBridgeInputTypeTest extends SearchTestBase {
-	private static final String TEST_DOCUMENT_PDF = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
-	private static final String PATH_TO_TEST_DOCUMENT_PDF;
+	private static final String TEST_DOCUMENT_PDF_1 = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
+	private static final String PATH_TO_TEST_DOCUMENT_PDF_1;
+	private static final String TEST_DOCUMENT_PDF_2 = "/org/hibernate/search/test/bridge/tika/test-document-2.pdf";
+	private static final String PATH_TO_TEST_DOCUMENT_PDF_2;
 
 	static {
 		try {
-			File pdfFile = new File( TikaBridgeInputTypeTest.class.getResource( TEST_DOCUMENT_PDF ).toURI() );
-			PATH_TO_TEST_DOCUMENT_PDF = pdfFile.getAbsolutePath();
+			File pdfFile = new File( TikaBridgeInputTypeTest.class.getResource( TEST_DOCUMENT_PDF_1 ).toURI() );
+			PATH_TO_TEST_DOCUMENT_PDF_1 = pdfFile.getAbsolutePath();
+			pdfFile = new File( TikaBridgeInputTypeTest.class.getResource( TEST_DOCUMENT_PDF_2 ).toURI() );
+			PATH_TO_TEST_DOCUMENT_PDF_2 = pdfFile.getAbsolutePath();
 		}
 		catch (URISyntaxException e) {
-			throw new RuntimeException( "Unable to determine file path for test document" );
+			throw new RuntimeException( "Unable to determine file path for test document", e );
 		}
+	}
+
+	@Test
+	public void testDefaultTikaBridgeWithListOfString() throws Exception {
+		try ( Session session = openSession() ) {
+			String content1 = new File(PATH_TO_TEST_DOCUMENT_PDF_1).getAbsolutePath();
+			String content2 = new File(PATH_TO_TEST_DOCUMENT_PDF_2).getAbsolutePath();
+
+			persistBook( session, new Book( content1, content2 ) );
+
+			indexBook( session );
+
+			List<Book> resultWithLucene = search( session, "contentAsListOfString", "Lucene" );
+			assertEquals( "there should be a match", 1, resultWithLucene.size() );
+
+			List<Book> resultWithTika = search( session, "contentAsListOfString", "Tika" );
+			assertEquals( "there should be a match", 1, resultWithTika.size() );
+		}
+	}
+
+	private List<Book> search(Session session, String field, String keyword) throws ParseException {
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		Transaction transaction = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( field, TestConstants.standardAnalyzer );
+		Query query = parser.parse( keyword );
+		@SuppressWarnings("unchecked")
+		List<Book> result = fullTextSession.createFullTextQuery( query ).list();
+		transaction.commit();
+		fullTextSession.clear();
+		return result;
 	}
 
 	@Test
 	public void testDefaultTikaBridgeWithBlob() throws Exception {
 		try ( Session session = openSession() ) {
-			Blob content = dataAsBlob( new File(PATH_TO_TEST_DOCUMENT_PDF), session );
+			Blob content = dataAsBlob( new File(PATH_TO_TEST_DOCUMENT_PDF_1), session );
 
 			persistBook( session, new Book( content ) );
 			persistBook( session, new Book() );
@@ -71,7 +105,7 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 	@Test
 	public void testDefaultTikaBridgeWithByteArray() throws Exception {
 		try ( Session session = openSession() ) {
-			byte[] content = dataAsBytes( new File(PATH_TO_TEST_DOCUMENT_PDF) );
+			byte[] content = dataAsBytes( new File(PATH_TO_TEST_DOCUMENT_PDF_1) );
 
 			persistBook( session, new Book( content ) );
 			persistBook( session, new Book() );
@@ -84,7 +118,7 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 	@Test
 	public void testDefaultTikaBridgeWithURI() throws Exception {
 		try ( Session session = openSession() ) {
-			URI content = new File(PATH_TO_TEST_DOCUMENT_PDF).toURI();
+			URI content = new File(PATH_TO_TEST_DOCUMENT_PDF_1).toURI();
 
 			persistBook( session, new Book( content ) );
 			persistBook( session, new Book() );
