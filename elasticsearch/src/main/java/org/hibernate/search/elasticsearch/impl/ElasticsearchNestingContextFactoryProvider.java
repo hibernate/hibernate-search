@@ -14,8 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchEntityHelper;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -149,15 +147,7 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 		}
 	}
 
-	private abstract static class MarkerField extends Field {
-
-		public MarkerField() {
-			super( "", new FieldType() );
-		}
-
-	}
-
-	private static final class NestingMarkerField extends MarkerField implements NestingMarker {
+	private static final class NestingMarkerField extends AbstractMarkerField implements NestingMarker {
 
 		private final List<NestingPathComponent> nestingPath;
 
