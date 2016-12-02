@@ -18,7 +18,10 @@ import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
+import org.hibernate.search.bridge.util.impl.EncodingStringBridge;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Bridge a {@code java.util.Calendar} to a {@code String} using the ISO 8601 standard which is the default date format
@@ -28,7 +31,11 @@ import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
  *
  * @author Guillaume Smet
  */
-public class ElasticsearchCalendarBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
+public class ElasticsearchCalendarBridge
+		extends EncodingStringBridge<Calendar>
+		implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	public static final ElasticsearchCalendarBridge DATE_YEAR = new ElasticsearchCalendarBridge( Resolution.YEAR );
 	public static final ElasticsearchCalendarBridge DATE_MONTH = new ElasticsearchCalendarBridge( Resolution.MONTH );
@@ -59,7 +66,7 @@ public class ElasticsearchCalendarBridge implements TwoWayFieldBridge, Parameter
 
 	@Override
 	public Object get(String name, Document document) {
-		return ElasticsearchDateHelper.stringToCalendar( document.get( name ) );
+		return convertFromString( document.get( name ) );
 	}
 
 	@Override
@@ -71,11 +78,25 @@ public class ElasticsearchCalendarBridge implements TwoWayFieldBridge, Parameter
 		return ElasticsearchDateHelper.calendarToString( ElasticsearchDateHelper.round( value, resolution ) );
 	}
 
+	private Calendar convertFromString(String value) {
+		return ElasticsearchDateHelper.stringToCalendar( value );
+	}
+
 	@Override
 	public void setParameterValues(Map<String, String> parameters) {
 		String resolution = parameters.get( "resolution" );
 		Resolution hibResolution = Resolution.valueOf( resolution.toUpperCase( Locale.ENGLISH ) );
 		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
+	}
+
+	@Override
+	protected Calendar parseIndexNullAs(String indexNullAs) throws IllegalArgumentException {
+		try {
+			return convertFromString( indexNullAs );
+		}
+		catch (IllegalArgumentException e) {
+			throw LOG.invalidNullMarkerForCalendarAndDate( e );
+		}
 	}
 
 }

@@ -18,7 +18,10 @@ import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
+import org.hibernate.search.bridge.util.impl.EncodingStringBridge;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Bridge a {@code java.util.Date} to a {@code String} using the ISO 8601 standard which is the default date format
@@ -28,7 +31,11 @@ import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
  *
  * @author Guillaume Smet
  */
-public class ElasticsearchDateBridge implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
+public class ElasticsearchDateBridge
+		extends EncodingStringBridge<Date>
+		implements TwoWayFieldBridge, ParameterizedBridge, IgnoreAnalyzerBridge {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	public static final ElasticsearchDateBridge DATE_YEAR = new ElasticsearchDateBridge( Resolution.YEAR );
 	public static final ElasticsearchDateBridge DATE_MONTH = new ElasticsearchDateBridge( Resolution.MONTH );
@@ -59,7 +66,7 @@ public class ElasticsearchDateBridge implements TwoWayFieldBridge, Parameterized
 
 	@Override
 	public Object get(String name, Document document) {
-		return ElasticsearchDateHelper.stringToDate( document.get( name ) );
+		return convertFromString( document.get( name ) );
 	}
 
 	@Override
@@ -71,10 +78,24 @@ public class ElasticsearchDateBridge implements TwoWayFieldBridge, Parameterized
 		return ElasticsearchDateHelper.dateToString( DateTools.round( value, resolution ) );
 	}
 
+	private Date convertFromString(String value) {
+		return ElasticsearchDateHelper.stringToDate( value );
+	}
+
 	@Override
 	public void setParameterValues(Map<String, String> parameters) {
 		String resolution = parameters.get( "resolution" );
 		Resolution hibResolution = Resolution.valueOf( resolution.toUpperCase( Locale.ENGLISH ) );
 		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
+	}
+
+	@Override
+	protected Date parseIndexNullAs(String indexNullAs) throws IllegalArgumentException {
+		try {
+			return convertFromString( indexNullAs );
+		}
+		catch (IllegalArgumentException e) {
+			throw LOG.invalidNullMarkerForCalendarAndDate( e );
+		}
 	}
 }
