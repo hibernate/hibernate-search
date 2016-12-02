@@ -291,4 +291,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "The given payload is not a valid JSON object." )
 	SearchException invalidSearchAPIPayload(@Cause Exception e);
 
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 53,
+			value = "Executing Elasticsearch query on '%s':\n%s" )
+	void executingElasticsearchQuery(String pathAndQueryAsString, String queryAsString);
+
 }
