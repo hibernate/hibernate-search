@@ -34,8 +34,8 @@ import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass
  * @author Hardy Ferentschik
  */
 final class AnalyzerBuilder {
-	
-	private static final String SOLR_LUCENE_VERSION_PARAM = "luceneMatchVersion";
+
+	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
 	private AnalyzerBuilder() {
 	}
@@ -105,7 +105,7 @@ final class AnalyzerBuilder {
 		for ( Parameter param : params ) {
 			mapOfParams.put( param.name(), param.value() );
 		}
-		mapOfParams.put( SOLR_LUCENE_VERSION_PARAM, luceneMatchVersion.toString() );
+		mapOfParams.put( LUCENE_VERSION_PARAM, luceneMatchVersion.toString() );
 		return mapOfParams;
 	}
 }

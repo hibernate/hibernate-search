@@ -23,11 +23,8 @@ import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the Solr analyzer creation framework.
- * This test might be affected by the version of the Analyzers being used. If it was to fail
- * after an upgrade of a Lucene or Solr version, make sure the new dependency still respects
- * the value Version.LUCENE_30, or update the test (older enum values are eventually deprecated
- * and not enforced anymore).
+ * Tests the analyzer creation framework.
+ * This test might be affected by the version of the Analyzers being used.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
