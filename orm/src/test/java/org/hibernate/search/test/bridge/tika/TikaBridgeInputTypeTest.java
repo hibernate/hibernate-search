@@ -104,7 +104,6 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 		);
 		Query query = parser.parse( "foo" );
 
-
 		List<Book> result = fullTextSession.createFullTextQuery( query ).list();
 		assertEquals( "there should be no match", 0, result.size() );
 
@@ -157,16 +156,15 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 		fullTextSession.clear();
 	}
 
-
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] {
+		return new Class[]{
 				Book.class
 		};
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		super.configure( cfg );
 		cfg.put( Environment.INDEXING_STRATEGY, "manual" );
 	}
