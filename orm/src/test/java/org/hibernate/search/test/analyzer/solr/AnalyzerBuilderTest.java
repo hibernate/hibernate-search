@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class SolrAnalyzerTest extends SearchTestBase {
+public class AnalyzerBuilderTest extends SearchTestBase {
 
 	/**
 	 * Tests that the token filters applied to <code>Team</code> are successfully created and used. Refer to

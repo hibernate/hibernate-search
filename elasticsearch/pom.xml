@@ -221,7 +221,7 @@
                             <excludes>
                                 <!-- HSEARCH-2391 Support -orm/-engine analyzer-related tests in -elasticsearch -->
                                 <exclude>**/CustomAnalyzerInClassBridgeTest.java</exclude>
-                                <exclude>**/SolrAnalyzerTest.java</exclude>
+                                <exclude>**/AnalyzerBuilderTest.java</exclude>
                                 <exclude>**/AnalyzerTest.java</exclude>
                                 <exclude>**/DoubleAnalyzerTest.java</exclude>
                                 <exclude>**/AnalyzerInheritanceTest.java</exclude>
