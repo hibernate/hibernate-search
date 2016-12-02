@@ -212,7 +212,7 @@ public class GolfPlayer {
 
 		private String firstName;
 		private String lastName;
-		private boolean active;
+		private Boolean active;
 		private Date dateOfBirth;
 		private Calendar subscriptionEndDate;
 		private double handicap;
