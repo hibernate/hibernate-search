@@ -26,11 +26,21 @@ public class DefaultGsonService implements GsonService {
 			.serializeNulls()
 			.create();
 
+	private final Gson gsonPrettyPrinting = builderBase()
+			.setPrettyPrinting()
+			.create();
+
 	private final Gson gsonNoSerializeNulls = builderBase()
 			.create();
 
+	@Override
 	public Gson getGson() {
 		return gson;
+	}
+
+	@Override
+	public Gson getGsonPrettyPrinting() {
+		return gsonPrettyPrinting;
 	}
 
 	@Override
