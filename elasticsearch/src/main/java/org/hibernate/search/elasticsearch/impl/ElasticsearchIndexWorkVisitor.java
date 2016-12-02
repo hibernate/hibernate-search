@@ -26,6 +26,7 @@ import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -318,6 +319,13 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				}
 				else {
 					JsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
+
+					// If the value was initially null, explicitly propagate null and let ES handle the default token.
+					if ( field instanceof NullMarker ) {
+						accessor.add( root, null );
+						return;
+					}
+
 					ExtendedFieldType type = FieldHelper.getType( documentFieldMetadata );
 					if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 						FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
@@ -329,19 +337,10 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 						Number numericValue = field.numericValue();
 
 						if ( numericValue != null ) {
-							// If the value was initially null, explicitly propagate null and let ES handle the default token.
-							if ( documentFieldMetadata.getNullMarkerCodec().representsNullValue( field ) ) {
-								numericValue = null;
-							}
 							accessor.add( root, numericValue != null ? new JsonPrimitive( numericValue ) : null );
 						}
 						else {
 							String stringValue = field.stringValue();
-							// If the value was initially null, explicitly propagate null and let ES handle the default token.
-							if ( documentFieldMetadata.getNullMarkerCodec().representsNullValue( field ) ) {
-								stringValue = null;
-							}
-
 							accessor.add( root, stringValue != null ? new JsonPrimitive( stringValue ) : null );
 						}
 					}

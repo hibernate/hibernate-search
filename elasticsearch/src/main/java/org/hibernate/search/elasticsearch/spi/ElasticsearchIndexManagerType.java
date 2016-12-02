@@ -8,7 +8,7 @@ package org.hibernate.search.elasticsearch.spi;
 
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
-import org.hibernate.search.engine.nulls.impl.LuceneMissingValueStrategy;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchMissingValueStrategy;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
 import org.hibernate.search.indexes.spi.IndexManagerType;
@@ -28,7 +28,7 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType, Re
 
 	@Override
 	public MissingValueStrategy getMissingValueStrategy() {
-		return LuceneMissingValueStrategy.INSTANCE;
+		return ElasticsearchMissingValueStrategy.INSTANCE;
 	}
 
 	@Override
