@@ -20,8 +20,6 @@ import java.lang.annotation.Documented;
  * <li>optionally one or more filters</li>
  * </ul>
  * Filters are applied in the order they are defined.
- * <p>
- * Reuses the Solr Tokenizer and Filter architecture.
  *
  * @author Emmanuel Bernard
  */
