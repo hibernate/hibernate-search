@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.bridge.builtin;
 
+import static org.apache.tika.io.IOUtils.closeQuietly;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,24 +24,24 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.WriteOutContentHandler;
+import org.hibernate.search.bridge.ContainerAwareBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.MetadataProvidingTikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaParseContextProvider;
+import org.hibernate.search.bridge.impl.ExtendedBridgeProvider.ExtendedBridgeProviderContext;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.apache.tika.io.IOUtils.closeQuietly;
 
 /**
  * Bridge implementation which uses Apache Tika to extract data from provided input.
  *
  * @author Hardy Ferentschik
  */
-public class TikaBridge implements MetadataProvidingFieldBridge {
+public class TikaBridge implements MetadataProvidingFieldBridge, ContainerAwareBridge {
 	private static final Log log = LoggerFactory.make();
 
 	// Expensive, so only do it once. The Parser is threadsafe.
@@ -197,5 +199,15 @@ public class TikaBridge implements MetadataProvidingFieldBridge {
 		public ParseContext getParseContext(String name, Object value) {
 			return new ParseContext();
 		}
+	}
+
+	@Override
+	public boolean isContainer(ExtendedBridgeProviderContext context) {
+		Class<?> returnType = context.getElementOrContainerReturnType();
+		if ( returnType.isAssignableFrom( byte[].class ) ) {
+			// If the property is of type byte[], we don't want to treat it as a container
+			return false;
+		}
+		return true;
 	}
 }
