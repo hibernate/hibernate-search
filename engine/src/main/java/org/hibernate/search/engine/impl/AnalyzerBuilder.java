@@ -33,10 +33,11 @@ import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-final class SolrAnalyzerBuilder {
+final class AnalyzerBuilder {
+	
 	private static final String SOLR_LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
-	private SolrAnalyzerBuilder() {
+	private AnalyzerBuilder() {
 	}
 
 	/**
