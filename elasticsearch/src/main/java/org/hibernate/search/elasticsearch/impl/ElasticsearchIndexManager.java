@@ -411,6 +411,11 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	}
 
 	@Override
+	public void awaitAsyncProcessingCompletion() {
+		requestProcessor.awaitAsyncProcessingCompletion();
+	}
+
+	@Override
 	public void optimize() {
 		performStreamOperation( OptimizeLuceneWork.INSTANCE, null, false );
 	}

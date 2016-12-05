@@ -104,6 +104,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
+	public void awaitAsyncProcessingCompletion() {
+		//TODO async not implemented
+	}
+
+	@Override
 	public void performOperations(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( log.isDebugEnabled() ) {
 			log.debug( "Applying work via workspace holder of type " + workspaceHolder.getClass() );

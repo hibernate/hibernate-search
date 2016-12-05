@@ -54,6 +54,11 @@ class DummyIndexManager implements IndexManager {
 	}
 
 	@Override
+	public void awaitAsyncProcessingCompletion() {
+		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
+	}
+
+	@Override
 	public void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context) {
 		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
 	}
