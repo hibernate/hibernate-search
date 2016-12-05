@@ -47,12 +47,7 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 
 	@Override
 	public <T> T unwrap(Class<T> bridgeClass) {
-		if ( bridgeClass.isInstance( this ) ) {
-			return bridgeClass.cast( this );
-		}
-		else {
-			return BridgeAdaptorUtils.unwrapAdaptorOnly( stringBridge, bridgeClass );
-		}
+		return BridgeAdaptorUtils.unwrapAdaptorOnly( stringBridge, bridgeClass );
 	}
 
 	@Override

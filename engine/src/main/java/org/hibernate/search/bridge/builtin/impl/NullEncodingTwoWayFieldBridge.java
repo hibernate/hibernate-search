@@ -62,12 +62,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge, BridgeA
 
 	@Override
 	public <T> T unwrap(Class<T> bridgeClass) {
-		if ( bridgeClass.isInstance( this ) ) {
-			return bridgeClass.cast( this );
-		}
-		else {
-			return BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, bridgeClass );
-		}
+		return BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, bridgeClass );
 	}
 
 	@Override
