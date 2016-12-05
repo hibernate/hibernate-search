@@ -8,6 +8,7 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.concurrent.locks.Lock;
 
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkExecutor;
@@ -29,16 +30,26 @@ final class LuceneBackendTaskStreamer {
 	private static final Log log = LoggerFactory.make();
 
 	private final LuceneBackendResources resources;
-	private final Lock modificationLock;
+	private final Lock exclusiveModificationLock;
+	private final Lock parallelModificationLock;
 	private final AbstractWorkspaceImpl workspace;
 
 	public LuceneBackendTaskStreamer(LuceneBackendResources resources) {
 		this.workspace = resources.getWorkspace();
-		this.modificationLock = resources.getParallelModificationLock();
+		this.exclusiveModificationLock = resources.getExclusiveModificationLock();
+		this.parallelModificationLock = resources.getParallelModificationLock();
 		this.resources = resources;
 	}
 
 	public void doWork(final LuceneWork work, final IndexingMonitor monitor) {
+		Lock modificationLock;
+		if ( work instanceof FlushLuceneWork ) {
+			modificationLock = exclusiveModificationLock;
+		}
+		else {
+			modificationLock = parallelModificationLock;
+		}
+
 		modificationLock.lock();
 		try {
 			IndexWriterDelegate delegate = workspace.getIndexWriterDelegate();
