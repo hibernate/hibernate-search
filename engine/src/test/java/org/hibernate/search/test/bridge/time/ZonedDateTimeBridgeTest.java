@@ -29,11 +29,16 @@ public class ZonedDateTimeBridgeTest {
 
 	private static final String MAX = "+9999999991231235959999999999+18:00";
 	private static final String MIN = "-9999999990101000000000000000-18:00";
-	private static final String CUSTOM = "-0000000010203040506000000007Europe/Paris";
+	private static final String CUSTOM_LEGACY_FORMAT = "+0000020010203040506000000007Europe/Paris";
+	private static final String CUSTOM = "+0000020010203040506000000007+01:00Europe/Paris";
+	private static final String BC_CUSTOM_LEGACY_FORMAT = "-0000000010203040506000000007Europe/Paris";
+	// The offset for Europe/Paris was 9 minutes 21 seconds until the beginning of the XXth century
+	private static final String BC_CUSTOM = "-0000000010203040506000000007+00:09:21Europe/Paris";
 
 	private static final ZonedDateTime MAX_VALUE = ZonedDateTime.of( LocalDateTime.MAX, ZoneOffset.MAX );
 	private static final ZonedDateTime MIN_VALUE = ZonedDateTime.of( LocalDateTime.MIN, ZoneOffset.MIN );
-	private static final ZonedDateTime CUSTOM_UTC = ZonedDateTime.of( LocalDate.of( -1, 2, 3 ), LocalTime.of( 4, 5, 6, 7 ), ZoneId.of( "Europe/Paris" ) );
+	private static final ZonedDateTime CUSTOM_VALUE = ZonedDateTime.of( LocalDate.of( 2001, 2, 3 ), LocalTime.of( 4, 5, 6, 7 ), ZoneId.of( "Europe/Paris" ) );
+	private static final ZonedDateTime BC_CUSTOM_VALUE = ZonedDateTime.of( LocalDate.of( -1, 2, 3 ), LocalTime.of( 4, 5, 6, 7 ), ZoneId.of( "Europe/Paris" ) );
 
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
@@ -49,8 +54,13 @@ public class ZonedDateTimeBridgeTest {
 	}
 
 	@Test
-	public void testPaddingObjectToString() throws Exception {
-		assertThat( BRIDGE.objectToString( CUSTOM_UTC ) ).isEqualTo( CUSTOM );
+	public void testCustomObjectToString() throws Exception {
+		assertThat( BRIDGE.objectToString( CUSTOM_VALUE ) ).isEqualTo( CUSTOM );
+	}
+
+	@Test
+	public void testBcCustomObjectToString() throws Exception {
+		assertThat( BRIDGE.objectToString( BC_CUSTOM_VALUE ) ).isEqualTo( BC_CUSTOM );
 	}
 
 	@Test
@@ -64,7 +74,22 @@ public class ZonedDateTimeBridgeTest {
 	}
 
 	@Test
-	public void testPaddingStringToObject() throws Exception {
-		assertThat( BRIDGE.stringToObject( CUSTOM ) ).isEqualTo( CUSTOM_UTC );
+	public void testCustomStringToObject() throws Exception {
+		assertThat( BRIDGE.stringToObject( CUSTOM ) ).isEqualTo( CUSTOM_VALUE );
+	}
+
+	@Test
+	public void testCustomLegacyStringToObject() throws Exception {
+		assertThat( BRIDGE.stringToObject( CUSTOM_LEGACY_FORMAT ) ).isEqualTo( CUSTOM_VALUE );
+	}
+
+	@Test
+	public void testBcCustomStringToObject() throws Exception {
+		assertThat( BRIDGE.stringToObject( BC_CUSTOM ) ).isEqualTo( BC_CUSTOM_VALUE );
+	}
+
+	@Test
+	public void testBcCustomLegacyStringToObject() throws Exception {
+		assertThat( BRIDGE.stringToObject( BC_CUSTOM_LEGACY_FORMAT ) ).isEqualTo( BC_CUSTOM_VALUE );
 	}
 }
