@@ -15,6 +15,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.NullMarkerCodec;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -60,8 +61,13 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge, BridgeA
 	}
 
 	@Override
-	public TwoWayFieldBridge unwrap() {
-		return fieldBridge;
+	public <T> T unwrap(Class<T> bridgeClass) {
+		if ( bridgeClass.isInstance( this ) ) {
+			return bridgeClass.cast( this );
+		}
+		else {
+			return BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, bridgeClass );
+		}
 	}
 
 	@Override

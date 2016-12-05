@@ -36,7 +36,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
-import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -55,10 +55,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -107,24 +105,23 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	public void testNumeric() throws Exception {
 		assertEquals(
 				NumericFieldBridge.SHORT_FIELD_BRIDGE,
-				getUnwrappedBridge( Item.class , "price" )
+				getUnwrappedBridge( Item.class , "price", NumericFieldBridge.class )
 				);
 
-		assertThat(
-				getUnwrappedBridge( Item.class , "price_string" ),
-				instanceOf( ShortBridge.class )
+		assertNotNull(
+				getUnwrappedBridge( Item.class , "price_string", ShortBridge.class )
 				);
 	}
 
-	private Object getUnwrappedBridge(Class<?> clazz, String string) {
+	private Object getUnwrappedBridge(Class<?> clazz, String string, Class<?> expectedBridgeClass) {
 		FieldBridge bridge = getExtendedSearchIntegrator().getIndexBinding( clazz ).getDocumentBuilder()
 				.getMetadata().getDocumentFieldMetadataFor( string ).getFieldBridge();
-		return unwrapBridge( bridge );
+		return unwrapBridge( bridge, expectedBridgeClass );
 	}
 
-	private Object unwrapBridge(Object bridge) {
-		if ( bridge instanceof TwoWayString2FieldBridgeAdaptor ) {
-			return unwrapBridge( ((TwoWayString2FieldBridgeAdaptor) bridge).unwrap() );
+	private Object unwrapBridge(Object bridge, Class<?> expectedBridgeClass) {
+		if ( bridge instanceof BridgeAdaptor ) {
+			return ((BridgeAdaptor) bridge).unwrap( expectedBridgeClass );
 		}
 		else {
 			return bridge;

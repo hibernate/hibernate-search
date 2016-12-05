@@ -12,6 +12,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 
 /**
@@ -51,8 +52,13 @@ public class NullEncodingFieldBridge implements FieldBridge, StringBridge, Bridg
 	}
 
 	@Override
-	public Object unwrap() {
-		return bridge;
+	public <T> T unwrap(Class<T> bridgeClass) {
+		if ( bridgeClass.isInstance( this ) ) {
+			return bridgeClass.cast( this );
+		}
+		else {
+			return BridgeAdaptorUtils.unwrapAdaptorOnly( bridge, bridgeClass );
+		}
 	}
 
 }
