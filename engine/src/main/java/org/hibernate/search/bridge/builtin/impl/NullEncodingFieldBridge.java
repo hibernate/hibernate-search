@@ -53,12 +53,7 @@ public class NullEncodingFieldBridge implements FieldBridge, StringBridge, Bridg
 
 	@Override
 	public <T> T unwrap(Class<T> bridgeClass) {
-		if ( bridgeClass.isInstance( this ) ) {
-			return bridgeClass.cast( this );
-		}
-		else {
-			return BridgeAdaptorUtils.unwrapAdaptorOnly( bridge, bridgeClass );
-		}
+		return BridgeAdaptorUtils.unwrapAdaptorOnly( bridge, bridgeClass );
 	}
 
 }
