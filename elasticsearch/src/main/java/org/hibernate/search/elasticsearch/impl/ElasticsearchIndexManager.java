@@ -391,6 +391,11 @@ public class ElasticsearchIndexManager implements IndexManager {
 	}
 
 	@Override
+	public void awaitAsyncProcessingCompletion() {
+		requestProcessor.awaitAsyncProcessingCompletion();
+	}
+
+	@Override
 	public void optimize() {
 		performStreamOperation( OptimizeLuceneWork.INSTANCE, null, false );
 	}
