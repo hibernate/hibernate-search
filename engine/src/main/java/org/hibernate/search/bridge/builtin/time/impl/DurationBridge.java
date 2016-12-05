@@ -11,6 +11,10 @@ import java.time.Duration;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericLongNullCodec;
+import org.hibernate.search.bridge.spi.EncodingBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
+import org.hibernate.search.bridge.spi.NullMarkerCodec;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -22,7 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Davide D'Alto
  */
-public class DurationBridge implements TwoWayFieldBridge, NumericTimeBridge {
+public class DurationBridge implements TwoWayFieldBridge, IgnoreAnalyzerBridge, EncodingBridge {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -68,5 +72,15 @@ public class DurationBridge implements TwoWayFieldBridge, NumericTimeBridge {
 	@Override
 	public NumericEncodingType getEncodingType() {
 		return NumericEncodingType.LONG;
+	}
+
+	@Override
+	public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws IllegalArgumentException {
+		try {
+			return new NumericLongNullCodec( Long.parseLong( indexNullAs ) );
+		}
+		catch (NumberFormatException e) {
+			throw log.invalidNullMarkerForLong( e );
+		}
 	}
 }

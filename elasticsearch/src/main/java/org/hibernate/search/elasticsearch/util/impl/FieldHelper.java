@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.FieldType;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
@@ -54,26 +54,31 @@ public class FieldHelper {
 		YEAR_MONTH,
 		MONTH_DAY,
 		INTEGER {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
 		},
 		LONG {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
 		},
 		FLOAT {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
 		},
 		DOUBLE {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
 		},
 		UNKNOWN_NUMERIC {
+			@Override
 			public boolean isNumeric() {
 				return true;
 			}
@@ -223,12 +228,7 @@ public class FieldHelper {
 		}
 
 		FieldBridge fieldBridge = field.getFieldBridge();
-
-		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
-			return ( (NullEncodingTwoWayFieldBridge) fieldBridge ).unwrap() instanceof NumericFieldBridge;
-		}
-
-		return false;
+		return BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, NumericFieldBridge.class ) != null;
 	}
 
 	public static String[] getFieldNameParts(String fieldName) {

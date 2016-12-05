@@ -31,5 +31,6 @@ public interface TwoWayFieldBridge extends FieldBridge, StringBridge {
 	 * @return string (index) representation of the specified object. Must not be <code>null</code>, but
 	 *         can be empty.
 	 */
+	@Override
 	String objectToString(Object object);
 }

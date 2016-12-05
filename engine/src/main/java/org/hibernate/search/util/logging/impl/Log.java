@@ -884,21 +884,17 @@ public interface Log extends BasicLogger {
 	@Message(id = 289, value = "Requested sort field(s) %3$s are not configured for entity type %1$s mapped to index %2$s, thus an uninverting reader must be created. You should declare the missing sort fields using @SortableField." )
 	void uncoveredSortsRequested(@FormatWith(ClassFormatter.class) Class<?> entityType, String indexName, String uncoveredSorts);
 
-	@Message(id = 290, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Double Number to match the field type of the index. "
-			+ "Please change value from '%1$s' to represent a Double." )
-	SearchException nullMarkerNeedsToRepresentADoubleNumber(String proposedTokenValue, String fieldName);
+	@Message(id = 290, value = "The 'indexNullAs' property for fields indexed as Doubles must represent a Double number." )
+	IllegalArgumentException invalidNullMarkerForDouble(@Cause Exception e);
 
-	@Message(id = 291, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Float Number to match the field type of the index. "
-			+ "Please change value from '%1$s' to represent a Float." )
-	SearchException nullMarkerNeedsToRepresentAFloatNumber(String proposedTokenValue, String fieldName);
+	@Message(id = 291, value = "The 'indexNullAs' property for fields indexed as Floats must represent a Float number." )
+	IllegalArgumentException invalidNullMarkerForFloat(@Cause Exception e);
 
-	@Message(id = 292, value = "The 'indexNullAs' property for field '%2$s' needs to represent an Integer Number to match the field type of the index. "
-			+ "Please change value from '%1$s' to represent an Integer." )
-	SearchException nullMarkerNeedsToRepresentAnIntegerNumber(String proposedTokenValue, String fieldName);
+	@Message(id = 292, value = "The 'indexNullAs' property for fields indexed as Integer must represent an Integer number." )
+	IllegalArgumentException invalidNullMarkerForInteger(@Cause Exception e);
 
-	@Message(id = 293, value = "The 'indexNullAs' property for field '%2$s' needs to represent a Long Number to match the field type of the index. "
-			+ "Please change value from '%1$s' to represent a Long." )
-	SearchException nullMarkerNeedsToRepresentALongNumber(String proposedTokenValue, String fieldName);
+	@Message(id = 293, value = "The 'indexNullAs' property for fields indexed as Longs must represent a Long number." )
+	IllegalArgumentException invalidNullMarkerForLong(@Cause Exception e);
 
 	@Message(id = 294, value = "Unable to search for null token on field '%1$s' if field bridge is ignored.")
 	SearchException unableToSearchOnNullValueWithoutFieldBridge(String fieldName);
@@ -999,5 +995,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 324, value = "The fieldBridge for field '%1$s' is an instance of '%2$s', which does not implement TwoWayFieldBridge. Projected fields must have a TwoWayFieldBridge.")
 	SearchException projectingFieldWithoutTwoWayFieldBridge(String fieldName, Class<?> fieldBridgeClass);
+
+	@Message(id = 325, value = "The 'indexNullAs' property for field '%2$s', with value '%1$s', has invalid format: %3$s"
+			+ " Could not parse '%1$s'." )
+	SearchException nullMarkerInvalidFormat(String proposedTokenValue, String fieldName, String invalidFormatMessage, @Cause Exception e);
 
 }

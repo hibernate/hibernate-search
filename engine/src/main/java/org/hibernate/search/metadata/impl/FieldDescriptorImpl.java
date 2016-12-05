@@ -49,7 +49,7 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		this.termVector = determineTermVectorType( documentFieldMetadata.getTermVector() );
 		this.norms = determineNormsType( documentFieldMetadata.getIndex() );
 		this.boost = documentFieldMetadata.getBoost();
-		this.indexNullAs = documentFieldMetadata.indexNullAs();
+		this.indexNullAs = documentFieldMetadata.getNullMarkerCodec().nullRepresentedAsString();
 		this.analyzer = initAnalyzer( documentFieldMetadata );
 		this.fieldBridge = documentFieldMetadata.getFieldBridge();
 		this.fieldType = determineFieldType( documentFieldMetadata );

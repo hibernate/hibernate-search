@@ -11,12 +11,14 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 
 /**
  * @author Davide D'Alto
  */
-public class NullEncodingFieldBridge implements FieldBridge, StringBridge {
+public class NullEncodingFieldBridge implements FieldBridge, StringBridge, BridgeAdaptor {
 
 	private final String2FieldBridgeAdaptor bridge;
 	private final String nullMarker;
@@ -47,6 +49,16 @@ public class NullEncodingFieldBridge implements FieldBridge, StringBridge {
 			return nullMarker;
 		}
 		return bridge.objectToString( object );
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> bridgeClass) {
+		if ( bridgeClass.isInstance( this ) ) {
+			return bridgeClass.cast( this );
+		}
+		else {
+			return BridgeAdaptorUtils.unwrapAdaptorOnly( bridge, bridgeClass );
+		}
 	}
 
 }

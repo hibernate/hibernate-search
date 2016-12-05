@@ -30,8 +30,8 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
@@ -44,9 +44,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class NumericFieldTest extends SearchTestBase {
@@ -210,24 +209,23 @@ public class NumericFieldTest extends SearchTestBase {
 	public void testOneOfSeveralFieldsIsNumeric() {
 		assertEquals(
 				NumericFieldBridge.SHORT_FIELD_BRIDGE,
-				getUnwrappedBridge( TouristAttraction.class , "scoreNumeric" )
+				getUnwrappedBridge( TouristAttraction.class , "scoreNumeric", NumericFieldBridge.class )
 				);
 
-		assertThat(
-				getUnwrappedBridge( TouristAttraction.class , "scoreString" ),
-				instanceOf( ShortBridge.class )
+		assertNotNull(
+				getUnwrappedBridge( TouristAttraction.class , "scoreString", ShortBridge.class )
 				);
 	}
 
-	private Object getUnwrappedBridge(Class<?> clazz, String string) {
+	private Object getUnwrappedBridge(Class<?> clazz, String string, Class<?> expectedBridgeClass) {
 		FieldBridge bridge = getExtendedSearchIntegrator().getIndexBinding( clazz ).getDocumentBuilder()
 				.getMetadata().getDocumentFieldMetadataFor( string ).getFieldBridge();
-		return unwrapBridge( bridge );
+		return unwrapBridge( bridge, expectedBridgeClass );
 	}
 
-	private Object unwrapBridge(Object bridge) {
-		if ( bridge instanceof TwoWayString2FieldBridgeAdaptor ) {
-			return unwrapBridge( ((TwoWayString2FieldBridgeAdaptor) bridge).unwrap() );
+	private Object unwrapBridge(Object bridge, Class<?> expectedBridgeClass) {
+		if ( bridge instanceof BridgeAdaptor ) {
+			return ((BridgeAdaptor) bridge).unwrap( expectedBridgeClass );
 		}
 		else {
 			return bridge;
@@ -269,12 +267,12 @@ public class NumericFieldTest extends SearchTestBase {
 	public void testNumericMappingOfEmbeddedFields() {
 		assertEquals(
 				NumericFieldBridge.INT_FIELD_BRIDGE,
-				getUnwrappedBridge( ScoreBoard.class , "score_id" )
+				getUnwrappedBridge( ScoreBoard.class , "score_id", NumericFieldBridge.class )
 				);
 
 		assertEquals(
 				NumericFieldBridge.INT_FIELD_BRIDGE,
-				getUnwrappedBridge( ScoreBoard.class , "score_beta" )
+				getUnwrappedBridge( ScoreBoard.class , "score_beta", NumericFieldBridge.class )
 				);
 	}
 

@@ -798,7 +798,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						Index.NOT_ANALYZED,
 						fieldMetaData.getTermVector(),
 						fieldMetaData.getStore(),
-						fieldMetaData.indexNullAs(),
+						fieldMetaData.getNullMarkerCodec().nullRepresentedAsString(),
 						fieldMetaData.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( propertyValue ),
 						documentBoost
 				);
