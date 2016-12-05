@@ -31,6 +31,13 @@ public interface BatchBackend {
 	void enqueueAsyncWork(LuceneWork work) throws InterruptedException;
 
 	/**
+	 * Blocks until all the previously submitted work via {@link #enqueueAsyncWork(LuceneWork)} are applied
+	 * to the index.
+	 *
+	 */
+	void awaitAsyncProcessingCompletion();
+
+	/**
 	 * Does one work in sync
 	 *
 	 * @param work the lucene work to execute

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.impl.batch;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.FlushLuceneWork;
@@ -46,6 +47,16 @@ public class DefaultBatchBackend implements BatchBackend {
 	@Override
 	public void enqueueAsyncWork(LuceneWork work) throws InterruptedException {
 		sendWorkToShards( work, true );
+	}
+
+	@Override
+	public void awaitAsyncProcessingCompletion() {
+		Map<Class<?>, EntityIndexBinding> indexBindings = integrator.getIndexBindings();
+		for ( EntityIndexBinding indexBinding : indexBindings.values() ) {
+			for ( IndexManager indexManager : indexBinding.getIndexManagers() ) {
+				indexManager.awaitAsyncProcessingCompletion();
+			}
+		}
 	}
 
 	@Override

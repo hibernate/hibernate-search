@@ -68,6 +68,12 @@ public interface IndexManager {
 	void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync);
 
 	/**
+	 * Blocks until all the previously submitted work via
+	 * {@link #performStreamOperation(LuceneWork, IndexingMonitor, boolean)} are applied to the index.
+	 */
+	void awaitAsyncProcessingCompletion();
+
+	/**
 	 * Initialize this {@code IndexManager} before its use.
 	 *
 	 * @param indexName the unique name of the index (manager). Can be used to retrieve a {@code IndexManager} instance
