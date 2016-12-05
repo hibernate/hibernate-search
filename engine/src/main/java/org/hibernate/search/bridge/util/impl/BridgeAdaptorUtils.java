@@ -29,9 +29,11 @@ public final class BridgeAdaptorUtils {
 	 * as necessary.
 	 *
 	 * <p>The returned object may be the adaptor itself, or its delegate, or a delegate of
-	 * its delegate, and so on.
-	 * <p>If neither the adaptor or one of its delegates is an instance of the specified type,
-	 * {@code null} is returned.
+	 * its delegate, and so on, but it may also be a element bridge of the given bridge if the
+	 * given bridge is a {@link ContainerBridge}, or an element bridge of a delegate of the given
+	 * bridge, and so on.
+	 * <p>If neither the adaptor nor one of its delegates can provide an instance of the
+	 * specified type, {@code null} is returned.
 	 *
 	 * @param bridge The bridge to use as a starting point.
 	 * @param clazz The expected bridge type.
@@ -39,20 +41,42 @@ public final class BridgeAdaptorUtils {
 	 * if none could be found.
 	 */
 	public static <T> T unwrapAdaptorAndContainer(Object bridge, Class<T> clazz) {
-		if ( clazz.isInstance( bridge ) ) {
-			return clazz.cast( bridge );
+		T resultFromAdaptor = unwrapAdaptorOnly( bridge, clazz );
+		if ( resultFromAdaptor != null ) {
+			return resultFromAdaptor;
 		}
-		else if ( bridge instanceof BridgeAdaptor ) {
-			Object delegate = ( (BridgeAdaptor) bridge ).unwrap();
-			return unwrapAdaptorAndContainer( delegate, clazz );
+
+		Object elementBridge = getElementBridge( bridge );
+		if ( elementBridge != null ) {
+			return unwrapAdaptorAndContainer( elementBridge, clazz );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Return the element bridge for the given bridge, if any, taking adaptors into account.
+	 *
+	 * <p>The returned object may be the element bridge for the given bridge itself, or its delegate,
+	 * or a delegate of its delegate, and so on.
+	 * <p>If neither the given bridge nor one of its delegates is a {@link ContainerBridge},
+	 * {@code null} is returned.
+	 *
+	 * @param bridge The bridge to use as a starting point.
+	 * @param clazz The expected bridge type.
+	 * @return A unwrapped bridge implementing the expected bridge type, or {@code null}
+	 * if none could be found.
+	 */
+	private static Object getElementBridge(Object bridge) {
+		ContainerBridge containerBridge = null;
+		if ( bridge instanceof BridgeAdaptor ) {
+			containerBridge = ( (BridgeAdaptor) bridge ).unwrap( ContainerBridge.class );
 		}
 		else if ( bridge instanceof ContainerBridge ) {
-			Object delegate = ( (ContainerBridge) bridge ).getElementBridge();
-			return unwrapAdaptorAndContainer( delegate, clazz );
+			containerBridge = (ContainerBridge) bridge;
 		}
-		else {
-			return null;
-		}
+
+		return containerBridge == null ? null : containerBridge.getElementBridge();
 	}
 
 	/**
@@ -75,8 +99,7 @@ public final class BridgeAdaptorUtils {
 			return clazz.cast( bridge );
 		}
 		else if ( bridge instanceof BridgeAdaptor ) {
-			Object delegate = ( (BridgeAdaptor) bridge ).unwrap();
-			return unwrapAdaptorOnly( delegate, clazz );
+			return ( (BridgeAdaptor) bridge ).unwrap( clazz );
 		}
 		else {
 			return null;

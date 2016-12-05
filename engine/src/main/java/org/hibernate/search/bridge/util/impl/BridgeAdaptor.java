@@ -22,8 +22,13 @@ import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 public interface BridgeAdaptor {
 
 	/**
-	 * @return The bridge that is directly wrapped by this adaptor.
+	 * Return an object of the specified type to allow access to specific
+	 * bridge interfaces.
+	 *
+	 * <p>If no adapted bridge matches this type, {@code null} is returned.
+
+	 * @return An instance of the specified class, or {@code null} if there is none.
 	 */
-	Object unwrap();
+	<T> T unwrap(Class<T> bridgeClass);
 
 }

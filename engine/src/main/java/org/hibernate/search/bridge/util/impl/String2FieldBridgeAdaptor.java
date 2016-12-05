@@ -54,7 +54,12 @@ public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge, App
 	}
 
 	@Override
-	public Object unwrap() {
-		return stringBridge;
+	public <T> T unwrap(Class<T> bridgeClass) {
+		if ( bridgeClass.isInstance( this ) ) {
+			return bridgeClass.cast( this );
+		}
+		else {
+			return BridgeAdaptorUtils.unwrapAdaptorOnly( stringBridge, bridgeClass );
+		}
 	}
 }
