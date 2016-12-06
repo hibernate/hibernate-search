@@ -49,6 +49,34 @@ public final class ElasticsearchEnvironment {
 	public static final String SERVER_URI = "elasticsearch.host";
 
 	/**
+	 * Property for specifying the timeout when reading responses from an Elasticsearch server.
+	 * <p>
+	 * A numeric value in milliseconds, such as 60000 is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#SERVER_READ_TIMEOUT}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.default.elasticsearch.read_timeout=60000}), because only a single Elasticsearch
+	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
+	 * Hibernate Search.
+	 */
+	public static final String SERVER_READ_TIMEOUT = "elasticsearch.read_timeout";
+
+	/**
+	 * Property for specifying the timeout when connecting to an Elasticsearch server.
+	 * <p>
+	 * A numeric value in milliseconds, such as 2000 is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#SERVER_CONNECTION_TIMEOUT}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.default.elasticsearch.connection_timeout=2000}), because only a single Elasticsearch
+	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
+	 * Hibernate Search.
+	 */
+	public static final String SERVER_CONNECTION_TIMEOUT = "elasticsearch.connection_timeout";
+
+	/**
 	 * Property for specifying the strategy for maintaining the Elasticsearch index.
 	 * <p>
 	 * The name of one of the {@link IndexSchemaManagementStrategy} constants is expected, e.g. MERGE.

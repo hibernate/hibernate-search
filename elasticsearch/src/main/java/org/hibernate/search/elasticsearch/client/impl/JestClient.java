@@ -58,12 +58,14 @@ public class JestClient implements Service, Startable, Stoppable {
 	private static final int TIME_OUT = 408;
 
 	/**
-	 * Prefix for accessing the {@link ElasticsearchEnvironment#SERVER_URI} variable. That's currently needed as we
-	 * don't access this one in the context of a specific index manager. The prefix is used to have the property name
-	 * in line with the other index-related property names, even though this property can not yet be override on
-	 * a per-index base.
+	 * Prefix for accessing the client-related settings.
+	 * That's currently needed as we only have a single client for all
+	 * index managers.
+	 * The prefix is used to have the property name in line with the other
+	 * index-related property names, even though this property can not yet
+	 * be overridden on a per-index basis.
 	 */
-	private static final String SERVER_URI_PROP_PREFIX = "hibernate.search.default.";
+	private static final String CLIENT_PROP_PREFIX = "hibernate.search.default.";
 
 	private io.searchbox.client.JestClient client;
 
@@ -79,18 +81,25 @@ public class JestClient implements Service, Startable, Stoppable {
 
 		String serverUrisString = ConfigurationParseHelper.getString(
 				properties,
-				SERVER_URI_PROP_PREFIX + ElasticsearchEnvironment.SERVER_URI,
+				CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_URI,
 				ElasticsearchEnvironment.Defaults.SERVER_URI
 		);
 
 		Collection<String> serverUris = Arrays.asList( serverUrisString.trim().split( "\\s" ) );
 
-		// TODO HSEARCH-2062 Make timeouts configurable
 		factory.setHttpClientConfig(
 			new HttpClientConfig.Builder( serverUris )
 				.multiThreaded( true )
-				.readTimeout( ElasticsearchEnvironment.Defaults.SERVER_READ_TIMEOUT )
-				.connTimeout( ElasticsearchEnvironment.Defaults.SERVER_CONNECTION_TIMEOUT )
+				.readTimeout( ConfigurationParseHelper.getIntValue(
+						properties,
+						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT,
+						ElasticsearchEnvironment.Defaults.SERVER_READ_TIMEOUT
+				) )
+				.connTimeout( ConfigurationParseHelper.getIntValue(
+						properties,
+						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_CONNECTION_TIMEOUT,
+						ElasticsearchEnvironment.Defaults.SERVER_CONNECTION_TIMEOUT
+				) )
 				.gson( gsonService.getGson() )
 				.build()
 		);
