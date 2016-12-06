@@ -20,7 +20,7 @@ public final class ElasticsearchEnvironment {
 
 		public static final String SERVER_URI = "http://localhost:9200";
 		public static final int SERVER_READ_TIMEOUT = 60000;
-		public static final int SERVER_CONNECTION_TIMEOUT = 2000;
+		public static final int SERVER_CONNECTION_TIMEOUT = 3000;
 		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.CREATE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final String REQUIRED_INDEX_STATUS = "green";
