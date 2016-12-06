@@ -34,21 +34,21 @@ public class ElasticsearchIndexNameConflictIT extends SearchInitializationTestBa
 	public void testNameCollisionDetection() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH000326" );
-		thrown.expectMessage( MyFirstEntity.class.getName() );
-		thrown.expectMessage( MyfirstEntity.class.getName() );
-		thrown.expectMessage( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( MyfirstEntity.class.getName() ) );
+		thrown.expectMessage( "MYFIRSTENTITY" );
+		thrown.expectMessage( "myfirstentity" );
+		thrown.expectMessage( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( "myfirstentity" ) );
 
-		init( MyFirstEntity.class, MyfirstEntity.class );
+		init( MyFirstEntityUpperCase.class, MyfirstEntityLowerCase.class );
 	}
 
 	@Test
 	public void testWithoutConflictWhenIndexIsRenamed() {
-		init( MySecondEntity.class, MysecondEntity.class );
+		init( MySecondEntityUpperCase.class, MysecondEntityLowerCase.class );
 	}
 
-	@Indexed
+	@Indexed(index = "MYFIRSTENTITY")
 	@Entity
-	static class MyFirstEntity {
+	static class MyFirstEntityUpperCase {
 
 		@DocumentId
 		@Id
@@ -58,9 +58,9 @@ public class ElasticsearchIndexNameConflictIT extends SearchInitializationTestBa
 		boolean myField;
 	}
 
-	@Indexed
+	@Indexed(index = "myfirstentity")
 	@Entity
-	static class MyfirstEntity {
+	static class MyfirstEntityLowerCase {
 
 		@DocumentId
 		@Id
@@ -70,9 +70,9 @@ public class ElasticsearchIndexNameConflictIT extends SearchInitializationTestBa
 		boolean myField;
 	}
 
-	@Indexed(index = "should_not_have_conflict")
+	@Indexed(index = "MYSECONDENTITY")
 	@Entity
-	static class MySecondEntity {
+	static class MySecondEntityUpperCase {
 
 		@DocumentId
 		@Id
@@ -82,9 +82,9 @@ public class ElasticsearchIndexNameConflictIT extends SearchInitializationTestBa
 		boolean myField;
 	}
 
-	@Indexed
+	@Indexed(index = "mysecondentityWithPostfix")
 	@Entity
-	static class MysecondEntity {
+	static class MysecondEntityLowerCase {
 
 		@DocumentId
 		@Id
