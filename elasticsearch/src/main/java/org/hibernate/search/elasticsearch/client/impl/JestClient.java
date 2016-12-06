@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.impl.GsonService;
@@ -115,6 +116,14 @@ public class JestClient implements Service, Startable, Stoppable {
 						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.DISCOVERY_ENABLED,
 						ElasticsearchEnvironment.Defaults.DISCOVERY_ENABLED
 				) )
+				.discoveryFrequency(
+						ConfigurationParseHelper.getLongValue(
+								properties,
+								CLIENT_PROP_PREFIX + ElasticsearchEnvironment.DISCOVERY_REFRESH_INTERVAL,
+								ElasticsearchEnvironment.Defaults.DISCOVERY_REFRESH_INTERVAL
+						),
+						TimeUnit.SECONDS
+				)
 				.gson( gsonService.getGson() )
 				.build()
 		);
