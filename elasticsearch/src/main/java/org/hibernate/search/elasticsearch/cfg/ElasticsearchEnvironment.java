@@ -23,6 +23,7 @@ public final class ElasticsearchEnvironment {
 		public static final int SERVER_CONNECTION_TIMEOUT = 3000;
 		public static final int MAX_TOTAL_CONNECTION = 20;
 		public static final int MAX_TOTAL_CONNECTION_PER_ROUTE = 2;
+		public static final boolean DISCOVERY_ENABLED = false;
 		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.CREATE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final String REQUIRED_INDEX_STATUS = "green";
@@ -105,6 +106,20 @@ public final class ElasticsearchEnvironment {
 	 * Hibernate Search.
 	 */
 	public static final String MAX_TOTAL_CONNECTION_PER_ROUTE = "elasticsearch.max_total_connection_per_route";
+
+	/**
+	 * Property for specifying whether automatic discovery of nodes in the Elasticsearch cluster is enabled.
+	 * <p>
+	 * Either {@code true} or {@code false} is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.default.elasticsearch.discovery.enabled=true}), because only a single Elasticsearch
+	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
+	 * Hibernate Search.
+	 */
+	public static final String DISCOVERY_ENABLED = "elasticsearch.discovery.enabled";
 
 	/**
 	 * Property for specifying the strategy for maintaining the Elasticsearch index.
