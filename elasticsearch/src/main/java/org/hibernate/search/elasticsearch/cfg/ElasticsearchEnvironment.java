@@ -24,6 +24,7 @@ public final class ElasticsearchEnvironment {
 		public static final int MAX_TOTAL_CONNECTION = 20;
 		public static final int MAX_TOTAL_CONNECTION_PER_ROUTE = 2;
 		public static final boolean DISCOVERY_ENABLED = false;
+		public static final long DISCOVERY_REFRESH_INTERVAL = 10L;
 		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.CREATE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final String REQUIRED_INDEX_STATUS = "green";
@@ -120,6 +121,20 @@ public final class ElasticsearchEnvironment {
 	 * Hibernate Search.
 	 */
 	public static final String DISCOVERY_ENABLED = "elasticsearch.discovery.enabled";
+
+	/**
+	 * Property for specifying the time interval between two executions of the automatic discovery, if enabled.
+	 * <p>
+	 * A positive numeric value in seconds is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.default.elasticsearch.discovery.refresh_interval=20}), because only a single Elasticsearch
+	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
+	 * Hibernate Search.
+	 */
+	public static final String DISCOVERY_REFRESH_INTERVAL = "elasticsearch.discovery.refresh_interval";
 
 	/**
 	 * Property for specifying the strategy for maintaining the Elasticsearch index.

@@ -150,6 +150,9 @@ When using automatic discovery, the Elasticsearch client will periodically probe
 and will add those to the server list (see `host` above).
 Similarly, the client will periodically check whether registered servers still respond,
 and will remove them from the server list if they don't.
+Time interval between two executions of the automatic discovery (in seconds):: `hibernate.search.default.elasticsearch.discovery.refresh_interval 10` (default)
++
+This setting will only be taken into account if automatic discovery is enabled (see above).
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000` (default)
 +
 This value must be lower than the read timeout (see above).
@@ -177,7 +180,7 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`
 
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
-Excluded properties are `host`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route` and `discovery.enabled`.
+Excluded properties are `host`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled` and `discovery.refresh_interval`.
 --
 
 ===== Elasticsearch configuration
