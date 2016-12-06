@@ -144,6 +144,12 @@ Maximum time to wait for a connection to the Elasticsearch server before failing
 Maximum time to wait for a response from the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.read_timeout 60000` (default)
 Maximum number of simultaneous connections to the Elasticsearch cluster:: `hibernate.search.default.elasticsearch.max_total_connection 20` (default)
 Maximum number of simultaneous connections to a single Elasticsearch server:: `hibernate.search.default.elasticsearch.max_total_connection_per_route 2` (default)
+Whether to enable automatic discovery of servers in the Elasticsearch cluster (`true` or `false`):: `hibernate.search.default.elasticsearch.discovery.enabled false` (default)
++
+When using automatic discovery, the Elasticsearch client will periodically probe for new nodes in the cluster,
+and will add those to the server list (see `host` above).
+Similarly, the client will periodically check whether registered servers still respond,
+and will remove them from the server list if they don't.
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000` (default)
 +
 This value must be lower than the read timeout (see above).
@@ -171,7 +177,7 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`
 
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
-Excluded properties are `host`, `read_timeout`, `connection_timeout`, `max_total_connection` and `max_total_connection_per_route`.
+Excluded properties are `host`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route` and `discovery.enabled`.
 --
 
 ===== Elasticsearch configuration
