@@ -576,3 +576,10 @@ Here is a list of known Elasticsearch bugs, and what to do about it.
 * Mapping `java.time.ZonedDateTime` won't work with Elasticsearch 2.4.1 because of https://github.com/elastic/elasticsearch/issues/20911[a JodaTime bug affecting Elasticsearch]: https://hibernate.atlassian.net/browse/HSEARCH-2414[HSEARCH-2414].
 +
 *Fix:* Upgrade to Elasticsearch 2.4.2.
+
+=== Acknowledgment
+
+More information about Elasticsearch can be found on the https://www.elastic.co/products/elasticsearch[Elasticsearch website]
+and its https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html[reference documentation].
+
+Hibernate Search uses https://github.com/searchbox-io/Jest[Jest] to communicate with Elasticsearch.
