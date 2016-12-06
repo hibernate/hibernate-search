@@ -142,6 +142,8 @@ One exception should be noted, though: date formats must match exactly the forma
 --
 Maximum time to wait for a connection to the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.connection_timeout 3000` (default)
 Maximum time to wait for a response from the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.read_timeout 60000` (default)
+Maximum number of simultaneous connections to the Elasticsearch cluster:: `hibernate.search.default.elasticsearch.max_total_connection 20` (default)
+Maximum number of simultaneous connections to a single Elasticsearch server:: `hibernate.search.default.elasticsearch.max_total_connection_per_route 2` (default)
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000` (default)
 +
 This value must be lower than the read timeout (see above).
@@ -169,7 +171,7 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`
 
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
-Excluded properties are `host`, `read_timeout` and `connection_timeout`.
+Excluded properties are `host`, `read_timeout`, `connection_timeout`, `max_total_connection` and `max_total_connection_per_route`.
 --
 
 ===== Elasticsearch configuration

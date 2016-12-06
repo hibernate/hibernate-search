@@ -21,6 +21,8 @@ public final class ElasticsearchEnvironment {
 		public static final String SERVER_URI = "http://localhost:9200";
 		public static final int SERVER_READ_TIMEOUT = 60000;
 		public static final int SERVER_CONNECTION_TIMEOUT = 3000;
+		public static final int MAX_TOTAL_CONNECTION = 20;
+		public static final int MAX_TOTAL_CONNECTION_PER_ROUTE = 2;
 		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.CREATE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final String REQUIRED_INDEX_STATUS = "green";
@@ -75,6 +77,34 @@ public final class ElasticsearchEnvironment {
 	 * Hibernate Search.
 	 */
 	public static final String SERVER_CONNECTION_TIMEOUT = "elasticsearch.connection_timeout";
+
+	/**
+	 * Property for specifying the maximum number of simultaneous connections to the Elasticsearch cluster.
+	 * <p>
+	 * A positive numeric value is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#MAX_TOTAL_CONNECTION}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.default.elasticsearch.max_total_connection=30}), because only a single Elasticsearch
+	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
+	 * Hibernate Search.
+	 */
+	public static final String MAX_TOTAL_CONNECTION = "elasticsearch.max_total_connection";
+
+	/**
+	 * Property for specifying the maximum number of simultaneous connections to a single Elasticsearch server.
+	 * <p>
+	 * A positive numeric value is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#MAX_TOTAL_CONNECTION_PER_ROUTE}.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.default.elasticsearch.max_total_connection_per_route=3}), because only a single Elasticsearch
+	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
+	 * Hibernate Search.
+	 */
+	public static final String MAX_TOTAL_CONNECTION_PER_ROUTE = "elasticsearch.max_total_connection_per_route";
 
 	/**
 	 * Property for specifying the strategy for maintaining the Elasticsearch index.

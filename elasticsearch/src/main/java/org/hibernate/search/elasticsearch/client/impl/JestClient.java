@@ -100,6 +100,16 @@ public class JestClient implements Service, Startable, Stoppable {
 						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_CONNECTION_TIMEOUT,
 						ElasticsearchEnvironment.Defaults.SERVER_CONNECTION_TIMEOUT
 				) )
+				.maxTotalConnection( ConfigurationParseHelper.getIntValue(
+						properties,
+						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION,
+						ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION
+				) )
+				.defaultMaxTotalConnectionPerRoute( ConfigurationParseHelper.getIntValue(
+						properties,
+						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION_PER_ROUTE,
+						ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE
+				) )
 				.gson( gsonService.getGson() )
 				.build()
 		);
