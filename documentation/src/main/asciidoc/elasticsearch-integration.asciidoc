@@ -140,7 +140,11 @@ Mapping validation is as permissive as possible. Fields or mappings that are unk
 
 One exception should be noted, though: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
 --
+Maximum time to wait for a connection to the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.connection_timeout 2000` (default)
+Maximum time to wait for a response from the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.read_timeout 60000` (default)
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000` (default)
++
+This value must be lower than the read timeout (see above).
 Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red")::
 `hibernate.search.default.elasticsearch.required_index_status green` (default)
 +
@@ -158,8 +162,15 @@ When <<elasticsearch-scrolling,scrolling>>, the number of results fetched by eac
 When <<elasticsearch-scrolling,scrolling>>, the maximum duration `ScrollableResults` will be usable if no other results are fetched from Elasticsearch, in seconds::
 `hibernate.search.elasticsearch.scroll_timeout 60` (default)
 
-Note that all properties prefixed with `hibernate.search.default` (besides `host`) can be given globally as shown above and/or be given for specific indexes:
-`hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`.
+[NOTE]
+--
+Properties prefixed with `hibernate.search.default` can be given globally as shown above and/or be given for specific indexes:
+
+`hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`
+
+This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
+Excluded properties are `host`, `read_timeout` and `connection_timeout`.
+--
 
 ===== Elasticsearch configuration
 
