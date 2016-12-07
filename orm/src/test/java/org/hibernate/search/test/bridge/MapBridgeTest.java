@@ -21,10 +21,8 @@ import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ENGLISH;
 import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ITALIAN;
@@ -42,7 +40,7 @@ public class MapBridgeTest extends SearchTestBase {
 	private FullTextSession fullTextSession;
 	private MapBridgeTestEntity withoutNull;
 	private MapBridgeTestEntity withNullEntry;
-	private MapBridgeTestEntity withNullEmbedded;
+	private MapBridgeTestEntity withNullContainer;
 	private Date indexedDate;
 
 	@Override
@@ -81,13 +79,13 @@ public class MapBridgeTest extends SearchTestBase {
 		withNullEntry.addNumericNullNotIndexed( 2, null );
 		withNullEntry.addDate( 1, null );
 
-		withNullEmbedded = persistEntity( fullTextSession, "Mime" );
-		withNullEmbedded.setDates( null );
-		withNullEmbedded.setNumericNullIndexed( null );
-		withNullEmbedded.setNumericNullNotIndexed( null );
-		withNullEmbedded.setNullIndexed( null );
-		withNullEmbedded.setNullNotIndexed( null );
-		withNullEmbedded.setDates( null );
+		withNullContainer = persistEntity( fullTextSession, "Mime" );
+		withNullContainer.setDates( null );
+		withNullContainer.setNumericNullIndexed( null );
+		withNullContainer.setNumericNullNotIndexed( null );
+		withNullContainer.setNullIndexed( null );
+		withNullContainer.setNullNotIndexed( null );
+		withNullContainer.setDates( null );
 
 		tx.commit();
 	}
@@ -102,30 +100,28 @@ public class MapBridgeTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
-	public void testSearchNullEmbedded() throws Exception {
-		List<MapBridgeTestEntity> results = findEmbeddedNullResults( "nullIndexed", MapBridgeTestEntity.NULL_EMBEDDED, true );
+	public void testSearchNullContainer() throws Exception {
+		List<MapBridgeTestEntity> results = findContainerNullResults( "nullIndexed", MapBridgeTestEntity.NULL_CONTAINER_TOKEN, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-		assertEquals( "Wrong result returned looking for a null in a collection", withNullEmbedded.getName(), results.get( 0 ).getName() );
+		assertEquals( "Wrong result returned looking for a null in a collection", withNullContainer.getName(), results.get( 0 ).getName() );
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
-	public void testSearchNullNumericEmbedded() throws Exception {
+	public void testSearchNullNumericContainer() throws Exception {
 		List<MapBridgeTestEntity> results =
-				findEmbeddedNullResults( "embeddedNum", MapBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
+				findNumericResults( "numericNullIndexed", MapBridgeTestEntity.NULL_CONTAINER_NUMERIC_TOKEN );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEmbedded.getName(), results.get( 0 ).getName() );
+		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullContainer.getName(), results.get( 0 ).getName() );
 	}
 
 	@Test
 	public void testSearchNullNumericEntry() throws Exception {
 		List<MapBridgeTestEntity> results =
-				findResults( "numericNullIndexed", MapBridgeTestEntity.NULL_NUMERIC_TOKEN, false );
+				findNumericResults( "numericNullIndexed", MapBridgeTestEntity.NULL_NUMERIC_TOKEN );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
@@ -232,7 +228,7 @@ public class MapBridgeTest extends SearchTestBase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<MapBridgeTestEntity> findEmbeddedNullResults(String fieldName, Object value, boolean checkNullToken) {
+	private List<MapBridgeTestEntity> findContainerNullResults(String fieldName, Object value, boolean checkNullToken) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
 				.forEntity( MapBridgeTestEntity.class ).get();
 		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );
