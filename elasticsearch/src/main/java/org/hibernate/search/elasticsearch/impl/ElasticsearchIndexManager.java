@@ -232,6 +232,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	 */
 	private boolean initializeIndex(Set<Class<?>> entityTypesToInitialize) {
 		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
+			schemaCreator.checkIndexExists( actualIndexName, schemaManagementExecutionOptions );
 			return false;
 		}
 
@@ -257,6 +258,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 				schemaMigrator.merge( indexMetadata, schemaManagementExecutionOptions );
 				break;
 			case VALIDATE:
+				schemaCreator.checkIndexExists( actualIndexName, schemaManagementExecutionOptions );
 				schemaValidator.validate( indexMetadata, schemaManagementExecutionOptions );
 				createdIndex = false;
 				break;

@@ -35,6 +35,14 @@ public interface ElasticsearchSchemaCreator extends Service {
 	boolean createIndexIfAbsent(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
 
 	/**
+	 * Checks that an index already exists.
+	 *
+	 * @param indexMetadata The expected index name.
+	 * @throws SearchException If the index doesn't exist, or if an error occurs.
+	 */
+	void checkIndexExists(String indexname, ExecutionOptions executionOptions);
+
+	/**
 	 * Create mappings on a supposedly existing index.
 	 *
 	 * <p>Mappings are supposed to be absent from the index.

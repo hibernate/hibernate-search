@@ -9,12 +9,14 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import java.util.Map;
 import java.util.Properties;
 
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * The default {@link ElasticsearchSchemaCreator} implementation.
@@ -22,6 +24,8 @@ import org.hibernate.search.spi.BuildContext;
  * @author Yoann Rodiere
  */
 public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCreator, Startable, Stoppable {
+
+	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private ServiceManager serviceManager;
 	private ElasticsearchSchemaAccessor schemaAccessor;
@@ -62,13 +66,21 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 
 		if ( !schemaAccessor.indexExists( indexName ) ) {
 			created = schemaAccessor.createIndexIfAbsent( indexName, executionOptions );
-
-			if ( created ) {
-				schemaAccessor.waitForIndexStatus( indexName, executionOptions );
-			}
 		}
 
+		schemaAccessor.waitForIndexStatus( indexName, executionOptions );
+
 		return created;
+	}
+
+	@Override
+	public void checkIndexExists(String indexName, ExecutionOptions executionOptions) {
+		if ( schemaAccessor.indexExists( indexName ) ) {
+			schemaAccessor.waitForIndexStatus( indexName, executionOptions );
+		}
+		else {
+			throw LOG.indexMissing( indexName );
+		}
 	}
 
 	@Override
