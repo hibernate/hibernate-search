@@ -29,6 +29,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
@@ -443,6 +444,7 @@ public class SortingTest {
 		final List<Friend> friends;
 
 		@Field
+		@IndexedContainer
 		Integer[] array;
 
 		Person(int id, Integer age, String name, CuddlyToy favoriteCuddlyToy) {
