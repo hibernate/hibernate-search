@@ -28,7 +28,6 @@ import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
@@ -43,8 +42,6 @@ import org.junit.rules.ExpectedException;
 public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBase {
 
 	private static final String VALIDATION_FAILED_MESSAGE_ID = "HSEARCH400033";
-	private static final String MAPPINGS_RETRIEVAL_FAILED_MESSAGE_ID = "HSEARCH400034";
-	private static final String ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID = "HSEARCH400007";
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -142,19 +139,6 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 		init( SimpleDateEntity.class, SimpleBooleanEntity.class, FacetedDateEntity.class );
 
 		// If we get here, it means validation passed (no exception was thrown)
-	}
-
-	@Test
-	public void index_missing() throws Exception {
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( MAPPINGS_RETRIEVAL_FAILED_MESSAGE_ID )
-				.causedBy( SearchException.class )
-						.withMessage( ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID )
-				.build()
-		);
-
-		init( SimpleDateEntity.class );
 	}
 
 	@Test
