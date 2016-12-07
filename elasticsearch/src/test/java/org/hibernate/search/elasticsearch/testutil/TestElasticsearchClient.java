@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.impl.DefaultGsonService;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -48,6 +49,13 @@ public class TestElasticsearchClient extends ExternalResource {
 	private JestClient client;
 
 	private final List<String> createdIndicesNames = Lists.newArrayList();
+
+	private ElasticsearchIndexStatus requiredIndexStatus = ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS;
+
+	public TestElasticsearchClient requiredIndexStatus(ElasticsearchIndexStatus requiredIndexStatus) {
+		this.requiredIndexStatus = requiredIndexStatus;
+		return this;
+	}
 
 	public void deleteAndCreateIndex(Class<?> rootClass) throws IOException {
 		deleteAndCreateIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
@@ -100,7 +108,7 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	private void waitForIndexCreation(final String indexNameToWaitFor) throws IOException {
 		Builder healthBuilder = new Health.Builder()
-				.setParameter( "wait_for_status", ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS.getElasticsearchString() )
+				.setParameter( "wait_for_status", requiredIndexStatus.getElasticsearchString() )
 				.setParameter( "timeout", ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_WAIT_TIMEOUT + "ms" );
 
 		Health health = new Health( healthBuilder ) {
