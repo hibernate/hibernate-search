@@ -24,7 +24,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
@@ -37,9 +37,11 @@ import org.hibernate.search.annotations.Store;
 public class IterableBridgeTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
-	static final String NULL_NUMERIC_TOKEN = "-555";
-	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
-	static final String NULL_EMBEDDED_NUMERIC = "-666";
+	static final int NULL_NUMERIC_TOKEN = -555;
+	static final String NULL_NUMERIC_TOKEN_STRING = "-555";
+	static final String NULL_CONTAINER_TOKEN = "EMBEDDED_NULL";
+	static final int NULL_CONTAINER_NUMERIC_TOKEN = -666;
+	static final String NULL_CONTAINER_NUMERIC_TOKEN_STRING = "-666";
 
 	private Long id;
 	private String name;
@@ -77,11 +79,7 @@ public class IterableBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
-	/*
-	 * This will only have an effect for null maps, since the type for the map values
-	 * does not contain any @Field annotation (which means there is nothing to embed).
-	 */
-	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
+	@IndexedContainer(indexNullAs = NULL_CONTAINER_TOKEN)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
 	public Set<Language> getNullIndexed() {
@@ -96,13 +94,9 @@ public class IterableBridgeTestEntity {
 		this.nullIndexed.add( nullIndexed );
 	}
 
-	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
+	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN_STRING, analyze = Analyze.NO)
 	@ElementCollection
-	/*
-	 * This will only have an effect for null maps, since the type for the map values
-	 * does not contain any @Field annotation (which means there is nothing to embed).
-	 */
-	@IndexedEmbedded(prefix = "embeddedNum.", indexNullAs = NULL_EMBEDDED_NUMERIC)
+	@IndexedContainer(indexNullAs = NULL_CONTAINER_NUMERIC_TOKEN_STRING)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
 	public Set<Integer> getNumericNullIndexed() {
@@ -119,7 +113,7 @@ public class IterableBridgeTestEntity {
 
 	@Field(store = Store.YES)
 	@ElementCollection
-	@IndexedEmbedded
+	@IndexedContainer
 	@CollectionTable(name = "NullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullNotIndexed")
 	public List<String> getNullNotIndexed() {
@@ -136,7 +130,7 @@ public class IterableBridgeTestEntity {
 
 	@Field(store = Store.YES)
 	@ElementCollection
-	@IndexedEmbedded
+	@IndexedContainer
 	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullNotIndexed")
 	public List<Long> getNumericNullNotIndexed() {
@@ -153,7 +147,7 @@ public class IterableBridgeTestEntity {
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	@ElementCollection
-	@IndexedEmbedded
+	@IndexedContainer
 	@DateBridge(resolution = Resolution.SECOND)
 	@CollectionTable(name = "Dates", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "dates")
