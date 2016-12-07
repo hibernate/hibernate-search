@@ -22,28 +22,32 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public final class ElasticsearchMissingValueStrategy implements MissingValueStrategy {
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	public static final ElasticsearchMissingValueStrategy INSTANCE = new ElasticsearchMissingValueStrategy();
+	private final ElasticsearchNullMarkerIndexStrategy indexStrategy;
+
+	public ElasticsearchMissingValueStrategy(ElasticsearchNullMarkerIndexStrategy indexStrategy) {
+		this.indexStrategy = indexStrategy;
+	}
 
 	@Override
 	public NullMarkerCodec createNullMarkerCodec(Class<?> entityType, DocumentFieldPath path, NullMarker nullMarker) {
 		Object nullEncoded = nullMarker.nullEncoded();
 		if ( nullEncoded instanceof String ) {
-			return new ElasticsearchStringNullMarkerCodec( nullMarker );
+			return new ElasticsearchStringNullMarkerCodec( nullMarker, indexStrategy );
 		}
 		else if ( nullEncoded instanceof Integer ) {
-			return new ElasticsearchIntegerNullMarkerCodec( nullMarker );
+			return new ElasticsearchIntegerNullMarkerCodec( nullMarker, indexStrategy );
 		}
 		else if ( nullEncoded instanceof Long ) {
-			return new ElasticsearchLongNullMarkerCodec( nullMarker );
+			return new ElasticsearchLongNullMarkerCodec( nullMarker, indexStrategy );
 		}
 		else if ( nullEncoded instanceof Float ) {
-			return new ElasticsearchFloatNullMarkerCodec( nullMarker );
+			return new ElasticsearchFloatNullMarkerCodec( nullMarker, indexStrategy );
 		}
 		else if ( nullEncoded instanceof Double ) {
-			return new ElasticsearchDoubleNullMarkerCodec( nullMarker );
+			return new ElasticsearchDoubleNullMarkerCodec( nullMarker, indexStrategy );
 		}
 		else if ( nullEncoded instanceof Boolean ) {
-			return new ElasticsearchBooleanNullMarkerCodec( nullMarker );
+			return new ElasticsearchBooleanNullMarkerCodec( nullMarker, indexStrategy );
 		}
 		else {
 			throw LOG.unsupportedNullTokenType( entityType, path.getAbsoluteName(), nullEncoded.getClass() );

@@ -18,12 +18,12 @@ import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 /**
  * @author Davide D'Alto
  */
-public class NullEncodingFieldBridge implements FieldBridge, StringBridge, BridgeAdaptor {
+public class NullEncodingAsStringFieldBridge implements FieldBridge, StringBridge, BridgeAdaptor {
 
 	private final String2FieldBridgeAdaptor bridge;
 	private final String nullMarker;
 
-	public NullEncodingFieldBridge(StringBridge bridge, String nullMarker) {
+	public NullEncodingAsStringFieldBridge(StringBridge bridge, String nullMarker) {
 		this.bridge = new String2FieldBridgeAdaptor( bridge );
 		this.nullMarker = nullMarker;
 	}

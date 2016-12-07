@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.spi;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
 import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchMissingValueStrategy;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchNullMarkerIndexStrategy;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
 import org.hibernate.search.indexes.spi.IndexManagerType;
@@ -16,6 +17,12 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 public final class ElasticsearchIndexManagerType implements IndexManagerType, RemoteAnalyzerProvider {
 
 	public static final ElasticsearchIndexManagerType INSTANCE = new ElasticsearchIndexManagerType();
+
+	private final ElasticsearchMissingValueStrategy missingValueStrategy =
+			new ElasticsearchMissingValueStrategy( ElasticsearchNullMarkerIndexStrategy.DEFAULT );
+
+	private final ElasticsearchMissingValueStrategy containerMissingValueStrategy =
+			new ElasticsearchMissingValueStrategy( ElasticsearchNullMarkerIndexStrategy.CONTAINER );
 
 	private ElasticsearchIndexManagerType() {
 		//use the INSTANCE singleton
@@ -28,7 +35,12 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType, Re
 
 	@Override
 	public MissingValueStrategy getMissingValueStrategy() {
-		return ElasticsearchMissingValueStrategy.INSTANCE;
+		return missingValueStrategy;
+	}
+
+	@Override
+	public MissingValueStrategy getContainerMissingValueStrategy() {
+		return containerMissingValueStrategy;
 	}
 
 	@Override

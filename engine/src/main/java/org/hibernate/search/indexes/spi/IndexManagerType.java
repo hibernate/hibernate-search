@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.indexes.spi;
 
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 
 /**
@@ -39,4 +40,10 @@ public interface IndexManagerType {
 	 * The strategy for missing values employed by index managers of this family.
 	 */
 	MissingValueStrategy getMissingValueStrategy();
+
+	/**
+	 * The strategy for missing values employed by index managers of this family
+	 * for fields targeted by an {@link IndexedContainer} annotation.
+	 */
+	MissingValueStrategy getContainerMissingValueStrategy();
 }

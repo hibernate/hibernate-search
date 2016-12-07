@@ -26,10 +26,12 @@ import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchNullMarkerField;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchNullMarkerIndexStrategy;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchJsonHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -320,9 +322,23 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				else {
 					JsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
 
-					// If the value was initially null, explicitly propagate null and let ES handle the default token.
-					if ( field instanceof NullMarker ) {
-						accessor.add( root, null );
+					if ( field instanceof ElasticsearchNullMarkerField ) {
+						ElasticsearchNullMarkerField markerField = (ElasticsearchNullMarkerField) field;
+						if ( ElasticsearchNullMarkerIndexStrategy.CONTAINER.equals( markerField.indexStrategy() ) ) {
+							/*
+							 * Index the null marker instead of null, because null_value is not set
+							 * in ES (see ElasticsearchNullMarkerIndexStrategy.CONTAINER).
+							 */
+							accessor.add( root, ElasticsearchJsonHelper.toJsonPrimitive( markerField.nullEncoded() ) );
+						}
+						else {
+							/*
+							 * Index the null value explicitly, because null_value is set in ES
+							 * and ES will handle the default token.
+							 */
+							accessor.add( root, null );
+						}
+
 						return;
 					}
 

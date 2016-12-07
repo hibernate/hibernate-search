@@ -23,6 +23,11 @@ public final class LuceneEmbeddedIndexManagerType implements IndexManagerType {
 	}
 
 	@Override
+	public MissingValueStrategy getContainerMissingValueStrategy() {
+		return LuceneMissingValueStrategy.INSTANCE;
+	}
+
+	@Override
 	public AnalyzerExecutionStrategy getAnalyzerExecutionStrategy() {
 		return AnalyzerExecutionStrategy.EMBEDDED;
 	}

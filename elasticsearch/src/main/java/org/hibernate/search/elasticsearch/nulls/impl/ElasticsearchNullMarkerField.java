@@ -16,10 +16,12 @@ import org.hibernate.search.elasticsearch.impl.AbstractMarkerField;
 public class ElasticsearchNullMarkerField extends AbstractMarkerField implements NullMarker {
 
 	private final NullMarker nullMarker;
+	private final ElasticsearchNullMarkerIndexStrategy indexStrategy;
 
-	public ElasticsearchNullMarkerField(String name, NullMarker nullMarker) {
+	public ElasticsearchNullMarkerField(String name, NullMarker nullMarker, ElasticsearchNullMarkerIndexStrategy indexStrategy) {
 		super( name );
 		this.nullMarker = nullMarker;
+		this.indexStrategy = indexStrategy;
 	}
 
 	@Override
@@ -30,6 +32,10 @@ public class ElasticsearchNullMarkerField extends AbstractMarkerField implements
 	@Override
 	public Object nullEncoded() {
 		return nullMarker.nullEncoded();
+	}
+
+	public ElasticsearchNullMarkerIndexStrategy indexStrategy() {
+		return indexStrategy;
 	}
 
 }
