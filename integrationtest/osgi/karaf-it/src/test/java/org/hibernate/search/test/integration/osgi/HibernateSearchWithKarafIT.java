@@ -144,6 +144,14 @@ public class HibernateSearchWithKarafIT {
 						"etc/org.apache.aries.transaction.cfg",
 						"aries.transaction.timeout", "600"
 				),
+				editConfigurationFilePut(
+						"etc/org.apache.karaf.management.cfg",
+						"rmiServerHost", "127.0.0.1"
+				),
+				editConfigurationFilePut(
+						"etc/org.apache.karaf.management.cfg",
+						"rmiRegistryHost", "127.0.0.1"
+				),
 				// set the log level for the in container logging to INFO
 				// also just logging to file (out), check data/log/karaf.log w/i the Karaf installation for the test execution log
 				editConfigurationFilePut(
