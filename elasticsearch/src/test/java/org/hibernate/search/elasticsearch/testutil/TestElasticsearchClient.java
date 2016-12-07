@@ -67,6 +67,10 @@ public class TestElasticsearchClient extends ExternalResource {
 		deleteAndCreateIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
 	}
 
+	public void ensureIndexDoesNotExist(Class<?> rootClass) throws IOException {
+		ensureIndexDoesNotExist( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
+	}
+
 	public void registerForCleanup(Class<?> rootClass) {
 		createdIndicesNames.add( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
 	}
@@ -117,6 +121,17 @@ public class TestElasticsearchClient extends ExternalResource {
 		registerTemplateForCleanup( templateName );
 		if ( !result.isSucceeded() ) {
 			throw new AssertionFailure( "Error while creating template '" + templateName + "' for tests:" + result.getErrorMessage() );
+		}
+	}
+
+	public void ensureIndexDoesNotExist(String indexName) throws IOException {
+		JestResult result = client.execute( new DeleteIndex.Builder( indexName ).build() );
+		if ( !result.isSucceeded() && result.getResponseCode() != 404 /* Index not found is ok */ ) {
+			throw new AssertionFailure( String.format(
+					Locale.ENGLISH,
+					"Error while trying to delete index '%s' as part of test initialization: %s",
+					indexName, result.getErrorMessage()
+					) );
 		}
 	}
 
