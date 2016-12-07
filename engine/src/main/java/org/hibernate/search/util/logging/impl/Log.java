@@ -1006,4 +1006,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 327, value = "Unsupported indexNullAs token type '%3$s' on field '%2$s' of entity '%1$s'." )
 	SearchException unsupportedNullTokenType(Class<?> entityType, String fieldName, Class<?> tokenType);
 
+	@Message(id = 328, value = "Unsupported @IndexedContainer on non-container property: the property '%2$s' on type '%1$s' has type '%3$s'" )
+	SearchException unsupportedIndexedContainerOnNonContainer(String declaringClassName, String propertyName, String propertyTypeName);
+
 }

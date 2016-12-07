@@ -298,8 +298,6 @@ public final class BridgeFactory {
 	public FieldBridge wrapInContainerBridge(FieldBridge bridge, XMember member, ReflectionManager reflectionManager) {
 		ContainerType containerType = getContainerType( member, reflectionManager );
 		switch ( containerType ) {
-			case SINGLE:
-				return bridge;
 			case ITERABLE:
 				// Should we cache these per bridge instance?
 				// would make sense at least for the known built-in bridges
@@ -309,8 +307,10 @@ public final class BridgeFactory {
 				return new BuiltinArrayBridge( bridge );
 			case MAP:
 				return new BuiltinMapBridge( bridge );
+			case SINGLE:
 			default:
-				throw new AssertionFailure( "Unknown ContainerType " + containerType );
+				throw LOG.unsupportedIndexedContainerOnNonContainer( member.getDeclaringClass().getName(),
+						member.getName(), member.getType().getName() );
 		}
 	}
 
