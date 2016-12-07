@@ -140,7 +140,7 @@ The different values of this attribute are:
                     `WITH_OFFSETS` and `WITH_POSITIONS`.
 |===============
 
-* `indexNullAs`: Per default null values are ignored and not indexed. However, using `indexNullAs`
+* [[field-annotation-indexNullAs]] `indexNullAs`: Per default null values are ignored and not indexed. However, using `indexNullAs`
 you can specify a string which will be inserted as token for the null value. Per default this value
 is set to `org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL` indicating that null values
 should not be indexed. You can set this value to `DEFAULT_NULL_TOKEN` to indicate that a default null
@@ -474,6 +474,91 @@ tokenized way, and once as `summary_forSort` in an un-tokenized way.
 * `bridge`: defines a `@FieldBridge` annotation per field rather than per property
 
 See below for more information about analyzers and field bridges.
+
+[[indexed-container-annotation]]
+==== Multi-valued properties (containers)
+
+Sometimes a field bridge exists for a given type (say, `Integer`),
+but what you want to index is a property holding multiple values of such type (say, `Integer[]` or `List<Integer>`).
+
+If what you want to do for a given multi-valued property is simply
+to apply an existing field bridge on each element, adding document fields with the same name for each element,
+you can use `@IndexedContainer`. This annotation will work for:
+
+ * arrays, for instance `Integer[]`.
+ * `java.lang.Iterable` or any subtype, for instance `java.util.Collection`, `java.util.List`, `java.util.Set`, ...
+ * `java.util.Map` or any subtype, for instance `java.util.SortedMap`. Maps only get their values indexed, keys are ignored.
+
+In the example <<example-indexing-multi-valued-property>>, we index the names of the authors of a book.
+Those names are stored as a list of strings.
+When indexing, each name is added to the Lucene document as a new value for the field "authorName".
+Querying on this field will work exactly the same as if there was only one author name.
+
+[NOTE]
+====
+Any attribute of the `@Field` annotation can be used in conjunction with `@IndexedContainer`, which means
+in particular that a <<section-custom-bridges,custom bridge>> can be used. 
+====
+
+[[example-indexing-multi-valued-property]]
+.Using `@IndexedContainer` to map a multi-valued property
+====
+[source, JAVA]
+----
+@Entity
+@Indexed(index = "Book")
+public class Book {
+    @ElementCollection 
+    @Field(name = "authorName")
+    @IndexedContainer(forField = "authorName")
+    private List<String> authorNames;
+
+    // ...
+}
+----
+====
+
+[WARNING]
+====
+`@IndexedContainer` only applies a single, locally-defined field bridge to each element of a multi-valued property,
+which will mostly be useful for collections of primitive types or of very simple objects. 
+
+When the elements in the multi-valued property are more complex,
+e.g. types that have themselves `@Field` annotations on some of their properties,
+what you want is probably to index each element as part of the root entity index using **each element's own mapping**:
+see <<search-mapping-associated>> to know more about this feature.
+====
+
+The following attributes are available on the `@IndexedContainer` annotation:
+
+ * `forField`: must be set to the name of the field this annotation applies to if this field has a custom name,
+   i.e. if `@Field.name` is used.
+ * `indexNullAs`: normally null containers are considered empty and not indexed. You may use indexNullAs to specify
+   a token to index when a null container is encountered.
+   For more information, see <<field-annotation-indexNullAs,the documentation for the Field.indexNullAs attribute>>,
+   which works the same way. Please mind in particular that the value for `indexNullAs` must be numeric when using a
+   numeric field bridge.
+
+The example <<example-indexing-multi-valued-property-indexNullAs>> shows how to index a null list of authors as `NO_AUTHOR`
+and null elements in the list as `UNKNOWN_AUTHOR`.
+
+[[example-indexing-multi-valued-property-indexNullAs]]
+.Using `@IndexedContainer` to map null values in a multi-valued property
+====
+[source, JAVA]
+----
+@Entity
+@Indexed(index = "Book")
+public class Book {
+    @ElementCollection 
+    @Field(indexNullAs = "UNKNOWN_AUTHOR")
+    @IndexedContainer(forField = "authorName", indexNullAs = "NO_AUTHOR")
+    private List<String> authorNames;
+
+    // ...
+}
+----
+====
 
 [[search-mapping-associated]]
 ==== Embedded and associated objects
