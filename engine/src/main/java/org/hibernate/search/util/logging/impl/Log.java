@@ -1019,4 +1019,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 332, value = "None of the specified entity types ('%s') or any of their subclasses are configured." )
 	IllegalArgumentException targetedEntityTypesNotConfigured(String targetedEntities);
+
+	@Message(id = 333, value = "Unsupported @IndexedContainer on non-container property: the property '%2$s' on type '%1$s' has type '%3$s'" )
+	SearchException unsupportedIndexedContainerOnNonContainer(String declaringClassName, String propertyName, String propertyTypeName);
+
 }
