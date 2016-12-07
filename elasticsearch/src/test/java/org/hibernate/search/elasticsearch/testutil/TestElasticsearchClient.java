@@ -100,7 +100,7 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	private void waitForIndexCreation(final String indexNameToWaitFor) throws IOException {
 		Builder healthBuilder = new Health.Builder()
-				.setParameter( "wait_for_status", ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS )
+				.setParameter( "wait_for_status", ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS.getElasticsearchString() )
 				.setParameter( "timeout", ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_WAIT_TIMEOUT + "ms" );
 
 		Health health = new Health( healthBuilder ) {

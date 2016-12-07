@@ -156,10 +156,15 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		String status = ConfigurationParseHelper.getString(
 				properties,
 				ElasticsearchEnvironment.REQUIRED_INDEX_STATUS,
-				ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS
+				null
 		);
 
-		return ElasticsearchIndexStatus.fromString( status );
+		if ( status == null ) {
+			return ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS;
+		}
+		else {
+			return ElasticsearchIndexStatus.fromString( status );
+		}
 	}
 
 	private static boolean getRefreshAfterWrite(Properties properties) {
