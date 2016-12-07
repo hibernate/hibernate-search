@@ -182,7 +182,7 @@
         <commonsLangVersion>2.6</commonsLangVersion>
 
         <!-- Elasticsearch -->
-        <elasticsearchJestVersion>2.0.0</elasticsearchJestVersion>
+        <elasticsearchJestVersion>2.0.4</elasticsearchJestVersion>
         <elasticsearchCommonsLang3Version>3.4</elasticsearchCommonsLang3Version>
         <elasticsearchGsonVersion>2.4</elasticsearchGsonVersion>
 

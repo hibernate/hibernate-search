@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.elasticsearch.client.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import io.searchbox.core.search.sort.Sort;
 
@@ -33,10 +33,10 @@ public class ArbitrarySort extends Sort {
 	}
 
 	@Override
-	public Map<String, Object> toMap() {
-		Map<String, Object> rootMap = new HashMap<String, Object>();
-		rootMap.put( fieldName, sortDescription );
-		return rootMap;
+	public JsonObject toJsonObject() {
+		return JsonBuilder.object()
+				.add( fieldName, sortDescription )
+				.build();
 	}
 
 }
