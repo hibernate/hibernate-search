@@ -11,7 +11,6 @@ import java.util.Date;
 
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.impl.JavaTimeBridgeProvider;
 import org.hibernate.search.bridge.spi.EncodingBridge;
@@ -148,23 +147,17 @@ public final class NumericFieldUtils {
 	 * @return true if the considered {@code FieldBridge} is a numeric {@code FieldBridge}
 	 */
 	public static boolean isNumericFieldBridge(FieldBridge fieldBridge) {
-		EncodingBridge encodingBridge = BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, EncodingBridge.class );
-		return !NumericEncodingType.UNKNOWN.equals( getNumericEncoding( encodingBridge ) );
+		return !NumericEncodingType.UNKNOWN.equals( getNumericEncoding( fieldBridge ) );
 	}
 
 	/**
-	 * Indicates whether the considered {@code FieldBridge}, or its {@link ContainerBridge#getElementBridge() element bridge},
-	 * is a numeric one.
+	 * Extracts the numeric encoding from a {@code FieldBridge}.
 	 *
 	 * @param fieldBridge the considered {@code FieldBridge}
-	 * @return true if the considered {@code FieldBridge} is a numeric {@code FieldBridge}
+	 * @return the numeric encoding for this field (may be NumericEncodingType.UNKNOWN if the field is not numeric)
 	 */
-	public static boolean isNumericContainerOrNumericFieldBridge(FieldBridge fieldBridge) {
+	public static NumericEncodingType getNumericEncoding(FieldBridge fieldBridge) {
 		EncodingBridge encodingBridge = BridgeAdaptorUtils.unwrapAdaptorAndContainer( fieldBridge, EncodingBridge.class );
-		return !NumericEncodingType.UNKNOWN.equals( getNumericEncoding( encodingBridge ) );
-	}
-
-	private static NumericEncodingType getNumericEncoding(EncodingBridge encodingBridge) {
 		if ( encodingBridge != null ) {
 			return encodingBridge.getEncodingType();
 		}
