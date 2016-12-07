@@ -29,6 +29,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -85,7 +86,7 @@ public class GolfPlayer {
 
 	@ElementCollection
 	@Field
-	@IndexedEmbedded
+	@IndexedContainer
 	private Set<String> strengths;
 
 	@ManyToMany

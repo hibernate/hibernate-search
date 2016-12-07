@@ -21,7 +21,7 @@ import javax.persistence.Lob;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.annotations.TikaBridge;
 
 /**
@@ -106,7 +106,7 @@ public class Book {
 		this.contentAsURI = contentAsURI;
 	}
 
-	@IndexedEmbedded
+	@IndexedContainer
 	@Field
 	@TikaBridge
 	@ElementCollection
