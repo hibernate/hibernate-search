@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.elasticsearch.client.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.spatial.Coordinates;
+
+import com.google.gson.JsonObject;
 
 import io.searchbox.core.search.sort.Sort;
 
@@ -31,22 +31,19 @@ public class DistanceSort extends Sort {
 		this.center = center;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> toMap() {
-		Map<String, Object> rootMap = super.toMap();
-		Map<String, Object> innerMap = (Map<String, Object>) rootMap.get( GEO_DISTANCE_FIELD );
-
-		Map<String, Double> location = new HashMap<String, Double>( 3 );
-		location.put( "lat", center.getLatitude() );
-		location.put( "lon", center.getLongitude() );
-
-		innerMap.put( fieldName, location );
-
-		innerMap.put( "unit", "km" );
-		innerMap.put( "distance_type", "arc" );
-
-		return rootMap;
+	public JsonObject toJsonObject() {
+		JsonObject rootObject = super.toJsonObject();
+		JsonObject gsonDistanceFieldObject = rootObject.getAsJsonObject( GEO_DISTANCE_FIELD );
+		JsonBuilder.object( gsonDistanceFieldObject )
+				.add( fieldName, JsonBuilder.object()
+						.addProperty( "lat", center.getLatitude() )
+						.addProperty( "lon", center.getLongitude() )
+						.build()
+				)
+				.addProperty( "unit", "km" )
+				.addProperty( "distance_type", "arc" );
+		return rootObject;
 	}
 
 }
