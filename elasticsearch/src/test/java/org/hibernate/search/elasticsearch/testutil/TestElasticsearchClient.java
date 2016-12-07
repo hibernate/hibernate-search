@@ -10,11 +10,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Locale;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.impl.DefaultGsonService;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -38,6 +40,8 @@ import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
+import io.searchbox.indices.template.DeleteTemplate;
+import io.searchbox.indices.template.PutTemplate;
 
 /**
  * @author Yoann Rodiere
@@ -49,6 +53,8 @@ public class TestElasticsearchClient extends ExternalResource {
 	private JestClient client;
 
 	private final List<String> createdIndicesNames = Lists.newArrayList();
+
+	private final List<String> createdTemplatesNames = Lists.newArrayList();
 
 	private ElasticsearchIndexStatus requiredIndexStatus = ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS;
 
@@ -94,7 +100,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		tryDeleteESIndex( indexName );
 
 		JestResult result = client.execute( new CreateIndex.Builder( indexName ).build() );
-		registerForCleanup( indexName );
+		registerIndexForCleanup( indexName );
 		if ( !result.isSucceeded() ) {
 			throw new AssertionFailure( "Error while creating index '" + indexName + "' for tests:" + result.getErrorMessage() );
 		}
@@ -102,8 +108,24 @@ public class TestElasticsearchClient extends ExternalResource {
 		waitForIndexCreation( indexName );
 	}
 
-	public void registerForCleanup(String indexName) {
+	public void createTemplate(String templateName, String templateString, JsonObject settings) throws IOException {
+		JsonObject source = JsonBuilder.object()
+				.addProperty( "template", templateString )
+				.add( "settings", settings )
+				.build();
+		JestResult result = client.execute( new PutTemplate.Builder( templateName, source ).build() );
+		registerTemplateForCleanup( templateName );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while creating template '" + templateName + "' for tests:" + result.getErrorMessage() );
+		}
+	}
+
+	public void registerIndexForCleanup(String indexName) {
 		createdIndicesNames.add( indexName );
+	}
+
+	private void registerTemplateForCleanup(String templateName) {
+		createdTemplatesNames.add( templateName );
 	}
 
 	private void waitForIndexCreation(final String indexNameToWaitFor) throws IOException {
@@ -212,6 +234,10 @@ public class TestElasticsearchClient extends ExternalResource {
 			tryDeleteESIndex( indexName );
 		}
 		createdIndicesNames.clear();
+		for ( String templateName : createdTemplatesNames ) {
+			tryDeleteESTemplate( templateName );
+		}
+		createdTemplatesNames.clear();
 		client.shutdownClient();
 		client = null;
 	}
@@ -225,6 +251,18 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 		catch (IOException | RuntimeException e) {
 			LOG.warnf( e, "Error while trying to delete index '%s' as part of test cleanup", indexName );
+		}
+	}
+
+	private void tryDeleteESTemplate(String templateName) {
+		try {
+			JestResult result = client.execute( new DeleteTemplate.Builder( templateName ).build() );
+			if ( !result.isSucceeded() && result.getResponseCode() != 404 /* Index not found is ok */ ) {
+				LOG.warnf( "Error while trying to delete template '%s' as part of test cleanup: %s", templateName, result.getErrorMessage() );
+			}
+		}
+		catch (IOException | RuntimeException e) {
+			LOG.warnf( e, "Error while trying to delete template '%s' as part of test cleanup", templateName );
 		}
 	}
 
