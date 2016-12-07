@@ -11,10 +11,10 @@ import java.time.Year;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NumericIntegerNullCodec;
 import org.hibernate.search.bridge.spi.EncodingBridge;
 import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.bridge.util.impl.ToStringNullMarker;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -58,9 +58,9 @@ public class YearBridge implements IgnoreAnalyzerBridge, EncodingBridge, TwoWayF
 	}
 
 	@Override
-	public NullMarkerCodec createNullMarkerCodec(String indexNullAs) throws NumberFormatException {
+	public NullMarker createNullMarker(String indexNullAs) throws NumberFormatException {
 		try {
-			return new NumericIntegerNullCodec( Integer.parseInt( indexNullAs ) );
+			return new ToStringNullMarker( Integer.parseInt( indexNullAs ) );
 		}
 		catch (NumberFormatException e) {
 			throw LOG.invalidNullMarkerForInteger( e );

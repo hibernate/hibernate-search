@@ -29,6 +29,9 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchNullMarkerField;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchNullMarkerIndexStrategy;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchJsonHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -318,6 +321,27 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				}
 				else {
 					JsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
+
+					if ( field instanceof ElasticsearchNullMarkerField ) {
+						ElasticsearchNullMarkerField markerField = (ElasticsearchNullMarkerField) field;
+						if ( ElasticsearchNullMarkerIndexStrategy.CONTAINER.equals( markerField.indexStrategy() ) ) {
+							/*
+							 * Index the null marker instead of null, because null_value is not set
+							 * in ES (see ElasticsearchNullMarkerIndexStrategy.CONTAINER).
+							 */
+							accessor.add( root, ElasticsearchJsonHelper.toJsonPrimitive( markerField.nullEncoded() ) );
+						}
+						else {
+							/*
+							 * Index the null value explicitly, because null_value is set in ES
+							 * and ES will handle the default token.
+							 */
+							accessor.add( root, null );
+						}
+
+						return;
+					}
+
 					ExtendedFieldType type = FieldHelper.getType( documentFieldMetadata );
 					if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 						FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
@@ -329,19 +353,10 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 						Number numericValue = field.numericValue();
 
 						if ( numericValue != null ) {
-							// If the value was initially null, explicitly propagate null and let ES handle the default token.
-							if ( documentFieldMetadata.getNullMarkerCodec().representsNullValue( field ) ) {
-								numericValue = null;
-							}
 							accessor.add( root, numericValue != null ? new JsonPrimitive( numericValue ) : null );
 						}
 						else {
 							String stringValue = field.stringValue();
-							// If the value was initially null, explicitly propagate null and let ES handle the default token.
-							if ( documentFieldMetadata.getNullMarkerCodec().representsNullValue( field ) ) {
-								stringValue = null;
-							}
-
 							accessor.add( root, stringValue != null ? new JsonPrimitive( stringValue ) : null );
 						}
 					}

@@ -26,7 +26,6 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.bridge.builtin.TikaBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinArrayBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
@@ -199,7 +198,6 @@ public final class BridgeFactory {
 		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext(
 				member, isId, isExplicitlyMarkedAsNumeric, reflectionManager, serviceManager
 		);
-		ContainerType containerType = getContainerType( member, reflectionManager );
 
 		// Backend specific providers are managed first so that they can override the standard
 		// bridges
@@ -207,9 +205,8 @@ public final class BridgeFactory {
 			if ( providerEntry.getKey().equals( indexManagerType ) ) {
 				bridge = getFieldBridgeFromBridgeProvider(
 						providerEntry.getValue(),
-						context,
-						containerType );
-
+						context
+				);
 				if ( bridge != null ) {
 					return bridge;
 				}
@@ -222,8 +219,7 @@ public final class BridgeFactory {
 		for ( BridgeProvider provider : annotationBasedProviders ) {
 			bridge = getFieldBridgeFromBridgeProvider(
 					provider,
-					context,
-					containerType
+					context
 			);
 			if ( bridge != null ) {
 				return bridge;
@@ -237,8 +233,7 @@ public final class BridgeFactory {
 		for ( BridgeProvider provider : regularProviders ) {
 			FieldBridge createdBridge = getFieldBridgeFromBridgeProvider(
 					provider,
-					context,
-					containerType
+					context
 			);
 			if ( createdBridge != null ) {
 				// oops we found a duplicate
@@ -290,20 +285,19 @@ public final class BridgeFactory {
 
 	private FieldBridge getFieldBridgeFromBridgeProvider(
 			BridgeProvider bridgeProvider,
-			ExtendedBridgeProvider.ExtendedBridgeProviderContext context,
-			ContainerType containerType
+			ExtendedBridgeProvider.ExtendedBridgeProviderContext context
 	) {
 		FieldBridge bridge = bridgeProvider.provideFieldBridge( context );
 		if ( bridge == null ) {
 			return null;
 		}
-		if ( bridge instanceof TikaBridge ) {
-			return bridge;
-		}
 		populateReturnType( context.getReturnType(), bridge.getClass(), bridge );
+		return bridge;
+	}
+
+	public FieldBridge wrapInContainerBridge(FieldBridge bridge, XMember member, ReflectionManager reflectionManager) {
+		ContainerType containerType = getContainerType( member, reflectionManager );
 		switch ( containerType ) {
-			case SINGLE:
-				return bridge;
 			case ITERABLE:
 				// Should we cache these per bridge instance?
 				// would make sense at least for the known built-in bridges
@@ -313,8 +307,10 @@ public final class BridgeFactory {
 				return new BuiltinArrayBridge( bridge );
 			case MAP:
 				return new BuiltinMapBridge( bridge );
+			case SINGLE:
 			default:
-				throw new AssertionFailure( "Unknown ContainerType " + containerType );
+				throw LOG.unsupportedIndexedContainerOnNonContainer( member.getDeclaringClass().getName(),
+						member.getName(), member.getType().getName() );
 		}
 	}
 

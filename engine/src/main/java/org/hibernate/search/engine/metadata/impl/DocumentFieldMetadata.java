@@ -17,8 +17,8 @@ import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NotEncodingCodec;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.engine.nulls.codec.impl.NotEncodingCodec;
+import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 
 import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
@@ -187,7 +187,7 @@ public class DocumentFieldMetadata {
 				", analyzer=" + analyzerReference +
 				", isId=" + isId +
 				", isIdInEmbedded=" + isIdInEmbedded +
-				", nullToken='" + nullMarkerCodec.nullRepresentedAsString() + '\'' +
+				", nullMarkerCodec='" + nullMarkerCodec + '\'' +
 				", isNumeric=" + isNumeric +
 				", isSpatial=" + isSpatial +
 				", precisionStep=" + precisionStep +

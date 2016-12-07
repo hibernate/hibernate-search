@@ -36,17 +36,26 @@ class TikaBridgeProvider extends ExtendedBridgeProvider {
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
 		if ( annotatedElement.isAnnotationPresent( TikaBridge.class ) ) {
-			Class<?> returnType = context.getElementOrContainerReturnType();
-			if ( ! Blob.class.isAssignableFrom( returnType )
-					&& ! byte[].class.isAssignableFrom( returnType )
-					&& ! String.class.isAssignableFrom( returnType )
-					&& ! URI.class.isAssignableFrom( returnType ) ) {
-				throw LOG.unsupportedTikaBridgeType( returnType );
-			}
+			validateMemberType( context );
 			TikaBridge tikaAnnotation = annotatedElement.getAnnotation( TikaBridge.class );
 			return createTikaBridge( tikaAnnotation, context.getServiceManager() );
 		}
 		return null;
+	}
+
+	private void validateMemberType(ExtendedBridgeProviderContext context) {
+		Class<?> elementType = context.getReturnType();
+		// Example: URI, List<URI>, List<byte[]>
+		if ( ! Blob.class.isAssignableFrom( elementType )
+				&& ! String.class.isAssignableFrom( elementType )
+				&& ! byte[].class.isAssignableFrom( elementType )
+				&& ! URI.class.isAssignableFrom( elementType ) ) {
+			// byte[] is actually an array but we want to treat it as a simple element
+			Class<?> returnType = context.getElementOrContainerReturnType();
+			if ( ! byte[].class.isAssignableFrom( returnType ) ) {
+				throw LOG.unsupportedTikaBridgeType( elementType );
+			}
+		}
 	}
 
 	private FieldBridge createTikaBridge(org.hibernate.search.annotations.TikaBridge annotation, ServiceManager serviceManager) {

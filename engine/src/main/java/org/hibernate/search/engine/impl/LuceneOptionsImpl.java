@@ -19,6 +19,7 @@ import org.apache.lucene.document.LongField;
 import org.apache.lucene.index.IndexOptions;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.StringHelper;
@@ -65,7 +66,8 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		this.storeType = fieldMetadata.getStore();
 		this.storeCompressed = this.storeType.equals( Store.COMPRESS );
 		this.storeUncompressed = this.storeType.equals( Store.YES );
-		this.indexNullAs = fieldMetadata.getNullMarkerCodec().nullRepresentedAsString();
+		NullMarker nullMarker = fieldMetadata.getNullMarkerCodec().getNullMarker();
+		this.indexNullAs = nullMarker == null ? null : nullMarker.nullRepresentedAsString();
 	}
 
 	public LuceneOptionsImpl(Index indexMode, TermVector termVector, Store store, String indexNullAs, float fieldLevelBoost, float inheritedBoost) {

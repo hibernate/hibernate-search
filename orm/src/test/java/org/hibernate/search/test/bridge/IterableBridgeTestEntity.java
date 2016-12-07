@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -25,6 +24,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
@@ -37,7 +37,11 @@ import org.hibernate.search.annotations.Store;
 public class IterableBridgeTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
-	static final String NULL_NUMERIC_TOKEN = "-555";
+	static final int NULL_NUMERIC_TOKEN = -555;
+	static final String NULL_NUMERIC_TOKEN_STRING = "-555";
+	static final String NULL_CONTAINER_TOKEN = "EMBEDDED_NULL";
+	static final int NULL_CONTAINER_NUMERIC_TOKEN = -666;
+	static final String NULL_CONTAINER_NUMERIC_TOKEN_STRING = "-666";
 
 	private Long id;
 	private String name;
@@ -75,6 +79,7 @@ public class IterableBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	@IndexedContainer(indexNullAs = NULL_CONTAINER_TOKEN)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
 	public Set<Language> getNullIndexed() {
@@ -89,8 +94,9 @@ public class IterableBridgeTestEntity {
 		this.nullIndexed.add( nullIndexed );
 	}
 
-	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
+	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN_STRING, analyze = Analyze.NO)
 	@ElementCollection
+	@IndexedContainer(indexNullAs = NULL_CONTAINER_NUMERIC_TOKEN_STRING)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
 	public Set<Integer> getNumericNullIndexed() {
@@ -107,6 +113,7 @@ public class IterableBridgeTestEntity {
 
 	@Field(store = Store.YES)
 	@ElementCollection
+	@IndexedContainer
 	@CollectionTable(name = "NullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullNotIndexed")
 	public List<String> getNullNotIndexed() {
@@ -123,6 +130,7 @@ public class IterableBridgeTestEntity {
 
 	@Field(store = Store.YES)
 	@ElementCollection
+	@IndexedContainer
 	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullNotIndexed")
 	public List<Long> getNumericNullNotIndexed() {
@@ -139,6 +147,7 @@ public class IterableBridgeTestEntity {
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	@ElementCollection
+	@IndexedContainer
 	@DateBridge(resolution = Resolution.SECOND)
 	@CollectionTable(name = "Dates", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "dates")

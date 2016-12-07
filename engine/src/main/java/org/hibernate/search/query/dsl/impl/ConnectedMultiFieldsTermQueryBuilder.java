@@ -95,8 +95,16 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		}
 		else {
 			applyTokenization = false;
-			if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
-				NullEncodingTwoWayFieldBridge nullEncodingBridge = (NullEncodingTwoWayFieldBridge) fieldBridge;
+			/*
+			 * We don't support NullEncodingOneWayFieldBridge, because this bridge is used on containers indexed
+			 * using @IndexedContainer(indexNullAs = "..."), and those encode null containers. When the field is an @IndexedContainer,
+			 * we want to target null *elements*. The rationale being that we always interpret a null match value as
+			 * "whatever null token was provided in @Field.indexNullAs".
+			 * Null containers can only be matched by passing the numeric null token explicitly.
+			 */
+			NullEncodingTwoWayFieldBridge nullEncodingBridge =
+					BridgeAdaptorUtils.unwrapAdaptorAndContainer( fieldBridge, NullEncodingTwoWayFieldBridge.class );
+			if ( nullEncodingBridge != null ) {
 				validateNullValueIsSearchable( fieldContext );
 				return nullEncodingBridge.buildNullQuery( fieldContext.getField() );
 			}

@@ -30,6 +30,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -88,6 +89,7 @@ public class GolfPlayer {
 
 	@ElementCollection
 	@Field
+	@IndexedContainer
 	private Set<String> strengths;
 
 	@ManyToMany
@@ -212,7 +214,7 @@ public class GolfPlayer {
 
 		private String firstName;
 		private String lastName;
-		private boolean active;
+		private Boolean active;
 		private Date dateOfBirth;
 		private Calendar subscriptionEndDate;
 		private double handicap;

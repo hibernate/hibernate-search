@@ -11,14 +11,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.builtin.nullencoding.impl.NotEncodingCodec;
-import org.hibernate.search.bridge.spi.NullMarkerCodec;
+import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
@@ -26,16 +22,19 @@ import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchJsonHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldPath;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
@@ -132,7 +131,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 			logDynamicBoostWarning( mappingBuilder, sourceProperty.getDynamicBoostStrategy(), propertyPath );
 		}
 
-		addNullValue( propertyMapping, fieldMetadata );
+		addNullValue( propertyMapping, mappingBuilder, fieldMetadata );
 
 		for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
 			try {
@@ -404,55 +403,23 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		return elasticsearchType;
 	}
 
-	private void addNullValue(PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
+	private void addNullValue(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {
 		NullMarkerCodec nullMarkerCodec = fieldMetadata.getNullMarkerCodec();
-
-		if ( nullMarkerCodec != NotEncodingCodec.SINGLETON ) { // XXX NotEncodingCodec is not accessible...
-			JsonPrimitive nullTokenJson = retrieveNullTokenAsJson( propertyMapping.getType(), fieldMetadata, nullMarkerCodec );
-
+		NullMarker nullMarker = nullMarkerCodec.getNullMarker();
+		if ( nullMarker != null ) {
+			JsonPrimitive nullTokenJson = convertIndexedNullTokenToJson( mappingBuilder, fieldMetadata.getPath(), nullMarker.nullEncoded() );
 			propertyMapping.setNullValue( nullTokenJson );
 		}
 	}
 
-	private JsonPrimitive retrieveNullTokenAsJson(DataType dataType, DocumentFieldMetadata fieldMetadata, NullMarkerCodec nullMarkerCodec) {
-		Document dummyDocument = new Document();
-		LuceneOptions luceneOptions =
-				fieldMetadata.getSourceType().getFieldLuceneOptions( fieldMetadata.getSourceProperty(), fieldMetadata, null, 1.0f );
-
-		nullMarkerCodec.encodeNullValue( fieldMetadata.getAbsoluteName(), dummyDocument, luceneOptions );
-
-		List<IndexableField> fields = dummyDocument.getFields();
-
-		if ( fields.size() > 1 ) {
-			throw new AssertionFailure( "Expected only one field" );
+	private JsonPrimitive convertIndexedNullTokenToJson(ElasticsearchMappingBuilder mappingBuilder,
+			DocumentFieldPath fieldPath, Object indexedNullToken) {
+		try {
+			return ElasticsearchJsonHelper.toJsonPrimitive( indexedNullToken );
 		}
-
-		if ( !fields.isEmpty() ) {
-			IndexableField field = fields.iterator().next();
-			return convertNullTokenFieldToJson( dataType, field );
-		}
-		else {
-			return null;
-		}
-	}
-
-	private JsonPrimitive convertNullTokenFieldToJson(DataType dataType, IndexableField field) {
-		Number numericValue = field.numericValue();
-		String stringValue = field.stringValue();
-		if ( numericValue != null ) {
-			return new JsonPrimitive( numericValue );
-		}
-		else if ( stringValue != null ) {
-			if ( DataType.BOOLEAN.equals( dataType ) ) {
-				// Parse the string so we send the proper type to Elasticsearch
-				return new JsonPrimitive( Boolean.parseBoolean( stringValue ) );
-			}
-			else {
-				return new JsonPrimitive( stringValue );
-			}
-		}
-		else {
-			return null;
+		catch (IllegalArgumentException notPropagated) {
+			throw LOG.unsupportedNullTokenType( mappingBuilder.getBeanClass(), fieldPath.getAbsoluteName(),
+					indexedNullToken.getClass() );
 		}
 	}
 

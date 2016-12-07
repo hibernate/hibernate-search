@@ -45,6 +45,10 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+
 /**
  * @author Yoann Rodiere
  */
@@ -295,12 +299,18 @@ public class ElasticsearchIndexNullAsIT extends SearchTestBase {
 					.list();
 			for ( Object[] projection : result ) {
 				if ( projection[0].equals( 1L ) ) {
-					// This behavior should change: such document should have a non-null value. See HSEARCH-2172
-
-					assertThat( projection[1] ).as( "Document with field '" + field + "' non-null should have a null"
+					assertThat( projection[1] ).as( "Document with field '" + field + "' non-null should have a non-null"
 							+ " projection on this field" )
-							.isNull();
-					JsonHelper.assertJsonEqualsIgnoringUnknownFields( "{'" + field + "': null}", (String) projection[2] );
+							.isEqualTo( expectedValue );
+
+					JsonElement json = new Gson().fromJson( (String) projection[2], JsonElement.class );
+					JsonElement propertyValue = json.getAsJsonObject().get( field );
+					assertThat( propertyValue ).as( "Document with field '" + field + "' non-null should have a value for"
+							+ " this field in their source" )
+							.isNotNull();
+					assertThat( propertyValue ).as( "Document with field '" + field + "' non-null should have a non-null"
+							+ " value for this field in their source" )
+							.isNotEqualTo( JsonNull.INSTANCE );
 				}
 				else {
 					assertThat( projection[1] ).as( "Document with field '" + field + "' indexed as null should have a null"

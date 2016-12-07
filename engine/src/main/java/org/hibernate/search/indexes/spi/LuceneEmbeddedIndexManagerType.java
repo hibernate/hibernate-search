@@ -6,12 +6,25 @@
  */
 package org.hibernate.search.indexes.spi;
 
+import org.hibernate.search.engine.nulls.impl.LuceneMissingValueStrategy;
+import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
+
 public final class LuceneEmbeddedIndexManagerType implements IndexManagerType {
 
 	public static final LuceneEmbeddedIndexManagerType INSTANCE = new LuceneEmbeddedIndexManagerType();
 
 	private LuceneEmbeddedIndexManagerType() {
 		//use the INSTANCE singleton
+	}
+
+	@Override
+	public MissingValueStrategy getMissingValueStrategy() {
+		return LuceneMissingValueStrategy.INSTANCE;
+	}
+
+	@Override
+	public MissingValueStrategy getContainerMissingValueStrategy() {
+		return LuceneMissingValueStrategy.INSTANCE;
 	}
 
 	@Override
