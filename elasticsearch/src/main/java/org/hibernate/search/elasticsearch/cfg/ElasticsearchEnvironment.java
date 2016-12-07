@@ -27,7 +27,7 @@ public final class ElasticsearchEnvironment {
 		public static final long DISCOVERY_REFRESH_INTERVAL = 10L;
 		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.CREATE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
-		public static final String REQUIRED_INDEX_STATUS = "green";
+		public static final ElasticsearchIndexStatus REQUIRED_INDEX_STATUS = ElasticsearchIndexStatus.GREEN;
 		public static final boolean REFRESH_AFTER_WRITE = false;
 		public static final int SCROLL_BACKTRACKING_WINDOW_SIZE = 10_000;
 		public static final int SCROLL_FETCH_SIZE = 1_000;
