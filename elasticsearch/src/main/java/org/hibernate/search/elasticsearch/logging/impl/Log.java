@@ -279,4 +279,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ " format (--MM-dd)." )
 	IllegalArgumentException invalidNullMarkerForMonthDay(@Cause Exception e);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 50,
+			value = "The index '%1$s' does not exist in the Elasticsearch cluster." )
+	SearchException indexMissing(String indexName);
+
 }

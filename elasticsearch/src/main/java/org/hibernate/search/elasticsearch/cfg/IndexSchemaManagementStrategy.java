@@ -14,10 +14,10 @@ package org.hibernate.search.elasticsearch.cfg;
 public enum IndexSchemaManagementStrategy {
 
 	/**
-	 * Indexes will never be created or deleted. The index schema is not managed by Hibernate Search and is not checked.
+	 * Indexes will never be created or deleted. Hibernate Search will only check that the index actually exists.
+	 * The index schema (mapping) is not managed by Hibernate Search and is not checked.
 	 */
 	NONE,
-
 
 	/**
 	 * Upon session factory initialization, existing index mappings will be checked by Hibernate Search, causing an
