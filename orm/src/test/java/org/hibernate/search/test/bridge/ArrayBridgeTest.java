@@ -13,6 +13,7 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -23,6 +24,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.bridge.ArrayBridgeTestEntity.Language;
+import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 
 import static org.hibernate.search.test.bridge.ArrayBridgeTestEntity.Language.ENGLISH;
 import static org.hibernate.search.test.bridge.ArrayBridgeTestEntity.Language.ITALIAN;
@@ -31,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Test indexing of {@link javax.persistence.ElementCollection} annotated arrays.
+ * Test indexing of {@link javax.persistence.ElementCollection} annotated elements.
  *
  * @author Davide D'Alto
  */
@@ -89,6 +91,27 @@ public class ArrayBridgeTest extends SearchTestBase {
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
 		assertEquals( "Wrong result returned looking for a null in a collection", withNullEntry.getName(), results.get( 0 ).getName() );
+	}
+
+	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
+	public void testSearchNullEmbedded() throws Exception {
+		List<ArrayBridgeTestEntity> results = findEmbeddedNullResults( "nullIndexed", ArrayBridgeTestEntity.NULL_EMBEDDED, true );
+
+		assertNotNull( "No result found for an indexed collection", results );
+		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
+		assertEquals( "Wrong result returned looking for a null in a collection", withNullEmbedded.getName(), results.get( 0 ).getName() );
+	}
+
+	@Test
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
+	public void testSearchNullNumericEmbedded() throws Exception {
+		List<ArrayBridgeTestEntity> results =
+				findEmbeddedNullResults( "embeddedNum", ArrayBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
+
+		assertNotNull( "No result found for an indexed collection", results );
+		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
+		assertEquals( "Wrong result returned looking for a null collection", withNullEmbedded.getName(), results.get( 0 ).getName() );
 	}
 
 	@Test
@@ -200,6 +223,18 @@ public class ArrayBridgeTest extends SearchTestBase {
 				"Wrong result returned from a collection of Date", withoutNull.getName(), results.get( 0 )
 						.getName()
 		);
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<ArrayBridgeTestEntity> findEmbeddedNullResults(String fieldName, Object value, boolean checkNullToken) {
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
+				.forEntity( ArrayBridgeTestEntity.class ).get();
+		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );
+		if ( checkNullToken ) {
+			termMatchingContext.ignoreFieldBridge();
+		}
+		Query query = termMatchingContext.ignoreAnalyzer().matching( value ).createQuery();
+		return fullTextSession.createFullTextQuery( query, ArrayBridgeTestEntity.class ).list();
 	}
 
 	@SuppressWarnings("unchecked")

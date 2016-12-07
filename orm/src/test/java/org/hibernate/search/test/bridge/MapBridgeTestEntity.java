@@ -23,6 +23,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
@@ -36,6 +37,8 @@ public class MapBridgeTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
 	static final String NULL_NUMERIC_TOKEN = "-7777";
+	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
+	static final String NULL_EMBEDDED_NUMERIC = "-4444";
 
 	private Long id;
 	private String name;
@@ -73,6 +76,11 @@ public class MapBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
 	@MapKeyColumn(nullable = false)
@@ -90,6 +98,11 @@ public class MapBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(prefix = "embeddedNum.", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
 	@MapKeyColumn(nullable = false)
@@ -107,6 +120,7 @@ public class MapBridgeTestEntity {
 
 	@Field(store = Store.YES)
 	@ElementCollection
+	@IndexedEmbedded
 	@CollectionTable(name = "NullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullNotIndexed")
 	@MapKeyColumn(nullable = false)
@@ -124,6 +138,7 @@ public class MapBridgeTestEntity {
 
 	@Field(store = Store.YES)
 	@ElementCollection
+	@IndexedEmbedded
 	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullNotIndexed")
 	@MapKeyColumn(nullable = false)
@@ -141,6 +156,7 @@ public class MapBridgeTestEntity {
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	@ElementCollection
+	@IndexedEmbedded
 	@DateBridge(resolution = Resolution.SECOND)
 	@CollectionTable(name = "Dates", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "dates")
