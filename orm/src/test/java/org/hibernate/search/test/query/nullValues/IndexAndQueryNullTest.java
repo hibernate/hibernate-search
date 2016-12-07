@@ -27,6 +27,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.junit.Test;
 
 /**
@@ -74,6 +75,62 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 
 		QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
 		Query query = queryBuilder.keyword().onField( "value" ).matching( null ).createQuery();
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
+
+		@SuppressWarnings("unchecked")
+		List<Value> valueList = fullTextQuery.list();
+		assertEquals( "Wrong number of results", 1, valueList.size() );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testNullContainerElementIndexingWithDSLQuery() throws Exception {
+		Value fooValue = new Value( "bar" );
+		fooValue.setContainerStringValue( CollectionHelper.asSet( "foo" ) );
+		Value nullValue = new Value( "bar" );
+		fooValue.setContainerStringValue( CollectionHelper.asSet( (String) null ) );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		getSession().save( fooValue );
+		getSession().save( nullValue );
+		tx.commit();
+
+		fullTextSession.clear();
+		tx = fullTextSession.beginTransaction();
+
+		QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
+		Query query = queryBuilder.keyword().onField( "containerStringValue" ).matching( null ).createQuery();
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
+
+		@SuppressWarnings("unchecked")
+		List<Value> valueList = fullTextQuery.list();
+		assertEquals( "Wrong number of results", 1, valueList.size() );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testNullContainerNumericElementIndexingWithDSLQuery() throws Exception {
+		Value fooValue = new Value( "bar" );
+		fooValue.setContainerNumericValue( CollectionHelper.asSet( 123 ) );
+		Value nullValue = new Value( "bar" );
+		fooValue.setContainerNumericValue( CollectionHelper.asSet( (Integer) null ) );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		getSession().save( fooValue );
+		getSession().save( nullValue );
+		tx.commit();
+
+		fullTextSession.clear();
+		tx = fullTextSession.beginTransaction();
+
+		QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
+		Query query = queryBuilder.keyword().onField( "containerNumericValue" ).matching( null ).createQuery();
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
 
 		@SuppressWarnings("unchecked")
