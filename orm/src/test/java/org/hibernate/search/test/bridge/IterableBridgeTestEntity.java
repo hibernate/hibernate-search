@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -39,6 +38,8 @@ public class IterableBridgeTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
 	static final String NULL_NUMERIC_TOKEN = "-555";
+	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
+	static final String NULL_EMBEDDED_NUMERIC = "-666";
 
 	private Long id;
 	private String name;
@@ -76,7 +77,11 @@ public class IterableBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
-	@IndexedEmbedded
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
 	public Set<Language> getNullIndexed() {
@@ -93,7 +98,11 @@ public class IterableBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
-	@IndexedEmbedded
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(prefix = "embeddedNum.", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
 	public Set<Integer> getNumericNullIndexed() {

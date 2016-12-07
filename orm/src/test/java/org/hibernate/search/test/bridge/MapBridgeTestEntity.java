@@ -37,6 +37,8 @@ public class MapBridgeTestEntity {
 
 	static final String NULL_TOKEN = "NULL_MARKER";
 	static final String NULL_NUMERIC_TOKEN = "-7777";
+	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
+	static final String NULL_EMBEDDED_NUMERIC = "-4444";
 
 	private Long id;
 	private String name;
@@ -74,7 +76,11 @@ public class MapBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
-	@IndexedEmbedded
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
 	@MapKeyColumn(nullable = false)
@@ -92,7 +98,11 @@ public class MapBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
-	@IndexedEmbedded
+	/*
+	 * This will only have an effect for null maps, since the type for the map values
+	 * does not contain any @Field annotation (which means there is nothing to embed).
+	 */
+	@IndexedEmbedded(prefix = "embeddedNum.", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
 	@MapKeyColumn(nullable = false)
