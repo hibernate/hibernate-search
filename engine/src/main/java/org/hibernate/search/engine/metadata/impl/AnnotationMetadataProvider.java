@@ -48,6 +48,8 @@ import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.IndexedContainer;
+import org.hibernate.search.annotations.IndexedContainers;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
@@ -66,7 +68,8 @@ import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
-import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingAsStringFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingOneWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.spi.EncodingBridge;
@@ -793,6 +796,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				configContext.getServiceManager()
 		);
 
+		fieldBridge = applyIndexedContainerAnnotation( typeMetadataBuilder, propertyMetadataBuilder,
+				fieldBridge, configContext, parseContext, fieldPath );
+
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
@@ -1292,6 +1298,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
 		}
 
+		fieldBridge = applyIndexedContainerAnnotation( typeMetadataBuilder, propertyMetadataBuilder,
+				fieldBridge, configContext, parseContext, fieldPath );
+
 		AnalyzerReference analyzerReference;
 		if ( parseContext.skipAnalyzers() ) {
 			analyzerReference = null;
@@ -1383,6 +1392,48 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		parseContext.collectUnqualifiedCollectionRole( member.getName() );
 	}
 
+	private FieldBridge applyIndexedContainerAnnotation(TypeMetadata.Builder typeMetadataBuilder,
+			PropertyMetadata.Builder propertyMetadataBuilder, FieldBridge fieldBridge,
+			ConfigContext configContext, ParseContext parseContext, DocumentFieldPath fieldPath) {
+		FieldBridge result = fieldBridge;
+		if ( !parseContext.skipFieldBridges() ) {
+			XProperty member = propertyMetadataBuilder.getPropertyAccessor();
+			IndexedContainer indexedContainerAnnotation = getIndexedContainerAnnotation( fieldPath, member );
+			if ( indexedContainerAnnotation != null ) {
+				FieldBridge elementBridge = fieldBridge;
+				result = bridgeFactory.wrapInContainerBridge( elementBridge, member, reflectionManager );
+				final NullMarkerCodec containerNullTokenCodec = determineNullMarkerCodec(
+						elementBridge, indexedContainerAnnotation, configContext,
+						parseContext, typeMetadataBuilder.getIndexedType(), fieldPath );
+				if ( containerNullTokenCodec != NotEncodingCodec.SINGLETON ) {
+					result = new NullEncodingOneWayFieldBridge( result, containerNullTokenCodec );
+				}
+			}
+		}
+		return result;
+	}
+
+	private IndexedContainer getIndexedContainerAnnotation(DocumentFieldPath fieldPath, XProperty member) {
+		IndexedContainer singleIndexedContainer = member.getAnnotation( IndexedContainer.class );
+		String fieldName = fieldPath.getRelativeName();
+		if ( singleIndexedContainer != null ) {
+			String targetFieldName = ReflectionHelper.getAttributeName( member, singleIndexedContainer.forField() );
+			if ( fieldName.equals( targetFieldName ) ) {
+				return singleIndexedContainer;
+			}
+		}
+		IndexedContainers indexedContainers = member.getAnnotation( IndexedContainers.class );
+		if ( indexedContainers != null ) {
+			for ( IndexedContainer indexedContainer : indexedContainers.value() ) {
+				String targetFieldName = ReflectionHelper.getAttributeName( member, indexedContainer.forField() );
+				if ( fieldName.equals( targetFieldName ) ) {
+					return indexedContainer;
+				}
+			}
+		}
+		return null;
+	}
+
 	private FacetEncodingType determineFacetEncodingType(XProperty member, Facet facetAnnotation) {
 		FacetEncodingType facetEncodingType = facetAnnotation.encoding();
 		if ( !facetEncodingType.equals( FacetEncodingType.AUTO ) ) {
@@ -1432,37 +1483,64 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private NullMarkerCodec determineNullMarkerCodec(FieldBridge fieldBridge,
 			org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context,
 			ParseContext parseContext, Class<?> indexedType, DocumentFieldPath fieldPath) {
+		NullMarker nullMarker = fieldAnnotation == null ? null : determineNullMarker(
+				fieldBridge, fieldAnnotation == null ? null : fieldAnnotation.indexNullAs(),
+				org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL,
+				org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN,
+				configContext, parseContext, indexedType, fieldPath );
+		if ( nullMarker == null ) {
+			return NotEncodingCodec.SINGLETON;
+		}
+
+		IndexManagerType indexManagerType = parseContext.getIndexManagerType();
+		MissingValueStrategy missingValueStrategy = configContext.getMissingValueStrategy( indexManagerType );
+
+		return missingValueStrategy.createNullMarkerCodec( indexedType, fieldPath, nullMarker );
+	}
+
+	private NullMarkerCodec determineNullMarkerCodec(FieldBridge fieldBridge,
+			org.hibernate.search.annotations.IndexedContainer containerAnnotation, ConfigContext configContext,
+			ParseContext parseContext, Class<?> indexedType, DocumentFieldPath fieldPath) {
+		NullMarker nullMarker = containerAnnotation == null ? null : determineNullMarker(
+				fieldBridge, containerAnnotation == null ? null : containerAnnotation.indexNullAs(),
+				org.hibernate.search.annotations.IndexedContainer.DO_NOT_INDEX_NULL,
+				org.hibernate.search.annotations.IndexedContainer.DEFAULT_NULL_TOKEN,
+				configContext, parseContext, indexedType, fieldPath );
+		if ( nullMarker == null ) {
+			return NotEncodingCodec.SINGLETON;
+		}
+
+		IndexManagerType indexManagerType = parseContext.getIndexManagerType();
+		MissingValueStrategy missingValueStrategy = configContext.getContainerMissingValueStrategy( indexManagerType );
+
+		return missingValueStrategy.createNullMarkerCodec( indexedType, fieldPath, nullMarker );
+	}
+
+	private NullMarker determineNullMarker(FieldBridge fieldBridge, String indexNullAs,
+			String indexNullAsDoNotIndexNullMarker, String indexNullAsUseDefaultMarker,
+			ConfigContext configContext,
+			ParseContext parseContext, Class<?> indexedType, DocumentFieldPath fieldPath) {
 		if ( parseContext.skipNullMarkerCodec() ) {
-			return NotEncodingCodec.SINGLETON;
+			return null;
 		}
-
-		if ( fieldAnnotation == null ) {
-			// The option of null-markers is not being used
-			return NotEncodingCodec.SINGLETON;
-		}
-
-		String indexNullAs = fieldAnnotation.indexNullAs();
-		if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL ) ) {
+		if ( indexNullAs.equals( indexNullAsDoNotIndexNullMarker ) ) {
 			// The option is explicitly disabled
-			return NotEncodingCodec.SINGLETON;
+			return null;
+		}
+
+		if ( indexNullAs.equals( indexNullAsUseDefaultMarker ) ) {
+			// Use the default null token
+			// This will require the global default to be an encodable value
+			indexNullAs = configContext.getDefaultNullToken();
+		}
+
+		if ( indexNullAs.equals( indexNullAsDoNotIndexNullMarker ) ) {
+			// The option is explicitly disabled
+			return null;
 		}
 		else {
-			NullMarker nullMarker;
-			if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
-				// Use the default null token
-				// This will require the global default to be an encodable value
-				nullMarker = createNullMarker( fieldBridge, context.getDefaultNullToken(), fieldPath );
-			}
-			else {
-				// Use the default null token
-				// This will require 'indexNullAs' to be an encodable value
-				nullMarker = createNullMarker( fieldBridge, indexNullAs, fieldPath );
-			}
-
-			IndexManagerType indexManagerType = parseContext.getIndexManagerType();
-			MissingValueStrategy missingValueStrategy = context.getMissingValueStrategy( indexManagerType );
-
-			return missingValueStrategy.createNullMarkerCodec( indexedType, fieldPath, nullMarker );
+			// This will require indexNullAs to be an encodable value
+			return createNullMarker( fieldBridge, indexNullAs, fieldPath );
 		}
 	}
 
@@ -1837,7 +1915,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 			final String indexNullAs = embeddedNullToken( configContext, indexedEmbeddedAnnotation );
 			if ( indexNullAs != null ) {
-				FieldBridge fieldBridge = new NullEncodingFieldBridge( NULL_EMBEDDED_STRING_BRIDGE, indexNullAs );
+				FieldBridge fieldBridge = new NullEncodingAsStringFieldBridge( NULL_EMBEDDED_STRING_BRIDGE, indexNullAs );
 				embeddedTypeMetadataBuilder.indexNullToken(
 						indexNullAs,
 						embeddedNullField( fullPrefix ),

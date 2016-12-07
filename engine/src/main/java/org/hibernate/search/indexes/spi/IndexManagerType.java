@@ -7,6 +7,7 @@
 package org.hibernate.search.indexes.spi;
 
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -48,4 +49,10 @@ public interface IndexManagerType {
 	 * @param cfg the Hibernate Search configuration, providing in particular access to configuration properties.
 	 */
 	MissingValueStrategy createMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg);
+
+	/**
+	 * Creates the strategy for missing values employed by index managers of this family
+	 * for fields targeted by an {@link IndexedContainer} annotation.
+	 */
+	MissingValueStrategy createContainerMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg);
 }

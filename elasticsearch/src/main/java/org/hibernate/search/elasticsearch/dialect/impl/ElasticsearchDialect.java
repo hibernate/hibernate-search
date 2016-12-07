@@ -31,4 +31,6 @@ public interface ElasticsearchDialect {
 
 	MissingValueStrategy createMissingValueStrategy();
 
+	MissingValueStrategy createContainerMissingValueStrategy();
+
 }

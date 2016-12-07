@@ -70,6 +70,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 	private MissingValueStrategy missingValueStrategy;
 
+	private MissingValueStrategy containerMissingValueStrategy;
+
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		ServiceManager serviceManager = context.getServiceManager();
@@ -98,6 +100,7 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 			this.schemaMigrator = new DefaultElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
 
 			this.missingValueStrategy = dialect.createMissingValueStrategy();
+			this.containerMissingValueStrategy = dialect.createContainerMissingValueStrategy();
 		}
 	}
 
@@ -162,5 +165,10 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public MissingValueStrategy getMissingValueStrategy() {
 		return missingValueStrategy;
+	}
+
+	@Override
+	public MissingValueStrategy getContainerMissingValueStrategy() {
+		return containerMissingValueStrategy;
 	}
 }

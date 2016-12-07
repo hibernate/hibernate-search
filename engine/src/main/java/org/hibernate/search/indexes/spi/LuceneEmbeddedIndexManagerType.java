@@ -30,4 +30,10 @@ public final class LuceneEmbeddedIndexManagerType implements IndexManagerType {
 	public MissingValueStrategy createMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		return LuceneMissingValueStrategy.INSTANCE;
 	}
+
+	@Override
+	public MissingValueStrategy createContainerMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
+		return LuceneMissingValueStrategy.INSTANCE;
+	}
+
 }

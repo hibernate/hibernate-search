@@ -19,7 +19,6 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
@@ -199,7 +198,6 @@ public final class BridgeFactory {
 		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext(
 				member, isId, isExplicitlyMarkedAsNumeric, reflectionManager, serviceManager
 		);
-		ContainerType containerType = getContainerType( member, reflectionManager );
 
 		// Backend specific providers are managed first so that they can override the standard
 		// bridges
@@ -207,9 +205,8 @@ public final class BridgeFactory {
 			if ( providerEntry.getKey().equals( indexManagerType ) ) {
 				bridge = getFieldBridgeFromBridgeProvider(
 						providerEntry.getValue(),
-						context,
-						containerType );
-
+						context
+				);
 				if ( bridge != null ) {
 					return bridge;
 				}
@@ -222,8 +219,7 @@ public final class BridgeFactory {
 		for ( BridgeProvider provider : annotationBasedProviders ) {
 			bridge = getFieldBridgeFromBridgeProvider(
 					provider,
-					context,
-					containerType
+					context
 			);
 			if ( bridge != null ) {
 				return bridge;
@@ -237,8 +233,7 @@ public final class BridgeFactory {
 		for ( BridgeProvider provider : regularProviders ) {
 			FieldBridge createdBridge = getFieldBridgeFromBridgeProvider(
 					provider,
-					context,
-					containerType
+					context
 			);
 			if ( createdBridge != null ) {
 				// oops we found a duplicate
@@ -275,9 +270,6 @@ public final class BridgeFactory {
 	}
 
 	private ContainerType getContainerType(XMember member, ReflectionManager reflectionManager) {
-		if ( ! member.isAnnotationPresent( IndexedEmbedded.class ) ) {
-			return ContainerType.SINGLE;
-		}
 		if ( member.isArray() ) {
 			return ContainerType.ARRAY;
 		}
@@ -295,14 +287,18 @@ public final class BridgeFactory {
 
 	private FieldBridge getFieldBridgeFromBridgeProvider(
 			BridgeProvider bridgeProvider,
-			ExtendedBridgeProvider.ExtendedBridgeProviderContext context,
-			ContainerType containerType
+			ExtendedBridgeProvider.ExtendedBridgeProviderContext context
 	) {
 		FieldBridge bridge = bridgeProvider.provideFieldBridge( context );
 		if ( bridge == null ) {
 			return null;
 		}
 		populateReturnType( context.getReturnType(), bridge.getClass(), bridge );
+		return bridge;
+	}
+
+	public FieldBridge wrapInContainerBridge(FieldBridge bridge, XMember member, ReflectionManager reflectionManager) {
+		ContainerType containerType = getContainerType( member, reflectionManager );
 		switch ( containerType ) {
 			case SINGLE:
 				return bridge;
