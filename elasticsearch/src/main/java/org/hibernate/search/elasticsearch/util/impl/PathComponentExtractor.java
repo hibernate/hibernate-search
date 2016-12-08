@@ -50,20 +50,28 @@ public class PathComponentExtractor implements Cloneable {
 	}
 
 	public enum ConsumptionLimit {
+		/**
+		 * Consume up to the second-but-last path component, i.e. up to the last path separator
+		 * in the path string.
+		 * <p>Don't consume anything if there is no path separator in the path string.
+		 */
 		SECOND_BUT_LAST,
+		/**
+		 * Consume up to the last path component, i.e. up to the end of the path string.
+		 */
 		LAST;
 	}
 
 	/**
-	 * Consumes one more component in the current path (if possible) and returns this component.
+	 * Consume one more component in the current path (provided it's not beyond the given limit) and returns this component.
 	 *
 	 *<p>If this method reaches a incompletely qualified path component, i.e one that is not
-	 *followed by a dot but by the end of the path, it will return it only if {@code includeLast}
-	 *is {@code true}.
+	 *followed by a dot but by the end of the path, it will return it only if {@code consumptionLimit}
+	 *is {@link ConsumptionLimit#LAST}.
 	 *
-	 * @return The next path component.
-	 * @throws AssertionFailure If there is nothing to consume in the path, or if there is more
-	 * than one component to consume.
+	 * @param consumeLimit The consumption limit, i.e. the definition of the last component
+	 * to consume in the path.
+	 * @return The next path component, or {@code null} if the consumption limit has been reached.
 	 */
 	public String next(ConsumptionLimit consumeLimit) {
 		int nextSeparatorIndex = path.indexOf( PATH_COMPONENT_SEPARATOR, currentIndexInPath );
