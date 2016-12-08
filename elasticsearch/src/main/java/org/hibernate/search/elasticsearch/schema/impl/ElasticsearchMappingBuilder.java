@@ -40,32 +40,52 @@ final class ElasticsearchMappingBuilder {
 	private final TypeMetadata typeMetadata;
 
 	private final PathComponentExtractor pathComponentExtractor;
-	private final TypeMapping elasticsearchMapping;
+	private TypeMapping elasticsearchMapping;
 
+	/**
+	 * Create a root mapping builder.
+	 * @param binding The Hibernate Search binding to be translated in an Elasticsearch mapping
+	 * @param elasticsearchMapping The Elasticsearch mapping on which properties should be added
+	 */
 	public ElasticsearchMappingBuilder(EntityIndexBinding binding, TypeMapping elasticsearchMapping) {
-		this( null, binding, binding.getDocumentBuilder().getTypeMetadata(), elasticsearchMapping, new PathComponentExtractor() );
-	}
-
-	private ElasticsearchMappingBuilder(ElasticsearchMappingBuilder parent, EntityIndexBinding binding, TypeMetadata typeMetadata,
-			TypeMapping elasticsearchMapping, PathComponentExtractor pathComponentExtractor) {
 		this.binding = binding;
-		this.parent = parent;
+		this.parent = null;
+		this.typeMetadata = binding.getDocumentBuilder().getTypeMetadata();
+		this.pathComponentExtractor = new PathComponentExtractor();
 		this.elasticsearchMapping = elasticsearchMapping;
-		this.typeMetadata = typeMetadata;
-		this.pathComponentExtractor = pathComponentExtractor;
 	}
 
-	public ElasticsearchMappingBuilder createEmbedded(EmbeddedTypeMetadata embeddedTypeMetadata) {
-		PathComponentExtractor newExtractor = pathComponentExtractor.clone();
-		newExtractor.append( embeddedTypeMetadata.getEmbeddedFieldPrefix() );
-
-		TypeMapping newElasticsearchMapping = getOrCreateParents( newExtractor );
-
-		return new ElasticsearchMappingBuilder( this, binding, embeddedTypeMetadata, newElasticsearchMapping, newExtractor );
+	/**
+	 * Create an embedded mapping builder.
+	 * @param parent The builder for the mapping on which the new mapping will be added as a property
+	 * @param embeddedTypeMetadata The Hibernate Search metadata to be translated in an Elasticsearch mapping
+	 */
+	public ElasticsearchMappingBuilder(ElasticsearchMappingBuilder parent, EmbeddedTypeMetadata embeddedTypeMetadata) {
+		this.binding = parent.binding;
+		this.parent = parent;
+		this.typeMetadata = embeddedTypeMetadata;
+		this.pathComponentExtractor = parent.clonePathExtractor();
+		this.pathComponentExtractor.append( embeddedTypeMetadata.getEmbeddedFieldPrefix() );
+		this.elasticsearchMapping = null; // Will be lazily initialized
 	}
+
 
 	private TypeMapping getOrCreateParents(PathComponentExtractor extractor) {
-		TypeMapping currentElasticsearchMapping = elasticsearchMapping;
+		/*
+		 * Lazily add the mapping to its parent, because we'd been asked to do so.
+		 * This lazy initialization allows users to use
+		 * @IndexedEmbedded(prefix = "foo") in conjunction with @Field(name = "foo") on
+		 * the same property, provided the @IndexedEmbedded will not add any sub-property.
+		 *
+		 * This might seem weird (and arguably is), but this is how users tell Hibernate
+		 * Search to unwrap a multi-valued property (array, List, Map, ...) to pass each
+		 * value to the field bridge instead of simply passing the container itself.
+		 */
+		if ( this.elasticsearchMapping == null ) {
+			this.elasticsearchMapping = parent.getOrCreateParents( pathComponentExtractor );
+		}
+
+		TypeMapping currentElasticsearchMapping = this.elasticsearchMapping;
 		String newPathComponent = extractor.next( ConsumptionLimit.SECOND_BUT_LAST );
 		while ( newPathComponent != null ) {
 			/*
@@ -112,14 +132,22 @@ final class ElasticsearchMappingBuilder {
 	}
 
 	public boolean hasPropertyAbsolute(String absolutePath) {
+		return getPropertyAbsolute( absolutePath ) != null;
+	}
+
+	public TypeMapping getPropertyAbsolute(String absolutePath) {
 		/*
 		 * Handle cases where the field name contains dots (and therefore requires
-		 * creating containing properties).
+		 * handling parent properties along the path).
 		 */
 		PathComponentExtractor newExtractor = createPathExtractorForAbsolutePath( absolutePath );
-		TypeMapping parent = getOrCreateParents( newExtractor );
-		String propertyName = newExtractor.next( ConsumptionLimit.LAST );
-		return getPropertyRelative( parent, propertyName ) != null;
+		TypeMapping currentMapping = elasticsearchMapping;
+		String pathComponent = newExtractor.next( ConsumptionLimit.LAST );
+		while ( currentMapping != null && pathComponent != null ) {
+			currentMapping = getPropertyRelative( currentMapping, pathComponent );
+			pathComponent = newExtractor.next( ConsumptionLimit.LAST );
+		}
+		return currentMapping;
 	}
 
 	public void setPropertyAbsolute(String absolutePath, PropertyMapping propertyMapping) {
@@ -148,9 +176,20 @@ final class ElasticsearchMappingBuilder {
 		parent.addProperty( propertyName, propertyMapping );
 	}
 
+	private PathComponentExtractor clonePathExtractor() {
+		PathComponentExtractor newExtractor = pathComponentExtractor.clone();
+		/*
+		 * Ignore the part of the path that hasn't been consumed yet due to the lazy initialization
+		 * not having been performed yet.
+		 * See getOrCreateParents().
+		 */
+		newExtractor.flushTo( ConsumptionLimit.SECOND_BUT_LAST );
+		return newExtractor;
+	}
+
 	private PathComponentExtractor createPathExtractorForAbsolutePath(String absolutePath) {
 		try {
-			PathComponentExtractor newExtractor = this.pathComponentExtractor.clone();
+			PathComponentExtractor newExtractor = clonePathExtractor();
 			newExtractor.appendRelativePart( absolutePath );
 			return newExtractor;
 		}
