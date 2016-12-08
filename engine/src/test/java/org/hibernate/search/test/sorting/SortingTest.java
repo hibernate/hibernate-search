@@ -443,6 +443,7 @@ public class SortingTest {
 		final List<Friend> friends;
 
 		@Field
+		@IndexedEmbedded//TODO improve error message when this is missing
 		Integer[] array;
 
 		Person(int id, Integer age, String name, CuddlyToy favoriteCuddlyToy) {
