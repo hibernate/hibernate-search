@@ -21,6 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * Creates queries to be used with Elasticsearch.
@@ -51,7 +52,14 @@ public class ElasticsearchQueries {
 	 * official documentation</a> for the complete payload syntax.
 	 */
 	public static QueryDescriptor fromJson(String payload) {
-		JsonObject payloadAsJsonObject = PARSER.parse( payload ).getAsJsonObject();
+		JsonObject payloadAsJsonObject;
+
+		try {
+			payloadAsJsonObject = PARSER.parse( payload ).getAsJsonObject();
+		}
+		catch (IllegalStateException | JsonSyntaxException e) {
+			throw LOG.invalidSearchAPIPayload( e );
+		}
 
 		List<String> invalidAttributes = new ArrayList<>();
 		for ( Map.Entry<String, ?> entry : payloadAsJsonObject.entrySet() ) {
