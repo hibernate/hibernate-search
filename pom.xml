@@ -184,7 +184,7 @@
         <!-- Elasticsearch -->
         <elasticsearchJestVersion>2.0.4</elasticsearchJestVersion>
         <elasticsearchCommonsLang3Version>3.4</elasticsearchCommonsLang3Version>
-        <elasticsearchGsonVersion>2.4</elasticsearchGsonVersion>
+        <elasticsearchGsonVersion>2.6.2</elasticsearchGsonVersion>
 
         <!-- Integration tests -->
         <arquillianVersion>1.1.11.Final</arquillianVersion>
