@@ -283,4 +283,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "The index '%1$s' does not exist in the Elasticsearch cluster." )
 	SearchException indexMissing(String indexName);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 51,
+			value = "The given payload contains unsupported attributes: %1$s. Only 'query' is supported." )
+	SearchException unsupportedSearchAPIPayloadAttributes(List<String> invalidAttributes);
+
 }
