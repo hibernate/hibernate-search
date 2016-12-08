@@ -296,4 +296,14 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Executing Elasticsearch query on '%s':\n%s" )
 	void executingElasticsearchQuery(String pathAndQueryAsString, String queryAsString);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 54,
+			value = "Invalid field path detected for field '%2$s' on entity '%1$s':"
+					+ " the field name is not prefixed with '%3$s' as it should."
+					+ " This probably means that the field was created with a custom field bridge which added"
+					+ " fields with an arbitrary name, not taking the name passed as a parameter into account."
+					+ " This is not supported with the Elasticsearch indexing service: please only add suffixes to the name"
+					+ " passed as a parameter to the various bridge methods and never ignore this name."
+	)
+	SearchException indexedEmbeddedPrefixBypass(Class<?> entityType, String fieldPath, String expectedParent);
+
 }

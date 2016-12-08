@@ -33,6 +33,7 @@ import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponen
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
+import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -357,6 +358,10 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 					}
 				}
 			}
+		}
+		catch (ParentPathMismatchException e) {
+			throw LOG.indexedEmbeddedPrefixBypass( indexBinding.getDocumentBuilder().getBeanClass(),
+					e.getMismatchingPath(), e.getExpectedParentPath() );
 		}
 		catch (UnexpectedJsonElementTypeException e) {
 			List<JsonElementType<?>> expectedTypes = e.getExpectedTypes();
