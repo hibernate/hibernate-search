@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.ScrollableResults;
@@ -182,6 +184,23 @@ public class ElasticsearchIT extends SearchTestBase {
 		List<?> result = session.createFullTextQuery( query ).list();
 
 		assertThat( result ).onProperty( "title" ).containsOnly( "Latest in ORM", "ORM for beginners" );
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2467")
+	public void testDateFieldRangeQuery() throws Exception {
+		Session s = openSession();
+		FullTextSession session = Search.getFullTextSession( s );
+		Transaction tx = s.beginTransaction();
+
+		Query query = NumericRangeQuery.newLongRange( "dateOfBirth", -373078800000L, null, true, true );
+		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
+				.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) )
+				.list();
+
+		assertThat( result ).onProperty( "firstName" ).containsOnly( "Klaus" );
 		tx.commit();
 		s.close();
 	}
