@@ -97,7 +97,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 
 		// Recurse into embedded types
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
-			ElasticsearchMappingBuilder embeddedContext = mappingBuilder.createEmbedded( embeddedTypeMetadata );
+			ElasticsearchMappingBuilder embeddedContext = new ElasticsearchMappingBuilder( mappingBuilder, embeddedTypeMetadata );
 			addMappings( embeddedContext );
 		}
 	}
