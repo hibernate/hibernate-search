@@ -14,6 +14,7 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
+import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
 import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor;
 import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor.ConsumptionLimit;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
@@ -115,8 +116,7 @@ final class ElasticsearchMappingBuilder {
 		 * Handle cases where the field name contains dots (and therefore requires
 		 * creating containing properties).
 		 */
-		PathComponentExtractor newExtractor = this.pathComponentExtractor.clone();
-		newExtractor.appendRelativePart( absolutePath );
+		PathComponentExtractor newExtractor = createPathExtractorForAbsolutePath( absolutePath );
 		TypeMapping parent = getOrCreateParents( newExtractor );
 		String propertyName = newExtractor.next( ConsumptionLimit.LAST );
 		return getPropertyRelative( parent, propertyName ) != null;
@@ -127,8 +127,7 @@ final class ElasticsearchMappingBuilder {
 		 * Handle cases where the field name contains dots (and therefore requires
 		 * creating containing properties).
 		 */
-		PathComponentExtractor newExtractor = this.pathComponentExtractor.clone();
-		newExtractor.appendRelativePart( absolutePath );
+		PathComponentExtractor newExtractor = createPathExtractorForAbsolutePath( absolutePath );
 		TypeMapping parent = getOrCreateParents( newExtractor );
 		String propertyName = newExtractor.next( ConsumptionLimit.LAST );
 
@@ -147,6 +146,17 @@ final class ElasticsearchMappingBuilder {
 			 */
 		}
 		parent.addProperty( propertyName, propertyMapping );
+	}
+
+	private PathComponentExtractor createPathExtractorForAbsolutePath(String absolutePath) {
+		try {
+			PathComponentExtractor newExtractor = this.pathComponentExtractor.clone();
+			newExtractor.appendRelativePart( absolutePath );
+			return newExtractor;
+		}
+		catch (ParentPathMismatchException e) {
+			throw LOG.indexedEmbeddedPrefixBypass( getBeanClass(), e.getMismatchingPath(), e.getExpectedParentPath() );
+		}
 	}
 
 	public TypeMetadata getMetadata() {
