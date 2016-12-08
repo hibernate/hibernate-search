@@ -20,19 +20,23 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchJsonQueryDescriptor implements QueryDescriptor {
 
-	private final JsonObject jsonQuery;
+	/**
+	 * The raw payload for the Search API, which will serve as a base
+	 * to build the actual payload.
+	 */
+	private final JsonObject rawSearchPayload;
 
-	public ElasticsearchJsonQueryDescriptor(JsonObject jsonQuery) {
-		this.jsonQuery = jsonQuery;
+	public ElasticsearchJsonQueryDescriptor(JsonObject rawSearchPayload) {
+		this.rawSearchPayload = rawSearchPayload;
 	}
 
 	@Override
 	public HSQuery createHSQuery(SearchIntegrator searchIntegrator) {
-		return new ElasticsearchHSQueryImpl( jsonQuery, searchIntegrator.unwrap( ExtendedSearchIntegrator.class ) );
+		return new ElasticsearchHSQueryImpl( rawSearchPayload, searchIntegrator.unwrap( ExtendedSearchIntegrator.class ) );
 	}
 
 	@Override
 	public String toString() {
-		return jsonQuery.toString();
+		return rawSearchPayload.toString();
 	}
 }
