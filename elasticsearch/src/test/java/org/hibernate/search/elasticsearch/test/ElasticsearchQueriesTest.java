@@ -44,4 +44,24 @@ public class ElasticsearchQueriesTest {
 		);
 	}
 
+	@Test
+	public void malformatedJson() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400051" );
+
+		ElasticsearchQueries.fromJson(
+				"{ 'query': }"
+		);
+	}
+
+	@Test
+	public void nonObjectJson() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400051" );
+
+		ElasticsearchQueries.fromJson(
+				"'foo'"
+		);
+	}
+
 }
