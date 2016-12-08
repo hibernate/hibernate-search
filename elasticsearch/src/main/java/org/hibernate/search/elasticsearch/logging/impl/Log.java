@@ -287,4 +287,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "The given payload contains unsupported attributes: %1$s. Only 'query' is supported." )
 	SearchException unsupportedSearchAPIPayloadAttributes(List<String> invalidAttributes);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 52,
+			value = "The given payload is not a valid JSON object." )
+	SearchException invalidSearchAPIPayload(@Cause Exception e);
+
 }
