@@ -39,11 +39,12 @@ public class PathComponentExtractor implements Cloneable {
 	 * denotes a child element of the current path, while preserving the memory of the previously
 	 * consumed path components.
 	 * @param otherPath A path that must start with the current path.
+	 * @throws ParentPathMismatchException If {@code otherPath} is not contained with the current path.
 	 */
-	public void appendRelativePart(String otherPath) {
+	public void appendRelativePart(String otherPath) throws ParentPathMismatchException {
 		String pathAsString = path.toString();
 		if ( !otherPath.startsWith( pathAsString ) ) {
-			throw new AssertionFailure( "The path '" + otherPath + "' is not contained within '" + pathAsString + "'" );
+			throw new ParentPathMismatchException( pathAsString, otherPath );
 		}
 
 		path.append( otherPath, path.length(), otherPath.length() );
