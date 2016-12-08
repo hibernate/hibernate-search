@@ -9,6 +9,8 @@ package org.hibernate.search.elasticsearch.schema.impl.model;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.google.gson.GsonBuilder;
+
 /**
  * An object representic an Elasticsearch index.
  *
@@ -42,6 +44,11 @@ public class IndexMetadata {
 
 	public void removeMapping(String name) {
 		this.mappings.remove( name );
+	}
+
+	@Override
+	public String toString() {
+		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
 	}
 
 }
