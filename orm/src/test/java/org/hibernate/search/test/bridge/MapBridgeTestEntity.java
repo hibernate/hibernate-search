@@ -23,6 +23,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
@@ -73,6 +74,7 @@ public class MapBridgeTestEntity {
 
 	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	@IndexedEmbedded
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
 	@MapKeyColumn(nullable = false)
@@ -90,6 +92,7 @@ public class MapBridgeTestEntity {
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
+	@IndexedEmbedded
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
 	@MapKeyColumn(nullable = false)
@@ -107,6 +110,7 @@ public class MapBridgeTestEntity {
 
 	@Field(store = Store.YES)
 	@ElementCollection
+	@IndexedEmbedded
 	@CollectionTable(name = "NullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullNotIndexed")
 	@MapKeyColumn(nullable = false)
@@ -124,6 +128,7 @@ public class MapBridgeTestEntity {
 
 	@Field(store = Store.YES)
 	@ElementCollection
+	@IndexedEmbedded
 	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullNotIndexed")
 	@MapKeyColumn(nullable = false)
@@ -141,6 +146,7 @@ public class MapBridgeTestEntity {
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	@ElementCollection
+	@IndexedEmbedded
 	@DateBridge(resolution = Resolution.SECOND)
 	@CollectionTable(name = "Dates", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "dates")
