@@ -125,7 +125,15 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			)
 	);
 
-	private final JsonObject jsonQuery;
+	/**
+	 * The constructor-provided payload for the Search API, holding
+	 * the search query in particular.
+	 * <p>
+	 * This raw payload will serve as a basis for the actual payload to be sent toElasticsearch,
+	 * which will also contain automatically generated data related in particular to sorts
+	 * and projections.
+	 */
+	private final JsonObject rawSearchPayload;
 
 	private Integer resultSize;
 	private IndexSearcher searcher;
@@ -135,9 +143,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	private transient FacetManagerImpl facetManager;
 
-	public ElasticsearchHSQueryImpl(JsonObject jsonQuery, ExtendedSearchIntegrator extendedIntegrator) {
+	public ElasticsearchHSQueryImpl(JsonObject rawSearchPayload, ExtendedSearchIntegrator extendedIntegrator) {
 		super( extendedIntegrator );
-		this.jsonQuery = jsonQuery;
+		this.rawSearchPayload = rawSearchPayload;
 	}
 
 	@Override
@@ -160,7 +168,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public String getQueryString() {
-		return jsonQuery.toString();
+		return rawSearchPayload.toString();
 	}
 
 	@Override
@@ -253,7 +261,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	@Override
 	protected TimeoutManagerImpl buildTimeoutManager() {
 		return new TimeoutManagerImpl(
-				jsonQuery,
+				rawSearchPayload,
 				timeoutExceptionFactory,
 				this.extendedIntegrator.getTimingSource()
 		);
@@ -317,7 +325,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
 						throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
 							queriedEntityType,
-							jsonQuery.toString()
+							rawSearchPayload.toString()
 						);
 					}
 
@@ -329,7 +337,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 
 			// Query filters; always a type filter, possibly a tenant id filter;
-			JsonObject filteredQuery = getFilteredQuery( jsonQuery.get( "query" ), typeFilters );
+			JsonObject filteredQuery = getFilteredQuery( rawSearchPayload.get( "query" ), typeFilters );
 
 			JsonBuilder.Object payloadBuilder = JsonBuilder.object();
 			payloadBuilder.add( "query", filteredQuery );

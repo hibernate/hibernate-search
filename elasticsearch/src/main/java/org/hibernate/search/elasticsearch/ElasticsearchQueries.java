@@ -28,19 +28,21 @@ public class ElasticsearchQueries {
 	}
 
 	/**
-	 * Creates an Elasticsearch query from the given JSON query representation. See the <a
-	 * href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html">official
-	 * documentation</a> for the complete query syntax.
+	 * Creates an Elasticsearch query from the given JSON payload for the Elasticsearch Search API.
+	 * <p>
+	 * See the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html">
+	 * official documentation</a> for the complete payload syntax.
 	 */
-	public static QueryDescriptor fromJson(String jsonQuery) {
-		return new ElasticsearchJsonQueryDescriptor( PARSER.parse( jsonQuery ).getAsJsonObject() );
+	public static QueryDescriptor fromJson(String payload) {
+		return new ElasticsearchJsonQueryDescriptor( PARSER.parse( payload ).getAsJsonObject() );
 	}
 
 	/**
 	 * Creates an Elasticsearch query from the given Query String Query, as e.g. to be used with the "q" parameter in
-	 * the Elasticsearch API. See the <a
-	 * href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">official
-	 * documentation</a> for a description of the query syntax.
+	 * the Elasticsearch Search API.
+	 * <p>
+	 * See the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">
+	 * official documentation</a> for the query syntax.
 	 */
 	public static QueryDescriptor fromQueryString(String queryStringQuery) {
 		// Payload looks like so:
