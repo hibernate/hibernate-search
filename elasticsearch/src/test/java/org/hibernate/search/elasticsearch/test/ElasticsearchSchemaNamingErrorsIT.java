@@ -52,12 +52,16 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Yoann Rodiere
  */
 @RunWith(Parameterized.class)
-@TestForIssue(jiraKey = "HSEARCH-2448")
-public class ElasticsearchSchemaNamingConflictIT extends SearchInitializationTestBase {
+public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestBase {
 
 	private static final String COMPOSITE_CONCRETE_CONFLICT_MESSAGE_ID = "HSEARCH400036";
+	private static final String INDEXED_EMBEDDED_BYPASS_MESSAGE_ID = "HSEARCH400054";
 
 	private static final String CONFLICTING_FIELD_NAME = "conflictingFieldName";
+
+	private static final String BYPASSING_FIELD_NAME = "fieldNameThatBypassesIndexedEmbeddedPrefix";
+	private static final String BYPASSING_FIELD_INDEXED_EMBEDDED_PREFIX = "indexedEmbeddedPrefix.";
+	private static final String BYPASSING_FIELD_DEFAULT_FIELD_NAME = "defaultFieldName";
 
 	@Parameters(name = "With strategy {0}")
 	public static IndexSchemaManagementStrategy[] strategies() {
@@ -72,17 +76,19 @@ public class ElasticsearchSchemaNamingConflictIT extends SearchInitializationTes
 
 	private IndexSchemaManagementStrategy strategy;
 
-	public ElasticsearchSchemaNamingConflictIT(IndexSchemaManagementStrategy strategy) {
+	public ElasticsearchSchemaNamingErrorsIT(IndexSchemaManagementStrategy strategy) {
 		super();
 		this.strategy = strategy;
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2448")
 	public void detectConflict_schemaGeneration_compositeOnConcrete() throws Exception {
 		testDetectConflictDuringSchemaGeneration( CompositeOnConcreteEntity.class );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2448")
 	public void detectConflict_schemaGeneration_concreteOnComposite() throws Exception {
 		testDetectConflictDuringSchemaGeneration( ConcreteOnCompositeEntity.class );
 	}
@@ -105,11 +111,13 @@ public class ElasticsearchSchemaNamingConflictIT extends SearchInitializationTes
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2448")
 	public void detectConflict_indexing_compositeOnConcrete() throws Exception {
 		testDetectConflictDuringIndexing( CompositeOnConcreteEntity.class );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2448")
 	public void detectConflict_indexing_concreteOnComposite() throws Exception {
 		testDetectConflictDuringIndexing( ConcreteOnCompositeEntity.class );
 	}
@@ -141,6 +149,60 @@ public class ElasticsearchSchemaNamingConflictIT extends SearchInitializationTes
 		}
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2488")
+	public void detectIndexedEmbeddedPrefixBypass_schemaGeneration() {
+		Assume.assumeTrue( "The strategy " + strategy + " does not involve schema generation."
+				+ " No point running this test.",
+				generatesSchema( strategy ) );
+
+		Class<?> entityClass = BypassingIndexedEmbeddedPrefixEntity.class;
+
+		thrown.expect(
+				isException( SearchException.class )
+						.withMessage( INDEXED_EMBEDDED_BYPASS_MESSAGE_ID )
+						.withMessage( "'" + BYPASSING_FIELD_NAME + "'" )
+						.withMessage( "'" + BYPASSING_FIELD_INDEXED_EMBEDDED_PREFIX + "'" )
+						.withMessage( entityClass.getName() )
+				.build()
+		);
+
+		elasticSearchClient.registerForCleanup( entityClass );
+		init( strategy, entityClass );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2488")
+	public void detectIndexedEmbeddedPrefixBypass_indexing() throws Exception {
+		Assume.assumeFalse( "The strategy " + strategy + " involves schema generation,"
+				+ " which means @IndexedEmbedded.prefix bypasses prevent search factory initialization"
+				+ " and thus prevent indexing. No point running this test.",
+				generatesSchema( strategy ) );
+
+		Class<?> entityClass = BypassingIndexedEmbeddedPrefixEntity.class;
+
+		elasticSearchClient.deleteAndCreateIndex( entityClass );
+		init( strategy, entityClass );
+
+		thrown.expect(
+				isException( AssertionFailure.class )
+				.causedBy( HibernateException.class )
+				.causedBy( SearchException.class )
+						.withMessage( INDEXED_EMBEDDED_BYPASS_MESSAGE_ID )
+						.withMessage( "'" + BYPASSING_FIELD_NAME + "'" )
+						.withMessage( "'" + BYPASSING_FIELD_INDEXED_EMBEDDED_PREFIX + "'" )
+						.withMessage( entityClass.getName() )
+				.build()
+		);
+
+		Object newEntity = entityClass.newInstance();
+		try ( Session session = getTestResourceManager().openSession() ) {
+			Transaction tx = session.beginTransaction();
+			session.save( newEntity );
+			tx.commit();
+		}
+	}
+
 	private boolean generatesSchema(IndexSchemaManagementStrategy strategy) {
 		return !IndexSchemaManagementStrategy.NONE.equals( strategy );
 	}
@@ -156,13 +218,13 @@ public class ElasticsearchSchemaNamingConflictIT extends SearchInitializationTes
 	}
 
 	@Embeddable
-	public static class EmbeddedTypeWithNonConflictingField {
+	static class EmbeddedTypeWithNonConflictingField {
 		@Field
 		int nonConflictingField = 0;
 	}
 
 	@Embeddable
-	public static class EmbeddedTypeWithConflictingField {
+	static class EmbeddedTypeWithConflictingField {
 		@Field(name = CONFLICTING_FIELD_NAME)
 		int conflictingField = 0;
 	}
@@ -173,7 +235,7 @@ public class ElasticsearchSchemaNamingConflictIT extends SearchInitializationTes
 	 */
 	@Entity
 	@Indexed
-	public static class CompositeOnConcreteEntity {
+	static class CompositeOnConcreteEntity {
 		@DocumentId
 		@Id
 		@GeneratedValue
@@ -205,7 +267,7 @@ public class ElasticsearchSchemaNamingConflictIT extends SearchInitializationTes
 	 */
 	@Entity
 	@Indexed
-	public static class ConcreteOnCompositeEntity {
+	static class ConcreteOnCompositeEntity {
 		@DocumentId
 		@Id
 		@GeneratedValue
@@ -225,6 +287,37 @@ public class ElasticsearchSchemaNamingConflictIT extends SearchInitializationTes
 		@Embedded
 		EmbeddedTypeWithConflictingField otherEmbedded =
 				new EmbeddedTypeWithConflictingField();
+	}
+
+	@Indexed
+	@Entity
+	static class BypassingIndexedEmbeddedPrefixEntity {
+		@Id
+		@GeneratedValue
+		private Integer id;
+
+		@IndexedEmbedded(prefix = BYPASSING_FIELD_INDEXED_EMBEDDED_PREFIX)
+		private BypassingIndexedEmbeddedPrefixEmbedded embedded =
+				new BypassingIndexedEmbeddedPrefixEmbedded();
+
+	}
+
+	@Embeddable
+	static class BypassingIndexedEmbeddedPrefixEmbedded {
+		@Field(name = BYPASSING_FIELD_DEFAULT_FIELD_NAME, bridge = @FieldBridge(impl = BypassingIndexedEmbeddedPrefixFieldBridge.class))
+		private String field = "fieldValue";
+	}
+
+	public static class BypassingIndexedEmbeddedPrefixFieldBridge implements MetadataProvidingFieldBridge {
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( BYPASSING_FIELD_NAME, FieldType.STRING );
+		}
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			luceneOptions.addFieldToDocument( BYPASSING_FIELD_NAME, (String) value, document );
+		}
 	}
 
 }
