@@ -91,6 +91,26 @@ public class PathComponentExtractor implements Cloneable {
 		}
 	}
 
+	/**
+	 * Consume all components in the current path up to the given limit.
+	 *
+	 *<p>This is equivalent to calling {@code next(consumeLimit)} repeatedly until {@code null} is returned.
+	 *
+	 * @param consumeLimit The consumption limit, i.e. the definition of the last component
+	 * to consume in the path.
+	 */
+	public void flushTo(ConsumptionLimit consumeLimit) {
+		if ( ConsumptionLimit.LAST.equals( consumeLimit ) ) {
+			currentIndexInPath = path.length();
+		}
+		else {
+			int nextSeparatorIndex = path.lastIndexOf( PATH_COMPONENT_SEPARATOR );
+			if ( nextSeparatorIndex >= 0 ) {
+				currentIndexInPath = nextSeparatorIndex + 1;
+			}
+		}
+	}
+
 	public void reset() {
 		path.delete( 0, path.length() );
 		currentIndexInPath = 0;
