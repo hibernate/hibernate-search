@@ -18,6 +18,7 @@ public final class ElasticsearchEnvironment {
 	 */
 	public static final class Defaults {
 
+		public static final DynamicType DYNAMIC_MAPPING = DynamicType.STRICT;
 		public static final String SERVER_URI = "http://localhost:9200";
 		public static final int SERVER_READ_TIMEOUT = 60000;
 		public static final int SERVER_CONNECTION_TIMEOUT = 3000;
@@ -222,6 +223,21 @@ public final class ElasticsearchEnvironment {
 	 * {@code hibernate.search.elasticsearch.scroll_timeout=60}).
 	 */
 	public static final String SCROLL_TIMEOUT = "elasticsearch.scroll_timeout";
+
+	/**
+	 * Property for specifying the behaviour when Elasticsearch encounters a previously unknown field in a document.
+	 * <p>
+	 * Possible values are:
+	 * <p>
+	 * <ul>
+	 *   <li>{@code true}: Add new fields dynamically</li>
+	 *   <li>{@code false}: Ignore new fields</li>
+	 *   <li>{@code strict}: Throw an exception if an unknown field is encountered</li>
+	 * </ul>
+	 * <p>
+	 * Defaults to {@code strict}.
+	 */
+	public static final String DYNAMIC_MAPPING = "elasticsearch.dynamic_mapping";
 
 	private ElasticsearchEnvironment() {
 	}
