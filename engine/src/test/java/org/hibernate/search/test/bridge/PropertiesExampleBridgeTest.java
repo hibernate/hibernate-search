@@ -8,19 +8,17 @@ package org.hibernate.search.test.bridge;
 
 import java.util.List;
 
-import org.junit.Assert;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * @author Sanne Grinovero (C) 2013 Red Hat Inc.
@@ -28,10 +26,11 @@ import org.junit.experimental.categories.Category;
 public class PropertiesExampleBridgeTest {
 
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( DynamicIndexedValueHolder.class );
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( DynamicIndexedValueHolder.class )
+			// This property make sense only if you are using elasticsearch
+			.withProperty( "hibernate.search.all.elasticsearch.dynamic_mapping", "true" );
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2387 Configurable dynamic mapping settings
 	public void testPropertiesIndexing() {
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Assert.assertNotNull( searchFactory.getIndexManagerHolder().getIndexManager( "all" ) );

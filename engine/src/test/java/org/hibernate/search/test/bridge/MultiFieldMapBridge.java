@@ -9,13 +9,15 @@ package org.hibernate.search.test.bridge;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
+import org.hibernate.search.bridge.spi.FieldType;
 
 /**
  * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  */
-public class MultiFieldMapBridge implements FieldBridge {
+public class MultiFieldMapBridge implements MetadataProvidingFieldBridge {
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
@@ -34,4 +36,8 @@ public class MultiFieldMapBridge implements FieldBridge {
 		luceneOptions.addFieldToDocument( fieldPrefix + "." + key, value, document );
 	}
 
+	@Override
+	public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+		builder.field( name, FieldType.OBJECT );
+	}
 }
