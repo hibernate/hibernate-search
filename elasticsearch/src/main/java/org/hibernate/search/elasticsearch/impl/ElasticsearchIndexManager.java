@@ -11,9 +11,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -31,6 +34,7 @@ import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaMigrato
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.schema.impl.ExecutionOptions;
+import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -45,9 +49,6 @@ import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.similarities.Similarity;
 
 /**
  * An {@link IndexManager} applying indexing work to an Elasticsearch server.
@@ -95,6 +96,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		final ElasticsearchIndexStatus requiredIndexStatus = getRequiredIndexStatus( properties );
 		final int indexManagementWaitTimeout = getIndexManagementWaitTimeout( properties );
 		final boolean multitenancyEnabled = context.isMultitenancyEnabled();
+		final DynamicType dynamicMapping = getDynamicMapping( properties );
 		this.schemaManagementExecutionOptions = new ExecutionOptions() {
 			@Override
 			public ElasticsearchIndexStatus getRequiredIndexStatus() {
@@ -109,6 +111,11 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			@Override
 			public boolean isMultitenancyEnabled() {
 				return multitenancyEnabled;
+			}
+
+			@Override
+			public DynamicType getDynamicMapping() {
+				return dynamicMapping;
 			}
 		};
 		this.schemaCreator = serviceManager.requestService( ElasticsearchSchemaCreator.class );
@@ -152,6 +159,15 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		}
 
 		return timeout;
+	}
+
+	private static DynamicType getDynamicMapping(Properties properties) {
+		String status = ConfigurationParseHelper.getString(
+				properties,
+				ElasticsearchEnvironment.DYNAMIC_MAPPING,
+				ElasticsearchEnvironment.Defaults.DYNAMIC_MAPPING.name() );
+
+		return DynamicType.valueOf( status.toUpperCase( Locale.ROOT ) );
 	}
 
 	private static ElasticsearchIndexStatus getRequiredIndexStatus(Properties properties) {

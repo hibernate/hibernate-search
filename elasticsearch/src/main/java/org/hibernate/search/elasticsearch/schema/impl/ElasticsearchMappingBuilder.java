@@ -231,5 +231,4 @@ final class ElasticsearchMappingBuilder {
 	public Class<?> getBeanClass() {
 		return binding.getDocumentBuilder().getBeanClass();
 	}
-
 }

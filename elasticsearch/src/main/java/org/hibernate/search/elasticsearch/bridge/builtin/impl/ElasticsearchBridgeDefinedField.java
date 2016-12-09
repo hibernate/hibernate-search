@@ -9,6 +9,8 @@ package org.hibernate.search.elasticsearch.bridge.builtin.impl;
 import org.hibernate.search.elasticsearch.cfg.DynamicType;
 
 /**
+ * Contains details of the field that only make sense with Elasticsearch.
+ *
  * @author Davide D'Alto
  */
 public class ElasticsearchBridgeDefinedField {
