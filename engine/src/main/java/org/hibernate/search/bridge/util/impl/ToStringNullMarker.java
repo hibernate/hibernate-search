@@ -16,17 +16,19 @@ import org.hibernate.search.bridge.spi.NullMarker;
 public class ToStringNullMarker implements NullMarker {
 
 	private final Object indexNullAs;
+	private final String stringRepresentation;
 
 	public ToStringNullMarker(final Object indexNullAs) {
 		if ( indexNullAs == null ) {
 			throw new NullPointerException( "The constructor parameter is mandatory" );
 		}
 		this.indexNullAs = indexNullAs;
+		this.stringRepresentation = indexNullAs.toString();
 	}
 
 	@Override
 	public String nullRepresentedAsString() {
-		return indexNullAs.toString();
+		return stringRepresentation;
 	}
 
 	@Override
@@ -38,6 +40,5 @@ public class ToStringNullMarker implements NullMarker {
 	public String toString() {
 		return getClass().getSimpleName() + "[" + indexNullAs + "]";
 	}
-
 
 }
