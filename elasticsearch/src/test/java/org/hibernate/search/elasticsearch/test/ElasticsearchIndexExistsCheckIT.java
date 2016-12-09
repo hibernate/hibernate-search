@@ -96,6 +96,7 @@ public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBas
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400024" );
+		thrown.expectMessage( "100ms" );
 
 		init( SimpleEntity.class );
 	}
@@ -117,6 +118,7 @@ public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBas
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400024" );
+		thrown.expectMessage( "100ms" );
 
 		init( SimpleEntity.class );
 	}

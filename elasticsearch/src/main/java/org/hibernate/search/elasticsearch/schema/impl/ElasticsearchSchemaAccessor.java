@@ -158,9 +158,10 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	public void waitForIndexStatus(final String theIndexName, ExecutionOptions executionOptions) {
 		String requiredIndexStatusString = executionOptions.getRequiredIndexStatus().getElasticsearchString();
+		String timeoutAndUnit = executionOptions.getIndexManagementTimeoutInMs() + "ms";
 		Builder healthBuilder = new Health.Builder()
 				.setParameter( "wait_for_status", requiredIndexStatusString )
-				.setParameter( "timeout", executionOptions.getIndexManagementTimeoutInMs() + "ms" );
+				.setParameter( "timeout", timeoutAndUnit );
 
 		Health health = new Health( healthBuilder ) {
 			@Override
@@ -179,7 +180,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 		if ( !result.isSucceeded() ) {
 			String status = result.getJsonObject().get( "status" ).getAsString();
-			throw LOG.unexpectedIndexStatus( theIndexName, requiredIndexStatusString, status );
+			throw LOG.unexpectedIndexStatus( theIndexName, requiredIndexStatusString, status, timeoutAndUnit );
 		}
 	}
 

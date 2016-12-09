@@ -144,9 +144,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException negativeTimeoutValue(int timeout);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 24,
-			value = "Index '%1$s' has status '%3$s', but it is expected to be '%2$s'."
+			value = "Timed out while waiting for for index '%1$s' to reach status '%2$s'; status was still '%3$s' after %4$s."
 	)
-	SearchException unexpectedIndexStatus(String indexName, String expected, String actual);
+	SearchException unexpectedIndexStatus(String indexName, String expected, String actual, String timeoutAndUnit);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 25,
 			value = "With an Elasticsearch backend it is not possible to get a ReaderProvider or an IndexReader"
