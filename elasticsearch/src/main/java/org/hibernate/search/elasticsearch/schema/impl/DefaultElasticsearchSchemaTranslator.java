@@ -9,12 +9,14 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.lucene.document.Field;
 import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchBridgeDefinedField;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
@@ -56,7 +58,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	public TypeMapping translate(EntityIndexBinding descriptor, ExecutionOptions executionOptions) {
 		TypeMapping root = new TypeMapping();
 
-		root.setDynamic( DynamicType.STRICT );
+		root.setDynamic( executionOptions.getDynamicMapping() );
 
 		ElasticsearchMappingBuilder builder = new ElasticsearchMappingBuilder( descriptor, root );
 
@@ -67,18 +69,18 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 			builder.setPropertyAbsolute( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
 		}
 
-		addMappings( builder );
+		addMappings( builder, executionOptions );
 
 		return root;
 	}
 
-	private void addMappings(ElasticsearchMappingBuilder mappingBuilder) {
+	private void addMappings(ElasticsearchMappingBuilder mappingBuilder, ExecutionOptions executionOptions) {
 		TypeMetadata typeMetadata = mappingBuilder.getMetadata();
 
 		// normal document fields
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getNonEmbeddedDocumentFieldMetadata() ) {
 			try {
-				addPropertyMapping( mappingBuilder, fieldMetadata );
+				addPropertyMapping( mappingBuilder, fieldMetadata, executionOptions );
 			}
 			catch (IncompleteDataException e) {
 				LOG.debug( "Not adding a mapping for field " + fieldMetadata.getAbsoluteName() + " because of incomplete data", e );
@@ -98,14 +100,15 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		// Recurse into embedded types
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			ElasticsearchMappingBuilder embeddedContext = new ElasticsearchMappingBuilder( mappingBuilder, embeddedTypeMetadata );
-			addMappings( embeddedContext );
+			addMappings( embeddedContext, executionOptions );
 		}
 	}
 
 	/**
 	 * Adds a property mapping for the given field to the given type mapping.
+	 * @param executionOptions
 	 */
-	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {
+	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata, ExecutionOptions executionOptions) {
 		if ( fieldMetadata.getAbsoluteName().isEmpty() || fieldMetadata.getAbsoluteName().endsWith( "." )
 				|| fieldMetadata.isSpatial() ) {
 			return;
@@ -117,12 +120,16 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 
 		addTypeOptions( propertyMapping, fieldMetadata );
 
-		propertyMapping.setStore( fieldMetadata.getStore() == Store.NO ? false : true );
+		if ( propertyMapping.getType() != DataType.OBJECT ) {
+			propertyMapping.setStore( fieldMetadata.getStore() == Store.NO ? false : true );
+		}
 
 		addIndexOptions( propertyMapping, mappingBuilder, fieldMetadata.getSourceProperty(), fieldMetadata.getAbsoluteName(),
 				fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
 
-		propertyMapping.setBoost( mappingBuilder.getBoost( fieldMetadata.getBoost() ) );
+		if ( propertyMapping.getType() != DataType.OBJECT ) {
+			propertyMapping.setBoost( mappingBuilder.getBoost( fieldMetadata.getBoost() ) );
+		}
 
 		logDynamicBoostWarning( mappingBuilder, fieldMetadata.getSourceType().getDynamicBoost(), propertyPath );
 		PropertyMetadata sourceProperty = fieldMetadata.getSourceProperty();
@@ -158,15 +165,20 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		String propertyPath = bridgeDefinedField.getAbsoluteName();
 
 		if ( !SpatialHelper.isSpatialField( propertyPath ) ) {
-			PropertyMapping propertyMapping = new PropertyMapping();
-			addTypeOptions( propertyMapping, bridgeDefinedField );
-			addIndexOptions( propertyMapping, mappingBuilder, bridgeDefinedField.getSourceField().getSourceProperty(),
-					propertyPath, bridgeDefinedField.getIndex(), null );
-
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
 			if ( !mappingBuilder.hasPropertyAbsolute( propertyPath ) ) {
+				PropertyMapping propertyMapping = new PropertyMapping();
+				addTypeOptions( propertyMapping, bridgeDefinedField );
+				addIndexOptions( propertyMapping, mappingBuilder, bridgeDefinedField.getSourceField().getSourceProperty(),
+						propertyPath, bridgeDefinedField.getIndex(), null );
+
+				addDynamicOption( bridgeDefinedField, propertyMapping );
 				mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
+			}
+			else {
+				TypeMapping propertyMapping = mappingBuilder.getPropertyAbsolute( propertyPath );
+				addDynamicOption( bridgeDefinedField, propertyMapping );
 			}
 		}
 		else {
@@ -194,6 +206,13 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		}
 	}
 
+	private void addDynamicOption(BridgeDefinedField bridgeDefinedField, TypeMapping propertyMapping) {
+		ElasticsearchBridgeDefinedField mappedOn = bridgeDefinedField.mappedOn( ElasticsearchBridgeDefinedField.class );
+		if ( mappedOn != null && mappedOn.getDynamic() != null ) {
+			propertyMapping.setDynamic( DynamicType.valueOf( mappedOn.getDynamic().name().toUpperCase( Locale.ROOT ) ) );
+		}
+	}
+
 	/*
 	 * Adds an Elasticsearch "field" to an existing property for a facet.
 	 * <p>Note that "field" in ES has a very specific meaning, which is not the meaning it has in Lucene or Hibernate Search.
@@ -216,32 +235,36 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	 */
 	private void addIndexOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder, PropertyMetadata sourceProperty,
 			String propertyPath, Field.Index index, AnalyzerReference analyzerReference) {
-		IndexType elasticsearchIndex;
+		if ( propertyMapping.getType() != DataType.OBJECT ) {
+			IndexType elasticsearchIndex = elasticsearchIndexType( propertyMapping, index );
+			propertyMapping.setIndex( elasticsearchIndex );
+
+			if ( IndexType.NO.equals( elasticsearchIndex ) && FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, propertyPath ) ) {
+				// We must use doc values in order to enable sorting on non-indexed fields
+				propertyMapping.setDocValues( true );
+			}
+
+			if ( IndexType.ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
+				String analyzerName = mappingBuilder.getAnalyzerName( analyzerReference, propertyPath );
+				propertyMapping.setAnalyzer( analyzerName );
+			}
+		}
+	}
+
+	private IndexType elasticsearchIndexType(PropertyMapping propertyMapping, Field.Index index) {
 		switch ( index ) {
 			case ANALYZED:
 			case ANALYZED_NO_NORMS:
-				elasticsearchIndex = canTypeBeAnalyzed( propertyMapping.getType() ) ? IndexType.ANALYZED : IndexType.NOT_ANALYZED;
-				break;
+				return canTypeBeAnalyzed( propertyMapping.getType() )
+						? IndexType.ANALYZED
+						: IndexType.NOT_ANALYZED;
 			case NOT_ANALYZED:
 			case NOT_ANALYZED_NO_NORMS:
-				elasticsearchIndex = IndexType.NOT_ANALYZED;
-				break;
+				return IndexType.NOT_ANALYZED;
 			case NO:
-				elasticsearchIndex = IndexType.NO;
-				break;
+				return IndexType.NO;
 			default:
 				throw new AssertionFailure( "Unexpected index type: " + index );
-		}
-		propertyMapping.setIndex( elasticsearchIndex );
-
-		if ( IndexType.NO.equals( elasticsearchIndex ) && FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, propertyPath ) ) {
-			// We must use doc values in order to enable sorting on non-indexed fields
-			propertyMapping.setDocValues( true );
-		}
-
-		if ( IndexType.ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
-			String analyzerName = mappingBuilder.getAnalyzerName( analyzerReference, propertyPath );
-			propertyMapping.setAnalyzer( analyzerName );
 		}
 	}
 
@@ -374,6 +397,9 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 				break;
 			case DOUBLE:
 				elasticsearchType = DataType.DOUBLE;
+				break;
+			case OBJECT:
+				elasticsearchType = DataType.OBJECT;
 				break;
 			case UNKNOWN_NUMERIC:
 				// Likely a custom field bridge which does not expose the type of the given field; either correctly

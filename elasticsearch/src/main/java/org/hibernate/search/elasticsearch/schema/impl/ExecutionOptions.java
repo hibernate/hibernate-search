@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.schema.impl;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 
 /**
  * @author Gunnar Morling
@@ -18,6 +19,11 @@ public interface ExecutionOptions {
 	 * Status the index needs to be at least in, otherwise we'll fail starting up.
 	 */
 	ElasticsearchIndexStatus getRequiredIndexStatus();
+
+	/**
+	 * Elasticsearch dynamic behaviour.
+	 */
+	DynamicType getDynamicMapping();
 
 	/**
 	 * Time to wait for the {@link #getRequiredIndexStatus() required index status}, in milliseconds.

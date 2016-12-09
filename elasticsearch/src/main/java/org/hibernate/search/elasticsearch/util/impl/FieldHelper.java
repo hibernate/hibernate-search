@@ -53,6 +53,7 @@ public class FieldHelper {
 		YEAR,
 		YEAR_MONTH,
 		MONTH_DAY,
+		OBJECT,
 		INTEGER {
 			@Override
 			public boolean isNumeric() {
@@ -217,6 +218,8 @@ public class FieldHelper {
 				return ExtendedFieldType.LONG;
 			case STRING:
 				return ExtendedFieldType.STRING;
+			case OBJECT:
+				return ExtendedFieldType.OBJECT;
 			default:
 				return ExtendedFieldType.UNKNOWN;
 		}

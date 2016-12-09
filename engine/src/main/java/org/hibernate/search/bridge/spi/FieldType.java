@@ -48,5 +48,13 @@ public enum FieldType {
 	/**
 	 * A double field.
 	 */
-	DOUBLE
+	DOUBLE,
+
+	/**
+	 * An object field, a generic object that doesn't have a unique definition in all the backends.
+	 * <p>
+	 * For example, it could identify a field that should be mapped in Elasticsearch as an inner object and in Lucene
+	 * as multiple string fields (Lucene does not have inner objects).
+	 */
+	OBJECT
 }
