@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.lucene.document.Field;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchBridgeDefinedField;

@@ -6,22 +6,17 @@
  */
 package org.hibernate.search.indexes.spi;
 
+import org.hibernate.search.annotations.AnalyzerDef;
+
 /**
- * A strategy for applying analyzers.
+ * A set of analyzer definitions retrieved by Hibernate Search from the mapping.
  *
- * @author Gunnar Morling
+ * @author Yoann Rodiere
  * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You
  * should be prepared for incompatible changes in future releases.
  */
-public enum AnalyzerExecutionStrategy {
+public interface AnalyzerDefinitions {
 
-	/**
-	 * Analyzers will be applied locally, when talking to an embedded Lucene index.
-	 */
-	EMBEDDED,
+	AnalyzerDef getDefinition(String name);
 
-	/**
-	 * Analyzers will be applied remotely, e.g. when talking to an instance of Elasticsearch or Solr.
-	 */
-	REMOTE;
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.indexes.impl;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -604,6 +605,6 @@ public class IndexManagerHolder {
 	}
 
 	public Collection<IndexManagerType> getIndexManagerTypes() {
-		return indexManagerImplementationsRegistry.values();
+		return new HashSet<>( indexManagerImplementationsRegistry.values() );
 	}
 }

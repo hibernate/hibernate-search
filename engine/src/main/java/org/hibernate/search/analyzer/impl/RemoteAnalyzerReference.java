@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.analyzer.impl;
 
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
+
 /**
  * A reference to a {@code RemoteAnalyzer}.
  *
@@ -13,9 +15,6 @@ package org.hibernate.search.analyzer.impl;
  * @author Guillaume Smet
  */
 public final class RemoteAnalyzerReference implements AnalyzerReference {
-
-	public static final RemoteAnalyzerReference DEFAULT = new RemoteAnalyzerReference( new LazyRemoteAnalyzer( "default" ) );
-	public static final RemoteAnalyzerReference PASS_THROUGH = new RemoteAnalyzerReference( new LazyRemoteAnalyzer( "keyword" ) );
 
 	private RemoteAnalyzer analyzer;
 

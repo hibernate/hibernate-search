@@ -9,12 +9,10 @@ package org.hibernate.search.engine.impl;
 
 import java.lang.annotation.Annotation;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
-import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DynamicBoost;
@@ -26,7 +24,7 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -132,52 +130,18 @@ public final class AnnotationProcessingHelper {
 	}
 
 	public static AnalyzerReference getAnalyzerReference(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext,
-			boolean isRemote) {
+			IndexManagerType indexManagerType) {
+		AnalyzerReferenceRegistry<?> registry = indexManagerType == null ? null : configContext.getAnalyzerReferenceRegistry( indexManagerType );
 		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
-		if ( isRemote ) {
-			return remoteAnalyzerReferenceFromDefinition( analyzerAnn, configContext );
+		if ( analyzerClass != void.class ) {
+			return registry.getAnalyzerReference( analyzerClass );
 		}
 		else {
-			if ( analyzerClass == void.class ) {
-				return luceneAnalyzerReferenceFromDefinition( analyzerAnn, configContext );
+			String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
+			if ( StringHelper.isEmpty( definition ) ) {
+				return null;
 			}
-			else {
-				return luceneAnalyzerReferenceFromClass( configContext, analyzerClass );
-			}
-		}
-	}
-
-	private static AnalyzerReference remoteAnalyzerReferenceFromDefinition(org.hibernate.search.annotations.Analyzer analyzerAnn,
-			ConfigContext configContext) {
-		String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
-		if ( StringHelper.isEmpty( definition ) ) {
-			return null;
-		}
-		return configContext.buildRemoteAnalyzerReference( definition );
-	}
-
-	private static AnalyzerReference luceneAnalyzerReferenceFromDefinition(org.hibernate.search.annotations.Analyzer analyzerAnn,
-			ConfigContext configContext) {
-		String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
-		if ( StringHelper.isEmpty( definition ) ) {
-			return null;
-		}
-		return configContext.buildLazyLuceneAnalyzerReference( definition );
-	}
-
-	private static AnalyzerReference luceneAnalyzerReferenceFromClass(ConfigContext configContext, Class<?> analyzerClass) {
-		try {
-			// For now only local analyzer can be created from a class
-			// this should be easy to extend to remote analyzer using a common interface/super-class
-			Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, configContext.getLuceneMatchVersion() );
-			AnalyzerReference reference = new LuceneAnalyzerReference( analyzer );
-			return reference;
-		}
-		catch (ClassCastException e) {
-			throw new SearchException( "Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(), e );
-		}
-		catch (Exception e) {
-			throw new SearchException( "Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e );
+			return registry.getAnalyzerReference( definition );
 		}
 	}
 

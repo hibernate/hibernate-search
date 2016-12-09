@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 
 /**
@@ -68,14 +67,6 @@ public class ParseContext {
 	 */
 	boolean skipAnalyzers() {
 		return indexManagerType == null;
-	}
-
-
-	/**
-	 * Returns true if the analyzer should be a remote one.
-	 */
-	boolean isAnalyzerRemote() {
-		return indexManagerType != null && indexManagerType.getAnalyzerExecutionStrategy() == AnalyzerExecutionStrategy.REMOTE;
 	}
 
 	boolean hasBeenProcessed(XClass processedClass) {
