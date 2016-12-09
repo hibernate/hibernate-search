@@ -9,6 +9,7 @@ package org.hibernate.search.analyzer.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -47,11 +48,6 @@ public class ScopedRemoteAnalyzer extends RemoteAnalyzer implements ScopedAnalyz
 	@Override
 	public void addScopedAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
 		this.scopedAnalyzers.put( scope, getRemoteAnalyzer( analyzerReference ) );
-	}
-
-	@Override
-	public void addScopedPassThroughAnalyzerReference(String scope) {
-		this.scopedAnalyzers.put( scope, RemoteAnalyzerReference.PASS_THROUGH.getAnalyzer() );
 	}
 
 	@Override

@@ -12,9 +12,9 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.analyzer.impl.ScopedAnalyzer;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -62,11 +62,6 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 	@Override
 	public void addScopedAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
 		scopedAnalyzers.put( scope, getLuceneAnalyzer( analyzerReference ) );
-	}
-
-	@Override
-	public void addScopedPassThroughAnalyzerReference(String scope) {
-		scopedAnalyzers.put( scope, LuceneAnalyzerReference.PASS_THROUGH.getAnalyzer() );
 	}
 
 	/**

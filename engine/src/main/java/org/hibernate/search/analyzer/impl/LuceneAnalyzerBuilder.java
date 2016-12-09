@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.impl;
+package org.hibernate.search.analyzer.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,6 +22,7 @@ import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.engine.impl.TokenizerChain;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
 
@@ -33,11 +34,11 @@ import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-final class AnalyzerBuilder {
+final class LuceneAnalyzerBuilder {
 
 	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
-	private AnalyzerBuilder() {
+	private LuceneAnalyzerBuilder() {
 	}
 
 	/**

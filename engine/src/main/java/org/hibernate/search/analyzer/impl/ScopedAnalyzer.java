@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.analyzer.impl;
 
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
+
 /**
  * General interface for scope aware analyzers.
  *
@@ -15,8 +17,6 @@ public interface ScopedAnalyzer extends Cloneable {
 	void setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference);
 
 	void addScopedAnalyzerReference(String scope, AnalyzerReference analyzerReference);
-
-	void addScopedPassThroughAnalyzerReference(String scope);
 
 	ScopedAnalyzer clone();
 

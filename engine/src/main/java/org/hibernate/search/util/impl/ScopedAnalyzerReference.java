@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.util.impl;
 
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.analyzer.impl.ScopedAnalyzer;
 import org.hibernate.search.analyzer.impl.ScopedRemoteAnalyzer;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -99,11 +99,6 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 
 		public Builder addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
 			scopedAnalyzer.addScopedAnalyzerReference( scope, analyzerReference );
-			return this;
-		}
-
-		public Builder addPassThroughAnalyzerReference(String scope) {
-			scopedAnalyzer.addScopedPassThroughAnalyzerReference( scope );
 			return this;
 		}
 

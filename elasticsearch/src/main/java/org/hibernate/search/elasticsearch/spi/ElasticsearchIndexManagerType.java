@@ -6,14 +6,15 @@
  */
 package org.hibernate.search.elasticsearch.spi;
 
-import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzerProvider;
+import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategy;
 import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchMissingValueStrategy;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
-import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 
-public final class ElasticsearchIndexManagerType implements IndexManagerType, RemoteAnalyzerProvider {
+public final class ElasticsearchIndexManagerType implements IndexManagerType {
 
 	public static final ElasticsearchIndexManagerType INSTANCE = new ElasticsearchIndexManagerType();
 
@@ -22,17 +23,12 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType, Re
 	}
 
 	@Override
-	public AnalyzerExecutionStrategy getAnalyzerExecutionStrategy() {
-		return AnalyzerExecutionStrategy.REMOTE;
+	public AnalyzerStrategy<?> createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
+		return new ElasticsearchAnalyzerStrategy();
 	}
 
 	@Override
 	public MissingValueStrategy getMissingValueStrategy() {
 		return ElasticsearchMissingValueStrategy.INSTANCE;
-	}
-
-	@Override
-	public RemoteAnalyzer getRemoteAnalyzer(String name) {
-		return new RemoteAnalyzer( name );
 	}
 }

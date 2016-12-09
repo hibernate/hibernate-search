@@ -7,7 +7,7 @@
 package org.hibernate.search.analyzer.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.util.impl.PassThroughAnalyzer;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 
 /**
  * A reference to an {@link Analyzer}.
@@ -15,12 +15,6 @@ import org.hibernate.search.util.impl.PassThroughAnalyzer;
  * @author Davide D'Alto
  */
 public class LuceneAnalyzerReference implements AnalyzerReference {
-
-	/**
-	 * Analyzer that applies no operation whatsoever to the flux.
-	 * This is useful for queries operating on non tokenized fields.
-	 */
-	public static final LuceneAnalyzerReference PASS_THROUGH = new LuceneAnalyzerReference( PassThroughAnalyzer.INSTANCE );
 
 	private final Analyzer analyzer;
 

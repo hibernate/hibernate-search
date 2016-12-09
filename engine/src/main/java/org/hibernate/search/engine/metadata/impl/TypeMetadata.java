@@ -21,14 +21,13 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.engine.impl.AnalyzerReferenceRegistry;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.spi.AnalyzerExecutionStrategy;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ScopedAnalyzerReference;
@@ -165,7 +164,8 @@ public class TypeMetadata {
 	protected TypeMetadata(Builder builder) {
 		this.indexedType = builder.indexedType;
 		this.boost = builder.boost;
-		this.scopedAnalyzerReference = builder.scopedAnalyzerReferenceBuilder.build();
+		this.scopedAnalyzerReference = builder.scopedAnalyzerReferenceBuilder == null ? null
+				: builder.scopedAnalyzerReferenceBuilder.build();
 		this.discriminator = builder.discriminator;
 		this.discriminatorGetter = builder.discriminatorGetter;
 		this.classBoostStrategy = builder.classBoostStrategy;
@@ -488,6 +488,7 @@ public class TypeMetadata {
 		protected final BackReference<TypeMetadata> resultReference = new BackReference<>();
 		private final Class<?> indexedType;
 		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
+		private final AnalyzerReferenceRegistry<?> analyzerReferenceRegistry;
 
 		private float boost;
 		private BoostStrategy classBoostStrategy;
@@ -504,13 +505,24 @@ public class TypeMetadata {
 		private XProperty jpaProperty;
 		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new LinkedHashSet<>();
 
-		public Builder(Class<?> indexedType, IndexManagerType indexManagerType, ConfigContext configContext) {
-			this( indexedType, buildScopedAnalyzerReferenceBuilder( indexManagerType, configContext ) );
+		public Builder(Class<?> indexedType, ConfigContext configContext, ParseContext parseContext) {
+			this.indexedType = indexedType;
+			if ( parseContext.skipAnalyzers() ) {
+				this.analyzerReferenceRegistry = null;
+				this.scopedAnalyzerReferenceBuilder = null;
+			}
+			else {
+				IndexManagerType indexManagerType = parseContext.getIndexManagerType();
+				this.analyzerReferenceRegistry = configContext.getAnalyzerReferenceRegistry( indexManagerType );
+				this.scopedAnalyzerReferenceBuilder = new ScopedAnalyzerReference.Builder(
+						analyzerReferenceRegistry.getDefaultAnalyzerReference() );
+			}
 		}
 
-		public Builder(Class<?> indexedType, ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder) {
+		public Builder(Class<?> indexedType, Builder containerTypeBuilder) {
 			this.indexedType = indexedType;
-			this.scopedAnalyzerReferenceBuilder = scopedAnalyzerReferenceBuilder;
+			this.analyzerReferenceRegistry = containerTypeBuilder.analyzerReferenceRegistry;
+			this.scopedAnalyzerReferenceBuilder = containerTypeBuilder.scopedAnalyzerReferenceBuilder;
 		}
 
 		public Builder idProperty(PropertyMetadata propertyMetadata) {
@@ -594,15 +606,13 @@ public class TypeMetadata {
 				analyzerReference = scopedAnalyzerReferenceBuilder.getGlobalAnalyzerReference();
 			}
 
-			if ( Field.Index.ANALYZED.equals( index ) || Field.Index.ANALYZED_NO_NORMS.equals( index ) ) {
-				if ( analyzerReference != null ) {
-					scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldPath.getAbsoluteName(), analyzerReference );
-				}
+			if ( !index.isAnalyzed() ) {
+				// no analyzer is used, add a pass-through (i.e. no-op) analyzer for queries
+				analyzerReference = analyzerReferenceRegistry.getPassThroughAnalyzerReference();
 			}
-			else {
-				// no analyzer is used, add a fake one for queries
-				scopedAnalyzerReferenceBuilder.addPassThroughAnalyzerReference( fieldPath.getAbsoluteName() );
-			}
+
+			scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldPath.getAbsoluteName(), analyzerReference );
+
 			return analyzerReference;
 		}
 
@@ -657,18 +667,6 @@ public class TypeMetadata {
 			for ( String sortableFieldAbsoluteName : sortableFieldsAbsoluteNames ) {
 				classBridgeSortableFieldMetadata.add( new SortableFieldMetadata.Builder( sortableFieldAbsoluteName ).build() );
 			}
-		}
-
-		private static ScopedAnalyzerReference.Builder buildScopedAnalyzerReferenceBuilder(
-				IndexManagerType indexManagerType, ConfigContext configContext) {
-			AnalyzerReference defaultAnalyzerReference;
-			if ( indexManagerType != null && indexManagerType.getAnalyzerExecutionStrategy() == AnalyzerExecutionStrategy.REMOTE ) {
-				defaultAnalyzerReference = RemoteAnalyzerReference.DEFAULT;
-			}
-			else {
-				defaultAnalyzerReference = configContext.getDefaultLuceneAnalyzerReference();
-			}
-			return new ScopedAnalyzerReference.Builder( defaultAnalyzerReference );
 		}
 	}
 }

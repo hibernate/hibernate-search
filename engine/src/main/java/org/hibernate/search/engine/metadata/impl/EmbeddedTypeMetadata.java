@@ -12,7 +12,6 @@ import java.util.Map;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 
 /**
  * Class containing all the meta data extracted for a single type.
@@ -109,9 +108,10 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 		private String embeddedNullFieldName;
 		private FieldBridge embeddedNullFieldBridge;
 
-		public Builder(Class<?> indexedType, BackReference<PropertyMetadata> sourceProperty, XMember embeddedGetter,
-				String embeddedFieldPrefix, ScopedAnalyzerReference.Builder scopedAnalyzerBuilder) {
-			super( indexedType, scopedAnalyzerBuilder );
+		public Builder(TypeMetadata.Builder parentTypeBuilder,
+				Class<?> indexedType, BackReference<PropertyMetadata> sourceProperty, XMember embeddedGetter,
+				String embeddedFieldPrefix) {
+			super( indexedType, parentTypeBuilder );
 			this.sourceProperty = sourceProperty;
 			ReflectionHelper.setAccessible( embeddedGetter );
 			this.embeddedFieldPrefix = embeddedFieldPrefix;
