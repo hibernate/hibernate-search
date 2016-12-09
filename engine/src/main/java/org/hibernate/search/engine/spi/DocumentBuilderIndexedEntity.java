@@ -35,7 +35,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.analyzer.Discriminator;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Store;

@@ -12,7 +12,7 @@ import java.util.Map;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.client.impl.BulkRequestFailedException;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
