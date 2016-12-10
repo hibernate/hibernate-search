@@ -43,11 +43,11 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
 	private class FieldMetadataCreationContextImpl implements FieldMetadataCreationContext {
 
-		private final String absoluteFieldName;
+		private final BridgeDefinedField field;
 
 		public FieldMetadataCreationContextImpl(String name, FieldType type) {
-			this.absoluteFieldName = name;
-			bridgeDefinedFields.add( new BridgeDefinedField( fieldMetadata, name, type ) );
+			this.field = new BridgeDefinedField( fieldMetadata, name, type );
+			bridgeDefinedFields.add( field );
 		}
 
 		@Override
@@ -57,8 +57,21 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 
 		@Override
 		public FieldMetadataCreationContext sortable(boolean sortable) {
-			sortableFieldsAbsoluteNames.add( absoluteFieldName );
+			sortableFieldsAbsoluteNames.add( field.getAbsoluteName() );
 			return this;
+		}
+
+		public <T extends FieldMetadataCreationContext> T mappedOn(Class<T> backend) {
+			return create( backend );
+		}
+
+		private <T extends FieldMetadataCreationContext> T create(Class<T> backend) {
+			try {
+				return backend.getDeclaredConstructor( BridgeDefinedField.class, FieldMetadataCreationContext.class ).newInstance( field, this );
+			}
+			catch (Exception e) {
+				throw new RuntimeException( e );
+			}
 		}
 	}
 }

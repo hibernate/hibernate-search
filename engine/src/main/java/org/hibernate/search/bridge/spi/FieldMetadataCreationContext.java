@@ -33,4 +33,12 @@ public interface FieldMetadataCreationContext {
 	 * @return this context for fluent API invocations
 	 */
 	FieldMetadataCreationContext sortable(boolean sortable);
+
+	/**
+	 * Give access to properties that are backend specific
+	 *
+	 * @param backendType the selected backend.
+	 * @return the context for the fluent API related to the select backend.
+	 */
+	<T extends FieldMetadataCreationContext> T mappedOn(Class<T> backendType);
 }
