@@ -12,30 +12,10 @@ package org.hibernate.search.analyzer.impl;
  *
  * @author Guillaume Smet
  */
-public class RemoteAnalyzer {
+public interface RemoteAnalyzer {
 
-	protected String name;
+	String getName(String fieldName);
 
-	public RemoteAnalyzer(String name) {
-		this.name = name;
-	}
-
-	public String getName(String fieldName) {
-		return name;
-	}
-
-	public void close() {
-		// nothing to close
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append( getClass().getSimpleName() );
-		sb.append( "<" );
-		sb.append( name );
-		sb.append( ">" );
-		return sb.toString();
-	}
+	void close();
 
 }

@@ -30,7 +30,7 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 	private static final Log log = LoggerFactory.make();
 
 	private final LuceneAnalyzerReference globalAnalyzerReference;
-	private final Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
+	private final Map<String, LuceneAnalyzerReference> scopedAnalyzers = new HashMap<>();
 
 	public ScopedLuceneAnalyzer(Analyzer globalAnalyzer) {
 		this( new LuceneAnalyzerReference( globalAnalyzer ) );
@@ -71,13 +71,11 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 
 	@Override
 	protected Analyzer getWrappedAnalyzer(String fieldName) {
-		final Analyzer analyzer = scopedAnalyzers.get( fieldName );
-		if ( analyzer == null ) {
-			return globalAnalyzerReference.getAnalyzer();
+		LuceneAnalyzerReference analyzerReference = scopedAnalyzers.get( fieldName );
+		if ( analyzerReference == null ) {
+			analyzerReference = globalAnalyzerReference;
 		}
-		else {
-			return analyzer;
-		}
+		return analyzerReference.getAnalyzer();
 	}
 
 	@Override
@@ -85,12 +83,24 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 		return new Builder( globalAnalyzerReference, scopedAnalyzers );
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( "<" );
+		sb.append( globalAnalyzerReference );
+		sb.append( "," );
+		sb.append( scopedAnalyzers );
+		sb.append( ">" );
+		return sb.toString();
+	}
+
 	public static class Builder implements ScopedAnalyzer.Builder {
 
 		private LuceneAnalyzerReference globalAnalyzerReference;
-		private final Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
+		private final Map<String, LuceneAnalyzerReference> scopedAnalyzers = new HashMap<>();
 
-		public Builder(LuceneAnalyzerReference globalAnalyzerReference, Map<String, Analyzer> scopedAnalyzers) {
+		public Builder(LuceneAnalyzerReference globalAnalyzerReference, Map<String, LuceneAnalyzerReference> scopedAnalyzers) {
 			this.globalAnalyzerReference = globalAnalyzerReference;
 			this.scopedAnalyzers.putAll( scopedAnalyzers );
 		}
@@ -105,13 +115,9 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 			this.globalAnalyzerReference = getLuceneAnalyzerReference( globalAnalyzerReference );
 		}
 
-		public void addScopedAnalyzer(String scope, Analyzer scopedAnalyzer) {
-			scopedAnalyzers.put( scope, scopedAnalyzer );
-		}
-
 		@Override
 		public void addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
-			scopedAnalyzers.put( scope, getLuceneAnalyzerReference( analyzerReference ).getAnalyzer() );
+			scopedAnalyzers.put( scope, getLuceneAnalyzerReference( analyzerReference ) );
 		}
 
 		@Override

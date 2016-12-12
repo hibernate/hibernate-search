@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.analyzer.spi;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -34,9 +33,10 @@ public interface AnalyzerStrategy<T extends AnalyzerReference> {
 	T createPassThroughAnalyzerReference();
 
 	/**
-	 * @return a reference to an analyzer with the given name.
+	 * @param name The name of the analyzer to be referenced.
+	 * @return a reference that will be {@link #initializeNamedAnalyzerReferences(Map, Map) initialized later}.
 	 */
-	T createAnalyzerReference(String name);
+	T createNamedAnalyzerReference(String name);
 
 	/**
 	 * @return a reference to an instance of the given analyzer class.
@@ -44,12 +44,13 @@ public interface AnalyzerStrategy<T extends AnalyzerReference> {
 	T createAnalyzerReference(Class<?> analyzerClass);
 
 	/**
-	 * Initializes named references created by this strategy, i.e. make them point to the actual analyzer definition.
-	 * @param references The references to initialize
+	 * Initializes named references {@link #createNamedAnalyzerReference(String) created by this strategy}, i.e. make
+	 * them point to the actual analyzer definition.
+	 * @param references The references to initialize, mapped by name.
 	 * @param analyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
 	 * It is guaranteed to contain one analyzer definition for each reference name.
 	 */
-	void initializeNamedAnalyzerReferences(Collection<T> references, Map<String, AnalyzerDef> analyzerDefinitions);
+	void initializeNamedAnalyzerReferences(Map<String, T> references, Map<String, AnalyzerDef> analyzerDefinitions);
 
 	/**
 	 * @return A {@link ScopedAnalyzer} builder.
