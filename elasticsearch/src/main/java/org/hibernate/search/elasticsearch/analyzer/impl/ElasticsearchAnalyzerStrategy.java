@@ -10,10 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzerImpl;
-import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
-import org.hibernate.search.analyzer.impl.ScopedRemoteAnalyzer;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 
@@ -21,44 +17,44 @@ import org.hibernate.search.annotations.AnalyzerDef;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<RemoteAnalyzerReference> {
+public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<ElasticsearchAnalyzerReference> {
 
 	@Override
-	public RemoteAnalyzerReference createDefaultAnalyzerReference() {
-		return new RemoteAnalyzerReference( new RemoteAnalyzerImpl( "default" ) );
+	public ElasticsearchAnalyzerReference createDefaultAnalyzerReference() {
+		return new ElasticsearchAnalyzerReference( new ElasticsearchAnalyzerImpl( "default" ) );
 	}
 
 	@Override
-	public RemoteAnalyzerReference createPassThroughAnalyzerReference() {
-		return new RemoteAnalyzerReference( new RemoteAnalyzerImpl( "keyword" ) );
+	public ElasticsearchAnalyzerReference createPassThroughAnalyzerReference() {
+		return new ElasticsearchAnalyzerReference( new ElasticsearchAnalyzerImpl( "keyword" ) );
 	}
 
 	@Override
-	public RemoteAnalyzerReference createNamedAnalyzerReference(String name) {
-		return new RemoteAnalyzerReference( name );
+	public ElasticsearchAnalyzerReference createNamedAnalyzerReference(String name) {
+		return new ElasticsearchAnalyzerReference( name );
 	}
 
 	@Override
-	public RemoteAnalyzerReference createAnalyzerReference(Class<?> analyzerClass) {
+	public ElasticsearchAnalyzerReference createAnalyzerReference(Class<?> analyzerClass) {
 		return null;
 	}
 
 	@Override
-	public void initializeNamedAnalyzerReferences(Map<String, RemoteAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
-		Map<String, RemoteAnalyzer> initializedAnalyzers = new HashMap<>();
-		for ( Map.Entry<String, RemoteAnalyzerReference> entry : references.entrySet() ) {
+	public void initializeNamedAnalyzerReferences(Map<String, ElasticsearchAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
+		Map<String, ElasticsearchAnalyzer> initializedAnalyzers = new HashMap<>();
+		for ( Map.Entry<String, ElasticsearchAnalyzerReference> entry : references.entrySet() ) {
 			initializeReference( initializedAnalyzers, entry.getKey(), entry.getValue(), analyzerDefinitions );
 		}
 	}
 
-	private void initializeReference(Map<String, RemoteAnalyzer> initializedAnalyzers, String name,
-			RemoteAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
+	private void initializeReference(Map<String, ElasticsearchAnalyzer> initializedAnalyzers, String name,
+			ElasticsearchAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
 		if ( analyzerReference.isInitialized() ) {
 			initializedAnalyzers.put( analyzerReference.getAnalyzerName(), analyzerReference.getAnalyzer() );
 			return;
 		}
 
-		RemoteAnalyzer analyzer = initializedAnalyzers.get( name );
+		ElasticsearchAnalyzer analyzer = initializedAnalyzers.get( name );
 
 		if ( analyzer == null ) {
 			// TODO HSEARCH-2219 Actually use the definition
@@ -69,12 +65,14 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<RemoteAna
 		analyzerReference.initialize( analyzer );
 	}
 
-	private RemoteAnalyzer buildAnalyzer(String name) {
-		return new RemoteAnalyzerImpl( name );
+	private ElasticsearchAnalyzer buildAnalyzer(String name) {
+		return new ElasticsearchAnalyzerImpl( name );
 	}
 
 	@Override
-	public ScopedRemoteAnalyzer.Builder buildScopedAnalyzer(RemoteAnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedRemoteAnalyzer.Builder( initialGlobalAnalyzerReference, Collections.<String, RemoteAnalyzerReference>emptyMap() );
+	public ScopedElasticsearchAnalyzer.Builder buildScopedAnalyzer(ElasticsearchAnalyzerReference initialGlobalAnalyzerReference) {
+		return new ScopedElasticsearchAnalyzer.Builder(
+				initialGlobalAnalyzerReference, Collections.<String, ElasticsearchAnalyzerReference>emptyMap()
+				);
 	}
 }
