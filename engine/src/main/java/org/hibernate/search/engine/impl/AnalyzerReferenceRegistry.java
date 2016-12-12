@@ -36,7 +36,15 @@ public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
 	AnalyzerReferenceRegistry(AnalyzerStrategy<T> strategy) {
 		this.strategy = strategy;
 		this.defaultReference = strategy.createDefaultAnalyzerReference();
+		String analyzerName = defaultReference.getAnalyzerName();
+		if ( analyzerName != null ) {
+			referencesByName.put( analyzerName, defaultReference );
+		}
 		this.passThroughReference = strategy.createPassThroughAnalyzerReference();
+		analyzerName = passThroughReference.getAnalyzerName();
+		if ( analyzerName != null ) {
+			referencesByName.put( analyzerName, passThroughReference );
+		}
 	}
 
 	public T getDefaultAnalyzerReference() {

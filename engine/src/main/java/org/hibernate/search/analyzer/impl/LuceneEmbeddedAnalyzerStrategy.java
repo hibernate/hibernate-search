@@ -125,6 +125,11 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 
 	private void initializeReference(Map<String, Analyzer> initializedAnalyzers, String name, LuceneAnalyzerReference analyzerReference,
 			Map<String, AnalyzerDef> analyzerDefinitions) {
+		if ( analyzerReference.isInitialized() ) {
+			initializedAnalyzers.put( analyzerReference.getAnalyzerName(), analyzerReference.getAnalyzer() );
+			return;
+		}
+
 		Analyzer analyzer = initializedAnalyzers.get( name );
 
 		if ( analyzer == null ) {
