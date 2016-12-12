@@ -45,9 +45,7 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 	private ScopedLuceneAnalyzer(Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
 		super( PER_FIELD_REUSE_STRATEGY );
 		this.globalAnalyzer = globalAnalyzer;
-		for ( Map.Entry<String, Analyzer> entry : scopedAnalyzers.entrySet() ) {
-			addScopedAnalyzer( entry.getKey(), entry.getValue() );
-		}
+		this.scopedAnalyzers.putAll( scopedAnalyzers );
 	}
 
 	@Override
