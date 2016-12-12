@@ -23,7 +23,6 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
-import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
