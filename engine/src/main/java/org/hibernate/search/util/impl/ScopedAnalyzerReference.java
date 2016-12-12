@@ -48,21 +48,20 @@ public final class ScopedAnalyzerReference implements AnalyzerReference {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
 		if ( LuceneAnalyzerReference.class.isAssignableFrom( analyzerType ) ) {
 			if ( !( scopedAnalyzer instanceof ScopedLuceneAnalyzer ) ) {
 				throw log.scopedAnalyzerIsNotLucene( scopedAnalyzer );
 			}
-			return (T) new LuceneAnalyzerReference( (ScopedLuceneAnalyzer) scopedAnalyzer );
+			return analyzerType.cast( new LuceneAnalyzerReference( (ScopedLuceneAnalyzer) scopedAnalyzer ) );
 		}
 		else if ( RemoteAnalyzerReference.class.isAssignableFrom( analyzerType ) ) {
 			if ( !( scopedAnalyzer instanceof ScopedRemoteAnalyzer ) ) {
 				throw log.scopedAnalyzerIsNotRemote( scopedAnalyzer );
 			}
-			return (T) new RemoteAnalyzerReference( (ScopedRemoteAnalyzer) scopedAnalyzer );
+			return analyzerType.cast( new RemoteAnalyzerReference( (ScopedRemoteAnalyzer) scopedAnalyzer ) );
 		}
-		return (T) this;
+		return analyzerType.cast( this );
 	}
 
 	@Override

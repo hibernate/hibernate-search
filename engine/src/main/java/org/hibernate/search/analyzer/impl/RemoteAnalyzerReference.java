@@ -39,9 +39,8 @@ public final class RemoteAnalyzerReference implements AnalyzerReference {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
-		return (T) this;
+		return analyzerType.cast( this );
 	}
 
 	@Override
