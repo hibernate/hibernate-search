@@ -33,7 +33,7 @@ public class LuceneAnalyzerReference implements AnalyzerReference {
 
 	@Override
 	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return LuceneAnalyzerReference.class.isAssignableFrom( analyzerType );
+		return analyzerType.isAssignableFrom( LuceneAnalyzerReference.class );
 	}
 
 	@Override
