@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.analyzer.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,16 +27,16 @@ public class ScopedRemoteAnalyzer extends RemoteAnalyzer implements ScopedAnalyz
 	private static final Log log = LoggerFactory.make();
 
 	private RemoteAnalyzer globalAnalyzer;
-	private final Map<String, RemoteAnalyzer> scopedAnalyzers;
+	private final Map<String, RemoteAnalyzer> scopedAnalyzers = new HashMap<>();
 
 	public ScopedRemoteAnalyzer(AnalyzerReference globalAnalyzerReference) {
-		this( getRemoteAnalyzer( globalAnalyzerReference ), new HashMap<String, RemoteAnalyzer>() );
+		this( getRemoteAnalyzer( globalAnalyzerReference ), Collections.<String, RemoteAnalyzer>emptyMap() );
 	}
 
 	private ScopedRemoteAnalyzer(RemoteAnalyzer globalAnalyzer, Map<String, RemoteAnalyzer> analyzers) {
 		super( globalAnalyzer.name );
 		this.globalAnalyzer = globalAnalyzer;
-		this.scopedAnalyzers = analyzers;
+		this.scopedAnalyzers.putAll( analyzers );
 	}
 
 	@Override
