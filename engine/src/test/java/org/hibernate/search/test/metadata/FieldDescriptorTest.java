@@ -7,7 +7,6 @@
 
 package org.hibernate.search.test.metadata;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
@@ -29,6 +28,7 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -177,7 +177,7 @@ public class FieldDescriptorTest {
 		FieldDescriptor fieldDescriptor = getFieldDescriptor( Snafu.class, "my-snafu" );
 
 		assertNotNull( fieldDescriptor.getAnalyzer() );
-		assertTrue( fieldDescriptor.getAnalyzer() instanceof StandardAnalyzer );
+		assertTrue( fieldDescriptor.getAnalyzer() instanceof PassThroughAnalyzer );
 	}
 
 	@Test
