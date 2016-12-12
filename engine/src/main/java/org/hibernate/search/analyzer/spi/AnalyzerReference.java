@@ -17,6 +17,11 @@ package org.hibernate.search.analyzer.spi;
 public interface AnalyzerReference {
 
 	/**
+	 * @return The referenced analyzer.
+	 */
+	Object getAnalyzer();
+
+	/**
 	 * Check if the analyzer can be represented using a specific class.
 	 *
 	 * @param analyzerType an {@link AnalyzerReference} type

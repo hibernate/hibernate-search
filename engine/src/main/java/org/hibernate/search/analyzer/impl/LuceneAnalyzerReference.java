@@ -22,6 +22,7 @@ public class LuceneAnalyzerReference implements AnalyzerReference {
 		this.analyzer = analyzer;
 	}
 
+	@Override
 	public Analyzer getAnalyzer() {
 		return analyzer;
 	}

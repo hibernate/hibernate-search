@@ -7,12 +7,14 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.impl.LazyRemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
+import org.hibernate.search.analyzer.impl.ScopedRemoteAnalyzer;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 
@@ -69,5 +71,10 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<RemoteAna
 
 	private RemoteAnalyzer buildAnalyzer(String name) {
 		return new RemoteAnalyzer( name );
+	}
+
+	@Override
+	public ScopedRemoteAnalyzer.Builder buildScopedAnalyzer(RemoteAnalyzerReference initialGlobalAnalyzerReference) {
+		return new ScopedRemoteAnalyzer.Builder( initialGlobalAnalyzerReference, Collections.<String, RemoteAnalyzer>emptyMap() );
 	}
 }
