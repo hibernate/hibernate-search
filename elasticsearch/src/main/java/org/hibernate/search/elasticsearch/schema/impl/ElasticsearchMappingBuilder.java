@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
@@ -222,10 +224,11 @@ final class ElasticsearchMappingBuilder {
 
 	public String getAnalyzerName(AnalyzerReference analyzerReference, String fieldName) {
 		if ( !analyzerReference.is( RemoteAnalyzerReference.class ) ) {
-			LOG.analyzerIsNotRemote( getBeanClass(), fieldName, analyzerReference );
+			LOG.analyzerIsNotElasticsearch( getBeanClass(), fieldName, analyzerReference );
 			return null;
 		}
-		return analyzerReference.unwrap( RemoteAnalyzerReference.class ).getAnalyzer().getName( fieldName );
+		ElasticsearchAnalyzer analyzer = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class ).getAnalyzer();
+		return analyzer.getName( fieldName );
 	}
 
 	public Class<?> getBeanClass() {
