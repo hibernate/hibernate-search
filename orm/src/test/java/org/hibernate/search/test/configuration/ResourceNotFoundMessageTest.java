@@ -7,6 +7,9 @@
 
 package org.hibernate.search.test.configuration;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.analysis.core.StopFilterFactory;
@@ -31,7 +34,7 @@ public class ResourceNotFoundMessageTest {
 	public void testIllegalAnalyzerDefinition() {
 		try {
 			new FullTextSessionBuilder()
-					.addAnnotatedClass( User.class )
+					.addAnnotatedClass( SomeHibernateEntity.class )
 					.setProperty( Environment.MODEL_MAPPING, ResourceNotFoundMessageTest.class.getName() )
 					.build();
 			Assert.fail( "should not reach this" );
@@ -49,7 +52,15 @@ public class ResourceNotFoundMessageTest {
 				.analyzerDef( "ngram", StandardTokenizerFactory.class )
 				.filter( LowerCaseFilterFactory.class )
 				.filter( StopFilterFactory.class )
-				.param( "words", "non-existent-resourcename.file" );
+				.param( "words", "non-existent-resourcename.file" )
+				// We must mark at least one entity as indexed, otherwise analyzer definitions are not initialized (no need to)
+				.entity( SomeHibernateEntity.class ).indexed();
 		return mapping;
+	}
+
+	@Entity
+	private static class SomeHibernateEntity {
+		@Id
+		private Long id;
 	}
 }
