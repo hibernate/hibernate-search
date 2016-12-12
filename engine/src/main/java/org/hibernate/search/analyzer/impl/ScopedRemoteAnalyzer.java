@@ -22,33 +22,34 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Guillaume Smet
  */
-public class ScopedRemoteAnalyzer extends RemoteAnalyzer implements ScopedAnalyzer {
+public class ScopedRemoteAnalyzer implements RemoteAnalyzer, ScopedAnalyzer {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final RemoteAnalyzerReference globalAnalyzerReference;
-	private final Map<String, RemoteAnalyzer> scopedAnalyzers = new HashMap<>();
+	private final Map<String, RemoteAnalyzerReference> scopedAnalyzers = new HashMap<>();
 
 	public ScopedRemoteAnalyzer(RemoteAnalyzerReference globalAnalyzerReference) {
-		super( globalAnalyzerReference.getAnalyzer().name );
 		this.globalAnalyzerReference = globalAnalyzerReference;
 	}
 
 	public ScopedRemoteAnalyzer(Builder builder) {
-		super( builder.globalAnalyzerReference.getAnalyzer().name );
 		this.globalAnalyzerReference = builder.globalAnalyzerReference;
 		this.scopedAnalyzers.putAll( builder.scopedAnalyzers );
 	}
 
 	@Override
 	public String getName(String fieldName) {
-		final RemoteAnalyzer analyzer = scopedAnalyzers.get( fieldName );
-		if ( analyzer == null ) {
-			return globalAnalyzerReference.getAnalyzer().getName( fieldName );
+		RemoteAnalyzerReference analyzerReference = scopedAnalyzers.get( fieldName );
+		if ( analyzerReference == null ) {
+			analyzerReference = globalAnalyzerReference;
 		}
-		else {
-			return analyzer.getName( fieldName );
-		}
+		return analyzerReference.getAnalyzer().getName( fieldName );
+	}
+
+	@Override
+	public void close() {
+		// nothing to close
 	}
 
 	@Override
@@ -56,12 +57,24 @@ public class ScopedRemoteAnalyzer extends RemoteAnalyzer implements ScopedAnalyz
 		return new Builder( globalAnalyzerReference, scopedAnalyzers );
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( "<" );
+		sb.append( globalAnalyzerReference );
+		sb.append( "," );
+		sb.append( scopedAnalyzers );
+		sb.append( ">" );
+		return sb.toString();
+	}
+
 	public static class Builder implements ScopedAnalyzer.Builder {
 
 		private RemoteAnalyzerReference globalAnalyzerReference;
-		private final Map<String, RemoteAnalyzer> scopedAnalyzers = new HashMap<>();
+		private final Map<String, RemoteAnalyzerReference> scopedAnalyzers = new HashMap<>();
 
-		public Builder(RemoteAnalyzerReference globalAnalyzerReference, Map<String, RemoteAnalyzer> scopedAnalyzers) {
+		public Builder(RemoteAnalyzerReference globalAnalyzerReference, Map<String, RemoteAnalyzerReference> scopedAnalyzers) {
 			this.globalAnalyzerReference = globalAnalyzerReference;
 			this.scopedAnalyzers.putAll( scopedAnalyzers );
 		}
@@ -78,7 +91,7 @@ public class ScopedRemoteAnalyzer extends RemoteAnalyzer implements ScopedAnalyz
 
 		@Override
 		public void addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
-			scopedAnalyzers.put( scope, getRemoteAnalyzerReference( analyzerReference ).getAnalyzer() );
+			scopedAnalyzers.put( scope, getRemoteAnalyzerReference( analyzerReference ) );
 		}
 
 		@Override

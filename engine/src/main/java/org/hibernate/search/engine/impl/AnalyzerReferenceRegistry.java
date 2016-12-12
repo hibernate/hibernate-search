@@ -58,7 +58,7 @@ public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
 	public T getAnalyzerReference(String name) {
 		T reference = referencesByName.get( name );
 		if ( reference == null ) {
-			reference = strategy.createAnalyzerReference( name );
+			reference = strategy.createNamedAnalyzerReference( name );
 			referencesByName.put( name, reference );
 		}
 		return reference;
@@ -74,7 +74,7 @@ public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
 	}
 
 	public void initialize(Map<String, AnalyzerDef> analyzerDefinitions) {
-		strategy.initializeNamedAnalyzerReferences( referencesByName.values(), analyzerDefinitions );
+		strategy.initializeNamedAnalyzerReferences( referencesByName, analyzerDefinitions );
 	}
 
 	public ScopedAnalyzer.Builder buildScopedAnalyzer() {

@@ -6,13 +6,12 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.analyzer.impl.LazyRemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
+import org.hibernate.search.analyzer.impl.RemoteAnalyzerImpl;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.analyzer.impl.ScopedRemoteAnalyzer;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
@@ -26,17 +25,17 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<RemoteAna
 
 	@Override
 	public RemoteAnalyzerReference createDefaultAnalyzerReference() {
-		return new RemoteAnalyzerReference( new RemoteAnalyzer( "default" ) );
+		return new RemoteAnalyzerReference( new RemoteAnalyzerImpl( "default" ) );
 	}
 
 	@Override
 	public RemoteAnalyzerReference createPassThroughAnalyzerReference() {
-		return new RemoteAnalyzerReference( new RemoteAnalyzer( "keyword" ) );
+		return new RemoteAnalyzerReference( new RemoteAnalyzerImpl( "keyword" ) );
 	}
 
 	@Override
-	public RemoteAnalyzerReference createAnalyzerReference(String name) {
-		return new RemoteAnalyzerReference( new LazyRemoteAnalyzer( name ) );
+	public RemoteAnalyzerReference createNamedAnalyzerReference(String name) {
+		return new RemoteAnalyzerReference( name );
 	}
 
 	@Override
@@ -45,36 +44,32 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<RemoteAna
 	}
 
 	@Override
-	public void initializeNamedAnalyzerReferences(Collection<RemoteAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
+	public void initializeNamedAnalyzerReferences(Map<String, RemoteAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
 		Map<String, RemoteAnalyzer> initializedAnalyzers = new HashMap<>();
-		for ( RemoteAnalyzerReference reference : references ) {
-			initializeReference( initializedAnalyzers, reference, analyzerDefinitions );
+		for ( Map.Entry<String, RemoteAnalyzerReference> entry : references.entrySet() ) {
+			initializeReference( initializedAnalyzers, entry.getKey(), entry.getValue(), analyzerDefinitions );
 		}
 	}
 
+	private void initializeReference(Map<String, RemoteAnalyzer> initializedAnalyzers, String name,
+			RemoteAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
+		RemoteAnalyzer analyzer = initializedAnalyzers.get( name );
 
-	private void initializeReference(Map<String, RemoteAnalyzer> initializedAnalyzers, RemoteAnalyzerReference analyzerReference,
-			Map<String, AnalyzerDef> analyzerDefinitions) {
-		LazyRemoteAnalyzer lazyAnalyzer = (LazyRemoteAnalyzer) analyzerReference.getAnalyzer();
-
-		String name = lazyAnalyzer.getName();
-		RemoteAnalyzer delegate = initializedAnalyzers.get( name );
-
-		if ( delegate == null ) {
+		if ( analyzer == null ) {
 			// TODO HSEARCH-2219 Actually use the definition
-			delegate = buildAnalyzer( name );
-			initializedAnalyzers.put( name, delegate );
+			analyzer = buildAnalyzer( name );
+			initializedAnalyzers.put( name, analyzer );
 		}
 
-		lazyAnalyzer.setDelegate( delegate );
+		analyzerReference.initialize( analyzer );
 	}
 
 	private RemoteAnalyzer buildAnalyzer(String name) {
-		return new RemoteAnalyzer( name );
+		return new RemoteAnalyzerImpl( name );
 	}
 
 	@Override
 	public ScopedRemoteAnalyzer.Builder buildScopedAnalyzer(RemoteAnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedRemoteAnalyzer.Builder( initialGlobalAnalyzerReference, Collections.<String, RemoteAnalyzer>emptyMap() );
+		return new ScopedRemoteAnalyzer.Builder( initialGlobalAnalyzerReference, Collections.<String, RemoteAnalyzerReference>emptyMap() );
 	}
 }

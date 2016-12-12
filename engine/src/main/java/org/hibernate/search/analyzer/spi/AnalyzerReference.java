@@ -17,6 +17,11 @@ package org.hibernate.search.analyzer.spi;
 public interface AnalyzerReference {
 
 	/**
+	 * @return The name of the referenced analyzer, or {@code null} if unknown.
+	 */
+	String getAnalyzerName();
+
+	/**
 	 * @return The referenced analyzer.
 	 */
 	Object getAnalyzer();
