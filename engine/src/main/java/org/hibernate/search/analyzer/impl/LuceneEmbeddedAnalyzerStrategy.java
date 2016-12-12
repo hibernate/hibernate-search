@@ -8,7 +8,6 @@ package org.hibernate.search.analyzer.impl;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +82,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 			}
 			catch (Exception e) {
 				// Maybe the string refers to an analyzer definition instead?
-				return createAnalyzerReference( analyzerClassName );
+				return createNamedAnalyzerReference( analyzerClassName );
 			}
 		}
 		else {
@@ -112,35 +111,32 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 	}
 
 	@Override
-	public LuceneAnalyzerReference createAnalyzerReference(String name) {
-		return new LuceneAnalyzerReference( new LazyLuceneAnalyzer( name ) );
+	public LuceneAnalyzerReference createNamedAnalyzerReference(String name) {
+		return new LuceneAnalyzerReference( name );
 	}
 
 	@Override
-	public void initializeNamedAnalyzerReferences(Collection<LuceneAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
+	public void initializeNamedAnalyzerReferences(Map<String, LuceneAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
 		Map<String, Analyzer> initializedAnalyzers = new HashMap<>();
-		for ( LuceneAnalyzerReference reference : references ) {
-			initializeReference( initializedAnalyzers, reference, analyzerDefinitions );
+		for ( Map.Entry<String, LuceneAnalyzerReference> entry : references.entrySet() ) {
+			initializeReference( initializedAnalyzers, entry.getKey(), entry.getValue(), analyzerDefinitions );
 		}
 	}
 
-	private void initializeReference(Map<String, Analyzer> initializedAnalyzers, LuceneAnalyzerReference analyzerReference,
+	private void initializeReference(Map<String, Analyzer> initializedAnalyzers, String name, LuceneAnalyzerReference analyzerReference,
 			Map<String, AnalyzerDef> analyzerDefinitions) {
-		LazyLuceneAnalyzer lazyAnalyzer = (LazyLuceneAnalyzer) analyzerReference.getAnalyzer();
+		Analyzer analyzer = initializedAnalyzers.get( name );
 
-		String name = lazyAnalyzer.getName();
-		Analyzer delegate = initializedAnalyzers.get( name );
-
-		if ( delegate == null ) {
+		if ( analyzer == null ) {
 			AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
 			if ( analyzerDefinition == null ) {
 				throw new SearchException( "Lucene analyzer found with an unknown definition: " + name );
 			}
-			delegate = buildAnalyzer( analyzerDefinition );
-			initializedAnalyzers.put( name, delegate );
+			analyzer = buildAnalyzer( analyzerDefinition );
+			initializedAnalyzers.put( name, analyzer );
 		}
 
-		lazyAnalyzer.setDelegate( delegate );
+		analyzerReference.initialize( analyzer );
 	}
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDefinition) {
@@ -154,6 +150,6 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 
 	@Override
 	public ScopedLuceneAnalyzer.Builder buildScopedAnalyzer(LuceneAnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedLuceneAnalyzer.Builder( initialGlobalAnalyzerReference, Collections.<String, Analyzer>emptyMap() );
+		return new ScopedLuceneAnalyzer.Builder( initialGlobalAnalyzerReference, Collections.<String, LuceneAnalyzerReference>emptyMap() );
 	}
 }

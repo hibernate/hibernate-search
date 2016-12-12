@@ -7,6 +7,9 @@
 package org.hibernate.search.analyzer.impl;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A reference to a {@code RemoteAnalyzer}.
@@ -16,15 +19,44 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
  */
 public class RemoteAnalyzerReference implements AnalyzerReference {
 
+	private static final Log LOG = LoggerFactory.make();
+
+	private String name;
+
 	private RemoteAnalyzer analyzer;
 
+	public RemoteAnalyzerReference(String name) {
+		this.name = name;
+		this.analyzer = null; // Not initialized
+	}
+
 	public RemoteAnalyzerReference(RemoteAnalyzer analyzer) {
+		this.name = null;
 		this.analyzer = analyzer;
 	}
 
 	@Override
+	public String getAnalyzerName() {
+		return name;
+	}
+
+	@Override
 	public RemoteAnalyzer getAnalyzer() {
+		if ( analyzer == null ) {
+			throw LOG.lazyRemoteAnalyzerReferenceNotInitialized( this );
+		}
 		return analyzer;
+	}
+
+	public boolean isInitialized() {
+		return analyzer != null;
+	}
+
+	public void initialize(RemoteAnalyzer analyzer) {
+		if ( this.analyzer != null ) {
+			throw new AssertionFailure( "An analyzer reference has been initialized more than once: " + this );
+		}
+		this.analyzer = analyzer;
 	}
 
 	@Override
@@ -51,6 +83,9 @@ public class RemoteAnalyzerReference implements AnalyzerReference {
 		sb.append( "<" );
 		if ( analyzer != null ) {
 			sb.append( analyzer );
+		}
+		else {
+			sb.append( name );
 		}
 		sb.append( ">" );
 		return sb.toString();
