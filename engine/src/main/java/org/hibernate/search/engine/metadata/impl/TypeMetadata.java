@@ -22,6 +22,8 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnalyzerReferenceRegistry;
@@ -30,7 +32,6 @@ import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -487,7 +488,7 @@ public class TypeMetadata {
 	public static class Builder {
 		protected final BackReference<TypeMetadata> resultReference = new BackReference<>();
 		private final Class<?> indexedType;
-		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
+		private final ScopedAnalyzer.Builder scopedAnalyzerReferenceBuilder;
 		private final AnalyzerReferenceRegistry<?> analyzerReferenceRegistry;
 
 		private float boost;
@@ -514,8 +515,7 @@ public class TypeMetadata {
 			else {
 				IndexManagerType indexManagerType = parseContext.getIndexManagerType();
 				this.analyzerReferenceRegistry = configContext.getAnalyzerReferenceRegistry( indexManagerType );
-				this.scopedAnalyzerReferenceBuilder = new ScopedAnalyzerReference.Builder(
-						analyzerReferenceRegistry.getDefaultAnalyzerReference() );
+				this.scopedAnalyzerReferenceBuilder = analyzerReferenceRegistry.buildScopedAnalyzer();
 			}
 		}
 
@@ -632,7 +632,7 @@ public class TypeMetadata {
 			return scopedAnalyzerReferenceBuilder.getGlobalAnalyzerReference();
 		}
 
-		public ScopedAnalyzerReference.Builder getScopedAnalyzerReferenceBuilder() {
+		public ScopedAnalyzer.Builder getScopedAnalyzerReferenceBuilder() {
 			return scopedAnalyzerReferenceBuilder;
 		}
 

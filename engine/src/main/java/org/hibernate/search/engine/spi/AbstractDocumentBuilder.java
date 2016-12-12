@@ -18,6 +18,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.BoostStrategy;
@@ -30,7 +31,6 @@ import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

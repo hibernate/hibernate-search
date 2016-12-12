@@ -16,9 +16,9 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.backend.impl.lucene.analysis.ConcurrentlyMutableAnalyzer;
 import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
-import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 
 /**
  * Encapsulates various operations to be performed on a single IndexWriter.

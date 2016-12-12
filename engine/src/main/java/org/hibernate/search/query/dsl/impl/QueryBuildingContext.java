@@ -7,11 +7,11 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 
 /**
  * Keep the query builder contextual information

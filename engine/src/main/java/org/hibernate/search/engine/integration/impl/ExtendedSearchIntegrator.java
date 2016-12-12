@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -149,7 +150,7 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
 	 * class is not an indexed entity.
 	 */
-	AnalyzerReference getAnalyzerReference(Class<?> clazz);
+	ScopedAnalyzerReference getAnalyzerReference(Class<?> clazz);
 
 	/**
 	 * Return an Hibernate Search query object.

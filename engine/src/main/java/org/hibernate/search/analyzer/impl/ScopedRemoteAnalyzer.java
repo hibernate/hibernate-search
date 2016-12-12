@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.analyzer.impl;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -26,36 +26,25 @@ public class ScopedRemoteAnalyzer extends RemoteAnalyzer implements ScopedAnalyz
 
 	private static final Log log = LoggerFactory.make();
 
-	private RemoteAnalyzer globalAnalyzer;
+	private final RemoteAnalyzerReference globalAnalyzerReference;
 	private final Map<String, RemoteAnalyzer> scopedAnalyzers = new HashMap<>();
 
-	public ScopedRemoteAnalyzer(AnalyzerReference globalAnalyzerReference) {
-		this( getRemoteAnalyzer( globalAnalyzerReference ), Collections.<String, RemoteAnalyzer>emptyMap() );
+	public ScopedRemoteAnalyzer(RemoteAnalyzerReference globalAnalyzerReference) {
+		super( globalAnalyzerReference.getAnalyzer().name );
+		this.globalAnalyzerReference = globalAnalyzerReference;
 	}
 
-	private ScopedRemoteAnalyzer(RemoteAnalyzer globalAnalyzer, Map<String, RemoteAnalyzer> analyzers) {
-		super( globalAnalyzer.name );
-		this.globalAnalyzer = globalAnalyzer;
-		this.scopedAnalyzers.putAll( analyzers );
-	}
-
-	@Override
-	public void setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference) {
-		RemoteAnalyzer remoteAnalyzer = getRemoteAnalyzer( globalAnalyzerReference );
-		this.name = remoteAnalyzer.name;
-		this.globalAnalyzer = remoteAnalyzer;
-	}
-
-	@Override
-	public void addScopedAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
-		this.scopedAnalyzers.put( scope, getRemoteAnalyzer( analyzerReference ) );
+	public ScopedRemoteAnalyzer(Builder builder) {
+		super( builder.globalAnalyzerReference.getAnalyzer().name );
+		this.globalAnalyzerReference = builder.globalAnalyzerReference;
+		this.scopedAnalyzers.putAll( builder.scopedAnalyzers );
 	}
 
 	@Override
 	public String getName(String fieldName) {
 		final RemoteAnalyzer analyzer = scopedAnalyzers.get( fieldName );
 		if ( analyzer == null ) {
-			return globalAnalyzer.getName( fieldName );
+			return globalAnalyzerReference.getAnalyzer().getName( fieldName );
 		}
 		else {
 			return analyzer.getName( fieldName );
@@ -63,16 +52,48 @@ public class ScopedRemoteAnalyzer extends RemoteAnalyzer implements ScopedAnalyz
 	}
 
 	@Override
-	public ScopedAnalyzer clone() {
-		return new ScopedRemoteAnalyzer( globalAnalyzer, scopedAnalyzers );
+	public Builder startCopy() {
+		return new Builder( globalAnalyzerReference, scopedAnalyzers );
 	}
 
-	private static RemoteAnalyzer getRemoteAnalyzer(AnalyzerReference analyzerReference) {
-		if ( !( analyzerReference instanceof RemoteAnalyzerReference ) ) {
+	public static class Builder implements ScopedAnalyzer.Builder {
+
+		private RemoteAnalyzerReference globalAnalyzerReference;
+		private final Map<String, RemoteAnalyzer> scopedAnalyzers = new HashMap<>();
+
+		public Builder(RemoteAnalyzerReference globalAnalyzerReference, Map<String, RemoteAnalyzer> scopedAnalyzers) {
+			this.globalAnalyzerReference = globalAnalyzerReference;
+			this.scopedAnalyzers.putAll( scopedAnalyzers );
+		}
+
+		@Override
+		public RemoteAnalyzerReference getGlobalAnalyzerReference() {
+			return globalAnalyzerReference;
+		}
+
+		@Override
+		public void setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference) {
+			this.globalAnalyzerReference = getRemoteAnalyzerReference( globalAnalyzerReference );
+		}
+
+		@Override
+		public void addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
+			scopedAnalyzers.put( scope, getRemoteAnalyzerReference( analyzerReference ).getAnalyzer() );
+		}
+
+		@Override
+		public ScopedRemoteAnalyzerReference build() {
+			ScopedRemoteAnalyzer analyzer = new ScopedRemoteAnalyzer( this );
+			return new ScopedRemoteAnalyzerReference( analyzer );
+		}
+	}
+
+	private static RemoteAnalyzerReference getRemoteAnalyzerReference(AnalyzerReference analyzerReference) {
+		if ( !analyzerReference.is( RemoteAnalyzerReference.class ) ) {
 			throw log.analyzerReferenceIsNotRemote( analyzerReference );
 		}
 
-		return ( (RemoteAnalyzerReference) analyzerReference ).getAnalyzer();
+		return analyzerReference.unwrap( RemoteAnalyzerReference.class );
 	}
 
 }
