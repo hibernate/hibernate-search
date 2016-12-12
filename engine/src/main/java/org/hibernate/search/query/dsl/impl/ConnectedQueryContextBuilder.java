@@ -9,11 +9,11 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.util.Set;
 
+import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
-import org.hibernate.search.util.impl.ScopedAnalyzerReference;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 	public final class HSearchEntityContext implements EntityContext {
 		private final Class<?> indexBoundType;
-		private final ScopedAnalyzerReference.Builder queryAnalyzerReferenceBuilder;
+		private final ScopedAnalyzer.Builder queryAnalyzerReferenceBuilder;
 
 		public HSearchEntityContext(Class<?> entityType, ExtendedSearchIntegrator factory) {
 			// get a type for meta-data retrieval; if the given type itself is not indexed, one indexed sub-type will
@@ -51,7 +51,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 				throw log.cantQueryUnindexedType( entityType.getCanonicalName() );
 			}
 
-			queryAnalyzerReferenceBuilder = new ScopedAnalyzerReference.Builder( factory.getAnalyzerReference( indexBoundType ) );
+			queryAnalyzerReferenceBuilder = factory.getAnalyzerReference( indexBoundType ).getAnalyzer().startCopy();
 		}
 
 		/**

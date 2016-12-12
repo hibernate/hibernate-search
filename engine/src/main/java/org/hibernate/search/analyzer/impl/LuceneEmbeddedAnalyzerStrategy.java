@@ -9,6 +9,7 @@ package org.hibernate.search.analyzer.impl;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
+import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -149,5 +151,10 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 		catch (IOException e) {
 			throw new SearchException( "Could not initialize Analyzer definition " + analyzerDefinition, e );
 		}
+	}
+
+	@Override
+	public ScopedLuceneAnalyzer.Builder buildScopedAnalyzer(LuceneAnalyzerReference initialGlobalAnalyzerReference) {
+		return new ScopedLuceneAnalyzer.Builder( initialGlobalAnalyzerReference, Collections.<String, Analyzer>emptyMap() );
 	}
 }

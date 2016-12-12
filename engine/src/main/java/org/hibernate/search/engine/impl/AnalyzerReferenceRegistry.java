@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 
 /**
@@ -74,6 +75,10 @@ public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
 
 	public void initialize(Map<String, AnalyzerDef> analyzerDefinitions) {
 		strategy.initializeNamedAnalyzerReferences( referencesByName.values(), analyzerDefinitions );
+	}
+
+	public ScopedAnalyzer.Builder buildScopedAnalyzer() {
+		return strategy.buildScopedAnalyzer( getDefaultAnalyzerReference() );
 	}
 
 }

@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.backend.spi.BatchBackend;
@@ -377,7 +378,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public AnalyzerReference getAnalyzerReference(Class<?> clazz) {
+	public ScopedAnalyzerReference getAnalyzerReference(Class<?> clazz) {
 		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( clazz );
 		DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
 		return builder.getAnalyzerReference();

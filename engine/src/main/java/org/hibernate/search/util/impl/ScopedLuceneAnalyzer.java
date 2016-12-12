@@ -6,15 +6,15 @@
  */
 package org.hibernate.search.util.impl;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
-import org.hibernate.search.analyzer.impl.ScopedAnalyzer;
+import org.hibernate.search.analyzer.impl.ScopedLuceneAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -31,35 +31,22 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 
 	private static final Log log = LoggerFactory.make();
 
-	private Analyzer globalAnalyzer;
-	private final Map<String, Analyzer> scopedAnalyzers = new HashMap<String, Analyzer>();
+	private final LuceneAnalyzerReference globalAnalyzerReference;
+	private final Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
 
 	public ScopedLuceneAnalyzer(Analyzer globalAnalyzer) {
-		this( globalAnalyzer, Collections.<String, Analyzer>emptyMap() );
+		this( new LuceneAnalyzerReference( globalAnalyzer ) );
 	}
 
-	public ScopedLuceneAnalyzer(AnalyzerReference globalAnalyzerReference) {
-		this( getLuceneAnalyzer( globalAnalyzerReference ), Collections.<String, Analyzer>emptyMap() );
-	}
-
-	private ScopedLuceneAnalyzer(Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
+	public ScopedLuceneAnalyzer(LuceneAnalyzerReference globalAnalyzerReference) {
 		super( PER_FIELD_REUSE_STRATEGY );
-		this.globalAnalyzer = globalAnalyzer;
-		this.scopedAnalyzers.putAll( scopedAnalyzers );
+		this.globalAnalyzerReference = globalAnalyzerReference;
 	}
 
-	@Override
-	public void setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference) {
-		this.globalAnalyzer = getLuceneAnalyzer( globalAnalyzerReference );
-	}
-
-	public void addScopedAnalyzer(String scope, Analyzer scopedAnalyzer) {
-		scopedAnalyzers.put( scope, scopedAnalyzer );
-	}
-
-	@Override
-	public void addScopedAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
-		scopedAnalyzers.put( scope, getLuceneAnalyzer( analyzerReference ) );
+	public ScopedLuceneAnalyzer(Builder builder) {
+		super( PER_FIELD_REUSE_STRATEGY );
+		this.globalAnalyzerReference = builder.globalAnalyzerReference;
+		this.scopedAnalyzers.putAll( builder.scopedAnalyzers );
 	}
 
 	/**
@@ -70,7 +57,7 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 	 * and all scoped analyzers also match, by reference.
 	 */
 	public boolean isCompositeOfSameInstances(ScopedLuceneAnalyzer other) {
-		if ( this.globalAnalyzer != other.globalAnalyzer ) {
+		if ( this.globalAnalyzerReference.getAnalyzer() != other.globalAnalyzerReference.getAnalyzer() ) {
 			return false;
 		}
 		if ( this.scopedAnalyzers.size() != other.scopedAnalyzers.size() ) {
@@ -88,7 +75,7 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 	protected Analyzer getWrappedAnalyzer(String fieldName) {
 		final Analyzer analyzer = scopedAnalyzers.get( fieldName );
 		if ( analyzer == null ) {
-			return globalAnalyzer;
+			return globalAnalyzerReference.getAnalyzer();
 		}
 		else {
 			return analyzer;
@@ -96,17 +83,52 @@ public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements Scope
 	}
 
 	@Override
-	public ScopedLuceneAnalyzer clone() {
-		ScopedLuceneAnalyzer clone = new ScopedLuceneAnalyzer( globalAnalyzer, scopedAnalyzers );
-		return clone;
+	public Builder startCopy() {
+		return new Builder( globalAnalyzerReference, scopedAnalyzers );
 	}
 
-	private static Analyzer getLuceneAnalyzer(AnalyzerReference analyzerReference) {
-		if ( !( analyzerReference instanceof LuceneAnalyzerReference ) ) {
+	public static class Builder implements ScopedAnalyzer.Builder {
+
+		private LuceneAnalyzerReference globalAnalyzerReference;
+		private final Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
+
+		public Builder(LuceneAnalyzerReference globalAnalyzerReference, Map<String, Analyzer> scopedAnalyzers) {
+			this.globalAnalyzerReference = globalAnalyzerReference;
+			this.scopedAnalyzers.putAll( scopedAnalyzers );
+		}
+
+		@Override
+		public LuceneAnalyzerReference getGlobalAnalyzerReference() {
+			return globalAnalyzerReference;
+		}
+
+		@Override
+		public void setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference) {
+			this.globalAnalyzerReference = getLuceneAnalyzerReference( globalAnalyzerReference );
+		}
+
+		public void addScopedAnalyzer(String scope, Analyzer scopedAnalyzer) {
+			scopedAnalyzers.put( scope, scopedAnalyzer );
+		}
+
+		@Override
+		public void addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
+			scopedAnalyzers.put( scope, getLuceneAnalyzerReference( analyzerReference ).getAnalyzer() );
+		}
+
+		@Override
+		public ScopedLuceneAnalyzerReference build() {
+			ScopedLuceneAnalyzer analyzer = new ScopedLuceneAnalyzer( this );
+			return new ScopedLuceneAnalyzerReference( analyzer );
+		}
+	}
+
+	private static LuceneAnalyzerReference getLuceneAnalyzerReference(AnalyzerReference analyzerReference) {
+		if ( !analyzerReference.is( LuceneAnalyzerReference.class ) ) {
 			throw log.analyzerReferenceIsNotLucene( analyzerReference );
 		}
 
-		return ( (LuceneAnalyzerReference) analyzerReference ).getAnalyzer();
+		return analyzerReference.unwrap( LuceneAnalyzerReference.class );
 	}
 
 }

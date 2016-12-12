@@ -14,7 +14,7 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
  * @author Davide D'Alto
  * @author Guillaume Smet
  */
-public final class RemoteAnalyzerReference implements AnalyzerReference {
+public class RemoteAnalyzerReference implements AnalyzerReference {
 
 	private RemoteAnalyzer analyzer;
 
@@ -22,6 +22,7 @@ public final class RemoteAnalyzerReference implements AnalyzerReference {
 		this.analyzer = analyzer;
 	}
 
+	@Override
 	public RemoteAnalyzer getAnalyzer() {
 		return analyzer;
 	}
