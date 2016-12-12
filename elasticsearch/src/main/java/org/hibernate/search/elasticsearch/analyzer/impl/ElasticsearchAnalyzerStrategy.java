@@ -53,6 +53,11 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<RemoteAna
 
 	private void initializeReference(Map<String, RemoteAnalyzer> initializedAnalyzers, String name,
 			RemoteAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
+		if ( analyzerReference.isInitialized() ) {
+			initializedAnalyzers.put( analyzerReference.getAnalyzerName(), analyzerReference.getAnalyzer() );
+			return;
+		}
+
 		RemoteAnalyzer analyzer = initializedAnalyzers.get( name );
 
 		if ( analyzer == null ) {
