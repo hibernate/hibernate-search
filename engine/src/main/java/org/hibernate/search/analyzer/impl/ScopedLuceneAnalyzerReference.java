@@ -8,7 +8,6 @@ package org.hibernate.search.analyzer.impl;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
-import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
 
 /**
  * @author Yoann Rodiere
