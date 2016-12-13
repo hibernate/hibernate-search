@@ -10,18 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * A definition of an Elasticsearch analyzer, to be included in index settings.
  *
  * @author Yoann Rodiere
  */
+@JsonAdapter(AnalyzerDefinitionJsonAdapterFactory.class)
 public class AnalyzerDefinition extends AnalysisDefinition {
 
 	private String tokenizer;
 
+	@SerializedName("filter")
 	private List<String> tokenFilters;
 
+	@SerializedName("char_filter")
 	private List<String> charFilters;
 
 	public String getTokenizer() {

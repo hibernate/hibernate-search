@@ -354,4 +354,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ " Please only use builtin Lucene analyzers that have a builtin equivalent in Elasticsearch.")
 	SearchException unsupportedAnalyzerImplementation(@FormatWith(ClassFormatter.class) Class<?> luceneClass);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 65,
+			value = "Could not update settings for index '%1$s'"
+	)
+	SearchException elasticsearchSettingsUpdateFailed(String indexName, @Cause Exception e);
+
 }

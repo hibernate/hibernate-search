@@ -8,6 +8,8 @@ package org.hibernate.search.elasticsearch.settings.impl.model;
 
 import java.util.Map;
 
+import org.hibernate.search.elasticsearch.util.impl.gson.SerializeExtraProperties;
+
 import com.google.gson.JsonElement;
 
 /**
@@ -19,6 +21,7 @@ public abstract class AnalysisDefinition {
 
 	private String type;
 
+	@SerializeExtraProperties
 	private Map<String, JsonElement> parameters;
 
 	public String getType() {
