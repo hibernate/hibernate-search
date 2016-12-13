@@ -330,14 +330,12 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	}
 
 	private IndexMetadata createIndexMetadata(Collection<Class<?>> classes) {
-		IndexMetadata index = new IndexMetadata();
-		index.setName( actualIndexName );
+		List<EntityIndexBinding> descriptors = new ArrayList<>();
 		for ( Class<?> entityType : classes ) {
-			String entityName = entityType.getName();
 			EntityIndexBinding descriptor = searchIntegrator.getIndexBinding( entityType );
-			index.putMapping( entityName, schemaTranslator.translate( descriptor, schemaManagementExecutionOptions ) );
+			descriptors.add( descriptor );
 		}
-		return index;
+		return schemaTranslator.translate( actualIndexName, descriptors, schemaManagementExecutionOptions );
 	}
 
 	@Override
