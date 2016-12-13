@@ -23,6 +23,14 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface TokenFilterDef {
+
+	/**
+	 * @return the name of this token filter definition. Optional when using an embedded Lucene
+	 * instance, but should be provided to avoid conflicts when using a remote indexing service
+	 * such as Elasticsearch.
+	 */
+	String name() default "";
+
 	/**
 	 * @return the <code>TokenFilterFactory</code> class which shall be instantiated.
 	 */

@@ -21,12 +21,12 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<Elasticse
 
 	@Override
 	public ElasticsearchAnalyzerReference createDefaultAnalyzerReference() {
-		return new ElasticsearchAnalyzerReference( new ElasticsearchAnalyzerImpl( "default" ) );
+		return new ElasticsearchAnalyzerReference( new UndefinedElasticsearchAnalyzerImpl( "default" ) );
 	}
 
 	@Override
 	public ElasticsearchAnalyzerReference createPassThroughAnalyzerReference() {
-		return new ElasticsearchAnalyzerReference( new ElasticsearchAnalyzerImpl( "keyword" ) );
+		return new ElasticsearchAnalyzerReference( new UndefinedElasticsearchAnalyzerImpl( "keyword" ) );
 	}
 
 	@Override
@@ -57,16 +57,17 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<Elasticse
 		ElasticsearchAnalyzer analyzer = initializedAnalyzers.get( name );
 
 		if ( analyzer == null ) {
-			// TODO HSEARCH-2219 Actually use the definition
-			analyzer = buildAnalyzer( name );
+			AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
+			if ( analyzerDefinition == null ) {
+				analyzer = new UndefinedElasticsearchAnalyzerImpl( name );
+			}
+			else {
+				analyzer = new CustomElasticsearchAnalyzerImpl( analyzerDefinition );
+			}
 			initializedAnalyzers.put( name, analyzer );
 		}
 
 		analyzerReference.initialize( analyzer );
-	}
-
-	private ElasticsearchAnalyzer buildAnalyzer(String name) {
-		return new ElasticsearchAnalyzerImpl( name );
 	}
 
 	@Override

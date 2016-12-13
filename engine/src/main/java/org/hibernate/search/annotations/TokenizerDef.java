@@ -25,6 +25,13 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 public @interface TokenizerDef {
 
 	/**
+	 * @return the name of this tokenizer definition. Optional when using an embedded Lucene
+	 * instance, but should be provided to avoid conflicts when using a remote indexing service
+	 * such as Elasticsearch.
+	 */
+	String name() default "";
+
+	/**
 	 * @return the <code>TokenizerFactory</code> class which shall be instantiated.
 	 */
 	Class<? extends TokenizerFactory> factory();

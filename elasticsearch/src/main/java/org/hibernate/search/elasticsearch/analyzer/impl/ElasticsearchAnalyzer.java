@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
 
 /**
  * A description of an Elasticsearch analyzer.
@@ -14,5 +15,7 @@ import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
  * @author Guillaume Smet
  */
 public interface ElasticsearchAnalyzer extends RemoteAnalyzer {
+
+	AnalyzerDef getDefinition(String fieldName);
 
 }
