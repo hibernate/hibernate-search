@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.settings.impl.model;
 import java.util.Map;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Settings for an Elasticsearch index.
@@ -34,12 +35,16 @@ public class IndexSettings {
 
 	public static class Analysis {
 
+		@SerializedName("analyzer")
 		private Map<String, AnalyzerDefinition> analyzers;
 
+		@SerializedName("tokenizer")
 		private Map<String, TokenizerDefinition> tokenizers;
 
+		@SerializedName("filter")
 		private Map<String, TokenFilterDefinition> tokenFilters;
 
+		@SerializedName("char_filter")
 		private Map<String, CharFilterDefinition> charFilters;
 
 		public Map<String, AnalyzerDefinition> getAnalyzers() {

@@ -7,12 +7,18 @@
 package org.hibernate.search.elasticsearch.settings.impl.model;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.JsonAdapter;
 
 /**
  * A definition of an Elasticsearch tokenizer, to be included in index settings.
  *
  * @author Yoann Rodiere
  */
+/*
+ * CAUTION: JSON serialization is controlled by a specific adapter, which must be
+ * updated whenever fields of this class are added, renamed or removed.
+ */
+@JsonAdapter(AnalysisDefinitionJsonAdapterFactory.class)
 public class TokenizerDefinition extends AnalysisDefinition {
 
 	@Override

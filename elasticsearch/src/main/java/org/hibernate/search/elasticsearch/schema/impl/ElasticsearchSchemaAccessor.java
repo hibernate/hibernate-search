@@ -17,6 +17,7 @@ import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
+import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
@@ -76,8 +77,20 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		serviceManager = null;
 	}
 
-	public void createIndex(String indexName, ExecutionOptions executionOptions) {
+	/*
+	 * Serializing nulls is really not a good idea here, it triggers NPEs in ElasticSearch
+	 * We better not include the null fields.
+	 */
+	private String serializeAsJsonWithoutNulls(Object object) {
+		Gson gson = gsonService.getGsonNoSerializeNulls();
+		return gson.toJson( object );
+	}
+
+	public void createIndex(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {
+		String settingsAsJson = settings == null ? null : serializeAsJsonWithoutNulls( settings );
+
 		CreateIndex createIndex = new CreateIndex.Builder( indexName )
+				.settings( settingsAsJson )
 				.build();
 
 		jestClient.executeRequest( createIndex );
@@ -86,11 +99,14 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	/**
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
-	public boolean createIndexIfAbsent(String indexName, ExecutionOptions executionOptions) {
-		JestResult result = jestClient.executeRequest(
-				new CreateIndex.Builder( indexName ).build(),
-				"index_already_exists_exception"
-				);
+	public boolean createIndexIfAbsent(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {
+		String settingsAsJson = settings == null ? null : serializeAsJsonWithoutNulls( settings );
+
+		CreateIndex createIndex = new CreateIndex.Builder( indexName )
+				.settings( settingsAsJson )
+				.build();
+
+		JestResult result = jestClient.executeRequest( createIndex, "index_already_exists_exception" );
 		if ( !result.isSucceeded() ) {
 			// The index was created just after we checked if it existed: just do as if it had been created when we checked.
 			return false;
@@ -134,12 +150,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	public void putMapping(String indexName, String mappingName, TypeMapping mapping) {
-		/*
-		 * Serializing nulls is really not a good idea here, it triggers NPEs in ElasticSearch
-		 * We better not include the null fields.
-		 */
-		Gson gson = gsonService.getGsonNoSerializeNulls();
-		String mappingAsJson = gson.toJson( mapping );
+		String mappingAsJson = serializeAsJsonWithoutNulls( mapping );
 
 		PutMapping putMapping = new PutMapping.Builder(
 				indexName,
