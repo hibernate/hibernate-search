@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -38,13 +39,22 @@ public class ScopedElasticsearchAnalyzer implements ElasticsearchAnalyzer, Scope
 		this.scopedAnalyzers.putAll( builder.scopedAnalyzers );
 	}
 
-	@Override
-	public String getName(String fieldName) {
+	private ElasticsearchAnalyzerReference getDelegate(String fieldName) {
 		ElasticsearchAnalyzerReference analyzerReference = scopedAnalyzers.get( fieldName );
 		if ( analyzerReference == null ) {
 			analyzerReference = globalAnalyzerReference;
 		}
-		return analyzerReference.getAnalyzer().getName( fieldName );
+		return analyzerReference;
+	}
+
+	@Override
+	public String getName(String fieldName) {
+		return getDelegate( fieldName ).getAnalyzer().getName( fieldName );
+	}
+
+	@Override
+	public AnalyzerDef getDefinition(String fieldName) {
+		return getDelegate( fieldName ).getAnalyzer().getDefinition( fieldName );
 	}
 
 	@Override

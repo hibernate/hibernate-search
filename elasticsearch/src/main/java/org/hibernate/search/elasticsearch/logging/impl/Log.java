@@ -306,4 +306,47 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	SearchException indexedEmbeddedPrefixBypass(Class<?> entityType, String fieldPath, String expectedParent);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 55,
+			value = "The same tokenizer name '%1$s' is used multiple times. The tokenizer names must be unique."
+					+ " If this name was automatically generated, you may override it by using @TokenizerDef.name." )
+	SearchException tokenizerNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 56,
+			value = "The same char filter name '%1$s' is used multiple times. The char filter names must be unique."
+					+ " If this name was automatically generated, you may override it by using @CharFilterDef.name." )
+	SearchException charFilterNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 57,
+			value = "The same token filter name '%1$s' is used multiple times. The token filter names must be unique."
+					+ " If this name was automatically generated, you may override it by using @TokenFilterDef.name." )
+	SearchException tokenFilterNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 58,
+			value = "The char filter factory '%1$s' is not supported with Elasticsearch."
+					+ " Please only use builtin Lucene factories that have a builtin equivalent in Elasticsearch." )
+	SearchException unsupportedCharFilterFactory(@FormatWith(ClassFormatter.class) Class<?> factoryType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 59,
+			value = "The tokenizer factory '%1$s' is not supported with Elasticsearch."
+					+ " Please only use builtin Lucene factories that have a builtin equivalent in Elasticsearch." )
+	SearchException unsupportedTokenizerFactory(@FormatWith(ClassFormatter.class) Class<?> factoryType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 60,
+			value = "The token filter factory '%1$s' is not supported with Elasticsearch."
+					+ " Please only use builtin Lucene factories that have a builtin equivalent in Elasticsearch." )
+	SearchException unsupportedTokenFilterFactory(@FormatWith(ClassFormatter.class) Class<?> factoryType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 61,
+			value = "The parameter '%2$s' is not supported for the factory '%1$s' with Elasticsearch." )
+	SearchException unsupportedAnalysisFactoryParameter(@FormatWith(ClassFormatter.class) Class<?> factoryType, String parameter);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 62,
+			value = "The parameter '%2$s' for the factory '%1$s' refers to the class '%3$s',"
+					+ " which cannot be converted to a builtin Elasticsearch tokenizer type." )
+	SearchException unsupportedAnalysisFactoryTokenizerClassNameParameter(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String tokenizerClass);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 63,
+			value = "The parameter '%2$s' for the factory '%1$s' has an unsupported value: '%3$s' is unsupported with Elasticsearch." )
+	SearchException unsupportedAnalysisDefinitionParameterValue(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String parameterValue);
+
 }

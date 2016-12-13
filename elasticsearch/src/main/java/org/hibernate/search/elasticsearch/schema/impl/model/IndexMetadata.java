@@ -9,10 +9,12 @@ package org.hibernate.search.elasticsearch.schema.impl.model;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
+
 import com.google.gson.GsonBuilder;
 
 /**
- * An object representic an Elasticsearch index.
+ * An object representing an Elasticsearch index.
  *
  * @author Yoann Rodiere
  */
@@ -21,6 +23,8 @@ public class IndexMetadata {
 	private String name;
 
 	private Map<String, TypeMapping> mappings = new TreeMap<>();
+
+	private IndexSettings settings;
 
 	public String getName() {
 		return name;
@@ -46,9 +50,16 @@ public class IndexMetadata {
 		this.mappings.remove( name );
 	}
 
+	public IndexSettings getSettings() {
+		return settings;
+	}
+
+	public void setSettings(IndexSettings settings) {
+		this.settings = settings;
+	}
+
 	@Override
 	public String toString() {
 		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
 	}
-
 }

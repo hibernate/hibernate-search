@@ -25,6 +25,13 @@ import java.lang.annotation.Target;
 public @interface CharFilterDef {
 
 	/**
+	 * @return the name of this char filter definition. Optional when using an embedded Lucene
+	 * instance, but should be provided to avoid conflicts when using a remote indexing service
+	 * such as Elasticsearch.
+	 */
+	String name() default "";
+
+	/**
 	 * @return the <code>TokenFilterFactory</code> class which shall be instantiated.
 	 */
 	Class<? extends CharFilterFactory> factory();
