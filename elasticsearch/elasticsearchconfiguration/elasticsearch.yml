@@ -53,75 +53,14 @@ index.number_of_replicas: 0
 script.engine.groovy.inline.search: on
 
 # Custom analyzer used in tests
+# See ElasticsearchAnalyzerIT
 index.analysis:
   analyzer:
-    custom-analyzer:
+    server-defined-custom-analyzer:
       type: custom
       tokenizer: standard
-      filter: [custom-filter, lowercase]
-    stemmer:
-      type: custom
-      tokenizer: standard
-      filter: [lowercase, stopWordsDefaultEnglish, snowballEnglish]
-    ngram:
-      type: custom
-      tokenizer: standard
-      filter: [lowercase, stopWordsDefaultEnglish, ngram3]
-    htmlStrip:
-      type: custom
-      tokenizer: standard
-      filter: [lowercase]
-      char_filter: htmlStrip
-    org_hibernate_search_test_configuration_BlogEntry_en:
-      type: custom
-      tokenizer: standard
-      filter: [lowercase, snowballEnglish]
-    org_hibernate_search_test_configuration_BlogEntry_de:
-      type: custom
-      tokenizer: standard
-      filter: [lowercase, stemGerman]
-    org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory_ngram:
-      type: custom
-      tokenizer: standard
-      filter: [lowercase, ngram3]
-    org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory_english:
-      type: custom
-      tokenizer: standard
-      filter: [lowercase, snowballEnglish]
-    org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory_deutsch:
-      type: custom
-      tokenizer: standard
-      filter: [lowercase, stemGerman]
-    org_hibernate_search_test_query_facet_Car_collatingAnalyzer:
-      type: custom
-      tokenizer: keyword
-      filter: [asciifolding, lowercase]
-    org_hibernate_search_test_sorting_SortingTest_Person_collatingAnalyzer:
-      type: custom
-      tokenizer: keyword
-      filter: [asciifolding, lowercase]
-    org_hibernate_search_test_sorting_SortingTest_Person_tokenizingAnalyzer:
-      type: custom
-      tokenizer: whitespace
+      filter: [server-defined-custom-filter, lowercase]
   filter:
-    custom-filter:
+    server-defined-custom-filter:
       type : stop
       stopwords : [test1, close]
-    stopWordsDefaultEnglish:
-      type: stop
-      # default list of stop words. See org.apache.lucene.analysis.core.StopAnalyzer#ENGLISH_STOP_WORDS_SET
-      stopwords: [a, an, and, are, as, at, be, but, by, for, if, in, into, is, it, no, not, of, on, or, such, that, the, their, then, there, these, they, this, to, was, will, with]
-    ngram3:
-      type : nGram
-      min_gram: 3
-      max_gram: 3
-    snowballEnglish:
-      type: snowball
-      language: 'English'
-    stemGerman:
-      type : stemmer
-      name : 'german'
-  char_filter:
-    htmlStrip:
-      type: html_strip
-      escaped_tags: [escaped]

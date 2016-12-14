@@ -22,6 +22,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
@@ -30,7 +31,8 @@ import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
 /**
- * Test the use of Elasticsearch built-in and custom analyzers.
+ * Test the use of Elasticsearch built-in and server-defined, custom analyzers,
+ * <strong>without</strong> using {@link AnalyzerDef}.
  *
  * @author Davide D'Alto
  */
@@ -161,12 +163,12 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 
 		@Field
 		// Defined in the elasticsearch.yml configuration file
-		@Analyzer(definition = "custom-analyzer")
+		@Analyzer(definition = "server-defined-custom-analyzer")
 		private String customTweet;
 
 		@Fields({
 				@Field(name = "tweetNotAnalyzed", analyze = Analyze.NO, store = Store.YES),
-				@Field(name = "tweetWithCustom", analyzer = @Analyzer(definition = "custom-analyzer") ) })
+				@Field(name = "tweetWithCustom", analyzer = @Analyzer(definition = "server-defined-custom-analyzer") ) })
 		private String multipleTweets;
 
 		private String defaultAnalyzer;
