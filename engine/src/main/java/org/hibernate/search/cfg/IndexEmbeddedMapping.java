@@ -82,7 +82,11 @@ public class IndexEmbeddedMapping {
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
+		return analyzerDef( name, "", tokenizerFactory );
+	}
+
+	public AnalyzerDefMapping analyzerDef(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory) {
+		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
