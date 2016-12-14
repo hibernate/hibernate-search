@@ -20,10 +20,11 @@ public class CharFilterDefMapping {
 	private Map<String, Object> analyzerDef;
 	private SearchMapping mapping;
 
-	CharFilterDefMapping(Class<? extends CharFilterFactory> factory, Map<String, Object> analyzerDef, SearchMapping mapping) {
+	CharFilterDefMapping(String name, Class<? extends CharFilterFactory> factory, Map<String, Object> analyzerDef, SearchMapping mapping) {
 		this.mapping = mapping;
 		this.analyzerDef = analyzerDef;
 		this.charFilter = SearchMapping.addElementToAnnotationArray( analyzerDef, "charFilters" );
+		charFilter.put( "name", name );
 		charFilter.put( "factory", factory );
 	}
 
@@ -46,7 +47,17 @@ public class CharFilterDefMapping {
 	 * @return a new {@link CharFilterDefMapping}
 	 */
 	public CharFilterDefMapping charFilter(Class<? extends CharFilterFactory> factory) {
-		return new CharFilterDefMapping( factory, analyzerDef, mapping );
+		return charFilter( "", factory );
+	}
+
+	/**
+	 * {@code &#064;CharFilterDef(name=name, factory=factory) }
+	 * @param name the char filter name
+	 * @param factory the {@link CharFilterFactory}
+	 * @return a new {@link CharFilterDefMapping}
+	 */
+	public CharFilterDefMapping charFilter(String name, Class<? extends CharFilterFactory> factory) {
+		return new CharFilterDefMapping( name, factory, analyzerDef, mapping );
 	}
 
 	/**
@@ -55,6 +66,16 @@ public class CharFilterDefMapping {
 	 * @return a new {@link CharFilterDefMapping}
 	 */
 	public TokenFilterDefMapping filter(Class<? extends TokenFilterFactory> factory) {
+		return filter( "", factory );
+	}
+
+	/**
+	 * {@code &#064;TokenFilterDef(name=name, factory=factory) }
+	 * @param name the token filter name
+	 * @param factory the {@link TokenFilterFactory}
+	 * @return a new {@link TokenFilterDefMapping}
+	 */
+	public TokenFilterDefMapping filter(String name, Class<? extends TokenFilterFactory> factory) {
 		return new TokenFilterDefMapping( factory, analyzerDef, mapping );
 	}
 
@@ -63,7 +84,11 @@ public class CharFilterDefMapping {
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
+		return analyzerDef( name, "", tokenizerFactory );
+	}
+
+	public AnalyzerDefMapping analyzerDef(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory) {
+		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, mapping );
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
