@@ -8,6 +8,7 @@ package org.hibernate.search.test.analyzer.inheritance;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.hibernate.Transaction;
@@ -15,19 +16,25 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Map;
+
 /**
  * Test to verify HSEARCH-267.
  *
- * A base class defines a field as indexable without specifying an explicit analyzer. A subclass then defines ab analyzer
+ * A base class defines a field as indexable without specifying an explicit analyzer. A subclass then defines an analyzer
  * at class level. This should also be the analyzer used for indexing the field in the base class.
  *
  * @author Hardy Ferentschik
@@ -37,14 +44,16 @@ public class AnalyzerInheritanceTest extends SearchTestBase {
 	public static final Log log = LoggerFactory.make();
 
 	/**
-	 * Try to verify that the right analyzer is used by indexing and searching.
+	 * Try to verify that the right analyzer is used when indexing.
 	 *
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
 	public void testBySearch() throws Exception {
 		SubClass testClass = new SubClass();
-		testClass.setName( "Proca\u00EFne" );
+
+		// See https://en.wikipedia.org/wiki/Dotted_and_dotless_I
+		testClass.setName( "I\u0307stanbul" );
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		s.persist( testClass );
@@ -53,13 +62,9 @@ public class AnalyzerInheritanceTest extends SearchTestBase {
 		tx = s.beginTransaction();
 
 
-		QueryParser parser = new QueryParser( "name", s.getSearchFactory().getAnalyzer( SubClass.class ) );
-		org.apache.lucene.search.Query luceneQuery = parser.parse( "name:Proca\u00EFne" );
+		QueryParser parser = new QueryParser( "name", TestConstants.keywordAnalyzer );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "name:istanbul" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery, SubClass.class );
-		assertEquals( 1, query.getResultSize() );
-
-		luceneQuery = parser.parse( "name:Procaine" );
-		query = s.createFullTextQuery( luceneQuery, SubClass.class );
 		assertEquals( 1, query.getResultSize() );
 
 		// make sure the result is not always 1
@@ -77,15 +82,23 @@ public class AnalyzerInheritanceTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
+	@Category(SkipOnElasticsearch.class) // Analyzers cannot be retrieved directly when using Elasticsearch
 	public void testByAnalyzerRetrieval() throws Exception {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Analyzer analyzer = s.getSearchFactory().getAnalyzer( SubClass.class );
 
-		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", "Proca\u00EFne" );
-		assertTokensEqual( tokens, new String[] { "Procaine" } );
+		// See https://en.wikipedia.org/wiki/Dotted_and_dotless_I
+		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", "I\u0307stanbul" );
+		assertTokensEqual( tokens, new String[] { "istanbul" } );
 
 		s.close();
+	}
+
+	@Override
+	public void configure(Map<String, Object> settings) {
+		super.configure( settings );
+		settings.put( Environment.ANALYZER_CLASS, KeywordAnalyzer.class.getName() );
 	}
 
 	@Override

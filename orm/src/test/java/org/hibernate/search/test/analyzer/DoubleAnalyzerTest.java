@@ -18,9 +18,11 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,6 +30,7 @@ import static org.junit.Assert.assertEquals;
  * @author Sanne Grinovero
  */
 @TestForIssue(jiraKey = "HSEARCH-263")
+@Category(SkipOnElasticsearch.class) // Custom analyzer implementations cannot be used with Elasticsearch.
 public class DoubleAnalyzerTest extends SearchTestBase {
 
 	public static final Log log = LoggerFactory.make();
