@@ -58,6 +58,11 @@ public class ScopedElasticsearchAnalyzer implements ElasticsearchAnalyzer, Scope
 	}
 
 	@Override
+	public Class<?> getLuceneClass(String fieldName) {
+		return getDelegate( fieldName ).getAnalyzer().getLuceneClass( fieldName );
+	}
+
+	@Override
 	public void close() {
 		// nothing to close
 	}

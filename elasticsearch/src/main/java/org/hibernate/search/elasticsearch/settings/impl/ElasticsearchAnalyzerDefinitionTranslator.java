@@ -23,6 +23,15 @@ import org.hibernate.search.exception.SearchException;
 public interface ElasticsearchAnalyzerDefinitionTranslator extends Service {
 
 	/**
+	 * Translate a Lucene analyzer class, throwing an exception if translation fails.
+	 *
+	 * @param luceneClass The Lucene analyzer class to be translated.
+	 * @return The name of this analyzer type on Elasticsearch.
+	 * @throws SearchException If an error occurs.
+	 */
+	String translate(Class<?> luceneClass);
+
+	/**
 	 * Translate a tokenizer definition, throwing an exception if translation fails.
 	 *
 	 * @param hibernateSearchDef The Hibernate Search definition to be translated.
