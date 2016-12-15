@@ -36,6 +36,12 @@ public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 	}
 
 	@Override
+	public Class<?> getLuceneClass(String fieldName) {
+		// No analyzer class
+		return null;
+	}
+
+	@Override
 	public void close() {
 		// nothing to close
 	}

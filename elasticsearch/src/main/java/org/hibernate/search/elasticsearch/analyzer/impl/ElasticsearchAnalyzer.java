@@ -18,4 +18,6 @@ public interface ElasticsearchAnalyzer extends RemoteAnalyzer {
 
 	AnalyzerDef getDefinition(String fieldName);
 
+	Class<?> getLuceneClass(String fieldName);
+
 }

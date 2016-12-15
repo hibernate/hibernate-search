@@ -98,12 +98,20 @@ public class ElasticsearchIndexSettingsBuilder {
 		ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
 
 		AnalyzerDef hibernateSearchDefinition = analyzer.getDefinition( fieldName );
-		if ( hibernateSearchDefinition == null ) {
-			// Assuming a reference to a builtin or pre-defined analyzer
-			return analyzer.getName( fieldName );
+		if ( hibernateSearchDefinition != null ) {
+			return addAnalyzerDef( hibernateSearchDefinition );
 		}
 		else {
-			return addAnalyzerDef( hibernateSearchDefinition );
+			String name = analyzer.getName( fieldName );
+			if ( name != null ) {
+				// Assuming a reference to a builtin or pre-defined analyzer by its name
+				return analyzer.getName( fieldName );
+			}
+			else {
+				Class<?> luceneClass = analyzer.getLuceneClass( fieldName );
+				// Assuming a reference to a builtin analyzer by its Lucene class
+				return analyzerDefinitionTranslator.translate( luceneClass );
+			}
 		}
 	}
 
