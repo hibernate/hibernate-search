@@ -50,12 +50,6 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 		schemaAccessor.createIndex( indexName, indexMetadata.getSettings(), executionOptions );
 
 		schemaAccessor.waitForIndexStatus( indexName, executionOptions );
-
-		for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
-			String mappingName = entry.getKey();
-			TypeMapping mapping = entry.getValue();
-			schemaAccessor.putMapping( indexName, mappingName, mapping );
-		}
 	}
 
 	@Override
