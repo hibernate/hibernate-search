@@ -9,22 +9,18 @@ package org.hibernate.search.elasticsearch.analyzer.impl;
 import org.hibernate.search.annotations.AnalyzerDef;
 
 /**
- * An Elasticsearch analyzer for which no definition was found in the Hibernate Search mapping.
+ * A builtin Elasticsearch analyzer referenced by its Lucene class.
  * <p>
- * Such an analyzer is expected to be defined separately on Elasticsearch.
- * <p>
- * This implementation is used whenever {@code @Analyzer(definition = "foo")} is encountered
- * and <strong>no</strong> {@code @AnalyzerDefinition} exists with the given name
- * ("foo" in this example).
+ * The Lucene class is expected to be that of a core analyzer, not some custom implementation.
  *
  * @author Yoann Rodiere
  */
-public class UndefinedElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
+public class BuiltinElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 
-	private final String remoteName;
+	private final Class<?> luceneClass;
 
-	public UndefinedElasticsearchAnalyzerImpl(String remoteName) {
-		this.remoteName = remoteName;
+	public BuiltinElasticsearchAnalyzerImpl(Class<?> luceneClass) {
+		this.luceneClass = luceneClass;
 	}
 
 	@Override
@@ -34,7 +30,8 @@ public class UndefinedElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer
 
 	@Override
 	public String getName(String fieldName) {
-		return remoteName;
+		// No name
+		return null;
 	}
 
 	@Override
@@ -45,8 +42,7 @@ public class UndefinedElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer
 
 	@Override
 	public Class<?> getLuceneClass(String fieldName) {
-		// No analyzer class
-		return null;
+		return luceneClass;
 	}
 
 }

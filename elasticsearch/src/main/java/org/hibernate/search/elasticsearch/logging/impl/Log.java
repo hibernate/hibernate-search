@@ -349,4 +349,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "The parameter '%2$s' for the factory '%1$s' has an unsupported value: '%3$s' is unsupported with Elasticsearch." )
 	SearchException unsupportedAnalysisDefinitionParameterValue(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String parameterValue);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 64,
+			value = "The analyzer implementation '%1$s' is not supported with Elasticsearch."
+					+ " Please only use builtin Lucene analyzers that have a builtin equivalent in Elasticsearch.")
+	SearchException unsupportedAnalyzerImplementation(@FormatWith(ClassFormatter.class) Class<?> luceneClass);
+
 }

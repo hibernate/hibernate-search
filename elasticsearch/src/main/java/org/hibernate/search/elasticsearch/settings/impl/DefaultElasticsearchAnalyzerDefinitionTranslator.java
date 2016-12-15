@@ -9,50 +9,79 @@ package org.hibernate.search.elasticsearch.settings.impl;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.lucene.analysis.ar.ArabicAnalyzer;
 import org.apache.lucene.analysis.ar.ArabicNormalizationFilterFactory;
 import org.apache.lucene.analysis.ar.ArabicStemFilterFactory;
+import org.apache.lucene.analysis.bg.BulgarianAnalyzer;
 import org.apache.lucene.analysis.bg.BulgarianStemFilterFactory;
+import org.apache.lucene.analysis.br.BrazilianAnalyzer;
 import org.apache.lucene.analysis.br.BrazilianStemFilterFactory;
+import org.apache.lucene.analysis.ca.CatalanAnalyzer;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
 import org.apache.lucene.analysis.charfilter.MappingCharFilterFactory;
+import org.apache.lucene.analysis.cjk.CJKAnalyzer;
 import org.apache.lucene.analysis.cjk.CJKBigramFilterFactory;
 import org.apache.lucene.analysis.cjk.CJKWidthFilterFactory;
+import org.apache.lucene.analysis.ckb.SoraniAnalyzer;
 import org.apache.lucene.analysis.ckb.SoraniNormalizationFilterFactory;
 import org.apache.lucene.analysis.ckb.SoraniStemFilterFactory;
 import org.apache.lucene.analysis.commongrams.CommonGramsFilterFactory;
 import org.apache.lucene.analysis.compound.DictionaryCompoundWordTokenFilterFactory;
 import org.apache.lucene.analysis.compound.HyphenationCompoundWordTokenFilterFactory;
 import org.apache.lucene.analysis.core.DecimalDigitFilterFactory;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.analysis.core.LetterTokenizerFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseTokenizerFactory;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.core.StopFilterFactory;
 import org.apache.lucene.analysis.core.UpperCaseFilterFactory;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
+import org.apache.lucene.analysis.cz.CzechAnalyzer;
 import org.apache.lucene.analysis.cz.CzechStemFilterFactory;
+import org.apache.lucene.analysis.da.DanishAnalyzer;
+import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.analysis.de.GermanLightStemFilterFactory;
 import org.apache.lucene.analysis.de.GermanMinimalStemFilterFactory;
 import org.apache.lucene.analysis.de.GermanNormalizationFilterFactory;
 import org.apache.lucene.analysis.de.GermanStemFilterFactory;
+import org.apache.lucene.analysis.el.GreekAnalyzer;
 import org.apache.lucene.analysis.el.GreekStemFilterFactory;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.en.EnglishMinimalStemFilterFactory;
 import org.apache.lucene.analysis.en.EnglishPossessiveFilterFactory;
 import org.apache.lucene.analysis.en.KStemFilterFactory;
 import org.apache.lucene.analysis.en.PorterStemFilterFactory;
+import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.analysis.es.SpanishLightStemFilterFactory;
+import org.apache.lucene.analysis.eu.BasqueAnalyzer;
+import org.apache.lucene.analysis.fa.PersianAnalyzer;
 import org.apache.lucene.analysis.fa.PersianNormalizationFilterFactory;
+import org.apache.lucene.analysis.fi.FinnishAnalyzer;
 import org.apache.lucene.analysis.fi.FinnishLightStemFilterFactory;
+import org.apache.lucene.analysis.fr.FrenchAnalyzer;
 import org.apache.lucene.analysis.fr.FrenchLightStemFilterFactory;
 import org.apache.lucene.analysis.fr.FrenchMinimalStemFilterFactory;
+import org.apache.lucene.analysis.ga.IrishAnalyzer;
+import org.apache.lucene.analysis.gl.GalicianAnalyzer;
 import org.apache.lucene.analysis.gl.GalicianMinimalStemFilterFactory;
 import org.apache.lucene.analysis.gl.GalicianStemFilterFactory;
+import org.apache.lucene.analysis.hi.HindiAnalyzer;
 import org.apache.lucene.analysis.hi.HindiNormalizationFilterFactory;
 import org.apache.lucene.analysis.hi.HindiStemFilterFactory;
+import org.apache.lucene.analysis.hu.HungarianAnalyzer;
 import org.apache.lucene.analysis.hu.HungarianLightStemFilterFactory;
+import org.apache.lucene.analysis.hy.ArmenianAnalyzer;
+import org.apache.lucene.analysis.id.IndonesianAnalyzer;
 import org.apache.lucene.analysis.id.IndonesianStemFilterFactory;
 import org.apache.lucene.analysis.in.IndicNormalizationFilterFactory;
+import org.apache.lucene.analysis.it.ItalianAnalyzer;
 import org.apache.lucene.analysis.it.ItalianLightStemFilterFactory;
+import org.apache.lucene.analysis.lt.LithuanianAnalyzer;
+import org.apache.lucene.analysis.lv.LatvianAnalyzer;
 import org.apache.lucene.analysis.lv.LatvianStemFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.KeepWordFilterFactory;
@@ -70,6 +99,8 @@ import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
 import org.apache.lucene.analysis.ngram.EdgeNGramTokenizerFactory;
 import org.apache.lucene.analysis.ngram.NGramFilterFactory;
 import org.apache.lucene.analysis.ngram.NGramTokenizerFactory;
+import org.apache.lucene.analysis.nl.DutchAnalyzer;
+import org.apache.lucene.analysis.no.NorwegianAnalyzer;
 import org.apache.lucene.analysis.no.NorwegianLightStemFilterFactory;
 import org.apache.lucene.analysis.no.NorwegianMinimalStemFilterFactory;
 import org.apache.lucene.analysis.path.PathHierarchyTokenizerFactory;
@@ -78,23 +109,30 @@ import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternReplaceFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
 import org.apache.lucene.analysis.payloads.DelimitedPayloadTokenFilterFactory;
+import org.apache.lucene.analysis.pt.PortugueseAnalyzer;
 import org.apache.lucene.analysis.pt.PortugueseLightStemFilterFactory;
 import org.apache.lucene.analysis.pt.PortugueseMinimalStemFilterFactory;
 import org.apache.lucene.analysis.pt.PortugueseStemFilterFactory;
 import org.apache.lucene.analysis.reverse.ReverseStringFilterFactory;
+import org.apache.lucene.analysis.ro.RomanianAnalyzer;
+import org.apache.lucene.analysis.ru.RussianAnalyzer;
 import org.apache.lucene.analysis.ru.RussianLightStemFilterFactory;
 import org.apache.lucene.analysis.shingle.ShingleFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.sr.SerbianNormalizationFilterFactory;
 import org.apache.lucene.analysis.standard.ClassicFilterFactory;
 import org.apache.lucene.analysis.standard.ClassicTokenizerFactory;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.analysis.standard.UAX29URLEmailTokenizerFactory;
+import org.apache.lucene.analysis.sv.SwedishAnalyzer;
 import org.apache.lucene.analysis.sv.SwedishLightStemFilterFactory;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
+import org.apache.lucene.analysis.th.ThaiAnalyzer;
 import org.apache.lucene.analysis.th.ThaiTokenizerFactory;
 import org.apache.lucene.analysis.tr.ApostropheFilterFactory;
+import org.apache.lucene.analysis.tr.TurkishAnalyzer;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.ElisionFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
@@ -120,6 +158,8 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 
 	static final Log LOG = LoggerFactory.make( Log.class );
 
+	private Map<String, String> luceneAnalyzers;
+
 	private Map<String, AnalysisDefinitionFactory<CharFilterDefinition>> luceneCharFilters;
 
 	private Map<String, AnalysisDefinitionFactory<TokenizerDefinition>> luceneTokenizers;
@@ -128,6 +168,47 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
+		luceneAnalyzers = new LuceneAnalyzerImplementationTranslationMapBuilder()
+				.add( StandardAnalyzer.class, "standard" )
+				.add( SimpleAnalyzer.class, "simple" )
+				.add( WhitespaceAnalyzer.class, "whitespace" )
+				.add( StopAnalyzer.class, "stop" )
+				.add( KeywordAnalyzer.class, "keyword" )
+				.add( ArabicAnalyzer.class, "arabic" )
+				.add( ArmenianAnalyzer.class, "armenian" )
+				.add( BasqueAnalyzer.class, "basque" )
+				.add( BrazilianAnalyzer.class, "brazilian" )
+				.add( BulgarianAnalyzer.class, "bulgarian" )
+				.add( CatalanAnalyzer.class, "catalan" )
+				.add( CJKAnalyzer.class, "cjk" )
+				.add( CzechAnalyzer.class, "czech" )
+				.add( DanishAnalyzer.class, "danish" )
+				.add( DutchAnalyzer.class, "dutch" )
+				.add( EnglishAnalyzer.class, "english" )
+				.add( FinnishAnalyzer.class, "finnish" )
+				.add( FrenchAnalyzer.class, "french" )
+				.add( GalicianAnalyzer.class, "galician" )
+				.add( GermanAnalyzer.class, "german" )
+				.add( GreekAnalyzer.class, "greek" )
+				.add( HindiAnalyzer.class, "hindi" )
+				.add( HungarianAnalyzer.class, "hungarian" )
+				.add( IndonesianAnalyzer.class, "indonesian" )
+				.add( IrishAnalyzer.class, "irish" )
+				.add( ItalianAnalyzer.class, "italian" )
+				.add( LatvianAnalyzer.class, "latvian" )
+				.add( LithuanianAnalyzer.class, "lithuanian" )
+				.add( NorwegianAnalyzer.class, "norwegian" )
+				.add( PersianAnalyzer.class, "persian" )
+				.add( PortugueseAnalyzer.class, "portuguese" )
+				.add( RomanianAnalyzer.class, "romanian" )
+				.add( RussianAnalyzer.class, "russian" )
+				.add( SoraniAnalyzer.class, "sorani" )
+				.add( SpanishAnalyzer.class, "spanish" )
+				.add( SwedishAnalyzer.class, "swedish" )
+				.add( TurkishAnalyzer.class, "turkish" )
+				.add( ThaiAnalyzer.class, "thai" )
+				.build();
+
 		luceneCharFilters = new LuceneAnalysisDefinitionTranslationMapBuilder<>( CharFilterDefinition.class )
 				.builder( MappingCharFilterFactory.class, "mapping" ) // "mappings" (unmapped) is an array
 						.rename( "mapping", "mappings_path" ) // Only accepts one file, no support for comma-separated list
@@ -353,9 +434,19 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 
 	@Override
 	public void stop() {
+		luceneAnalyzers = null;
 		luceneCharFilters = null;
 		luceneTokenizers = null;
 		luceneTokenFilters = null;
+	}
+
+	@Override
+	public String translate(Class<?> luceneClass) {
+		String elasticsearchName = luceneAnalyzers.get( luceneClass.getName() );
+		if ( elasticsearchName == null ) {
+			throw LOG.unsupportedAnalyzerImplementation( luceneClass );
+		}
+		return elasticsearchName;
 	}
 
 	@Override

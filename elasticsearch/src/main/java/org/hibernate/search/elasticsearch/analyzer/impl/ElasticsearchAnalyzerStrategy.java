@@ -36,7 +36,7 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<Elasticse
 
 	@Override
 	public ElasticsearchAnalyzerReference createAnalyzerReference(Class<?> analyzerClass) {
-		return null;
+		return new ElasticsearchAnalyzerReference( new BuiltinElasticsearchAnalyzerImpl( analyzerClass ) );
 	}
 
 	@Override
