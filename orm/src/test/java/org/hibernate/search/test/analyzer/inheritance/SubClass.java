@@ -8,6 +8,7 @@ package org.hibernate.search.test.analyzer.inheritance;
 
 import javax.persistence.Entity;
 
+import org.apache.lucene.analysis.tr.TurkishAnalyzer;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Indexed;
 
@@ -16,7 +17,7 @@ import org.hibernate.search.annotations.Indexed;
  */
 @Entity
 @Indexed
-@Analyzer(impl = ISOLatin1Analyzer.class)
+@Analyzer(impl = TurkishAnalyzer.class)
 public class SubClass extends BaseClass {
 
 }

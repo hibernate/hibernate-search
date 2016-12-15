@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
@@ -33,9 +32,11 @@ import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
@@ -48,7 +49,8 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Hardy Ferentschik
  */
-public class CustomAnalyzerInClassBridgeTest extends SearchTestBase {
+@Category(SkipOnElasticsearch.class) // Custom analyzer implementations cannot be used with Elasticsearch
+public class CustomAnalyzerImplementationInClassBridgeTest extends SearchTestBase {
 
 	public static final Log log = LoggerFactory.make();
 
@@ -124,15 +126,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestBase {
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 			for ( String fieldName : fieldNames ) {
-				Field field = new Field(
-						fieldName,
-						"This text will be replaced by the test analyzers",
-						luceneOptions.getStore(),
-						luceneOptions.getIndex(),
-						luceneOptions.getTermVector()
-				);
-				field.setBoost( luceneOptions.getBoost() );
-				document.add( field );
+				luceneOptions.addFieldToDocument( fieldName, "This text will be replaced by the test analyzers", document );
 			}
 		}
 
@@ -168,15 +162,8 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestBase {
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			Field field = new Field(
-					name,
-					"This text will be replaced by the test analyzers",
-					luceneOptions.getStore(),
-					luceneOptions.getIndex(),
-					luceneOptions.getTermVector()
-			);
-			field.setBoost( luceneOptions.getBoost() );
-			document.add( field );
+			luceneOptions.addFieldToDocument( name, "This text will be replaced by the test analyzers", document );
 		}
 	}
+
 }
