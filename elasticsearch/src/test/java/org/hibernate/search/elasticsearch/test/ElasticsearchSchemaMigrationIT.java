@@ -59,8 +59,9 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 
 	@Test
 	public void nothingToDo() throws Exception {
-		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
-		elasticSearchClient.putMapping( SimpleDateEntity.class,
+		elasticSearchClient.index( SimpleDateEntity.class )
+				.deleteAndCreate()
+				.mapping( SimpleDateEntity.class ).put(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -81,9 +82,9 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.deleteAndCreateIndex( SimpleBooleanEntity.class );
-		elasticSearchClient.putMapping(
-				SimpleBooleanEntity.class,
+		elasticSearchClient.index( SimpleBooleanEntity.class )
+				.deleteAndCreate()
+				.mapping( SimpleBooleanEntity.class ).put(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -126,7 +127,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.getMapping( SimpleDateEntity.class )
+				elasticSearchClient.mapping( SimpleDateEntity.class ).get()
 				);
 		assertJsonEquals(
 				"{"
@@ -145,13 +146,13 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.getMapping( SimpleBooleanEntity.class )
+				elasticSearchClient.mapping( SimpleBooleanEntity.class ).get()
 				);
 	}
 
 	@Test
 	public void mapping_missing() throws Exception {
-		elasticSearchClient.deleteAndCreateIndex( SimpleBooleanEntity.class );
+		elasticSearchClient.index( SimpleBooleanEntity.class ).deleteAndCreate();
 
 		init( SimpleBooleanEntity.class );
 
@@ -169,15 +170,15 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.getMapping( SimpleBooleanEntity.class )
+				elasticSearchClient.mapping( SimpleBooleanEntity.class ).get()
 				);
 	}
 
 	@Test
 	public void rootMapping_attribute_missing() throws Exception {
-		elasticSearchClient.deleteAndCreateIndex( SimpleBooleanEntity.class );
-		elasticSearchClient.putMapping(
-				SimpleBooleanEntity.class,
+		elasticSearchClient.index( SimpleBooleanEntity.class )
+				.deleteAndCreate()
+				.mapping(SimpleBooleanEntity.class).put(
 				"{"
 					+ "'properties': {"
 							+ "'id': {"
@@ -216,15 +217,15 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.getMapping( SimpleBooleanEntity.class )
+				elasticSearchClient.mapping( SimpleBooleanEntity.class ).get()
 				);
 	}
 
 	@Test
 	public void property_missing() throws Exception {
-		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
-		elasticSearchClient.putMapping(
-				SimpleDateEntity.class,
+		elasticSearchClient.index( SimpleDateEntity.class )
+				.deleteAndCreate()
+				.mapping( SimpleDateEntity.class ).put(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -262,15 +263,15 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.getMapping( SimpleDateEntity.class )
+				elasticSearchClient.mapping( SimpleDateEntity.class ).get()
 				);
 	}
 
 	@Test
 	public void property_attribute_invalid() throws Exception {
-		elasticSearchClient.deleteAndCreateIndex( SimpleDateEntity.class );
-		elasticSearchClient.putMapping(
-				SimpleDateEntity.class,
+		elasticSearchClient.index( SimpleDateEntity.class )
+				.deleteAndCreate()
+				.mapping( SimpleDateEntity.class ).put(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
