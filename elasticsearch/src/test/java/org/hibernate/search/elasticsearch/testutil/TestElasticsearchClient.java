@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.testutil;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,6 +41,8 @@ import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
+import io.searchbox.indices.settings.GetSettings;
+import io.searchbox.indices.settings.UpdateSettings;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.PutTemplate;
 
@@ -105,6 +108,14 @@ public class TestElasticsearchClient extends ExternalResource {
 		public MappingClient mapping(String mappingName) {
 			return new MappingClient( this, mappingName );
 		}
+
+		public SettingsClient settings() {
+			return settings( "" );
+		}
+
+		public SettingsClient settings(String settingsPath) {
+			return new SettingsClient( this, settingsPath );
+		}
 	}
 
 	public class MappingClient {
@@ -130,6 +141,26 @@ public class TestElasticsearchClient extends ExternalResource {
 		public MappingClient index(String id, String jsonDocument) throws IOException {
 			TestElasticsearchClient.this.index( indexClient.indexName, mappingName, id, jsonDocument );
 			return this;
+		}
+	}
+
+	public class SettingsClient {
+
+		private final IndexClient indexClient;
+
+		private final String settingsPath;
+
+		public SettingsClient(IndexClient indexClient, String settingsPath) {
+			this.indexClient = indexClient;
+			this.settingsPath = settingsPath;
+		}
+
+		public String get() throws IOException {
+			return TestElasticsearchClient.this.getSettings( indexClient.indexName, settingsPath );
+		}
+
+		public void put(String settings) throws IOException {
+			TestElasticsearchClient.this.putSettings( indexClient.indexName, settingsPath, settings );
 		}
 	}
 
@@ -254,6 +285,43 @@ public class TestElasticsearchClient extends ExternalResource {
 			return new JsonObject().toString();
 		}
 		return mapping.toString();
+	}
+
+	private void putSettings(String indexName, String settingsPath, String settings) throws IOException {
+		JsonElement settingsJsonElement = toJsonElement( settings );
+
+		for ( String property : Lists.reverse( Arrays.asList( settingsPath.split( "\\." ) ) ) ) {
+			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
+		}
+
+		JestResult result = client.execute( new UpdateSettings.Builder( settingsJsonElement ).addIndex( indexName ).build() );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while putting settings on index '" + indexName
+					+ "' for tests:" + result.getErrorMessage() );
+		}
+	}
+
+	private String getSettings(String indexName, String path) throws IOException {
+		JestResult result = client.execute( new GetSettings.Builder().addIndex( indexName ).build() );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while getting settings on index '" + indexName +
+					"' for tests:" + result.getErrorMessage() );
+		}
+		JsonElement index = result.getJsonObject().get( indexName );
+		if ( index == null ) {
+			return new JsonObject().toString();
+		}
+		JsonElement settings = index.getAsJsonObject().get( "settings" );
+		for ( String property : path.split( "\\." ) ) {
+			if ( settings == null ) {
+				break;
+			}
+			settings = settings.getAsJsonObject().get( property );
+		}
+		if ( settings == null ) {
+			return new JsonObject().toString();
+		}
+		return settings.toString();
 	}
 
 	private void index(String indexName, String typeName, String id, String jsonDocument) throws IOException {
