@@ -41,6 +41,11 @@ class LuceneAnalysisDefinitionTranslationMapBuilder<D extends AnalysisDefinition
 		return this;
 	}
 
+	public LuceneAnalysisDefinitionTranslationMapBuilder<D> addJsonPassThrough(Class<? extends AbstractAnalysisFactory> factoryClass) {
+		result.put( factoryClass.getName(), new JsonPassThroughAnalysisDefinitionFactory<>( targetClass, factoryClass ) );
+		return this;
+	}
+
 	public Map<String, AnalysisDefinitionFactory<D>> build() {
 		return Collections.unmodifiableMap( result );
 	}
