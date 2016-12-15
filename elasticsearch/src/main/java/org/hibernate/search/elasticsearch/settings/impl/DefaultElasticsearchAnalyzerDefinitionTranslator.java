@@ -140,6 +140,9 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory;
+import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory;
+import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenizerFactory;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
@@ -218,6 +221,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.transform( "escapedTags", new SplitArrayParameterValueTransformer( "[\\s,]+", StringParameterValueTransformer.INSTANCE ) )
 				.end()
 				.builder( PatternReplaceCharFilterFactory.class, "pattern_replace" ).end()
+				.addJsonPassThrough( ElasticsearchCharFilterFactory.class )
 				.build();
 
 		luceneTokenizers = new LuceneAnalysisDefinitionTranslationMapBuilder<>( TokenizerDefinition.class )
@@ -249,6 +253,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.rename( "maxTokenLength", "max_token_length" )
 				.end()
 				.builder( ThaiTokenizerFactory.class, "thai" ).end()
+				.addJsonPassThrough( ElasticsearchTokenizerFactory.class )
 				.build();
 
 		luceneTokenFilters = new LuceneAnalysisDefinitionTranslationMapBuilder<>( TokenFilterDefinition.class )
@@ -429,6 +434,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 				.builder( ClassicFilterFactory.class, "classic" ).end()
 				.builder( ApostropheFilterFactory.class, "apostrophe" ).end()
 				.builder( DecimalDigitFilterFactory.class, "decimal_digit" ).end()
+				.addJsonPassThrough( ElasticsearchTokenFilterFactory.class )
 				.build();
 	}
 

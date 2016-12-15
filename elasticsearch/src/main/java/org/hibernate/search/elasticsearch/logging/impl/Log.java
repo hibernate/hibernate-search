@@ -355,6 +355,14 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException unsupportedAnalyzerImplementation(@FormatWith(ClassFormatter.class) Class<?> luceneClass);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 65,
+			value = "The parameter '%2$s' for the factory '%1$s' could not be parsed as a JSON string: %3$s" )
+	SearchException invalidAnalysisDefinitionJsonStringParameter(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String causeMessage, @Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 66,
+			value = "The parameter '%2$s' for the factory '%1$s' could not be parsed as JSON: %3$s" )
+	SearchException invalidAnalysisDefinitionJsonParameter(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String causeMessage, @Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 67,
 			value = "Could not update settings for index '%1$s'"
 	)
 	SearchException elasticsearchSettingsUpdateFailed(String indexName, @Cause Exception e);
