@@ -19,15 +19,17 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * Verifies a proper message is thrown when a resource is not found
  *
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
+@Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class ResourceNotFoundMessageTest {
 
 	@Test

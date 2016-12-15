@@ -65,6 +65,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-phonetic</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
             <scope>test</scope>
@@ -219,16 +224,6 @@
                                 <include>**/*.java</include>
                             </includes>
                             <excludes>
-                                <!-- HSEARCH-2391 Support -orm/-engine analyzer-related tests in -elasticsearch -->
-                                <exclude>**/CustomAnalyzerInClassBridgeTest.java</exclude>
-                                <exclude>**/AnalyzerBuilderTest.java</exclude>
-                                <exclude>**/AnalyzerTest.java</exclude>
-                                <exclude>**/DoubleAnalyzerTest.java</exclude>
-                                <exclude>**/AnalyzerInheritanceTest.java</exclude>
-                                <exclude>**/AnalyzerDefsAnnotationTest.java</exclude>
-                                <exclude>**/AnalyzerDefAnnotationTest.java</exclude>
-                                <exclude>**/ResourceNotFoundMessageTest.java</exclude>
-                                
                                 <!-- HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch -->
                                 <exclude>**/IndexEmbeddedProgrammaticallyMappedTest.java</exclude>
                                 <!-- Also, parts of NullEmbeddedTest -->
