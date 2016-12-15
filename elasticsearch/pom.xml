@@ -252,6 +252,31 @@
                 </executions>
             </plugin>
 
+             <plugin>
+                 <artifactId>maven-dependency-plugin</artifactId>
+                 <executions>
+                     <execution>
+                         <id>unpack-es-analysis-configuration-files</id>
+                         <phase>pre-integration-test</phase>
+                         <goals>
+                             <goal>unpack</goal>
+                         </goals>
+                         <configuration>
+                             <artifactItems>
+                                 <artifactItem>
+                                     <groupId>org.hibernate</groupId>
+                                     <artifactId>hibernate-search-orm</artifactId>
+                                     <type>test-jar</type>
+                                     <version>${project.version}</version>
+                                     <overWrite>true</overWrite>
+                                     <outputDirectory>${project.build.directory}/test-classes/elasticsearchconfiguration/</outputDirectory>
+                                     <includes>org/hibernate/search/test/analyzer/*.properties</includes>
+                                 </artifactItem>
+                             </artifactItems>
+                         </configuration>
+                     </execution>
+                 </executions>
+             </plugin>
             <plugin>
                 <groupId>org.bsc.maven</groupId>
                 <artifactId>maven-processor-plugin</artifactId>
@@ -265,7 +290,7 @@
                     <httpPort>9200</httpPort>
                     <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
                     <outputDirectory>${project.build.directory}/elastisearchnode1</outputDirectory>
-                    <configPath>${basedir}/elasticsearchconfiguration/</configPath>
+                    <configPath>${project.build.directory}/test-classes/elasticsearchconfiguration/</configPath>
                 </configuration>
                 <executions>
                     <execution>
@@ -297,7 +322,7 @@
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>unpack</id>
+                                <id>unpack-es-plugins</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>unpack</goal>
@@ -352,7 +377,7 @@
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>unpack</id>
+                                <id>unpack-es-plugins</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>unpack</goal>
