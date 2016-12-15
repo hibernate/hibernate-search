@@ -16,7 +16,7 @@ import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldMetadataCreationContext;
 import org.hibernate.search.bridge.spi.FieldType;
-import org.hibernate.search.elasticsearch.bridge.builtin.impl.Elasticsearch;
+import org.hibernate.search.elasticsearch.bridge.spi.Elasticsearch;
 import org.hibernate.search.elasticsearch.cfg.DynamicType;
 
 /**
