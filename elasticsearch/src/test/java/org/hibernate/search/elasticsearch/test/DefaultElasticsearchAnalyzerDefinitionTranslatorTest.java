@@ -28,6 +28,7 @@ import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.settings.impl.DefaultElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
@@ -304,6 +305,120 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 		assertThat( definition.getParameters().keySet() ).as( "parameter names" )
 				.excludes( "han", "hiragana", "katakana", "hangul", "outputUnigrams" );
+	}
+
+	@Test
+	public void passThrough() {
+		TokenFilterDef annotation = annotation(
+				TokenFilterDef.class,
+				ElasticsearchTokenFilterFactory.class,
+				param( "type", "'foo'" ),
+				param( "string", "'foo'" ),
+				param( "boolean", "true" ),
+				param( "integer", "42" ),
+				param( "string_array", "['a','b']" ),
+				param( "integer_array", "[1,2]" ),
+				param( "object", "{'a':42}" )
+				);
+
+		TokenFilterDefinition definition = translator.translate( annotation );
+
+		assertThat( definition.getType() ).as( "type" ).isEqualTo( "foo" );
+		assertThat( definition.getParameters() ).as( "parameters" )
+				.includes(
+						entry( "string", new JsonPrimitive( "foo" ) ),
+						entry( "boolean", new JsonPrimitive( true ) ),
+						entry( "integer", new JsonPrimitive( 42 ) ),
+						entry(
+								"string_array",
+								JsonBuilder.array()
+										.add( new JsonPrimitive( "a" ) )
+										.add( new JsonPrimitive( "b" ) )
+								.build()
+						),
+						entry(
+								"integer_array",
+								JsonBuilder.array()
+										.add( new JsonPrimitive( 1 ) )
+										.add( new JsonPrimitive( 2 ) )
+								.build()
+						),
+						entry(
+								"object",
+								JsonBuilder.object()
+										.add( "a", new JsonPrimitive( 42 ) )
+								.build()
+						)
+				);
+		assertThat( definition.getParameters().keySet() ).as( "parameters" )
+				.excludes( "type" );
+	}
+
+	@Test
+	public void passThrough_stringWithoutQuotes() {
+		TokenFilterDef annotation = annotation(
+				TokenFilterDef.class,
+				ElasticsearchTokenFilterFactory.class,
+				param( "type", "stringWithoutQuotes" ),
+				param( "param", "stringWithoutQuotes" )
+				);
+
+		TokenFilterDefinition definition = translator.translate( annotation );
+
+		assertThat( definition.getType() ).as( "type" ).isEqualTo( "stringWithoutQuotes" );
+		assertThat( definition.getParameters() ).as( "parameters" )
+				.includes( entry( "param", new JsonPrimitive( "stringWithoutQuotes" ) ) );
+		assertThat( definition.getParameters().keySet() ).as( "parameters" )
+				.excludes( "type" );
+	}
+
+	@Test
+	public void passThrough_nonJsonType() {
+		TokenFilterDef annotation = annotation(
+				TokenFilterDef.class,
+				ElasticsearchTokenFilterFactory.class,
+				param( "type", "[" )
+				);
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400065" );
+		thrown.expectMessage( ElasticsearchTokenFilterFactory.class.getSimpleName() );
+		thrown.expectMessage( "'type'" );
+
+		translator.translate( annotation );
+	}
+
+	@Test
+	public void passThrough_nonStringType() {
+		TokenFilterDef annotation = annotation(
+				TokenFilterDef.class,
+				ElasticsearchTokenFilterFactory.class,
+				param( "type", "{'foo':'bar'}" )
+				);
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400065" );
+		thrown.expectMessage( ElasticsearchTokenFilterFactory.class.getSimpleName() );
+		thrown.expectMessage( "'type'" );
+
+		translator.translate( annotation );
+	}
+
+	@Test
+	public void passThrough_nonJsonParameter() {
+		TokenFilterDef annotation = annotation(
+				TokenFilterDef.class,
+				ElasticsearchTokenFilterFactory.class,
+				param( "type", "'foo'" ),
+				param( "param", "{" )
+				);
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400066" );
+		thrown.expectMessage( ElasticsearchTokenFilterFactory.class.getSimpleName() );
+		thrown.expectMessage( "'param'" );
+
+		translator.translate( annotation );
 	}
 
 	private static <T extends Annotation> T annotation(Class<T> annotationType, Class<?> factoryType, Parameter ... parameters) {

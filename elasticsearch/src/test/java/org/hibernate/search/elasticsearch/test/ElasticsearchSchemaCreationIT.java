@@ -32,6 +32,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory;
+import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory;
+import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenizerFactory;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
@@ -164,6 +167,11 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 									+ "'char_filter': ['custom-html-stripper'],"
 									+ "'tokenizer': 'custom-classic-tokenizer',"
 									+ "'filter': ['custom-word-delimiter']"
+							+ "},"
+							+ "'analyzerWithElasticsearchFactories': {"
+									+ "'char_filter': ['custom-pattern-replace'],"
+									+ "'tokenizer': 'custom-edgeNGram',"
+									+ "'filter': ['custom-keep-types']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -177,6 +185,12 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 							+ "'custom-html-stripper': {"
 									+ "'type': 'html_strip',"
 									+ "'escaped_tags': ['br', 'p']"
+							+ "},"
+							+ "'custom-pattern-replace': {"
+									+ "'type': 'pattern_replace',"
+									+ "'pattern': '[^0-9]',"
+									+ "'replacement': '0',"
+									+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
 							+ "}"
 					+ "},"
 					+ "'tokenizer': {"
@@ -185,6 +199,16 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 							+ "},"
 							+ "'custom-classic-tokenizer': {"
 									+ "'type': 'classic'"
+							+ "},"
+							+ "'custom-edgeNGram': {"
+									+ "'type': 'edgeNGram',"
+									/*
+									 * Strangely enough, even if you send properly typed numbers
+									 * to Elasticsearch, when you ask for the current settings it
+									 * will spit back strings instead of numbers...
+									 */
+									+ "'min_gram': '1',"
+									+ "'max_gram': '10'"
 							+ "}"
 					+ "},"
 					+ "'filter': {"
@@ -212,6 +236,10 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 									+ "'split_on_case_change': '0',"
 									+ "'split_on_numerics': '0',"
 									+ "'preserve_original': '1'"
+							+ "},"
+							+ "'custom-keep-types': {"
+									+ "'type': 'keep_types',"
+									+ "'types': ['<NUM>', '<DOUBLE>']"
 							+ "}"
 					+ "}"
 				+ "}",
@@ -241,6 +269,10 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 							+ "'myField4': {"
 									+ "'type': 'string',"
 									+ "'analyzer': 'analyzerWithNamedComplexComponents'"
+							+ "},"
+							+ "'myField5': {"
+									+ "'type': 'string',"
+									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
 							+ "}"
 					+ "}"
 				+ "}",
@@ -337,6 +369,36 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 									@Parameter(name = "preserveOriginal", value = "1")
 							}
 					)
+			),
+			@AnalyzerDef(
+					name = "analyzerWithElasticsearchFactories",
+					charFilters = @CharFilterDef(
+							name = "custom-pattern-replace",
+							factory = ElasticsearchCharFilterFactory.class,
+							params = {
+									@Parameter(name = "type", value = "'pattern_replace'"),
+									@Parameter(name = "pattern", value = "'[^0-9]'"),
+									@Parameter(name = "replacement", value = "'0'"),
+									@Parameter(name = "tags", value = "'CASE_INSENSITIVE|COMMENTS'")
+							}
+					),
+					tokenizer = @TokenizerDef(
+							name = "custom-edgeNGram",
+							factory = ElasticsearchTokenizerFactory.class,
+							params = {
+									@Parameter(name = "type", value = "'edgeNGram'"),
+									@Parameter(name = "min_gram", value = "1"),
+									@Parameter(name = "max_gram", value = "10")
+							}
+					),
+					filters = @TokenFilterDef(
+							name = "custom-keep-types",
+							factory = ElasticsearchTokenFilterFactory.class,
+							params = {
+									@Parameter(name = "type", value = "'keep_types'"),
+									@Parameter(name = "types", value = "['<NUM>','<DOUBLE>']")
+							}
+					)
 			)
 	})
 	private static class SimpleAnalyzedEntity {
@@ -348,7 +410,8 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 				@Field(name = "myField1", analyzer = @Analyzer(definition = "analyzerWithSimpleComponents")),
 				@Field(name = "myField2", analyzer = @Analyzer(definition = "analyzerWithNamedSimpleComponents")),
 				@Field(name = "myField3", analyzer = @Analyzer(definition = "analyzerWithComplexComponents")),
-				@Field(name = "myField4", analyzer = @Analyzer(definition = "analyzerWithNamedComplexComponents"))
+				@Field(name = "myField4", analyzer = @Analyzer(definition = "analyzerWithNamedComplexComponents")),
+				@Field(name = "myField5", analyzer = @Analyzer(definition = "analyzerWithElasticsearchFactories"))
 		})
 		String myField;
 	}
