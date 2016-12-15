@@ -67,7 +67,7 @@ public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBas
 				+ " No point running this test.",
 				createsIndex( strategy ) );
 
-		elasticSearchClient.ensureIndexDoesNotExist( SimpleEntity.class );
+		elasticSearchClient.index( SimpleEntity.class ).ensureDoesNotExist();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400050" );
@@ -82,17 +82,17 @@ public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBas
 				createsIndex( strategy ) );
 
 		// Make sure automatically created indexes will never be green
-		elasticSearchClient.createTemplate(
-				"yellow_index_because_not_enough_nodes_for_so_many_replicas",
-				"*",
-				/*
-				 * The exact number of replicas we ask for doesn't matter much,
-				 * since we're testing with only 1 node (the cluster can't replicate shards)
-				 */
-				JsonBuilder.object().addProperty( "number_of_replicas", 5 ).build()
+		elasticSearchClient.template( "yellow_index_because_not_enough_nodes_for_so_many_replicas" )
+				.create(
+						"*",
+						/*
+						 * The exact number of replicas we ask for doesn't matter much,
+						 * since we're testing with only 1 node (the cluster can't replicate shards)
+						 */
+						JsonBuilder.object().addProperty( "number_of_replicas", 5 ).build()
 				);
 
-		elasticSearchClient.ensureIndexDoesNotExist( SimpleEntity.class );
+		elasticSearchClient.index( SimpleEntity.class ).ensureDoesNotExist();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400024" );
@@ -104,17 +104,17 @@ public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBas
 	@Test
 	public void invalidIndexStatus_usingPreexistingIndex() throws Exception {
 		// Make sure automatically created indexes will never be green
-		elasticSearchClient.createTemplate(
-				"yellow_index_because_not_enough_nodes_for_so_many_replicas",
-				"*",
-				/*
-				 * The exact number of replicas we ask for doesn't matter much,
-				 * since we're testing with only 1 node (the cluster can't replicate shards)
-				 */
-				JsonBuilder.object().addProperty( "number_of_replicas", 5 ).build()
+		elasticSearchClient.template( "yellow_index_because_not_enough_nodes_for_so_many_replicas" )
+				.create(
+						"*",
+						/*
+						 * The exact number of replicas we ask for doesn't matter much,
+						 * since we're testing with only 1 node (the cluster can't replicate shards)
+						 */
+						JsonBuilder.object().addProperty( "number_of_replicas", 5 ).build()
 				);
 
-		elasticSearchClient.deleteAndCreateIndex( SimpleEntity.class );
+		elasticSearchClient.index( SimpleEntity.class ).deleteAndCreate();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400024" );

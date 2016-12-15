@@ -144,8 +144,9 @@ public class ElasticsearchClassBridgeIT extends SearchTestBase {
 	@Test
 	public void testProjectionOnUnknownBridgeField() throws Exception {
 		// Add an additional field to the ES mapping, unknown to Hibernate Search
-		elasticsearchClient.putMapping( "golfplayer", GolfPlayer.class, "{'properties': {'fieldNotInMapping': {'type':'integer'}}}" );
-		elasticsearchClient.index( "golfplayer", GolfPlayer.class, "9999", "{'id':9999,'fieldNotInMapping':42}" );
+		elasticsearchClient.index( "golfplayer" ).mapping( GolfPlayer.class )
+				.put( "{'properties': {'fieldNotInMapping': {'type':'integer'}}}" )
+				.index( "9999", "{'id':9999,'fieldNotInMapping':42}" );
 
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );
