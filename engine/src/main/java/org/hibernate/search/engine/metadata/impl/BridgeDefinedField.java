@@ -89,7 +89,7 @@ public class BridgeDefinedField {
 	 * @param bridgeDefineFieldClass the type of the object containing the properties of the field
 	 * @return the object containing the properties of the field
 	 */
-	public <T> T mappedOn(Class<T> bridgeDefineFieldClass) {
+	public <T> T getBridgeDefinedField(Class<T> bridgeDefineFieldClass) {
 		return bridgeDefineFieldClass.cast( extra.get( bridgeDefineFieldClass ) );
 	}
 }

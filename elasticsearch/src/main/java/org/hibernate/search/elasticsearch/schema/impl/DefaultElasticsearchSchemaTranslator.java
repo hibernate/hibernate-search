@@ -207,7 +207,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	}
 
 	private void addDynamicOption(BridgeDefinedField bridgeDefinedField, TypeMapping propertyMapping) {
-		ElasticsearchBridgeDefinedField mappedOn = bridgeDefinedField.mappedOn( ElasticsearchBridgeDefinedField.class );
+		ElasticsearchBridgeDefinedField mappedOn = bridgeDefinedField.getBridgeDefinedField( ElasticsearchBridgeDefinedField.class );
 		if ( mappedOn != null && mappedOn.getDynamic() != null ) {
 			propertyMapping.setDynamic( DynamicType.valueOf( mappedOn.getDynamic().name().toUpperCase( Locale.ROOT ) ) );
 		}
