@@ -10,16 +10,10 @@ package org.hibernate.search.analyzer.spi;
  * Reference to an analyzer implementation.
  *
  * @author Davide D'Alto
- *
- * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You
- * should be prepared for incompatible changes in future releases.
+ * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You should be
+ * prepared for incompatible changes in future releases.
  */
 public interface AnalyzerReference {
-
-	/**
-	 * @return The name of the referenced analyzer, or {@code null} if unknown.
-	 */
-	String getAnalyzerName();
 
 	/**
 	 * @return The referenced analyzer.

@@ -7,16 +7,15 @@
 package org.hibernate.search.analyzer.spi;
 
 /**
- * General interface for scope aware analyzers.
+ * A reference to an analyzer that also provides a name for this analyzer.
  *
- * @author Guillaume Smet
  * @author Yoann Rodiere
  *
  * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You
  * should be prepared for incompatible changes in future releases.
  */
-public interface ScopedAnalyzer {
+public interface NamedAnalyzerReference extends AnalyzerReference {
 
-	void close();
+	String getAnalyzerName();
 
 }
