@@ -8,8 +8,11 @@ package org.hibernate.search.test.bridge.tika;
 
 import java.net.URI;
 import java.sql.Blob;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -32,7 +35,17 @@ public class Book {
 	private byte[] contentAsBytes;
 	private URI contentAsURI;
 
+	private Set<String> contentAsListOfString;
+
 	public Book() {
+	}
+
+	public Book(String... contents) {
+		Set<String> temp = new HashSet<>();
+		for ( String string : contents ) {
+			temp.add( string );
+		}
+		this.contentAsListOfString = temp;
 	}
 
 	public Book(Blob content) {
@@ -81,7 +94,6 @@ public class Book {
 		this.contentAsBytes = contentAsBytes;
 	}
 
-	@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Field(indexNullAs = "<NULL>")
 	@TikaBridge
@@ -91,5 +103,16 @@ public class Book {
 
 	public void setContentAsURI(URI contentAsURI) {
 		this.contentAsURI = contentAsURI;
+	}
+
+	@Field
+	@TikaBridge
+	@ElementCollection
+	public Set<String> getContentAsListOfString() {
+		return contentAsListOfString;
+	}
+
+	public void setContentAsListOfString(Set<String> contentAsListOfString) {
+		this.contentAsListOfString = contentAsListOfString;
 	}
 }
