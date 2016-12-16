@@ -55,6 +55,6 @@ public interface AnalyzerStrategy<T extends AnalyzerReference> {
 	/**
 	 * @return A {@link ScopedAnalyzer} builder.
 	 */
-	ScopedAnalyzer.Builder buildScopedAnalyzer(T initialGlobalAnalyzerReference);
+	ScopedAnalyzerReference.Builder buildScopedAnalyzerReference(T initialGlobalAnalyzerReference);
 
 }

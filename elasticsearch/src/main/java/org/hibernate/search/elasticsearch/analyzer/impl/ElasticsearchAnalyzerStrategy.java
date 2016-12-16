@@ -21,34 +21,36 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<Elasticse
 
 	@Override
 	public ElasticsearchAnalyzerReference createDefaultAnalyzerReference() {
-		return new ElasticsearchAnalyzerReference( new UndefinedElasticsearchAnalyzerImpl( "default" ) );
+		return new SimpleElasticsearchAnalyzerReference( new UndefinedElasticsearchAnalyzerImpl( "default" ) );
 	}
 
 	@Override
 	public ElasticsearchAnalyzerReference createPassThroughAnalyzerReference() {
-		return new ElasticsearchAnalyzerReference( new UndefinedElasticsearchAnalyzerImpl( "keyword" ) );
+		return new SimpleElasticsearchAnalyzerReference( new UndefinedElasticsearchAnalyzerImpl( "keyword" ) );
 	}
 
 	@Override
-	public ElasticsearchAnalyzerReference createNamedAnalyzerReference(String name) {
-		return new ElasticsearchAnalyzerReference( name );
+	public NamedElasticsearchAnalyzerReference createNamedAnalyzerReference(String name) {
+		return new NamedElasticsearchAnalyzerReference( name );
 	}
 
 	@Override
 	public ElasticsearchAnalyzerReference createAnalyzerReference(Class<?> analyzerClass) {
-		return new ElasticsearchAnalyzerReference( new BuiltinElasticsearchAnalyzerImpl( analyzerClass ) );
+		return new SimpleElasticsearchAnalyzerReference( new BuiltinElasticsearchAnalyzerImpl( analyzerClass ) );
 	}
 
 	@Override
 	public void initializeNamedAnalyzerReferences(Map<String, ElasticsearchAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
 		Map<String, ElasticsearchAnalyzer> initializedAnalyzers = new HashMap<>();
 		for ( Map.Entry<String, ElasticsearchAnalyzerReference> entry : references.entrySet() ) {
-			initializeReference( initializedAnalyzers, entry.getKey(), entry.getValue(), analyzerDefinitions );
+			String name = entry.getKey();
+			NamedElasticsearchAnalyzerReference namedReference = entry.getValue().unwrap( NamedElasticsearchAnalyzerReference.class );
+			initializeReference( initializedAnalyzers, name, namedReference, analyzerDefinitions );
 		}
 	}
 
 	private void initializeReference(Map<String, ElasticsearchAnalyzer> initializedAnalyzers, String name,
-			ElasticsearchAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
+			NamedElasticsearchAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
 		if ( analyzerReference.isInitialized() ) {
 			initializedAnalyzers.put( analyzerReference.getAnalyzerName(), analyzerReference.getAnalyzer() );
 			return;
@@ -71,8 +73,8 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<Elasticse
 	}
 
 	@Override
-	public ScopedElasticsearchAnalyzer.Builder buildScopedAnalyzer(ElasticsearchAnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedElasticsearchAnalyzer.Builder(
+	public ScopedElasticsearchAnalyzerReference.Builder buildScopedAnalyzerReference(ElasticsearchAnalyzerReference initialGlobalAnalyzerReference) {
+		return new ScopedElasticsearchAnalyzerReference.Builder(
 				initialGlobalAnalyzerReference, Collections.<String, ElasticsearchAnalyzerReference>emptyMap()
 				);
 	}

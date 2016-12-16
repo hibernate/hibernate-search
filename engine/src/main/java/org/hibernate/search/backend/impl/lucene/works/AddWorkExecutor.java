@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
-import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
+import org.hibernate.search.analyzer.impl.SimpleLuceneAnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -85,14 +84,14 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 			return scopedAnalyzerReference;
 		}
 
-		ScopedAnalyzer.Builder copyBuilder = scopedAnalyzerReference.getAnalyzer().startCopy();
+		ScopedAnalyzerReference.Builder copyBuilder = scopedAnalyzerReference.startCopy();
 		for ( Map.Entry<String, String> entry : fieldToAnalyzerMap.entrySet() ) {
 			Analyzer analyzer = workspace.getAnalyzer( entry.getValue() );
 			if ( analyzer == null ) {
 				log.unableToRetrieveNamedAnalyzer( entry.getValue() );
 			}
 			else {
-				copyBuilder.addAnalyzerReference( entry.getKey(), new LuceneAnalyzerReference( analyzer ) );
+				copyBuilder.addAnalyzerReference( entry.getKey(), new SimpleLuceneAnalyzerReference( analyzer ) );
 			}
 		}
 		return copyBuilder.build();

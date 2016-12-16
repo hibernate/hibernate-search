@@ -93,14 +93,14 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 
 	@Override
 	public LuceneAnalyzerReference createPassThroughAnalyzerReference() {
-		return new LuceneAnalyzerReference( PassThroughAnalyzer.INSTANCE );
+		return new SimpleLuceneAnalyzerReference( PassThroughAnalyzer.INSTANCE );
 	}
 
 	@Override
 	public LuceneAnalyzerReference createAnalyzerReference(Class<?> analyzerClass) {
 		try {
 			Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
-			return new LuceneAnalyzerReference( analyzer );
+			return new SimpleLuceneAnalyzerReference( analyzer );
 		}
 		catch (ClassCastException e) {
 			throw new SearchException( "Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(), e );
@@ -112,18 +112,20 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 
 	@Override
 	public LuceneAnalyzerReference createNamedAnalyzerReference(String name) {
-		return new LuceneAnalyzerReference( name );
+		return new NamedLuceneAnalyzerReference( name );
 	}
 
 	@Override
 	public void initializeNamedAnalyzerReferences(Map<String, LuceneAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
 		Map<String, Analyzer> initializedAnalyzers = new HashMap<>();
 		for ( Map.Entry<String, LuceneAnalyzerReference> entry : references.entrySet() ) {
-			initializeReference( initializedAnalyzers, entry.getKey(), entry.getValue(), analyzerDefinitions );
+			String name = entry.getKey();
+			NamedLuceneAnalyzerReference namedReference = entry.getValue().unwrap( NamedLuceneAnalyzerReference.class );
+			initializeReference( initializedAnalyzers, name, namedReference, analyzerDefinitions );
 		}
 	}
 
-	private void initializeReference(Map<String, Analyzer> initializedAnalyzers, String name, LuceneAnalyzerReference analyzerReference,
+	private void initializeReference(Map<String, Analyzer> initializedAnalyzers, String name, NamedLuceneAnalyzerReference analyzerReference,
 			Map<String, AnalyzerDef> analyzerDefinitions) {
 		if ( analyzerReference.isInitialized() ) {
 			initializedAnalyzers.put( analyzerReference.getAnalyzerName(), analyzerReference.getAnalyzer() );
@@ -154,7 +156,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 	}
 
 	@Override
-	public ScopedLuceneAnalyzer.Builder buildScopedAnalyzer(LuceneAnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedLuceneAnalyzer.Builder( initialGlobalAnalyzerReference, Collections.<String, LuceneAnalyzerReference>emptyMap() );
+	public ScopedLuceneAnalyzerReference.Builder buildScopedAnalyzerReference(LuceneAnalyzerReference initialGlobalAnalyzerReference) {
+		return new ScopedLuceneAnalyzerReference.Builder( initialGlobalAnalyzerReference, Collections.<String, LuceneAnalyzerReference>emptyMap() );
 	}
 }
