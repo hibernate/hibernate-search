@@ -9,9 +9,10 @@ package org.hibernate.search.elasticsearch.cfg;
 /**
  * Configuration values for Elasticsearch "dynamic" attribute values.
  * <p>
- * Defines the behaviour when a document contains an unrecognized field.
- *
- * @see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic.html">Elasticsearch mapping:
+ * Defines the behaviour when a document contains a field the wasn't define in the index schema.
+ * <p>
+ * More details on the Elasticsearch documentation:
+ * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/dynamic.html">Elasticsearch mapping:
  * dynamic</a>
  *
  * @author Davide D'Alto

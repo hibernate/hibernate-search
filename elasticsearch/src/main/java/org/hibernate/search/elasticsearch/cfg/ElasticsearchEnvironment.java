@@ -225,14 +225,15 @@ public final class ElasticsearchEnvironment {
 	public static final String SCROLL_TIMEOUT = "elasticsearch.scroll_timeout";
 
 	/**
-	 * Property for specifying the behaviour when Elasticsearch encounters a previously unknown field in a document.
+	 * Equivalent to elasticsearch "dynamic", define what to do when a document contains a field which was not declared
+	 * in the index schema.
 	 * <p>
 	 * Possible values are:
 	 * <p>
 	 * <ul>
-	 *   <li>{@code true}: Add new fields dynamically</li>
-	 *   <li>{@code false}: Ignore new fields</li>
-	 *   <li>{@code strict}: Throw an exception if an unknown field is encountered</li>
+	 * <li>{@code true}: Add new fields dynamically</li>
+	 * <li>{@code false}: Ignore new fields</li>
+	 * <li>{@code strict}: Throw an exception</li>
 	 * </ul>
 	 * <p>
 	 * Defaults to {@code strict}.

@@ -29,8 +29,8 @@ public class BridgeDefinedField {
 	private final FieldType type;
 
 	/*
-	 * Backends have specific field properties (Elastic search dynamic mapping for example). this map will group the
-	 * properties per backend.
+	 * This map will group bridge defined field properties that make sense only for specific index managers.
+	 * For example, in Elasticsearch one can specify the mapping as dynamic.
 	 */
 	private Map<Class<?>, Object> extra = new HashMap<>();
 
@@ -84,12 +84,12 @@ public class BridgeDefinedField {
 	}
 
 	/**
-	 * Returns the object containing the properties of the field for the specific class.
+	 * Get the bridge defined field of the specific class.
 	 *
-	 * @param backendBridgeDefineFieldClass the type of the object containing the properties of the field
+	 * @param bridgeDefineFieldClass the type of the object containing the properties of the field
 	 * @return the object containing the properties of the field
 	 */
-	public <T> T mappedOn(Class<T> backendBridgeDefineFieldClass) {
-		return backendBridgeDefineFieldClass.cast( extra.get( backendBridgeDefineFieldClass ) );
+	public <T> T mappedOn(Class<T> bridgeDefineFieldClass) {
+		return bridgeDefineFieldClass.cast( extra.get( bridgeDefineFieldClass ) );
 	}
 }
