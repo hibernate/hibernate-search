@@ -28,6 +28,10 @@ public class IndexSettings {
 		this.analysis = analysis;
 	}
 
+	public boolean isEmpty() {
+		return analysis == null || analysis.isEmpty();
+	}
+
 	@Override
 	public String toString() {
 		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
@@ -49,6 +53,19 @@ public class IndexSettings {
 
 		public Map<String, AnalyzerDefinition> getAnalyzers() {
 			return analyzers;
+		}
+
+		public boolean isEmpty() {
+			return ! hasContent( analyzers, tokenizers, tokenFilters, charFilters );
+		}
+
+		private boolean hasContent(Map<?, ?> ... maps) {
+			for ( Map<?, ?> map : maps ) {
+				if ( map != null && !map.isEmpty() ) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public void setAnalyzers(Map<String, AnalyzerDefinition> analyzers) {

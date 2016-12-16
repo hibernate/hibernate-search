@@ -22,7 +22,6 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
-import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
@@ -488,7 +487,7 @@ public class TypeMetadata {
 	public static class Builder {
 		protected final BackReference<TypeMetadata> resultReference = new BackReference<>();
 		private final Class<?> indexedType;
-		private final ScopedAnalyzer.Builder scopedAnalyzerReferenceBuilder;
+		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
 		private final AnalyzerReferenceRegistry<?> analyzerReferenceRegistry;
 
 		private float boost;
@@ -515,7 +514,7 @@ public class TypeMetadata {
 			else {
 				IndexManagerType indexManagerType = parseContext.getIndexManagerType();
 				this.analyzerReferenceRegistry = configContext.getAnalyzerReferenceRegistry( indexManagerType );
-				this.scopedAnalyzerReferenceBuilder = analyzerReferenceRegistry.buildScopedAnalyzer();
+				this.scopedAnalyzerReferenceBuilder = analyzerReferenceRegistry.buildScopedAnalyzerReference();
 			}
 		}
 
@@ -632,7 +631,7 @@ public class TypeMetadata {
 			return scopedAnalyzerReferenceBuilder.getGlobalAnalyzerReference();
 		}
 
-		public ScopedAnalyzer.Builder getScopedAnalyzerReferenceBuilder() {
+		public ScopedAnalyzerReference.Builder getScopedAnalyzerReferenceBuilder() {
 			return scopedAnalyzerReferenceBuilder;
 		}
 

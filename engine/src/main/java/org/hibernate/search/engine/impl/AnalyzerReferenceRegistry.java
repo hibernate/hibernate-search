@@ -12,7 +12,8 @@ import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
-import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
+import org.hibernate.search.analyzer.spi.NamedAnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 
 /**
@@ -36,14 +37,18 @@ public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
 	AnalyzerReferenceRegistry(AnalyzerStrategy<T> strategy) {
 		this.strategy = strategy;
 		this.defaultReference = strategy.createDefaultAnalyzerReference();
-		String analyzerName = defaultReference.getAnalyzerName();
-		if ( analyzerName != null ) {
-			referencesByName.put( analyzerName, defaultReference );
+		if ( defaultReference.is( NamedAnalyzerReference.class ) ) {
+			referencesByName.put(
+					defaultReference.unwrap( NamedAnalyzerReference.class ).getAnalyzerName(),
+					defaultReference
+					);
 		}
 		this.passThroughReference = strategy.createPassThroughAnalyzerReference();
-		analyzerName = passThroughReference.getAnalyzerName();
-		if ( analyzerName != null ) {
-			referencesByName.put( analyzerName, passThroughReference );
+		if ( passThroughReference.is( NamedAnalyzerReference.class ) ) {
+			referencesByName.put(
+					passThroughReference.unwrap( NamedAnalyzerReference.class ).getAnalyzerName(),
+					passThroughReference
+					);
 		}
 	}
 
@@ -85,8 +90,8 @@ public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
 		strategy.initializeNamedAnalyzerReferences( referencesByName, analyzerDefinitions );
 	}
 
-	public ScopedAnalyzer.Builder buildScopedAnalyzer() {
-		return strategy.buildScopedAnalyzer( getDefaultAnalyzerReference() );
+	public ScopedAnalyzerReference.Builder buildScopedAnalyzerReference() {
+		return strategy.buildScopedAnalyzerReference( getDefaultAnalyzerReference() );
 	}
 
 }
