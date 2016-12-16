@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.google.gson.GsonBuilder;
+
 /**
  * An object representic Elasticsearch type mappings.
  *
@@ -50,6 +52,11 @@ public class TypeMapping {
 
 	public void setDynamic(DynamicType dynamic) {
 		this.dynamic = dynamic;
+	}
+
+	@Override
+	public String toString() {
+		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
 	}
 
 }

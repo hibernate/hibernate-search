@@ -41,15 +41,50 @@ import org.junit.Test;
  * @author Hardy Ferentschik
  */
 public class TikaBridgeInputTypeTest extends SearchTestBase {
-	private static final String TEST_DOCUMENT_PDF = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
+
+	private static final String TEST_DOCUMENT_PDF_1 = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
+	private static final String TEST_DOCUMENT_PDF_2 = "/org/hibernate/search/test/bridge/tika/test-document-2.pdf";
 
 	@Rule
-	public ClasspathResourceAsFile testDocumentPdf = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF );
+	public ClasspathResourceAsFile testDocumentPdf1 = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF_1 );
+
+	@Rule
+	public ClasspathResourceAsFile testDocumentPdf2 = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF_2 );
+
+	@Test
+	public void testDefaultTikaBridgeWithListOfString() throws Exception {
+		try ( Session session = openSession() ) {
+			String content1 = testDocumentPdf1.get().getAbsolutePath();
+			String content2 = testDocumentPdf2.get().getAbsolutePath();
+
+			persistBook( session, new Book( content1, content2 ) );
+
+			indexBook( session );
+
+			List<Book> resultWithLucene = search( session, "contentAsListOfString", "Lucene" );
+			assertEquals( "there should be a match", 1, resultWithLucene.size() );
+
+			List<Book> resultWithTika = search( session, "contentAsListOfString", "Tika" );
+			assertEquals( "there should be a match", 1, resultWithTika.size() );
+		}
+	}
+
+	private List<Book> search(Session session, String field, String keyword) throws ParseException {
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		Transaction transaction = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( field, TestConstants.standardAnalyzer );
+		Query query = parser.parse( keyword );
+		@SuppressWarnings("unchecked")
+		List<Book> result = fullTextSession.createFullTextQuery( query ).list();
+		transaction.commit();
+		fullTextSession.clear();
+		return result;
+	}
 
 	@Test
 	public void testDefaultTikaBridgeWithBlob() throws Exception {
 		try ( Session session = openSession() ) {
-			Blob content = dataAsBlob( testDocumentPdf.get(), session );
+			Blob content = dataAsBlob( testDocumentPdf1.get(), session );
 
 			persistBook( session, new Book( content ) );
 			persistBook( session, new Book() );
@@ -64,7 +99,7 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 	@Test
 	public void testDefaultTikaBridgeWithByteArray() throws Exception {
 		try ( Session session = openSession() ) {
-			byte[] content = dataAsBytes( testDocumentPdf.get() );
+			byte[] content = dataAsBytes( testDocumentPdf1.get() );
 
 			persistBook( session, new Book( content ) );
 			persistBook( session, new Book() );
@@ -77,7 +112,7 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 	@Test
 	public void testDefaultTikaBridgeWithURI() throws Exception {
 		try ( Session session = openSession() ) {
-			URI content = testDocumentPdf.get().toURI();
+			URI content = testDocumentPdf1.get().toURI();
 
 			persistBook( session, new Book( content ) );
 			persistBook( session, new Book() );
@@ -96,7 +131,6 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 				TestConstants.standardAnalyzer
 		);
 		Query query = parser.parse( "foo" );
-
 
 		List<Book> result = fullTextSession.createFullTextQuery( query ).list();
 		assertEquals( "there should be no match", 0, result.size() );
@@ -150,16 +184,15 @@ public class TikaBridgeInputTypeTest extends SearchTestBase {
 		fullTextSession.clear();
 	}
 
-
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] {
+		return new Class[]{
 				Book.class
 		};
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		super.configure( cfg );
 		cfg.put( Environment.INDEXING_STRATEGY, "manual" );
 	}
