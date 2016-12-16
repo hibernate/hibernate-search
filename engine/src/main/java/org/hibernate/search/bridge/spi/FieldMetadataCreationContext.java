@@ -35,10 +35,10 @@ public interface FieldMetadataCreationContext {
 	FieldMetadataCreationContext sortable(boolean sortable);
 
 	/**
-	 * Give access to properties that are backend specific
+	 * Gives access to properties that are specific to an indexing technology.
 	 *
-	 * @param backendType the selected backend.
+	 * @param indexTechnology the selected index technology.
 	 * @return the context for the fluent API related to the select backend.
 	 */
-	<T extends FieldMetadataCreationContext> T mappedOn(Class<T> backendType);
+	<T extends FieldMetadataCreationContext> T mappedOn(Class<T> indexTechnology);
 }
