@@ -22,7 +22,7 @@ import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 public class Elasticsearch implements FieldMetadataCreationContext {
 
 	private final FieldMetadataCreationContext creationContext;
-	private ElasticsearchBridgeDefinedField elasticsearchDefinedField;
+	private final ElasticsearchBridgeDefinedField elasticsearchDefinedField;
 
 	public Elasticsearch(BridgeDefinedField definedField, FieldMetadataCreationContext creationContext) {
 		this.elasticsearchDefinedField = new ElasticsearchBridgeDefinedField();
