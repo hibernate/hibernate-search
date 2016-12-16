@@ -1006,4 +1006,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 327, value = "Unsupported indexNullAs token type '%3$s' on field '%2$s' of entity '%1$s'." )
 	SearchException unsupportedNullTokenType(Class<?> entityType, String fieldName, Class<?> tokenType);
 
+	@Message(id = 328, value = "Cannot create context for class: %1$s" )
+	SearchException cannotCreateBridgeDefinedField(@FormatWith(ClassFormatter.class) Class<?> backend, @Cause Exception e);
 }

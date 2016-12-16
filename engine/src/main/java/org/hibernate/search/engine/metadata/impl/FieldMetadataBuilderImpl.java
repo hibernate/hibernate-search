@@ -12,6 +12,8 @@ import java.util.Set;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldMetadataCreationContext;
 import org.hibernate.search.bridge.spi.FieldType;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * The internal implementation of {@link FieldMetadataBuilder}.
@@ -19,6 +21,8 @@ import org.hibernate.search.bridge.spi.FieldType;
  * @author Gunnar Morling
  */
 class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private final Set<String> sortableFieldsAbsoluteNames = new LinkedHashSet<>();
 	private final Set<BridgeDefinedField> bridgeDefinedFields = new LinkedHashSet<>();
@@ -70,7 +74,7 @@ class FieldMetadataBuilderImpl implements FieldMetadataBuilder {
 				return backend.getDeclaredConstructor( BridgeDefinedField.class, FieldMetadataCreationContext.class ).newInstance( field, this );
 			}
 			catch (Exception e) {
-				throw new RuntimeException( e );
+				throw LOG.cannotCreateBridgeDefinedField( backend, e );
 			}
 		}
 	}
