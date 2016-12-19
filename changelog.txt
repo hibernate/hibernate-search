@@ -1,6 +1,52 @@
 Hibernate Search Changelog
 ==========================
 
+5.6.0.CR1 (19-12-2016)
+-------------------------
+
+** Bug
+    * HSEARCH-2526 Javadoc errors failing the release process
+    * HSEARCH-2525 Some Hibernate ORM dependencies have an incorrect version in our OSGi integration
+    * HSEARCH-2507 ElasticsearchIndexNameConflictIT is broken on file-insensitive filesystems
+    * HSEARCH-2500 TikaBridge not working for containers type
+    * HSEARCH-2499 Tests leaking transactions hang the build when running on MariaDB
+    * HSEARCH-2494 TikaBridgeProvider does not recognize byte arrays as a compatible type
+    * HSEARCH-2492 Stream operations behaviour not consistent across IndexManagers
+    * HSEARCH-2491 Flush per entity ignored for ElasticsearchIndexManager
+    * HSEARCH-2488 AssertionFailure thrown when field bridges bypass @IndexedEmbedded prefixes with Elasticsearch
+    * HSEARCH-2486 @ContainedIn in super class being ignored when child class has no Search-specific annotations
+    * HSEARCH-2484 Concurrent projections fails randomly with Elasticsearch due to service access issues
+    * HSEARCH-2479 ConnectedMultiFieldsPhraseQueryBuilder uses HashMap on sorted map
+    * HSEARCH-2467 Avoid scientific notation of date values (epoch millis format) in queries since Elasticsearch is unable to parse it
+    * HSEARCH-2456 Wait for index status does not raise an exception
+    * HSEARCH-2441 ElasticsearchQueries.fromJson expects top-level JSON but only the "query" parameter is supported
+    * HSEARCH-2415 indexNullAs doesn't work on Java 8 date/time types with ES
+    * HSEARCH-2363 ZonedDateTimeBridge stores time in an ambiguous representation
+
+** Improvement
+    * HSEARCH-2387 Configurable dynamic mapping settings
+    * HSEARCH-2348 Improve logging for elasticsearch integration
+    * HSEARCH-2219 Define analyzers via the REST API
+    * HSEARCH-2172 Non-null properties persisted as null in ES if value equals indexNullAs()
+    * HSEARCH-1589 ServiceManager closes services too aggressively
+
+** New Feature
+    * HSEARCH-2449 Allow configuration of the pool sizes, timeouts and autodiscovery for the Jest client connections
+
+** Task
+    * HSEARCH-2523 Clarify the Elasticsearch integration is not ready for usage within OSGi
+    * HSEARCH-2512 Force OSGi integration tests to use the loopback device for RMI
+    * HSEARCH-2509 Upgrade to Jest 2.0.4
+    * HSEARCH-2508 Restore the previous default for container bridges
+    * HSEARCH-2506 Mention Jest in the Elasticsearch documentation
+    * HSEARCH-2503 Fix ExpectedLog4jLog when expectations are defined during the test
+    * HSEARCH-2489 Update documentation opening to introduce the Lucene/Elasticsearch option
+    * HSEARCH-2391 Support -orm/-engine analyzer-related tests in -elasticsearch
+    * HSEARCH-2379 Upgrade to Hibernate ORM 5.1.3.Final
+    * HSEARCH-2258 Index lowercasing required by Elasticsearch might introduce name conflicts
+    * HSEARCH-2223 Rename SolrAnalyzerBuilder as it's not Solr related anymore
+    * HSEARCH-2095 LuceneQueryTranslator is forcing to export the whole impl package to OSGi headers
+
 5.6.0.Beta4 (29-11-2016)
 -------------------------
 
