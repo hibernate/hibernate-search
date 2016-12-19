@@ -45,7 +45,11 @@ public class SearchMapping {
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping( name, tokenizerFactory, this );
+		return analyzerDef( name, "", tokenizerFactory );
+	}
+
+	public AnalyzerDefMapping analyzerDef(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory) {
+		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, this );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {

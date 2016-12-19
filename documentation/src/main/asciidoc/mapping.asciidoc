@@ -1035,6 +1035,7 @@ building more complex and results less predictable (for the novice), especially 
 field the same analyzer should be used for indexing and querying.
 ====
 
+[[section-named-analyzers]]
 ==== Named analyzers
 
 Analyzers can become quite complex to deal with. For this reason introduces Hibernate Search the

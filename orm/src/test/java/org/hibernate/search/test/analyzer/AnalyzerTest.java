@@ -21,11 +21,13 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +37,7 @@ import static org.junit.Assert.fail;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
+@Category(SkipOnElasticsearch.class) // Custom analyzer implementations cannot be used with Elasticsearch
 public class AnalyzerTest extends SearchTestBase {
 
 	public static final Log log = LoggerFactory.make();

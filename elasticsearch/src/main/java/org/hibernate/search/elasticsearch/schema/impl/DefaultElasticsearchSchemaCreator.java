@@ -47,15 +47,9 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 	public void createIndex(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
 		String indexName = indexMetadata.getName();
 
-		schemaAccessor.createIndex( indexName, executionOptions );
+		schemaAccessor.createIndex( indexName, indexMetadata.getSettings(), executionOptions );
 
 		schemaAccessor.waitForIndexStatus( indexName, executionOptions );
-
-		for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
-			String mappingName = entry.getKey();
-			TypeMapping mapping = entry.getValue();
-			schemaAccessor.putMapping( indexName, mappingName, mapping );
-		}
 	}
 
 	@Override
@@ -65,7 +59,7 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 		boolean created = false;
 
 		if ( !schemaAccessor.indexExists( indexName ) ) {
-			created = schemaAccessor.createIndexIfAbsent( indexName, executionOptions );
+			created = schemaAccessor.createIndexIfAbsent( indexName, indexMetadata.getSettings(), executionOptions );
 		}
 
 		schemaAccessor.waitForIndexStatus( indexName, executionOptions );

@@ -19,24 +19,23 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.testutil.JsonHelper;
+import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.mapping.GetMapping;
 
 /**
  * @author Gunnar Morling
  */
 public class ElasticsearchIndexMappingIT extends SearchTestBase {
+
+	@Rule
+	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
 	@Before
 	public void setupTestData() {
@@ -121,24 +120,6 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 
 		tx.commit();
 		s.close();
-	}
-
-	private String getMapping(String indexName, String typeName) {
-		ServiceManager serviceManager = getExtendedSearchIntegrator().getServiceManager();
-		try (ServiceReference<JestClient> clientReference = serviceManager.requestReference( JestClient.class ) ) {
-			JestClient client = clientReference.get();
-			JestResult result = client.executeRequest(
-					new GetMapping.Builder()
-					.addIndex( indexName )
-					.addType( typeName )
-					.build()
-					);
-
-			return result.getJsonObject()
-					.get( indexName ).getAsJsonObject()
-					.get( "mappings" ).getAsJsonObject()
-					.get( typeName ).toString();
-		}
 	}
 
 	@Test
@@ -247,7 +228,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 						"}" +
 					"}" +
 				"}",
-				getMapping( "golfplayer", GolfPlayer.class.getName() )
+				elasticsearchClient.index( "golfplayer" ).mapping( GolfPlayer.class.getName() ).get()
 		);
 
 		// Check we send correctly formatted data when indexing

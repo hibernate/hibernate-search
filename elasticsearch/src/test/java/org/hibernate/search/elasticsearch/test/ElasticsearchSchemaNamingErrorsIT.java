@@ -106,7 +106,7 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 				.build()
 		);
 
-		elasticSearchClient.registerForCleanup( entityClass );
+		elasticSearchClient.index( entityClass ).registerForCleanup();
 		init( strategy, entityClass );
 	}
 
@@ -128,7 +128,7 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 				+ " and thus prevent indexing. No point running this test.",
 				generatesSchema( strategy ) );
 
-		elasticSearchClient.deleteAndCreateIndex( entityClass );
+		elasticSearchClient.index( entityClass ).deleteAndCreate();
 		init( strategy, entityClass );
 
 		thrown.expect(
@@ -167,7 +167,7 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 				.build()
 		);
 
-		elasticSearchClient.registerForCleanup( entityClass );
+		elasticSearchClient.index( entityClass ).registerForCleanup();
 		init( strategy, entityClass );
 	}
 
@@ -181,7 +181,7 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 
 		Class<?> entityClass = BypassingIndexedEmbeddedPrefixEntity.class;
 
-		elasticSearchClient.deleteAndCreateIndex( entityClass );
+		elasticSearchClient.index( entityClass ).deleteAndCreate();
 		init( strategy, entityClass );
 
 		thrown.expect(

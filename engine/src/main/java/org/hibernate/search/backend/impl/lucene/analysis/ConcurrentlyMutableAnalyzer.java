@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
+import org.hibernate.search.analyzer.impl.ScopedLuceneAnalyzer;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.util.impl.ScopedLuceneAnalyzer;
 
 /**
  * An Analyzer implementation which can dynamically be reconfigured. We use this as temporary solution to workaround

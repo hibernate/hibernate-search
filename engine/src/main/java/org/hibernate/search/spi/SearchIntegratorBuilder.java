@@ -408,7 +408,7 @@ public class SearchIntegratorBuilder {
 		);
 
 		factoryState.addFilterDefinitions( configContext.initFilters() );
-		factoryState.addAnalyzerReferences( configContext.initLazyAnalyzerReferences( indexesFactory ) );
+		factoryState.addAnalyzerReferences( configContext.initNamedAnalyzerReferences( indexesFactory ) );
 	}
 
 	private void detectIndexNamesCollisions(Collection<IndexManager> indexManagers) {

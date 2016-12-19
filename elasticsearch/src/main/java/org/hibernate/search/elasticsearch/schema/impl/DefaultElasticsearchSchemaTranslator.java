@@ -7,13 +7,15 @@
 package org.hibernate.search.elasticsearch.schema.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.document.Field;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchBridgeDefinedField;
@@ -21,9 +23,12 @@ import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
+import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
+import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchAnalyzerDefinitionTranslator;
+import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.BoostStrategy;
@@ -36,11 +41,15 @@ import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spatial.impl.SpatialHelper;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
@@ -50,37 +59,75 @@ import com.google.gson.JsonPrimitive;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchemaTranslator {
+public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchemaTranslator, Startable, Stoppable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
+	private ServiceManager serviceManager;
+
+	private ElasticsearchAnalyzerDefinitionTranslator analyzerDefinitionTranslator;
+
 	@Override
-	public TypeMapping translate(EntityIndexBinding descriptor, ExecutionOptions executionOptions) {
+	public void start(Properties properties, BuildContext context) {
+		serviceManager = context.getServiceManager();
+		analyzerDefinitionTranslator = serviceManager.requestService( ElasticsearchAnalyzerDefinitionTranslator.class );
+	}
+
+	@Override
+	public void stop() {
+		analyzerDefinitionTranslator = null;
+		serviceManager.releaseService( ElasticsearchAnalyzerDefinitionTranslator.class );
+		serviceManager = null;
+	}
+
+	@Override
+	public IndexMetadata translate(String indexName, Collection<EntityIndexBinding> descriptors, ExecutionOptions executionOptions) {
+		IndexMetadata indexMetadata = new IndexMetadata();
+
+		indexMetadata.setName( indexName );
+
+		ElasticsearchIndexSettingsBuilder settingsBuilder = new ElasticsearchIndexSettingsBuilder( analyzerDefinitionTranslator );
+		for ( EntityIndexBinding descriptor : descriptors ) {
+			String typeName = descriptor.getDocumentBuilder().getBeanClass().getName();
+
+			settingsBuilder.setBinding( descriptor );
+			TypeMapping mapping = translate( descriptor, settingsBuilder, executionOptions );
+
+			indexMetadata.putMapping( typeName, mapping );
+		}
+
+		indexMetadata.setSettings( settingsBuilder.build() );
+
+		return indexMetadata;
+	}
+
+	private TypeMapping translate(EntityIndexBinding descriptor, ElasticsearchIndexSettingsBuilder settingsBuilder, ExecutionOptions executionOptions) {
 		TypeMapping root = new TypeMapping();
 
 		root.setDynamic( executionOptions.getDynamicMapping() );
 
-		ElasticsearchMappingBuilder builder = new ElasticsearchMappingBuilder( descriptor, root );
+		ElasticsearchMappingBuilder mappingBuilder = new ElasticsearchMappingBuilder( descriptor, root );
 
 		if ( executionOptions.isMultitenancyEnabled() ) {
 			PropertyMapping tenantId = new PropertyMapping();
 			tenantId.setType( DataType.STRING );
 			tenantId.setIndex( IndexType.NOT_ANALYZED );
-			builder.setPropertyAbsolute( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
+			mappingBuilder.setPropertyAbsolute( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
 		}
 
-		addMappings( builder, executionOptions );
+		addMappings( mappingBuilder, settingsBuilder, executionOptions );
 
 		return root;
 	}
 
-	private void addMappings(ElasticsearchMappingBuilder mappingBuilder, ExecutionOptions executionOptions) {
+	private void addMappings(ElasticsearchMappingBuilder mappingBuilder, ElasticsearchIndexSettingsBuilder settingsBuilder,
+			ExecutionOptions executionOptions) {
 		TypeMetadata typeMetadata = mappingBuilder.getMetadata();
 
 		// normal document fields
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getNonEmbeddedDocumentFieldMetadata() ) {
 			try {
-				addPropertyMapping( mappingBuilder, fieldMetadata, executionOptions );
+				addPropertyMapping( mappingBuilder, settingsBuilder, fieldMetadata, executionOptions );
 			}
 			catch (IncompleteDataException e) {
 				LOG.debug( "Not adding a mapping for field " + fieldMetadata.getAbsoluteName() + " because of incomplete data", e );
@@ -90,7 +137,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		// bridge-defined fields
 		for ( BridgeDefinedField bridgeDefinedField : getNonEmbeddedBridgeDefinedFields( typeMetadata ) ) {
 			try {
-				addPropertyMapping( mappingBuilder, bridgeDefinedField );
+				addPropertyMapping( mappingBuilder, settingsBuilder, bridgeDefinedField );
 			}
 			catch (IncompleteDataException e) {
 				LOG.debug( "Not adding a mapping for field " + bridgeDefinedField.getAbsoluteName() + " because of incomplete data", e );
@@ -100,7 +147,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 		// Recurse into embedded types
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			ElasticsearchMappingBuilder embeddedContext = new ElasticsearchMappingBuilder( mappingBuilder, embeddedTypeMetadata );
-			addMappings( embeddedContext, executionOptions );
+			addMappings( embeddedContext, settingsBuilder, executionOptions );
 		}
 	}
 
@@ -108,7 +155,8 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	 * Adds a property mapping for the given field to the given type mapping.
 	 * @param executionOptions
 	 */
-	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata, ExecutionOptions executionOptions) {
+	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, ElasticsearchIndexSettingsBuilder settingsBuilder,
+			DocumentFieldMetadata fieldMetadata, ExecutionOptions executionOptions) {
 		if ( fieldMetadata.getAbsoluteName().isEmpty() || fieldMetadata.getAbsoluteName().endsWith( "." )
 				|| fieldMetadata.isSpatial() ) {
 			return;
@@ -124,7 +172,8 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 			propertyMapping.setStore( fieldMetadata.getStore() == Store.NO ? false : true );
 		}
 
-		addIndexOptions( propertyMapping, mappingBuilder, fieldMetadata.getSourceProperty(), fieldMetadata.getAbsoluteName(),
+		addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
+				fieldMetadata.getSourceProperty(), fieldMetadata.getAbsoluteName(),
 				fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
 
 		if ( propertyMapping.getType() != DataType.OBJECT ) {
@@ -161,7 +210,8 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	/**
 	 * Adds a type mapping for the given field to the given request payload.
 	 */
-	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, BridgeDefinedField bridgeDefinedField) {
+	private void addPropertyMapping(ElasticsearchMappingBuilder mappingBuilder, ElasticsearchIndexSettingsBuilder settingsBuilder,
+			BridgeDefinedField bridgeDefinedField) {
 		String propertyPath = bridgeDefinedField.getAbsoluteName();
 
 		if ( !SpatialHelper.isSpatialField( propertyPath ) ) {
@@ -170,7 +220,8 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 			if ( !mappingBuilder.hasPropertyAbsolute( propertyPath ) ) {
 				PropertyMapping propertyMapping = new PropertyMapping();
 				addTypeOptions( propertyMapping, bridgeDefinedField );
-				addIndexOptions( propertyMapping, mappingBuilder, bridgeDefinedField.getSourceField().getSourceProperty(),
+				addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
+						bridgeDefinedField.getSourceField().getSourceProperty(),
 						propertyPath, bridgeDefinedField.getIndex(), null );
 
 				addDynamicOption( bridgeDefinedField, propertyMapping );
@@ -233,7 +284,8 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 	/**
 	 * Adds the main indexing-related options to the given field: "index", "doc_values", "analyzer", ...
 	 */
-	private void addIndexOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder, PropertyMetadata sourceProperty,
+	private void addIndexOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder,
+			ElasticsearchIndexSettingsBuilder settingsBuilder, PropertyMetadata sourceProperty,
 			String propertyPath, Field.Index index, AnalyzerReference analyzerReference) {
 		if ( propertyMapping.getType() != DataType.OBJECT ) {
 			IndexType elasticsearchIndex = elasticsearchIndexType( propertyMapping, index );
@@ -245,7 +297,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 			}
 
 			if ( IndexType.ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
-				String analyzerName = mappingBuilder.getAnalyzerName( analyzerReference, propertyPath );
+				String analyzerName = settingsBuilder.registerAnalyzer( analyzerReference, propertyPath );
 				propertyMapping.setAnalyzer( analyzerName );
 			}
 		}

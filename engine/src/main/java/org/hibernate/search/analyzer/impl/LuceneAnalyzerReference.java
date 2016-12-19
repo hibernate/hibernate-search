@@ -7,7 +7,10 @@
 package org.hibernate.search.analyzer.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.util.impl.PassThroughAnalyzer;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A reference to an {@link Analyzer}.
@@ -16,36 +19,61 @@ import org.hibernate.search.util.impl.PassThroughAnalyzer;
  */
 public class LuceneAnalyzerReference implements AnalyzerReference {
 
-	/**
-	 * Analyzer that applies no operation whatsoever to the flux.
-	 * This is useful for queries operating on non tokenized fields.
-	 */
-	public static final LuceneAnalyzerReference PASS_THROUGH = new LuceneAnalyzerReference( PassThroughAnalyzer.INSTANCE );
+	private static final Log LOG = LoggerFactory.make();
 
-	private final Analyzer analyzer;
+	private String name;
+
+	private Analyzer analyzer;
+
+	public LuceneAnalyzerReference(String name) {
+		this.name = name;
+		this.analyzer = null; // Not initialized
+	}
 
 	public LuceneAnalyzerReference(Analyzer analyzer) {
+		this.name = null;
 		this.analyzer = analyzer;
 	}
 
+	@Override
+	public String getAnalyzerName() {
+		return name;
+	}
+
+	@Override
 	public Analyzer getAnalyzer() {
+		if ( analyzer == null ) {
+			throw LOG.lazyLuceneAnalyzerReferenceNotInitialized( this );
+		}
 		return analyzer;
+	}
+
+	public boolean isInitialized() {
+		return analyzer != null;
+	}
+
+	public void initialize(Analyzer analyzer) {
+		if ( this.analyzer != null ) {
+			throw new AssertionFailure( "An analyzer reference has been initialized more than once:" + this );
+		}
+		this.analyzer = analyzer;
 	}
 
 	@Override
 	public void close() {
-		analyzer.close();
+		if ( analyzer != null ) {
+			analyzer.close();
+		}
 	}
 
 	@Override
 	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return LuceneAnalyzerReference.class.isAssignableFrom( analyzerType );
+		return analyzerType.isAssignableFrom( LuceneAnalyzerReference.class );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
-		return (T) this;
+		return analyzerType.cast( this );
 	}
 
 	@Override
@@ -53,7 +81,12 @@ public class LuceneAnalyzerReference implements AnalyzerReference {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() );
 		sb.append( "<" );
-		sb.append( analyzer );
+		if ( analyzer != null ) {
+			sb.append( analyzer );
+		}
+		else {
+			sb.append( name );
+		}
 		sb.append( ">" );
 		return sb.toString();
 	}

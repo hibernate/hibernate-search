@@ -6,54 +6,26 @@
  */
 package org.hibernate.search.analyzer.impl;
 
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
+
 /**
  * A reference to a {@code RemoteAnalyzer}.
  *
  * @author Davide D'Alto
  * @author Guillaume Smet
  */
-public final class RemoteAnalyzerReference implements AnalyzerReference {
-
-	public static final RemoteAnalyzerReference DEFAULT = new RemoteAnalyzerReference( new LazyRemoteAnalyzer( "default" ) );
-	public static final RemoteAnalyzerReference PASS_THROUGH = new RemoteAnalyzerReference( new LazyRemoteAnalyzer( "keyword" ) );
-
-	private RemoteAnalyzer analyzer;
-
-	public RemoteAnalyzerReference(RemoteAnalyzer analyzer) {
-		this.analyzer = analyzer;
-	}
-
-	public RemoteAnalyzer getAnalyzer() {
-		return analyzer;
-	}
+public abstract class RemoteAnalyzerReference implements AnalyzerReference {
 
 	@Override
-	public void close() {
-		if ( analyzer != null ) {
-			analyzer.close();
-		}
-	}
+	public abstract RemoteAnalyzer getAnalyzer();
 
 	@Override
 	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return RemoteAnalyzerReference.class.isAssignableFrom( analyzerType );
+		return analyzerType.isAssignableFrom( RemoteAnalyzerReference.class );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
-		return (T) this;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append( getClass().getSimpleName() );
-		sb.append( "<" );
-		if ( analyzer != null ) {
-			sb.append( analyzer );
-		}
-		sb.append( ">" );
-		return sb.toString();
+		return analyzerType.cast( this );
 	}
 }

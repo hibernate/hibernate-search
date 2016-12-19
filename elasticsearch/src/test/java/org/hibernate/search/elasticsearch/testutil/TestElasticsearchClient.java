@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.testutil;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,6 +41,8 @@ import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
+import io.searchbox.indices.settings.GetSettings;
+import io.searchbox.indices.settings.UpdateSettings;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.PutTemplate;
 
@@ -63,43 +66,128 @@ public class TestElasticsearchClient extends ExternalResource {
 		return this;
 	}
 
-	public void deleteAndCreateIndex(Class<?> rootClass) throws IOException {
-		deleteAndCreateIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
+	public IndexClient index(Class<?> rootClass) {
+		return new IndexClient( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
 	}
 
-	public void ensureIndexDoesNotExist(Class<?> rootClass) throws IOException {
-		ensureIndexDoesNotExist( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
+	public IndexClient index(String indexName) {
+		return new IndexClient( indexName );
 	}
 
-	public void registerForCleanup(Class<?> rootClass) {
-		createdIndicesNames.add( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
+	public MappingClient mapping(Class<?> rootClass) {
+		return index( rootClass ).mapping( rootClass );
 	}
 
-	public void putMapping(Class<?> mappedAndRootClass, String mappingJson) throws IOException {
-		putMapping( mappedAndRootClass, mappedAndRootClass, mappingJson );
+	public class IndexClient {
+
+		private final String indexName;
+
+		public IndexClient(String indexName) {
+			this.indexName = indexName;
+		}
+
+		public IndexClient deleteAndCreate() throws IOException {
+			TestElasticsearchClient.this.deleteAndCreateIndex( indexName );
+			return this;
+		}
+
+		public IndexClient ensureDoesNotExist() throws IOException {
+			TestElasticsearchClient.this.ensureIndexDoesNotExist( indexName );
+			return this;
+		}
+
+		public IndexClient registerForCleanup() {
+			TestElasticsearchClient.this.registerIndexForCleanup( indexName );
+			return this;
+		}
+
+		public MappingClient mapping(Class<?> mappingClass) {
+			return mapping( mappingClass.getName() );
+		}
+
+		public MappingClient mapping(String mappingName) {
+			return new MappingClient( this, mappingName );
+		}
+
+		public SettingsClient settings() {
+			return settings( "" );
+		}
+
+		public SettingsClient settings(String settingsPath) {
+			return new SettingsClient( this, settingsPath );
+		}
 	}
 
-	public void putMapping(String indexName, Class<?> mappedClass, String mappingJson) throws IOException {
-		putMapping( indexName, mappedClass.getName(), mappingJson );
+	public class MappingClient {
+
+		private final IndexClient indexClient;
+
+		private final String mappingName;
+
+		public MappingClient(IndexClient indexClient, String mappingName) {
+			this.indexClient = indexClient;
+			this.mappingName = mappingName;
+		}
+
+		public MappingClient put(String mappingJson) throws IOException {
+			TestElasticsearchClient.this.putMapping( indexClient.indexName, mappingName, mappingJson );
+			return this;
+		}
+
+		public String get() throws IOException {
+			return TestElasticsearchClient.this.getMapping( indexClient.indexName, mappingName );
+		}
+
+		public MappingClient index(String id, String jsonDocument) throws IOException {
+			TestElasticsearchClient.this.index( indexClient.indexName, mappingName, id, jsonDocument );
+			return this;
+		}
 	}
 
-	public void putMapping(Class<?> rootClass, Class<?> mappedClass, String mappingJson) throws IOException {
-		putMapping( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), mappingJson );
+	public class SettingsClient {
+
+		private final IndexClient indexClient;
+
+		private final String settingsPath;
+
+		public SettingsClient(IndexClient indexClient, String settingsPath) {
+			this.indexClient = indexClient;
+			this.settingsPath = settingsPath;
+		}
+
+		public String get() throws IOException {
+			return TestElasticsearchClient.this.getSettings( indexClient.indexName, settingsPath );
+		}
+
+		public void put(String settings) throws IOException {
+			TestElasticsearchClient.this.putSettings( indexClient.indexName, settingsPath, settings );
+		}
 	}
 
-	public String getMapping(String indexName, Class<?> mappedClass) throws IOException {
-		return getMapping( indexName, mappedClass.getName() );
+	public TemplateClient template(String templateName) {
+		return new TemplateClient( templateName );
 	}
 
-	public String getMapping(Class<?> mappedAndRootClass) throws IOException {
-		return getMapping( mappedAndRootClass, mappedAndRootClass );
+	public class TemplateClient {
+
+		private final String templateName;
+
+		public TemplateClient(String templateName) {
+			this.templateName = templateName;
+		}
+
+		public TemplateClient create(String templateString, JsonObject settings) throws IOException {
+			TestElasticsearchClient.this.createTemplate( templateName, templateString, settings );
+			return this;
+		}
+
+		public TemplateClient registerForCleanup() {
+			TestElasticsearchClient.this.registerTemplateForCleanup( templateName );
+			return this;
+		}
 	}
 
-	public String getMapping(Class<?> rootClass, Class<?> mappedClass) throws IOException {
-		return getMapping( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName() );
-	}
-
-	public void deleteAndCreateIndex(String indexName) throws IOException {
+	private void deleteAndCreateIndex(String indexName) throws IOException {
 		// Ignore the result: if the deletion fails, we don't care unless the creation just after also fails
 		tryDeleteESIndex( indexName );
 
@@ -112,7 +200,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		waitForIndexCreation( indexName );
 	}
 
-	public void createTemplate(String templateName, String templateString, JsonObject settings) throws IOException {
+	private void createTemplate(String templateName, String templateString, JsonObject settings) throws IOException {
 		JsonObject source = JsonBuilder.object()
 				.addProperty( "template", templateString )
 				.add( "settings", settings )
@@ -124,7 +212,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 	}
 
-	public void ensureIndexDoesNotExist(String indexName) throws IOException {
+	private void ensureIndexDoesNotExist(String indexName) throws IOException {
 		JestResult result = client.execute( new DeleteIndex.Builder( indexName ).build() );
 		if ( !result.isSucceeded() && result.getResponseCode() != 404 /* Index not found is ok */ ) {
 			throw new AssertionFailure( String.format(
@@ -135,7 +223,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 	}
 
-	public void registerIndexForCleanup(String indexName) {
+	private void registerIndexForCleanup(String indexName) {
 		createdIndicesNames.add( indexName );
 	}
 
@@ -168,7 +256,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 	}
 
-	public void putMapping(String indexName, String mappingName, String mappingJson) throws IOException {
+	private void putMapping(String indexName, String mappingName, String mappingJson) throws IOException {
 		JsonElement mappingJsonElement = toJsonElement( mappingJson );
 
 		JestResult result = client.execute( new PutMapping.Builder( indexName, mappingName, mappingJsonElement ).build() );
@@ -178,7 +266,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 	}
 
-	public String getMapping(String indexName, String mappingName) throws IOException {
+	private String getMapping(String indexName, String mappingName) throws IOException {
 		JestResult result = client.execute( new GetMapping.Builder().addIndex( indexName ).addType( mappingName ).build() );
 		if ( !result.isSucceeded() ) {
 			throw new AssertionFailure( "Error while getting mapping '" + mappingName
@@ -199,19 +287,44 @@ public class TestElasticsearchClient extends ExternalResource {
 		return mapping.toString();
 	}
 
-	public void index(String indexName, Class<?> mappedClass, String id, String jsonDocument) throws IOException {
-		index( indexName, mappedClass.getName(), id, jsonDocument );
+	private void putSettings(String indexName, String settingsPath, String settings) throws IOException {
+		JsonElement settingsJsonElement = toJsonElement( settings );
+
+		for ( String property : Lists.reverse( Arrays.asList( settingsPath.split( "\\." ) ) ) ) {
+			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
+		}
+
+		JestResult result = client.execute( new UpdateSettings.Builder( settingsJsonElement ).addIndex( indexName ).build() );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while putting settings on index '" + indexName
+					+ "' for tests:" + result.getErrorMessage() );
+		}
 	}
 
-	public void index(Class<?> mappedAndRootClass, String id, String jsonDocument) throws IOException {
-		index( mappedAndRootClass, mappedAndRootClass, id, jsonDocument );
+	private String getSettings(String indexName, String path) throws IOException {
+		JestResult result = client.execute( new GetSettings.Builder().addIndex( indexName ).build() );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while getting settings on index '" + indexName +
+					"' for tests:" + result.getErrorMessage() );
+		}
+		JsonElement index = result.getJsonObject().get( indexName );
+		if ( index == null ) {
+			return new JsonObject().toString();
+		}
+		JsonElement settings = index.getAsJsonObject().get( "settings" );
+		for ( String property : path.split( "\\." ) ) {
+			if ( settings == null ) {
+				break;
+			}
+			settings = settings.getAsJsonObject().get( property );
+		}
+		if ( settings == null ) {
+			return new JsonObject().toString();
+		}
+		return settings.toString();
 	}
 
-	public void index(Class<?> rootClass, Class<?> mappedClass, String id, String jsonDocument) throws IOException {
-		index( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ), mappedClass.getName(), id, jsonDocument );
-	}
-
-	public void index(String indexName, String typeName, String id, String jsonDocument) throws IOException {
+	private void index(String indexName, String typeName, String id, String jsonDocument) throws IOException {
 		JsonElement documentJsonElement = toJsonElement( jsonDocument );
 
 		JestResult result = client.execute( new Index.Builder( documentJsonElement )

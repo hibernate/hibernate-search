@@ -7,7 +7,7 @@
 package org.hibernate.search.test.configuration.mutablefactory;
 
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;

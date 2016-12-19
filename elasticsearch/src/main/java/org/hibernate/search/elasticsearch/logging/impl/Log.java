@@ -12,7 +12,7 @@ import java.util.Map;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.client.impl.BulkRequestFailedException;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
@@ -77,8 +77,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,
-			value = "Field '%2$s' in '%1$s' requires a remote analyzer reference (got '%3$s' instead). The analyzer will be ignored.")
-	void analyzerIsNotRemote(@FormatWith(ClassFormatter.class) Class<?> entityType, String fieldName, AnalyzerReference analyzerReference);
+			value = "Field '%2$s' in '%1$s' requires an Elasticsearch analyzer reference (got '%3$s' instead). The analyzer will be ignored.")
+	void analyzerIsNotElasticsearch(@FormatWith(ClassFormatter.class) Class<?> entityType, String fieldName, AnalyzerReference analyzerReference);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 10,
 			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green';\n Request:\n========\n%1$sResponse:\n=========\n%2$s" )
@@ -305,5 +305,66 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ " passed as a parameter to the various bridge methods and never ignore this name."
 	)
 	SearchException indexedEmbeddedPrefixBypass(Class<?> entityType, String fieldPath, String expectedParent);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 55,
+			value = "The same tokenizer name '%1$s' is used multiple times. The tokenizer names must be unique."
+					+ " If this name was automatically generated, you may override it by using @TokenizerDef.name." )
+	SearchException tokenizerNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 56,
+			value = "The same char filter name '%1$s' is used multiple times. The char filter names must be unique."
+					+ " If this name was automatically generated, you may override it by using @CharFilterDef.name." )
+	SearchException charFilterNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 57,
+			value = "The same token filter name '%1$s' is used multiple times. The token filter names must be unique."
+					+ " If this name was automatically generated, you may override it by using @TokenFilterDef.name." )
+	SearchException tokenFilterNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 58,
+			value = "The char filter factory '%1$s' is not supported with Elasticsearch."
+					+ " Please only use builtin Lucene factories that have a builtin equivalent in Elasticsearch." )
+	SearchException unsupportedCharFilterFactory(@FormatWith(ClassFormatter.class) Class<?> factoryType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 59,
+			value = "The tokenizer factory '%1$s' is not supported with Elasticsearch."
+					+ " Please only use builtin Lucene factories that have a builtin equivalent in Elasticsearch." )
+	SearchException unsupportedTokenizerFactory(@FormatWith(ClassFormatter.class) Class<?> factoryType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 60,
+			value = "The token filter factory '%1$s' is not supported with Elasticsearch."
+					+ " Please only use builtin Lucene factories that have a builtin equivalent in Elasticsearch." )
+	SearchException unsupportedTokenFilterFactory(@FormatWith(ClassFormatter.class) Class<?> factoryType);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 61,
+			value = "The parameter '%2$s' is not supported for the factory '%1$s' with Elasticsearch." )
+	SearchException unsupportedAnalysisFactoryParameter(@FormatWith(ClassFormatter.class) Class<?> factoryType, String parameter);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 62,
+			value = "The parameter '%2$s' for the factory '%1$s' refers to the class '%3$s',"
+					+ " which cannot be converted to a builtin Elasticsearch tokenizer type." )
+	SearchException unsupportedAnalysisFactoryTokenizerClassNameParameter(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String tokenizerClass);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 63,
+			value = "The parameter '%2$s' for the factory '%1$s' has an unsupported value: '%3$s' is unsupported with Elasticsearch." )
+	SearchException unsupportedAnalysisDefinitionParameterValue(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String parameterValue);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 64,
+			value = "The analyzer implementation '%1$s' is not supported with Elasticsearch."
+					+ " Please only use builtin Lucene analyzers that have a builtin equivalent in Elasticsearch.")
+	SearchException unsupportedAnalyzerImplementation(@FormatWith(ClassFormatter.class) Class<?> luceneClass);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 65,
+			value = "The parameter '%2$s' for the factory '%1$s' could not be parsed as a JSON string: %3$s" )
+	SearchException invalidAnalysisDefinitionJsonStringParameter(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String causeMessage, @Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 66,
+			value = "The parameter '%2$s' for the factory '%1$s' could not be parsed as JSON: %3$s" )
+	SearchException invalidAnalysisDefinitionJsonParameter(@FormatWith(ClassFormatter.class) Class<?> factoryClass, String parameterName, String causeMessage, @Cause Exception cause);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 67,
+			value = "Could not update settings for index '%1$s'"
+	)
+	SearchException elasticsearchSettingsUpdateFailed(String indexName, @Cause Exception e);
 
 }

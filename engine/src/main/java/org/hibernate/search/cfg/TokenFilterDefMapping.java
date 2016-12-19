@@ -46,6 +46,16 @@ public class TokenFilterDefMapping {
 	 * @return a new {@link TokenFilterDefMapping}
 	 */
 	public TokenFilterDefMapping filter(Class<? extends TokenFilterFactory> factory) {
+		return filter( "", factory );
+	}
+
+	/**
+	 * {@code &#064;TokenFilterDef(name=name, factory=factory) }
+	 * @param name the token filter name
+	 * @param factory the {@link TokenFilterFactory}
+	 * @return a new {@link TokenFilterDefMapping}
+	 */
+	public TokenFilterDefMapping filter(String name, Class<? extends TokenFilterFactory> factory) {
 		return new TokenFilterDefMapping( factory, analyzerDef, mapping );
 	}
 
@@ -55,7 +65,17 @@ public class TokenFilterDefMapping {
 	 * @return a new {@link CharFilterDefMapping}
 	 */
 	public CharFilterDefMapping charFilter(Class<? extends CharFilterFactory> factory) {
-		return new CharFilterDefMapping( factory, analyzerDef, mapping );
+		return charFilter( "", factory );
+	}
+
+	/**
+	 * {@code &#064;CharFilterDef(name=name, factory=factory) }
+	 * @param name the char filter name
+	 * @param factory the {@link CharFilterFactory}
+	 * @return a new {@link CharFilterDefMapping}
+	 */
+	public CharFilterDefMapping charFilter(String name, Class<? extends CharFilterFactory> factory) {
+		return new CharFilterDefMapping( name, factory, analyzerDef, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
@@ -63,7 +83,11 @@ public class TokenFilterDefMapping {
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
+		return analyzerDef( name, "", tokenizerFactory );
+	}
+
+	public AnalyzerDefMapping analyzerDef(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory) {
+		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, mapping );
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {

@@ -24,15 +24,14 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.analyzer.impl.AnalyzerReference;
-import org.hibernate.search.analyzer.impl.LazyLuceneAnalyzer;
-import org.hibernate.search.analyzer.impl.LazyRemoteAnalyzer;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
-import org.hibernate.search.analyzer.impl.ScopedAnalyzer;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.EmptyQueryException;
 import org.hibernate.search.exception.SearchException;
@@ -954,8 +953,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 311, value = "Analyzer %1$s is not a scoped Lucene analyzer.")
 	SearchException scopedAnalyzerIsNotLucene(ScopedAnalyzer analyzer);
 
-	@Message(id = 312, value = "Lazy Lucene analyzer %1$s is not initialized.")
-	SearchException lazyLuceneAnalyzerNotInitialized(LazyLuceneAnalyzer analyzer);
+	@Message(id = 312, value = "Lazy Lucene analyzer reference %1$s is not initialized.")
+	SearchException lazyLuceneAnalyzerReferenceNotInitialized(LuceneAnalyzerReference reference);
 
 	@Message(id = 313, value = "Remote analyzer reference %1$s is not initialized.")
 	SearchException remoteAnalyzerNotInitialized(RemoteAnalyzerReference analyzerReference);
@@ -963,8 +962,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 314, value = "Remote analyzer %1$s already defined as a Lucene analyzer.")
 	SearchException remoteAnalyzerAlreadyDefinedAsLuceneAnalyzer(String name);
 
-	@Message(id = 315, value = "Lazy remote analyzer %1$s is not initialized.")
-	SearchException lazyRemoteAnalyzerNotInitialized(LazyRemoteAnalyzer analyzer);
+	@Message(id = 315, value = "Lazy remote analyzer reference %1$s is not initialized.")
+	SearchException lazyRemoteAnalyzerReferenceNotInitialized(RemoteAnalyzerReference reference);
 
 	@Message(id = 317, value = "Projection constant '%s' is not supported for this query.")
 	SearchException unexpectedProjectionConstant(String constantName);

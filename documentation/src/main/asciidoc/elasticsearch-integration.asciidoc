@@ -108,7 +108,7 @@ You may also select multiple hosts (separated by whitespace characters), so that
 `hibernate.search.default.elasticsearch.host \http://es1.mycompany.com:9200 \http://es2.mycompany.com:9200`
 +
 In the example above, the first request will go to `es1`, the second to `es2`, the third to `es1`, and so on.
-Selects the index creation strategy::
+[[elasticsearch-schema-management-strategy]]Select the index creation strategy::
 `hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE` (default)
 +
 Let's see the options for the `index_schema_management_strategy` property:
@@ -118,7 +118,11 @@ Let's see the options for the `index_schema_management_strategy` property:
 |Value|Definition
 |`NONE`|Indexes and their mappings will not be created, deleted nor altered. Hibernate Search will only check that the indexes already exist.
 |`VALIDATE`|Existing indexes and mappings will be checked for conflicts with Hibernate Search's metamodel. Indexes and their mappings will not be created, deleted nor altered.
++
+*Caution:* analyzer definitions will not be validated (https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519]).
 |`MERGE`|Missing indexes and mappings will be created, existing mappings will be updated if there are no conflicts.
++
+*Caution:* analyzer definitions will not be updated (https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520]).
 |`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created along with their mappings.
 |`RECREATE`|Indexes will be deleted if existing and then created along with their mappings. This will delete all content from the indexes!
 |`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
@@ -189,7 +193,6 @@ There is no specific configuration required on the Elasticsearch side.
 
 However there are a few features that would benefit from a few changes:
 
-* you can only refer to analyzers that are already registered on Elasticsearch, see <<elasticsearch-mapping-analyzer>>
 * if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
   see <<elasticsearch-query-spatial>>
 * if you want to be able to use the `purgeAll` Hibernate Search command,
@@ -234,15 +237,12 @@ The `org.hibernate.search.annotations.DynamicBoost` annotation is not (and canno
 
 WARNING: Analyzers are treated differently than in Lucene embedded mode.
 
+===== Built-in or server-defined analyzers
+
 Using the `definition` attribute in the `@Analyzer` annotation, you can refer to the name of the
-built-in or custom analyzers registered on your Elasticsearch instances.
+built-in Elasticsearch analyzer, or custom analyzers already registered on your Elasticsearch instances.
 
-You should not define an analyzer definition with the same name (e.g. no `@AnalyzerDef`).
-If there is an analyzer definition, Hibernate Search will throw an exception.
-
-CAUTION: We are working on propagating simple analyzer definitions to Elasticsearch, stay tuned.
-
-More information on analyzers, in particular the already defined ones, can be found
+More information on analyzers, in particular those already built in Elasticsearch, can be found
 in link:https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html[the Elasticsearch documentation].
 
 [source, yml]
@@ -266,7 +266,7 @@ From there, you can use the custom analyzers by name in your entity mappings.
 --
 @Entity
 @Indexed(index = "tweet")
-public static class Tweet {
+public class Tweet {
 
     @Id
     @GeneratedValue
@@ -286,8 +286,211 @@ public static class Tweet {
         // Custom analyzer
         @Field(
             name = "tweetWithCustom",
-            analyzer = @Analyzer(definition = "custom-analyzer"))})
+            analyzer = @Analyzer(definition = "custom-analyzer")
+        )
+    })
     private String multipleTweets;
+}
+--
+
+You may also reference a built-in Lucene analyzer implementation using the `@Analyzer.impl` attribute:
+Hibernate Search will translate the implementation to an equivalent Elasticsearch built-in type, if possible.
+
+[WARNING]
+====
+Using the `@Analyzer.impl` attribute is not recommended with Elasticsearch because it will
+never allow you to take full advantage of Elasticsearch analysis capabilities.
+You cannot, for instance, use custom analyzer implementations: only built-in Lucene implementations are supported.
+
+It should only be used when migrating an application that already used Hibernate Search,
+moving from an embedded Lucene instance to an Elasticsearch cluster.
+====
+
+[source,java]
+.Example of mapping that refers to a built-in analyzer on Elasticsearch using a Lucene implementation class
+--
+@Entity
+@Indexed(index = "tweet")
+public class Tweet {
+
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    @Analyzer(impl = EnglishAnalyzer.class) // Elasticsearch built-in "english" analyzer
+    private String englishTweet;
+
+    @Field
+    @Analyzer(impl = WhitespaceAnalyzer.class) // Elasticsearch built-in "whitespace" analyzer
+    private String whitespaceTweet;
+
+}
+--
+
+===== Custom analyzers
+
+You can also define analyzers within your Hibernate Search mapping using the `@AnalyzerDef` annotation,
+like you would <<section-named-analyzers,do with an embedded Lucene instance>>.
+When Hibernate Search creates the Elasticsearch indexes, the relevant definitions will then be automatically added as a
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html[custom analyzer]
+in  the index settings.
+
+[WARNING]
+====
+Analyzer definitions will only be created automatically when Hibernate Search creates the index.
+Hibernate Search will never update analyzer definitions on an existing index
+(no support for the `MERGE` <<elasticsearch-schema-management-strategy,schema management strategy>>)
+and will never validate that pre-existing definitions actually match your Hibernate Search mapping
+(no support for the `VALIDATE` <<elasticsearch-schema-management-strategy,schema management strategy>>).
+
+We are working on fixing those issues, though: https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519],
+https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520].
+====
+
+Two different approaches allow you to define your analyzers with Elasticsearch.
+
+The first, recommended approach is to use the factories provided by the `hibernate-search-elasticsearch` module:
+
+ * `org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory`
+ * `org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory`
+ * `org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenizerFactory`
+
+Those classes can be passed to the `factory` attribute of
+the `@CharFilterDef`, `@TokenFilterDef` and `@TokenizerDef` annotations.
+
+The `params` attribute may be used to define the `type` parameter and any other parameter
+accepted by Elasticsearch for this type.
+
+The parameter values will be interpreted as JSON. The parser is not strict, though:
+
+ * quotes around strings may be left out in some cases, as when a string only contains letters.
+ * when quotes *are* required (e.g. your string may be interpreted as a number, and you don't want that),
+   you may use single quotes instead of double quotes (which are painful to write in Java).
+
+[NOTE]
+====
+You may use the `name` attribute of the `@CharFilterDef`, `@TokenFilterDef` and `@TokenizerDef` annotations
+to define the exact name to give to that definition in the Elasticsearch settings.
+====
+
+[source,java]
+.Example of mapping that defines analyzers on Elasticsearch using the `Elasticsearch*Factory` types
+--
+@Entity
+@Indexed(index = "tweet")
+@AnalyzerDefs(
+	@AnalyzerDef(
+		name = "tweet_analyzer",
+		charFilters = {
+			@CharFilterDef(
+				name = "custom_html_strip",
+				factory = ElasticsearchCharFilterFactory.class,
+				params = {
+					@Parameter(name = "type", value = "'html_strip'"),
+					// One can use Json arrays
+					@Parameter(name = "escaped_tags", value = "['br', 'p']")
+				}
+			),
+			@CharFilterDef(
+				name = "p_br_as_space",
+				factory = ElasticsearchCharFilterFactory.class,
+				params = {
+					@Parameter(name = "type", value = "'pattern_replace'"),
+					@Parameter(name = "pattern", value = "'<p/?>|<br/?>'"),
+					@Parameter(name = "replacement", value = "' '"),
+					@Parameter(name = "tags", value = "'CASE_INSENSITIVE'")
+				}
+			)
+		},
+		tokenizer = @TokenizerDef(
+			factory = ElasticsearchTokenizerFactory.class,
+			params = {
+				@Parameter(name = "type", value = "'whitespace'"),
+			}
+		)
+	)
+)
+public class Tweet {
+
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    @Analyzer(definition = "tweet_analyzer")
+    private String content;
+}
+--
+
+
+The second approach is to configure everything as if you were using Lucene:
+use the Lucene factories, their parameter names, and format the parameter values as required in Lucene.
+Hibernate Search will automatically convert these definitions to the Elasticsearch equivalent.
+
+[WARNING]
+====
+Referencing Lucene factories is not recommended with Elasticsearch because it will
+never allow you to take full advantage of Elasticsearch analysis capabilities.
+
+Here are the known limitations of the automatic translation:
+
+ * a few factories have unsupported parameters, because those have no equivalent in Elasticsearch.
+   An exception will be raised on startup a parameter is not supported.
+ * the `hyphenator` parameter for `HyphenatedWordsFilterFactory` must refer to
+   a file on the Elasticsearch servers, on contrary to other factories
+   where the files are accessed by Hibernate Search directly.
+   This is due to an Elasticsearch limitation
+   (there is no way to forward the content of a local hyphenation pattern file).
+ * some built-in Lucene factories are not (and cannot) be translated, because of incompatible
+   parameters between the Lucene factory and the Elasticsearch equivalent.
+   This is in particular the case for `HunspellStemFilterFactory`.
+
+Therefore, Lucene factories should only be referenced within analyzer definitions
+when migrating an application that already used Hibernate Search,
+moving from an embedded Lucene instance to an Elasticsearch cluster.
+====
+
+
+[source,java]
+.Example of mapping that defines analyzers on Elasticsearch using Lucene factories
+--
+@Entity
+@Indexed(index = "tweet")
+@AnalyzerDefs(
+	@AnalyzerDef(
+		name = "tweet_analyzer",
+		charFilters = {
+			@CharFilterDef(
+				name = "custom_html_strip",
+				factory = HTMLStripCharFilterFactory.class,
+				params = {
+					@Parameter(name = "escapedTags", value = "br,p")
+				}
+			),
+			@CharFilterDef(
+				name = "p_br_as_space",
+				factory = PatternReplaceCharFilterFactory.class,
+				params = {
+					@Parameter(name = "pattern", value = "<p/?>|<br/?>"),
+					@Parameter(name = "replacement", value = " ")
+				}
+			)
+		},
+		tokenizer = @TokenizerDef(
+			factory = WhitespaceTokenizerFactory.class
+		)
+	)
+)
+public class Tweet {
+
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    @Analyzer(definition = "tweet_analyzer")
+    private String content;
 }
 --
 
@@ -578,7 +781,8 @@ Here is a list of known limitations.
 
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
-* Defining analyzers with `@AnalyzerDef`, analyzers have to be defined in the Elasticsearch configuration: https://hibernate.atlassian.net/browse/HSEARCH-2417[HSEARCH-2417]
+* The `MERGE` schema management strategy does not update analyzer definitions: https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520]
+* The `VALIDATE` schema management strategy does not validate analyzer definitions: https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519]
 * Query timeouts: https://hibernate.atlassian.net/browse/HSEARCH-2399[HSEARCH-2399]
 * MoreLikeThis queries: https://hibernate.atlassian.net/browse/HSEARCH-2395[HSEARCH-2395]
 * `@IndexedEmbedded.indexNullAs`: https://hibernate.atlassian.net/browse/HSEARCH-2389[HSEARCH-2389]
