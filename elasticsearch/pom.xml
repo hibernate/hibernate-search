@@ -173,6 +173,8 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Elasticsearch integration currently not supported in OSGi;
+                 If you need this, see and vote for: https://hibernate.atlassian.net/browse/HSEARCH-2524
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -196,7 +198,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

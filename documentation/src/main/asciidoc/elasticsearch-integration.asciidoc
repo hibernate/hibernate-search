@@ -7,7 +7,7 @@
 [CAUTION]
 ====
 This feature is a work in progress.
-Read this section carefully!
+Make sure to read the <<elasticsearch-limitations,Limitations>> section!
 ====
 
 The integration with Elasticsearch is in development and should be considered experimental.
@@ -571,7 +571,7 @@ The optimization features documented in <<search-optimize>> are only partially i
  * The automatic optimization is not implemented and most probably never will be.
  * The manual optimization (`searchFactory.optimize()`) is implemented.
 
-=== Limitations
+=== [[elasticsearch-limitations]]Limitations
 
 Not everything is implemented yet.
 Here is a list of known limitations.
@@ -589,6 +589,7 @@ Please check with JIRA and the mailing lists for updates, but at the time of wri
   This is largely mitigated by the fact that Hibernate Search does the denormalization itself and maintain data consistency when nested objects are updated.
 * There is room for improvements in the performances of the MassIndexer implementation
 * There is no failover to the next host when multiple hosts are configured and one host happens to fail: https://hibernate.atlassian.net/browse/HSEARCH-2469[HSEARCH-2469]
+* Our new Elasticsearch integration module does not work in OSGi environments. If you need this, please vote for: https://hibernate.atlassian.net/browse/HSEARCH-2524[HSEARCH-2524].
 
 === Known bugs in Elasticsearch
 
