@@ -221,7 +221,7 @@ public class StandardServiceManager implements ServiceManager {
 				if ( status != ServiceStatus.RUNNING ) {
 					stateExpectedFailure();
 				}
-				stopAndRemoveFromCache();
+				stopReal();
 			}
 			else if ( status != ServiceStatus.RUNNING ) {
 				//Could happen on circular dependencies
@@ -236,7 +236,7 @@ public class StandardServiceManager implements ServiceManager {
 			}
 		}
 
-		private void stopAndRemoveFromCache() {
+		private synchronized void stopReal() {
 			status = ServiceStatus.STOPPING;
 			try {
 				if ( service instanceof Stoppable ) {
@@ -248,6 +248,14 @@ public class StandardServiceManager implements ServiceManager {
 			}
 			finally {
 				status = ServiceStatus.STOPPED;
+			}
+		}
+
+		private synchronized void stopAndRemoveFromCache() {
+			try {
+				stopReal();
+			}
+			finally {
 				cachedServices.remove( serviceClass );
 			}
 		}
