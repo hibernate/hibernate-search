@@ -25,6 +25,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Tests for the standard implementation of the {@code ServiceManager} interface.
@@ -94,13 +95,17 @@ public class StandardServiceManagerTest {
 	}
 
 	@Test
-	public void testStopServiceIsPerformed() {
+	@TestForIssue(jiraKey = "HSEARCH-1589")
+	public void testStopServiceIsPerformedLazily() {
 		StoppableService service = serviceManagerUnderTest.requestService( StoppableService.class );
 
 		assertNotNull( "The service should be created", service );
 		assertTrue( service instanceof StoppableServiceImpl );
 
 		serviceManagerUnderTest.releaseService( StoppableService.class );
+		assertFalse( "Service should not be stopped yet", ( (StoppableServiceImpl) service ).isStopped() );
+
+		serviceManagerUnderTest.releaseAllServices();
 		assertTrue( "Service should have been stopped", ( (StoppableServiceImpl) service ).isStopped() );
 	}
 
