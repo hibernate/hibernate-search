@@ -118,11 +118,9 @@ Let's see the options for the `index_schema_management_strategy` property:
 |Value|Definition
 |`NONE`|Indexes and their mappings will not be created, deleted nor altered. Hibernate Search will only check that the indexes already exist.
 |`VALIDATE`|Existing indexes and mappings will be checked for conflicts with Hibernate Search's metamodel. Indexes and their mappings will not be created, deleted nor altered.
-+
-*Caution:* analyzer definitions will not be validated (https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519]).
+Caution: analyzer definitions will not be validated (https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519]).
 |`MERGE`|Missing indexes and mappings will be created, existing mappings will be updated if there are no conflicts.
-+
-*Caution:* analyzer definitions will not be updated (https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520]).
+Caution: analyzer definitions will not be updated (https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520]).
 |`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created along with their mappings.
 |`RECREATE`|Indexes will be deleted if existing and then created along with their mappings. This will delete all content from the indexes!
 |`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
@@ -344,7 +342,7 @@ Hibernate Search will never update analyzer definitions on an existing index
 and will never validate that pre-existing definitions actually match your Hibernate Search mapping
 (no support for the `VALIDATE` <<elasticsearch-schema-management-strategy,schema management strategy>>).
 
-We are working on fixing those issues, though: https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519],
+We are working on improving these aspects: https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519],
 https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520].
 ====
 
