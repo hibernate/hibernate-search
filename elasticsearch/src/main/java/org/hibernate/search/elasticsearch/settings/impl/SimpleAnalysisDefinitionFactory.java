@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.settings.impl;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.annotations.Parameter;
@@ -19,18 +20,12 @@ class SimpleAnalysisDefinitionFactory<D extends AnalysisDefinition> implements A
 
 	private final Class<D> targetClass;
 	private final String type;
-	private final Map<String, String> parameterNameTranslations;
-	private final Map<String, ParameterValueTransformer> parameterValueTranslations;
-	private final Map<String, JsonElement> staticParameters;
+	private final List<ParametersTransformer> parameterTransformers;
 
-	public SimpleAnalysisDefinitionFactory(Class<D> targetClazz, String type, Map<String, String> parameterNameTranslations,
-			Map<String, ParameterValueTransformer> parameterValueTranslations,
-			Map<String, JsonElement> staticParameters) {
+	public SimpleAnalysisDefinitionFactory(Class<D> targetClazz, String type, List<ParametersTransformer> parameterTransformers) {
 		this.targetClass = targetClazz;
 		this.type = type;
-		this.parameterNameTranslations = parameterNameTranslations;
-		this.parameterValueTranslations = parameterValueTranslations;
-		this.staticParameters = staticParameters;
+		this.parameterTransformers = parameterTransformers;
 	}
 
 	@Override
@@ -49,34 +44,23 @@ class SimpleAnalysisDefinitionFactory<D extends AnalysisDefinition> implements A
 		}
 		result.setType( type );
 
-		Map<String, JsonElement> parameterMap = new LinkedHashMap<>( staticParameters );
-
-		if ( parameters != null && parameters.length > 0 ) {
+		Map<String, String> luceneParameterMap = new LinkedHashMap<>();
+		if ( parameters != null ) {
 			for ( Parameter parameter : parameters ) {
-				addParameter( parameterMap, parameter.name(), parameter.value() );
+				luceneParameterMap.put( parameter.name(), parameter.value() );
 			}
 		}
 
-		if ( !parameterMap.isEmpty() ) {
-			result.setParameters( parameterMap );
+		Map<String, JsonElement> elasticsearchParameterMap = new LinkedHashMap<>();
+		for ( ParametersTransformer transformer : parameterTransformers ) {
+			elasticsearchParameterMap.putAll( transformer.transform( luceneParameterMap ) );
+		}
+
+		if ( !elasticsearchParameterMap.isEmpty() ) {
+			result.setParameters( elasticsearchParameterMap );
 		}
 
 		return result;
-	}
-
-	protected void addParameter(Map<String, JsonElement> parameterMap, String luceneParameterName, String value) {
-		String elasticsearchParameterName = parameterNameTranslations.get( luceneParameterName );
-		if ( elasticsearchParameterName == null ) {
-			// Assume the parameter actually exists in Elasticsearch
-			elasticsearchParameterName = luceneParameterName;
-		}
-
-		ParameterValueTransformer valueTransformer = parameterValueTranslations.get( luceneParameterName );
-		if ( valueTransformer == null ) {
-			valueTransformer = StringParameterValueTransformer.INSTANCE;
-		}
-
-		parameterMap.put( elasticsearchParameterName, valueTransformer.transform( value ) );
 	}
 
 	@Override
@@ -85,9 +69,7 @@ class SimpleAnalysisDefinitionFactory<D extends AnalysisDefinition> implements A
 				.append( "[" )
 				.append( "targetClass = " ).append( targetClass )
 				.append( ", type = " ).append( type )
-				.append( ", parameterNameTranslations = " ).append( parameterNameTranslations )
-				.append( ", parameterValueTranslations = " ).append( parameterValueTranslations )
-				.append( ", staticParameters = " ).append( staticParameters )
+				.append( ", parameterTransformers = " ).append( parameterTransformers )
 				.append( "]" )
 				.toString();
 	}

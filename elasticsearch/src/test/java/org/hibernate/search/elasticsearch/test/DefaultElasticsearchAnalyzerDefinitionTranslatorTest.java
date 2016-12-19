@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.MapAssert.entry;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 
 /**
@@ -289,19 +291,19 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 		assertThat( definition.getParameters() ).as( "parameters" )
 				.includes(
 						entry(
-								"ignored_scripts",
-								JsonBuilder.array()
-										.add( new JsonPrimitive( "han" ) )
-										.add( new JsonPrimitive( "hiragana" ) )
-										.add( new JsonPrimitive( "katakana" ) )
-										.add( new JsonPrimitive( "hangul" ) )
-								.build()
-						),
-						entry(
 								"output_unigrams",
-								new JsonPrimitive( true )
+								new JsonPrimitive( "true" )
 						)
 				);
+
+		assertThat( definition.getParameters().keySet() ).as( "parameter names" )
+				.contains( "ignored_scripts" );
+
+		JsonArray ignoredScripts = definition.getParameters().get( "ignored_scripts" ).getAsJsonArray();
+		assertTrue( ignoredScripts.contains( new JsonPrimitive( "han" ) ) );
+		assertTrue( ignoredScripts.contains( new JsonPrimitive( "hiragana" ) ) );
+		assertTrue( ignoredScripts.contains( new JsonPrimitive( "katakana" ) ) );
+		assertTrue( ignoredScripts.contains( new JsonPrimitive( "hangul" ) ) );
 
 		assertThat( definition.getParameters().keySet() ).as( "parameter names" )
 				.excludes( "han", "hiragana", "katakana", "hangul", "outputUnigrams" );
