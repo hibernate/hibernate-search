@@ -8,6 +8,7 @@ package org.hibernate.search.analyzer.impl;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.cfg.Environment;
@@ -31,7 +33,7 @@ import org.hibernate.search.exception.SearchException;
 /**
  * @author Yoann Rodiere
  */
-public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAnalyzerReference> {
+public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -116,19 +118,22 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 	}
 
 	@Override
-	public void initializeNamedAnalyzerReferences(Map<String, LuceneAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
+	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
 		Map<String, Analyzer> initializedAnalyzers = new HashMap<>();
-		for ( Map.Entry<String, LuceneAnalyzerReference> entry : references.entrySet() ) {
-			String name = entry.getKey();
-			NamedLuceneAnalyzerReference namedReference = entry.getValue().unwrap( NamedLuceneAnalyzerReference.class );
-			initializeReference( initializedAnalyzers, name, namedReference, analyzerDefinitions );
+		for ( AnalyzerReference reference : references ) {
+			if ( reference.is( NamedLuceneAnalyzerReference.class ) ) {
+				NamedLuceneAnalyzerReference namedReference = reference.unwrap( NamedLuceneAnalyzerReference.class );
+				initializeReference( initializedAnalyzers, namedReference, analyzerDefinitions );
+			}
 		}
 	}
 
-	private void initializeReference(Map<String, Analyzer> initializedAnalyzers, String name, NamedLuceneAnalyzerReference analyzerReference,
+	private void initializeReference(Map<String, Analyzer> initializedAnalyzers, NamedLuceneAnalyzerReference analyzerReference,
 			Map<String, AnalyzerDef> analyzerDefinitions) {
+		String name = analyzerReference.getAnalyzerName();
+
 		if ( analyzerReference.isInitialized() ) {
-			initializedAnalyzers.put( analyzerReference.getAnalyzerName(), analyzerReference.getAnalyzer() );
+			initializedAnalyzers.put( name, analyzerReference.getAnalyzer() );
 			return;
 		}
 
@@ -156,7 +161,9 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy<LuceneAn
 	}
 
 	@Override
-	public ScopedLuceneAnalyzerReference.Builder buildScopedAnalyzerReference(LuceneAnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedLuceneAnalyzerReference.Builder( initialGlobalAnalyzerReference, Collections.<String, LuceneAnalyzerReference>emptyMap() );
+	public ScopedLuceneAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference) {
+		return new ScopedLuceneAnalyzerReference.Builder(
+				initialGlobalAnalyzerReference.unwrap( LuceneAnalyzerReference.class ),
+				Collections.<String, LuceneAnalyzerReference>emptyMap() );
 	}
 }

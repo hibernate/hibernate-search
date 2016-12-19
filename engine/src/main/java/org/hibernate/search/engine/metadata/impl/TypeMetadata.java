@@ -488,7 +488,7 @@ public class TypeMetadata {
 		protected final BackReference<TypeMetadata> resultReference = new BackReference<>();
 		private final Class<?> indexedType;
 		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
-		private final AnalyzerReferenceRegistry<?> analyzerReferenceRegistry;
+		private final AnalyzerReferenceRegistry analyzerReferenceRegistry;
 
 		private float boost;
 		private BoostStrategy classBoostStrategy;

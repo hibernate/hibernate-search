@@ -97,8 +97,8 @@ public final class ConfigContext {
 	private final Map<String, FilterDef> filterDefs = new HashMap<String, FilterDef>();
 
 
-	private final Map<IndexManagerType, AnalyzerReferenceRegistry<?>> analyzerReferenceRegistries =
-			new HashMap<IndexManagerType, AnalyzerReferenceRegistry<?>>();
+	private final Map<IndexManagerType, AnalyzerReferenceRegistry> analyzerReferenceRegistries =
+			new HashMap<IndexManagerType, AnalyzerReferenceRegistry>();
 
 	private final boolean jpaPresent;
 	private final String nullToken;
@@ -171,10 +171,10 @@ public final class ConfigContext {
 		}
 	}
 
-	public AnalyzerReferenceRegistry<?> getAnalyzerReferenceRegistry(IndexManagerType type) {
-		AnalyzerReferenceRegistry<?> registry = analyzerReferenceRegistries.get( type );
+	public AnalyzerReferenceRegistry getAnalyzerReferenceRegistry(IndexManagerType type) {
+		AnalyzerReferenceRegistry registry = analyzerReferenceRegistries.get( type );
 		if ( registry == null ) {
-			registry = new AnalyzerReferenceRegistry<>( type.createAnalyzerStrategy( serviceManager, searchConfiguration ) );
+			registry = new AnalyzerReferenceRegistry( type.createAnalyzerStrategy( serviceManager, searchConfiguration ) );
 			analyzerReferenceRegistries.put( type, registry );
 		}
 		return registry;
@@ -283,7 +283,7 @@ public final class ConfigContext {
 		 */
 		for ( String name : analyzerDefs.keySet() ) {
 			if ( !hasAnalyzerReference( name ) ) {
-				AnalyzerReferenceRegistry<?> registry = getAnalyzerReferenceRegistry( LuceneEmbeddedIndexManagerType.INSTANCE );
+				AnalyzerReferenceRegistry registry = getAnalyzerReferenceRegistry( LuceneEmbeddedIndexManagerType.INSTANCE );
 				registry.getAnalyzerReference( name );
 			}
 		}
@@ -295,7 +295,7 @@ public final class ConfigContext {
 		indexManagerTypes.addAll( analyzerReferenceRegistries.keySet() );
 
 		for ( IndexManagerType indexManagerType : indexManagerTypes ) {
-			AnalyzerReferenceRegistry<?> registry = getAnalyzerReferenceRegistry( indexManagerType );
+			AnalyzerReferenceRegistry registry = getAnalyzerReferenceRegistry( indexManagerType );
 			registry.initialize( analyzerDefs );
 			Map<String, ? extends AnalyzerReference> referencesByNameForType =
 					registry.getAnalyzerReferencesByName();
@@ -325,7 +325,7 @@ public final class ConfigContext {
 	}
 
 	private boolean hasAnalyzerReference(String name) {
-		for ( AnalyzerReferenceRegistry<?> registry : analyzerReferenceRegistries.values() ) {
+		for ( AnalyzerReferenceRegistry registry : analyzerReferenceRegistries.values() ) {
 			if ( registry.getAnalyzerReferencesByName().containsKey( name ) ) {
 				return true;
 			}
