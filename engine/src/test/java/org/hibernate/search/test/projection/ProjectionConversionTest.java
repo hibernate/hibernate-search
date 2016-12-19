@@ -184,7 +184,6 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2484 Concurrent projections fails randomly with Elasticsearch due to service access issues
 	public void concurrentMixedProjections() throws Exception {
 		//The point of this test is to "simultaneously" project multiple different types
 		new ConcurrentRunner( 1000, 20,
