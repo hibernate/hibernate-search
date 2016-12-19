@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 
 /**
  * A reference to an {@code ElasticsearchAnalyzer}.
@@ -19,8 +18,4 @@ public abstract class ElasticsearchAnalyzerReference extends RemoteAnalyzerRefer
 	@Override
 	public abstract ElasticsearchAnalyzer getAnalyzer();
 
-	@Override
-	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return analyzerType.isAssignableFrom( ElasticsearchAnalyzerReference.class );
-	}
 }
