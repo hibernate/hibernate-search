@@ -226,7 +226,6 @@
                             org.hibernate.search.query.dsl.sort;version="${project.version}",
                             org.hibernate.search.query.engine;version="${project.version}",
                             org.hibernate.search.query.engine.spi;version="${project.version}",
-                            org.hibernate.search.query.engine.impl;version="${project.version}",
                             org.hibernate.search.query.facet;version="${project.version}",
                             org.hibernate.search.query.fieldcache;version="${project.version}",
                             org.hibernate.search.spatial;version="${project.version}",
