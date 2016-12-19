@@ -1,3 +1,4 @@
+[[elasticsearch-integration]]
 == Integration with Elasticsearch
 
 // vim: set colorcolumn=100:

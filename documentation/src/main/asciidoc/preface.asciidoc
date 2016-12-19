@@ -13,3 +13,9 @@ annotations, takes care of database/index synchronization and brings back regula
 from free text queries. To achieve this Hibernate Search is combining the power of
 link:$$http://www.hibernate.org$$[Hibernate] and link:$$http://lucene.apache.org$$[Apache Lucene].
 
+Since version `5.6` Hibernate Search sports an experimental integration with link:$$https://www.elastic.co/products/elasticsearch$$[Elasticsearch].
+Elasticsearch is built on Apache Lucene so we can now expose very similar features, making most
+of this reference documentation a valid guide to both approaches.
+For details specific to Elasticsearch, jump to <<elasticsearch-integration>>.
+The other sections of this guide will assume you're using Lucene without the Elasticsearch indirection.
+
