@@ -37,6 +37,7 @@ import org.apache.lucene.analysis.core.LowerCaseTokenizerFactory;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.core.StopFilterFactory;
+import org.apache.lucene.analysis.core.TypeTokenFilterFactory;
 import org.apache.lucene.analysis.core.UpperCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
@@ -135,6 +136,7 @@ import org.apache.lucene.analysis.tr.ApostropheFilterFactory;
 import org.apache.lucene.analysis.tr.TurkishAnalyzer;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.ElisionFilterFactory;
+import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.annotations.CharFilterDef;
@@ -150,6 +152,7 @@ import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinitio
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -171,6 +174,8 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
+		final ResourceLoader resourceLoader = new HibernateSearchResourceLoader( context.getServiceManager() );
+
 		luceneAnalyzers = new LuceneAnalyzerImplementationTranslationMapBuilder()
 				.add( StandardAnalyzer.class, "standard" )
 				.add( SimpleAnalyzer.class, "simple" )
@@ -214,7 +219,11 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 
 		luceneCharFilters = new LuceneAnalysisDefinitionTranslationMapBuilder<>( CharFilterDefinition.class )
 				.builder( MappingCharFilterFactory.class, "mapping" ) // "mappings" (unmapped) is an array
-						.rename( "mapping", "mappings_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "mapping", "mappings" )
+						.transform(
+								"mapping",
+								new CharMappingRuleFileParameterValueTransformer( resourceLoader )
+						)
 				.end()
 				.builder( HTMLStripCharFilterFactory.class, "html_strip" )
 						.rename( "escapedTags", "escaped_tags" )
@@ -282,7 +291,11 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.rename( "fillerToken", "filler_token" )
 				.end()
 				.builder( StopFilterFactory.class, "stop" ) // "stopwords" array (or string), "stopwords_path" file path
-						.rename( "words", "stopwords_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "words", "stopwords" )
+						.transform(
+								"words",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
 						.rename( "ignoreCase", "ignore_case" )
 						.disallow( "format" )
 						.disallow( "enablePositionIncrements" )
@@ -297,8 +310,16 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.rename( "splitOnNumerics", "split_on_numerics" )
 						.rename( "preserveOriginal", "preserve_original" )
 						.rename( "stemEnglishPossessive", "stem_english_possessive" )
-						.rename( "protected", "protected_words_path" ) // Only accepts one file, no support for comma-separated list
-						.rename( "types", "type_table_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "protected", "protected_words" )
+						.transform(
+								"protected",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
+						.rename( "types", "type_table" )
+						.transform(
+								"types",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
 				.end()
 				.builder( ArabicStemFilterFactory.class, "stemmer" ).add( "name", "armenian" ).end()
 				.builder( BrazilianStemFilterFactory.class, "stemmer" ).add( "name", "brazilian" ).end()
@@ -344,11 +365,19 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 				.builder( SpanishLightStemFilterFactory.class, "stemmer" ).add( "name", "light_spanish" ).end()
 				.builder( SwedishLightStemFilterFactory.class, "stemmer" ).add( "name", "light_swedish" ).end()
 				.builder( StemmerOverrideFilterFactory.class, "stemmer_override" ) // "rules" array, "rules_path" file path
-						.rename( "dictionary", "rules_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "dictionary", "rules" )
+						.transform(
+								"dictionary",
+								new StemmerOverrideRuleFileParameterValueTransformer( resourceLoader )
+						)
 						.disallow( "ignoreCase" )
 				.end()
 				.builder( KeywordMarkerFilterFactory.class, "keyword_marker" ) // "keywords" array, "keywords_path" file path
-						.rename( "protected", "keywords_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "protected", "keywords" )
+						.transform(
+								"protected",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
 						.disallow( "pattern" )
 						.rename( "ignoreCase", "ignore_case" )
 				.end()
@@ -359,23 +388,31 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 				.end()
 				.builder( SynonymFilterFactory.class, "synonym" ) // "synonyms" array, "synonyms_path" file path
 						.rename( "ignoreCase", "ignore_case" )
-						.rename( "synonyms", "synonyms_path" ) // Only accepts one file, no support for comma-separated list
+						.transform( new SynonymsParametersTransformer( SynonymFilterFactory.class, resourceLoader ) )
 						.disallow( "analyzer" )
 						.rename( "tokenizerFactory", "tokenizer" )
 						.transform( "tokenizerFactory",
 								new TokenizerClassNameToElasticsearchTypeNameTransformer( SynonymFilterFactory.class, "tokenizerFactory" ) )
 				.end()
 				.builder( HyphenationCompoundWordTokenFilterFactory.class, "hyphenation_decompounder" )
-						.rename( "dictionary", "word_list_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "dictionary", "word_list" )
+						.transform(
+								"dictionary",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
 						.disallow( "encoding" )
-						.rename( "hyphenator", "hyphenation_patterns_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "hyphenator", "hyphenation_patterns_path" ) // The file must be on the Elasticsearch servers, because we can't forward the content of a local file
 						.rename( "minWordSize", "min_word_size" )
 						.rename( "minSubwordSize", "min_subword_size" )
 						.rename( "maxSubwordSize", "max_subword_size" )
 						.rename( "onlyLongestMatch", "only_longest_match" )
 				.end()
 				.builder( DictionaryCompoundWordTokenFilterFactory.class, "dictionary_decompounder" )
-						.rename( "dictionary", "word_list_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "dictionary", "word_list" )
+						.transform(
+								"dictionary",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
 						.rename( "minWordSize", "min_word_size" )
 						.rename( "minSubwordSize", "min_subword_size" )
 						.rename( "maxSubwordSize", "max_subword_size" )
@@ -383,7 +420,10 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 				.end()
 				.builder( ReverseStringFilterFactory.class, "reverse" ).end()
 				.builder( ElisionFilterFactory.class, "elision" )
-						.rename( "articles", "articles_path" ) // Only accepts one file, no support for comma-separated list
+						.transform(
+								"articles",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
 						.rename( "ignoreCase", "articles_case" )
 				.end()
 				.builder( TruncateTokenFilterFactory.class, "truncate" )
@@ -408,8 +448,12 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.rename( "consumeAllTokens", "consume_all_tokens" )
 				.end()
 				.builder( CommonGramsFilterFactory.class, "common_grams" ) // "common_words" array, "common_words_path" file path
-						.rename( "words", "common_words_path" ) // Only accepts one file, no support for comma-separated list
-						.disallow( "format" )
+						.rename( "words", "common_words" )
+						.transform(
+								"words",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
+						.disallow( "format" ) // Only one format is supported
 						.rename( "ignoreCase", "ignore_case" )
 				.end()
 				.builder( ArabicNormalizationFilterFactory.class, "arabic_normalization" ).end()
@@ -430,8 +474,20 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.rename( "encoder", "encoding" ) // custom class name is not supported
 				.end()
 				.builder( KeepWordFilterFactory.class, "keep" )
-						.rename( "words", "keep_words_path" ) // Only accepts one file, no support for comma-separated list
+						.rename( "words", "keep_words" )
+						.transform(
+								"words",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
 						.rename( "ignoreCase", "keep_words_case" )
+						.disallow( "enablePositionIncrements" )
+				.end()
+				.builder( TypeTokenFilterFactory.class, "keep_types" )
+						.transform(
+								"types",
+								new WordSetFileParameterValueTransformer( resourceLoader )
+						)
+						.disallow( "useWhitelist" )
 						.disallow( "enablePositionIncrements" )
 				.end()
 				.builder( ClassicFilterFactory.class, "classic" ).end()
