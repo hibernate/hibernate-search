@@ -53,11 +53,6 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 	}
 
 	@Override
-	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return analyzerType.isAssignableFrom( ScopedElasticsearchAnalyzerReference.class );
-	}
-
-	@Override
 	public Builder startCopy() {
 		return builder.clone();
 	}

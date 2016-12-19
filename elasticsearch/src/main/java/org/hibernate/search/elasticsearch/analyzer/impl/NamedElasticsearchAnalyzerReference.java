@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.NamedAnalyzerReference;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
@@ -62,11 +61,6 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 		if ( analyzer != null ) {
 			analyzer.close();
 		}
-	}
-
-	@Override
-	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return analyzerType.isAssignableFrom( NamedElasticsearchAnalyzerReference.class );
 	}
 
 	@Override

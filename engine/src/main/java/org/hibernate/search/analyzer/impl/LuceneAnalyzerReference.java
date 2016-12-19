@@ -21,7 +21,7 @@ public abstract class LuceneAnalyzerReference implements AnalyzerReference {
 
 	@Override
 	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return analyzerType.isAssignableFrom( LuceneAnalyzerReference.class );
+		return analyzerType.isAssignableFrom( getClass() );
 	}
 
 	@Override
