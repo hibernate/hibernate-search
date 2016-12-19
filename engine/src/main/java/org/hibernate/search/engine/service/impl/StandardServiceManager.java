@@ -72,8 +72,9 @@ public class StandardServiceManager implements ServiceManager {
 		}
 
 		// provided services have priority over managed services
-		if ( providedServices.containsKey( serviceRole ) ) {
-			return (S) providedServices.get( serviceRole );
+		final Object providedService = providedServices.get( serviceRole );
+		if ( providedService != null ) {
+			return (S) providedService;
 		}
 
 		ServiceWrapper<S> wrapper = (ServiceWrapper<S>) cachedServices.get( serviceRole );
