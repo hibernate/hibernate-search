@@ -1,5 +1,5 @@
 = Hibernate Search
-Emmanuel Bernard; Hardy Ferentschik; Gustavo Fernandes; Sanne Grinovero; Nabeel Ali Memon; Gunnar Morling
+Emmanuel Bernard; Hardy Ferentschik; Gustavo Fernandes; Sanne Grinovero; Nabeel Ali Memon; Gunnar Morling; Yoann Rodière; Guillaume Smet
 :revdate: {hibernateSearchVersion}
 :toc:
 :docinfo:
