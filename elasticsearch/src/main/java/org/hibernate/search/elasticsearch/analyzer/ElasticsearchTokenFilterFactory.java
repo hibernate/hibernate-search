@@ -23,7 +23,7 @@ import org.hibernate.search.annotations.AnalyzerDef;
  * 		factory = ElasticsearchTokenFilterFactory.class,
  * 		params = {
  * 					{@literal @}Parameter(name = "type", value = "keep_types"),
- * 					{@literal @}Parameter(name = "types", value = "['<NUM>','<DOUBLE>']")
+ * 					{@literal @}Parameter(name = "types", value = "['{@literal <}NUM{@literal >}','{@literal <}DOUBLE{@literal >}']")
  * 		}
  * )
  * </code></pre>

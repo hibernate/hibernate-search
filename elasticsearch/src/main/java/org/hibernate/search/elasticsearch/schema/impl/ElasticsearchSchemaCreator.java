@@ -37,7 +37,7 @@ public interface ElasticsearchSchemaCreator extends Service {
 	/**
 	 * Checks that an index already exists.
 	 *
-	 * @param indexMetadata The expected index name.
+	 * @param indexname The expected index name.
 	 * @throws SearchException If the index doesn't exist, or if an error occurs.
 	 */
 	void checkIndexExists(String indexname, ExecutionOptions executionOptions);
