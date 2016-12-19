@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.test.analyzer.definition;
 
+import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -16,11 +19,10 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.junit.Test;
-
-import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
-import static org.junit.Assert.assertEquals;
+import org.junit.experimental.categories.Category;
 
 /**
  * Tests the analyzer creation framework.
@@ -83,6 +85,7 @@ public class AnalyzerBuilderTest extends SearchTestBase {
 	 * @throws Exception in case the test fails.
 	 */
 	@Test
+	@Category(SkipOnElasticsearch.class) // Analyzers cannot be retrieved directly when using Elasticsearch
 	public void testAnalyzers() throws Exception {
 		FullTextSession fts = Search.getFullTextSession( openSession() );
 
@@ -104,7 +107,7 @@ public class AnalyzerBuilderTest extends SearchTestBase {
 		analyzer = fts.getSearchFactory().getAnalyzer( "trim_analyzer" );
 		text = " Kittens!   ";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		assertTokensEqual( tokens, new String[] { "kittens" } );
+		assertTokensEqual( tokens, new String[] { "Kittens!" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "length_analyzer" );
 		text = "ab abc abcd abcde abcdef";
