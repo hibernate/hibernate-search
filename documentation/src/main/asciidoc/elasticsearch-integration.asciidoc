@@ -435,14 +435,16 @@ never allow you to take full advantage of Elasticsearch analysis capabilities.
 
 Here are the known limitations of the automatic translation:
 
- * parameters expecting a list of file paths in Lucene only accept *one* file path in Elasticsearch
- * file path parameters must refer to files on the Elasticsearch servers, be it absolute paths
-   or paths relative to the Elasticsearch configuration directory.
  * a few factories have unsupported parameters, because those have no equivalent in Elasticsearch.
    An exception will be raised on startup a parameter is not supported.
+ * the `hyphenator` parameter for `HyphenatedWordsFilterFactory` must refer to
+   a file on the Elasticsearch servers, on contrary to other factories
+   where the files are accessed by Hibernate Search directly.
+   This is due to an Elasticsearch limitation
+   (there is no way to forward the content of a local hyphenation pattern file).
  * some built-in Lucene factories are not (and cannot) be translated, because of incompatible
    parameters between the Lucene factory and the Elasticsearch equivalent.
-   This is in particular the case for `HunspellStemFilterFactory` and `TypeTokenFilterFactory`.
+   This is in particular the case for `HunspellStemFilterFactory`.
 
 Therefore, Lucene factories should only be referenced within analyzer definitions
 when migrating an application that already used Hibernate Search,

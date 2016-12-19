@@ -36,6 +36,8 @@ import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefiniti
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,7 +60,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 	@Before
 	public void setup() {
-		translator.start( null, null ); // Parameters are not used
+		translator.start( null, new BuildContextForTest( new SearchConfigurationForTest() ) );
 	}
 
 	@After
