@@ -12,12 +12,13 @@ import javax.persistence.Id;
 
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
 import org.apache.lucene.analysis.charfilter.MappingCharFilterFactory;
+import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.core.LowerCaseTokenizerFactory;
 import org.apache.lucene.analysis.core.StopFilterFactory;
 import org.apache.lucene.analysis.en.PorterStemFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.LengthFilterFactory;
+import org.apache.lucene.analysis.miscellaneous.StemmerOverrideFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.TrimFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
@@ -33,6 +34,7 @@ import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
@@ -85,9 +87,8 @@ import org.hibernate.search.annotations.TokenizerDef;
 				}),
 
 		@AnalyzerDef(name = "trim_analyzer",
-				tokenizer = @TokenizerDef(factory = LowerCaseTokenizerFactory.class),
+				tokenizer = @TokenizerDef(factory = KeywordTokenizerFactory.class),
 				filters = {
-						@TokenFilterDef(factory = InsertWhitespaceFilterFactory.class),
 						@TokenFilterDef(factory = TrimFilterFactory.class)
 				}),
 
@@ -164,7 +165,21 @@ import org.hibernate.search.annotations.TokenizerDef;
 						})
 				},
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class)
-		)
+		),
+
+		@AnalyzerDef(name = "stemmer_override_analyzer",
+				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+				filters = {
+						@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
+						@TokenFilterDef(factory = StemmerOverrideFilterFactory.class, params = {
+								@Parameter(name = "dictionary",
+										value = "org/hibernate/search/test/analyzer/stemmer-override.properties")
+						}),
+						@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+								@Parameter(name = "language", value = "English")
+						})
+		})
 })
 public class Team {
 	@Id
@@ -172,7 +187,23 @@ public class Team {
 	@GeneratedValue
 	private Integer id;
 
-	@Field
+	@Fields({
+		@Field,
+		@Field(name = "name_customanalyzer", analyzer = @Analyzer(definition = "customanalyzer")),
+		@Field(name = "name_pattern_analyzer", analyzer = @Analyzer(definition = "pattern_analyzer")),
+		@Field(name = "name_standard_analyzer", analyzer = @Analyzer(definition = "standard_analyzer")),
+		@Field(name = "name_html_standard_analyzer", analyzer = @Analyzer(definition = "html_standard_analyzer")),
+		@Field(name = "name_html_whitespace_analyzer", analyzer = @Analyzer(definition = "html_whitespace_analyzer")),
+		@Field(name = "name_trim_analyzer", analyzer = @Analyzer(definition = "trim_analyzer")),
+		@Field(name = "name_length_analyzer", analyzer = @Analyzer(definition = "length_analyzer")),
+		@Field(name = "name_porter_analyzer", analyzer = @Analyzer(definition = "porter_analyzer")),
+		@Field(name = "name_word_analyzer", analyzer = @Analyzer(definition = "word_analyzer")),
+		@Field(name = "name_synonym_analyzer", analyzer = @Analyzer(definition = "synonym_analyzer")),
+		@Field(name = "name_shingle_analyzer", analyzer = @Analyzer(definition = "shingle_analyzer")),
+		@Field(name = "name_html_char_analyzer", analyzer = @Analyzer(definition = "html_char_analyzer")),
+		@Field(name = "name_mapping_char_analyzer", analyzer = @Analyzer(definition = "mapping_char_analyzer")),
+		@Field(name = "name_stemmer_override_analyzer", analyzer = @Analyzer(definition = "stemmer_override_analyzer"))
+	})
 	private String name;
 
 	@Field
