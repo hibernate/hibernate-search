@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
-
 /**
  * A reference to an analyzer that is fully defined from the start.
  *
@@ -31,11 +29,6 @@ public class SimpleElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 		if ( analyzer != null ) {
 			analyzer.close();
 		}
-	}
-
-	@Override
-	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return analyzerType.isAssignableFrom( SimpleElasticsearchAnalyzerReference.class );
 	}
 
 	@Override

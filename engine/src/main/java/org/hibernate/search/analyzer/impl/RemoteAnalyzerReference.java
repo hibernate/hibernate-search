@@ -21,7 +21,7 @@ public abstract class RemoteAnalyzerReference implements AnalyzerReference {
 
 	@Override
 	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return analyzerType.isAssignableFrom( RemoteAnalyzerReference.class );
+		return analyzerType.isAssignableFrom( getClass() );
 	}
 
 	@Override

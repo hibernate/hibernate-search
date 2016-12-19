@@ -7,7 +7,6 @@
 package org.hibernate.search.analyzer.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.NamedAnalyzerReference;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
@@ -68,11 +67,6 @@ public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference implem
 		if ( analyzer != null ) {
 			analyzer.close();
 		}
-	}
-
-	@Override
-	public <T extends AnalyzerReference> boolean is(Class<T> analyzerType) {
-		return analyzerType.isAssignableFrom( NamedLuceneAnalyzerReference.class );
 	}
 
 	@Override
