@@ -160,6 +160,10 @@ public class StandardServiceManager implements ServiceManager {
 		if ( previousWrapper != null ) {
 			wrapper = previousWrapper;
 		}
+		else {
+			//Initialize the service usage counter with an additional usage token, on top of the one granted by the service request:
+			wrapper.startVirtual();
+		}
 		return wrapper;
 	}
 
@@ -200,6 +204,20 @@ public class StandardServiceManager implements ServiceManager {
 			return service;
 		}
 
+		/**
+		 * Virtual call to the start method: only actually starts the
+		 * service when bumping up the counter of start requests from
+		 * zero. Subsequent start requests will simply increment the
+		 * counter, so that we can eventually tear down the services
+		 * in reverse order to make dependency graphs happy.
+		 *
+		 * Make sure to invoke startVirtual() both on service request,
+		 * and on creation of the wrapper so that the first request
+		 * accounts for two usage tokens rather than one.
+		 * The shutdown process will similarly invoke stopVirtual() an
+		 * additional time; this is to prevent services from starting
+		 * and stopping frequently at runtime.
+		 */
 		synchronized void startVirtual() {
 			int previousValue = userCounter;
 			userCounter++;
@@ -218,18 +236,17 @@ public class StandardServiceManager implements ServiceManager {
 		synchronized void stopVirtual() {
 			userCounter--;
 			if ( userCounter == 0 ) {
-				if ( status != ServiceStatus.RUNNING ) {
-					stateExpectedFailure();
-				}
+				//Do not check for the expected status in this case: we don't want a previous service start failure to
+				//prevent us to further attempt to stop services.
 				stopReal();
-			}
-			else if ( status != ServiceStatus.RUNNING ) {
-				//Could happen on circular dependencies
-				stateExpectedFailure();
 			}
 		}
 
 		synchronized void ensureStopped() {
+			//Perform an additional stopVirtual, to remove the extra usage token granted at first initialization,
+			//which keeps the service to be really stopped when it's released by the service client, yet we're not shutting down
+			//the Search engine yet.
+			stopVirtual();
 			if ( status != ServiceStatus.STOPPED ) {
 				log.serviceProviderNotReleased( serviceClass );
 				stopAndRemoveFromCache();
