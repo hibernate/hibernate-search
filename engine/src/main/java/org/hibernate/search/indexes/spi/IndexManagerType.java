@@ -39,7 +39,7 @@ public interface IndexManagerType {
 	 * @param serviceManager the service manager
 	 * @param cfg the Hibernate Search configuration, providing in particular access to configuration properties.
 	 */
-	AnalyzerStrategy<?> createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg);
+	AnalyzerStrategy createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg);
 
 	/**
 	 * The strategy for missing values employed by index managers of this family.

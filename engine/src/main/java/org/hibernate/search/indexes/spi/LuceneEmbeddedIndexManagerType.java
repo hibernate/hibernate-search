@@ -22,7 +22,7 @@ public final class LuceneEmbeddedIndexManagerType implements IndexManagerType {
 	}
 
 	@Override
-	public AnalyzerStrategy<?> createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
+	public AnalyzerStrategy createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		return new LuceneEmbeddedAnalyzerStrategy( serviceManager, cfg );
 	}
 

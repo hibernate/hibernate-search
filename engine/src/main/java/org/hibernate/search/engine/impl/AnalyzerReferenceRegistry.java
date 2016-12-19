@@ -6,14 +6,17 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
-import org.hibernate.search.analyzer.spi.NamedAnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
+import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference.Builder;
 import org.hibernate.search.annotations.AnalyzerDef;
 
 /**
@@ -22,54 +25,44 @@ import org.hibernate.search.annotations.AnalyzerDef;
  *
  * @author Yoann Rodiere
  */
-public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
+public class AnalyzerReferenceRegistry {
 
-	private final AnalyzerStrategy<T> strategy;
+	private final AnalyzerStrategy strategy;
 
-	private final T defaultReference;
+	private final AnalyzerReference defaultReference;
 
-	private final T passThroughReference;
+	private final AnalyzerReference passThroughReference;
 
-	private final Map<String, T> referencesByName = new LinkedHashMap<>();
+	private final Map<String, AnalyzerReference> referencesByName = new LinkedHashMap<>();
 
-	private final Map<Class<?>, T> referencesByClass = new LinkedHashMap<>();
+	private final Map<Class<?>, AnalyzerReference> referencesByClass = new LinkedHashMap<>();
 
-	AnalyzerReferenceRegistry(AnalyzerStrategy<T> strategy) {
+	private final Collection<AnalyzerReference> scopedReferences = new ArrayList<>();
+
+	AnalyzerReferenceRegistry(AnalyzerStrategy strategy) {
 		this.strategy = strategy;
 		this.defaultReference = strategy.createDefaultAnalyzerReference();
-		if ( defaultReference.is( NamedAnalyzerReference.class ) ) {
-			referencesByName.put(
-					defaultReference.unwrap( NamedAnalyzerReference.class ).getAnalyzerName(),
-					defaultReference
-					);
-		}
 		this.passThroughReference = strategy.createPassThroughAnalyzerReference();
-		if ( passThroughReference.is( NamedAnalyzerReference.class ) ) {
-			referencesByName.put(
-					passThroughReference.unwrap( NamedAnalyzerReference.class ).getAnalyzerName(),
-					passThroughReference
-					);
-		}
 	}
 
-	public T getDefaultAnalyzerReference() {
+	public AnalyzerReference getDefaultAnalyzerReference() {
 		return defaultReference;
 	}
 
-	public T getPassThroughAnalyzerReference() {
+	public AnalyzerReference getPassThroughAnalyzerReference() {
 		return passThroughReference;
 	}
 
-	public Map<String, T> getAnalyzerReferencesByName() {
+	public Map<String, AnalyzerReference> getAnalyzerReferencesByName() {
 		return Collections.unmodifiableMap( referencesByName );
 	}
 
-	public Map<Class<?>, T> getAnalyzerReferencesByClass() {
+	public Map<Class<?>, AnalyzerReference> getAnalyzerReferencesByClass() {
 		return Collections.unmodifiableMap( referencesByClass );
 	}
 
-	public T getAnalyzerReference(String name) {
-		T reference = referencesByName.get( name );
+	public AnalyzerReference getAnalyzerReference(String name) {
+		AnalyzerReference reference = referencesByName.get( name );
 		if ( reference == null ) {
 			reference = strategy.createNamedAnalyzerReference( name );
 			referencesByName.put( name, reference );
@@ -77,8 +70,8 @@ public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
 		return reference;
 	}
 
-	public T getAnalyzerReference(Class<?> analyzerClazz) {
-		T reference = referencesByClass.get( analyzerClazz );
+	public AnalyzerReference getAnalyzerReference(Class<?> analyzerClazz) {
+		AnalyzerReference reference = referencesByClass.get( analyzerClazz );
 		if ( reference == null ) {
 			reference = strategy.createAnalyzerReference( analyzerClazz );
 			referencesByClass.put( analyzerClazz, reference );
@@ -87,11 +80,59 @@ public class AnalyzerReferenceRegistry<T extends AnalyzerReference> {
 	}
 
 	public void initialize(Map<String, AnalyzerDef> analyzerDefinitions) {
-		strategy.initializeNamedAnalyzerReferences( referencesByName, analyzerDefinitions );
+		List<AnalyzerReference> references = new ArrayList<>();
+		references.add( defaultReference );
+		references.add( passThroughReference );
+		references.addAll( referencesByName.values() );
+		references.addAll( referencesByClass.values() );
+		references.addAll( scopedReferences );
+		strategy.initializeAnalyzerReferences( references, analyzerDefinitions );
 	}
 
 	public ScopedAnalyzerReference.Builder buildScopedAnalyzerReference() {
-		return strategy.buildScopedAnalyzerReference( getDefaultAnalyzerReference() );
+		return new ScopedAnalyzerReferenceBuilderRegisteringWrapper(
+				strategy.buildScopedAnalyzerReference( getDefaultAnalyzerReference() )
+				);
+	}
+
+	/**
+	 * A builder that will delegate to another builder for all operations, but will also add any
+	 * built reference to the registry.
+	 *
+	 * @author Yoann Rodiere
+	 */
+	private class ScopedAnalyzerReferenceBuilderRegisteringWrapper implements ScopedAnalyzerReference.Builder {
+
+		private final ScopedAnalyzerReference.Builder delegate;
+
+		public ScopedAnalyzerReferenceBuilderRegisteringWrapper(Builder delegate) {
+			super();
+			this.delegate = delegate;
+		}
+
+		@Override
+		public AnalyzerReference getGlobalAnalyzerReference() {
+			return delegate.getGlobalAnalyzerReference();
+		}
+
+		@Override
+		public void setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference) {
+			delegate.setGlobalAnalyzerReference( globalAnalyzerReference );
+		}
+
+		@Override
+		public void addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
+			delegate.addAnalyzerReference( scope, analyzerReference );
+		}
+
+		@Override
+		public ScopedAnalyzerReference build() {
+			ScopedAnalyzerReference reference = delegate.build();
+			// Register the newly built reference
+			scopedReferences.add( reference );
+			return reference;
+		}
+
 	}
 
 }
