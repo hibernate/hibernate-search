@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 
@@ -17,7 +19,7 @@ import org.hibernate.search.annotations.AnalyzerDef;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<ElasticsearchAnalyzerReference> {
+public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public ElasticsearchAnalyzerReference createDefaultAnalyzerReference() {
@@ -40,19 +42,22 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<Elasticse
 	}
 
 	@Override
-	public void initializeNamedAnalyzerReferences(Map<String, ElasticsearchAnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
+	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
 		Map<String, ElasticsearchAnalyzer> initializedAnalyzers = new HashMap<>();
-		for ( Map.Entry<String, ElasticsearchAnalyzerReference> entry : references.entrySet() ) {
-			String name = entry.getKey();
-			NamedElasticsearchAnalyzerReference namedReference = entry.getValue().unwrap( NamedElasticsearchAnalyzerReference.class );
-			initializeReference( initializedAnalyzers, name, namedReference, analyzerDefinitions );
+		for ( AnalyzerReference reference : references ) {
+			if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
+				NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
+				initializeReference( initializedAnalyzers, namedReference, analyzerDefinitions );
+			}
 		}
 	}
 
-	private void initializeReference(Map<String, ElasticsearchAnalyzer> initializedAnalyzers, String name,
+	private void initializeReference(Map<String, ElasticsearchAnalyzer> initializedAnalyzers,
 			NamedElasticsearchAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
+		String name = analyzerReference.getAnalyzerName();
+
 		if ( analyzerReference.isInitialized() ) {
-			initializedAnalyzers.put( analyzerReference.getAnalyzerName(), analyzerReference.getAnalyzer() );
+			initializedAnalyzers.put( name, analyzerReference.getAnalyzer() );
 			return;
 		}
 
@@ -73,9 +78,10 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy<Elasticse
 	}
 
 	@Override
-	public ScopedElasticsearchAnalyzerReference.Builder buildScopedAnalyzerReference(ElasticsearchAnalyzerReference initialGlobalAnalyzerReference) {
+	public ScopedElasticsearchAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference) {
 		return new ScopedElasticsearchAnalyzerReference.Builder(
-				initialGlobalAnalyzerReference, Collections.<String, ElasticsearchAnalyzerReference>emptyMap()
+				initialGlobalAnalyzerReference.unwrap( ElasticsearchAnalyzerReference.class ),
+				Collections.<String, ElasticsearchAnalyzerReference>emptyMap()
 				);
 	}
 }

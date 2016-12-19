@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.analyzer.spi;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -18,42 +19,43 @@ import org.hibernate.search.annotations.AnalyzerDef;
  * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You
  * should be prepared for incompatible changes in future releases.
  */
-public interface AnalyzerStrategy<T extends AnalyzerReference> {
+public interface AnalyzerStrategy {
 
 	/**
 	 * @return a reference to the default analyzer, the one to be used when no specific configuration is set
 	 * on a given field.
 	 */
-	T createDefaultAnalyzerReference();
+	AnalyzerReference createDefaultAnalyzerReference();
 
 	/**
 	 * @return a reference to an analyzer that applies no operation whatsoever to the flux.
 	 * This is useful for queries operating on non-tokenized fields.
 	 */
-	T createPassThroughAnalyzerReference();
+	AnalyzerReference createPassThroughAnalyzerReference();
 
 	/**
 	 * @param name The name of the analyzer to be referenced.
-	 * @return a reference that will be {@link #initializeNamedAnalyzerReferences(Map, Map) initialized later}.
+	 * @return a reference that will be {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
 	 */
-	T createNamedAnalyzerReference(String name);
+	AnalyzerReference createNamedAnalyzerReference(String name);
 
 	/**
-	 * @return a reference to an instance of the given analyzer class.
+	 * @return a reference to an instance of the given analyzer class that will be
+	 * {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
 	 */
-	T createAnalyzerReference(Class<?> analyzerClass);
+	AnalyzerReference createAnalyzerReference(Class<?> analyzerClass);
 
 	/**
-	 * Initializes named references {@link #createNamedAnalyzerReference(String) created by this strategy}, i.e. make
-	 * them point to the actual analyzer definition.
+	 * Initializes references created by this strategy, i.e. make them point to the actual analyzer definition.
 	 * @param references The references to initialize, mapped by name.
 	 * @param analyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
 	 */
-	void initializeNamedAnalyzerReferences(Map<String, T> references, Map<String, AnalyzerDef> analyzerDefinitions);
+	void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions);
 
 	/**
-	 * @return A {@link ScopedAnalyzer} builder.
+	 * @return A {@link ScopedAnalyzerReference} builder. The returned reference will be
+	 * {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
 	 */
-	ScopedAnalyzerReference.Builder buildScopedAnalyzerReference(T initialGlobalAnalyzerReference);
+	ScopedAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference);
 
 }
