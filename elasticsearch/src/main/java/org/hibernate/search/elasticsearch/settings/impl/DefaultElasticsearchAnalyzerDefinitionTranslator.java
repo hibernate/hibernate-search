@@ -422,7 +422,10 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 				.builder( ScandinavianFoldingFilterFactory.class, "scandinavian_folding" ).end()
 				.builder( SerbianNormalizationFilterFactory.class, "serbian_normalization" ).end()
 				.builder( CJKWidthFilterFactory.class, "cjk_width" ).end()
-				.add( CJKBigramFilterFactory.class, new CjkBigramTokenFilterDefinitionFactory() ) // "ignored_scripts" array
+				.builder( CJKBigramFilterFactory.class, "cjk_bigram" ) // "ignored_scripts" array
+						.transform( new CjkBigramIgnoredScriptsParametersTransformer() )
+						.rename( "outputUnigrams", "output_unigrams" )
+				.end()
 				.builder( DelimitedPayloadTokenFilterFactory.class, "delimited_payload_filter" )
 						.rename( "encoder", "encoding" ) // custom class name is not supported
 				.end()

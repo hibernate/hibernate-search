@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.util.AbstractAnalysisFactory;
@@ -56,6 +58,7 @@ class LuceneAnalysisDefinitionTranslationMapBuilder<D extends AnalysisDefinition
 		private final Class<? extends AbstractAnalysisFactory> luceneClass;
 		private final String typeName;
 
+		private List<ParametersTransformer> parametersTransformers = new ArrayList<>();
 		private Map<String, String> parameterNameTranslations;
 		private Map<String, ParameterValueTransformer> parameterValueTranslations;
 		private Map<String, JsonElement> staticParameters;
@@ -65,6 +68,11 @@ class LuceneAnalysisDefinitionTranslationMapBuilder<D extends AnalysisDefinition
 			this.parent = parent;
 			this.luceneClass = luceneClass;
 			this.typeName = typeName;
+		}
+
+		public SimpleAnalysisDefinitionFactoryBuilder<D> transform(ParametersTransformer transformer) {
+			parametersTransformers.add( transformer );
+			return this;
 		}
 
 		public SimpleAnalysisDefinitionFactoryBuilder<D> add(String elasticsearchParam, String value) {
@@ -100,18 +108,31 @@ class LuceneAnalysisDefinitionTranslationMapBuilder<D extends AnalysisDefinition
 		}
 
 		public LuceneAnalysisDefinitionTranslationMapBuilder<D> end() {
+			if ( staticParameters != null ) {
+				/*
+				 * Add static parameters first, so that they can be overridden by
+				 * both custom transformers and the simple transformer added just below.
+				 */
+				parametersTransformers.add( 0, new StaticParametersTransformer( staticParameters ) );
+			}
+
 			if ( parameterNameTranslations == null ) {
 				parameterNameTranslations = Collections.emptyMap();
 			}
 			if ( parameterValueTranslations == null ) {
 				parameterValueTranslations = Collections.emptyMap();
 			}
-			if ( staticParameters == null ) {
-				staticParameters = Collections.emptyMap();
-			}
+			/*
+			 * This transformer will only handle those parameters that were not consumed by
+			 * custom transformer, so we can safely execute it last.
+			 *
+			 * We always add this transformer, even when the maps we pass to the constructor are empty,
+			 * because it also handles unknown parameters.
+			 */
+			parametersTransformers.add( new SimpleParametersTransformer( parameterNameTranslations, parameterValueTranslations ) );
+
 			return parent.add( luceneClass, new SimpleAnalysisDefinitionFactory<>(
-					parent.targetClass, typeName,
-					parameterNameTranslations, parameterValueTranslations, staticParameters ) );
+					parent.targetClass, typeName, parametersTransformers ) );
 		}
 
 	}
