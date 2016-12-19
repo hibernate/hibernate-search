@@ -48,7 +48,6 @@ public interface AnalyzerStrategy<T extends AnalyzerReference> {
 	 * them point to the actual analyzer definition.
 	 * @param references The references to initialize, mapped by name.
 	 * @param analyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
-	 * It is guaranteed to contain one analyzer definition for each reference name.
 	 */
 	void initializeNamedAnalyzerReferences(Map<String, T> references, Map<String, AnalyzerDef> analyzerDefinitions);
 
