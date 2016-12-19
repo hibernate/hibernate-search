@@ -11,9 +11,9 @@ import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 
 /**
- * Implementations translate Lucene queries into other backend-specific representions.
+ * Implementations translate Lucene queries into other backend-specific representations.
  * <p>
- * Not a public contract for the time being!
+ * Not a public contract.
  *
  * @author Gunnar Morling
  */
