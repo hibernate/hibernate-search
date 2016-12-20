@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -81,6 +82,39 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 		LogErrorHandler.appendFailureMessage( expectedErrorMessage, firstFailure );
 		LogErrorHandler.appendFailureMessage( expectedErrorMessage, thirdWork );
 		LogErrorHandler.appendFailureMessage( expectedErrorMessage, fourthWork );
+
+		// should verify the errorHandler logs the work which was not processed (third and fourth)
+		// and which work was failing
+		Assert.assertEquals( expectedErrorMessage.toString() , errorMessage );
+		Assert.assertTrue( exception instanceof SearchException );
+		Assert.assertEquals( "failed work message", exception.getMessage() );
+		Assert.assertEquals( indexManager, mockErrorHandler.getIndexManager() );
+	}
+
+	@Test
+	public void testNoEntityErrorHandling() {
+		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
+		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( Foo.class );
+		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
+
+		List<LuceneWork> queue = new ArrayList<LuceneWork>();
+
+		WORK_COUNTER.set( 0 ); // reset work counter
+		final NoEntityFailingWork firstFailure = new NoEntityFailingWork();
+		queue.add( firstFailure );
+		indexManager.performOperations( queue, null );
+		Assert.assertEquals( 0, WORK_COUNTER.get() );
+
+		String errorMessage = mockErrorHandler.getErrorMessage();
+		Throwable exception = mockErrorHandler.getLastException();
+
+		StringBuilder expectedErrorMessage = new StringBuilder();
+		expectedErrorMessage.append( "Exception occurred " ).append( exception ).append( "\n" );
+		expectedErrorMessage.append( "Primary Failure:\n" );
+		LogErrorHandler.appendFailureMessage( expectedErrorMessage, firstFailure );
+
+		expectedErrorMessage.append( "Subsequent failures:\n" );
+		LogErrorHandler.appendFailureMessage( expectedErrorMessage, firstFailure );
 
 		// should verify the errorHandler logs the work which was not processed (third and fourth)
 		// and which work was failing
@@ -186,6 +220,30 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 		public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
 			throw new SearchException( "failed work message" );
 		}
+	}
+
+	/**
+	 * A LuceneWork with no attached entity type which will throw a
+	 * SearchException when applied to the index, which is the type
+	 * thrown to wrap real IOExceptions.
+	 */
+	static class NoEntityFailingWork extends FlushLuceneWork {
+
+		public NoEntityFailingWork() {
+			super( null, null );
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
+			return (R) new FailingLuceneWorkDelegate();
+		}
+
+		@Override
+		public String toString() {
+			return "NoEntityFailingWork";
+		}
+
 	}
 
 }

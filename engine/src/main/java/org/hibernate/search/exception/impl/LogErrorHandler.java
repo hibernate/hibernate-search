@@ -53,8 +53,10 @@ public class LogErrorHandler implements ErrorHandler {
 	}
 
 	public static final void appendFailureMessage(StringBuilder message, LuceneWork workThatFailed) {
+		Class<?> entityClass = workThatFailed.getEntityClass();
+		String entityClassName = entityClass == null ? null : entityClass.getName();
 		message.append( "\tEntity " )
-			.append( workThatFailed.getEntityClass().getName() )
+			.append( entityClassName )
 			.append( " " )
 			.append( " Id " ).append( workThatFailed.getIdInString() )
 			.append( " " ).append( " Work Type " )
