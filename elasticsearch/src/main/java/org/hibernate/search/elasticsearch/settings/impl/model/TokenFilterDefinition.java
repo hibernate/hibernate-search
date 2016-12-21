@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl.model;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.JsonAdapter;
 
 /**
@@ -19,5 +20,10 @@ import com.google.gson.annotations.JsonAdapter;
  */
 @JsonAdapter(AnalysisDefinitionJsonAdapterFactory.class)
 public class TokenFilterDefinition extends AnalysisDefinition {
+
+	@Override
+	public String toString() {
+		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
+	}
 
 }

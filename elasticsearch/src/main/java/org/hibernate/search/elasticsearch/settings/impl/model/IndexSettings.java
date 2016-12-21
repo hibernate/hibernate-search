@@ -78,6 +78,11 @@ public class IndexSettings {
 		public void setCharFilters(Map<String, CharFilterDefinition> charFilters) {
 			this.charFilters = charFilters;
 		}
+
+		@Override
+		public String toString() {
+			return new GsonBuilder().setPrettyPrinting().create().toJson( this );
+		}
 	}
 
 }
