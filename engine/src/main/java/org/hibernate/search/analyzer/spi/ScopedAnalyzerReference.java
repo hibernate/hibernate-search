@@ -22,10 +22,10 @@ public interface ScopedAnalyzerReference extends AnalyzerReference {
 	/**
 	 * @return A builder for copying the referenced analyzer, altering some scopes as necessary.
 	 */
-	Builder startCopy();
+	CopyBuilder startCopy();
 
 	/**
-	 * Interface for building scope aware analyzers.
+	 * Interface for building a reference to a scope aware analyzer when bootstrapping.
 	 *
 	 * @author Guillaume Smet
 	 * @author Yoann Rodiere
@@ -37,6 +37,22 @@ public interface ScopedAnalyzerReference extends AnalyzerReference {
 
 		void setGlobalAnalyzerReference(AnalyzerReference globalAnalyzerReference);
 
+		void addAnalyzerReference(String scope, AnalyzerReference analyzerReference);
+
+		ScopedAnalyzerReference build();
+	}
+
+	/**
+	 * Interface for building a copy of a reference to a scope aware analyzer at runtime.
+	 * <p>
+	 * This is mainly used to override analyzers for some scopes.
+	 *
+	 * @author Guillaume Smet
+	 * @author Yoann Rodiere
+	 * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You
+	 * should be prepared for incompatible changes in future releases.
+	 */
+	public interface CopyBuilder {
 		void addAnalyzerReference(String scope, AnalyzerReference analyzerReference);
 
 		ScopedAnalyzerReference build();

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +24,24 @@ import org.hibernate.search.annotations.AnalyzerDef;
 public class ScopedElasticsearchAnalyzer implements ElasticsearchAnalyzer, ScopedAnalyzer {
 
 	private final ElasticsearchAnalyzer globalAnalyzer;
-	private final Map<String, ElasticsearchAnalyzer> scopedAnalyzers = new HashMap<>();
+	private final Map<String, ElasticsearchAnalyzer> scopedAnalyzers;
 
 	public ScopedElasticsearchAnalyzer(ElasticsearchAnalyzer globalAnalyzer) {
-		this.globalAnalyzer = globalAnalyzer;
+		this( globalAnalyzer, Collections.<String, ElasticsearchAnalyzer>emptyMap() );
 	}
 
 	public ScopedElasticsearchAnalyzer(ElasticsearchAnalyzer globalAnalyzer,
 			Map<String, ElasticsearchAnalyzer> scopedAnalyzers) {
 		this.globalAnalyzer = globalAnalyzer;
-		this.scopedAnalyzers.putAll( scopedAnalyzers );
+		this.scopedAnalyzers = Collections.unmodifiableMap( new HashMap<>( scopedAnalyzers ) );
+	}
+
+	ElasticsearchAnalyzer getGlobalAnalyzer() {
+		return globalAnalyzer;
+	}
+
+	Map<String, ElasticsearchAnalyzer> getScopedAnalyzers() {
+		return scopedAnalyzers;
 	}
 
 	private ElasticsearchAnalyzer getDelegate(String fieldName) {
