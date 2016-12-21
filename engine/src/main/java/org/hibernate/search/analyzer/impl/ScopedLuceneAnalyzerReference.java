@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -22,48 +23,67 @@ public class ScopedLuceneAnalyzerReference extends LuceneAnalyzerReference imple
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private volatile ScopedLuceneAnalyzer analyzer;
+	private ScopedLuceneAnalyzer analyzer;
 
 	/*
 	 * We keep a reference to the builder for two reasons:
-	 *  1. Lazy initialization of the analyzer
+	 *  1. Deferred initialization of the analyzer
 	 *  2. Copies of the analyzer; see startCopy()
 	 */
-	private final Builder builder;
+	private final AbstractBuilder builder;
 
-	public ScopedLuceneAnalyzerReference(Builder builder) {
+	public ScopedLuceneAnalyzerReference(AbstractBuilder builder, ScopedLuceneAnalyzer analyzer) {
 		this.builder = builder;
+		this.analyzer = analyzer; // Already initialized
+	}
+
+	public ScopedLuceneAnalyzerReference(AbstractBuilder builder) {
+		this.builder = builder;
+		this.analyzer = null; // Not initialized yet
 	}
 
 	@Override
 	public ScopedLuceneAnalyzer getAnalyzer() {
 		if ( analyzer == null ) {
-			// Lazy initialization, done only once
-			synchronized ( this ) {
-				if ( analyzer == null ) {
-					analyzer = builder.buildAnalyzer();
-				}
-			}
+			throw LOG.lazyLuceneAnalyzerReferenceNotInitialized( this );
 		}
 		return analyzer;
 	}
 
+	public boolean isInitialized() {
+		return analyzer != null;
+	}
+
+	public void initialize() {
+		if ( this.analyzer != null ) {
+			throw new AssertionFailure( "A lucene analyzer reference has been initialized more than once: " + this );
+		}
+		this.analyzer = builder.buildAnalyzer();
+	}
+
 	@Override
 	public void close() {
-		getAnalyzer().close();
+		if ( isInitialized() ) {
+			getAnalyzer().close();
+		}
 	}
 
 	@Override
-	public Builder startCopy() {
-		return builder.clone();
+	public CopyBuilder startCopy() {
+		return new CopyBuilder( builder );
 	}
 
-	public static class Builder implements ScopedAnalyzerReference.Builder, Cloneable {
+	public abstract static class AbstractBuilder implements ScopedAnalyzerReference.Builder {
 
 		private LuceneAnalyzerReference globalAnalyzerReference;
 		private final Map<String, LuceneAnalyzerReference> scopedAnalyzerReferences = new HashMap<>();
 
-		public Builder(LuceneAnalyzerReference globalAnalyzerReference, Map<String, LuceneAnalyzerReference> scopedAnalyzers) {
+		protected AbstractBuilder(AbstractBuilder copied) {
+			this( copied.globalAnalyzerReference, copied.scopedAnalyzerReferences );
+		}
+
+		public AbstractBuilder(LuceneAnalyzerReference globalAnalyzerReference,
+				Map<String, LuceneAnalyzerReference> scopedAnalyzers) {
 			this.globalAnalyzerReference = globalAnalyzerReference;
 			this.scopedAnalyzerReferences.putAll( scopedAnalyzers );
 		}
@@ -84,21 +104,9 @@ public class ScopedLuceneAnalyzerReference extends LuceneAnalyzerReference imple
 		}
 
 		@Override
-		public ScopedLuceneAnalyzerReference build() {
-			/*
-			 * Defer the actual analyzer creation to when it is first used, so that
-			 * dangling references can get initialized first.
-			 */
-			return new ScopedLuceneAnalyzerReference( this );
-		}
+		public abstract ScopedLuceneAnalyzerReference build();
 
-		/**
-		 * Defers the actual analyzer creation to when it is first used, so that
-		 * the builder accepts dangling references.
-		 *
-		 * @author Yoann Rodiere
-		 */
-		private ScopedLuceneAnalyzer buildAnalyzer() {
+		protected final ScopedLuceneAnalyzer buildAnalyzer() {
 			Analyzer globalAnalyzer = globalAnalyzerReference.getAnalyzer();
 
 			Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
@@ -109,11 +117,39 @@ public class ScopedLuceneAnalyzerReference extends LuceneAnalyzerReference imple
 
 			return new ScopedLuceneAnalyzer( globalAnalyzer, scopedAnalyzers );
 		}
+	}
+
+	/**
+	 * A builder that defers the actual analyzer creation to later during the search
+	 * factory initialization, so that the builder accepts dangling references.
+	 *
+	 * @author Yoann Rodiere
+	 */
+	public static class DeferredInitializationBuilder extends AbstractBuilder {
+
+		public DeferredInitializationBuilder(LuceneAnalyzerReference globalAnalyzerReference,
+				Map<String, LuceneAnalyzerReference> scopedAnalyzers) {
+			super( globalAnalyzerReference, scopedAnalyzers );
+		}
 
 		@Override
-		protected Builder clone() {
-			return new Builder( globalAnalyzerReference, scopedAnalyzerReferences );
+		public ScopedLuceneAnalyzerReference build() {
+			return new ScopedLuceneAnalyzerReference( this );
 		}
+	}
+
+	public static class CopyBuilder extends AbstractBuilder {
+
+		private CopyBuilder(AbstractBuilder copied) {
+			super( copied );
+		}
+
+		@Override
+		public ScopedLuceneAnalyzerReference build() {
+			ScopedLuceneAnalyzer analyzer = buildAnalyzer();
+			return new ScopedLuceneAnalyzerReference( this, analyzer );
+		}
+
 	}
 
 	private static LuceneAnalyzerReference getLuceneAnalyzerReference(AnalyzerReference analyzerReference) {
