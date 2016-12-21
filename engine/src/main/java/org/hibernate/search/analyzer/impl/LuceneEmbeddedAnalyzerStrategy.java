@@ -125,6 +125,12 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 				NamedLuceneAnalyzerReference namedReference = reference.unwrap( NamedLuceneAnalyzerReference.class );
 				initializeReference( initializedAnalyzers, namedReference, analyzerDefinitions );
 			}
+			else if ( reference.is( ScopedLuceneAnalyzerReference.class ) ) {
+				ScopedLuceneAnalyzerReference scopedReference = reference.unwrap( ScopedLuceneAnalyzerReference.class );
+				if ( !scopedReference.isInitialized() ) {
+					scopedReference.initialize();
+				}
+			}
 		}
 	}
 
@@ -162,7 +168,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public ScopedLuceneAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedLuceneAnalyzerReference.Builder(
+		return new ScopedLuceneAnalyzerReference.DeferredInitializationBuilder(
 				initialGlobalAnalyzerReference.unwrap( LuceneAnalyzerReference.class ),
 				Collections.<String, LuceneAnalyzerReference>emptyMap() );
 	}

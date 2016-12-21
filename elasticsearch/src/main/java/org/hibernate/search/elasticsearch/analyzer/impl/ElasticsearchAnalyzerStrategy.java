@@ -49,6 +49,12 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 				NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
 				initializeReference( initializedAnalyzers, namedReference, analyzerDefinitions );
 			}
+			else if ( reference.is( ScopedElasticsearchAnalyzerReference.class ) ) {
+				ScopedElasticsearchAnalyzerReference scopedReference = reference.unwrap( ScopedElasticsearchAnalyzerReference.class );
+				if ( !scopedReference.isInitialized() ) {
+					scopedReference.initialize();
+				}
+			}
 		}
 	}
 
@@ -79,7 +85,7 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public ScopedElasticsearchAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedElasticsearchAnalyzerReference.Builder(
+		return new ScopedElasticsearchAnalyzerReference.DeferredInitializationBuilder(
 				initialGlobalAnalyzerReference.unwrap( ElasticsearchAnalyzerReference.class ),
 				Collections.<String, ElasticsearchAnalyzerReference>emptyMap()
 				);
