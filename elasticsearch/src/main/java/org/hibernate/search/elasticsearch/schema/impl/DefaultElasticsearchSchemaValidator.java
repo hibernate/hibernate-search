@@ -8,10 +8,12 @@ package org.hibernate.search.elasticsearch.schema.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
@@ -20,15 +22,22 @@ import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
-import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
+import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jboss.logging.Messages;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 /**
@@ -103,14 +112,28 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	}
 
 	private Object formatIntro(ValidationContext context) {
-		if ( StringHelper.isNotEmpty( context.getFieldName() ) ) {
-			return MESSAGES.errorIntro( context.getIndexName(), context.getMappingName(), context.getPath(), context.getFieldName() );
+		if ( StringHelper.isNotEmpty( context.getMappingName() ) ) {
+			if ( StringHelper.isNotEmpty( context.getFieldName() ) ) {
+				return MESSAGES.mappingErrorIntro( context.getIndexName(), context.getMappingName(), context.getPropertyPath(), context.getFieldName() );
+			}
+			else if ( StringHelper.isNotEmpty( context.getPropertyPath() ) ) {
+				return MESSAGES.mappingErrorIntro( context.getIndexName(), context.getMappingName(), context.getPropertyPath() );
+			}
+			else {
+				return MESSAGES.mappingErrorIntro( context.getIndexName(), context.getMappingName() );
+			}
 		}
-		else if ( StringHelper.isNotEmpty( context.getPath() ) ) {
-			return MESSAGES.errorIntro( context.getIndexName(), context.getMappingName(), context.getPath() );
+		else if ( StringHelper.isNotEmpty( context.getCharFilterName() ) ) {
+			return MESSAGES.charFilterErrorIntro( context.getIndexName(), context.getCharFilterName() );
 		}
-		else if ( StringHelper.isNotEmpty( context.getMappingName() ) ) {
-			return MESSAGES.errorIntro( context.getIndexName(), context.getMappingName() );
+		else if ( StringHelper.isNotEmpty( context.getTokenizerName() ) ) {
+			return MESSAGES.tokenizerErrorIntro( context.getIndexName(), context.getTokenizerName() );
+		}
+		else if ( StringHelper.isNotEmpty( context.getTokenFilterName() ) ) {
+			return MESSAGES.tokenFilterErrorIntro( context.getIndexName(), context.getTokenFilterName() );
+		}
+		else if ( StringHelper.isNotEmpty( context.getAnalyzerName() ) ) {
+			return MESSAGES.analyzerErrorIntro( context.getIndexName(), context.getAnalyzerName() );
 		}
 		else {
 			return MESSAGES.errorIntro( context.getIndexName() );
@@ -118,6 +141,8 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	}
 
 	private void validate(ValidationErrorCollector errorCollector, IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
+		validateIndexSettings( errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings() );
+
 		// Unknown mappings are ignored, we only validate expected mappings
 		for ( Map.Entry<String, TypeMapping> entry : expectedIndexMetadata.getMappings().entrySet() ) {
 			String mappingName = entry.getKey();
@@ -135,6 +160,179 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 			}
 			finally {
 				errorCollector.setMappingName( null );
+			}
+		}
+	}
+
+	private void validateIndexSettings(ValidationErrorCollector errorCollector, IndexSettings expectedSettings, IndexSettings actualSettings) {
+		IndexSettings.Analysis expectedAnalysis = expectedSettings.getAnalysis();
+		if ( expectedAnalysis == null ) {
+			// No expectation
+			return;
+		}
+		IndexSettings.Analysis actualAnalysis = actualSettings.getAnalysis();
+
+		Map<String, AnalyzerDefinition> actualAnalyzers = actualAnalysis == null ? null : actualAnalysis.getAnalyzers();
+		if ( actualAnalyzers == null ) {
+			actualAnalyzers = Collections.<String, AnalyzerDefinition>emptyMap();
+		}
+		// Unknown analyzers are ignored, we only validate expected ones
+		for ( Map.Entry<String, AnalyzerDefinition> entry : expectedAnalysis.getAnalyzers().entrySet() ) {
+			String name = entry.getKey();
+			AnalyzerDefinition expected = entry.getValue();
+			AnalyzerDefinition actual = actualAnalyzers.get( name );
+
+			errorCollector.setAnalyzerName( name );
+			try {
+				if ( actual == null ) {
+					errorCollector.addError( MESSAGES.analyzerMissing() );
+					continue;
+				}
+
+				validateAnalyzerDefinition( errorCollector, expected, actual );
+			}
+			finally {
+				errorCollector.setAnalyzerName( null );
+			}
+		}
+
+		Map<String, CharFilterDefinition> actualCharFilters = actualAnalysis == null ? null : actualAnalysis.getCharFilters();
+		if ( actualCharFilters == null ) {
+			actualCharFilters = Collections.<String, CharFilterDefinition>emptyMap();
+		}
+		// Unknown char filters are ignored, we only validate expected ones
+		for ( Map.Entry<String, CharFilterDefinition> entry : expectedAnalysis.getCharFilters().entrySet() ) {
+			String name = entry.getKey();
+			CharFilterDefinition expected = entry.getValue();
+			CharFilterDefinition actual = actualCharFilters.get( name );
+
+			errorCollector.setCharFilterName( name );
+			try {
+				if ( actual == null ) {
+					errorCollector.addError( MESSAGES.charFilterMissing() );
+					continue;
+				}
+
+				validateAnalysisDefinition( errorCollector, expected, actual );
+			}
+			finally {
+				errorCollector.setCharFilterName( null );
+			}
+		}
+
+		Map<String, TokenizerDefinition> actualTokenizers = actualAnalysis == null ? null : actualAnalysis.getTokenizers();
+		if ( actualTokenizers == null ) {
+			actualTokenizers = Collections.<String, TokenizerDefinition>emptyMap();
+		}
+		// Unknown tokenizers are ignored, we only validate expected ones
+		for ( Map.Entry<String, TokenizerDefinition> entry : expectedAnalysis.getTokenizers().entrySet() ) {
+			String name = entry.getKey();
+			TokenizerDefinition expected = entry.getValue();
+			TokenizerDefinition actual = actualTokenizers.get( name );
+
+			errorCollector.setTokenizerName( name );
+			try {
+				if ( actual == null ) {
+					errorCollector.addError( MESSAGES.tokenizerMissing() );
+					continue;
+				}
+
+				validateAnalysisDefinition( errorCollector, expected, actual );
+			}
+			finally {
+				errorCollector.setTokenizerName( null );
+			}
+		}
+
+		Map<String, TokenFilterDefinition> actualTokenFilters = actualAnalysis == null ? null : actualAnalysis.getTokenFilters();
+		if ( actualTokenFilters == null ) {
+			actualTokenFilters = Collections.<String, TokenFilterDefinition>emptyMap();
+		}
+		// Unknown token filters are ignored, we only validate expected ones
+		for ( Map.Entry<String, TokenFilterDefinition> entry : expectedAnalysis.getTokenFilters().entrySet() ) {
+			String name = entry.getKey();
+			TokenFilterDefinition expected = entry.getValue();
+			TokenFilterDefinition actual = actualTokenFilters.get( name );
+
+			errorCollector.setTokenFilterName( name );
+			try {
+				if ( actual == null ) {
+					errorCollector.addError( MESSAGES.tokenFilterMissing() );
+					continue;
+				}
+
+				validateAnalysisDefinition( errorCollector, expected, actual );
+			}
+			finally {
+				errorCollector.setTokenFilterName( null );
+			}
+		}
+	}
+
+	private void validateAnalyzerDefinition(ValidationErrorCollector errorCollector, AnalyzerDefinition expectedDefinition,
+			AnalyzerDefinition actualDefinition) {
+		validateAnalysisDefinition(errorCollector, expectedDefinition, actualDefinition);
+
+		if ( ! Objects.equals( expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) ) {
+			errorCollector.addError( MESSAGES.invalidAnalyzerCharFilters(
+					expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) );
+		}
+
+		if ( ! Objects.equals( expectedDefinition.getTokenizer(), actualDefinition.getTokenizer() ) ) {
+			errorCollector.addError( MESSAGES.invalidAnalyzerTokenizer(
+					expectedDefinition.getTokenizer(), actualDefinition.getTokenizer() ) );
+		}
+
+		if ( ! Objects.equals( expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) ) {
+			errorCollector.addError( MESSAGES.invalidAnalyzerTokenFilters(
+					expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) );
+		}
+	}
+
+	private void validateAnalysisDefinition(ValidationErrorCollector errorCollector, AnalysisDefinition expectedDefinition,
+			AnalysisDefinition actualDefinition) {
+		if ( ! Objects.equals( expectedDefinition.getType(), actualDefinition.getType() ) ) {
+			errorCollector.addError( MESSAGES.invalidAnalysisDefinitionType(
+					expectedDefinition.getType(), actualDefinition.getType()
+					) );
+		}
+
+		Map<String, JsonElement> expectedParameters = expectedDefinition.getParameters();
+		if ( expectedParameters == null ) {
+			expectedParameters = Collections.emptyMap();
+		}
+
+		Map<String, JsonElement> actualParameters = actualDefinition.getParameters();
+		if ( actualParameters == null ) {
+			actualParameters = Collections.emptyMap();
+		}
+
+		// We also validate there isn't any unexpected parameters
+		Set<String> parametersToValidate = new HashSet<>();
+		parametersToValidate.addAll( expectedParameters.keySet() );
+		parametersToValidate.addAll( actualParameters.keySet() );
+
+		for ( String name : parametersToValidate ) {
+			JsonElement expected = expectedParameters.get( name );
+			JsonElement actual = actualParameters.get( name );
+			validateAnalysisDefinitionParameterValue( errorCollector, name, expected, actual );
+		}
+	}
+
+	private void validateAnalysisDefinitionParameterValue(ValidationErrorCollector errorCollector,
+			String name, JsonElement expected, JsonElement actual) {
+		if ( expected != null && expected.isJsonPrimitive() && actual != null && actual.isJsonPrimitive() ) {
+			/*
+			 * Elasticsearch returns strings even for integers or booleans,
+			 * so in this case we must compare the string representations.
+			 */
+			if ( ! Objects.equals( expected.getAsString(), actual.getAsString() ) ) {
+				errorCollector.addError( MESSAGES.invalidAnalysisDefinitionParameter( name, expected, actual ) );
+			}
+		}
+		else {
+			if ( ! Objects.equals( expected, actual ) ) {
+				errorCollector.addError( MESSAGES.invalidAnalysisDefinitionParameter( name, expected, actual ) );
 			}
 		}
 	}

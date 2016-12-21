@@ -40,6 +40,7 @@ import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
+import io.searchbox.indices.settings.GetSettings;
 
 /**
  * A utility implementing primitives for the various {@code DefaultElasticsearchSchema*}.
@@ -121,10 +122,12 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	public IndexMetadata getCurrentIndexMetadata(String indexName) {
+		IndexMetadata indexMetadata = new IndexMetadata();
+		indexMetadata.setName( indexName );
+
 		GetMapping getMapping = new GetMapping.Builder()
 				.addIndex( indexName )
 				.build();
-
 		try {
 			JestResult result = jestClient.executeRequest( getMapping );
 			JsonObject resultJson = result.getJsonObject();
@@ -134,19 +137,45 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 			}
 			JsonElement mappings = index.getAsJsonObject().get( "mappings" );
 
-			IndexMetadata indexMetadata = new IndexMetadata();
-			indexMetadata.setName( indexName );
-
 			if ( mappings != null ) {
-					Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
-					indexMetadata.setMappings( gsonService.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType ) );
+				Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
+				indexMetadata.setMappings( gsonService.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType ) );
 			}
-
-			return indexMetadata;
 		}
 		catch (RuntimeException e) {
 			throw LOG.elasticsearchMappingRetrievalForValidationFailed( e );
 		}
+
+		GetSettings getSettings = new GetSettings.Builder()
+				.addIndex( indexName )
+				.build();
+		try {
+			JestResult result = jestClient.executeRequest( getSettings );
+			JsonObject resultJson = result.getJsonObject();
+			JsonElement index = result.getJsonObject().get( indexName );
+			if ( index == null || !index.isJsonObject() ) {
+				throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + resultJson );
+			}
+
+			JsonElement settings = index.getAsJsonObject().get( "settings" );
+			if ( settings == null || !settings.isJsonObject() ) {
+				throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + resultJson );
+			}
+
+			JsonElement indexSettings = settings.getAsJsonObject().get( "index" );
+			if ( indexSettings != null ) {
+				indexMetadata.setSettings( gsonService.getGson().fromJson( indexSettings, IndexSettings.class ) );
+			}
+			else {
+				// Empty settings
+				indexMetadata.setSettings( new IndexSettings() );
+			}
+		}
+		catch (RuntimeException e) {
+			throw LOG.elasticsearchIndexSettingsRetrievalForValidationFailed( e );
+		}
+
+		return indexMetadata;
 	}
 
 	public void putMapping(String indexName, String mappingName, TypeMapping mapping) {
