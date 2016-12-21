@@ -18,9 +18,15 @@ import org.hibernate.search.util.StringHelper;
 final class ValidationErrorCollector {
 
 	private String indexName;
+
 	private String mappingName;
-	private final Deque<String> currentPath = new ArrayDeque<String>();
+	private final Deque<String> currentPropertyPath = new ArrayDeque<String>();
 	private String fieldName;
+
+	private String analyzerName;
+	private String charFilterName;
+	private String tokenizerName;
+	private String tokenFilterName;
 
 	private final Map<ValidationContext, List<String>> messagesByContext = new LinkedHashMap<>();
 
@@ -33,15 +39,31 @@ final class ValidationErrorCollector {
 	}
 
 	public void pushPropertyName(String propertyName) {
-		currentPath.addLast( propertyName );
+		currentPropertyPath.addLast( propertyName );
 	}
 
 	public void popPropertyName() {
-		currentPath.removeLast();
+		currentPropertyPath.removeLast();
 	}
 
 	public void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
+	}
+
+	public void setAnalyzerName(String analyzerName) {
+		this.analyzerName = analyzerName;
+	}
+
+	public void setCharFilterName(String charFilterName) {
+		this.charFilterName = charFilterName;
+	}
+
+	public void setTokenizerName(String tokenizerName) {
+		this.tokenizerName = tokenizerName;
+	}
+
+	public void setTokenFilterName(String tokenFilterName) {
+		this.tokenFilterName = tokenFilterName;
 	}
 
 	public void addError(String errorMessage) {
@@ -55,7 +77,12 @@ final class ValidationErrorCollector {
 	}
 
 	private ValidationContext createContext() {
-		return new ValidationContext( indexName, mappingName, StringHelper.join( currentPath, "." ), fieldName );
+		return new ValidationContext(
+				indexName,
+				mappingName, StringHelper.join( currentPropertyPath, "." ), fieldName,
+				analyzerName,
+				charFilterName, tokenizerName, tokenFilterName
+				);
 	}
 
 	/**

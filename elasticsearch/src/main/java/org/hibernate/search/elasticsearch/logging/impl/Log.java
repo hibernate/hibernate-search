@@ -367,4 +367,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	SearchException elasticsearchSettingsUpdateFailed(String indexName, @Cause Exception e);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 68,
+			value = "Could not retrieve the index settings from Elasticsearch for validation"
+	)
+	SearchException elasticsearchIndexSettingsRetrievalForValidationFailed(@Cause Exception cause);
+
 }

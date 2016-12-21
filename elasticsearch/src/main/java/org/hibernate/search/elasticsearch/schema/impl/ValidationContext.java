@@ -10,16 +10,27 @@ import java.util.Objects;
 
 final class ValidationContext {
 	private final String indexName;
+
 	private final String mappingName;
-	private final String path;
+	private final String propertyPath;
 	private final String fieldName;
 
-	public ValidationContext(String indexName, String mappingName, String path, String fieldName) {
+	private final String analyzerName;
+	private final String charFilterName;
+	private final String tokenizerName;
+	private final String tokenFilterName;
+
+	public ValidationContext(String indexName, String mappingName, String propertyPath, String fieldName,
+			String analyzerName, String charFilterName, String tokenizerName, String tokenFilterName) {
 		super();
 		this.indexName = indexName;
 		this.mappingName = mappingName;
-		this.path = path;
+		this.propertyPath = propertyPath;
 		this.fieldName = fieldName;
+		this.analyzerName = analyzerName;
+		this.charFilterName = charFilterName;
+		this.tokenizerName = tokenizerName;
+		this.tokenFilterName = tokenFilterName;
 	}
 
 	public String getIndexName() {
@@ -30,12 +41,32 @@ final class ValidationContext {
 		return mappingName;
 	}
 
-	public String getPath() {
-		return path;
+	public String getPropertyPath() {
+		return propertyPath;
 	}
 
 	public String getFieldName() {
 		return fieldName;
+	}
+
+
+	public String getAnalyzerName() {
+		return analyzerName;
+	}
+
+
+	public String getCharFilterName() {
+		return charFilterName;
+	}
+
+
+	public String getTokenizerName() {
+		return tokenizerName;
+	}
+
+
+	public String getTokenFilterName() {
+		return tokenFilterName;
 	}
 
 	@Override
@@ -44,8 +75,12 @@ final class ValidationContext {
 			ValidationContext other = (ValidationContext) obj;
 			return Objects.equals( indexName, other.indexName )
 					&& Objects.equals( mappingName, other.mappingName )
-					&& Objects.equals( path, other.path )
-					&& Objects.equals( fieldName, other.fieldName );
+					&& Objects.equals( propertyPath, other.propertyPath )
+					&& Objects.equals( fieldName, other.fieldName )
+					&& Objects.equals( analyzerName, other.analyzerName )
+					&& Objects.equals( charFilterName, other.charFilterName )
+					&& Objects.equals( tokenizerName, other.tokenizerName )
+					&& Objects.equals( tokenFilterName, other.tokenFilterName );
 		}
 		return false;
 	}
@@ -56,8 +91,12 @@ final class ValidationContext {
 		int result = 1;
 		result = prime * result + Objects.hashCode( indexName );
 		result = prime * result + Objects.hashCode( mappingName );
-		result = prime * result + Objects.hashCode( path );
+		result = prime * result + Objects.hashCode( propertyPath );
 		result = prime * result + Objects.hashCode( fieldName );
+		result = prime * result + Objects.hashCode( analyzerName );
+		result = prime * result + Objects.hashCode( charFilterName );
+		result = prime * result + Objects.hashCode( tokenizerName );
+		result = prime * result + Objects.hashCode( tokenFilterName );
 		return result;
 	}
 }
