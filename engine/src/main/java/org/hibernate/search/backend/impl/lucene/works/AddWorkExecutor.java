@@ -84,7 +84,7 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 			return scopedAnalyzerReference;
 		}
 
-		ScopedAnalyzerReference.Builder copyBuilder = scopedAnalyzerReference.startCopy();
+		ScopedAnalyzerReference.CopyBuilder copyBuilder = scopedAnalyzerReference.startCopy();
 		for ( Map.Entry<String, String> entry : fieldToAnalyzerMap.entrySet() ) {
 			Analyzer analyzer = workspace.getAnalyzer( entry.getValue() );
 			if ( analyzer == null ) {

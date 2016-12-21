@@ -39,7 +39,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 	public final class HSearchEntityContext implements EntityContext {
 		private final Class<?> indexBoundType;
-		private final ScopedAnalyzerReference.Builder queryAnalyzerReferenceBuilder;
+		private final ScopedAnalyzerReference.CopyBuilder queryAnalyzerReferenceBuilder;
 
 		public HSearchEntityContext(Class<?> entityType, ExtendedSearchIntegrator factory) {
 			// get a type for meta-data retrieval; if the given type itself is not indexed, one indexed sub-type will
