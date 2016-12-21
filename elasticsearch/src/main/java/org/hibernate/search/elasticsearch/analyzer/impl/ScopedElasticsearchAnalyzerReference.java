@@ -24,19 +24,14 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 
 	private ScopedElasticsearchAnalyzer analyzer;
 
-	/*
-	 * We keep a reference to the builder for two reasons:
-	 *  1. Deferred initialization of the analyzer
-	 *  2. Copies of the analyzer; see startCopy()
-	 */
-	private final AbstractBuilder builder;
+	private DeferredInitializationBuilder builder;
 
-	public ScopedElasticsearchAnalyzerReference(AbstractBuilder builder, ScopedElasticsearchAnalyzer analyzer) {
-		this.builder = builder;
+	public ScopedElasticsearchAnalyzerReference(ScopedElasticsearchAnalyzer analyzer) {
+		this.builder = null;
 		this.analyzer = analyzer; // Already initialized
 	}
 
-	public ScopedElasticsearchAnalyzerReference(AbstractBuilder builder) {
+	private ScopedElasticsearchAnalyzerReference(DeferredInitializationBuilder builder) {
 		this.builder = builder;
 		this.analyzer = null; // Not initialized yet
 	}
@@ -58,6 +53,7 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 			throw new AssertionFailure( "An Elasticsearch analyzer reference has been initialized more than once: " + this );
 		}
 		this.analyzer = builder.buildAnalyzer();
+		this.builder = null;
 	}
 
 	@Override
@@ -68,20 +64,22 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 	}
 
 	@Override
-	public Builder startCopy() {
-		return new CopyBuilder( builder );
+	public CopyBuilder startCopy() {
+		return new CopyBuilder( getAnalyzer() );
 	}
 
-	public abstract static class AbstractBuilder implements ScopedAnalyzerReference.Builder {
+	/**
+	 * A builder that defers the actual analyzer creation to later during the search
+	 * factory initialization, so that the builder accepts dangling references.
+	 *
+	 * @author Yoann Rodiere
+	 */
+	public static class DeferredInitializationBuilder implements ScopedAnalyzerReference.Builder {
 
 		private ElasticsearchAnalyzerReference globalAnalyzerReference;
 		private final Map<String, ElasticsearchAnalyzerReference> scopedAnalyzerReferences = new HashMap<>();
 
-		protected AbstractBuilder(AbstractBuilder copied) {
-			this( copied.globalAnalyzerReference, copied.scopedAnalyzerReferences );
-		}
-
-		public AbstractBuilder(ElasticsearchAnalyzerReference globalAnalyzerReference,
+		public DeferredInitializationBuilder(ElasticsearchAnalyzerReference globalAnalyzerReference,
 				Map<String, ElasticsearchAnalyzerReference> scopedAnalyzers) {
 			this.globalAnalyzerReference = globalAnalyzerReference;
 			this.scopedAnalyzerReferences.putAll( scopedAnalyzers );
@@ -103,13 +101,14 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 		}
 
 		@Override
-		public abstract ScopedElasticsearchAnalyzerReference build();
+		public ScopedElasticsearchAnalyzerReference build() {
+			return new ScopedElasticsearchAnalyzerReference( this );
+		}
 
 		protected final ScopedElasticsearchAnalyzer buildAnalyzer() {
 			ElasticsearchAnalyzer globalAnalyzer = globalAnalyzerReference.getAnalyzer();
 
 			Map<String, ElasticsearchAnalyzer> scopedAnalyzers = new HashMap<>();
-
 			for ( Map.Entry<String, ElasticsearchAnalyzerReference> entry : scopedAnalyzerReferences.entrySet() ) {
 				scopedAnalyzers.put( entry.getKey(), entry.getValue().getAnalyzer() );
 			}
@@ -118,37 +117,31 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 		}
 	}
 
-	/**
-	 * A builder that defers the actual analyzer creation to later during the search
-	 * factory initialization, so that the builder accepts dangling references.
-	 *
-	 * @author Yoann Rodiere
-	 */
-	public static class DeferredInitializationBuilder extends AbstractBuilder {
+	public static class CopyBuilder implements ScopedAnalyzerReference.CopyBuilder {
 
-		public DeferredInitializationBuilder(ElasticsearchAnalyzerReference globalAnalyzerReference,
-				Map<String, ElasticsearchAnalyzerReference> scopedAnalyzers) {
-			super( globalAnalyzerReference, scopedAnalyzers );
+		private final ScopedElasticsearchAnalyzer baseAnalyzer;
+		private final Map<String, ElasticsearchAnalyzer> scopedAnalyzersOverrides = new HashMap<>();
+
+		protected CopyBuilder(ScopedElasticsearchAnalyzer baseAnalyzer) {
+			this.baseAnalyzer = baseAnalyzer;
+		}
+
+		@Override
+		public void addAnalyzerReference(String scope, AnalyzerReference analyzerReference) {
+			scopedAnalyzersOverrides.put( scope, getElasticsearchAnalyzerReference( analyzerReference ).getAnalyzer() );
 		}
 
 		@Override
 		public ScopedElasticsearchAnalyzerReference build() {
-			return new ScopedElasticsearchAnalyzerReference( this );
+			ElasticsearchAnalyzer globalAnalyzer = baseAnalyzer.getGlobalAnalyzer();
+
+			Map<String, ElasticsearchAnalyzer> scopedAnalyzers = new HashMap<>( baseAnalyzer.getScopedAnalyzers() );
+			scopedAnalyzers.putAll( scopedAnalyzersOverrides );
+
+			ScopedElasticsearchAnalyzer scopedAnalyzer = new ScopedElasticsearchAnalyzer( globalAnalyzer, scopedAnalyzers );
+
+			return new ScopedElasticsearchAnalyzerReference( scopedAnalyzer );
 		}
-	}
-
-	public static class CopyBuilder extends AbstractBuilder {
-
-		private CopyBuilder(AbstractBuilder copied) {
-			super( copied );
-		}
-
-		@Override
-		public ScopedElasticsearchAnalyzerReference build() {
-			ScopedElasticsearchAnalyzer analyzer = buildAnalyzer();
-			return new ScopedElasticsearchAnalyzerReference( this, analyzer );
-		}
-
 	}
 
 	private static ElasticsearchAnalyzerReference getElasticsearchAnalyzerReference(AnalyzerReference analyzerReference) {

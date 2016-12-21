@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.analyzer.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,16 +26,24 @@ import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements ScopedAnalyzer {
 
 	private final Analyzer globalAnalyzer;
-	private final Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
+	private final Map<String, Analyzer> scopedAnalyzers;
 
 	public ScopedLuceneAnalyzer(Analyzer globalAnalyzer) {
-		super( PER_FIELD_REUSE_STRATEGY );
-		this.globalAnalyzer = globalAnalyzer;
+		this( globalAnalyzer, Collections.<String, Analyzer>emptyMap() );
 	}
 
 	public ScopedLuceneAnalyzer(Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
-		this( globalAnalyzer );
-		this.scopedAnalyzers.putAll( scopedAnalyzers );
+		super( PER_FIELD_REUSE_STRATEGY );
+		this.globalAnalyzer = globalAnalyzer;
+		this.scopedAnalyzers = Collections.unmodifiableMap( new HashMap<>( scopedAnalyzers ) );
+	}
+
+	Analyzer getGlobalAnalyzer() {
+		return globalAnalyzer;
+	}
+
+	Map<String, Analyzer> getScopedAnalyzers() {
+		return scopedAnalyzers;
 	}
 
 	/**
