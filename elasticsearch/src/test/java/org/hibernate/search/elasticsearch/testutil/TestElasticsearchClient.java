@@ -37,8 +37,10 @@ import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.Health.Builder;
 import io.searchbox.core.Index;
+import io.searchbox.indices.CloseIndex;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
+import io.searchbox.indices.OpenIndex;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
 import io.searchbox.indices.settings.GetSettings;
@@ -294,9 +296,19 @@ public class TestElasticsearchClient extends ExternalResource {
 			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
 		}
 
-		JestResult result = client.execute( new UpdateSettings.Builder( settingsJsonElement ).addIndex( indexName ).build() );
+		JestResult result = client.execute( new CloseIndex.Builder( indexName ).build() );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while closing index '" + indexName
+					+ "' for tests:" + result.getErrorMessage() );
+		}
+		result = client.execute( new UpdateSettings.Builder( settingsJsonElement ).addIndex( indexName ).build() );
 		if ( !result.isSucceeded() ) {
 			throw new AssertionFailure( "Error while putting settings on index '" + indexName
+					+ "' for tests:" + result.getErrorMessage() );
+		}
+		result = client.execute( new OpenIndex.Builder( indexName ).build() );
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while re-opening index '" + indexName
 					+ "' for tests:" + result.getErrorMessage() );
 		}
 	}
