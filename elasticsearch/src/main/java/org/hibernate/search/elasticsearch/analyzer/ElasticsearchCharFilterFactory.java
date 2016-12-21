@@ -11,7 +11,7 @@ import org.hibernate.search.annotations.AnalyzerDef;
 
 /**
  * A token filter factory to use with {@link AnalyzerDef} annotations
- * to define an Elasticsearch token filter.
+ * to define an Elasticsearch char filter.
  * <p>
  * <strong>Caution:</strong> parameter values are interpreted as JSON, though using lenient parsing
  * (quotes around strings may be left out in some cases, as when a string only contains letters).
