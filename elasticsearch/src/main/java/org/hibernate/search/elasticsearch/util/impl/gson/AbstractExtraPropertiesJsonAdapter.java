@@ -64,13 +64,13 @@ public abstract class AbstractExtraPropertiesJsonAdapter<T> extends TypeAdapter<
 					fieldAdapter.read( in, instance );
 				}
 			}
-
+			in.endObject();
 		}
 		catch (IllegalStateException e) {
 			throw new JsonSyntaxException( e );
 		}
 
-		return null;
+		return instance;
 	}
 
 	@Override
