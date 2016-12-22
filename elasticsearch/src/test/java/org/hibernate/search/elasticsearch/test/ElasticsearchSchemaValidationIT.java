@@ -176,7 +176,11 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "'filter': {"
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
-									+ "'types': ['<NUM>', '<DOUBLE>']"
+									/*
+									 * The order doesn't matter with this array.
+									 * Here we test that validation ignores order.
+									 */
+									+ "'types': ['<DOUBLE>', '<NUM>']"
 							+ "},"
 							+ "'custom-word-delimiter': {"
 									+ "'type': 'word_delimiter',"
