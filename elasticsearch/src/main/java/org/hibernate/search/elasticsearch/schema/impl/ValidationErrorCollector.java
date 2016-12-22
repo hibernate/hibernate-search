@@ -13,76 +13,28 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.util.StringHelper;
-
 final class ValidationErrorCollector {
 
-	private String indexName;
-
-	private String mappingName;
-	private final Deque<String> currentPropertyPath = new ArrayDeque<String>();
-	private String fieldName;
-
-	private String analyzerName;
-	private String charFilterName;
-	private String tokenizerName;
-	private String tokenFilterName;
+	private final Deque<ValidationContextElement> currentContext = new ArrayDeque<ValidationContextElement>();
 
 	private final Map<ValidationContext, List<String>> messagesByContext = new LinkedHashMap<>();
 
-	public void setIndexName(String indexName) {
-		this.indexName = indexName;
+	public void push(ValidationContextType contextType, String name) {
+		this.currentContext.addLast( new ValidationContextElement( contextType, name ) );
 	}
 
-	public void setMappingName(String mappingName) {
-		this.mappingName = mappingName;
-	}
-
-	public void pushPropertyName(String propertyName) {
-		currentPropertyPath.addLast( propertyName );
-	}
-
-	public void popPropertyName() {
-		currentPropertyPath.removeLast();
-	}
-
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-	}
-
-	public void setAnalyzerName(String analyzerName) {
-		this.analyzerName = analyzerName;
-	}
-
-	public void setCharFilterName(String charFilterName) {
-		this.charFilterName = charFilterName;
-	}
-
-	public void setTokenizerName(String tokenizerName) {
-		this.tokenizerName = tokenizerName;
-	}
-
-	public void setTokenFilterName(String tokenFilterName) {
-		this.tokenFilterName = tokenFilterName;
+	public void pop() {
+		this.currentContext.removeLast();
 	}
 
 	public void addError(String errorMessage) {
-		ValidationContext context = createContext();
+		ValidationContext context = new ValidationContext( currentContext );
 		List<String> messages = messagesByContext.get( context );
 		if ( messages == null ) {
 			messages = new ArrayList<>();
 			messagesByContext.put( context, messages );
 		}
 		messages.add( errorMessage );
-	}
-
-	private ValidationContext createContext() {
-		return new ValidationContext(
-				indexName,
-				mappingName, StringHelper.join( currentPropertyPath, "." ), fieldName,
-				analyzerName,
-				charFilterName, tokenizerName, tokenFilterName
-				);
 	}
 
 	/**
