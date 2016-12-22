@@ -8,11 +8,11 @@ package org.hibernate.search.elasticsearch.settings.impl;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
-import org.hibernate.search.util.impl.CollectionHelper;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,8 +20,19 @@ import com.google.gson.JsonPrimitive;
 
 class CjkBigramIgnoredScriptsParametersTransformer implements ParametersTransformer {
 
-	private static final Set<String> SCRIPTS = Collections.unmodifiableSet(
-			CollectionHelper.asSet( "han", "hiragana", "katakana", "hangul" ) );
+	private static final Set<String> SCRIPTS;
+	static {
+		/*
+		 * Use LinkedHashSet to make sure the iteration order will always be the same,
+		 * so as not to confuse schema validation.
+		 */
+		Set<String> scripts = new LinkedHashSet<>();
+		scripts.add( "han" );
+		scripts.add( "hiragana" );
+		scripts.add( "katakana" );
+		scripts.add( "hangul" );
+		SCRIPTS = Collections.unmodifiableSet( scripts );
+	}
 
 	@Override
 	public Map<String, JsonElement> transform(Map<String, String> luceneParameters) {
