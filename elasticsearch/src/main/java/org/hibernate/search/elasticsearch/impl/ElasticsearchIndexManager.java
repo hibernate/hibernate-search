@@ -59,8 +59,25 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	static final Log LOG = LoggerFactory.make( Log.class );
 
+	/**
+	 * The index name for Hibernate Search, which is actually
+	 * the index <em>manager</em> name.
+	 * <p>
+	 * Following the behavior of Lucene index managers, this
+	 * name will reflect any annotation-based index name override
+	 * ({@code @Indexed(index = "override")}) but will ignore
+	 * configuration-based override
+	 * ({@code hibernate.search.my.package.MyClass.indexName = foo}),
+	 * which is only reflected in {@link #actualIndexName}.
+	 */
 	private String indexName;
+
+	/**
+	 * The index name for the Elasticsearch module, i.e. the
+	 * actual name of the underlying Elasticsearch index.
+	 */
 	private String actualIndexName;
+
 	private boolean refreshAfterWrite;
 	private IndexSchemaManagementStrategy schemaManagementStrategy;
 	private ExecutionOptions schemaManagementExecutionOptions;
@@ -91,7 +108,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	public void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context) {
 		this.serviceManager = context.getServiceManager();
 
-		this.indexName = getIndexName( indexName, properties );
+		this.indexName = indexName;
 		this.schemaManagementStrategy = getIndexManagementStrategy( properties );
 		final ElasticsearchIndexStatus requiredIndexStatus = getRequiredIndexStatus( properties );
 		final int indexManagementWaitTimeout = getIndexManagementWaitTimeout( properties );
@@ -124,7 +141,8 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		this.schemaValidator = serviceManager.requestService( ElasticsearchSchemaValidator.class );
 		this.schemaTranslator = serviceManager.requestService( ElasticsearchSchemaTranslator.class );
 
-		this.actualIndexName = ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( this.indexName );
+		String overriddenIndexName = getOverriddenIndexName( indexName, properties );
+		this.actualIndexName = ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( overriddenIndexName );
 		this.refreshAfterWrite = getRefreshAfterWrite( properties );
 
 		this.similarity = similarity;
@@ -137,7 +155,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		this.requestProcessor = context.getServiceManager().requestService( BackendRequestProcessor.class );
 	}
 
-	private static String getIndexName(String indexName, Properties properties) {
+	private static String getOverriddenIndexName(String indexName, Properties properties) {
 		String name = properties.getProperty( Environment.INDEX_NAME_PROP_NAME );
 		return name != null ? name : indexName;
 	}
