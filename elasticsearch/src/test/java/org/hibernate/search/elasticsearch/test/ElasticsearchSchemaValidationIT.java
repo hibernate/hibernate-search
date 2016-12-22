@@ -548,9 +548,9 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage(
-								"\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity':"
+								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity':"
 								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
-								+ "\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity', property 'myField':"
+								+ "\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity', property 'myField':"
 								+ "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'STRING'"
 						)
 				.build()
@@ -598,16 +598,16 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage(
-								"\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simplebooleanentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleBooleanEntity':"
+								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simplebooleanentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleBooleanEntity':"
 								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
 						)
 				.withSuppressed(
 						isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage(
-								"\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity':"
+								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity':"
 								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
-								+ "\nIndex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity', property 'myField':"
+								+ "\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simpledateentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleDateEntity', property 'myField':"
 								+ "\n\tInvalid value for attribute 'type'. Expected 'DATE', actual is 'STRING'"
 						)
 						.build()

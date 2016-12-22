@@ -20,44 +20,44 @@ import org.jboss.logging.annotations.MessageBundle;
 public interface ElasticsearchValidationMessages {
 
 	@Message(
-			value = "Index '%1$s':"
+			value = "index '%1$s'"
 	)
-	String errorIntro(String indexName);
+	String indexContext(String name);
 
 	@Message(
-			value = "Index '%1$s', mapping '%2$s':"
+			value = "mapping '%1$s'"
 	)
-	String mappingErrorIntro(String indexName, String mappingName);
+	String mappingContext(String name);
 
 	@Message(
-			value = "Index '%1$s', mapping '%2$s', property '%3$s':"
+			value = "property '%1$s'"
 	)
-	String mappingErrorIntro(String indexName, String mappingName, String path);
+	String mappingPropertyContext(String path);
 
 	@Message(
-			value = "Index '%1$s', mapping '%2$s', property '%3$s', field '%4$s':"
+			value = "field '%1$s'"
 	)
-	String mappingErrorIntro(String indexName, String mappingName, String path, String field);
+	String mappingPropertyFieldContext(String name);
 
 	@Message(
-			value = "Index '%1$s', analyzer '%2$s':"
+			value = "analyzer '%1$s'"
 	)
-	String analyzerErrorIntro(String indexName, String analyzerName);
+	String analyzerContext(String name);
 
 	@Message(
-			value = "Index '%1$s', char filter '%2$s':"
+			value = "char filter '%1$s'"
 	)
-	String charFilterErrorIntro(String indexName, String charFilterName);
+	String charFilterContext(String name);
 
 	@Message(
-			value = "Index '%1$s', tokenizer '%2$s':"
+			value = "tokenizer '%1$s'"
 	)
-	String tokenizerErrorIntro(String indexName, String tokenizerName);
+	String tokenizerContext(String name);
 
 	@Message(
-			value = "Index '%1$s', token filter '%2$s':"
+			value = "token filter '%1$s'"
 	)
-	String tokenFilterErrorIntro(String indexName, String tokenizerName);
+	String tokenFilterContext(String name);
 
 	@Message(
 			value = "Missing type mapping"

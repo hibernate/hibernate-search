@@ -6,81 +6,29 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 final class ValidationContext {
-	private final String indexName;
+	private final List<ValidationContextElement> elements;
 
-	private final String mappingName;
-	private final String propertyPath;
-	private final String fieldName;
-
-	private final String analyzerName;
-	private final String charFilterName;
-	private final String tokenizerName;
-	private final String tokenFilterName;
-
-	public ValidationContext(String indexName, String mappingName, String propertyPath, String fieldName,
-			String analyzerName, String charFilterName, String tokenizerName, String tokenFilterName) {
+	public ValidationContext(Collection<ValidationContextElement> elements) {
 		super();
-		this.indexName = indexName;
-		this.mappingName = mappingName;
-		this.propertyPath = propertyPath;
-		this.fieldName = fieldName;
-		this.analyzerName = analyzerName;
-		this.charFilterName = charFilterName;
-		this.tokenizerName = tokenizerName;
-		this.tokenFilterName = tokenFilterName;
+		this.elements = Collections.unmodifiableList( new ArrayList<>( elements ) );
 	}
 
-	public String getIndexName() {
-		return indexName;
-	}
-
-	public String getMappingName() {
-		return mappingName;
-	}
-
-	public String getPropertyPath() {
-		return propertyPath;
-	}
-
-	public String getFieldName() {
-		return fieldName;
-	}
-
-
-	public String getAnalyzerName() {
-		return analyzerName;
-	}
-
-
-	public String getCharFilterName() {
-		return charFilterName;
-	}
-
-
-	public String getTokenizerName() {
-		return tokenizerName;
-	}
-
-
-	public String getTokenFilterName() {
-		return tokenFilterName;
+	public List<ValidationContextElement> getElements() {
+		return elements;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if ( obj != null && getClass().equals( obj.getClass() ) ) {
 			ValidationContext other = (ValidationContext) obj;
-			return Objects.equals( indexName, other.indexName )
-					&& Objects.equals( mappingName, other.mappingName )
-					&& Objects.equals( propertyPath, other.propertyPath )
-					&& Objects.equals( fieldName, other.fieldName )
-					&& Objects.equals( analyzerName, other.analyzerName )
-					&& Objects.equals( charFilterName, other.charFilterName )
-					&& Objects.equals( tokenizerName, other.tokenizerName )
-					&& Objects.equals( tokenFilterName, other.tokenFilterName );
+			return Objects.equals( elements, other.elements );
 		}
 		return false;
 	}
@@ -89,14 +37,7 @@ final class ValidationContext {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Objects.hashCode( indexName );
-		result = prime * result + Objects.hashCode( mappingName );
-		result = prime * result + Objects.hashCode( propertyPath );
-		result = prime * result + Objects.hashCode( fieldName );
-		result = prime * result + Objects.hashCode( analyzerName );
-		result = prime * result + Objects.hashCode( charFilterName );
-		result = prime * result + Objects.hashCode( tokenizerName );
-		result = prime * result + Objects.hashCode( tokenFilterName );
+		result = prime * result + Objects.hashCode( elements );
 		return result;
 	}
 }
