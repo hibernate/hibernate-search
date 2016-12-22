@@ -16,6 +16,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.schema.impl.json.AnalysisJsonElementEquivalence;
+import org.hibernate.search.elasticsearch.schema.impl.json.AnalysisParameterEquivalenceRegistry;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
@@ -63,6 +65,51 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		formats.add( "epoch_millis" );
 		DEFAULT_DATE_FORMAT = CollectionHelper.toImmutableList( formats );
 	}
+
+	private static final AnalysisParameterEquivalenceRegistry ANALYZER_EQUIVALENCES =
+			new AnalysisParameterEquivalenceRegistry.Builder()
+					.type( "keep_types" )
+							.param( "types" ).unorderedArray()
+					.end()
+					.build();
+
+	private static final AnalysisParameterEquivalenceRegistry CHAR_FILTER_EQUIVALENCES =
+			new AnalysisParameterEquivalenceRegistry.Builder().build();
+
+	private static final AnalysisParameterEquivalenceRegistry TOKENIZER_EQUIVALENCES =
+			new AnalysisParameterEquivalenceRegistry.Builder()
+					.type( "edgeNGram" )
+							.param( "token_chars" ).unorderedArray()
+					.end()
+					.type( "nGram" )
+							.param( "token_chars" ).unorderedArray()
+					.end()
+					.type( "stop" )
+							.param( "stopwords" ).unorderedArray()
+					.end()
+					.type( "word_delimiter" )
+							.param( "protected_words" ).unorderedArray()
+					.end()
+					.type( "keyword_marker" )
+							.param( "keywords" ).unorderedArray()
+					.end()
+					.type( "pattern_capture" )
+							.param( "patterns" ).unorderedArray()
+					.end()
+					.type( "common_grams" )
+							.param( "common_words" ).unorderedArray()
+					.end()
+					.type( "cjk_bigram" )
+							.param( "ignored_scripts" ).unorderedArray()
+					.end()
+					.build();
+
+	private static final AnalysisParameterEquivalenceRegistry TOKEN_FILTER_EQUIVALENCES =
+			new AnalysisParameterEquivalenceRegistry.Builder()
+					.type( "keep_types" )
+							.param( "types" ).unorderedArray()
+					.end()
+					.build();
 
 	private ServiceManager serviceManager;
 	private ElasticsearchSchemaAccessor schemaAccessor;
@@ -213,7 +260,7 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 					continue;
 				}
 
-				validateAnalysisDefinition( errorCollector, expected, actual );
+				validateAnalysisDefinition( errorCollector, CHAR_FILTER_EQUIVALENCES, expected, actual );
 			}
 			finally {
 				errorCollector.setCharFilterName( null );
@@ -237,7 +284,7 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 					continue;
 				}
 
-				validateAnalysisDefinition( errorCollector, expected, actual );
+				validateAnalysisDefinition( errorCollector, TOKENIZER_EQUIVALENCES, expected, actual );
 			}
 			finally {
 				errorCollector.setTokenizerName( null );
@@ -261,7 +308,7 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 					continue;
 				}
 
-				validateAnalysisDefinition( errorCollector, expected, actual );
+				validateAnalysisDefinition( errorCollector, TOKEN_FILTER_EQUIVALENCES, expected, actual );
 			}
 			finally {
 				errorCollector.setTokenFilterName( null );
@@ -271,7 +318,7 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 
 	private void validateAnalyzerDefinition(ValidationErrorCollector errorCollector, AnalyzerDefinition expectedDefinition,
 			AnalyzerDefinition actualDefinition) {
-		validateAnalysisDefinition(errorCollector, expectedDefinition, actualDefinition);
+		validateAnalysisDefinition( errorCollector, ANALYZER_EQUIVALENCES, expectedDefinition, actualDefinition );
 
 		if ( ! Objects.equals( expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) ) {
 			errorCollector.addError( MESSAGES.invalidAnalyzerCharFilters(
@@ -289,8 +336,8 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		}
 	}
 
-	private void validateAnalysisDefinition(ValidationErrorCollector errorCollector, AnalysisDefinition expectedDefinition,
-			AnalysisDefinition actualDefinition) {
+	private void validateAnalysisDefinition(ValidationErrorCollector errorCollector, AnalysisParameterEquivalenceRegistry equivalences,
+			AnalysisDefinition expectedDefinition, AnalysisDefinition actualDefinition) {
 		if ( ! Objects.equals( expectedDefinition.getType(), actualDefinition.getType() ) ) {
 			errorCollector.addError( MESSAGES.invalidAnalysisDefinitionType(
 					expectedDefinition.getType(), actualDefinition.getType()
@@ -312,27 +359,13 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		parametersToValidate.addAll( expectedParameters.keySet() );
 		parametersToValidate.addAll( actualParameters.keySet() );
 
-		for ( String name : parametersToValidate ) {
-			JsonElement expected = expectedParameters.get( name );
-			JsonElement actual = actualParameters.get( name );
-			validateAnalysisDefinitionParameterValue( errorCollector, name, expected, actual );
-		}
-	}
-
-	private void validateAnalysisDefinitionParameterValue(ValidationErrorCollector errorCollector,
-			String name, JsonElement expected, JsonElement actual) {
-		if ( expected != null && expected.isJsonPrimitive() && actual != null && actual.isJsonPrimitive() ) {
-			/*
-			 * Elasticsearch returns strings even for integers or booleans,
-			 * so in this case we must compare the string representations.
-			 */
-			if ( ! Objects.equals( expected.getAsString(), actual.getAsString() ) ) {
-				errorCollector.addError( MESSAGES.invalidAnalysisDefinitionParameter( name, expected, actual ) );
-			}
-		}
-		else {
-			if ( ! Objects.equals( expected, actual ) ) {
-				errorCollector.addError( MESSAGES.invalidAnalysisDefinitionParameter( name, expected, actual ) );
+		String typeName = expectedDefinition.getType();
+		for ( String parameterName : parametersToValidate ) {
+			JsonElement expected = expectedParameters.get( parameterName );
+			JsonElement actual = actualParameters.get( parameterName );
+			AnalysisJsonElementEquivalence parameterEquivalence = equivalences.get( typeName, parameterName );
+			if ( ! parameterEquivalence.isEquivalent( expected, actual ) ) {
+				errorCollector.addError( MESSAGES.invalidAnalysisDefinitionParameter( parameterName, expected, actual ) );
 			}
 		}
 	}
