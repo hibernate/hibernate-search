@@ -25,6 +25,7 @@ public interface ElasticsearchSchemaMigrator extends Service {
 	 * <p>The index is expected to already exist.
 	 *
 	 * @param indexMetadata The expected index metadata.
+	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
 	void merge(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
