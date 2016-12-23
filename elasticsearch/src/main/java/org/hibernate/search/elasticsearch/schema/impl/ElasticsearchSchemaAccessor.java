@@ -35,12 +35,15 @@ import io.searchbox.action.AbstractAction;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.Health.Builder;
+import io.searchbox.indices.CloseIndex;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
+import io.searchbox.indices.OpenIndex;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
 import io.searchbox.indices.settings.GetSettings;
+import io.searchbox.indices.settings.UpdateSettings;
 
 /**
  * A utility implementing primitives for the various {@code DefaultElasticsearchSchema*}.
@@ -178,6 +181,21 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		return indexMetadata;
 	}
 
+	public void updateSettings(String indexName, IndexSettings settings) {
+		String settingsAsJson = serializeAsJsonWithoutNulls( settings );
+
+		UpdateSettings putSettings = new UpdateSettings.Builder( settingsAsJson )
+				.addIndex( indexName )
+				.build();
+
+		try {
+			jestClient.executeRequest( putSettings );
+		}
+		catch (RuntimeException e) {
+			throw LOG.elasticsearchSettingsUpdateFailed( indexName, e );
+		}
+	}
+
 	public void putMapping(String indexName, String mappingName, TypeMapping mapping) {
 		String mappingAsJson = serializeAsJsonWithoutNulls( mapping );
 
@@ -226,5 +244,13 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	public void dropIndex(String indexName, ExecutionOptions executionOptions) {
 		jestClient.executeRequest( new DeleteIndex.Builder( indexName ).build() );
+	}
+
+	public void closeIndex(String indexName) {
+		jestClient.executeRequest( new CloseIndex.Builder( indexName ).build() );
+	}
+
+	public void openIndex(String indexName) {
+		jestClient.executeRequest( new OpenIndex.Builder( indexName ).build() );
 	}
 }
