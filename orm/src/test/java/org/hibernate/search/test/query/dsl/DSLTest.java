@@ -1206,22 +1206,22 @@ public class DSLTest extends SearchTestBase {
 			SearchMapping mapping = new SearchMapping();
 			mapping
 					.analyzerDef( "stemmer", StandardTokenizerFactory.class )
-					.filter( StandardFilterFactory.class )
-					.filter( LowerCaseFilterFactory.class )
-					.filter( StopFilterFactory.class )
-					.filter( SnowballPorterFilterFactory.class )
-					.param( "language", "English" )
+							.filter( StandardFilterFactory.class )
+							.filter( LowerCaseFilterFactory.class )
+							.filter( StopFilterFactory.class )
+							.filter( SnowballPorterFilterFactory.class )
+									.param( "language", "English" )
 					.analyzerDef( "ngram", StandardTokenizerFactory.class )
-					.filter( StandardFilterFactory.class )
-					.filter( LowerCaseFilterFactory.class )
-					.filter( StopFilterFactory.class )
-					.filter( NGramFilterFactory.class )
-					.param( "minGramSize", "3" )
-					.param( "maxGramSize", "3" )
+							.filter( StandardFilterFactory.class )
+							.filter( LowerCaseFilterFactory.class )
+							.filter( StopFilterFactory.class )
+							.filter( NGramFilterFactory.class )
+									.param( "minGramSize", "3" )
+									.param( "maxGramSize", "3" )
 					.analyzerDef( "htmlStrip", StandardTokenizerFactory.class )
-					.charFilter( HTMLStripCharFilterFactory.class )
-					.param( "escapedTags", "escaped" )
-					.filter( LowerCaseFilterFactory.class );
+							.charFilter( HTMLStripCharFilterFactory.class )
+									.param( "escapedTags", "escaped" )
+							.filter( LowerCaseFilterFactory.class );
 			return mapping;
 		}
 	}
