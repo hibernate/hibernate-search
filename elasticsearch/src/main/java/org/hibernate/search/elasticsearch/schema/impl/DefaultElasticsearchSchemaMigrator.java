@@ -31,15 +31,19 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 
 	private ServiceManager serviceManager;
 	private ElasticsearchSchemaAccessor schemaAccessor;
+	private ElasticsearchSchemaValidator schemaValidator;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
 		schemaAccessor = serviceManager.requestService( ElasticsearchSchemaAccessor.class );
+		schemaValidator = serviceManager.requestService( ElasticsearchSchemaValidator.class );
 	}
 
 	@Override
 	public void stop() {
+		schemaValidator = null;
+		serviceManager.releaseService( ElasticsearchSchemaValidator.class );
 		schemaAccessor = null;
 		serviceManager.releaseService( ElasticsearchSchemaAccessor.class );
 		serviceManager = null;
@@ -51,7 +55,11 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 		IndexSettings settings = indexMetadata.getSettings();
 
 		try {
-			if ( !settings.isEmpty() ) {
+			/*
+			 * We only update settings if it's really necessary, because closing the index,
+			 * even for just a moment, may hurt if other clients are using the index.
+			 */
+			if ( !settings.isEmpty() && !schemaValidator.isSettingsValid( indexMetadata, executionOptions ) ) {
 				schemaAccessor.closeIndex( indexName );
 				try {
 					schemaAccessor.updateSettings( indexName, settings );
