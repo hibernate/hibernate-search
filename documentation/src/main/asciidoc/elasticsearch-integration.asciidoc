@@ -117,13 +117,16 @@ Let's see the options for the `index_schema_management_strategy` property:
 [options="header"]
 |===============
 |Value|Definition
-|`NONE`|Indexes and their mappings will not be created, deleted nor altered. Hibernate Search will only check that the indexes already exist.
-|`VALIDATE`|Existing indexes and mappings will be checked for conflicts with Hibernate Search's metamodel. Indexes and their mappings will not be created, deleted nor altered.
+|`NONE`|Indexes, their mappings and their analyzer definitions will not be created, deleted nor altered.
+Hibernate Search will only check that the indexes already exist.
+|`VALIDATE`|Existing indexes and mappings will be checked for conflicts with Hibernate Search's metamodel.
+Indexes, their mappings and their analyzer definitions will not be created, deleted nor altered.
 Caution: analyzer definitions will not be validated (https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519]).
 |`MERGE`|Missing indexes and mappings will be created, existing mappings will be updated if there are no conflicts.
 Caution: analyzer definitions will not be updated (https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520]).
-|`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created along with their mappings.
-|`RECREATE`|Indexes will be deleted if existing and then created along with their mappings. This will delete all content from the indexes!
+|`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created along with their mappings and analyzer definitions.
+|`RECREATE`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions.
+This will delete all content from the indexes!
 |`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
 |===============
 +
