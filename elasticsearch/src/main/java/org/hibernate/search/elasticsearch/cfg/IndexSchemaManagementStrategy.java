@@ -22,7 +22,8 @@ public enum IndexSchemaManagementStrategy {
 	/**
 	 * Upon session factory initialization, existing index mappings will be checked
 	 * by Hibernate Search, causing an exception if a required mapping does not exist
-	 * or exists but differs in a non-compatible way (more strict type constraints, for instance).
+	 * or exists but differs in a non-compatible way (more strict type constraints, for instance),
+	 * or if an analyzer definition is missing or differs in any way.
 	 * <p>This strategy will not bring any change to the mappings or analyzer definitions, nor create or delete any index.
 	 */
 	VALIDATE,
