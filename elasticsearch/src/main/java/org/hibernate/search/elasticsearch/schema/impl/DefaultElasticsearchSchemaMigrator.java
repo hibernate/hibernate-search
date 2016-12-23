@@ -12,6 +12,7 @@ import java.util.Properties;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
+import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
@@ -47,8 +48,28 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 	@Override
 	public void merge(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
 		String indexName = indexMetadata.getName();
+		IndexSettings settings = indexMetadata.getSettings();
 
 		try {
+			if ( !settings.isEmpty() ) {
+				schemaAccessor.closeIndex( indexName );
+				try {
+					schemaAccessor.updateSettings( indexName, settings );
+				}
+				catch (RuntimeException mainException) {
+					// Try not to leave the index closed if something failed
+					try {
+						schemaAccessor.openIndex( indexName );
+					}
+					catch (RuntimeException e) {
+						mainException.addSuppressed( e );
+					}
+					throw mainException;
+				}
+				// Re-open the index after the settings have been successfully updated
+				schemaAccessor.openIndex( indexName );
+			}
+
 			for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
 				String mappingName = entry.getKey();
 				TypeMapping mapping = entry.getValue();
