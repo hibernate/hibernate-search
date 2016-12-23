@@ -29,9 +29,10 @@ public enum IndexSchemaManagementStrategy {
 	VALIDATE,
 
 	/**
-	 * Upon session factory initialization, index mappings will be merged with existing ones, causing an exception if a
-	 * mapping to be merged is not compatible with the existing one.
-	 * <p>Missing indexes will be created along with their mappings. Missing mappings on existing indexes will be created.
+	 * Upon session factory initialization, index mappings and analyzer definitions will be merged with existing ones,
+	 * causing an exception if a mapping to be merged is not compatible with the existing one.
+	 * <p>Missing indexes will be created along with their mappings and analyzer definitions.
+	 * Missing mappings and analyzer definitions on existing indexes will be created.
 	 */
 	MERGE,
 
