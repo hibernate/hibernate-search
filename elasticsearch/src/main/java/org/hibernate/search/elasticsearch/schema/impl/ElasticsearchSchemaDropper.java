@@ -20,6 +20,7 @@ public interface ElasticsearchSchemaDropper extends Service {
 	 * Drops an index, throwing an exception if dropping fails.
 	 *
 	 * @param indexName The name of the index to drop.
+	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
 	void drop(String indexName, ExecutionOptions executionOptions);
@@ -30,6 +31,7 @@ public interface ElasticsearchSchemaDropper extends Service {
 	 * <p>This method will skip operations silently if the index does not exist.
 	 *
 	 * @param indexName The name of the index to drop.
+	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
 	void dropIfExisting(String indexName, ExecutionOptions executionOptions);
