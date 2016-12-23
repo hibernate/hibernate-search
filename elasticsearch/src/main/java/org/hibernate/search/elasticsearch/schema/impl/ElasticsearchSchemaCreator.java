@@ -21,6 +21,7 @@ public interface ElasticsearchSchemaCreator extends Service {
 	 * Create an index.
 	 *
 	 * @param indexMetadata The expected index metadata.
+	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
 	void createIndex(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
@@ -29,6 +30,7 @@ public interface ElasticsearchSchemaCreator extends Service {
 	 * Create an index, but only if the index doesn't already exist.
 	 *
 	 * @param indexMetadata The expected index metadata.
+	 * @param executionOptions The execution options, giving more context information.
 	 * @return {@code true} if the index had to be created, {@code false} otherwise.
 	 * @throws SearchException If an error occurs.
 	 */
@@ -38,6 +40,7 @@ public interface ElasticsearchSchemaCreator extends Service {
 	 * Checks that an index already exists.
 	 *
 	 * @param indexname The expected index name.
+	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If the index doesn't exist, or if an error occurs.
 	 */
 	void checkIndexExists(String indexname, ExecutionOptions executionOptions);
@@ -48,6 +51,7 @@ public interface ElasticsearchSchemaCreator extends Service {
 	 * <p>Mappings are supposed to be absent from the index.
 	 *
 	 * @param indexMetadata The expected index metadata.
+	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
 	void createMappings(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
