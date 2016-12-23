@@ -121,8 +121,9 @@ Let's see the options for the `index_schema_management_strategy` property:
 Hibernate Search will only check that the indexes already exist.
 |`VALIDATE`|Existing indexes, mappings and analyzer definitions will be checked for conflicts with Hibernate Search's metamodel.
 Indexes, their mappings and their analyzer definitions will not be created, deleted nor altered.
-|`MERGE`|Missing indexes and mappings will be created, existing mappings will be updated if there are no conflicts.
-Caution: analyzer definitions will not be updated (https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520]).
+|`MERGE`|Missing indexes, mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
++
+Caution: if analyzer definitions have to be updated, the index will be closed automatically during the update.
 |`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created along with their mappings and analyzer definitions.
 |`RECREATE`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions.
 This will delete all content from the indexes!
@@ -136,7 +137,11 @@ It is strongly recommended to use either `NONE` or `VALIDATE` in a production en
 
 To be precise, if your mapping changed in an incompatible way, such as a field having its type changed, merging may be impossible. In this case, the `MERGE` strategy will prevent Hibernate Search from starting, but it may already have successfully merged another index, making a rollback difficult at best.
 
-For this reason, migrating your mapping should be considered a part of your deployment process and be planned cautiously.
+Also, when updating analyzer definitions, Hibernate Search will stop the affected indexes during the update.
+This means the `MERGE` strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
+those clients should be synchronized in such a way that while Hibernate Search is starting, no other client tries to use the index.
+
+For these reasons, migrating your mapping should be considered a part of your deployment process and be planned cautiously.
 ====
 +
 [NOTE]
@@ -336,15 +341,6 @@ like you would <<section-named-analyzers,do with an embedded Lucene instance>>.
 When Hibernate Search creates the Elasticsearch indexes, the relevant definitions will then be automatically added as a
 https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html[custom analyzer]
 in  the index settings.
-
-[WARNING]
-====
-Analyzer definitions will only be created automatically when Hibernate Search creates the index.
-Hibernate Search will never update analyzer definitions on an existing index:
-there is no support for the `MERGE` <<elasticsearch-schema-management-strategy,schema management strategy>>.
-
-We are working on improving this aspect: https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520].
-====
 
 Two different approaches allow you to define your analyzers with Elasticsearch.
 
