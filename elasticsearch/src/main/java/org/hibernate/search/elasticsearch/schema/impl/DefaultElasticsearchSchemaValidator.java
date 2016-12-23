@@ -164,6 +164,23 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 		throw LOG.schemaValidationFailed( builder.toString() );
 	}
 
+	@Override
+	public boolean isSettingsValid(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
+		String indexName = expectedIndexMetadata.getName();
+		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
+
+		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
+		errorCollector.push( ValidationContextType.INDEX, indexName );
+		try {
+			validateIndexSettings( errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings() );
+		}
+		finally {
+			errorCollector.pop();
+		}
+
+		return errorCollector.getMessagesByContext().isEmpty();
+	}
+
 	/**
 	 * Format the validation context using the following format:
 	 * {@code contextElement1, contextElement2, ... , contextElementN:}.
