@@ -372,4 +372,22 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	SearchException elasticsearchIndexSettingsRetrievalForValidationFailed(@Cause Exception cause);
 
+	@LogMessage(level = Level.INFO)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 69,
+			value = "Closed Elasticsearch index '%1$s' automatically."
+	)
+	void closedIndex(String indexName);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 70,
+			value = "Opened Elasticsearch index '%1$s' automatically."
+	)
+	void openedIndex(String indexName);
+
+	@LogMessage(level = Level.ERROR)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 71,
+			value = "Failed to open Elasticsearch index '%1$s' ; see the stack trace below."
+	)
+	void failedToOpenIndex(String indexName);
+
 }

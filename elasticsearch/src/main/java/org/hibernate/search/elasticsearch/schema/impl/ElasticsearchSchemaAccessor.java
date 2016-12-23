@@ -248,9 +248,17 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	public void closeIndex(String indexName) {
 		jestClient.executeRequest( new CloseIndex.Builder( indexName ).build() );
+		LOG.closedIndex( indexName );
 	}
 
 	public void openIndex(String indexName) {
-		jestClient.executeRequest( new OpenIndex.Builder( indexName ).build() );
+		try {
+			jestClient.executeRequest( new OpenIndex.Builder( indexName ).build() );
+		}
+		catch (RuntimeException e) {
+			LOG.openedIndex( indexName );
+			throw e;
+		}
+		LOG.openedIndex( indexName );
 	}
 }
