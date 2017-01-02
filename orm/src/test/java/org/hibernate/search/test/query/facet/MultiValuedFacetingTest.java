@@ -290,9 +290,9 @@ public class MultiValuedFacetingTest {
 		@Field(analyze = Analyze.NO)
 		@org.hibernate.search.annotations.Facet
 		@IndexedEmbedded // This enables ArrayBridge: not needed for faceting, but needed for indexing
-		private Integer[] facet;
+		private int[] facet;
 
-		private NumberArrayFacetEntity(Long id, Integer ... facet) {
+		private NumberArrayFacetEntity(Long id, int ... facet) {
 			super();
 			this.id = id;
 			this.facet = facet;

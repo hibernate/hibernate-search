@@ -11,6 +11,7 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
  * Each entry ({@code null included}) of an array is indexed using the specified {@link org.hibernate.search.bridge.FieldBridge}.
@@ -43,8 +44,8 @@ public class ArrayBridge implements FieldBridge, ContainerBridge {
 	}
 
 	private void indexNotNullArray(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		Object[] collection = (Object[]) value;
-		for ( Object entry : collection ) {
+		// Use CollectionHelper.iterableFromArray to also support arrays of primitive values
+		for ( Object entry : CollectionHelper.iterableFromArray( value ) ) {
 			indexEntry( name, entry, document, luceneOptions );
 		}
 	}
