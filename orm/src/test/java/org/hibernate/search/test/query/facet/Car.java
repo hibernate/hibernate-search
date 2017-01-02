@@ -35,10 +35,6 @@ import org.hibernate.search.bridge.builtin.IntegerBridge;
  */
 @Entity
 @Indexed
-/*
- * CAUTION: those analyzer definitions are duplicated in the elasticsearch.yml for test with Elasticsearch.
- * Any update here should be reflected there.
- */
 @AnalyzerDefs({
 	@AnalyzerDef(
 			name = Car.COLLATING_ANALYZER_NAME,
