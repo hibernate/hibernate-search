@@ -661,10 +661,33 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					if ( fieldMetadata.hasFacets() ) {
 						faceting.enableFacetProcessing();
 						for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
-							if ( isParentPropertyMultiValued ) {
+							boolean multivalued = isParentPropertyMultiValued;
+
+							if ( member.isCollection() && currentFieldValue instanceof Collection ) {
+								multivalued = true;
+								for ( Object element : (Collection<?>) currentFieldValue ) {
+									addFacetDocValues( document, fieldMetadata, facetMetadata, element );
+								}
+							}
+							else if ( member.isCollection() && currentFieldValue instanceof Map ) {
+								multivalued = true;
+								for ( Object element : ((Map<?,?>) currentFieldValue).values() ) {
+									addFacetDocValues( document, fieldMetadata, facetMetadata, element );
+								}
+							}
+							else if ( member.isArray() ) {
+								multivalued = true;
+								for ( Object element : (Object[]) currentFieldValue ) {
+									addFacetDocValues( document, fieldMetadata, facetMetadata, element );
+								}
+							}
+							else {
+								addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
+							}
+
+							if ( multivalued ) {
 								faceting.setMultiValued( facetMetadata.getAbsoluteName() );
 							}
-							addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
 						}
 					}
 				}
