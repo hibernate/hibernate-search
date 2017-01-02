@@ -74,6 +74,7 @@ import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.InternalAnalyzerUtils;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -514,8 +515,11 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 				switch ( embeddedTypeMetadata.getEmbeddedContainer() ) {
 					case ARRAY:
-						Object[] array = objectInitializer.initializeArray( (Object[]) value );
-						for ( Object arrayValue : array ) {
+						if ( value instanceof Object[] ) {
+							objectInitializer.initializeArray( (Object[]) value );
+						}
+						// Use CollectionHelper.iterableFromArray to also support arrays of primitive values
+						for ( Object arrayValue : CollectionHelper.iterableFromArray( value ) ) {
 							nestingContext.mark( doc );
 							buildDocumentFields(
 									arrayValue,
@@ -635,6 +639,9 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						objectInitializer.initializeMap( (Map) currentFieldValue );
 					}
 				}
+				else if ( member.isArray() && currentFieldValue instanceof Object[] ) {
+					objectInitializer.initializeArray( (Object[]) currentFieldValue );
+				}
 			}
 
 			try {
@@ -677,7 +684,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 							}
 							else if ( member.isArray() ) {
 								multivalued = true;
-								for ( Object element : (Object[]) currentFieldValue ) {
+								// Use CollectionHelper.iterableFromArray to also support arrays of primitive values
+								for ( Object element : CollectionHelper.iterableFromArray( currentFieldValue ) ) {
 									addFacetDocValues( document, fieldMetadata, facetMetadata, element );
 								}
 							}
