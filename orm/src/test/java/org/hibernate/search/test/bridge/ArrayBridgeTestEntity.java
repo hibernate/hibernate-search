@@ -44,6 +44,7 @@ public class ArrayBridgeTestEntity {
 	private String[] nullNotIndexed = new String[0];
 	private Integer[] numericNullIndexed = new Integer[0];
 	private Long[] numericNullNotIndexed = new Long[0];
+	private float[] primitive = new float[0];
 
 	private Date[] dates = new Date[0];
 
@@ -126,6 +127,20 @@ public class ArrayBridgeTestEntity {
 
 	public void setNumericNullNotIndexed(Long[] numericSkipNullCollection) {
 		this.numericNullNotIndexed = numericSkipNullCollection;
+	}
+
+	@Field(store = Store.YES)
+	@ElementCollection
+	@IndexedEmbedded
+	@OrderColumn
+	@CollectionTable(name = "primitive", joinColumns = @JoinColumn(name = "array_id"))
+	@Column(name = "primitive")
+	public float[] getPrimitive() {
+		return primitive;
+	}
+
+	public void setPrimitive(float[] primitive) {
+		this.primitive = primitive;
 	}
 
 	@Field(analyze = Analyze.NO, store = Store.YES)

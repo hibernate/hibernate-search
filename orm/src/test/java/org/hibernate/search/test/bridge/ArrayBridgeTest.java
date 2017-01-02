@@ -63,6 +63,7 @@ public class ArrayBridgeTest extends SearchTestBase {
 		withoutNull.setNumericNullIndexed( new Integer[] { 1, 2 } );
 		withoutNull.setNullNotIndexed( new String[] { "DaltoValue", "DavideValue" } );
 		withoutNull.setNumericNullNotIndexed( new Long[] { 3L, 4L } );
+		withoutNull.setPrimitive( new float[] { 3.2f, 452.2f } );
 		withoutNull.setDates( new Date[] { indexedDate } );
 
 		withNullEntry = persistEntity( fullTextSession, "Worf" );
@@ -70,12 +71,14 @@ public class ArrayBridgeTest extends SearchTestBase {
 		withNullEntry.setNumericNullIndexed( new Integer[] { 11, null } );
 		withNullEntry.setNullNotIndexed( new String[] { "WorfValue", null } );
 		withNullEntry.setNumericNullNotIndexed( new Long[] { 33L, null } );
+		withNullEntry.setPrimitive( new float[] { 2.0f } );
 		withNullEntry.setDates( new Date[] { null } );
 
 		withNullEmbedded = persistEntity( fullTextSession, "Mime" );
 		withNullEmbedded.setDates( null );
 		withNullEmbedded.setNumericNullIndexed( null );
 		withNullEmbedded.setNumericNullNotIndexed( null );
+		withNullEmbedded.setPrimitive( null );
 		withNullEmbedded.setNullIndexed( null );
 		withNullEmbedded.setNullNotIndexed( null );
 		withNullEmbedded.setDates( null );
@@ -205,6 +208,21 @@ public class ArrayBridgeTest extends SearchTestBase {
 			assertEquals( "Wrong result returned from an indexed array", withNullEntry.getName(), results.get( 0 )
 					.getName() );
 		}
+	}
+
+	@Test
+	public void testPrimitiveIndexing() throws Exception {
+		List<ArrayBridgeTestEntity> results = findResultsWithRangeQuery(
+				"primitive",
+				100.0f
+		);
+
+		assertNotNull( "No result found for an indexed collection", results );
+		assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
+		assertEquals(
+				"Wrong result returned from a collection of primitive numbers", withoutNull.getName(), results.get( 0 )
+						.getName()
+		);
 	}
 
 	@Test
