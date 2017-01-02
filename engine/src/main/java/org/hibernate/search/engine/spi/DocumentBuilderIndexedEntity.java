@@ -406,7 +406,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			ConversionContext conversionContext,
 			InstanceInitializer objectInitializer,
 			final float inheritedBoost,
-			boolean multiValued) {
+			boolean isParentPropertyMultiValued) {
 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
@@ -420,7 +420,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				objectInitializer,
 				inheritedBoost,
 				unproxiedInstance,
-				multiValued
+				isParentPropertyMultiValued
 		);
 
 		// allow analyzer override for the fields added by the class and field bridges
@@ -438,7 +438,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				objectInitializer,
 				inheritedBoost,
 				unproxiedInstance,
-				multiValued
+				isParentPropertyMultiValued
 		);
 	}
 
@@ -451,7 +451,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			InstanceInitializer objectInitializer,
 			float inheritedBoost,
 			Object unproxiedInstance,
-			boolean multiValued) {
+			boolean isParentPropertyMultiValued) {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
 			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
@@ -526,7 +526,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 								conversionContext,
 								objectInitializer,
 								embeddedBoost,
-								multiValued
+								isParentPropertyMultiValued
 						);
 						break;
 					default:
@@ -543,7 +543,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	/**
-	 * @param multiValued Whether the type whose properties should be added may appear more than once (within the same
+	 * @param isParentPropertyMultiValued Whether the type whose properties should be added may appear more than once (within the same
 	 * role) in a document or not. That's the case if the type is (directly or indirectly) contained within an embedded
 	 * to-many association.
 	 */
@@ -554,7 +554,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			InstanceInitializer objectInitializer,
 			float documentBoost,
 			Object unproxiedInstance,
-			boolean multiValued) {
+			boolean isParentPropertyMultiValued) {
 		XMember previousMember = null;
 		Object currentFieldValue = null;
 
@@ -600,7 +600,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					if ( fieldMetadata.hasFacets() ) {
 						faceting.enableFacetProcessing();
 						for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
-							if ( multiValued ) {
+							if ( isParentPropertyMultiValued ) {
 								faceting.setMultiValued( facetMetadata.getFacetName() );
 							}
 							addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
@@ -610,7 +610,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 				// add the doc value fields required for sorting, but only if this property is not part of an embedded
 				// to-many assoc, in which case sorting on these fields would not make sense
-				if ( !multiValued ) {
+				if ( !isParentPropertyMultiValued ) {
 					addSortFieldDocValues( document, propertyMetadata, documentBoost, currentFieldValue );
 				}
 			}
@@ -631,7 +631,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 		Field facetField;
 		switch ( facetMetadata.getEncoding() ) {
-			case STRING: {
+			case STRING:
 				String stringValue = value.toString();
 				// we don't add empty strings to the facet field
 				if ( stringValue.isEmpty() ) {
@@ -639,8 +639,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				}
 				facetField = new SortedSetDocValuesFacetField( facetMetadata.getFacetName(), stringValue );
 				break;
-			}
-			case LONG: {
+			case LONG:
 				if ( value instanceof Number ) {
 					facetField = new NumericDocValuesField(
 							facetMetadata.getFacetName(),
@@ -674,8 +673,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					throw new AssertionFailure( "Unexpected value type for faceting: " + value.getClass().getName() );
 				}
 				break;
-			}
-			case DOUBLE: {
+			case DOUBLE:
 				if ( value instanceof Number ) {
 					facetField = new DoubleDocValuesField(
 							facetMetadata.getFacetName(),
@@ -686,17 +684,14 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					throw new AssertionFailure( "Unexpected value type for faceting: " + value.getClass().getName() );
 				}
 				break;
-			}
-			case AUTO: {
+			case AUTO:
 				throw new AssertionFailure( "The facet type should have been resolved during bootstrapping" );
-			}
-			default: {
+			default:
 				throw new AssertionFailure(
 						"Unexpected facet encoding type '"
 								+ facetMetadata.getEncoding()
 								+ "' Has the enum been modified?"
 				);
-			}
 		}
 
 		document.add( facetField );
