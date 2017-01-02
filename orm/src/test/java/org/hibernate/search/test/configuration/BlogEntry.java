@@ -29,10 +29,6 @@ import org.hibernate.search.exception.AssertionFailure;
  */
 @Entity
 @Indexed
-/*
- * CAUTION: those analyzer definitions are duplicated in the elasticsearch.yml for test with Elasticsearch.
- * Any update here should be reflected there.
- */
 @AnalyzerDefs({
 		@AnalyzerDef(name = BlogEntry.EN_ANALYZER_NAME,
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),

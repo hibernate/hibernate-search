@@ -39,10 +39,6 @@ public class ProgrammaticSearchMappingFactory {
 		SearchMapping mapping = new SearchMapping();
 
 		mapping.fullTextFilterDef( "security", SecurityFilterFactory.class ).cache( FilterCacheModeType.INSTANCE_ONLY )
-				/*
-				 * CAUTION: those analyzer definitions are duplicated in the elasticsearch.yml for test with Elasticsearch.
-				 * Any update here should be reflected there.
-				 */
 				.analyzerDef( NGRAM_ANALYZER_NAME, StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( NGramFilterFactory.class )
