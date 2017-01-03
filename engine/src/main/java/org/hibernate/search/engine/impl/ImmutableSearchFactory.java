@@ -45,6 +45,8 @@ import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
@@ -96,7 +98,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
-	private final Map<String, AnalyzerReference> analyzerReferences;
+	private final Map<IndexManagerType, AnalyzerRegistry> analyzerRegistries;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
@@ -130,7 +132,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private volatile LuceneWorkSerializer workSerializer;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
-		this.analyzerReferences = state.getAnalyzerReferences();
+		this.analyzerRegistries = state.getAnalyzerRegistries();
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
 		this.indexBindingForEntities = state.getIndexBindings();
@@ -267,7 +269,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 			serviceManager.releaseAllServices();
 
-			for ( AnalyzerReference an : this.analyzerReferences.values() ) {
+			for ( AnalyzerRegistry an : this.analyzerRegistries.values() ) {
 				an.close();
 			}
 			for ( AbstractDocumentBuilder documentBuilder : this.documentBuildersContainedEntities.values() ) {
@@ -377,7 +379,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	// This method is a bit convoluted but it is going to be removed
 	// At the moment we cannot change this API because it's public
 	public Analyzer getAnalyzer(String name) {
-		final AnalyzerReference reference = analyzerReferences.get( name );
+		final AnalyzerRegistry registry = analyzerRegistries.get( LuceneEmbeddedIndexManagerType.INSTANCE );
+		if ( registry == null ) {
+			throw new SearchException( "Unknown Analyzer definition: " + name );
+		}
+		final AnalyzerReference reference = registry.getAnalyzerReference( name );
 		if ( reference == null || !reference.is( LuceneAnalyzerReference.class ) ) {
 			throw new SearchException( "Unknown Analyzer definition: " + name );
 		}
@@ -389,12 +395,12 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public AnalyzerReference getAnalyzerReference(String name) {
-		final AnalyzerReference analyzerReference = analyzerReferences.get( name );
-		if ( analyzerReference == null ) {
-			throw new SearchException( "Unknown Analyzer definition: " + name );
+	public AnalyzerRegistry getAnalyzerRegistry(IndexManagerType indexManagerType) {
+		final AnalyzerRegistry registry = analyzerRegistries.get( indexManagerType );
+		if ( registry == null ) {
+			throw new SearchException( "Unknown index manager type: " + indexManagerType );
 		}
-		return analyzerReference;
+		return registry;
 	}
 
 	@Override
@@ -430,8 +436,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> getAnalyzerReferences() {
-		return analyzerReferences;
+	public Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries() {
+		return analyzerRegistries;
 	}
 
 	@Override

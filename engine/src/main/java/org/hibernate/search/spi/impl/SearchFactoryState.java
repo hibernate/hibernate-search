@@ -10,10 +10,10 @@ package org.hibernate.search.spi.impl;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -23,6 +23,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -46,7 +47,7 @@ public interface SearchFactoryState {
 
 	FilterCachingStrategy getFilterCachingStrategy();
 
-	Map<String, AnalyzerReference> getAnalyzerReferences();
+	Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries();
 
 	int getCacheBitResultsSize();
 

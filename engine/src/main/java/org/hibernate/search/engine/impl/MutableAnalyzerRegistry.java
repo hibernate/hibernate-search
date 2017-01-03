@@ -25,7 +25,7 @@ import org.hibernate.search.annotations.AnalyzerDef;
  *
  * @author Yoann Rodiere
  */
-public class AnalyzerReferenceRegistry {
+public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 
 	private final AnalyzerStrategy strategy;
 
@@ -35,33 +35,55 @@ public class AnalyzerReferenceRegistry {
 
 	private final Map<String, AnalyzerReference> referencesByName = new LinkedHashMap<>();
 
-	private final Map<Class<?>, AnalyzerReference> referencesByClass = new LinkedHashMap<>();
+	private final Map<Class<?>, AnalyzerReference> referencesByLuceneClass = new LinkedHashMap<>();
 
 	private final Collection<AnalyzerReference> scopedReferences = new ArrayList<>();
 
-	AnalyzerReferenceRegistry(AnalyzerStrategy strategy) {
-		this.strategy = strategy;
-		this.defaultReference = strategy.createDefaultAnalyzerReference();
-		this.passThroughReference = strategy.createPassThroughAnalyzerReference();
+	MutableAnalyzerRegistry(AnalyzerStrategy strategy) {
+		this( strategy, null );
 	}
 
+	MutableAnalyzerRegistry(AnalyzerStrategy strategy, AnalyzerRegistry registryState) {
+		this.strategy = strategy;
+
+		if ( registryState != null ) {
+			this.defaultReference = registryState.getDefaultAnalyzerReference();
+			this.passThroughReference = registryState.getPassThroughAnalyzerReference();
+			this.referencesByName.putAll( registryState.getNamedAnalyzerReferences() );
+			this.referencesByLuceneClass.putAll( registryState.getLuceneClassAnalyzerReferences() );
+		}
+		else {
+			this.defaultReference = strategy.createDefaultAnalyzerReference();
+			this.passThroughReference = strategy.createPassThroughAnalyzerReference();
+		}
+	}
+
+	@Override
 	public AnalyzerReference getDefaultAnalyzerReference() {
 		return defaultReference;
 	}
 
+	@Override
 	public AnalyzerReference getPassThroughAnalyzerReference() {
 		return passThroughReference;
 	}
 
-	public Map<String, AnalyzerReference> getAnalyzerReferencesByName() {
+	@Override
+	public Map<String, AnalyzerReference> getNamedAnalyzerReferences() {
 		return Collections.unmodifiableMap( referencesByName );
 	}
 
-	public Map<Class<?>, AnalyzerReference> getAnalyzerReferencesByClass() {
-		return Collections.unmodifiableMap( referencesByClass );
+	@Override
+	public Map<Class<?>, AnalyzerReference> getLuceneClassAnalyzerReferences() {
+		return Collections.unmodifiableMap( referencesByLuceneClass );
 	}
 
+	@Override
 	public AnalyzerReference getAnalyzerReference(String name) {
+		return referencesByName.get( name );
+	}
+
+	public AnalyzerReference getOrCreateAnalyzerReference(String name) {
 		AnalyzerReference reference = referencesByName.get( name );
 		if ( reference == null ) {
 			reference = strategy.createNamedAnalyzerReference( name );
@@ -70,13 +92,29 @@ public class AnalyzerReferenceRegistry {
 		return reference;
 	}
 
+	@Override
 	public AnalyzerReference getAnalyzerReference(Class<?> analyzerClazz) {
-		AnalyzerReference reference = referencesByClass.get( analyzerClazz );
+		return referencesByLuceneClass.get( analyzerClazz );
+	}
+
+	public AnalyzerReference getOrCreateAnalyzerReference(Class<?> analyzerClazz) {
+		AnalyzerReference reference = referencesByLuceneClass.get( analyzerClazz );
 		if ( reference == null ) {
-			reference = strategy.createAnalyzerReference( analyzerClazz );
-			referencesByClass.put( analyzerClazz, reference );
+			reference = strategy.createLuceneClassAnalyzerReference( analyzerClazz );
+			referencesByLuceneClass.put( analyzerClazz, reference );
 		}
 		return reference;
+	}
+
+	@Override
+	public void close() {
+		close( referencesByLuceneClass.values() );
+	}
+
+	private void close(Collection<AnalyzerReference> references) {
+		for ( AnalyzerReference reference : references ) {
+			reference.close();
+		}
 	}
 
 	public void initialize(Map<String, AnalyzerDef> analyzerDefinitions) {
@@ -84,7 +122,7 @@ public class AnalyzerReferenceRegistry {
 		references.add( defaultReference );
 		references.add( passThroughReference );
 		references.addAll( referencesByName.values() );
-		references.addAll( referencesByClass.values() );
+		references.addAll( referencesByLuceneClass.values() );
 		references.addAll( scopedReferences );
 		strategy.initializeAnalyzerReferences( references, analyzerDefinitions );
 	}

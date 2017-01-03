@@ -43,7 +43,7 @@ public interface AnalyzerStrategy {
 	 * @return a reference to an instance of the given analyzer class that will be
 	 * {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
 	 */
-	AnalyzerReference createAnalyzerReference(Class<?> analyzerClass);
+	AnalyzerReference createLuceneClassAnalyzerReference(Class<?> analyzerClass);
 
 	/**
 	 * Initializes references created by this strategy, i.e. make them point to the actual analyzer definition.

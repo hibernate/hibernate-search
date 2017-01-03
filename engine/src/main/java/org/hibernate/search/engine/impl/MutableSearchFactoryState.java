@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.Environment;
@@ -25,6 +24,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -48,7 +48,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private BackendQueueProcessor backendQueueProcessor;
 	private Map<String, FilterDef> filterDefinitions = new ConcurrentHashMap<>();
 	private FilterCachingStrategy filterCachingStrategy;
-	private Map<String, AnalyzerReference> analyzerReferences = new ConcurrentHashMap<>();
+	private Map<IndexManagerType, AnalyzerRegistry> analyzerRegistries = new ConcurrentHashMap<>();
 	private int cacheBitResultsSize;
 	private Properties configurationProperties;
 	private PolymorphicIndexHierarchy indexHierarchy;
@@ -76,7 +76,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		worker = oldFactoryState.getWorker();
 		filterDefinitions = oldFactoryState.getFilterDefinitions();
 		filterCachingStrategy = oldFactoryState.getFilterCachingStrategy();
-		analyzerReferences = oldFactoryState.getAnalyzerReferences();
+		analyzerRegistries.clear();
+		analyzerRegistries.putAll( oldFactoryState.getAnalyzerRegistries() );
 		cacheBitResultsSize = oldFactoryState.getCacheBitResultsSize();
 		configurationProperties = oldFactoryState.getConfigurationProperties();
 		indexHierarchy = oldFactoryState.getIndexHierarchy();
@@ -142,8 +143,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> getAnalyzerReferences() {
-		return analyzerReferences;
+	public Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries() {
+		return analyzerRegistries;
 	}
 
 	@Override
@@ -189,8 +190,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.filterCachingStrategy = filterCachingStrategy;
 	}
 
-	public void addAnalyzerReferences(Map<String, AnalyzerReference> analyzerReferences) {
-		this.analyzerReferences.putAll( analyzerReferences );
+	public void addAnalyzerRegistries(Map<IndexManagerType, AnalyzerRegistry> analyzerRegistries) {
+		this.analyzerRegistries.putAll( analyzerRegistries );
 	}
 
 	public void setCacheBitResultsSize(int cacheBitResultsSize) {

@@ -305,7 +305,8 @@ public class SearchIntegratorBuilder {
 	 * This algorithm seems to be safe for incremental search factories.
 	 */
 	private void initDocumentBuilders(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping) {
-		ConfigContext configContext = new ConfigContext( searchConfiguration, buildContext, searchMapping );
+		ConfigContext configContext = new ConfigContext( searchConfiguration, buildContext, searchMapping,
+				factoryState.getAnalyzerRegistries() );
 
 		initProgrammaticAnalyzers( configContext, searchConfiguration.getReflectionManager() );
 		initProgrammaticallyDefinedFilterDef( configContext, searchConfiguration.getReflectionManager() );
@@ -408,7 +409,7 @@ public class SearchIntegratorBuilder {
 		);
 
 		factoryState.addFilterDefinitions( configContext.initFilters() );
-		factoryState.addAnalyzerReferences( configContext.initNamedAnalyzerReferences( indexesFactory ) );
+		factoryState.addAnalyzerRegistries( configContext.initAnalyzerRegistries( indexesFactory ) );
 	}
 
 	private void detectIndexNamesCollisions(Collection<IndexManager> indexManagers) {

@@ -959,9 +959,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 313, value = "Remote analyzer reference %1$s is not initialized.")
 	SearchException remoteAnalyzerNotInitialized(RemoteAnalyzerReference analyzerReference);
 
-	@Message(id = 314, value = "Remote analyzer %1$s already defined as a Lucene analyzer.")
-	SearchException remoteAnalyzerAlreadyDefinedAsLuceneAnalyzer(String name);
-
 	@Message(id = 315, value = "Lazy remote analyzer reference %1$s is not initialized.")
 	SearchException lazyRemoteAnalyzerReferenceNotInitialized(RemoteAnalyzerReference reference);
 

@@ -18,7 +18,7 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XPackage;
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Factory;
@@ -39,8 +39,6 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Provides access to some default configuration settings (eg default {@code Analyzer} or default
@@ -50,8 +48,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class ConfigContext {
-
-	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The default token for indexing null values. See {@link org.hibernate.search.annotations.Field#indexNullAs()}
@@ -97,8 +93,8 @@ public final class ConfigContext {
 	private final Map<String, FilterDef> filterDefs = new HashMap<String, FilterDef>();
 
 
-	private final Map<IndexManagerType, AnalyzerReferenceRegistry> analyzerReferenceRegistries =
-			new HashMap<IndexManagerType, AnalyzerReferenceRegistry>();
+	private final Map<IndexManagerType, MutableAnalyzerRegistry> analyzerRegistries =
+			new HashMap<IndexManagerType, MutableAnalyzerRegistry>();
 
 	private final boolean jpaPresent;
 	private final String nullToken;
@@ -108,16 +104,25 @@ public final class ConfigContext {
 	private final SearchConfiguration searchConfiguration;
 
 	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext) {
-		this( searchConfiguration, buildContext, null );
+		this( searchConfiguration, buildContext, null, null );
 	}
 
-	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping) {
+	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping,
+			Map<IndexManagerType, AnalyzerRegistry> previousAnalyzerRegistries) {
 		this.serviceManager = buildContext.getServiceManager();
 		this.jpaPresent = isPresent( "javax.persistence.Id" );
 		this.nullToken = initNullToken( searchConfiguration );
 		this.implicitProvidedId = searchConfiguration.isIdProvidedImplicit();
 		this.searchMapping = searchMapping;
 		this.searchConfiguration = searchConfiguration;
+		if ( previousAnalyzerRegistries != null ) {
+			for ( Map.Entry<IndexManagerType, AnalyzerRegistry> entry : previousAnalyzerRegistries.entrySet() ) {
+				IndexManagerType type = entry.getKey();
+				AnalyzerRegistry registryState = entry.getValue();
+				AnalyzerStrategy strategy = type.createAnalyzerStrategy( serviceManager, searchConfiguration );
+				analyzerRegistries.put( type, new MutableAnalyzerRegistry( strategy, registryState ) );
+			}
+		}
 	}
 
 	public ServiceManager getServiceManager() {
@@ -171,11 +176,11 @@ public final class ConfigContext {
 		}
 	}
 
-	public AnalyzerReferenceRegistry getAnalyzerReferenceRegistry(IndexManagerType type) {
-		AnalyzerReferenceRegistry registry = analyzerReferenceRegistries.get( type );
+	public MutableAnalyzerRegistry getAnalyzerRegistry(IndexManagerType type) {
+		MutableAnalyzerRegistry registry = analyzerRegistries.get( type );
 		if ( registry == null ) {
-			registry = new AnalyzerReferenceRegistry( type.createAnalyzerStrategy( serviceManager, searchConfiguration ) );
-			analyzerReferenceRegistries.put( type, registry );
+			registry = new MutableAnalyzerRegistry( type.createAnalyzerStrategy( serviceManager, searchConfiguration ) );
+			analyzerRegistries.put( type, registry );
 		}
 		return registry;
 	}
@@ -262,7 +267,7 @@ public final class ConfigContext {
 	 * <p>
 	 * To work around this issue, we do not resolve references immediately, but instead
 	 * create "dangling" references whose initialization will be delayed to the end of
-	 * the mapping (see {@link #getAnalyzerReferenceRegistry(IndexManagerType)}).
+	 * the mapping (see {@link #getAnalyzerRegistry(IndexManagerType)}).
 	 * <p>
 	 * This method executes the final initialization, resolving dangling references.
 	 *
@@ -270,8 +275,7 @@ public final class ConfigContext {
 	 * @return The named analyzer references, to be accessed through SearchFactory.getAnalyzer(String)
 	 * or ExtendedSearchIntegrator.getAnalyzerReference(String).
 	 */
-	public Map<String, AnalyzerReference> initNamedAnalyzerReferences(IndexManagerHolder indexesFactory) {
-		final Map<String, AnalyzerReference> referencesByName = new HashMap<>( analyzerDefs.size() );
+	public Map<IndexManagerType, AnalyzerRegistry> initAnalyzerRegistries(IndexManagerHolder indexesFactory) {
 
 		/*
 		 * For analyzer definitions that were not referenced in the mapping,
@@ -283,8 +287,8 @@ public final class ConfigContext {
 		 */
 		for ( String name : analyzerDefs.keySet() ) {
 			if ( !hasAnalyzerReference( name ) ) {
-				AnalyzerReferenceRegistry registry = getAnalyzerReferenceRegistry( LuceneEmbeddedIndexManagerType.INSTANCE );
-				registry.getAnalyzerReference( name );
+				MutableAnalyzerRegistry registry = getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE );
+				registry.getOrCreateAnalyzerReference( name );
 			}
 		}
 
@@ -292,41 +296,22 @@ public final class ConfigContext {
 		Set<IndexManagerType> indexManagerTypes = new HashSet<>();
 		indexManagerTypes.addAll( indexesFactory.getIndexManagerTypes() );
 		// Make sure to initialize every registry, even those that are not used by index managers (see the loop above)
-		indexManagerTypes.addAll( analyzerReferenceRegistries.keySet() );
+		indexManagerTypes.addAll( analyzerRegistries.keySet() );
+
+		final Map<IndexManagerType, AnalyzerRegistry> immutableAnalyzerRegistries = new HashMap<>( indexManagerTypes.size() );
 
 		for ( IndexManagerType indexManagerType : indexManagerTypes ) {
-			AnalyzerReferenceRegistry registry = getAnalyzerReferenceRegistry( indexManagerType );
+			MutableAnalyzerRegistry registry = getAnalyzerRegistry( indexManagerType );
 			registry.initialize( analyzerDefs );
-			Map<String, ? extends AnalyzerReference> referencesByNameForType =
-					registry.getAnalyzerReferencesByName();
-
-			// Check for naming conflicts between different index manager types
-			if ( !referencesByName.isEmpty() ) {
-				for ( Map.Entry<String, ? extends AnalyzerReference> entry : referencesByNameForType.entrySet() ) {
-					String referenceName = entry.getKey();
-					if ( referencesByName.containsKey( referenceName ) ) {
-						/*
-						 * The error message states that a remote analyzer has already
-						 * been defined as a Lucene analyzer.
-						 * We actually might be encountering a Lucene analyzer that
-						 * that is already defined as a remote analyzer (so the other way around),
-						 * but that makes no practical difference as far as the user is concerned,
-						 * especially because the is only one remote index manager type for now.
-						 */
-						throw log.remoteAnalyzerAlreadyDefinedAsLuceneAnalyzer( referenceName );
-					}
-				}
-			}
-
-			referencesByName.putAll( referencesByNameForType );
+			immutableAnalyzerRegistries.put( indexManagerType, new ImmutableAnalyzerRegistry( registry ) );
 		}
 
-		return Collections.unmodifiableMap( referencesByName );
+		return immutableAnalyzerRegistries;
 	}
 
 	private boolean hasAnalyzerReference(String name) {
-		for ( AnalyzerReferenceRegistry registry : analyzerReferenceRegistries.values() ) {
-			if ( registry.getAnalyzerReferencesByName().containsKey( name ) ) {
+		for ( MutableAnalyzerRegistry registry : analyzerRegistries.values() ) {
+			if ( registry.getNamedAnalyzerReferences().containsKey( name ) ) {
 				return true;
 			}
 		}

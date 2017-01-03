@@ -90,7 +90,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		else {
 			analyzerClass = StandardAnalyzer.class;
 		}
-		return createAnalyzerReference( analyzerClass );
+		return createLuceneClassAnalyzerReference( analyzerClass );
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
-	public LuceneAnalyzerReference createAnalyzerReference(Class<?> analyzerClass) {
+	public LuceneAnalyzerReference createLuceneClassAnalyzerReference(Class<?> analyzerClass) {
 		try {
 			Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
 			return new SimpleLuceneAnalyzerReference( analyzer );

@@ -8,13 +8,14 @@ package org.hibernate.search.test.configuration.mutablefactory;
 
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
-import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
@@ -63,12 +64,21 @@ public class DefinitionsOnHotRebootTest {
 	}
 
 	private boolean analyzerExists(SearchIntegrator sf, String analyzerName) {
-		AnalyzerReference analyzerReference = sf.unwrap( SearchFactoryState.class ).getAnalyzerReferences().get( analyzerName );
-		return analyzerReference != null && analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer() != null;
+		for ( AnalyzerRegistry registry : sf.unwrap( ExtendedSearchIntegrator.class ).getAnalyzerRegistries().values() ) {
+			AnalyzerReference analyzerReference = registry.getAnalyzerReference( analyzerName );
+			if ( analyzerReference != null && analyzerReference.getAnalyzer() != null ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private int countAnalyzers(SearchIntegrator sf) {
-		return sf.unwrap( SearchFactoryState.class ).getAnalyzerReferences().size();
+		int count = 0;
+		for ( AnalyzerRegistry registry : sf.unwrap( ExtendedSearchIntegrator.class ).getAnalyzerRegistries().values() ) {
+			count += registry.getNamedAnalyzerReferences().size();
+		}
+		return count;
 	}
 
 	private boolean filterExists(SearchIntegrator sf, String filterName) {

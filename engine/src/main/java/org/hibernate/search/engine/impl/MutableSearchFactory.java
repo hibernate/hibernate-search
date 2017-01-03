@@ -14,7 +14,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
@@ -32,6 +31,7 @@ import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
@@ -102,8 +102,8 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> getAnalyzerReferences() {
-		return delegate.getAnalyzerReferences();
+	public Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries() {
+		return delegate.getAnalyzerRegistries();
 	}
 
 	@Override
@@ -218,8 +218,8 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public AnalyzerReference getAnalyzerReference(String name) {
-		return delegate.getAnalyzerReference( name );
+	public AnalyzerRegistry getAnalyzerRegistry(IndexManagerType indexManagerType) {
+		return delegate.getAnalyzerRegistry( indexManagerType );
 	}
 
 	@Override

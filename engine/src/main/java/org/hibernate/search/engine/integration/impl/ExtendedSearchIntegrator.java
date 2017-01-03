@@ -10,14 +10,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
+import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -130,15 +131,23 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	boolean isIndexUninvertingAllowed();
 
 	/**
-	 * Retrieve an analyzer reference instance by its definition name
+	 * Returns a map of all known entity index binding (indexed entities) keyed against the indexed type
 	 *
-	 * @param name the name of the analyzer
-	 *
-	 * @return analyzer with the specified name
-	 *
-	 * @throws org.hibernate.search.exception.SearchException if the definition name is unknown
+	 * @return a map of all known entity index binding (indexed entities) keyed against the indexed type. The empty
+	 * map is returned if there are no indexed types.
 	 */
-	AnalyzerReference getAnalyzerReference(String name);
+	Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries();
+
+	/**
+	 * Retrieve the analyzer registry for a given index manager type.
+	 *
+	 * @param indexManagerType the index manager type for which to retrieve the registry
+	 *
+	 * @return The corresponding analyzer registry
+	 *
+	 * @throws org.hibernate.search.exception.SearchException if the index manager type is unknown
+	 */
+	AnalyzerRegistry getAnalyzerRegistry(IndexManagerType indexManagerType);
 
 	/**
 	 * Retrieve the scoped analyzer reference for a given class.

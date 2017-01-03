@@ -25,7 +25,7 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
-import org.hibernate.search.engine.impl.AnalyzerReferenceRegistry;
+import org.hibernate.search.engine.impl.MutableAnalyzerRegistry;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
@@ -488,7 +488,7 @@ public class TypeMetadata {
 		protected final BackReference<TypeMetadata> resultReference = new BackReference<>();
 		private final Class<?> indexedType;
 		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
-		private final AnalyzerReferenceRegistry analyzerReferenceRegistry;
+		private final MutableAnalyzerRegistry analyzerRegistry;
 
 		private float boost;
 		private BoostStrategy classBoostStrategy;
@@ -508,19 +508,19 @@ public class TypeMetadata {
 		public Builder(Class<?> indexedType, ConfigContext configContext, ParseContext parseContext) {
 			this.indexedType = indexedType;
 			if ( parseContext.skipAnalyzers() ) {
-				this.analyzerReferenceRegistry = null;
+				this.analyzerRegistry = null;
 				this.scopedAnalyzerReferenceBuilder = null;
 			}
 			else {
 				IndexManagerType indexManagerType = parseContext.getIndexManagerType();
-				this.analyzerReferenceRegistry = configContext.getAnalyzerReferenceRegistry( indexManagerType );
-				this.scopedAnalyzerReferenceBuilder = analyzerReferenceRegistry.buildScopedAnalyzerReference();
+				this.analyzerRegistry = configContext.getAnalyzerRegistry( indexManagerType );
+				this.scopedAnalyzerReferenceBuilder = analyzerRegistry.buildScopedAnalyzerReference();
 			}
 		}
 
 		public Builder(Class<?> indexedType, Builder containerTypeBuilder) {
 			this.indexedType = indexedType;
-			this.analyzerReferenceRegistry = containerTypeBuilder.analyzerReferenceRegistry;
+			this.analyzerRegistry = containerTypeBuilder.analyzerRegistry;
 			this.scopedAnalyzerReferenceBuilder = containerTypeBuilder.scopedAnalyzerReferenceBuilder;
 		}
 
@@ -607,7 +607,7 @@ public class TypeMetadata {
 
 			if ( !index.isAnalyzed() ) {
 				// no analyzer is used, add a pass-through (i.e. no-op) analyzer for queries
-				analyzerReference = analyzerReferenceRegistry.getPassThroughAnalyzerReference();
+				analyzerReference = analyzerRegistry.getPassThroughAnalyzerReference();
 			}
 
 			scopedAnalyzerReferenceBuilder.addAnalyzerReference( fieldPath.getAbsoluteName(), analyzerReference );

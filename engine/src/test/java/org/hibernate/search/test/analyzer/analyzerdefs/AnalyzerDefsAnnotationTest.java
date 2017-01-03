@@ -8,9 +8,9 @@ package org.hibernate.search.test.analyzer.analyzerdefs;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -19,11 +19,13 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.engine.impl.AnalyzerRegistry;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
-import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -55,9 +57,19 @@ public class AnalyzerDefsAnnotationTest {
 	}
 
 	@Test
-	public void shouldContainOnlyTheDefinedAnalyzers() throws Exception {
-		Map<String, AnalyzerReference> analyzerReferences = ( (SearchFactoryState) sfHolder.getSearchFactory() ).getAnalyzerReferences();
-		assertThat( analyzerReferences.keySet() ).containsOnly( "package-analyzer-1", "package-analyzer-2", "class-analyzer-1", "class-analyzer-2" );
+	public void shouldContainTheDefinedAnalyzers() throws Exception {
+		ExtendedSearchIntegrator factory = sfHolder.getSearchFactory();
+
+		Set<String> analyzerNames = new LinkedHashSet<>();
+		for ( AnalyzerRegistry registry : factory.getAnalyzerRegistries().values() ) {
+			analyzerNames.addAll( registry.getNamedAnalyzerReferences().keySet() );
+		}
+
+		/*
+		 * There may be other defined analyzers, because the indexing service may have
+		 * default analyzer definitions.
+		 */
+		assertThat( analyzerNames ).contains( "package-analyzer-1", "package-analyzer-2", "class-analyzer-1", "class-analyzer-2" );
 	}
 
 	@Test
@@ -70,8 +82,14 @@ public class AnalyzerDefsAnnotationTest {
 	}
 
 	private void assertThatAnalyzerExists(String analyzerName) {
-		Analyzer analyzer = sfHolder.getSearchFactory().getAnalyzer( analyzerName );
-		assertThat( analyzer ).isNotNull();
+		for ( AnalyzerRegistry registry : sfHolder.getSearchFactory().getAnalyzerRegistries().values() ) {
+			AnalyzerReference analyzerReference = registry.getAnalyzerReference( analyzerName );
+			if ( analyzerReference != null ) {
+				assertThat( analyzerReference.getAnalyzer() ).isNotNull();
+				return;
+			}
+		}
+		Assert.fail( "Analyzer does not exist: " + analyzerName );
 	}
 
 	@Indexed

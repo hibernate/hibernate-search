@@ -131,17 +131,17 @@ public final class AnnotationProcessingHelper {
 
 	public static AnalyzerReference getAnalyzerReference(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext,
 			IndexManagerType indexManagerType) {
-		AnalyzerReferenceRegistry registry = indexManagerType == null ? null : configContext.getAnalyzerReferenceRegistry( indexManagerType );
+		MutableAnalyzerRegistry registry = indexManagerType == null ? null : configContext.getAnalyzerRegistry( indexManagerType );
 		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
 		if ( analyzerClass != void.class ) {
-			return registry.getAnalyzerReference( analyzerClass );
+			return registry.getOrCreateAnalyzerReference( analyzerClass );
 		}
 		else {
 			String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
 			if ( StringHelper.isEmpty( definition ) ) {
 				return null;
 			}
-			return registry.getAnalyzerReference( definition );
+			return registry.getOrCreateAnalyzerReference( definition );
 		}
 	}
 

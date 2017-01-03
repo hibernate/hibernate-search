@@ -10,7 +10,9 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.Set;
 
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
+import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
@@ -40,6 +42,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 	public final class HSearchEntityContext implements EntityContext {
 		private final Class<?> indexBoundType;
 		private final ScopedAnalyzerReference.CopyBuilder queryAnalyzerReferenceBuilder;
+		private final AnalyzerRegistry analyzerRegistry;
 
 		public HSearchEntityContext(Class<?> entityType, ExtendedSearchIntegrator factory) {
 			// get a type for meta-data retrieval; if the given type itself is not indexed, one indexed sub-type will
@@ -52,6 +55,8 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 			}
 
 			queryAnalyzerReferenceBuilder = factory.getAnalyzerReference( indexBoundType ).startCopy();
+			IndexManagerType indexManagerType = factory.getIndexBinding( indexBoundType ).getIndexManagerType();
+			analyzerRegistry = factory.getAnalyzerRegistry( indexManagerType );
 		}
 
 		/**
@@ -78,7 +83,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 		@Override
 		public EntityContext overridesForField(String field, String analyzerName) {
-			queryAnalyzerReferenceBuilder.addAnalyzerReference( field, factory.getAnalyzerReference( analyzerName ) );
+			queryAnalyzerReferenceBuilder.addAnalyzerReference( field, analyzerRegistry.getAnalyzerReference( analyzerName ) );
 			return this;
 		}
 
