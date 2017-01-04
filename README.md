@@ -1,3 +1,7 @@
+# DON'T MERGE
+
+Don't merge this patch, we are just testing the web hooks
+
 # Hibernate Search
 
 *Version: 5.6.0.Beta4 - 29-11-2016*
