@@ -1,3 +1,5 @@
+# DON'T MERGE
+
 # Hibernate Search
 
 *Version: 5.6.0.CR1 - 19-12-2016*
