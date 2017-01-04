@@ -91,8 +91,9 @@ public final class CollectionHelper {
 	 * @param object a given array
 	 * @return an {@code Iterator} iterating over the array
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // Reflection is used to ensure the correct types are used
 	public static Iterator<?> iteratorFromArray(Object object) {
-		return iterableFromArray( object ).iterator();
+		return new ArrayIterator( accessorFromArray( object ), object );
 	}
 
 	/**
@@ -101,237 +102,196 @@ public final class CollectionHelper {
 	 * @param object a given array
 	 * @return an {@code Iterable} providing iterators over the array
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // Reflection is used to ensure the correct types are used
 	public static Iterable<?> iterableFromArray(Object object) {
-		Iterable<?> iterable;
+		return new ArrayIterable( accessorFromArray( object ), object );
+	}
+
+	private static ArrayAccessor<?, ?> accessorFromArray(Object object) {
+		ArrayAccessor<?, ?> accessor;
 		if ( Object.class.isAssignableFrom( object.getClass().getComponentType() ) ) {
-			iterable = new ObjectArrayIterable( (Object[]) object );
+			accessor = ArrayAccessor.OBJECT;
 		}
 		else if ( object.getClass() == boolean[].class ) {
-			iterable = new BooleanArrayIterable( (boolean[]) object );
+			accessor = ArrayAccessor.BOOLEAN;
 		}
 		else if ( object.getClass() == int[].class ) {
-			iterable = new IntArrayIterable( (int[]) object );
+			accessor = ArrayAccessor.INT;
 		}
 		else if ( object.getClass() == long[].class ) {
-			iterable = new LongArrayIterable( (long[]) object );
+			accessor = ArrayAccessor.LONG;
 		}
 		else if ( object.getClass() == double[].class ) {
-			iterable = new DoubleArrayIterable( (double[]) object );
+			accessor = ArrayAccessor.DOUBLE;
 		}
 		else if ( object.getClass() == float[].class ) {
-			iterable = new FloatArrayIterable( (float[]) object );
+			accessor = ArrayAccessor.FLOAT;
 		}
 		else if ( object.getClass() == byte[].class ) {
-			iterable = new ByteArrayIterable( (byte[]) object );
+			accessor = ArrayAccessor.BYTE;
 		}
 		else if ( object.getClass() == short[].class ) {
-			iterable = new ShortArrayIterable( (short[]) object );
+			accessor = ArrayAccessor.SHORT;
 		}
 		else if ( object.getClass() == char[].class ) {
-			iterable = new CharArrayIterable( (char[]) object );
+			accessor = ArrayAccessor.CHAR;
 		}
 		else {
 			throw new IllegalArgumentException( "Provided object " + object + " is not a supported array type" );
 		}
-		return iterable;
+		return accessor;
 	}
 
-	private abstract static class ArrayIterable<T> implements Iterable<T> {
+	private static class ArrayIterable<A, T> implements Iterable<T> {
+		private final ArrayAccessor<A, T> accessor;
+		private final A values;
 
-		protected abstract int size();
-
-		protected abstract T get(int index);
+		public ArrayIterable(ArrayAccessor<A, T> accessor, A values) {
+			this.accessor = accessor;
+			this.values = values;
+		}
 
 		@Override
 		public final Iterator<T> iterator() {
-			return new ArrayIterator();
+			return new ArrayIterator<>( accessor, values );
+		}
+	}
+
+	private static class ArrayIterator<A, T> implements Iterator<T> {
+		private final ArrayAccessor<A, T> accessor;
+		private final A values;
+		private int current = 0;
+
+		public ArrayIterator(ArrayAccessor<A, T> accessor, A values) {
+			this.accessor = accessor;
+			this.values = values;
 		}
 
-		private class ArrayIterator implements Iterator<T> {
-			private int current = 0;
+		@Override
+		public boolean hasNext() {
+			return current < accessor.size( values );
+		}
 
+		@Override
+		public T next() {
+			T result = accessor.get( values, current );
+			current++;
+			return result;
+		}
+	}
+
+	private interface ArrayAccessor<A, T> {
+
+		int size(A array);
+
+		T get(A array, int index);
+
+		ArrayAccessor<Object[], Object> OBJECT = new ArrayAccessor<Object[], Object>() {
 			@Override
-			public boolean hasNext() {
-				return current < size();
+			public int size(Object[] array) {
+				return array.length;
 			}
 
 			@Override
-			public T next() {
-				T result = get( current );
-				current++;
-				return result;
+			public Object get(Object[] array, int index) {
+				return array[index];
 			}
-		}
-	}
+		};
 
-	private static class ObjectArrayIterable extends ArrayIterable<Object> {
+		ArrayAccessor<boolean[], Boolean> BOOLEAN = new ArrayAccessor<boolean[], Boolean>() {
+			@Override
+			public int size(boolean[] array) {
+				return array.length;
+			}
 
-		private Object[] values;
+			@Override
+			public Boolean get(boolean[] array, int index) {
+				return array[index];
+			}
+		};
 
-		private ObjectArrayIterable(Object[] values) {
-			this.values = values;
-		}
+		ArrayAccessor<int[], Integer> INT = new ArrayAccessor<int[], Integer>() {
+			@Override
+			public int size(int[] array) {
+				return array.length;
+			}
 
-		@Override
-		protected int size() {
-			return values.length;
-		}
+			@Override
+			public Integer get(int[] array, int index) {
+				return array[index];
+			}
+		};
 
-		@Override
-		protected Object get(int index) {
-			return values[index];
-		}
-	}
+		ArrayAccessor<long[], Long> LONG = new ArrayAccessor<long[], Long>() {
+			@Override
+			public int size(long[] array) {
+				return array.length;
+			}
 
-	private static class BooleanArrayIterable extends ArrayIterable<Boolean> {
+			@Override
+			public Long get(long[] array, int index) {
+				return array[index];
+			}
+		};
 
-		private boolean[] values;
+		ArrayAccessor<double[], Double> DOUBLE = new ArrayAccessor<double[], Double>() {
+			@Override
+			public int size(double[] array) {
+				return array.length;
+			}
 
-		private BooleanArrayIterable(boolean[] values) {
-			this.values = values;
-		}
+			@Override
+			public Double get(double[] array, int index) {
+				return array[index];
+			}
+		};
 
-		@Override
-		protected int size() {
-			return values.length;
-		}
+		ArrayAccessor<float[], Float> FLOAT = new ArrayAccessor<float[], Float>() {
+			@Override
+			public int size(float[] array) {
+				return array.length;
+			}
 
-		@Override
-		protected Boolean get(int index) {
-			return values[index];
-		}
-	}
+			@Override
+			public Float get(float[] array, int index) {
+				return array[index];
+			}
+		};
 
-	private static class IntArrayIterable extends ArrayIterable<Integer> {
+		ArrayAccessor<byte[], Byte> BYTE = new ArrayAccessor<byte[], Byte>() {
+			@Override
+			public int size(byte[] array) {
+				return array.length;
+			}
 
-		private int[] values;
+			@Override
+			public Byte get(byte[] array, int index) {
+				return array[index];
+			}
+		};
 
-		private IntArrayIterable(int[] values) {
-			this.values = values;
-		}
+		ArrayAccessor<short[], Short> SHORT = new ArrayAccessor<short[], Short>() {
+			@Override
+			public int size(short[] array) {
+				return array.length;
+			}
 
-		@Override
-		protected int size() {
-			return values.length;
-		}
+			@Override
+			public Short get(short[] array, int index) {
+				return array[index];
+			}
+		};
 
-		@Override
-		protected Integer get(int index) {
-			return values[index];
-		}
-	}
+		ArrayAccessor<char[], Character> CHAR = new ArrayAccessor<char[], Character>() {
+			@Override
+			public int size(char[] array) {
+				return array.length;
+			}
 
-	private static class LongArrayIterable extends ArrayIterable<Long> {
-
-		private long[] values;
-
-		private LongArrayIterable(long[] values) {
-			this.values = values;
-		}
-
-		@Override
-		protected int size() {
-			return values.length;
-		}
-
-		@Override
-		protected Long get(int index) {
-			return values[index];
-		}
-	}
-
-	private static class DoubleArrayIterable extends ArrayIterable<Double> {
-
-		private double[] values;
-
-		private DoubleArrayIterable(double[] values) {
-			this.values = values;
-		}
-
-		@Override
-		protected int size() {
-			return values.length;
-		}
-
-		@Override
-		protected Double get(int index) {
-			return values[index];
-		}
-	}
-
-	private static class FloatArrayIterable extends ArrayIterable<Float> {
-
-		private float[] values;
-
-		private FloatArrayIterable(float[] values) {
-			this.values = values;
-		}
-
-		@Override
-		protected int size() {
-			return values.length;
-		}
-
-		@Override
-		protected Float get(int index) {
-			return values[index];
-		}
-	}
-
-	private static class ByteArrayIterable extends ArrayIterable<Byte> {
-
-		private byte[] values;
-
-		private ByteArrayIterable(byte[] values) {
-			this.values = values;
-		}
-
-		@Override
-		protected int size() {
-			return values.length;
-		}
-
-		@Override
-		protected Byte get(int index) {
-			return values[index];
-		}
-	}
-
-	private static class ShortArrayIterable extends ArrayIterable<Short> {
-
-		private short[] values;
-
-		private ShortArrayIterable(short[] values) {
-			this.values = values;
-		}
-
-		@Override
-		protected int size() {
-			return values.length;
-		}
-
-		@Override
-		protected Short get(int index) {
-			return values[index];
-		}
-	}
-
-	private static class CharArrayIterable extends ArrayIterable<Character> {
-
-		private char[] values;
-
-		private CharArrayIterable(char[] values) {
-			this.values = values;
-		}
-
-		@Override
-		protected int size() {
-			return values.length;
-		}
-
-		@Override
-		protected Character get(int index) {
-			return values[index];
-		}
+			@Override
+			public Character get(char[] array, int index) {
+				return array[index];
+			}
+		};
 	}
 }
