@@ -74,6 +74,7 @@ import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.InternalAnalyzerUtils;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -444,7 +445,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			ConversionContext conversionContext,
 			InstanceInitializer objectInitializer,
 			final float inheritedBoost,
-			boolean multiValued,
+			boolean isParentPropertyMultiValued,
 			NestingContext nestingContext) {
 
 		// needed for field access: I cannot work in the proxied version
@@ -459,7 +460,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				objectInitializer,
 				inheritedBoost,
 				unproxiedInstance,
-				multiValued
+				isParentPropertyMultiValued
 		);
 
 		// allow analyzer override for the fields added by the class and field bridges
@@ -477,7 +478,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				objectInitializer,
 				inheritedBoost,
 				unproxiedInstance,
-				multiValued,
+				isParentPropertyMultiValued,
 				nestingContext
 		);
 	}
@@ -491,7 +492,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			InstanceInitializer objectInitializer,
 			float inheritedBoost,
 			Object unproxiedInstance,
-			boolean multiValued,
+			boolean isParentPropertyMultiValued,
 			NestingContext nestingContext) {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
@@ -514,8 +515,11 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 				switch ( embeddedTypeMetadata.getEmbeddedContainer() ) {
 					case ARRAY:
-						Object[] array = objectInitializer.initializeArray( (Object[]) value );
-						for ( Object arrayValue : array ) {
+						if ( value instanceof Object[] ) {
+							objectInitializer.initializeArray( (Object[]) value );
+						}
+						// Use CollectionHelper.iterableFromArray to also support arrays of primitive values
+						for ( Object arrayValue : CollectionHelper.iterableFromArray( value ) ) {
 							nestingContext.mark( doc );
 							buildDocumentFields(
 									arrayValue,
@@ -585,7 +589,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 								conversionContext,
 								objectInitializer,
 								embeddedBoost,
-								multiValued,
+								isParentPropertyMultiValued,
 								nestingContext
 						);
 						break;
@@ -604,7 +608,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	/**
-	 * @param multiValued Whether the type whose properties should be added may appear more than once (within the same
+	 * @param isParentPropertyMultiValued Whether the type whose properties should be added may appear more than once (within the same
 	 * role) in a document or not. That's the case if the type is (directly or indirectly) contained within an embedded
 	 * to-many association.
 	 */
@@ -615,7 +619,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			InstanceInitializer objectInitializer,
 			float documentBoost,
 			Object unproxiedInstance,
-			boolean multiValued) {
+			boolean isParentPropertyMultiValued) {
 		XMember previousMember = null;
 		Object currentFieldValue = null;
 
@@ -634,6 +638,9 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					else if ( currentFieldValue instanceof Map ) {
 						objectInitializer.initializeMap( (Map) currentFieldValue );
 					}
+				}
+				else if ( member.isArray() && currentFieldValue instanceof Object[] ) {
+					objectInitializer.initializeArray( (Object[]) currentFieldValue );
 				}
 			}
 
@@ -661,17 +668,41 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					if ( fieldMetadata.hasFacets() ) {
 						faceting.enableFacetProcessing();
 						for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
-							if ( multiValued ) {
+							boolean multivalued = isParentPropertyMultiValued;
+
+							if ( member.isCollection() && currentFieldValue instanceof Collection ) {
+								multivalued = true;
+								for ( Object element : (Collection<?>) currentFieldValue ) {
+									addFacetDocValues( document, fieldMetadata, facetMetadata, element );
+								}
+							}
+							else if ( member.isCollection() && currentFieldValue instanceof Map ) {
+								multivalued = true;
+								for ( Object element : ((Map<?,?>) currentFieldValue).values() ) {
+									addFacetDocValues( document, fieldMetadata, facetMetadata, element );
+								}
+							}
+							else if ( member.isArray() ) {
+								multivalued = true;
+								// Use CollectionHelper.iterableFromArray to also support arrays of primitive values
+								for ( Object element : CollectionHelper.iterableFromArray( currentFieldValue ) ) {
+									addFacetDocValues( document, fieldMetadata, facetMetadata, element );
+								}
+							}
+							else {
+								addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
+							}
+
+							if ( multivalued ) {
 								faceting.setMultiValued( facetMetadata.getAbsoluteName() );
 							}
-							addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
 						}
 					}
 				}
 
 				// add the doc value fields required for sorting, but only if this property is not part of an embedded
 				// to-many assoc, in which case sorting on these fields would not make sense
-				if ( !multiValued ) {
+				if ( !isParentPropertyMultiValued ) {
 					addSortFieldDocValues( document, propertyMetadata, documentBoost, currentFieldValue );
 				}
 			}
@@ -692,7 +723,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 		Field facetField;
 		switch ( facetMetadata.getEncoding() ) {
-			case STRING: {
+			case STRING:
 				String stringValue = value.toString();
 				// we don't add empty strings to the facet field
 				if ( stringValue.isEmpty() ) {
@@ -700,8 +731,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				}
 				facetField = new SortedSetDocValuesFacetField( facetMetadata.getAbsoluteName(), stringValue );
 				break;
-			}
-			case LONG: {
+			case LONG:
 				if ( value instanceof Number ) {
 					facetField = new NumericDocValuesField(
 							facetMetadata.getAbsoluteName(),
@@ -740,8 +770,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					throw new AssertionFailure( "Unexpected value type for faceting: " + value.getClass().getName() );
 				}
 				break;
-			}
-			case DOUBLE: {
+			case DOUBLE:
 				if ( value instanceof Number ) {
 					facetField = new DoubleDocValuesField(
 							facetMetadata.getAbsoluteName(),
@@ -752,17 +781,14 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					throw new AssertionFailure( "Unexpected value type for faceting: " + value.getClass().getName() );
 				}
 				break;
-			}
-			case AUTO: {
+			case AUTO:
 				throw new AssertionFailure( "The facet type should have been resolved during bootstrapping" );
-			}
-			default: {
+			default:
 				throw new AssertionFailure(
 						"Unexpected facet encoding type '"
 								+ facetMetadata.getEncoding()
 								+ "' Has the enum been modified?"
 				);
-			}
 		}
 
 		document.add( facetField );
