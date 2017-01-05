@@ -15,7 +15,6 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
-import org.hibernate.search.exception.AssertionFailure;
 
 /**
  * Various utilities to manipulate dates and comply with Elasticsearch date format.
@@ -57,30 +56,13 @@ public final class ElasticsearchDateHelper {
 	 *
 	 * @see DateTools#round(Date, Resolution)
 	 */
-	@SuppressWarnings("fallthrough")
 	public static Calendar round(Calendar calendar, Resolution resolution) {
 		final Calendar calInstance = (Calendar) calendar.clone();
-
-		switch ( resolution ) {
-			// NOTE: switch statement fall-through is deliberate
-			case YEAR:
-				calInstance.set( Calendar.MONTH, 0 );
-			case MONTH:
-				calInstance.set( Calendar.DAY_OF_MONTH, 1 );
-			case DAY:
-				calInstance.set( Calendar.HOUR_OF_DAY, 0 );
-			case HOUR:
-				calInstance.set( Calendar.MINUTE, 0 );
-			case MINUTE:
-				calInstance.set( Calendar.SECOND, 0 );
-			case SECOND:
-				calInstance.set( Calendar.MILLISECOND, 0 );
-			case MILLISECOND:
-				// don't cut off anything
-				break;
-			default:
-				throw new AssertionFailure( "unknown resolution " + resolution );
-		}
+		/*
+		 * Make sure we keep the timezone: use a cloned version of the calendar
+		 * to set the rounded time on it, not a new calendar instance.
+		 */
+		calInstance.setTime( DateTools.round( calInstance.getTime(), resolution ) );
 		return calInstance;
 	}
 

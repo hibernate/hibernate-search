@@ -243,7 +243,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 				"{" +
 					"\"active\": true," +
 					"\"dateOfBirth\": \"1958-04-07T00:00:00Z\"," +
-					"\"subscriptionEndDate\": \"2016-06-07T00:00:00+02:00\"," +
+					"\"subscriptionEndDate\": \"2016-06-07T02:00:00+02:00\"," +
 					"\"driveWidth\": 285," +
 					"\"firstName\": \"Klaus\"," +
 					"\"handicap\": 3.4," +
