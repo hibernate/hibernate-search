@@ -181,7 +181,7 @@ public class BridgeTest extends SearchTestBase {
 	@Test
 	@SkipForDialect(PostgreSQL81Dialect.class)//PosgreSQL doesn't allow storing null with these column types
 	public void testDateBridge() throws Exception {
-		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
+		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
 		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
 		c.set( Calendar.MILLISECOND, 5 );
 		Date date = new Date( c.getTimeInMillis() );
@@ -267,7 +267,7 @@ public class BridgeTest extends SearchTestBase {
 	@Test
 	public void testCalendarBridge() throws Exception {
 		Cloud cloud = new Cloud();
-		Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT ); //for the sake of tests
+		Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
 		calendar.set( 2000, 11, 15, 3, 43, 2 );
 		calendar.set( Calendar.MILLISECOND, 5 );
 
