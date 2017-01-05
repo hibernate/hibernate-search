@@ -235,9 +235,6 @@
                                 <!-- HSEARCH-2399 Implement timeouts for the Elasticsearch backend -->
                                 <exclude>**/JPATimeoutTest.java</exclude>
                                 <exclude>**/TimeoutTest.java</exclude>
-
-                                <!-- HSEARCH-2404 Enable CollectionUpdateEventTest for Elasticsearch -->
-                                <exclude>**/CollectionUpdateEventTest.java</exclude><!-- Only fails on CI (Travis) -->
                             </excludes>
                             <excludedGroups>
                                 ${test.elasticsearch.failsafe.excludedGroups.version}
