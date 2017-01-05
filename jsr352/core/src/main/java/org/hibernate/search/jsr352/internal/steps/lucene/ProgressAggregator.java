@@ -7,20 +7,17 @@
 package org.hibernate.search.jsr352.internal.steps.lucene;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.batch.api.partition.AbstractPartitionAnalyzer;
-import javax.batch.runtime.context.JobContext;
+import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.hibernate.search.jsr352.internal.JobContextData;
 import org.jboss.logging.Logger;
 
 /**
- * Progress aggregator aggregates the intermediary chunk progress received from
- * each partition sent via the collectors. It runs on the step main thread.
+ * Progress aggregator aggregates the intermediary chunk progress received from each partition sent via the collectors.
+ * It runs on the step main thread.
  *
  * @author Mincong Huang
  */
@@ -28,56 +25,35 @@ import org.jboss.logging.Logger;
 public class ProgressAggregator extends AbstractPartitionAnalyzer {
 
 	private static final Logger LOGGER = Logger.getLogger( ProgressAggregator.class );
-	private final JobContext jobContext;
-	private Map<Integer, Long> globalProgress = new HashMap<>();
+	private final StepContext stepContext;
 
 	@Inject
-	public ProgressAggregator(JobContext jobContext) {
-		this.jobContext = jobContext;
+	public ProgressAggregator(StepContext stepContext) {
+		this.stepContext = stepContext;
 	}
 
 	/**
-	 * Analyze data obtained from different partition plans via partition data
-	 * collectors. The current analyze is to summarize to their progresses :
-	 * workDone = workDone1 + workDone2 + ... + workDoneN. Then it displays the
-	 * total mass index progress in percentage. This method is very similar to
-	 * the current simple progress monitor.
+	 * Analyze data obtained from different partition plans via partition data collectors. The current analyze is to
+	 * summarize to their progresses : workDone = workDone1 + workDone2 + ... + workDoneN. Then it displays the total
+	 * mass index progress in percentage. This method is very similar to the current simple progress monitor.
 	 * 
-	 * @param fromCollector the count of finished work of one partition,
-	 * obtained from partition collector's method #collectPartitionData()
+	 * @param fromCollector the indexing progress of one partition, obtained from partition collector's method
+	 * #collectPartitionData()
 	 */
 	@Override
 	public void analyzeCollectorData(Serializable fromCollector) throws Exception {
 
-		// receive progress update from partition
-		PartitionProgress progress = (PartitionProgress) fromCollector;
-		int PID = progress.getPartitionID();
-		long done = progress.getWorkDone();
-		globalProgress.put( PID, done );
+		// update step-level progress using partition-level progress
+		PartitionProgress partitionProgress = (PartitionProgress) fromCollector;
+		StepProgress stepProgress = (StepProgress) stepContext.getTransientUserData();
+		stepProgress.updateProgress( partitionProgress );
 
-		// compute the global progress.
-		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-		long totalTodo = jobData.getTotalEntityToIndex();
-		long totalDone = globalProgress.values()
-				.stream()
-				.mapToLong( Long::longValue )
-				.sum();
-		String comment = "";
-		if ( !progress.isRestarted() ) {
-			if ( totalTodo != 0 ) {
-				comment = String.format( "%.1f%%", 100F * totalDone / totalTodo );
-			}
-			else {
-				comment = "??.?%";
-			}
+		// logging
+		StringBuilder sb = new StringBuilder( System.lineSeparator() );
+		for ( String msg : stepProgress.getProgresses() ) {
+			sb.append( System.lineSeparator() ).append( "\t" ).append( msg );
 		}
-		else {
-			// TODO Currently, percentage is not supported for the restarted job
-			// instance, because collected data is lost after the job stop. The
-			// checkpoint mechanism is only available for partition scope and
-			// JSR 352 doesn't provide any API to store step-scope data.
-			comment = "restarted";
-		}
-		LOGGER.infof( "%d works processed (%s).", totalDone, comment );
+		sb.append( System.lineSeparator() );
+		LOGGER.info( sb.toString() );
 	}
 }

@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.jsr352.internal;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.listener.AbstractJobListener;
@@ -20,11 +23,11 @@ import javax.persistence.PersistenceUnit;
 
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
+import org.hibernate.search.jsr352.internal.util.MassIndexerUtil;
 import org.jboss.logging.Logger;
 
 /**
- * Listener before the start of the job. It aims to setup the job context data,
- * shared by all the steps.
+ * Listener before the start of the job. It aims to setup the job context data, shared by all the steps.
  *
  * @author Mincong Huang
  */
@@ -42,6 +45,10 @@ public class JobContextSetupListener extends AbstractJobListener {
 	@BatchProperty
 	private String rootEntities;
 
+	@Inject
+	@BatchProperty(name = "jobContextData")
+	private String serializedJobContextData;
+
 	@PersistenceUnit(unitName = "h2")
 	private EntityManagerFactory emf;
 
@@ -58,28 +65,23 @@ public class JobContextSetupListener extends AbstractJobListener {
 		try {
 			LOGGER.debug( "Creating entity manager ..." );
 			if ( isJavaSE ) {
-				emf = JobSEEnvironment.getEntityManagerFactory();
+				emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
 			}
 			em = emf.createEntityManager();
-			String[] entityNamesToIndex = rootEntities.split( "," );
-			Set<Class<?>> entityClazzesToIndex = new HashSet<>();
-			Set<Class<?>> indexedTypes = Search
+			List<String> entityNamesToIndex = Arrays.asList( rootEntities.split( "," ) );
+			Set<Class<?>> entityTypesToIndex = Search
 					.getFullTextEntityManager( em )
 					.getSearchFactory()
-					.getIndexedTypes();
+					.getIndexedTypes()
+					.stream()
+					.filter( clz -> entityNamesToIndex.contains( clz.getName() ) )
+					.collect( Collectors.toCollection( HashSet::new ) );
 
-			// check the root entities selected do exist
-			// in full-text entity session
-			for ( String entityName : entityNamesToIndex ) {
-				for ( Class<?> indexedType : indexedTypes ) {
-					if ( indexedType.getName().equals( entityName.trim() ) ) {
-						entityClazzesToIndex.add( indexedType );
-						continue;
-					}
-				}
-			}
-
-			jobContext.setTransientUserData( new JobContextData( entityClazzesToIndex ) );
+			JobContextData jobContextData = MassIndexerUtil
+					.deserializeJobContextData( serializedJobContextData );
+			LOGGER.infof( "%d criterions found.", jobContextData.getCriterions().size() );
+			jobContextData.setEntityTypes( entityTypesToIndex );
+			jobContext.setTransientUserData( jobContextData );
 		}
 		finally {
 			try {
@@ -94,7 +96,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 	@Override
 	public void afterJob() throws Exception {
 		if ( isJavaSE ) {
-			JobSEEnvironment.setEntityManagerFactory( null );
+			JobSEEnvironment.getInstance().setEntityManagerFactory( null );
 		}
 	}
 }

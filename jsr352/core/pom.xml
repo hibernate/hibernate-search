@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>5.5.4.Final</version>
+        <version>1.0</version>
     </parent>
 
     <artifactId>hsearch-jsr352-core</artifactId>
@@ -19,15 +19,24 @@
     <description>New implementation of mass-indexer using JSR 352</description>
 
     <properties>
+        <org.jboss.byteman>3.0.6</org.jboss.byteman>
         <org.mockito>1.10.19</org.mockito>
-        <org.powermock>1.6.4</org.powermock>
-        <byteman.version>3.0.6</byteman.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${org.hibernate}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.3.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.batch</groupId>
@@ -57,30 +66,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${org.powermock}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>${org.powermock}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-        <!-- below dependencies are moved from Java SE integration test -->
-        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${org.hibernate}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${org.hibernate}</version>
-        </dependency>
+
         <!-- JBeret minimal application dependencies -->
         <!-- https://jberet.gitbooks.io/jberet-user-guide/content/set_up_jberet/#minimal-application-dependencies -->
         <dependency>
@@ -102,11 +93,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <version>3.3.0.Final</version>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-core</artifactId>
             <version>2.3.4.Final</version>
@@ -124,6 +110,7 @@
             <version>19.0</version>
             <scope>test</scope>
         </dependency>
+
         <!-- Additional dependencies for Java SE batch applications -->
         <!-- https://jberet.gitbooks.io/jberet-user-guide/content/set_up_jberet/#additional-dependencies-for-java-se-batch-applications -->
         <dependency>
@@ -138,39 +125,37 @@
             <version>2.3.4.Final</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${com.h2database}</version>
             <scope>test</scope>
         </dependency>
-        <!-- above dependencies are moved from Java SE integration test -->
-        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
         <!-- bytemen -->
-        
         <dependency>
             <groupId>org.jboss.byteman</groupId>
             <artifactId>byteman</artifactId>
+            <version>${org.jboss.byteman}</version>
             <scope>test</scope>
-            <version>${byteman.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
             <artifactId>byteman-submit</artifactId>
+            <version>${org.jboss.byteman}</version>
             <scope>test</scope>
-            <version>${byteman.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
             <artifactId>byteman-install</artifactId>
+            <version>${org.jboss.byteman}</version>
             <scope>test</scope>
-            <version>${byteman.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
             <artifactId>byteman-bmunit</artifactId>
+            <version>${org.jboss.byteman}</version>
             <scope>test</scope>
-            <version>${byteman.version}</version>
         </dependency>
     </dependencies>
 
@@ -180,9 +165,6 @@
             <testResource>
                 <filtering>true</filtering>
                 <directory>src/test/resources</directory>
-                <includes>
-                    <include>META-INF/persistence.xml</include>
-                </includes>
             </testResource>
         </testResources>
         <plugins>

@@ -27,25 +27,22 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.jsr352.internal.JobContextData;
 import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
-import org.hibernate.search.jsr352.internal.util.MassIndexerUtil;
-import org.hibernate.search.jsr352.internal.util.PartitionUnit;
+import org.hibernate.search.jsr352.internal.util.PartitionBound;
 import org.jboss.logging.Logger;
 
 /**
- * Item reader reads entities using scrollable results. For each reader, there's
- * only one target entity type. The range to read is defined by the partition
- * unit. This range is always a left-closed interval.
+ * Item reader reads entities using scrollable results. For each reader, there's only one target entity type. The range
+ * to read is defined by the partition unit. This range is always a left-closed interval.
  * <p>
- * For example, there 2 entity types Company and Employee. The number of rows
- * are respectively 5 and 4500. The rowsPerPartition is set to 1000. Then, there
- * will be 6 readers and their ranges are :
+ * For example, there 2 entity types Company and Employee. The number of rows are respectively 5 and 4500. The
+ * rowsPerPartition is set to 1000. Then, there will be 6 readers and their ranges are :
  * <ul>
- * <li>partitionID = 0, entityType = Company, range = [null, null[
- * <li>partitionID = 1, entityType = Employee, range = [1, 1000[
- * <li>partitionID = 2, entityType = Employee, range = [1000, 2000[
- * <li>partitionID = 3, entityType = Employee, range = [2000, 3000[
- * <li>partitionID = 4, entityType = Employee, range = [3000, 4000[
- * <li>partitionID = 5, entityType = Employee, range = [4000, null[
+ * <li>partitionId = 0, entityType = Company, range = [null, null[
+ * <li>partitionId = 1, entityType = Employee, range = [null, 1000[
+ * <li>partitionId = 2, entityType = Employee, range = [1000, 2000[
+ * <li>partitionId = 3, entityType = Employee, range = [2000, 3000[
+ * <li>partitionId = 4, entityType = Employee, range = [3000, 4000[
+ * <li>partitionId = 5, entityType = Employee, range = [4000, null[
  * </ul>
  *
  * @author Mincong Huang
@@ -63,45 +60,75 @@ public class EntityReader extends AbstractItemReader {
 
 	@Inject
 	@BatchProperty
-	private boolean cacheable;
-
-	@Inject
-	@BatchProperty
-	private boolean isJavaSE;
-
-	@Inject
-	@BatchProperty
-	private int fetchSize;
-
-	@Inject
-	@BatchProperty
-	private int maxResults;
-
-	@Inject
-	@BatchProperty
-	private int partitionID;
+	private String cacheable;
 
 	@Inject
 	@BatchProperty
 	private String entityName;
 
+	@Inject
+	@BatchProperty
+	private String fetchSize;
+
+	@Inject
+	@BatchProperty
+	private String hql;
+
+	@Inject
+	@BatchProperty
+	private String isJavaSE;
+
+	@Inject
+	@BatchProperty
+	private String maxResults;
+
+	@Inject
+	@BatchProperty(name = "partitionId")
+	private String partitionIdStr;
+
 	@PersistenceUnit(unitName = "h2")
 	private EntityManagerFactory emf;
 
-	private Class<?> entityClazz;
-	private Serializable checkpointID;
+	private Class<?> entityType;
+	private Serializable checkpointId;
 	private Session session;
 	private StatelessSession ss;
 	private ScrollableResults scroll;
 	private SessionFactory sessionFactory;
 
-	public EntityReader() {
-
+	EntityReader() {
 	}
 
 	/**
-	 * The checkpointInfo method returns the current checkpoint data for this
-	 * reader. It is called before a chunk checkpoint is committed.
+	 * Constructor for unit test TODO should it be done in this way?
+	 *
+	 * @param cacheable
+	 * @param entityName
+	 * @param fetchSize
+	 * @param hql
+	 * @param isJavaSE
+	 * @param maxResults
+	 * @param partitionIdStr
+	 */
+	EntityReader(String cacheable,
+			String entityName,
+			String fetchSize,
+			String hql,
+			String isJavaSE,
+			String maxResults,
+			String partitionIdStr) {
+		this.cacheable = cacheable;
+		this.entityName = entityName;
+		this.fetchSize = fetchSize;
+		this.hql = hql;
+		this.isJavaSE = isJavaSE;
+		this.maxResults = maxResults;
+		this.partitionIdStr = partitionIdStr;
+	}
+
+	/**
+	 * The checkpointInfo method returns the current checkpoint data for this reader. It is called before a chunk
+	 * checkpoint is committed.
 	 *
 	 * @return the checkpoint info
 	 * @throws Exception thrown for any errors.
@@ -110,7 +137,7 @@ public class EntityReader extends AbstractItemReader {
 	public Serializable checkpointInfo() throws Exception {
 		LOGGER.debug( "checkpointInfo() called. "
 				+ "Saving last read ID to batch runtime..." );
-		return checkpointID;
+		return checkpointId;
 	}
 
 	/**
@@ -144,61 +171,87 @@ public class EntityReader extends AbstractItemReader {
 		}
 		// reset the chunk work count to avoid over-count in item collector
 		// release session
-		StepContextData stepData = (StepContextData) stepContext.getTransientUserData();
-		stepData.setSession( null );
-		stepContext.setPersistentUserData( stepData );
+		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
+		partitionData.setSession( null );
+		stepContext.setPersistentUserData( partitionData );
 	}
 
 	/**
-	 * Initialize the environment. If checkpoint does not exist, then it should
-	 * be the first open. If checkpoint exists, then it isn't the first open,
-	 * re-use the input object "checkpoint" as the last ID already read.
+	 * Initialize the environment. If checkpoint does not exist, then it should be the first open. If checkpoint exists,
+	 * then it isn't the first open, re-use the input object "checkpoint" as the last ID already read.
 	 *
-	 * @param checkpoint The last checkpoint info persisted in the batch
-	 * runtime, previously given by checkpointInfo(). If this is the first
-	 * start, then the checkpoint will be null.
+	 * @param checkpoint The last checkpoint info persisted in the batch runtime, previously given by checkpointInfo().
+	 * If this is the first start, then the checkpoint will be null.
 	 * @throws Exception thrown for any errors.
 	 */
 	@Override
-	public void open(Serializable checkpointID) throws Exception {
+	public void open(Serializable checkpointId) throws Exception {
 
-		LOGGER.debugf( "[partitionID=%d] open reader for entity %s ...", partitionID, entityName );
+		final int partitionId = Integer.parseInt( partitionIdStr );
+
+		LOGGER.debugf( "[partitionId=%d] open reader for entity %s ...", partitionId, entityName );
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-		entityClazz = jobData.getIndexedType( entityName );
-		PartitionUnit unit = jobData.getPartitionUnit( partitionID );
-		LOGGER.debug( unit );
+		entityType = jobData.getIndexedType( entityName );
+		PartitionBound bound = jobData.getPartitionBound( partitionId );
+		LOGGER.debug( bound );
 
-		if ( isJavaSE ) {
-			emf = JobSEEnvironment.getEntityManagerFactory();
+		if ( Boolean.parseBoolean( isJavaSE ) ) {
+			emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
 		}
 		sessionFactory = emf.unwrap( SessionFactory.class );
 		ss = sessionFactory.openStatelessSession();
 		session = sessionFactory.openSession();
-		scroll = buildScroll( ss, unit, checkpointID );
 
-		StepContextData stepData = null;
-		if ( checkpointID == null ) {
-			stepData = new StepContextData( partitionID, entityName );
-			stepData.setRestarted( false );
+		PartitionContextData partitionData = null;
+		// HQL approach
+		// In this approach, the checkpoint mechanism is disabled, because we
+		// don't know if the selection is ordered by ID ascendingly in the query.
+		if ( hql != null && !hql.isEmpty() ) {
+			// TODO should I worry about the Lucene AddWork? If this is a
+			// restart, will it create duplicate index for the same entity,
+			// since there's no purge?
+			scroll = buildScrollUsingHQL( ss, hql );
+			partitionData = new PartitionContextData( partitionId, entityName );
 		}
+		// Criteria approach
 		else {
-			stepData = (StepContextData) stepContext.getPersistentUserData();
-			stepData.setRestarted( true );
+			scroll = buildScrollUsingCriteria( ss, bound, checkpointId, jobData );
+			if ( checkpointId == null ) {
+				partitionData = new PartitionContextData( partitionId, entityName );
+			}
+			else {
+				partitionData = (PartitionContextData) stepContext.getPersistentUserData();
+			}
 		}
 
-		stepData.setSession( session );
-		stepContext.setTransientUserData( stepData );
+		partitionData.setSession( session );
+		stepContext.setTransientUserData( partitionData );
 	}
 
-	private ScrollableResults buildScroll(StatelessSession ss,
-			PartitionUnit unit, Object checkpointID) {
+	private ScrollableResults buildScrollUsingHQL(StatelessSession ss, String HQL) {
 
-		String idName = MassIndexerUtil.getIdName( entityClazz, session );
-		Criteria criteria = ss.createCriteria( entityClazz );
-		if ( checkpointID != null ) {
-			criteria.add( Restrictions.ge( idName, checkpointID ) );
+		return ss.createQuery( HQL )
+				.setReadOnly( true )
+				.setCacheable( Boolean.parseBoolean( cacheable ) )
+				.setFetchSize( Integer.parseInt( fetchSize ) )
+				.setMaxResults( Integer.parseInt( maxResults ) )
+				.scroll( ScrollMode.FORWARD_ONLY );
+	}
+
+	private ScrollableResults buildScrollUsingCriteria(StatelessSession ss,
+			PartitionBound unit, Object checkpointId, JobContextData jobData) {
+
+		String idName = sessionFactory.getClassMetadata( entityType )
+				.getIdentifierPropertyName();
+
+		Criteria criteria = ss.createCriteria( entityType );
+
+		// build criteria using checkpoint ID
+		if ( checkpointId != null ) {
+			criteria.add( Restrictions.ge( idName, checkpointId ) );
 		}
 
+		// build criteria using partition unit
 		if ( unit.isUniquePartition() ) {
 			// no bounds if the partition unit is unique
 		}
@@ -212,17 +265,20 @@ public class EntityReader extends AbstractItemReader {
 			criteria.add( Restrictions.ge( idName, unit.getLowerBound() ) )
 					.add( Restrictions.lt( idName, unit.getUpperBound() ) );
 		}
+
+		// build criteria using job context data
+		jobData.getCriterions().forEach( c -> criteria.add( c ) );
+
 		return criteria.addOrder( Order.asc( idName ) )
 				.setReadOnly( true )
-				.setCacheable( cacheable )
-				.setFetchSize( fetchSize )
-				.setMaxResults( maxResults )
+				.setCacheable( Boolean.parseBoolean( cacheable ) )
+				.setFetchSize( Integer.parseInt( fetchSize ) )
+				.setMaxResults( Integer.parseInt( maxResults ) )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
 	/**
-	 * Read item from database using JPA. Each read, there will be only one
-	 * entity fetched.
+	 * Read item from database using JPA. Each read, there will be only one entity fetched.
 	 *
 	 * @throws Exception thrown for any errors.
 	 */
@@ -233,7 +289,7 @@ public class EntityReader extends AbstractItemReader {
 
 		if ( scroll.next() ) {
 			entity = scroll.get( 0 );
-			checkpointID = (Serializable) emf.getPersistenceUnitUtil()
+			checkpointId = (Serializable) emf.getPersistenceUnitUtil()
 					.getIdentifier( entity );
 		}
 		else {

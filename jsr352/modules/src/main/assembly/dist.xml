@@ -17,7 +17,7 @@
     <files>
         <file>
             <source>${module.xml.basedir}/search/jsr352/module.xml</source>
-            <outputDirectory>/org/hibernate/search/jsr352/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>/org/hibernate/search/jsr352/${project.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -25,12 +25,14 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>/org/hibernate/search/jsr352/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>/org/hibernate/search/jsr352/${project.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
+                <!-- include the core module of this project -->
                 <include>org.hibernate:hsearch-jsr352-core</include>
             </includes>
         </dependencySet>
     </dependencySets>
+
 </assembly>

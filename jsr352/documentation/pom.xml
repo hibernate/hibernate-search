@@ -11,7 +11,7 @@
     <parent>
         <artifactId>hsearch-jsr352-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>5.5.4.Final</version>
+        <version>1.0</version>
     </parent>
 
     <artifactId>hsearch-jsr352-documentation</artifactId>
@@ -80,10 +80,7 @@
                         <sourceDocumentName>index.asciidoc</sourceDocumentName>
                         <doctype>book</doctype>
                         <attributes>
-                            <hibernateSearchVersion>${project.version}</hibernateSearchVersion>
-                            <hibernateVersion>${org.hibernate}</hibernateVersion>
-                            <luceneVersion>${luceneVersion}</luceneVersion>
-                            <infinispanVersion>${infinispanVersion}</infinispanVersion>
+                            <projectVersion>${project.version}</projectVersion>
                         </attributes>
                     </configuration>
                 </plugin>

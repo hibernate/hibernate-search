@@ -6,13 +6,16 @@
  */
 package org.hibernate.search.jsr352.internal;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.jsr352.internal.util.PartitionUnit;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.search.jsr352.internal.util.PartitionBound;
 
 /**
  * Container for data shared across the entire batch job.
@@ -20,21 +23,16 @@ import org.hibernate.search.jsr352.internal.util.PartitionUnit;
  * @author Gunnar Morling
  * @author Mincong Huang
  */
-public class JobContextData {
+public class JobContextData implements Serializable {
+
+	private static final long serialVersionUID = 4465274690302894983L;
 
 	/**
-	 * The map of key value pair (string, class-type), designed for storage of
-	 * name and class type of all root entities. In JSR 352 standard, only
-	 * string values can be propagated using job properties, but class types are
-	 * frequently used too. So this map facilites this kind of lookup.
+	 * The map of key value pair (string, class-type), designed for storage of name and class type of all root entities.
+	 * In JSR 352 standard, only string values can be propagated using job properties, but class types are frequently
+	 * used too. So this map facilitates this kind of lookup.
 	 */
-	private Map<String, Class<?>> entityClazzMap;
-
-	/**
-	 * The map of key value pair (string, long), designed for storage of name
-	 * and number of rows to index of all root entities.
-	 */
-	private Map<String, Long> entityCountMap = new HashMap<>();
+	private Map<String, Class<?>> entityTypeMap;
 
 	/**
 	 * The total number of entities to index over all the entity types.
@@ -42,39 +40,46 @@ public class JobContextData {
 	private long totalEntityToIndex;
 
 	/**
-	 * The list of units containing properties for each partition.
+	 * The list of partition boundaries, one element per partition
 	 */
-	private List<PartitionUnit> partitionUnits;
+	private List<PartitionBound> partitionBounds;
 
-	public JobContextData(Set<Class<?>> entityClazzes) {
-		entityClazzMap = new HashMap<>();
-		entityClazzes.forEach( clz -> entityClazzMap.put( clz.toString(), clz ) );
+	private Set<Criterion> criterions;
+
+	public JobContextData() {
+		entityTypeMap = new HashMap<>();
 	}
 
-	public Set<String> getEntityNameSet() {
-		return entityClazzMap.keySet();
+	public void setEntityTypes(Collection<Class<?>> entityTypes) {
+		entityTypes.forEach( clz -> entityTypeMap.put( clz.getName(), clz ) );
 	}
 
-	public Set<Class<?>> getEntityClazzSet() {
-		return new HashSet<Class<?>>( entityClazzMap.values() );
+	public void setEntityTypes(Class<?> firstEntityType, Class<?>... otherEntityTypes) {
+		entityTypeMap.put( firstEntityType.getName(), firstEntityType );
+		for ( Class<?> type : otherEntityTypes ) {
+			entityTypeMap.put( type.getName(), type );
+		}
 	}
 
-	public String[] getEntityNameArray() {
-		Set<String> keySet = entityClazzMap.keySet();
-		return keySet.toArray( new String[keySet.size()] );
+	public List<Class<?>> getEntityTypes() {
+		return new ArrayList<Class<?>>( entityTypeMap.values() );
 	}
 
 	public Class<?> getIndexedType(String entityName) throws ClassNotFoundException {
-		Class<?> clazz = entityClazzMap.get( entityName );
-		if ( clazz == null ) {
+		Class<?> entityType = entityTypeMap.get( entityName );
+		if ( entityType == null ) {
 			String msg = String.format( "entityName %s not found.", entityName );
 			throw new ClassNotFoundException( msg );
 		}
-		return clazz;
+		return entityType;
 	}
 
 	public long getTotalEntityToIndex() {
 		return totalEntityToIndex;
+	}
+
+	public Set<Criterion> getCriterions() {
+		return criterions;
 	}
 
 	public void setTotalEntityToIndex(long totalEntityToIndex) {
@@ -86,30 +91,25 @@ public class JobContextData {
 	 *
 	 * @param increment the entity number to index for one entity type
 	 */
-	public void incrementTotalEntity( long increment ) {
+	public void incrementTotalEntity(long increment) {
 		totalEntityToIndex += increment;
 	}
 
-	public void setPartitionUnits(List<PartitionUnit> partitionUnits) {
-		this.partitionUnits = partitionUnits;
+	public void setPartitionBounds(List<PartitionBound> partitionBounds) {
+		this.partitionBounds = partitionBounds;
 	}
 
-	public PartitionUnit getPartitionUnit(int partitionID) {
-		return partitionUnits.get( partitionID );
+	public PartitionBound getPartitionBound(int partitionId) {
+		return partitionBounds.get( partitionId );
 	}
 
-	public long getRowsToIndex(String entityName) {
-		return entityCountMap.get( entityName );
-	}
-
-	public void setRowsToIndex(String entityName, long rowsToIndex) {
-		entityCountMap.put( entityName, rowsToIndex );
+	public void setCriterions(Set<Criterion> criterions) {
+		this.criterions = criterions;
 	}
 
 	@Override
 	public String toString() {
-		return "JobContextData [entityClazzMap=" + entityClazzMap + ", entityCountMap="
-				+ entityCountMap + ", totalEntityToIndex=" + totalEntityToIndex
-				+ ", partitionUnits=" + partitionUnits + "]";
+		return "JobContextData [entityTypeMap=" + entityTypeMap + ", totalEntityToIndex=" + totalEntityToIndex + ", partitionBounds=" + partitionBounds
+				+ ", criterions=" + criterions + "]";
 	}
 }
