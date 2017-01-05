@@ -52,7 +52,9 @@ public class NumericEncodingQueriesTest extends SearchTestBase {
 	}
 
 	private static Calendar createCalendar() {
-		return Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ITALY );
+		Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ITALY );
+		calendar.setTimeInMillis( 0 ); // Reset to epoch; clears hours/minutes/seconds in particular
+		return calendar;
 	}
 
 	@Before
