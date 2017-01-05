@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<job id="BatchIndexingJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
+
+    <listeners>
+        <listener ref="jobContextSetupListener">
+            <properties>
+                <property name="isJavaSE" value="#{jobParameters['isJavaSE']}" />
+                <property name="rootEntities" value="#{jobParameters['rootEntities']}" />
+                <property name="jobContextData" value="#{jobParameters['jobContextData']}" />
+            </properties>
+        </listener>
+    </listeners>
+
+    <step id="beforeChunk" next="produceLuceneDoc">
+        <batchlet ref="beforeChunkBatchlet">
+            <properties>
+                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
+                <property name="purgeAtStart" value="#{jobParameters['purgeAtStart']}" />
+            </properties>
+        </batchlet>
+    </step>
+
+    <step id="produceLuceneDoc" next="afterChunk">
+        <listeners>
+            <listener ref="stepProgressSetupListener">
+                <properties>
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}" />
+                </properties>
+            </listener>
+        </listeners>
+        <chunk checkpoint-policy="custom">
+            <reader ref="entityReader">
+                <properties>
+                    <property name="entityName" value="#{partitionPlan['entityName']}" />
+                    <property name="partitionId" value="#{partitionPlan['partitionId']}" />
+                    <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
+                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
+                    <property name="hql" value="#{jobParameters['hql']}" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}" />
+                    <property name="maxResults" value="#{jobParameters['maxResults']}?:10000000;" />
+                </properties>
+            </reader>
+            <processor ref="luceneDocProducer">
+                <properties>
+                    <property name="entityName" value="#{partitionPlan['entityName']}" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
+                </properties>
+            </processor>
+            <writer ref="luceneDocWriter">
+                <properties>
+                    <property name="entityName" value="#{partitionPlan['entityName']}" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
+                </properties>
+            </writer>
+            <checkpoint-algorithm ref="checkpointAlgorithm">
+                <properties>
+                    <property name="itemCount" value="#{jobParameters['itemCount']}?:200;" />
+                </properties>
+            </checkpoint-algorithm>
+        </chunk>
+        <partition>
+            <mapper ref="partitionMapper">
+                <properties>
+                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
+                    <property name="hql" value="#{jobParameters['hql']}" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
+                    <property name="maxThreads" value="#{jobParameters['threads']}?:8;" />
+                    <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:0;" />
+                </properties>
+            </mapper>
+            <collector ref="progressCollector" />
+            <analyzer ref="progressAggregator" />
+        </partition>
+    </step>
+
+    <step id="afterChunk">
+        <batchlet ref="afterChunkBatchlet">
+            <properties>
+                <property name="optimizeAtEnd" value="#{jobParameters['optimizeAtEnd']}" />
+            </properties>
+        </batchlet>
+    </step>
+</job>

@@ -6,19 +6,45 @@
  */
 package org.hibernate.search.jsr352.internal.util;
 
-import org.hibernate.Session;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Base64;
+
+import org.hibernate.search.jsr352.internal.JobContextData;
+import org.jboss.logging.Logger;
 
 /**
  * @author Mincong Huang
  */
 public class MassIndexerUtil {
 
-	public static String getIdName(Class<?> clazz, Session session) {
-		return ContextHelper.getSearchintegrator( session )
-				.getIndexBindings()
-				.get( clazz )
-				.getDocumentBuilder()
-				.getIdentifierName();
+	public static final Logger LOGGER = Logger.getLogger( MassIndexerUtil.class );
+
+	public static String serialize(JobContextData ctxData)
+			throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream( baos );
+		oos.writeObject( ctxData );
+		oos.flush();
+		oos.close();
+		return Base64.getEncoder().encodeToString( baos.toByteArray() );
+	}
+
+	public static JobContextData deserializeJobContextData(String serialized)
+			throws IOException, ClassNotFoundException {
+		// TODO can NPE check be deleted?
+		if ( serialized == null ) {
+			LOGGER.warn( "JobContextData is null. Nothing to deserialize." );
+			return null;
+		}
+		byte bytes[] = Base64.getDecoder().decode( serialized );
+		ByteArrayInputStream bais = new ByteArrayInputStream( bytes );
+		ObjectInputStream ois = new ObjectInputStream( bais );
+		JobContextData jobContextData = (JobContextData) ois.readObject();
+		ois.close();
+		return jobContextData;
 	}
 }

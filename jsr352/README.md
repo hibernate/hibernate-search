@@ -1,3 +1,5 @@
+[![Build Status][travis-img]][travis]
+
 # gsoc-hsearch
 
 This project aims to provide an alternative to the current mass indexer 
@@ -22,3 +24,6 @@ long-running, background execution process. Execution contains operational
 control (start/stop/restart), logging, checkpointing and parallelization.
 
 For more information, please check http://mincong-h.github.io/gsoc-hsearch
+
+[travis]: https://travis-ci.org/mincong-h/gsoc-hsearch
+[travis-img]: https://travis-ci.org/mincong-h/gsoc-hsearch.svg?branch=master

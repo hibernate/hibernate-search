@@ -14,23 +14,22 @@ import java.io.Serializable;
 public class PartitionProgress implements Serializable {
 
 	private static final long serialVersionUID = -5923539799807235429L;
-	private long workDone = 0L;
 	private String entityName;
-	private int partitionID;
-	private boolean isRestarted = false;
+	private int partitionId;
+	private long workDone;
 
-	public PartitionProgress(int partitionID, String entityName) {
-		this.partitionID = partitionID;
+	public PartitionProgress(int partitionId, String entityName) {
+		this.partitionId = partitionId;
 		this.entityName = entityName;
+		this.workDone = 0L;
 	}
 
 	/**
-	 * documentsAdded is an elementary count. It records
-	 * how many items have been written in the current chunk. This value is
-	 * overwritten be the item writer at the end of each
+	 * documentsAdded is an elementary count. It records how many items have been written in the current chunk. This
+	 * value is overwritten be the item writer at the end of each
 	 * {@link org.hibernate.search.jsr352.internal.steps.lucene.ItemWriter#writeItems}
 	 */
-	public void documentsAdded(long increment) {
+	public void documentsAdded(int increment) {
 		this.workDone += increment;
 	}
 
@@ -42,20 +41,12 @@ public class PartitionProgress implements Serializable {
 		this.entityName = entityName;
 	}
 
-	public int getPartitionID() {
-		return partitionID;
+	public int getPartitionId() {
+		return partitionId;
 	}
 
-	public void setPartitionID(int partitionID) {
-		this.partitionID = partitionID;
-	}
-
-	public boolean isRestarted() {
-		return isRestarted;
-	}
-	
-	public void setRestarted(boolean isRestarted) {
-		this.isRestarted = isRestarted;
+	public void setPartitionId(int partitionId) {
+		this.partitionId = partitionId;
 	}
 
 	public long getWorkDone() {
@@ -69,6 +60,6 @@ public class PartitionProgress implements Serializable {
 	@Override
 	public String toString() {
 		return "PartitionProgress [workDone=" + workDone + ", entityName=" + entityName
-				+ ", partitionID=" + partitionID + "]";
+				+ ", partitionId=" + partitionId + "]";
 	}
 }

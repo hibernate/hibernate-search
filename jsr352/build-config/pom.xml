@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>5.5.4.Final</version>
+        <version>1.0</version>
     </parent>
     <artifactId>hsearch-jsr352-build-config</artifactId>
 
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>${puppycrawl.checkstyle.version}</version>
+            <version>${com.puppycrawl.tools}</version>
             <exclusions>
                 <!-- Excluding com.sun:tools since it causes errors when importing this module into an IDE on Windows (HSEARCH-1374) -->
                 <exclusion>

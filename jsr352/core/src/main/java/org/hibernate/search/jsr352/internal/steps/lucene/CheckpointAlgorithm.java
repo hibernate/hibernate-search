@@ -14,10 +14,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
- * This checkpoint algorithm is used to provide a checkpoint decision based on
- * the item count N given by the user. So, the job is ready to checkpoint each N
- * items. If user does not specify the itemCount value, default value described
- * in the mass indexer will be applied.
+ * This checkpoint algorithm is used to provide a checkpoint decision based on the item count N given by the user. So,
+ * the job is ready to checkpoint each N items. If user does not specify the itemCount value, default value described in
+ * the mass indexer will be applied.
  *
  * @author Mincong Huang
  */
@@ -28,7 +27,7 @@ public class CheckpointAlgorithm extends AbstractCheckpointAlgorithm {
 
 	@Inject
 	@BatchProperty
-	private int itemCount;
+	private String itemCount;
 
 	@Inject
 	public CheckpointAlgorithm(StepContext stepContext) {
@@ -40,7 +39,7 @@ public class CheckpointAlgorithm extends AbstractCheckpointAlgorithm {
 		Metric[] metrics = stepContext.getMetrics();
 		for ( final Metric m : metrics ) {
 			if ( m.getType().equals( Metric.MetricType.READ_COUNT ) ) {
-				return m.getValue() % itemCount == 0;
+				return m.getValue() % Integer.parseInt( itemCount ) == 0;
 			}
 		}
 		throw new Exception( "Metric READ_COUNT not found" );

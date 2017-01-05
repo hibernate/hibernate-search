@@ -11,15 +11,26 @@ import javax.persistence.EntityManagerFactory;
 /**
  * @author Mincong Huang
  */
-public class JobSEEnvironment {
+public final class JobSEEnvironment {
 
-	private static EntityManagerFactory emf;
+	private static final JobSEEnvironment INSTANCE = new JobSEEnvironment();
+	private EntityManagerFactory emf;
 
-	public static EntityManagerFactory getEntityManagerFactory() {
+	private JobSEEnvironment() {
+		if ( INSTANCE != null ) {
+			throw new IllegalStateException( "Already instantiated" );
+		}
+	}
+
+	public static JobSEEnvironment getInstance() {
+		return INSTANCE;
+	}
+
+	public EntityManagerFactory getEntityManagerFactory() {
 		return emf;
 	}
 
-	public static void setEntityManagerFactory( EntityManagerFactory entityManagerFactory ) {
+	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		emf = entityManagerFactory;
 	}
 }

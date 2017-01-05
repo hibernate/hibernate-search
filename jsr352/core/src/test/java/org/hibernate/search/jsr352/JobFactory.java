@@ -10,7 +10,6 @@ import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 
 /**
- *
  * @author Mincong Huang
  */
 public class JobFactory {

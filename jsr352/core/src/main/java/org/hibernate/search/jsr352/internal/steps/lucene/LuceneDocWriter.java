@@ -33,13 +33,13 @@ import org.hibernate.search.store.IndexShardingStrategy;
 import org.jboss.logging.Logger;
 
 /**
- * Batch item writer writes a list of items into Lucene documents. Here, items
- * mean the luceneWorks, given by the processor. These items will be executed
- * using StreamingOperationExecutor.
+ * Batch item writer writes a list of items into Lucene documents. Here, items mean the luceneWorks, given by the
+ * processor. These items will be executed using StreamingOperationExecutor.
  *
  * @author Mincong Huang
  */
 @Named
+@SuppressWarnings("deprecation")
 public class LuceneDocWriter extends AbstractItemWriter {
 
 	private static final Logger LOGGER = Logger.getLogger( LuceneDocWriter.class );
@@ -49,11 +49,11 @@ public class LuceneDocWriter extends AbstractItemWriter {
 
 	@Inject
 	@BatchProperty
-	private boolean isJavaSE;
+	private String entityName;
 
 	@Inject
 	@BatchProperty
-	private String entityName;
+	private String isJavaSE;
 
 	@PersistenceUnit(unitName = "h2")
 	private EntityManagerFactory emf;
@@ -68,10 +68,8 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	}
 
 	/**
-	 * The close method marks the end of use of the ItemWriter. This method is
-	 * called when the job stops for any reason. In case of job interruption,
-	 * the job might need to be restarted. That's why the step context data is
-	 * persisted.
+	 * The close method marks the end of use of the ItemWriter. This method is called when the job stops for any reason.
+	 * In case of job interruption, the job might need to be restarted. That's why the step context data is persisted.
 	 *
 	 * @throws Exception is thrown for any errors.
 	 */
@@ -95,18 +93,18 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	public void open(Serializable checkpoint) throws Exception {
 
 		LOGGER.debug( "open(Seriliazable) called" );
-		if ( isJavaSE ) {
-			emf = JobSEEnvironment.getEntityManagerFactory();
+		if ( Boolean.parseBoolean( isJavaSE ) ) {
+			emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
 		}
 		em = emf.createEntityManager();
 
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-		Class<?> entityClazz = jobData.getIndexedType( entityName );
+		Class<?> entityType = jobData.getIndexedType( entityName );
 		entityIndexBinding = Search
 				.getFullTextEntityManager( em )
 				.getSearchFactory()
 				.unwrap( SearchIntegrator.class )
-				.getIndexBinding( entityClazz );
+				.getIndexBinding( entityType );
 	}
 
 	/**
@@ -137,7 +135,7 @@ public class LuceneDocWriter extends AbstractItemWriter {
 		}
 
 		// update work count
-		StepContextData stepContextData = (StepContextData) stepContext.getTransientUserData();
-		stepContextData.documentAdded( items.size() );
+		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
+		partitionData.documentAdded( items.size() );
 	}
 }

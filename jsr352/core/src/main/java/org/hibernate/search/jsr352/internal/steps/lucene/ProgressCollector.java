@@ -16,9 +16,8 @@ import javax.inject.Named;
 import org.jboss.logging.Logger;
 
 /**
- * Progress collectors run on the partitioned step threads and there's one
- * collector per partition. They collect the partition progress and send it to
- * the partition analyzer.
+ * Progress collectors run on the partitioned step threads and there's one collector per partition. They collect the
+ * partition progress and send it to the partition analyzer.
  * 
  * @author Mincong Huang
  */
@@ -34,15 +33,13 @@ public class ProgressCollector implements PartitionCollector {
 	}
 
 	/**
-	 * The collectPartitionData method receives control periodically during
-	 * partition processing. This method receives control on each thread
-	 * processing a partition as lucene document production, once at the end of
-	 * the process.
+	 * The collectPartitionData method receives control periodically during partition processing. This method receives
+	 * control on each thread processing a partition as lucene document production, once at the end of the process.
 	 */
 	@Override
 	public Serializable collectPartitionData() throws Exception {
 		LOGGER.debug( "Collecting partition data ..." );
-		return ( (StepContextData) stepContext.getTransientUserData() )
+		return ( (PartitionContextData) stepContext.getTransientUserData() )
 				.getPartitionProgress();
 	}
 }
