@@ -1,6 +1,17 @@
 Hibernate Search Changelog
 ==========================
 
+5.5.6.Final (09-01-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2535 @Facet on container (Iterable, Array, ...) properties indexes the container's toString()
+    * HSEARCH-2510 ArrayBridge doesn't support arrays of primitive types
+    * HSEARCH-2500 TikaBridge not working for containers type
+    * HSEARCH-2494 TikaBridgeProvider does not recognize byte arrays as a compatible type
+    * HSEARCH-2486 @ContainedIn in super class being ignored when child class has no Search-specific annotations
+    * HSEARCH-2479 ConnectedMultiFieldsPhraseQueryBuilder uses HashMap on sorted map
+
 5.5.5.Final (06-10-2016)
 -------------------------
 
