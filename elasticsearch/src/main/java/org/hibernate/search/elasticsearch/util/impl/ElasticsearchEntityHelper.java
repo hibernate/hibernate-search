@@ -9,10 +9,10 @@ package org.hibernate.search.elasticsearch.util.impl;
 import java.util.Collection;
 import java.util.Set;
 
-import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
+import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 
 /**
  * @author Yoann Rodiere
@@ -41,12 +41,10 @@ public final class ElasticsearchEntityHelper {
 				continue;
 			}
 
-			IndexManager[] indexManagers = binding.getIndexManagers();
+			IndexManagerType indexManagerType = binding.getIndexManagerType();
 
-			for ( IndexManager indexManager : indexManagers ) {
-				if ( indexManager instanceof ElasticsearchIndexManager ) {
-					return true;
-				}
+			if ( ElasticsearchIndexManagerType.INSTANCE.equals( indexManagerType ) ) {
+				return true;
 			}
 		}
 
