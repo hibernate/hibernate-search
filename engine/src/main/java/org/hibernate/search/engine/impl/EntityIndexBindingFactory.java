@@ -12,6 +12,7 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
@@ -31,8 +32,10 @@ public final class EntityIndexBindingFactory {
 		// not allowed
 	}
 
-	@SuppressWarnings( "unchecked" )
-	public static MutableEntityIndexBinding buildEntityIndexBinding(Class<?> type, IndexManager[] providers,
+	public static MutableEntityIndexBinding buildEntityIndexBinding(
+			Class<?> type,
+			IndexManagerType indexManagerType,
+			IndexManager[] providers,
 			IndexShardingStrategy shardingStrategy,
 			ShardIdentifierProvider shardIdentifierProvider,
 			Similarity similarity,
@@ -52,11 +55,12 @@ public final class EntityIndexBindingFactory {
 					safeInterceptor,
 					properties,
 					context.getUninitializedSearchIntegrator(),
+					indexManagerType,
 					indexManagerHolder,
 					rootDirectoryProviderName );
 		}
 		else {
-			return new DefaultMutableEntityIndexBinding( shardingStrategy, similarity, providers, interceptor );
+			return new DefaultMutableEntityIndexBinding( shardingStrategy, similarity, indexManagerType, providers, interceptor );
 		}
 	}
 }

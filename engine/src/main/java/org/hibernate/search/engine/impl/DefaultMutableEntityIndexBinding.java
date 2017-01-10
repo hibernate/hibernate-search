@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
@@ -23,16 +24,19 @@ public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBindi
 	private final IndexShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
 	private DocumentBuilderIndexedEntity documentBuilder;
+	private final IndexManagerType indexManagerType;
 	private final IndexManager[] indexManagers;
 	private final EntityIndexingInterceptor entityIndexingInterceptor;
 
 	public DefaultMutableEntityIndexBinding(
 			IndexShardingStrategy shardingStrategy,
 			Similarity similarityInstance,
+			IndexManagerType indexManagerType,
 			IndexManager[] providers,
 			EntityIndexingInterceptor entityIndexingInterceptor) {
 				this.shardingStrategy = shardingStrategy;
 				this.similarityInstance = similarityInstance;
+				this.indexManagerType = indexManagerType;
 				this.indexManagers = providers;
 				this.entityIndexingInterceptor = entityIndexingInterceptor;
 	}
@@ -65,6 +69,11 @@ public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBindi
 	@Override
 	public void postInitialize(Set<Class<?>> indexedClasses) {
 		documentBuilder.postInitialize( indexedClasses );
+	}
+
+	@Override
+	public IndexManagerType getIndexManagerType() {
+		return indexManagerType;
 	}
 
 	@Override

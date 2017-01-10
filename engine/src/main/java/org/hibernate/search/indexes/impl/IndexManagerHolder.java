@@ -94,6 +94,7 @@ public class IndexManagerHolder {
 		Similarity similarity = createSimilarity( indexName, cfg, indexProperties[0], entity, buildContext );
 		boolean isDynamicSharding = isShardingDynamic( indexProperties[0], buildContext );
 
+		IndexManagerType indexManagerType = getIndexManagerType( entity, cfg, buildContext );
 		IndexManager[] indexManagers = new IndexManager[0];
 		if ( !isDynamicSharding ) {
 			indexManagers = createIndexManagers(
@@ -121,6 +122,7 @@ public class IndexManagerHolder {
 
 		return EntityIndexBindingFactory.buildEntityIndexBinding(
 				entity.getClass(),
+				indexManagerType,
 				indexManagers,
 				shardingStrategy,
 				shardIdentifierProvider,

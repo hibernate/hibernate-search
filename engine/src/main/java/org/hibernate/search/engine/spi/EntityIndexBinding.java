@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
@@ -48,6 +49,11 @@ public interface EntityIndexBinding {
 	 * @param indexedClasses set of indexed classes
 	 */
 	void postInitialize(Set<Class<?>> indexedClasses);
+
+	/**
+	 * @return the type of index managers
+	 */
+	IndexManagerType getIndexManagerType();
 
 	/**
 	 * @return the array of index managers
