@@ -16,6 +16,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
@@ -29,6 +30,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 	private final ShardIdentifierProvider shardIdentityProvider;
 	private final Properties properties;
 	private final ExtendedSearchIntegrator extendedIntegrator;
+	private final IndexManagerType indexManagerType;
 	private final IndexManagerHolder indexManagerHolder;
 	private final String rootDirectoryProviderName;
 	private DocumentBuilderIndexedEntity documentBuilder;
@@ -41,6 +43,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 			EntityIndexingInterceptor entityIndexingInterceptor,
 			Properties properties,
 			ExtendedSearchIntegrator extendedIntegrator,
+			IndexManagerType indexManagerType,
 			IndexManagerHolder indexManagerHolder,
 			String rootDirectoryProviderName) {
 		this.shardIdentityProvider = shardIdentityProvider;
@@ -48,6 +51,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 		this.entityIndexingInterceptor = entityIndexingInterceptor;
 		this.properties = properties;
 		this.extendedIntegrator = extendedIntegrator;
+		this.indexManagerType = indexManagerType;
 		// TODO
 		this.indexManagerFactory = indexManagerFactory;
 		this.indexManagerHolder = indexManagerHolder;
@@ -91,6 +95,11 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 	}
 
 	@Override
+	public IndexManagerType getIndexManagerType() {
+		return indexManagerType;
+	}
+
+	@Override
 	public IndexManager[] getIndexManagers() {
 		return shardingStrategy.getIndexManagersForAllShards();
 	}
@@ -119,6 +128,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 				entityIndexingInterceptor,
 				properties,
 				extendedIntegrator,
+				indexManagerType,
 				indexManagerHolder,
 				rootDirectoryProviderName
 		);
