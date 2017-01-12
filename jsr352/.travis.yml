@@ -1,3 +1,19 @@
 language: java
 jdk:
   - oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+cache:
+  directories:
+    - $HOME/.m2
+install:
+  # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
+  - mvn -N io.takari:maven:wrapper
+  - ./mvnw -v
+  # first run to download all the Maven dependencies without logging
+  - ./mvnw -B -q clean package -DskipTests=true
+script:
+  - ./mvnw clean verify
+

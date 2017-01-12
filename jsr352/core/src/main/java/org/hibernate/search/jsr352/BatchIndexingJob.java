@@ -17,7 +17,6 @@ import javax.batch.runtime.BatchRuntime;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.criterion.Criterion;
-import org.hibernate.search.jsr352.internal.JobContextData;
 import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
 import org.hibernate.search.jsr352.internal.util.MassIndexerUtil;
 
@@ -84,7 +83,7 @@ public class BatchIndexingJob {
 		private int rowsPerPartition = 250;
 		private int maxThreads = 1;
 		private JobOperator jobOperator;
-		private Set<Criterion> criterions;
+		private Set<Criterion> criteria;
 		private String hql;
 
 		private Builder(Class<?> rootEntity, Class<?>... rootEntities) {
@@ -96,7 +95,7 @@ public class BatchIndexingJob {
 			for ( Class<?> clz : rootEntities ) {
 				this.rootEntities.add( clz );
 			}
-			criterions = new HashSet<>();
+			criteria = new HashSet<>();
 			hql = "";
 		}
 
@@ -243,7 +242,7 @@ public class BatchIndexingJob {
 			if ( criterion == null ) {
 				throw new NullPointerException( "The criterion is null." );
 			}
-			criterions.add( criterion );
+			criteria.add( criterion );
 			return this;
 		}
 
@@ -257,7 +256,7 @@ public class BatchIndexingJob {
 			if ( hql == null ) {
 				throw new NullPointerException( "The HQL is null." );
 			}
-			if ( criterions.size() > 0 ) {
+			if ( criteria.size() > 0 ) {
 				throw new IllegalArgumentException( "Cannot use HQL approach "
 						+ "and Criteria approach in the same time." );
 			}
@@ -289,21 +288,17 @@ public class BatchIndexingJob {
 		public long start() throws IOException {
 
 			Properties jobParams = new Properties();
-			JobContextData jobContextData = new JobContextData();
 
 			// check different variables
 			if ( !isJavaSE ) {
 				jobOperator = BatchRuntime.getJobOperator();
 			}
 
-			jobContextData.setCriterions( criterions );
-
 			jobParams.put( "cacheable", String.valueOf( cacheable ) );
 			jobParams.put( "fetchSize", String.valueOf( fetchSize ) );
 			jobParams.put( "hql", hql );
 			jobParams.put( "isJavaSE", String.valueOf( isJavaSE ) );
 			jobParams.put( "itemCount", String.valueOf( itemCount ) );
-			jobParams.put( "jobContextData", MassIndexerUtil.serialize( jobContextData ) );
 			jobParams.put( "maxResults", String.valueOf( maxResults ) );
 			jobParams.put( "maxThreads", String.valueOf( maxThreads ) );
 			jobParams.put( "optimizeAfterPurge", String.valueOf( optimizeAfterPurge ) );
@@ -311,6 +306,9 @@ public class BatchIndexingJob {
 			jobParams.put( "purgeAtStart", String.valueOf( purgeAtStart ) );
 			jobParams.put( "rootEntities", getRootEntitiesAsString() );
 			jobParams.put( "rowsPerPartition", String.valueOf( rowsPerPartition ) );
+			if ( !criteria.isEmpty() ) {
+				jobParams.put( "criteria", MassIndexerUtil.serializeCriteria( criteria ) );
+			}
 			long executionId = jobOperator.start( JOB_NAME, jobParams );
 			return executionId;
 		}

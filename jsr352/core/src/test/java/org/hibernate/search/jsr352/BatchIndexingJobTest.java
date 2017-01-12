@@ -33,13 +33,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchIndexingJobTest {
 
-	private final boolean OPTIMIZE_AFTER_PURGE = true;
-	private final boolean OPTIMIZE_AT_END = true;
-	private final boolean PURGE_AT_START = true;
-	private final int FETCH_SIZE = 100000;
-	private final int MAX_RESULTS = 1000000;
-	private final int MAX_THREADS = 2;
-	private final int ROWS_PER_PARTITION = 500;
+	private static final boolean OPTIMIZE_AFTER_PURGE = true;
+	private static final boolean OPTIMIZE_AT_END = true;
+	private static final boolean PURGE_AT_START = true;
+	private static final int FETCH_SIZE = 100000;
+	private static final int MAX_RESULTS = 1000000;
+	private static final int MAX_THREADS = 2;
+	private static final int ROWS_PER_PARTITION = 500;
 
 	@Mock
 	private JobOperator mockedOperator;

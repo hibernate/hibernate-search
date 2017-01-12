@@ -15,7 +15,6 @@ import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 
 import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
@@ -26,7 +25,6 @@ import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.jsr352.internal.JobContextData;
-import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
 import org.hibernate.search.jsr352.internal.util.PartitionBound;
 import org.jboss.logging.Logger;
 
@@ -76,17 +74,12 @@ public class EntityReader extends AbstractItemReader {
 
 	@Inject
 	@BatchProperty
-	private String isJavaSE;
-
-	@Inject
-	@BatchProperty
 	private String maxResults;
 
 	@Inject
 	@BatchProperty(name = "partitionId")
 	private String partitionIdStr;
 
-	@PersistenceUnit(unitName = "h2")
 	private EntityManagerFactory emf;
 
 	private Class<?> entityType;
@@ -106,7 +99,6 @@ public class EntityReader extends AbstractItemReader {
 	 * @param entityName
 	 * @param fetchSize
 	 * @param hql
-	 * @param isJavaSE
 	 * @param maxResults
 	 * @param partitionIdStr
 	 */
@@ -114,14 +106,12 @@ public class EntityReader extends AbstractItemReader {
 			String entityName,
 			String fetchSize,
 			String hql,
-			String isJavaSE,
 			String maxResults,
 			String partitionIdStr) {
 		this.cacheable = cacheable;
 		this.entityName = entityName;
 		this.fetchSize = fetchSize;
 		this.hql = hql;
-		this.isJavaSE = isJavaSE;
 		this.maxResults = maxResults;
 		this.partitionIdStr = partitionIdStr;
 	}
@@ -195,9 +185,7 @@ public class EntityReader extends AbstractItemReader {
 		PartitionBound bound = jobData.getPartitionBound( partitionId );
 		LOGGER.debug( bound );
 
-		if ( Boolean.parseBoolean( isJavaSE ) ) {
-			emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
-		}
+		emf = jobData.getEntityManagerFactory();
 		sessionFactory = emf.unwrap( SessionFactory.class );
 		ss = sessionFactory.openStatelessSession();
 		session = sessionFactory.openSession();
@@ -267,7 +255,7 @@ public class EntityReader extends AbstractItemReader {
 		}
 
 		// build criteria using job context data
-		jobData.getCriterions().forEach( c -> criteria.add( c ) );
+		jobData.getCriteria().forEach( c -> criteria.add( c ) );
 
 		return criteria.addOrder( Order.asc( idName ) )
 				.setReadOnly( true )

@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
+import org.hibernate.criterion.Criterion;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
 import org.hibernate.search.jsr352.internal.util.MassIndexerUtil;
@@ -39,15 +40,15 @@ public class JobContextSetupListener extends AbstractJobListener {
 
 	@Inject
 	@BatchProperty
-	private boolean isJavaSE;
+	private String isJavaSE;
 
 	@Inject
 	@BatchProperty
 	private String rootEntities;
 
 	@Inject
-	@BatchProperty(name = "jobContextData")
-	private String serializedJobContextData;
+	@BatchProperty(name = "criteria")
+	private String serializedCriteria;
 
 	@PersistenceUnit(unitName = "h2")
 	private EntityManagerFactory emf;
@@ -64,7 +65,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 
 		try {
 			LOGGER.debug( "Creating entity manager ..." );
-			if ( isJavaSE ) {
+			if ( Boolean.parseBoolean( isJavaSE ) ) {
 				emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
 			}
 			em = emf.createEntityManager();
@@ -77,9 +78,12 @@ public class JobContextSetupListener extends AbstractJobListener {
 					.filter( clz -> entityNamesToIndex.contains( clz.getName() ) )
 					.collect( Collectors.toCollection( HashSet::new ) );
 
-			JobContextData jobContextData = MassIndexerUtil
-					.deserializeJobContextData( serializedJobContextData );
-			LOGGER.infof( "%d criterions found.", jobContextData.getCriterions().size() );
+			Set<Criterion> criteria = MassIndexerUtil.deserializeCriteria( serializedCriteria );
+			LOGGER.infof( "%d criteria found.", criteria.size() );
+
+			JobContextData jobContextData = new JobContextData();
+			jobContextData.setEntityManagerFactory( emf );
+			jobContextData.setCriteria( criteria );
 			jobContextData.setEntityTypes( entityTypesToIndex );
 			jobContext.setTransientUserData( jobContextData );
 		}
@@ -95,7 +99,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 
 	@Override
 	public void afterJob() throws Exception {
-		if ( isJavaSE ) {
+		if ( Boolean.parseBoolean( isJavaSE ) ) {
 			JobSEEnvironment.getInstance().setEntityManagerFactory( null );
 		}
 	}

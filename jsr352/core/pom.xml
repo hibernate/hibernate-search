@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>1.0</version>
+        <version>5.7.0.Beta2</version>
     </parent>
 
     <artifactId>hsearch-jsr352-core</artifactId>

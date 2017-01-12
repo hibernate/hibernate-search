@@ -44,10 +44,10 @@ public class BatchIndexingJobIT {
 	private static final Logger LOGGER = Logger.getLogger( BatchIndexingJobIT.class );
 
 	// example dataset
-	private final long DB_COMP_ROWS = 3;
-	private final long DB_PERS_ROWS = 3;
-	private final long DB_WHOS_ROWS = 3;
-	private final long DB_TOTAL_ROWS = DB_COMP_ROWS + DB_PERS_ROWS + DB_WHOS_ROWS;
+	private static final long DB_COMP_ROWS = 3;
+	private static final long DB_PERS_ROWS = 3;
+	private static final long DB_WHOS_ROWS = 3;
+	private static final long DB_TOTAL_ROWS = DB_COMP_ROWS + DB_PERS_ROWS + DB_WHOS_ROWS;
 
 	private EntityManagerFactory emf;
 	private JobOperator jobOperator;

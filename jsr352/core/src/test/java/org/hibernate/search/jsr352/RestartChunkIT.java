@@ -44,8 +44,8 @@ public class RestartChunkIT {
 
 	private static final Logger LOGGER = Logger.getLogger( RestartChunkIT.class );
 
-	private final long DB_COMP_ROWS = 100;
-	private final long DB_PERS_ROWS = 50;
+	private static final long DB_COMP_ROWS = 100;
+	private static final long DB_PERS_ROWS = 50;
 
 	private JobOperator jobOperator;
 	private EntityManagerFactory emf;

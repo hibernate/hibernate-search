@@ -20,7 +20,6 @@ import javax.persistence.Persistence;
 
 import org.hibernate.search.jsr352.entity.Company;
 import org.hibernate.search.jsr352.internal.JobContextData;
-import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
 import org.hibernate.search.jsr352.internal.steps.lucene.EntityReader;
 import org.hibernate.search.jsr352.internal.util.PartitionBound;
 import org.jboss.logging.Logger;
@@ -39,7 +38,7 @@ import org.mockito.MockitoAnnotations;
 public class EntityReaderTest {
 
 	private static final Logger LOGGER = Logger.getLogger( EntityReaderTest.class );
-	private final Company[] COMPANIES = new Company[]{
+	private static final Company[] COMPANIES = new Company[]{
 			new Company( "Red Hat" ),
 			new Company( "Google" ),
 			new Company( "Microsoft" ) };
@@ -75,19 +74,16 @@ public class EntityReaderTest {
 			}
 		}
 
-		JobSEEnvironment.getInstance().setEntityManagerFactory( emf );
 		final String cacheable = String.valueOf( false );
 		final String entityName = Company.class.getName();
 		final String fetchSize = String.valueOf( 1000 );
 		final String hql = null;
-		final String isJavaSE = String.valueOf( true );
 		final String maxResults = String.valueOf( Integer.MAX_VALUE );
 		final String partitionId = String.valueOf( 0 );
 		entityReader = new EntityReader( cacheable,
 				entityName,
 				fetchSize,
 				hql,
-				isJavaSE,
 				maxResults,
 				partitionId );
 
@@ -103,7 +99,8 @@ public class EntityReaderTest {
 
 		// mock job context
 		JobContextData jobData = new JobContextData();
-		jobData.setCriterions( new HashSet<>() );
+		jobData.setEntityManagerFactory( emf );
+		jobData.setCriteria( new HashSet<>() );
 		jobData.setEntityTypes( Company.class );
 		jobData.setPartitionBounds( Arrays.asList( partitionBound ) );
 		Mockito.when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
