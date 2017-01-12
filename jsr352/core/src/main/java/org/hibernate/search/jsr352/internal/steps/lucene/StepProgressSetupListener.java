@@ -6,20 +6,17 @@
  */
 package org.hibernate.search.jsr352.internal.steps.lucene;
 
-import javax.batch.api.BatchProperty;
 import javax.batch.api.listener.AbstractStepListener;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.jsr352.internal.JobContextData;
-import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
 import org.jboss.logging.Logger;
 
 /**
@@ -33,13 +30,6 @@ public class StepProgressSetupListener extends AbstractStepListener {
 	private static final Logger LOGGER = Logger.getLogger( StepProgressSetupListener.class );
 	private final JobContext jobContext;
 	private final StepContext stepContext;
-
-	@Inject
-	@BatchProperty
-	private String isJavaSE;
-
-	@PersistenceUnit(unitName = "h2")
-	private EntityManagerFactory emf;
 
 	@Inject
 	public StepProgressSetupListener(JobContext jobContext, StepContext stepContext) {
@@ -63,13 +53,12 @@ public class StepProgressSetupListener extends AbstractStepListener {
 		if ( stepProgress == null ) {
 			stepProgress = new StepProgress();
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-			SessionFactory sessionFactory = null;
+			EntityManagerFactory emf = jobData.getEntityManagerFactory();
+
+			SessionFactory sessionFactory = emf.unwrap( SessionFactory.class );
 			Session session = null;
+
 			try {
-				if ( Boolean.parseBoolean( isJavaSE ) ) {
-					emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
-				}
-				sessionFactory = emf.unwrap( SessionFactory.class );
 				session = sessionFactory.openSession();
 				for ( Class<?> entityType : jobData.getEntityTypes() ) {
 					long rowCount = rowCount( entityType, session );
@@ -77,7 +66,9 @@ public class StepProgressSetupListener extends AbstractStepListener {
 				}
 			}
 			finally {
-				session.close();
+				if ( session != null ) {
+					session.close();
+				}
 			}
 		}
 		stepContext.setTransientUserData( stepProgress );

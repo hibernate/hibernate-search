@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>1.0</version>
+        <version>5.7.0.Beta2</version>
     </parent>
 
     <artifactId>hsearch-jsr352-modules</artifactId>
@@ -21,8 +21,6 @@
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
         <aliases.xml.basedir>src/main/aliases</aliases.xml.basedir>
-        <hibernate.search.version>${project.version}</hibernate.search.version>
-        <hibernate.search.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot>
         <infinispan.integration.slot>for-hibernatesearch-${hibernate.search.module.slot}</infinispan.integration.slot>
         <tika.module.slot>${tikaVersion}</tika.module.slot>
     </properties>

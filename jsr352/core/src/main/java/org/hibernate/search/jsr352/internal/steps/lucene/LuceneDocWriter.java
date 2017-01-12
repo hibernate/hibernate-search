@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
@@ -27,7 +26,6 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.internal.JobContextData;
-import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.jboss.logging.Logger;
@@ -51,11 +49,6 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	@BatchProperty
 	private String entityName;
 
-	@Inject
-	@BatchProperty
-	private String isJavaSE;
-
-	@PersistenceUnit(unitName = "h2")
 	private EntityManagerFactory emf;
 
 	private EntityManager em;
@@ -93,12 +86,12 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	public void open(Serializable checkpoint) throws Exception {
 
 		LOGGER.debug( "open(Seriliazable) called" );
-		if ( Boolean.parseBoolean( isJavaSE ) ) {
-			emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
-		}
-		em = emf.createEntityManager();
 
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
+
+		emf = jobData.getEntityManagerFactory();
+		em = emf.createEntityManager();
+
 		Class<?> entityType = jobData.getIndexedType( entityName );
 		entityIndexBinding = Search
 				.getFullTextEntityManager( em )

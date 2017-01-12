@@ -18,7 +18,6 @@ import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 
 import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
@@ -30,7 +29,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.jsr352.internal.JobContextData;
-import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
 import org.hibernate.search.jsr352.internal.util.PartitionBound;
 import org.jboss.logging.Logger;
 
@@ -62,17 +60,12 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 	@Inject
 	@BatchProperty
-	private String isJavaSE;
-
-	@Inject
-	@BatchProperty
 	private String maxThreads;
 
 	@Inject
 	@BatchProperty
 	private String rowsPerPartition;
 
-	@PersistenceUnit(unitName = "h2")
 	private EntityManagerFactory emf;
 
 	PartitionMapper() {
@@ -84,20 +77,17 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	 * @param emf
 	 * @param fetchSize
 	 * @param hql
-	 * @param isJavaSE
 	 * @param maxThreads
 	 * @param rowsPerPartition
 	 */
 	PartitionMapper(EntityManagerFactory emf,
 			String fetchSize,
 			String hql,
-			String isJavaSE,
 			String rowsPerPartition,
 			String maxThreads) {
 		this.emf = emf;
 		this.fetchSize = fetchSize;
 		this.hql = hql;
-		this.isJavaSE = isJavaSE;
 		this.maxThreads = maxThreads;
 		this.rowsPerPartition = rowsPerPartition;
 	}
@@ -112,9 +102,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		ScrollableResults scroll = null;
 
 		try {
-			if ( Boolean.parseBoolean( isJavaSE ) ) {
-				emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
-			}
+			emf = jobData.getEntityManagerFactory();
 			sessionFactory = emf.unwrap( SessionFactory.class );
 			session = sessionFactory.openSession();
 			ss = sessionFactory.openStatelessSession();
@@ -123,7 +111,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			List<PartitionBound> partitionBounds = new ArrayList<>();
 			Class<?> entityType;
 
-			switch ( typeOfSelection( hql, jobData.getCriterions() ) ) {
+			switch ( typeOfSelection( hql, jobData.getCriteria() ) ) {
 				case HQL:
 					entityType = rootEntities.get( 0 );
 					partitionBounds.add( new PartitionBound( entityType, null, null ) );
@@ -131,7 +119,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 				case CRITERIA:
 					entityType = rootEntities.get( 0 );
-					scroll = buildScrollableResults( ss, session, entityType, jobData.getCriterions() );
+					scroll = buildScrollableResults( ss, session, entityType, jobData.getCriteria() );
 					partitionBounds = buildPartitionUnitsFrom( scroll, entityType );
 					break;
 

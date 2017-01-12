@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>1.0</version>
+        <version>5.7.0.Beta2</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -157,6 +157,24 @@
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/node1</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-orm-modules</artifactId>
+                                    <version>${org.hibernate}</version>
+                                    <classifier>wildfly-10-dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-modules</artifactId>
+                                    <version>${org.hibernate.search}</version>
+                                    <classifier>wildfly-10-dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
                                 </artifactItem>
                                 <!-- Provide the current project to WildFly as a new module -->
                                 <artifactItem>

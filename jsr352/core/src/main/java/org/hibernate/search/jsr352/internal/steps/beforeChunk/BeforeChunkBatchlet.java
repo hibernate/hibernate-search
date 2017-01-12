@@ -12,7 +12,6 @@ import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -41,9 +40,6 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 	@BatchProperty
 	private String optimizeAfterPurge;
 
-	@PersistenceUnit(unitName = "h2")
-	private EntityManagerFactory emf;
-
 	private Session session;
 	private FullTextSession fts;
 
@@ -57,14 +53,15 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 
 		if ( Boolean.parseBoolean( this.purgeAtStart ) ) {
 
+			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
+			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			session = emf.unwrap( SessionFactory.class ).openSession();
 			fts = Search.getFullTextSession( session );
-			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			jobData.getEntityTypes().forEach( clz -> fts.purgeAll( clz ) );
 
 			if ( Boolean.parseBoolean( this.optimizeAfterPurge ) ) {
 				LOGGER.info( "optimizing all entities ..." );
-				ContextHelper.getSearchintegrator( session ).optimize();
+				ContextHelper.getSearchIntegrator( session ).optimize();
 			}
 		}
 		return null;

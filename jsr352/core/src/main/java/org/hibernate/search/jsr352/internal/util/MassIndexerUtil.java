@@ -12,8 +12,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Set;
 
-import org.hibernate.search.jsr352.internal.JobContextData;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.search.util.StringHelper;
 import org.jboss.logging.Logger;
 
 /**
@@ -23,28 +26,28 @@ public class MassIndexerUtil {
 
 	public static final Logger LOGGER = Logger.getLogger( MassIndexerUtil.class );
 
-	public static String serialize(JobContextData ctxData)
+	public static String serializeCriteria(Set<Criterion> criteria)
 			throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream( baos );
-		oos.writeObject( ctxData );
-		oos.flush();
-		oos.close();
-		return Base64.getEncoder().encodeToString( baos.toByteArray() );
+		try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream( baos ) ) {
+			oos.writeObject( criteria );
+			oos.flush();
+			byte bytes[] = baos.toByteArray();
+			return Base64.getEncoder().encodeToString( bytes );
+		}
 	}
 
-	public static JobContextData deserializeJobContextData(String serialized)
+	public static Set<Criterion> deserializeCriteria(String serialized)
 			throws IOException, ClassNotFoundException {
-		// TODO can NPE check be deleted?
-		if ( serialized == null ) {
-			LOGGER.warn( "JobContextData is null. Nothing to deserialize." );
-			return null;
+		if ( StringHelper.isEmpty( serialized ) ) {
+			return Collections.emptySet();
 		}
 		byte bytes[] = Base64.getDecoder().decode( serialized );
-		ByteArrayInputStream bais = new ByteArrayInputStream( bytes );
-		ObjectInputStream ois = new ObjectInputStream( bais );
-		JobContextData jobContextData = (JobContextData) ois.readObject();
-		ois.close();
-		return jobContextData;
+		try ( ByteArrayInputStream bais = new ByteArrayInputStream( bytes );
+				ObjectInputStream ois = new ObjectInputStream( bais ) ) {
+			@SuppressWarnings("unchecked")
+			Set<Criterion> criteria = (Set<Criterion>) ois.readObject();
+			return criteria;
+		}
 	}
 }

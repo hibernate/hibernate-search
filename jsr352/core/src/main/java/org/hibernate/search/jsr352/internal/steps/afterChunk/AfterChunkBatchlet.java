@@ -8,14 +8,15 @@ package org.hibernate.search.jsr352.internal.steps.afterChunk;
 
 import javax.batch.api.AbstractBatchlet;
 import javax.batch.api.BatchProperty;
+import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
+import org.hibernate.search.jsr352.internal.JobContextData;
 import org.jboss.logging.Logger;
 
 /**
@@ -29,11 +30,11 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 	private static final Logger LOGGER = Logger.getLogger( AfterChunkBatchlet.class );
 
 	@Inject
+	private JobContext jobContext;
+
+	@Inject
 	@BatchProperty
 	private String optimizeAtEnd;
-
-	@PersistenceUnit(unitName = "h2")
-	private EntityManagerFactory emf;
 
 	private Session session;
 
@@ -42,11 +43,13 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-
 		if ( Boolean.parseBoolean( this.optimizeAtEnd ) ) {
 			LOGGER.info( "optimizing all entities ..." );
+
+			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
+			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			session = emf.unwrap( SessionFactory.class ).openSession();
-			ContextHelper.getSearchintegrator( session ).optimize();
+			ContextHelper.getSearchIntegrator( session ).optimize();
 		}
 		return null;
 	}

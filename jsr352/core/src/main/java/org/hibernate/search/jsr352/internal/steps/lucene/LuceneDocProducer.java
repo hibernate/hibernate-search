@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -30,7 +29,6 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jsr352.internal.JobContextData;
-import org.hibernate.search.jsr352.internal.se.JobSEEnvironment;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.jboss.logging.Logger;
 
@@ -51,11 +49,6 @@ public class LuceneDocProducer implements ItemProcessor {
 	@BatchProperty
 	private String entityName;
 
-	@Inject
-	@BatchProperty
-	private String isJavaSE;
-
-	@PersistenceUnit(unitName = "h2")
 	private EntityManagerFactory emf;
 
 	private Session session;
@@ -94,12 +87,12 @@ public class LuceneDocProducer implements ItemProcessor {
 				.getIndexedType( entityName );
 		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
 		session = partitionData.getSession();
-		searchIntegrator = ContextHelper.getSearchintegrator( session );
+		searchIntegrator = ContextHelper.getSearchIntegrator( session );
 		entityIndexBinding = searchIntegrator.getIndexBindings().get( entityType );
 		docBuilder = entityIndexBinding.getDocumentBuilder();
-		if ( Boolean.parseBoolean( isJavaSE ) ) {
-			emf = JobSEEnvironment.getInstance().getEntityManagerFactory();
-		}
+
+		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
+		emf = jobData.getEntityManagerFactory();
 	}
 
 	/**
@@ -124,7 +117,7 @@ public class LuceneDocProducer implements ItemProcessor {
 		Serializable id = (Serializable) emf.getPersistenceUnitUtil()
 				.getIdentifier( entity );
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
-		conversionContext.pushProperty( docBuilder.getIdKeywordName() );
+		conversionContext.pushIdentifierProperty();
 		String idInString = null;
 		try {
 			idInString = conversionContext

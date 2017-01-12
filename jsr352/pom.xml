@@ -10,25 +10,28 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hsearch-jsr352-parent</artifactId>
-    <version>1.0</version>
+    <version>5.7.0.Beta2</version>
     <packaging>pom</packaging>
     <name>GSoC JSR352 - Aggregator</name>
     <description>New implementation mass-indexer using JSR 352</description>
 
     <properties>
         <com.h2database>1.4.192</com.h2database>
-        <org.hibernate>5.1.0.Final</org.hibernate>
+        <org.hibernate>5.2.1.Final</org.hibernate>
         <com.puppycrawl.tools>6.16</com.puppycrawl.tools>
         <org.jboss.shrinkwrap>2.2.2</org.jboss.shrinkwrap>
         <org.jboss.arquillian.version>1.1.1.Final</org.jboss.arquillian.version>
         <org.jberet>1.3.0.Beta2</org.jberet>
-        <org.hibernate.search>5.5.4.Final</org.hibernate.search>
+        <org.hibernate.search>5.7.0.Beta2</org.hibernate.search>
         <!-- TODO WFLY-7000 change to WildFly 11 when they're ready -->
         <!-- <org.wildfly>11.0.0.Alpha1-SNAPSHOT</org.wildfly> -->
         <org.wildfly>10.0.0.Final</org.wildfly>
         <org.wildfly.arquillian>8.2.1.Final</org.wildfly.arquillian>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <hibernate.search.version>${project.version}</hibernate.search.version>
+        <hibernate.search.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot>
+        <hibernate-orm.module.slot>5.2</hibernate-orm.module.slot>
     </properties>
 
     <modules>
@@ -87,7 +90,7 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-orm</artifactId>
-                <version>5.5.3.Final</version>
+                <version>${org.hibernate.search}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.batch</groupId>
@@ -138,6 +141,23 @@
 
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <!-- This defines the properties 'parsedVersion.majorVersion'
+                    and 'parsedVersion.minorVersion' to be in synch with the current project version -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                    <id>parse-version</id>
+                    <goals>
+                        <goal>parse-version</goal>
+                    </goals>
+                  </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
