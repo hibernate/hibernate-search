@@ -374,6 +374,39 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <!-- Temporary workaround for HHH-11394 -->
+                    <execution>
+                        <id>orm-module-patch-node1</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules/org/hibernate/${hibernateVersion}/</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/orm-module-override</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>orm-module-patch-node2</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}/modules/org/hibernate/${hibernateVersion}/</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/orm-module-override</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<!--
+
+  This is not the original module from the Hibernate ORM project,
+  but a patched version to workaround a known issue:
+    https://hibernate.atlassian.net/browse/HHH-11394
+
+  See also the discussion on: http://lists.jboss.org/pipermail/hibernate-dev/2017-January/015721.html
+
+ -->
+<module xmlns="urn:jboss:module:1.3" name="org.hibernate" slot="5.2.6.Final">
+    <resources>
+        <resource-root path="hibernate-core-5.2.6.Final.jar"/>
+        <resource-root path="hibernate-envers-5.2.6.Final.jar"/>
+        <!-- The original module refers to an updated copy of javassist here:
+          intentionally removed to workaround HHH-11394 -->
+        <resource-root path="byte-buddy-1.5.4.jar"/>
+    </resources>
+
+    <dependencies>
+        <module name="asm.asm"/>
+        <module name="com.fasterxml.classmate"/>
+        <module name="javax.api"/>
+        <module name="javax.annotation.api"/>
+        <module name="javax.enterprise.api"/>
+        <module name="javax.persistence.api"/>
+        <module name="javax.transaction.api"/>
+        <module name="javax.validation.api"/>
+        <module name="javax.xml.bind.api"/>
+        <module name="org.antlr"/>
+        <module name="org.dom4j"/>
+        <!--
+          The following doesn't point to the right version of Javassist,
+          as it's older than the one required by Hibernate ORM 5.2.6
+          but happens to work for our testing purposes.
+          People wishing to use the right version should patch the org.javassist:main
+          module to upgrade Javassist, however this could break the older version
+          of Hibernate ORM included in WildFly out of the box.
+          Do it only if you know what you're doing; for example if all your deployments
+          will use Hibernate ORM 5.2.6+
+        -->
+        <module name="org.javassist"/>
+        <module name="org.jboss.as.jpa.spi"/>
+        <module name="org.jboss.jandex"/>
+        <module name="org.jboss.logging"/>
+        <module name="org.jboss.vfs"/>
+        <module name="org.hibernate.commons-annotations"/>
+        <module name="org.hibernate.infinispan" services="import" optional="true" slot="5.2.6.Final"/>
+        <module name="org.hibernate.jipijapa-hibernate5" services="import" slot="5.2.6.Final"/>
+    </dependencies>
+</module>
