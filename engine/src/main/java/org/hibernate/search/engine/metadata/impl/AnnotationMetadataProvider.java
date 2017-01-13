@@ -1040,7 +1040,19 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		checkForContainedIn( member, typeMetadataBuilder, parseContext );
 
-		numericFields.validate();
+		/*
+		 * When we skip field bridges, the numeric fields configuration may not
+		 * be aware of all the processed fields, because in this case we actually
+		 * don't care about which field is numeric.
+		 * Thus the validation cannot be performed reliably when we skip field bridges.
+		 * It's not important anyway, because field bridges are only skipped when
+		 * building contained-in metadata, and when we build contained-in metadata
+		 * we always have another pass on the same annotations to build the indexed
+		 * entity metadata.
+		 */
+		if ( !parseContext.skipFieldBridges() ) {
+			numericFields.validate();
+		}
 
 		PropertyMetadata property = propertyMetadataBuilder.build();
 		if ( !property.getFieldMetadataSet().isEmpty() ) {
