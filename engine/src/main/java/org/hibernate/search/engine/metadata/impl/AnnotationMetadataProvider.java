@@ -190,7 +190,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			);
 		}
 		else {
-			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( path ) ) {
+			if ( parseContext.includeEmbeddedObjectId() || pathsContext != null && pathsContext.containsPath( path ) ) {
 				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder, numericFields, configContext, unprefixedAttributeName, path );
 			}
 		}
@@ -1706,8 +1706,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private PathsContext updatePaths(String localPrefix, PathsContext pathsContext, IndexedEmbedded indexedEmbeddedAnnotation) {
 		if ( pathsContext != null ) {
+			// There is an upper-level path restriction: let it override any nested restriction
 			return pathsContext;
 		}
+		else if ( indexedEmbeddedAnnotation.includePaths().length == 0 ) {
+			// No upper-level restriction and no restriction on this level, either
+			return null;
+		}
+
 		PathsContext newPathsContext = new PathsContext();
 		for ( String path : indexedEmbeddedAnnotation.includePaths() ) {
 			newPathsContext.addPath( localPrefix + path );
