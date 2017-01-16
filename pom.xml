@@ -1039,8 +1039,6 @@
                             <id>verify-forbidden-apis</id>
                                 <configuration>
                                      <targetVersion>1.8</targetVersion>
-                                     <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                                     <internalRuntimeForbidden>true</internalRuntimeForbidden>
                                      <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                      <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                      <excludes>
@@ -1054,6 +1052,8 @@
                                          <bundledSignature>jdk-unsafe</bundledSignature>
                                          <bundledSignature>jdk-deprecated</bundledSignature>
                                          <bundledSignature>jdk-system-out</bundledSignature>
+                                         <bundledSignature>jdk-non-portable</bundledSignature>
+                                         <bundledSignature>jdk-internal</bundledSignature>
                                      </bundledSignatures>
                                      <failOnMissingClasses>false</failOnMissingClasses>
                                      <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
@@ -1064,7 +1064,6 @@
                                      compatibility with containers using an older JBoss Logger versions.
                                       -->
                                      <signatures>
-org.hibernate.SharedSessionContract#getTransaction()
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int ,int)
 org.jboss.logging.BasicLogger#tracef(java.lang.String, int, java.lang.Object)
@@ -1123,14 +1122,14 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                              <id>verify-forbidden-test-apis</id>
                              <configuration>
                                  <targetVersion>1.8</targetVersion>
-                                 <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                                 <internalRuntimeForbidden>true</internalRuntimeForbidden>
                                  <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                  <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                  <bundledSignatures>
                                      <!-- This will automatically choose the right signatures based on 'targetVersion': -->
                                      <bundledSignature>jdk-unsafe</bundledSignature>
                                      <bundledSignature>jdk-deprecated</bundledSignature>
+                                     <bundledSignature>jdk-non-portable</bundledSignature>
+                                     <bundledSignature>jdk-internal</bundledSignature>
                                  </bundledSignatures>
                              </configuration>
                              <phase>test-compile</phase>
