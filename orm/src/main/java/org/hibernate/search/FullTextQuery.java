@@ -13,7 +13,6 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.filter.FullTextFilter;
@@ -29,7 +28,7 @@ import org.hibernate.transform.ResultTransformer;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-public interface FullTextQuery<R> extends Query<R>, ProjectionConstants, QueryImplementor<R> {
+public interface FullTextQuery<R> extends ProjectionConstants, QueryImplementor<R> {
 
 	/**
 	 * Allows to let lucene sort the results. This is useful when you have
@@ -151,13 +150,13 @@ public interface FullTextQuery<R> extends Query<R>, ProjectionConstants, QueryIm
 	Explanation explain(int documentId);
 
 	/**
-	 * {@link Query#setFirstResult}
+	 * {@inheritDoc}
 	 */
 	@Override
 	FullTextQuery setFirstResult(int firstResult);
 
 	/**
-	 * {@link Query#setMaxResults}
+	 * {@inheritDoc}
 	 */
 	@Override
 	FullTextQuery setMaxResults(int maxResults);

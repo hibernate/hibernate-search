@@ -125,7 +125,7 @@ public class AnalyzerTest extends SearchTestBase {
 		query = s.createFullTextQuery( luceneQuery, MyEntity.class );
 		assertEquals( 1, query.getResultSize() );
 
-		s.delete( query.uniqueResult() );
+		s.delete( query.getSingleResult() );
 		tx.commit();
 
 		s.close();
