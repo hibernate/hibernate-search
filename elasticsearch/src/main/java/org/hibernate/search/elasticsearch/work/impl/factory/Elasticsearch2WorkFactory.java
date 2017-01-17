@@ -21,7 +21,7 @@ import org.hibernate.search.elasticsearch.work.impl.DeleteByQueryWork;
 import org.hibernate.search.elasticsearch.work.impl.DeleteWork;
 import org.hibernate.search.elasticsearch.work.impl.DropIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.ExplainWork;
-import org.hibernate.search.elasticsearch.work.impl.FlushWork;
+import org.hibernate.search.elasticsearch.work.impl.ES2FlushWork;
 import org.hibernate.search.elasticsearch.work.impl.GetIndexSettingsWork;
 import org.hibernate.search.elasticsearch.work.impl.GetIndexTypeMappingsWork;
 import org.hibernate.search.elasticsearch.work.impl.IndexExistsWork;
@@ -87,7 +87,7 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public FlushWorkBuilder flush() {
-		return new FlushWork.Builder();
+		return new ES2FlushWork.Builder();
 	}
 
 	@Override

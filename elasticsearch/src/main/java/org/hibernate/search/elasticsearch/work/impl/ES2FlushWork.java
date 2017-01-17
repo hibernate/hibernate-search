@@ -15,11 +15,13 @@ import org.hibernate.search.elasticsearch.work.impl.builder.FlushWorkBuilder;
 import com.google.gson.JsonObject;
 
 /**
+ * A flush work for ES2, using the Flush API.
+ *
  * @author Yoann Rodiere
  */
-public class FlushWork extends SimpleElasticsearchWork<Void> {
+public class ES2FlushWork extends SimpleElasticsearchWork<Void> {
 
-	protected FlushWork(Builder builder) {
+	protected ES2FlushWork(Builder builder) {
 		super( builder );
 	}
 
@@ -59,8 +61,8 @@ public class FlushWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public FlushWork build() {
-			return new FlushWork( this );
+		public ES2FlushWork build() {
+			return new ES2FlushWork( this );
 		}
 	}
 }
