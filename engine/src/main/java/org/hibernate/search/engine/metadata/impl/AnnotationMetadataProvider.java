@@ -237,7 +237,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			);
 		}
 		else {
-			if ( parseContext.includeEmbeddedObjectId() || pathsContext.isIncluded( fieldPath ) ) {
+			if ( parseContext.includeEmbeddedObjectId() || pathsContext != null && pathsContext.isIncluded( fieldPath ) ) {
 				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, propertyMetadataBuilder,
 						numericFields, configContext, parseContext, fieldPath );
 			}
@@ -1861,7 +1861,24 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		parseContext.setMaxLevel( oldMaxLevel ); //set back the old max level
 
 		if ( pathsCreatedAtThisLevel ) {
+			/*
+			 * Validate that paths mentioned in IndexedEmbedded.includePaths, if any,
+			 * were actually encountered.
+			 * Only do this at the top level, so that we report all missing paths
+			 * when an error occurs (not just the ones for some lower level).
+			 */
 			validateAllPathsEncountered( member, updatedPathsContext, indexedEmbeddedAnnotation );
+		}
+		else if ( pathsContext != null && pathsContext != updatedPathsContext ) {
+			/*
+			 * If the paths were already constrained at an upper level,
+			 * and if we use a different pathsContext, make sure to
+			 * update the parent pathsContext so that encountered paths
+			 * can be validated (see above).
+			 */
+			for ( String path : updatedPathsContext.getEncounteredPaths() ) {
+				pathsContext.markEncounteredPath( path );
+			}
 		}
 	}
 
@@ -1916,12 +1933,21 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private PathsContext updatePaths(String localPrefix, PathsContext pathsContext, IndexedEmbedded indexedEmbeddedAnnotation) {
-		if ( pathsContext != null ) {
+		if ( indexedEmbeddedAnnotation.includePaths().length == 0 ) {
+			// No restriction at this level: use upper-level restrictions (if any)
 			return pathsContext;
 		}
+
 		PathsContext newPathsContext = new PathsContext();
 		for ( String path : indexedEmbeddedAnnotation.includePaths() ) {
-			newPathsContext.addIncludedPath( localPrefix + path );
+			String fullPath = localPrefix + path;
+			/*
+			 * If there is an upper-level path restriction, only include those paths
+			 * that match both restrictions
+			 */
+			if ( pathsContext == null || pathsContext.isIncluded( fullPath ) ) {
+				newPathsContext.addIncludedPath( fullPath );
+			}
 		}
 		return newPathsContext;
 	}

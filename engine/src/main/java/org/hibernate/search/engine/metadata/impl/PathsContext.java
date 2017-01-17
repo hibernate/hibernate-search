@@ -24,12 +24,20 @@ public class PathsContext {
 		pathsEncounteredState.put( path, Boolean.FALSE );
 	}
 
+	public boolean isIncluded(String path) {
+		return pathsEncounteredState.keySet().contains( path );
+	}
+
 	public boolean isIncluded(DocumentFieldPath path) {
-		return pathsEncounteredState.keySet().contains( path.getAbsoluteName() );
+		return isIncluded( path.getAbsoluteName() );
+	}
+
+	public void markEncounteredPath(String path) {
+		pathsEncounteredState.put( path, Boolean.TRUE );
 	}
 
 	public void markEncounteredPath(DocumentFieldPath path) {
-		pathsEncounteredState.put( path.getAbsoluteName(), Boolean.TRUE );
+		markEncounteredPath( path.getAbsoluteName() );
 	}
 
 	public Set<String> getEncounteredPaths() {
