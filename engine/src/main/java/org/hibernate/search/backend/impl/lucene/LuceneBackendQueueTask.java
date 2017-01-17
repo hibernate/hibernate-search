@@ -9,6 +9,7 @@ package org.hibernate.search.backend.impl.lucene;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
@@ -27,7 +28,8 @@ final class LuceneBackendQueueTask implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Lock modificationLock;
+	private final Lock exclusiveModificationLock;
+	private final Lock parallelModificationLock;
 	private final LuceneBackendResources resources;
 	private final Iterable<LuceneWork> workList;
 	private final IndexingMonitor monitor;
@@ -36,11 +38,23 @@ final class LuceneBackendQueueTask implements Runnable {
 		this.workList = workList;
 		this.resources = resources;
 		this.monitor = monitor;
-		this.modificationLock = resources.getParallelModificationLock();
+		this.exclusiveModificationLock = resources.getExclusiveModificationLock();
+		this.parallelModificationLock = resources.getParallelModificationLock();
 	}
 
 	@Override
 	public void run() {
+		boolean exclusiveLockRequired = false;
+		for ( LuceneWork work : workList ) {
+			if ( work instanceof FlushLuceneWork ) {
+				exclusiveLockRequired = true;
+				break;
+			}
+		}
+
+		Lock modificationLock =
+				exclusiveLockRequired ? exclusiveModificationLock : parallelModificationLock;
+
 		modificationLock.lock();
 		try {
 			applyUpdates();
