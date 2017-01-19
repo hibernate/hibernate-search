@@ -15,4 +15,9 @@
             <module name="org.javassist" />
         </exclusions>
     </deployment>
+    <sub-deployment name="MemberRegistrationEarArchiveIT.jar">
+        <exclusions>
+            <module name="org.javassist" />
+        </exclusions>
+    </sub-deployment>
 </jboss-deployment-structure>

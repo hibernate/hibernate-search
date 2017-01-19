@@ -66,6 +66,7 @@ public final class DeploymentJmsMasterSlave {
 				)
 				.addAsResource( new StringAsset( "deploymentName=" + name ), CONFIGURATION_PROPERTIES_RESOURCENAME )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
+				.addAsWebInfResource( "jboss-deployment-structure-excludejavassist.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return webArchive;
 	}

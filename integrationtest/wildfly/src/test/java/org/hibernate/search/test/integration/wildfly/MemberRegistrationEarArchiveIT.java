@@ -48,7 +48,7 @@ public class MemberRegistrationEarArchiveIT {
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		JavaArchive ejb = ShrinkWrap
-				.create( JavaArchive.class, MemberRegistrationEarArchiveIT.class.getSimpleName() + ".jar" )
+				.create( JavaArchive.class, "MemberRegistrationEarArchiveIT.jar" )
 				.addClasses( MemberRegistrationEarArchiveIT.class, Member.class, MemberRegistration.class, Resources.class )
 				.addAsManifestResource( persistenceXml(), "persistence.xml" )
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
@@ -56,9 +56,9 @@ public class MemberRegistrationEarArchiveIT {
 		String applicationXml = Descriptors.create( ApplicationDescriptor.class ).createModule().ejb( ejb.getName() ).up().exportAsString();
 
 		EnterpriseArchive ear = ShrinkWrap
-				.create( EnterpriseArchive.class, MemberRegistrationEarArchiveIT.class.getSimpleName() + ".ear" )
+				.create( EnterpriseArchive.class, "MemberRegistrationEarArchiveIT.ear" )
 				.addAsModules( ejb )
-				.addAsManifestResource( "jboss-deployment-structure-hcann.xml", "/jboss-deployment-structure.xml" )
+				.addAsManifestResource( "jboss-deployment-structure-MemberRegistrationEarArchiveIT.xml", "/jboss-deployment-structure.xml" )
 				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
 				.setApplicationXML( new StringAsset( applicationXml ) );
 		return ear;

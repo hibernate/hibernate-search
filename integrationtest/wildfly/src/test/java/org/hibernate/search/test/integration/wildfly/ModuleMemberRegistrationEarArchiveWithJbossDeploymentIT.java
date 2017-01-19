@@ -55,11 +55,11 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 	@Deployment
 	public static Archive<?> createTestArchive() throws IllegalArgumentException, IOException {
 		WebArchive war = ShrinkWrap
-				.create( WebArchive.class, ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getSimpleName() + ".war" )
+				.create( WebArchive.class, "ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.war" )
 				.addAsWebInfResource( webXml(), "web.xml" );
 
 		JavaArchive ejb = ShrinkWrap
-				.create( JavaArchive.class, ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getSimpleName() + ".jar" )
+				.create( JavaArchive.class, "ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.jar" )
 				.addClasses( ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class, Member.class, MemberRegistration.class, Resources.class )
 				.addAsManifestResource( persistenceXml(), "persistence.xml" )
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
@@ -94,7 +94,7 @@ public class ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT {
 
 	private static Asset jbossDeploymentXml() throws IOException {
 		String text;
-		try ( InputStream inputStream = ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getClassLoader().getResourceAsStream( "jboss-deployment-structure.xml" ) ) {
+		try ( InputStream inputStream = ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.class.getClassLoader().getResourceAsStream( "jboss-deployment-structure-ModuleMemberRegistrationEarArchiveWithJbossDeploymentIT.xml" ) ) {
 			try ( Scanner scanner = new Scanner( inputStream, "UTF-8" ) ) {
 				text = scanner.useDelimiter( "\\A" ).next();
 			}
