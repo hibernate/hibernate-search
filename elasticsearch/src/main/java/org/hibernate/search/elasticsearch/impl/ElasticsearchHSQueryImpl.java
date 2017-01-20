@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
@@ -95,8 +94,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private static final JsonParser JSON_PARSER = new JsonParser();
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
-
-	private static final Pattern DOT = Pattern.compile( "\\." );
 
 	private static final String SPATIAL_DISTANCE_FIELD = "_distance";
 
@@ -498,22 +495,18 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 
-			JsonElement filter;
 			if ( includeAllSource ) {
-				filter = new JsonPrimitive( "*" );
+				payloadBuilder.add( "_source", new JsonPrimitive( "*" ) );
 			}
 			else {
-				JsonArray array = builder.build();
-				if ( array.size() > 0 ) {
-					filter = array;
-				}
-				else {
-					// Projecting only on score or other document-independent values
-					filter = new JsonPrimitive( false );
-				}
+				payloadBuilder.add( "_source", new JsonPrimitive( false ) );
 			}
 
-			payloadBuilder.add( "_source", filter );
+			JsonArray array = builder.build();
+			if ( array.size() > 0 ) {
+				payloadBuilder.add( "fields", array );
+			}
+
 		}
 
 		private FieldProjection createProjection(JsonBuilder.Array sourceFilterCollector, TypeMetadata rootTypeMetadata, String projectedField) {
@@ -848,23 +841,19 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		public abstract Object convertHit(JsonObject hit, ConversionContext conversionContext);
 
 		protected final JsonElement extractFieldValue(JsonObject parent, String projectedField) {
-			String field = projectedField;
+			JsonElement element = parent.get( projectedField );
 
-			if ( FieldHelper.isEmbeddedField( projectedField ) ) {
-				String[] parts = DOT.split( projectedField );
-				field = parts[parts.length - 1];
-
-				for ( int i = 0; i < parts.length - 1; i++ ) {
-					JsonElement newParent = parent.get( parts[i] );
-					if ( newParent == null ) {
-						return null;
-					}
-
-					parent = newParent.getAsJsonObject();
+			if ( element != null && element.isJsonArray() ) {
+				JsonArray array = element.getAsJsonArray();
+				if ( array.size() == 0 ) {
+					element = null;
+				}
+				else if ( array.size() == 1 ) {
+					element = array.get( 0 );
 				}
 			}
 
-			return parent.getAsJsonObject().get( field );
+			return element;
 		}
 
 	}
@@ -919,7 +908,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		public void addDocumentField(Document tmp, JsonObject hit, ConversionContext conversionContext) {
-			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), absoluteName );
+			JsonElement jsonValue = extractFieldValue( hit.get( "fields" ).getAsJsonObject(), absoluteName );
 			if ( jsonValue == null || jsonValue.isJsonNull() ) {
 				return;
 			}
@@ -949,7 +938,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		@Override
 		public Object convertHit(JsonObject hit, ConversionContext conversionContext) {
-			JsonElement jsonValue = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), absoluteName );
+			JsonElement jsonValue = extractFieldValue( hit.get( "fields" ).getAsJsonObject(), absoluteName );
 			if ( jsonValue == null || jsonValue.isJsonNull() ) {
 				return null;
 			}
@@ -982,7 +971,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		@Override
 		public Object convertHit(JsonObject hit, ConversionContext conversionContext) {
-			JsonElement value = extractFieldValue( hit.get( "_source" ).getAsJsonObject(), absoluteName );
+			JsonElement value = extractFieldValue( hit.get( "fields" ).getAsJsonObject(), absoluteName );
 			if ( value == null || value.isJsonNull() ) {
 				return null;
 			}
