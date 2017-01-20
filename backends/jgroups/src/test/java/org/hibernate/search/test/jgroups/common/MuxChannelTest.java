@@ -38,6 +38,7 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 		Assert.assertNotNull( sender );
 		String className = sender.getClass().getName();
 		Assert.assertTrue( "Wrong sender instance: " + className, className.contains( "DispatchMessageSender" ) );
+		integrator.getServiceManager().releaseService( MessageSenderService.class );
 	}
 
 	@Override
