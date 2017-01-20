@@ -896,6 +896,7 @@
                             <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
+                            <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                         </systemPropertyVariables>
                         <argLine>${additionalRuntimeArgLine}</argLine>
                         <additionalClasspathElements>

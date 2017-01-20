@@ -22,6 +22,7 @@ import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -82,4 +83,6 @@ public interface SearchFactoryState {
 	boolean enlistWorkerInTransaction();
 
 	Statistics getStatistics();
+
+	LuceneWorkSerializer getWorkSerializerState();
 }
