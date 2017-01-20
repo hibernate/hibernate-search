@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.engine.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -21,6 +23,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -43,6 +46,7 @@ public class StandardServiceManager implements ServiceManager {
 	private final Map<Class<? extends Service>, Object> providedServices;
 	private final Map<Class<? extends Service>, String> defaultServices;
 	private final ClassLoaderService classloaderService;
+	private final boolean failOnUnreleasedService;
 
 	private volatile boolean allServicesReleased = false;
 
@@ -58,6 +62,7 @@ public class StandardServiceManager implements ServiceManager {
 		this.providedServices = createProvidedServices( searchConfiguration );
 		this.defaultServices = defaultServices;
 		this.classloaderService = searchConfiguration.getClassLoaderService();
+		this.failOnUnreleasedService = Boolean.parseBoolean( System.getProperty( "org.hibernate.search.fail_on_unreleased_service" ) );
 	}
 
 	@Override
@@ -108,10 +113,24 @@ public class StandardServiceManager implements ServiceManager {
 
 	@Override
 	public void releaseAllServices() {
-		for ( ServiceWrapper wrapper : cachedServices.values() ) {
-			wrapper.ensureStopped();
+		List<String> unreleasedServicesToReport = failOnUnreleasedService ? new ArrayList<String>() : null;
+
+		for ( ServiceWrapper<?> wrapper : cachedServices.values() ) {
+			boolean stoppedProperly = wrapper.ensureStopped();
+			if ( !stoppedProperly ) {
+				log.serviceProviderNotReleased( wrapper.serviceClass );
+				if ( unreleasedServicesToReport != null ) {
+					unreleasedServicesToReport.add( wrapper.serviceClass.getName() );
+				}
+			}
 		}
+
 		allServicesReleased = true;
+
+		if ( failOnUnreleasedService && !unreleasedServicesToReport.isEmpty() ) {
+			throw new AssertionFailure( "The following services have been used but not released: "
+					+ unreleasedServicesToReport );
+		}
 	}
 
 	private Map<Class<? extends Service>, Object> createProvidedServices(SearchConfiguration searchConfiguration) {
@@ -242,14 +261,21 @@ public class StandardServiceManager implements ServiceManager {
 			}
 		}
 
-		synchronized void ensureStopped() {
+		/**
+		 * @return {@code true} if the service stopped properly (it wasn't used anymore),
+		 * {@code false} if it had to be stopped forcefully (it had not been released).
+		 */
+		synchronized boolean ensureStopped() {
 			//Perform an additional stopVirtual, to remove the extra usage token granted at first initialization,
 			//which keeps the service to be really stopped when it's released by the service client, yet we're not shutting down
 			//the Search engine yet.
 			stopVirtual();
-			if ( status != ServiceStatus.STOPPED ) {
-				log.serviceProviderNotReleased( serviceClass );
+			if ( status == ServiceStatus.STOPPED ) {
+				return true;
+			}
+			else {
 				stopAndRemoveFromCache();
+				return false;
 			}
 		}
 
