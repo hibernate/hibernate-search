@@ -19,7 +19,6 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -143,8 +142,6 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor,
 
 	@Override
 	public void close() {
-		integrator.getServiceManager().releaseService( LuceneWorkSerializer.class );
-
 		try {
 			if ( connection != null ) {
 				connection.close();
