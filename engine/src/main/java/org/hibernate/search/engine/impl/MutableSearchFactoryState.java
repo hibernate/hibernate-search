@@ -24,6 +24,7 @@ import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -66,6 +67,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private IndexManagerFactory indexManagerFactory;
 	private boolean enlistWorkerInTransaction;
 	private Statistics statistics;
+	private LuceneWorkSerializer workSerializer;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingMode = oldFactoryState.getIndexingMode();
@@ -93,6 +95,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		indexManagerFactory = oldFactoryState.getIndexManagerFactory();
 		enlistWorkerInTransaction = oldFactoryState.enlistWorkerInTransaction();
 		statistics = oldFactoryState.getStatistics();
+		workSerializer = oldFactoryState.getWorkSerializerState();
 	}
 
 	@Override
@@ -333,6 +336,17 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setStatistics(Statistics statistics) {
 		this.statistics = statistics;
+	}
+
+	/**
+	 * Immutable: what's important here is not to forget that a
+	 * workSerializer has already been requested, so that
+	 * the factory that copies this state will be able to know
+	 * it should release this service.
+	 */
+	@Override
+	public LuceneWorkSerializer getWorkSerializerState() {
+		return workSerializer;
 	}
 
 }
