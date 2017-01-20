@@ -112,19 +112,38 @@ public class StandardServiceManager implements ServiceManager {
 	}
 
 	@Override
-	public void releaseAllServices() {
-		List<String> unreleasedServicesToReport = failOnUnreleasedService ? new ArrayList<String>() : null;
-
+	public synchronized void releaseAllServices() {
 		for ( ServiceWrapper<?> wrapper : cachedServices.values() ) {
-			boolean stoppedProperly = wrapper.ensureStopped();
-			if ( !stoppedProperly ) {
+			/*
+			 * Perform an additional stopVirtual, to remove the extra usage token granted at first initialization,
+			 * which keeps the service to be really stopped when it's released by the service client, yet we're not shutting down
+			 * the Search engine yet.
+			 */
+			wrapper.stopVirtual();
+		}
+
+		/*
+		 * If everything went well, the previous pass should have brought every
+		 * user count to 0 for every service, so every service should have been stopped.
+		 * This should also have chained-released services used by services, which
+		 * ultimately should have stopped everything.
+		 */
+
+		/*
+		 * Second pass to check for still-running services and forcefully stop them.
+		 */
+		List<String> unreleasedServicesToReport = failOnUnreleasedService ? new ArrayList<String>() : null;
+		for ( ServiceWrapper<?> wrapper : cachedServices.values() ) {
+			if ( wrapper.status != ServiceStatus.STOPPED ) {
 				log.serviceProviderNotReleased( wrapper.serviceClass );
+				wrapper.stopReal();
 				if ( unreleasedServicesToReport != null ) {
 					unreleasedServicesToReport.add( wrapper.serviceClass.getName() );
 				}
 			}
 		}
 
+		cachedServices.clear();
 		allServicesReleased = true;
 
 		if ( failOnUnreleasedService && !unreleasedServicesToReport.isEmpty() ) {
@@ -261,25 +280,7 @@ public class StandardServiceManager implements ServiceManager {
 			}
 		}
 
-		/**
-		 * @return {@code true} if the service stopped properly (it wasn't used anymore),
-		 * {@code false} if it had to be stopped forcefully (it had not been released).
-		 */
-		synchronized boolean ensureStopped() {
-			//Perform an additional stopVirtual, to remove the extra usage token granted at first initialization,
-			//which keeps the service to be really stopped when it's released by the service client, yet we're not shutting down
-			//the Search engine yet.
-			stopVirtual();
-			if ( status == ServiceStatus.STOPPED ) {
-				return true;
-			}
-			else {
-				stopAndRemoveFromCache();
-				return false;
-			}
-		}
-
-		private synchronized void stopReal() {
+		synchronized void stopReal() {
 			status = ServiceStatus.STOPPING;
 			try {
 				if ( service instanceof Stoppable ) {
@@ -291,15 +292,6 @@ public class StandardServiceManager implements ServiceManager {
 			}
 			finally {
 				status = ServiceStatus.STOPPED;
-			}
-		}
-
-		private synchronized void stopAndRemoveFromCache() {
-			try {
-				stopReal();
-			}
-			finally {
-				cachedServices.remove( serviceClass );
 			}
 		}
 
