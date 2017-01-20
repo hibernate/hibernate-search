@@ -162,6 +162,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.isIdProvidedImplicit = state.isIdProvidedImplicit();
 		this.isMultitenancyEnabled = state.isMultitenancyEnabled();
 		this.indexManagerFactory = state.getIndexManagerFactory();
+		this.workSerializer = state.getWorkSerializerState();
 
 		this.enableDirtyChecks = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.ENABLE_DIRTY_CHECK, true
@@ -253,6 +254,10 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 			}
 			catch (Exception e) {
 				log.workerException( e );
+			}
+
+			if ( workSerializer != null ) {
+				serviceManager.releaseService( LuceneWorkSerializer.class );
 			}
 
 			this.allIndexesManager.stop();
@@ -639,6 +644,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 			workSerializer = serviceManager.requestService( LuceneWorkSerializer.class );
 		}
 
+		return workSerializer;
+	}
+
+	@Override
+	public LuceneWorkSerializer getWorkSerializerState() {
 		return workSerializer;
 	}
 
