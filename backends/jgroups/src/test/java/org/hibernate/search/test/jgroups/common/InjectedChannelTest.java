@@ -33,6 +33,7 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 		SearchIntegrator searchFactory = getSearchFactory().unwrap( SearchIntegrator.class );
 		MessageSenderService sender = searchFactory.getServiceManager().requestService( MessageSenderService.class );
 		Assert.assertTrue( masterChannel.getAddress().equals( sender.getAddress() ) );
+		searchFactory.getServiceManager().releaseService( MessageSenderService.class );
 	}
 
 	@Override
