@@ -150,6 +150,7 @@ public class StandardServiceManagerTest {
 	public void testRequestingServiceAfterReleaseAllThrowsException() {
 		SimpleService simpleService1 = serviceManagerUnderTest.requestService( SimpleService.class );
 		assertNotNull( "The service should be created", simpleService1 );
+		serviceManagerUnderTest.releaseService( SimpleService.class );
 
 		serviceManagerUnderTest.releaseAllServices();
 

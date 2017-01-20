@@ -15,6 +15,7 @@ import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
@@ -38,37 +39,39 @@ public class ConcurrentServiceTest {
 
 	@Test
 	public void concurrentSerialization() throws Exception {
-		final LuceneWorkSerializer serializer = extractSerializer();
-		final ConcurrentRunner runner = new ConcurrentRunner(
-				new TaskFactory() {
-					@Override
-					public Runnable createRunnable(int i) throws Exception {
-						return new SerializingThread( serializer, buildLuceneWorkList() );
+		try ( ServiceReference<LuceneWorkSerializer> serializer = extractSerializer() ) {
+			final ConcurrentRunner runner = new ConcurrentRunner(
+					new TaskFactory() {
+						@Override
+						public Runnable createRunnable(int i) throws Exception {
+							return new SerializingThread( serializer.get(), buildLuceneWorkList() );
+						}
 					}
-				}
-		);
-		runner.execute();
+			);
+			runner.execute();
+		}
 	}
 
 	@Test
 	public void concurrentDeserialization() throws Exception {
-		final LuceneWorkSerializer serializer = extractSerializer();
-		final byte[] serializedModel = serializer.toSerializedModel( buildLuceneWorkList() );
-		final ConcurrentRunner runner = new ConcurrentRunner(
-				new TaskFactory() {
-					@Override
-					public Runnable createRunnable(int i) throws Exception {
-						return new DeserializingThread( serializer, serializedModel );
+		try ( ServiceReference<LuceneWorkSerializer> serializer = extractSerializer() ) {
+			final byte[] serializedModel = serializer.get().toSerializedModel( buildLuceneWorkList() );
+			final ConcurrentRunner runner = new ConcurrentRunner(
+					new TaskFactory() {
+						@Override
+						public Runnable createRunnable(int i) throws Exception {
+							return new DeserializingThread( serializer.get(), serializedModel );
+						}
 					}
-				}
-		);
-		runner.execute();
+			);
+			runner.execute();
+		}
 	}
 
-	private LuceneWorkSerializer extractSerializer() {
+	private ServiceReference<LuceneWorkSerializer> extractSerializer() {
 		return searchFactoryHolder.getSearchFactory()
 				.getServiceManager()
-				.requestService( LuceneWorkSerializer.class );
+				.requestReference( LuceneWorkSerializer.class );
 	}
 
 	private static class SerializingThread implements Runnable {
