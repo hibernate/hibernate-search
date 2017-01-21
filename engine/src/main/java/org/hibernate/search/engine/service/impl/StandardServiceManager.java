@@ -62,7 +62,7 @@ public class StandardServiceManager implements ServiceManager {
 		this.providedServices = createProvidedServices( searchConfiguration );
 		this.defaultServices = defaultServices;
 		this.classloaderService = searchConfiguration.getClassLoaderService();
-		this.failOnUnreleasedService = Boolean.parseBoolean( System.getProperty( "org.hibernate.search.fail_on_unreleased_service" ) );
+		this.failOnUnreleasedService = Boolean.getBoolean( "org.hibernate.search.fail_on_unreleased_service" );
 	}
 
 	@Override
