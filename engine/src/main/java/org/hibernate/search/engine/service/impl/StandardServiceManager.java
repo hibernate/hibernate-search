@@ -134,11 +134,13 @@ public class StandardServiceManager implements ServiceManager {
 		 */
 		List<String> unreleasedServicesToReport = failOnUnreleasedService ? new ArrayList<String>() : null;
 		for ( ServiceWrapper<?> wrapper : cachedServices.values() ) {
-			if ( wrapper.status != ServiceStatus.STOPPED ) {
-				log.serviceProviderNotReleased( wrapper.serviceClass );
-				wrapper.stopReal();
-				if ( unreleasedServicesToReport != null ) {
-					unreleasedServicesToReport.add( wrapper.serviceClass.getName() );
+			synchronized ( wrapper ) {
+				if ( wrapper.status != ServiceStatus.STOPPED ) {
+					log.serviceProviderNotReleased( wrapper.serviceClass );
+					wrapper.stopReal();
+					if ( unreleasedServicesToReport != null ) {
+						unreleasedServicesToReport.add( wrapper.serviceClass.getName() );
+					}
 				}
 			}
 		}
