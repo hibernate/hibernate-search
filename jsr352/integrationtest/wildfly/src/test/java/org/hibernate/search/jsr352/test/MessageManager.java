@@ -44,6 +44,10 @@ public class MessageManager {
 		}
 	}
 
+	public void removeAll() {
+		em.createQuery( "delete from Message" ).executeUpdate();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Message> findMessagesFor(Date date) {
 		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
@@ -57,7 +61,4 @@ public class MessageManager {
 				.getResultList();
 	}
 
-	public EntityManager getEntityManager() {
-		return em;
-	}
 }
