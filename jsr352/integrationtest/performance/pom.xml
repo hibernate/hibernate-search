@@ -38,16 +38,10 @@
         <dependency>
             <groupId>org.jboss.ejb3</groupId>
             <artifactId>jboss-ejb3-ext-api</artifactId>
-            <version>2.1.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.batch</groupId>
-            <artifactId>jboss-batch-api_1.0_spec</artifactId>
+            <groupId>javax.batch</groupId>
+            <artifactId>javax.batch-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.ejb</groupId>

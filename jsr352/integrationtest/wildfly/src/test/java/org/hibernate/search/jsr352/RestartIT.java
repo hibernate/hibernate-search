@@ -11,20 +11,17 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.test.Message;
 import org.hibernate.search.jsr352.test.MessageManager;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -33,10 +30,10 @@ import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.FixMethodOrder;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 
 /**
  * This integration test (IT) aims to test the restartability of the job execution mass-indexer under Java EE
@@ -46,7 +43,6 @@ import org.junit.runners.MethodSorters;
  * @author Mincong Huang
  */
 @RunWith(Arquillian.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RestartIT {
 
 	private static final Logger LOGGER = Logger.getLogger( RestartIT.class );
@@ -74,8 +70,9 @@ public class RestartIT {
 		return war;
 	}
 
+	@Before
 	public void insertData() throws ParseException {
-		List<Message> messages = new ArrayList<>( DB_DAY1_ROWS + DB_DAY2_ROWS );
+		List<Message> messages = new LinkedList<>();
 		for ( int i = 0; i < DB_DAY1_ROWS; i++ ) {
 			messages.add( new Message( String.valueOf( i ), SDF.parse( "31/08/2016" ) ) );
 		}
@@ -85,10 +82,13 @@ public class RestartIT {
 		messageManager.persist( messages );
 	}
 
+	@After
+	public void removeAll() {
+		messageManager.removeAll();
+	}
+
 	@Test
 	public void testJob() throws InterruptedException, IOException, ParseException {
-
-		insertData();
 
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "31/08/2016" ) ).size() );
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "01/09/2016" ) ).size() );
@@ -110,14 +110,6 @@ public class RestartIT {
 
 	@Test
 	public void testJob_usingCriteria() throws InterruptedException, IOException, ParseException {
-
-		// purge all before start
-		// TODO Can the creation of a new EM and FTEM be avoided?
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( Message.class );
-		ftem.flushToIndexes();
-		em.close();
 
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "31/08/2016" ) ).size() );
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "01/09/2016" ) ).size() );
@@ -141,14 +133,6 @@ public class RestartIT {
 
 	@Test
 	public void testJob_usingHQL() throws InterruptedException, IOException, ParseException {
-
-		// purge all before start
-		// TODO Can the creation of a new EM and FTEM be avoided?
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		ftem.purgeAll( Message.class );
-		ftem.flushToIndexes();
-		em.close();
 
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "31/08/2016" ) ).size() );
 		assertEquals( 0, messageManager.findMessagesFor( SDF.parse( "01/09/2016" ) ).size() );
