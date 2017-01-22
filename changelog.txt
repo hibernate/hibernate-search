@@ -1,6 +1,29 @@
 Hibernate Search Changelog
 ==========================
 
+5.7.0.CR1 (22-01-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2547 Nesting @IndexedEmbeddeds with "includePaths" results in invalid path restrictions
+    * HSEARCH-2545 Validation of IndexedEmbedded targeting a numeric document ID fails inside a non-indexed entity
+    * HSEARCH-2535 @Facet on container (Iterable, Array, ...) properties indexes the container's toString()
+    * HSEARCH-2531 Cannot override index names through configuration properties with Elasticsearch
+    * HSEARCH-2529 NullPointerException in LogErrorHandler
+    * HSEARCH-2522 Elasticsearch backend in the classpath causes eager initialization of non related IndexManagers
+    * HSEARCH-2510 ArrayBridge doesn't support arrays of primitive types
+    * HSEARCH-2501 Elasticsearch calendar resolution handling is not consistent with Lucene's
+
+** Improvement
+    * HSEARCH-2527 Avoid mixups of analyzers and analyzer references in analyzer-related code
+    * HSEARCH-2520 Support analyzer definitions with the Elasticsearch MERGE strategy
+    * HSEARCH-2519 Support anlyzer definitions with the Elasticsearch VALIDATE strategy
+
+** Task
+    * HSEARCH-2555 Ensure the test suite fails if any service isn't properly released
+    * HSEARCH-2550 Improve injection of current version in Arquillian tests
+    * HSEARCH-2540 Array instantiation in WorkPlan.processContainedInAndPrepareExecution is misleading
+
 5.7.0.Beta2 (19-12-2016)
 -------------------------
 
