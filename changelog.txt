@@ -18,11 +18,15 @@ Hibernate Search Changelog
     * HSEARCH-2527 Avoid mixups of analyzers and analyzer references in analyzer-related code
     * HSEARCH-2520 Support analyzer definitions with the Elasticsearch MERGE strategy
     * HSEARCH-2519 Support anlyzer definitions with the Elasticsearch VALIDATE strategy
+    * HSEARCH-2548 Upgrade to Hibernate ORM 5.2.7.Final
 
 ** Task
     * HSEARCH-2555 Ensure the test suite fails if any service isn't properly released
     * HSEARCH-2550 Improve injection of current version in Arquillian tests
     * HSEARCH-2540 Array instantiation in WorkPlan.processContainedInAndPrepareExecution is misleading
+    * HSEARCH-2551 Avoid FullTextQuery API to directly depend on deprecated API methods
+    * HSEARCH-2549 MemberRegistrationIT should disable modules injection
+    * HSEARCH-2380 Upgrade to Hibernate ORM 5.2.6.Final
 
 5.7.0.Beta2 (19-12-2016)
 -------------------------
