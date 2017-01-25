@@ -775,8 +775,6 @@ Here is a list of known limitations.
 
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
-* The `MERGE` schema management strategy does not update analyzer definitions: https://hibernate.atlassian.net/browse/HSEARCH-2520[HSEARCH-2520]
-* The `VALIDATE` schema management strategy does not validate analyzer definitions: https://hibernate.atlassian.net/browse/HSEARCH-2519[HSEARCH-2519]
 * Query timeouts: https://hibernate.atlassian.net/browse/HSEARCH-2399[HSEARCH-2399]
 * MoreLikeThis queries: https://hibernate.atlassian.net/browse/HSEARCH-2395[HSEARCH-2395]
 * `@IndexedEmbedded.indexNullAs`: https://hibernate.atlassian.net/browse/HSEARCH-2389[HSEARCH-2389]
