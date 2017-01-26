@@ -10,9 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.document.SortedDocValuesField;
-import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Indexed;
@@ -57,7 +54,7 @@ public class Territory {
 			}
 			int id = ( (Territory) value ).getId();
 			luceneOptions.addNumericFieldToDocument( name, id, document );
-			document.add( new NumericDocValuesField( name, id ) );
+			luceneOptions.addNumericDocValuesFieldToDocument( name, id, document );
 		}
 
 	}
@@ -105,7 +102,7 @@ public class Territory {
 
 			String territoryName = territory.getName();
 			luceneOptions.addFieldToDocument( name + FIELD_SUFFIX, territoryName, document );
-			document.add( new SortedDocValuesField( name + FIELD_SUFFIX, new BytesRef( territoryName ) ) );
+			luceneOptions.addSortedDocValuesFieldToDocument( name + FIELD_SUFFIX, territoryName, document );
 		}
 
 		@Override
