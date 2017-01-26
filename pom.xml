@@ -66,8 +66,8 @@
     </licenses>
 
     <ciManagement>
-        <system>Hudson</system>
-        <url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-master/</url>
+        <system>Jenkins</system>
+        <url>http://ci.hibernate.org/view/Search/job/hibernate-search-master/</url>
     </ciManagement>
 
     <developers>
@@ -75,25 +75,50 @@
             <id>epbernard</id>
             <name>Emmanuel Bernard</name>
             <email>emmanuel@hibernate.org</email>
-            <url>http://in.relation.to/Bloggers/Emmanuel</url>
+            <organization>Red Hat, Inc.</organization>
+            <url>http://in.relation.to/emmanuel-bernard/</url>
         </developer>
         <developer>
             <id>hardy.ferentschik</id>
             <name>Hardy Ferentschik</name>
-            <email>hardy@hibernate.org</email>
-            <url>http://in.relation.to/Bloggers/Hardy</url>
+            <email>hferents@redhat.com</email>
+            <organization>Red Hat, Inc.</organization>
+            <url>http://in.relation.to/hardy-ferentschik/</url>
         </developer>
         <developer>
             <id>sannegrinovero</id>
             <name>Sanne Grinovero</name>
             <email>sanne@hibernate.org</email>
-            <url>http://in.relation.to/Bloggers/Sanne</url>
+            <organization>Red Hat, Inc.</organization>
+            <url>http://in.relation.to/sanne-grinovero/</url>
         </developer>
         <developer>
-            <id>gunnarmorling</id>
+            <id>gunnar.morling</id>
             <name>Gunnar Morling</name>
             <email>gunnar@hibernate.org</email>
-            <url>http://in.relation.to/Bloggers/Gunnar</url>
+            <organization>Red Hat, Inc.</organization>
+            <url>http://in.relation.to/gunnar-morling/</url>
+        </developer>
+        <developer>
+            <id>davide.dalto</id>
+            <name>Davide D'Alto</name>
+            <email>davide@hibernate.org</email>
+            <organization>Red Hat, Inc.</organization>
+            <url>http://in.relation.to/davide-dalto/</url>
+        </developer>
+        <developer>
+            <id>guillaume.smet</id>
+            <name>Guillaume Smet</name>
+            <email>guillaume@hibernate.org</email>
+            <organization>Red Hat, Inc.</organization>
+            <url>http://in.relation.to/guillaume-smet/</url>
+        </developer>
+        <developer>
+            <id>yoann.rodiere</id>
+            <name>Yoann Rodière</name>
+            <email>yoann@hibernate.org</email>
+            <organization>Red Hat, Inc.</organization>
+            <url>http://in.relation.to/yoann-rodiere/</url>
         </developer>
     </developers>
 
