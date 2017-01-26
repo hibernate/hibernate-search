@@ -22,7 +22,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -489,8 +488,8 @@ public class SortTest extends SearchTestBase {
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 			NumberHolder numberHolder = (NumberHolder) value;
 
-			document.add( new NumericDocValuesField( "num1", numberHolder.num1 ) );
-			document.add( new NumericDocValuesField( "num2", numberHolder.num2 ) );
+			luceneOptions.addNumericDocValuesFieldToDocument( "num1", numberHolder.num1, document );
+			luceneOptions.addNumericDocValuesFieldToDocument( "num2", numberHolder.num2, document );
 		}
 
 		@Override

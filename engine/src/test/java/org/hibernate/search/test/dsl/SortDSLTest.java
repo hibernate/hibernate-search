@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -760,7 +759,7 @@ public class SortDSLTest {
 			}
 
 			luceneOptions.addNumericFieldToDocument( name, doubleValue, document );
-			document.add( new DoubleDocValuesField( name, doubleValue ) );
+			luceneOptions.addNumericDocValuesFieldToDocument( name, doubleValue, document );
 		}
 
 	}
