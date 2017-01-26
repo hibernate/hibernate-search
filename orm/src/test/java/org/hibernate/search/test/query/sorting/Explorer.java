@@ -15,8 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.SortedDocValuesField;
-import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -101,11 +99,11 @@ public class Explorer {
 
 			String firstName = explorer.getNameParts().get( "firstName" );
 			luceneOptions.addFieldToDocument( name + "_firstName", firstName, document );
-			document.add( new SortedDocValuesField( name + "_firstName", new BytesRef( firstName ) ) );
+			luceneOptions.addSortedDocValuesFieldToDocument( name + "_firstName", firstName, document );
 
 			String middleName = explorer.getNameParts().get( "middleName" );
 			luceneOptions.addFieldToDocument( name + "_middleName", middleName, document );
-			document.add( new SortedDocValuesField( name + "_middleName", new BytesRef( middleName ) ) );
+			luceneOptions.addSortedDocValuesFieldToDocument( name + "_middleName", middleName, document );
 		}
 
 		@Override
@@ -130,7 +128,7 @@ public class Explorer {
 			String lastName = nameParts.get( "lastName" );
 
 			luceneOptions.addFieldToDocument( name + "_lastName", lastName, document );
-			document.add( new SortedDocValuesField( name + "_lastName", new BytesRef( lastName ) ) );
+			luceneOptions.addSortedDocValuesFieldToDocument( name + "_lastName", lastName, document );
 		}
 
 		@Override

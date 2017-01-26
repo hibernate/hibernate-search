@@ -61,6 +61,30 @@ public interface LuceneOptions {
 	void addNumericFieldToDocument(String fieldName, Object numericValue, Document document);
 
 	/**
+	 * Add a new sorted doc values field with the name {@code fieldName} to the Lucene Document
+	 * {@code document} using the value {@code indexedString}.
+	 * <p>
+	 * If the indexedString is null then the field is not added to the document.
+	 *
+	 * @param fieldName The field name
+	 * @param indexedString The value to index
+	 * @param document the document to which to add the new field
+	 */
+	void addSortedDocValuesFieldToDocument(String fieldName, String indexedString, Document document);
+
+	/**
+	 * Add a new numeric doc values field with the name {@code fieldName} to the Lucene Document
+	 * {@code document} using the value {@code numericValue}.
+	 * <p>
+	 * If the value is not numeric then the field is not added to the document
+	 *
+	 * @param fieldName The name of the field
+	 * @param numericValue The numeric value, either an Int, Long, Float or Double
+	 * @param document the document to which to add the new field
+	 */
+	void addNumericDocValuesFieldToDocument(String fieldName, Number numericValue, Document document);
+
+	/**
 	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
 	 * over manually building your Field objects and adding them to the Document.
 	 *

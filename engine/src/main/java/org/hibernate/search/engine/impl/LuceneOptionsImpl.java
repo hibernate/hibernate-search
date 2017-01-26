@@ -8,15 +8,20 @@ package org.hibernate.search.engine.impl;
 
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.FloatDocValuesField;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.spi.NullMarker;
@@ -224,6 +229,35 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		}
 		else if ( indexedValue instanceof Long ) {
 			addLongFieldToDocument( fieldName, ( (Long) indexedValue ).longValue(), document );
+		}
+		else {
+			throw new IllegalArgumentException( "unsupported type of Number" );
+		}
+	}
+
+	@Override
+	public void addSortedDocValuesFieldToDocument(String fieldName, String indexedString, Document document) {
+		if ( indexedString != null ) {
+			document.add( new SortedDocValuesField( fieldName, new BytesRef( indexedString ) ) );
+		}
+	}
+
+	@Override
+	public void addNumericDocValuesFieldToDocument(String fieldName, Number numericValue, Document document) {
+		if ( numericValue == null ) {
+			throw new IllegalArgumentException( "the numericValue parameter shall not be null" );
+		}
+		if ( numericValue instanceof Double ) {
+			document.add( new DoubleDocValuesField( fieldName, ( (Double) numericValue ).doubleValue() ) );
+		}
+		else if ( numericValue instanceof Float ) {
+			document.add( new FloatDocValuesField( fieldName, ( (Float) numericValue ).floatValue() ) );
+		}
+		else if ( numericValue instanceof Integer ) {
+			document.add( new NumericDocValuesField( fieldName, ( (Integer) numericValue ).longValue() ) );
+		}
+		else if ( numericValue instanceof Long ) {
+			document.add( new NumericDocValuesField( fieldName, ( (Long) numericValue ).longValue() ) );
 		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of Number" );

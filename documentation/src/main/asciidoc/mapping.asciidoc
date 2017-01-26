@@ -340,10 +340,8 @@ public class MyClassBridge implements MetadataProvidingFieldBridge {
       luceneOps.addFieldToDocument( name + "_lastName", lastName, document );
 
       // add doc value fields to allow for sorting
-      document.add( new SortedDocValuesField(
-                        name + "_firstName", new BytesRef( firstName ) ) );
-      document.add( new SortedDocValuesField(
-                        name + "_lastName", new BytesRef( lastName ) ) );
+      document.addSortedDocValuesFieldToDocument( name + "_firstName", firstName );
+      document.addSortedDocValuesFieldToDocument( name + "_lastName", lastName );
   }
 
   @Override
