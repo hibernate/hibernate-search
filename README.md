@@ -1,3 +1,5 @@
+Test CI 3
+
 # Hibernate Search
 
 *Version: 5.6.0.Final - 22-01-2017*
