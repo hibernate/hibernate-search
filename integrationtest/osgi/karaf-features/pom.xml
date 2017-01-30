@@ -22,6 +22,11 @@
     <name>Hibernate Search Karaf Features Definition</name>
     <description>Hibernate Search Apache Karaf features</description>
 
+    <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

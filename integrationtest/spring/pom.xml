@@ -22,6 +22,9 @@
     <description>Hibernate Search integration tests with Spring Framework and JTA</description>
 
     <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-release-version>4.3.2.RELEASE</spring-release-version>
     </properties>
