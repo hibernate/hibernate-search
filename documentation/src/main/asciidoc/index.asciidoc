@@ -1,8 +1,13 @@
-= Hibernate Search
+= Hibernate Search {hibernateSearchVersion}: Reference Guide
 Emmanuel Bernard; Hardy Ferentschik; Gustavo Fernandes; Sanne Grinovero; Nabeel Ali Memon; Gunnar Morling; Yoann Rodière; Guillaume Smet
-:revdate: {hibernateSearchVersion}
-:toc:
+:doctype: book
+:revdate: {docdate}
+:sectanchors:
+:anchor:
+:toc: left
+:docinfodir: {docinfodir}
 :docinfo:
+:title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
 include::preface.asciidoc[]
 

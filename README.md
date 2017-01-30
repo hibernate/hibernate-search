@@ -63,14 +63,14 @@ installation directory. Then read the documentation available in *docs/reference
 
 #### Build options (profiles and properties)
 
-The documentation is based on [AsciiDoctor](http://asciidoctor.org/). By default only the html
-output is enabled; to also generate the docbok output use:
+The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
+output is enabled; to also generate the PDF output use:
 
-    > mvn clean install -Pdocbook -s settings-example.xml
+    > mvn clean install -Pdocumentation-pdf -s settings-example.xml
 
 To build the distribution bundle run:
 
-    > mvn clean install -Pdocbook,dist -s settings-example.xml
+    > mvn clean install -Pdocumentation-pdf,dist -s settings-example.xml
 
 The Elasticsearch module tests against one single version of Elasticsearch at a time.
 You may redefine the version to use by specifying the right profile and using the

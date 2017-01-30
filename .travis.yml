@@ -36,6 +36,6 @@ before_script:
   - if [[ "$DB" == "pgsql" ]]; then psql -U postgres -f 'travis/pgsql.sql';fi 
   - if [[ "$DB" == "mariadb" ]]; then mysql -u root < 'travis/mariadb.sql'; fi
 script:
-  - if [[ "$DB" == "h2" ]]; then ./mvnw -s settings-example.xml -Pdocs,docbook,dist clean install;fi 
-  - if [[ "$DB" == "pgsql" ]]; then ./mvnw -s settings-example.xml -Pci-postgresql,docs,docbook,dist clean install;fi 
-  - if [[ "$DB" == "mariadb" ]]; then ./mvnw -s settings-example.xml -Pci-mariadb,docs,docbook,dist clean install; fi
+  - if [[ "$DB" == "h2" ]]; then ./mvnw -s settings-example.xml -Pdocs,dist clean install;fi
+  - if [[ "$DB" == "pgsql" ]]; then ./mvnw -s settings-example.xml -Pci-postgresql,docs,dist clean install;fi
+  - if [[ "$DB" == "mariadb" ]]; then ./mvnw -s settings-example.xml -Pci-mariadb,docs,dist clean install; fi

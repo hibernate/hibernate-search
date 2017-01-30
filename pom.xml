@@ -234,6 +234,13 @@
         <!-- Version 7.5 suffers from a bug that affects us: https://github.com/checkstyle/checkstyle/issues/3776 -->
         <puppycrawl.checkstyle.version>7.4</puppycrawl.checkstyle.version>
 
+        <!-- Asciidoctor -->
+        <hibernate-asciidoctor-theme.version>1.0.0.Final</hibernate-asciidoctor-theme.version>
+        <asciidoctor-maven-plugin.version>1.5.3</asciidoctor-maven-plugin.version>
+        <jruby.version>1.7.26</jruby.version>
+        <asciidoctorj.version>1.5.4.1</asciidoctorj.version>
+        <asciidoctorj-pdf.version>1.5.0-alpha.11</asciidoctorj-pdf.version>
+
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.5.2.Final</previous.stable>
     </properties>
@@ -934,28 +941,31 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.jboss.maven.plugins</groupId>
-                    <artifactId>maven-jdocbook-plugin</artifactId>
-                    <version>2.3.10</version>
-                    <extensions>true</extensions>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <version>${asciidoctor-maven-plugin.version}</version>
                     <dependencies>
                         <dependency>
-                            <groupId>org.jboss.pressgang</groupId>
-                            <artifactId>pressgang-xslt-ns</artifactId>
-                            <version>3.1.4</version>
+                            <groupId>org.jruby</groupId>
+                            <artifactId>jruby-complete</artifactId>
+                            <version>${jruby.version}</version>
+                        </dependency>
+                         <dependency>
+                            <groupId>org.asciidoctor</groupId>
+                            <artifactId>asciidoctorj</artifactId>
+                            <version>${asciidoctorj.version}</version>
                         </dependency>
                         <dependency>
-                            <groupId>org.hibernate</groupId>
-                            <artifactId>hibernate-jdocbook-style</artifactId>
-                            <version>3.0.2</version>
-                            <type>jdocbook-style</type>
+                            <groupId>org.asciidoctor</groupId>
+                            <artifactId>asciidoctorj-pdf</artifactId>
+                            <version>${asciidoctorj-pdf.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
-                    <groupId>org.asciidoctor</groupId>
-                    <artifactId>asciidoctor-maven-plugin</artifactId>
-                    <version>1.5.3</version>
+                    <groupId>ch.mfrey.maven.plugin</groupId>
+                    <artifactId>copy-maven-plugin</artifactId>
+                    <version>0.0.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
