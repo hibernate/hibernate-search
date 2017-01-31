@@ -129,13 +129,13 @@ public class ElasticsearchClassBridgeIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "Hergesheimer" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class )
-				.setProjection( "fullNameStored" )
+				.setProjection( "fullNameNotIndexed" )
 				.list();
 
 		assertThat( result ).hasSize( 1 );
 
 		Object[] projection = (Object[]) result.iterator().next();
-		assertThat( projection[0] ).describedAs( "fullNameStored" ).isEqualTo( "Klaus Hergesheimer" );
+		assertThat( projection[0] ).describedAs( "fullNameNotIndexed" ).isEqualTo( "Klaus Hergesheimer" );
 
 		tx.commit();
 		s.close();

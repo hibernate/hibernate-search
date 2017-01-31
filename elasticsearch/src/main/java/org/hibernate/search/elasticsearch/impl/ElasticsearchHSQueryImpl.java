@@ -548,6 +548,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
 			ExtendedFieldType type = FieldHelper.getType( fieldMetadata );
 
+			if ( !org.hibernate.search.annotations.Store.YES.equals( fieldMetadata.getStore() ) ) {
+				throw LOG.projectingNonStoredField( absoluteName );
+			}
+
 			if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 				sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
 
@@ -582,6 +586,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				BridgeDefinedField bridgeDefinedField) {
 			String absoluteName = bridgeDefinedField.getAbsoluteName();
 			ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
+
+			if ( !org.hibernate.search.annotations.Store.YES.equals( bridgeDefinedField.getSourceField().getStore() ) ) {
+				throw LOG.projectingNonStoredField( absoluteName );
+			}
 
 			sourceFilterCollector.add( new JsonPrimitive( absoluteName ) );
 
