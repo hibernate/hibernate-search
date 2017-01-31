@@ -730,7 +730,6 @@
                     and 'parsedVersion.minorVersion' to be in synch with the current project version -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9.1</version>
                 <executions>
                     <execution>
                     <id>parse-version</id>
@@ -1295,6 +1294,21 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                             <version>${project.version}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.12</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.servicemix.tooling</groupId>
+                    <artifactId>depends-maven-plugin</artifactId>
+                    <version>1.3.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
