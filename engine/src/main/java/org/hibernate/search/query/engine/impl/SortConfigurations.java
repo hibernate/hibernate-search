@@ -134,6 +134,11 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 			return this;
 		}
 
+		public Builder addSortableField(SortableFieldMetadata sortableFieldMetadata) {
+			currentEntityTypeBucket.add( sortableFieldMetadata );
+			return this;
+		}
+
 		public Builder addSortableFields(Collection<SortableFieldMetadata> sortableFieldMetadata) {
 			currentEntityTypeBucket.addAll( sortableFieldMetadata );
 			return this;

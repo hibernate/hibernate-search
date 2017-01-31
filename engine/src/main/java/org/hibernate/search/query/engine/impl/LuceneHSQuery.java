@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
@@ -33,6 +34,7 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -51,6 +53,7 @@ import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
+import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -417,18 +420,19 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 				List<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
 				targetedIndexes.addAll( indexManagers );
-				collectSortableFields( sortConfigurations, indexManagers, entityIndexBinding.getDocumentBuilder().getTypeMetadata() );
+				collectSortableFields( sortConfigurations, indexManagers, builder.getTypeMetadata(),
+						Optional.empty() /* No custom metadata in this case */ );
 			}
 			classesAndSubclasses = null;
 		}
 		else {
-			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities.size() );
-			involvedClasses.addAll( indexedTargetedEntities );
+			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities );
 			for ( Class<?> clazz : indexedTargetedEntities ) {
 				EntityIndexBinding indexBinder = indexBindings.get( clazz );
 				if ( indexBinder != null ) {
 					DocumentBuilderIndexedEntity builder = indexBinder.getDocumentBuilder();
-					involvedClasses.addAll( builder.getMappedSubclasses() );
+					Set<Class<?>> mappedSubclasses = builder.getMappedSubclasses();
+					involvedClasses.addAll( mappedSubclasses );
 				}
 			}
 
@@ -444,9 +448,10 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 
+				Optional<CustomTypeMetadata> customTypeMetadata = getCustomTypeMetadata( clazz );
 				List<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
 				targetedIndexes.addAll( indexManagers );
-				collectSortableFields( sortConfigurations, indexManagers, builder.getTypeMetadata() );
+				collectSortableFields( sortConfigurations, indexManagers, builder.getTypeMetadata(), customTypeMetadata );
 				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
 			}
 			this.classesAndSubclasses = involvedClasses;
@@ -562,7 +567,8 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	 * Collects all sort fields declared on the properties of the given type or the properties of all the types it
 	 * embeds into the given list.
 	 */
-	private void collectSortableFields(SortConfigurations.Builder sortConfigurations, Iterable<IndexManager> indexManagers, TypeMetadata typeMetadata) {
+	private void collectSortableFields(SortConfigurations.Builder sortConfigurations, Iterable<IndexManager> indexManagers, TypeMetadata typeMetadata,
+			Optional<CustomTypeMetadata> customTypeMetadataOptional) {
 		for ( IndexManager indexManager : indexManagers ) {
 			sortConfigurations.setIndex( indexManager.getIndexName() );
 			sortConfigurations.setEntityType( typeMetadata.getType() );
@@ -576,6 +582,13 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 			for ( EmbeddedTypeMetadata embeddedType : typeMetadata.getEmbeddedTypeMetadata() ) {
 				collectSortableFields( sortConfigurations, embeddedType );
+			}
+
+			if ( customTypeMetadataOptional.isPresent() ) {
+				CustomTypeMetadata customTypeMetadata = customTypeMetadataOptional.get();
+				for ( String fieldName : customTypeMetadata.getSortableFields() ) {
+					sortConfigurations.addSortableField( new SortableFieldMetadata.Builder( fieldName ).build() );
+				}
 			}
 		}
 	}

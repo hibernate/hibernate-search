@@ -79,7 +79,20 @@ public interface SearchIntegrator extends AutoCloseable {
 	 *
 	 * @return an Hibernate Search query object
 	 */
-	HSQuery createHSQuery(Query luceneQuery, Class<?>... entities);
+	HSQuery createHSQuery(Query luceneQuery, Class<?>... entityTypes);
+
+	/**
+	 * Return an Hibernate Search query object.
+	 * This method DOES support non-Lucene backends (e.g. Elasticsearch).
+	 * The returned object uses fluent APIs to define additional query settings.
+	 * <p>Be aware that some backends may not implement {@link HSQuery#luceneQuery(Query)},
+	 * in which case the query provided here cannot be overridden.
+	 * <p>Calling {@link HSQuery#targetedTypes(java.util.List)} on the resulting query
+	 * is not necessary, unless you later decide to target a subset of {@code entities}.
+	 *
+	 * @return an Hibernate Search query object
+	 */
+	HSQuery createHSQuery(Query luceneQuery, CustomTypeMetadata... types);
 
 	/**
 	 * @return true if the SearchIntegrator was stopped
