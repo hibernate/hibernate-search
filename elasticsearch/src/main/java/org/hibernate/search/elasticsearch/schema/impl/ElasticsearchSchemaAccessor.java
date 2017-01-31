@@ -82,7 +82,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	/*
-	 * Serializing nulls is really not a good idea here, it triggers NPEs in ElasticSearch
+	 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 	 * We better not include the null fields.
 	 */
 	private String serializeAsJsonWithoutNulls(Object object) {
