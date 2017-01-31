@@ -27,8 +27,6 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A helper classes dealing with the processing of annotation. It is there to share some annotation processing
@@ -38,8 +36,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class AnnotationProcessingHelper {
-
-	private static final Log log = LoggerFactory.make();
 
 	private AnnotationProcessingHelper() {
 		//not allowed
