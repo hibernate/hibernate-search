@@ -226,7 +226,8 @@
         <!-- Eclipse plugin options -->
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
-        <puppycrawl.checkstyle.version>6.16</puppycrawl.checkstyle.version>
+        <!-- Version 7.5 suffers from a bug that affects us: https://github.com/checkstyle/checkstyle/issues/3776 -->
+        <puppycrawl.checkstyle.version>7.4</puppycrawl.checkstyle.version>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.5.2.Final</previous.stable>

@@ -69,7 +69,7 @@ public class DistanceCollector implements Collector {
 			this.documentId = documentId;
 		}
 
-		abstract Double getDistance(final Point center);
+		abstract Double getDistance(Point center);
 	}
 
 	private static final class CompleteHitEntry extends HitEntry {
