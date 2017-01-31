@@ -27,7 +27,7 @@ public class NativeSortField extends SortField {
 			throw new SearchException(
 					"This sort field should never have been executed in the first place."
 					+ " This is probably a result of queryBuilder.sort().byNative(String) being called while using the Lucene backend."
-					+ " This method is only provided for use with the ElasticSearch backend."
+					+ " This method is only provided for use with the Elasticsearch backend."
 			);
 		}
 	};

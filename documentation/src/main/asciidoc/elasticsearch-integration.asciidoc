@@ -200,7 +200,7 @@ There is no specific configuration required on the Elasticsearch side.
 However there are a few features that would benefit from a few changes:
 
 * if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
-  see <<elasticsearch-query-spatial>>
+  see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
 * if you want to be able to use the `purgeAll` Hibernate Search command,
   install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query`] plugin
 * if you want to use paging (as opposed to <<elasticsearch-scrolling,scrolling>>) on result sets larger than 10000 elements (for instance access the 10001st result), you may increase the value of the `index.max_result_window` property (default is 10000).
@@ -599,7 +599,7 @@ By default Elasticsearch interprets the date/time strings lacking the time zone 
 The simplest way to avoid issues is to always explicitly provide time zones IDs or offsets when building native Elasticsearch queries. This may be achieved either by directly adding the time zone ID or offset in date strings, or by using the `time_zone` parameter (range queries only). See Elasticsearch documentation for more information.
 ====
 
-==== [[elasticsearch-query-spatial]]Spatial queries
+==== [[elasticsearch-query-spatial]] Spatial queries
 
 The Elasticsearch integration supports spatial queries by using either the DSL or native Elasticsearch queries.
 
@@ -630,9 +630,9 @@ Limitations:
   This is because Elasticsearch does not provide such feature, thus Hibernate Search has to scroll through every previous result under the hood.
 * The Elasticsearch implementation allows only limited backtracking. Calling `scrollableResults.setRowNumber(4)` when currently positioned at index `1006`,
   for example, may result in a `SearchException` being thrown, because only 1000 previous elements had been kept in memory.
-  You may work this around by tweaking the property: `hibernate.search.elasticsearch.scroll_backtracking_window_size` (see <<elasticsearch-integration-configuration>>).
+  You may work this around by tweaking the property: `hibernate.search.elasticsearch.scroll_backtracking_window_size` (see <<elasticsearch-integration-configuration, Elasticsearch integration configuration>>).
 * The `ScrollableResults` will become stale and unusable after a given period of time spent without fetching results from Elasticsearch.
-  You may work this around by tweaking two properties: `hibernate.search.elasticsearch.scroll_timeout` and `hibernate.search.elasticsearch.scroll_fetch_size` (see <<elasticsearch-integration-configuration>>).
+  You may work this around by tweaking two properties: `hibernate.search.elasticsearch.scroll_timeout` and `hibernate.search.elasticsearch.scroll_fetch_size` (see <<elasticsearch-integration-configuration, Elasticsearch integration configuration>>).
   Typically, you will solve timeout issues by reducing the fetch size and/or increasing the timeout limit, but this will also increase the performance hit on Elasticsearch.
 
 ==== [[elasticsearch-query-sorting]]Sorting
