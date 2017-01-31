@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,8 +44,9 @@ import org.junit.runners.Parameterized.Parameters;
 public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBase {
 
 	@Parameters(name = "With strategy {0}")
-	public static IndexSchemaManagementStrategy[] strategies() {
-		return IndexSchemaManagementStrategy.values();
+	public static Iterable<IndexSchemaManagementStrategy> strategies() {
+		// The "NONE" strategy never checks that the index exists.
+		return EnumSet.complementOf( EnumSet.of( IndexSchemaManagementStrategy.NONE ) );
 	}
 
 	@Rule

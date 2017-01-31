@@ -118,7 +118,7 @@ Let's see the options for the `index_schema_management_strategy` property:
 |===============
 |Value|Definition
 |`NONE`|Indexes, their mappings and their analyzer definitions will not be created, deleted nor altered.
-Hibernate Search will only check that the indexes already exist.
+Hibernate Search will **not even check** that the indexes already exist.
 |`VALIDATE`|Existing indexes, mappings and analyzer definitions will be checked for conflicts with Hibernate Search's metamodel.
 Indexes, their mappings and their analyzer definitions will not be created, deleted nor altered.
 |`MERGE`|Missing indexes, mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
@@ -164,6 +164,8 @@ Time interval between two executions of the automatic discovery (in seconds):: `
 +
 This setting will only be taken into account if automatic discovery is enabled (see above).
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000` (default)
++
+This setting is ignored when the `NONE` strategy is selected, since the index will not be checked on startup (see above).
 +
 This value must be lower than the read timeout (see above).
 Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red")::

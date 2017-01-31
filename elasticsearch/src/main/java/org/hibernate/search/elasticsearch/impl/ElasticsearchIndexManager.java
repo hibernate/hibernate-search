@@ -273,7 +273,6 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	 */
 	private boolean initializeIndex(Set<Class<?>> entityTypesToInitialize) {
 		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
-			schemaCreator.checkIndexExists( actualIndexName, schemaManagementExecutionOptions );
 			return false;
 		}
 
