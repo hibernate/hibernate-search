@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.query.engine.impl;
 
+import static java.util.stream.Collectors.toList;
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.lucene.search.Filter;
@@ -33,6 +36,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
+import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -59,6 +63,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	protected List<Class<?>> targetedEntities;
 	protected Set<Class<?>> indexedTargetedEntities;
+	private List<CustomTypeMetadata> customTypeMetadata;
 
 	protected Sort sort;
 	protected String tenantId;
@@ -105,15 +110,40 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	}
 
 	@Override
-	public HSQuery targetedEntities(List<Class<?>> classes) {
+	public final HSQuery targetedEntities(List<Class<?>> classes) {
+		setTargetedEntities( classes == null ? new ArrayList<>( 0 ) : new ArrayList<Class<?>>( classes ) );
+		this.customTypeMetadata = Collections.emptyList();
+		return this;
+	}
+
+	private void setTargetedEntities(List<Class<?>> classes) {
 		clearCachedResults();
-		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>( classes );
+		this.targetedEntities = classes;
 		final Class<?>[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
 		this.indexedTargetedEntities = extendedIntegrator.getIndexedTypesPolymorphic( classesAsArray );
 		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
 			throw LOG.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ) );
 		}
+	}
+
+	@Override
+	public final HSQuery targetedTypes(List<CustomTypeMetadata> types) {
+		if ( types == null ) {
+			return targetedEntities( null );
+		}
+
+		List<Class<?>> entityTypes = types.stream()
+				.map( CustomTypeMetadata::getEntityType ).collect( toList() );
+		setTargetedEntities( entityTypes );
+		this.customTypeMetadata = new ArrayList<>( types );
+
 		return this;
+	}
+
+	protected final Optional<CustomTypeMetadata> getCustomTypeMetadata(Class<?> clazz) {
+		return customTypeMetadata.stream()
+				.filter( metadata -> metadata.getEntityType().isAssignableFrom( clazz ) )
+				.findFirst();
 	}
 
 	@Override

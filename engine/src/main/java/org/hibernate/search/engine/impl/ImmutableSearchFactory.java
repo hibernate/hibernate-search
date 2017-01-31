@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.impl;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -58,6 +59,7 @@ import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
+import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -289,13 +291,31 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public HSQuery createHSQuery(Query luceneQuery, Class<?>... entities) {
+	public HSQuery createHSQuery(Query luceneQuery, Class<?>... entityTypes) {
+		QueryDescriptor descriptor = createQueryDescriptor( luceneQuery, entityTypes );
+
+		return descriptor.createHSQuery( this ).targetedEntities( Arrays.asList( entityTypes ) );
+	}
+
+	@Override
+	public HSQuery createHSQuery(Query luceneQuery, CustomTypeMetadata... types) {
+		List<CustomTypeMetadata> typeList = Arrays.asList( types );
+		Class<?>[] entityTypes = typeList.stream()
+				.map( CustomTypeMetadata::getEntityType )
+				.toArray( Class<?>[]::new );
+
+		QueryDescriptor descriptor = createQueryDescriptor( luceneQuery, entityTypes );
+
+		return descriptor.createHSQuery( this ).targetedTypes( typeList );
+	}
+
+	private QueryDescriptor createQueryDescriptor(Query luceneQuery, Class<?>[] entityTypes) {
 		QueryDescriptor descriptor = null;
 
 		if ( queryTranslatorPresent ) {
 			try (ServiceReference<LuceneQueryTranslator> translator =
 					getServiceManager().requestReference( LuceneQueryTranslator.class )) {
-				if ( translator.get().conversionRequired( entities ) ) {
+				if ( translator.get().conversionRequired( entityTypes ) ) {
 					descriptor = translator.get().convertLuceneQuery( luceneQuery );
 				}
 			}
@@ -305,7 +325,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 			descriptor = new LuceneQueryDescriptor( luceneQuery );
 		}
 
-		return descriptor.createHSQuery( this ).targetedEntities( Arrays.asList( entities ) );
+		return descriptor;
 	}
 
 	@Override
