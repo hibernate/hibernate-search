@@ -880,7 +880,7 @@
                                 <processors>
                                     <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                                 </processors>
-                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.7 -target 1.7</compilerArguments>
+                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.8 -target 1.8</compilerArguments>
                             </configuration>
                         </execution>
                     </executions>
