@@ -1432,7 +1432,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             </activation>
             <properties>
                 <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
-                <testElasticsearchVersion>2.4.2</testElasticsearchVersion>
+                <testElasticsearchVersion>2.4.4</testElasticsearchVersion>
             </properties>
         </profile>
 
