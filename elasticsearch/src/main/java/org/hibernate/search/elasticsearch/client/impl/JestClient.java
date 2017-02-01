@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -34,7 +35,6 @@ import com.google.gson.JsonElement;
 
 import io.searchbox.action.Action;
 import io.searchbox.action.BulkableAction;
-import io.searchbox.action.DocumentTargetedAction;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
@@ -72,11 +72,13 @@ public class JestClient implements Service, Startable, Stoppable {
 
 	private ServiceManager serviceManager;
 	private GsonService gsonService;
+	private JestAPIFormatter jestAPIFormatter;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
 		gsonService = serviceManager.requestService( GsonService.class );
+		jestAPIFormatter = serviceManager.requestService( JestAPIFormatter.class );
 
 		JestClientFactory factory = new JestClientFactory();
 
@@ -136,6 +138,8 @@ public class JestClient implements Service, Startable, Stoppable {
 		client.shutdownClient();
 		client = null;
 
+		jestAPIFormatter = null;
+		serviceManager.releaseService( JestAPIFormatter.class );
 		gsonService = null;
 		serviceManager.releaseService( GsonService.class );
 		serviceManager = null;
@@ -169,17 +173,17 @@ public class JestClient implements Service, Startable, Stoppable {
 			if ( !result.isSucceeded() && !isResponseCode( result.getResponseCode(), ignoredErrorStatuses )
 					&& !isErrorType( result, ignoredErrorTypes ) ) {
 				if ( result.getResponseCode() == TIME_OUT ) {
-					throw LOG.elasticsearchRequestTimeout( requestToString( request ), resultToString( result ) );
+					throw LOG.elasticsearchRequestTimeout( jestAPIFormatter.formatRequest( request ), jestAPIFormatter.formatResult( result ) );
 				}
 				else {
-					throw LOG.elasticsearchRequestFailed( requestToString( request ), resultToString( result ), null );
+					throw LOG.elasticsearchRequestFailed( jestAPIFormatter.formatRequest( request ), jestAPIFormatter.formatResult( result ), null );
 				}
 			}
 
 			return result;
 		}
 		catch (IOException e) {
-			throw LOG.elasticsearchRequestFailed( requestToString( request ), null, e );
+			throw LOG.elasticsearchRequestFailed( jestAPIFormatter.formatRequest( request ), null, e );
 		}
 	}
 
@@ -223,8 +227,8 @@ public class JestClient implements Service, Startable, Stoppable {
 
 			if ( !erroneousItems.isEmpty() ) {
 				throw LOG.elasticsearchBulkRequestFailed(
-						requestToString( request ),
-						resultToString( response ),
+						jestAPIFormatter.formatRequest( request ),
+						jestAPIFormatter.formatResult( response ),
 						successfulItems,
 						erroneousItems
 				);
@@ -234,7 +238,7 @@ public class JestClient implements Service, Startable, Stoppable {
 			}
 		}
 		catch (IOException e) {
-			throw LOG.elasticsearchRequestFailed( requestToString( request ), null, e );
+			throw LOG.elasticsearchRequestFailed( jestAPIFormatter.formatRequest( request ), null, e );
 		}
 	}
 
@@ -293,56 +297,5 @@ public class JestClient implements Service, Startable, Stoppable {
 		}
 
 		return ignored;
-	}
-
-	private String requestToString(Action<?> action) {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append( "Operation: " ).append( action.getClass().getSimpleName() ).append( "\n" );
-		sb.append( "URI:" ).append( action.getURI() ).append( "\n" );
-
-		if ( action instanceof DocumentTargetedAction ) {
-			sb.append( "Index: " ).append( ( (DocumentTargetedAction<?>) action ).getIndex() ).append( "\n" );
-			sb.append( "Type: " ).append( ( (DocumentTargetedAction<?>) action ).getType() ).append( "\n" );
-			sb.append( "Id: " ).append( ( (DocumentTargetedAction<?>) action ).getId() ).append( "\n" );
-		}
-
-		sb.append( "Data:\n" );
-		sb.append( action.getData( gsonService.getGson() ) );
-		sb.append( "\n" );
-		return sb.toString();
-	}
-
-	private String resultToString(JestResult result) {
-		StringBuilder sb = new StringBuilder();
-		sb.append( "Status: " ).append( result.getResponseCode() ).append( "\n" );
-		sb.append( "Error message: " ).append( result.getErrorMessage() ).append( "\n" );
-		sb.append( "Cluster name: " ).append( property( result, "cluster_name" ) ).append( "\n" );
-		sb.append( "Cluster status: " ).append( property( result, "status" ) ).append( "\n" );
-		sb.append( "\n" );
-
-		if ( result instanceof BulkResult ) {
-			for ( BulkResultItem item : ( (BulkResult) result ).getItems() ) {
-				sb.append( "Operation: " ).append( item.operation ).append( "\n" );
-				sb.append( "  Index: " ).append( item.index ).append( "\n" );
-				sb.append( "  Type: " ).append( item.type ).append( "\n" );
-				sb.append( "  Id: " ).append( item.id ).append( "\n" );
-				sb.append( "  Status: " ).append( item.status ).append( "\n" );
-				sb.append( "  Error: " ).append( item.error ).append( "\n" );
-			}
-		}
-
-		return sb.toString();
-	}
-
-	private String property(JestResult result, String name) {
-		if ( result.getJsonObject() == null ) {
-			return null;
-		}
-		JsonElement clusterName = result.getJsonObject().get( name );
-		if ( clusterName == null ) {
-			return null;
-		}
-		return clusterName.getAsString();
 	}
 }
