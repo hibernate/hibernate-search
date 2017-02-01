@@ -12,8 +12,11 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Properties;
 
+import org.hibernate.search.elasticsearch.client.impl.BackendRequestResultAssessor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.elasticsearch.impl.DefaultBackendRequestResultAssessor;
 import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
@@ -65,15 +68,34 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	private GsonService gsonService;
 
+	private JestAPIFormatter jestApiFormatter;
+
+	private BackendRequestResultAssessor<JestResult> createIndexResultAssessor;
+	private BackendRequestResultAssessor<JestResult> indexExistsResultAssessor;
+	private BackendRequestResultAssessor<JestResult> healthResultAssessor;
+
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
 		jestClient = serviceManager.requestService( JestClient.class );
 		gsonService = serviceManager.requestService( GsonService.class );
+		jestApiFormatter = serviceManager.requestService( JestAPIFormatter.class );
+		createIndexResultAssessor = DefaultBackendRequestResultAssessor.builder( jestApiFormatter )
+				.ignoreErrorTypes( "index_already_exists_exception" )
+				.build();
+		indexExistsResultAssessor = DefaultBackendRequestResultAssessor.builder( jestApiFormatter )
+				.ignoreErrorStatuses( 404 )
+				.build();
+		healthResultAssessor = DefaultBackendRequestResultAssessor.builder( jestApiFormatter )
+				.ignoreErrorStatuses( 408 )
+				.build();
 	}
 
 	@Override
 	public void stop() {
+		createIndexResultAssessor = null;
+		jestApiFormatter = null;
+		serviceManager.releaseService( JestAPIFormatter.class );
 		jestClient = null;
 		serviceManager.releaseService( JestClient.class );
 		gsonService = null;
@@ -110,7 +132,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 				.settings( settingsAsJson )
 				.build();
 
-		JestResult result = jestClient.executeRequest( createIndex, "index_already_exists_exception" );
+		JestResult result = jestClient.executeRequest( createIndex, createIndexResultAssessor );
 		if ( !result.isSucceeded() ) {
 			// The index was created just after we checked if it existed: just do as if it had been created when we checked.
 			return false;
@@ -120,7 +142,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	public boolean indexExists(String indexName) {
-		JestResult peekResult = jestClient.executeRequest( new IndicesExists.Builder( indexName ).build(), 404 );
+		JestResult peekResult = jestClient.executeRequest( new IndicesExists.Builder( indexName ).build(), indexExistsResultAssessor );
 		return peekResult.getResponseCode() == 200;
 	}
 
@@ -234,7 +256,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 			}
 		};
 
-		JestResult result = jestClient.executeRequest( health, 408 );
+		JestResult result = jestClient.executeRequest( health, healthResultAssessor );
 
 		if ( !result.isSucceeded() ) {
 			String status = result.getJsonObject().get( "status" ).getAsString();
