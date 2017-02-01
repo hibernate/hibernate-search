@@ -226,6 +226,11 @@
         <!-- Eclipse plugin options -->
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
+        <!--
+            Please don't change the name of this property, it may be used and
+            overridden by a CI job of the Checkstyle project so that they can
+            check for regressions. Which is obviously good for us, too.
+         -->
         <!-- Version 7.5 suffers from a bug that affects us: https://github.com/checkstyle/checkstyle/issues/3776 -->
         <puppycrawl.checkstyle.version>7.4</puppycrawl.checkstyle.version>
 
