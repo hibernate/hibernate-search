@@ -77,7 +77,6 @@ import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -706,30 +705,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			Search search = builder.build();
 
 			if ( QUERY_LOG.isDebugEnabled() ) {
-				try ( ServiceReference<GsonService> gsonService =
-						extendedIntegrator.getServiceManager().requestReference( GsonService.class ) ) {
+				try ( ServiceReference<JestAPIFormatter> jestAPIFormatter =
+						extendedIntegrator.getServiceManager().requestReference( JestAPIFormatter.class ) ) {
 					// We use getURI(), but the name is confusing: it's actually the path + query parts of the URL
-					QUERY_LOG.executingElasticsearchQuery( search.getURI(), getPrettyPrintedData( gsonService.get(), search) );
+					QUERY_LOG.executingElasticsearchQuery( search.getURI(), jestAPIFormatter.get().formatRequestData( search) );
 				}
 			}
 
 			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
 				return client.get().executeRequest( search );
 			}
-		}
-
-		private String getPrettyPrintedData(GsonService gsonService, Search search) {
-			Gson gson = gsonService.getGson();
-			/*
-			 * The Gson we use as an argument is not always used, which means we have to reformat
-			 * the result ourselves to be sure it's pretty-printed.
-			 */
-			String data = search.getData( gson );
-
-			// Make sure the JSON is pretty-printed
-			gson = gsonService.getGsonPrettyPrinting();
-			JsonElement tree = gson.fromJson( data, JsonElement.class );
-			return gson.toJson( tree );
 		}
 
 		private String getScrollTimeout() {
