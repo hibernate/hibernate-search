@@ -96,10 +96,25 @@ you will need the new `hibernate-search-elasticsearch` jar.
 ----
 ====
 
-==== [[elasticsearch-integration-configuration]] Configuration
+==== [[elasticsearch-integration-server-configuration]] Elasticsearch configuration
+
+Hibernate Search can work with an Elasticsearch server without altering its configuration.
+
+However some features offered by Hibernate Search require specific configuration:
+
+* if you want to be able to use the Hibernate Search <<search-batchindex-massindexer,MassIndexer>> with `purgeAllOnStart` enabled,
+  or to use `FullTextSession.purge()` or `FullTextSession.purgeAll()`,
+  install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query` plugin]
+* if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
+  see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
+* if you want to use paging (as opposed to <<elasticsearch-scrolling,scrolling>>) on result sets larger than 10000 elements
+(for instance access the 10001st result),
+you may increase the value of the `index.max_result_window` property (default is 10000).
+
+==== [[elasticsearch-integration-configuration]] Hibernate Search configuration
 
 Configuration is minimal.
-Add them to your `persistence.xml` or where you put the rest of your Hibernate Search configuration.
+Add the configuration properties to your `persistence.xml` or where you put the rest of your Hibernate Search configuration.
 
 Select Elasticsearch as the backend:: `hibernate.search.default.indexmanager elasticsearch`
 Hostname and port for Elasticsearch:: `hibernate.search.default.elasticsearch.host \http://127.0.0.1:9200` (default)
@@ -192,18 +207,6 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
 Excluded properties are `host`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled` and `discovery.refresh_interval`.
 --
-
-===== Elasticsearch configuration
-
-There is no specific configuration required on the Elasticsearch side.
-
-However there are a few features that would benefit from a few changes:
-
-* if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
-  see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
-* if you want to be able to use the `purgeAll` Hibernate Search command,
-  install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query`] plugin
-* if you want to use paging (as opposed to <<elasticsearch-scrolling,scrolling>>) on result sets larger than 10000 elements (for instance access the 10001st result), you may increase the value of the `index.max_result_window` property (default is 10000).
 
 === Mapping and indexing
 
