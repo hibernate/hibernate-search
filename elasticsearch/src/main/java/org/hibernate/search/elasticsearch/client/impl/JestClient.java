@@ -10,15 +10,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.elasticsearch.impl.DefaultBackendRequestResultAssessor;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -30,8 +28,6 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import com.google.gson.JsonElement;
 
 import io.searchbox.action.Action;
 import io.searchbox.action.BulkableAction;
@@ -54,11 +50,6 @@ public class JestClient implements Service, Startable, Stoppable {
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	/**
-	 * HTTP response code for a request timed out.
-	 */
-	private static final int TIME_OUT = 408;
-
-	/**
 	 * Prefix for accessing the client-related settings.
 	 * That's currently needed as we only have a single client for all
 	 * index managers.
@@ -73,12 +64,14 @@ public class JestClient implements Service, Startable, Stoppable {
 	private ServiceManager serviceManager;
 	private GsonService gsonService;
 	private JestAPIFormatter jestAPIFormatter;
+	private DefaultBackendRequestResultAssessor defaultResultAssessor;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
 		gsonService = serviceManager.requestService( GsonService.class );
 		jestAPIFormatter = serviceManager.requestService( JestAPIFormatter.class );
+		defaultResultAssessor = DefaultBackendRequestResultAssessor.builder( jestAPIFormatter ).build();
 
 		JestClientFactory factory = new JestClientFactory();
 
@@ -145,40 +138,15 @@ public class JestClient implements Service, Startable, Stoppable {
 		serviceManager = null;
 	}
 
-	/**
-	 * Just to remove ambiguity between {@link #executeRequest(Action, int...)} and {@link #executeRequest(Action, String...)}
-	 * when the vararg is empty.
-	 */
 	public <T extends JestResult> T executeRequest(Action<T> request) {
-		return executeRequest( request, Collections.<Integer>emptySet(), Collections.<String>emptySet() );
+		return executeRequest( request, defaultResultAssessor );
 	}
 
-	public <T extends JestResult> T executeRequest(Action<T> request, int... ignoredErrorStatuses) {
-		return executeRequest( request, asSet( ignoredErrorStatuses ) );
-	}
-
-	public <T extends JestResult> T executeRequest(Action<T> request, String... ignoredErrorTypes) {
-		return executeRequest( request, Collections.<Integer>emptySet(), CollectionHelper.asImmutableSet( ignoredErrorTypes ) );
-	}
-
-	public <T extends JestResult> T executeRequest(Action<T> request, Set<Integer> ignoredErrorStatuses) {
-		return executeRequest( request, ignoredErrorStatuses, Collections.<String>emptySet() );
-	}
-
-	public <T extends JestResult> T executeRequest(Action<T> request, Set<Integer> ignoredErrorStatuses, Set<String> ignoredErrorTypes) {
+	public <T extends JestResult> T executeRequest(Action<T> request, BackendRequestResultAssessor<? super T> resultAssessor) {
 		try {
 			T result = client.execute( request );
 
-			// The request failed with a status that's not ignore-able
-			if ( !result.isSucceeded() && !isResponseCode( result.getResponseCode(), ignoredErrorStatuses )
-					&& !isErrorType( result, ignoredErrorTypes ) ) {
-				if ( result.getResponseCode() == TIME_OUT ) {
-					throw LOG.elasticsearchRequestTimeout( jestAPIFormatter.formatRequest( request ), jestAPIFormatter.formatResult( result ) );
-				}
-				else {
-					throw LOG.elasticsearchRequestFailed( jestAPIFormatter.formatRequest( request ), jestAPIFormatter.formatResult( result ), null );
-				}
-			}
+			resultAssessor.checkSuccess( request, result );
 
 			return result;
 		}
@@ -216,11 +184,11 @@ public class JestClient implements Service, Startable, Stoppable {
 			for ( BulkResultItem resultItem : response.getItems() ) {
 				BackendRequest<?> backendRequest = backendRequests.get( i );
 
-				if ( isErrored( backendRequest, resultItem ) ) {
-					erroneousItems.add( backendRequest );
+				if ( backendRequest.getResultAssessor().isSuccess( resultItem ) ) {
+					successfulItems.put( backendRequest, resultItem );
 				}
 				else {
-					successfulItems.put( backendRequest, resultItem );
+					erroneousItems.add( backendRequest );
 				}
 				++i;
 			}
@@ -240,62 +208,5 @@ public class JestClient implements Service, Startable, Stoppable {
 		catch (IOException e) {
 			throw LOG.elasticsearchRequestFailed( jestAPIFormatter.formatRequest( request ), null, e );
 		}
-	}
-
-	private boolean isErrored(BackendRequest<?> backendRequest, BulkResultItem resultItem) {
-		// When getting a 404 for a DELETE, the error is null :(, so checking both
-		return (resultItem.error != null || resultItem.status >= 400 )
-			&& !isResponseCode( resultItem.status, backendRequest.getIgnoredErrorStatuses() );
-	}
-
-	private boolean isResponseCode(int responseCode, Set<Integer> codes) {
-		if ( codes == null ) {
-			return false;
-		}
-		else {
-			return codes.contains( responseCode );
-		}
-	}
-
-	private boolean isErrorType(JestResult result, Set<String> errorTypes) {
-		if ( errorTypes == null ) {
-			return false;
-		}
-		else {
-			return errorTypes.contains( getErrorType(result) );
-		}
-	}
-
-	private String getErrorType(JestResult result) {
-		JsonElement error = result.getJsonObject().get( "error" );
-		if ( error == null || !error.isJsonObject() ) {
-			return null;
-		}
-
-		JsonElement errorType = error.getAsJsonObject().get( "type" );
-		if ( errorType == null || !errorType.isJsonPrimitive() ) {
-			return null;
-		}
-
-		return errorType.getAsString();
-	}
-
-	private Set<Integer> asSet(int... ignoredErrorStatuses) {
-		Set<Integer> ignored;
-
-		if ( ignoredErrorStatuses == null || ignoredErrorStatuses.length == 0 ) {
-			ignored = Collections.emptySet();
-		}
-		else if ( ignoredErrorStatuses.length == 1 ) {
-			ignored = Collections.singleton( ignoredErrorStatuses[0] );
-		}
-		else {
-			ignored = new HashSet<>();
-			for ( int ignoredErrorStatus : ignoredErrorStatuses ) {
-				ignored.add( ignoredErrorStatus );
-			}
-		}
-
-		return ignored;
 	}
 }

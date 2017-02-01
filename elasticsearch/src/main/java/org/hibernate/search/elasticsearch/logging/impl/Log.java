@@ -390,4 +390,13 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	)
 	void failedToOpenIndex(String indexName);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 72,
+			value = "DeleteByQuery request to Elasticsearch failed with 404 result code."
+					+ "\nPlease check that 1. you installed the delete-by-query plugin on your Elasticsearch nodes"
+					+ " and 2. the targeted index exists"
+					+ "\n Request:\n========\n%1$s"
+					+ "Response:\n=========\n%2$s"
+			)
+	SearchException elasticsearchRequestDeleteByQueryNotFound(String request, String response);
+
 }

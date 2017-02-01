@@ -39,7 +39,7 @@ public class SingleRequest implements ExecutableRequest {
 
 	private <T extends JestResult> void doExecute(BackendRequest<T> request) {
 		try {
-			T result = jestClient.executeRequest( request.getAction(), request.getIgnoredErrorStatuses() );
+			T result = jestClient.executeRequest( request.getAction(), request.getResultAssessor() );
 			IndexingMonitor monitor = request.getIndexingMonitor();
 			if ( monitor != null ) {
 				request.getSuccessReporter().report( result, monitor );

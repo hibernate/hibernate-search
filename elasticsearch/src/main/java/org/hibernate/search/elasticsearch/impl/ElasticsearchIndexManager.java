@@ -147,10 +147,12 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 		this.similarity = similarity;
 
+		JestAPIFormatter jestApiFormatter = serviceManager.requestService( JestAPIFormatter.class );
 		this.visitor = new ElasticsearchIndexWorkVisitor(
 				this.actualIndexName,
 				this.refreshAfterWrite,
-				context.getUninitializedSearchIntegrator()
+				context.getUninitializedSearchIntegrator(),
+				jestApiFormatter
 		);
 		this.requestProcessor = context.getServiceManager().requestService( BackendRequestProcessor.class );
 	}
@@ -216,6 +218,8 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
 			schemaDropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
 		}
+
+		serviceManager.releaseService( JestAPIFormatter.class );
 
 		requestProcessor = null;
 		serviceManager.releaseService( BackendRequestProcessor.class );
