@@ -40,6 +40,7 @@ public interface AnalyzerStrategy {
 	AnalyzerReference createNamedAnalyzerReference(String name);
 
 	/**
+	 * @param analyzerClass The analyzer class the reference should reference.
 	 * @return a reference to an instance of the given analyzer class that will be
 	 * {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
 	 */
@@ -47,12 +48,14 @@ public interface AnalyzerStrategy {
 
 	/**
 	 * Initializes references created by this strategy, i.e. make them point to the actual analyzer definition.
-	 * @param references The references to initialize, mapped by name.
+	 * @param references The references to initialize.
 	 * @param analyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
 	 */
 	void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions);
 
 	/**
+	 * Creates a {@link ScopedAnalyzerReference} builder.
+	 * @param initialGlobalAnalyzerReference The global analyzer to set initially on the builder.
 	 * @return A {@link ScopedAnalyzerReference} builder. The returned reference will be
 	 * {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
 	 */
