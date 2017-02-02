@@ -13,12 +13,21 @@ import java.util.Map;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchAnalyzerDefinitionTranslator;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 
 
 /**
  * @author Yoann Rodiere
  */
 public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
+
+	private final ServiceManager serviceManager;
+
+	public ElasticsearchAnalyzerStrategy(ServiceManager serviceManager) {
+		this.serviceManager = serviceManager;
+	}
 
 	@Override
 	public ElasticsearchAnalyzerReference createDefaultAnalyzerReference() {
@@ -37,28 +46,39 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public ElasticsearchAnalyzerReference createLuceneClassAnalyzerReference(Class<?> analyzerClass) {
-		return new SimpleElasticsearchAnalyzerReference( new BuiltinElasticsearchAnalyzerImpl( analyzerClass ) );
+		return new LuceneClassElasticsearchAnalyzerReference( analyzerClass );
 	}
 
 	@Override
 	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
-		for ( AnalyzerReference reference : references ) {
-			if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
-				NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
-				if ( !namedReference.isInitialized() ) {
-					initializeReference( namedReference, analyzerDefinitions );
+		try ( ServiceReference<ElasticsearchAnalyzerDefinitionTranslator> translatorReference =
+				serviceManager.requestReference( ElasticsearchAnalyzerDefinitionTranslator.class ) ) {
+			ElasticsearchAnalyzerDefinitionTranslator translator = translatorReference.get();
+
+			for ( AnalyzerReference reference : references ) {
+				if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
+					NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
+					if ( !namedReference.isInitialized() ) {
+						initializeNamedReference( namedReference, analyzerDefinitions );
+					}
 				}
-			}
-			else if ( reference.is( ScopedElasticsearchAnalyzerReference.class ) ) {
-				ScopedElasticsearchAnalyzerReference scopedReference = reference.unwrap( ScopedElasticsearchAnalyzerReference.class );
-				if ( !scopedReference.isInitialized() ) {
-					scopedReference.initialize();
+				else if ( reference.is( LuceneClassElasticsearchAnalyzerReference.class ) ) {
+					LuceneClassElasticsearchAnalyzerReference luceneClassReference = reference.unwrap( LuceneClassElasticsearchAnalyzerReference.class );
+					if ( !luceneClassReference.isInitialized() ) {
+						initializeLuceneClassReference( luceneClassReference, translator );
+					}
+				}
+				else if ( reference.is( ScopedElasticsearchAnalyzerReference.class ) ) {
+					ScopedElasticsearchAnalyzerReference scopedReference = reference.unwrap( ScopedElasticsearchAnalyzerReference.class );
+					if ( !scopedReference.isInitialized() ) {
+						scopedReference.initialize();
+					}
 				}
 			}
 		}
 	}
 
-	private void initializeReference(NamedElasticsearchAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
+	private void initializeNamedReference(NamedElasticsearchAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
 		String name = analyzerReference.getAnalyzerName();
 
 		ElasticsearchAnalyzer analyzer;
@@ -71,6 +91,17 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		}
 
 		analyzerReference.initialize( analyzer );
+	}
+
+	private void initializeLuceneClassReference(LuceneClassElasticsearchAnalyzerReference analyzerReference,
+			ElasticsearchAnalyzerDefinitionTranslator translator) {
+		Class<?> clazz = analyzerReference.getLuceneClass();
+
+		String name = translator.translate( clazz );
+
+		ElasticsearchAnalyzer analyzer = new UndefinedElasticsearchAnalyzerImpl( name );
+
+		analyzerReference.initialize( name, analyzer );
 	}
 
 	@Override

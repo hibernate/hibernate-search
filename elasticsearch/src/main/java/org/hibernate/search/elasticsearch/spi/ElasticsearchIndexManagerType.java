@@ -24,7 +24,7 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType {
 
 	@Override
 	public AnalyzerStrategy createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
-		return new ElasticsearchAnalyzerStrategy();
+		return new ElasticsearchAnalyzerStrategy( serviceManager );
 	}
 
 	@Override

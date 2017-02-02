@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
-import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 
 /**
  * A {@code ScopedElasticsearchAnalyzer} is a wrapper class containing all remote analyzers for a given class.
@@ -58,13 +58,8 @@ public class ScopedElasticsearchAnalyzer implements ElasticsearchAnalyzer, Scope
 	}
 
 	@Override
-	public AnalyzerDef getDefinition(String fieldName) {
-		return getDelegate( fieldName ).getDefinition( fieldName );
-	}
-
-	@Override
-	public Class<?> getLuceneClass(String fieldName) {
-		return getDelegate( fieldName ).getLuceneClass( fieldName );
+	public String registerDefinitions(ElasticsearchIndexSettingsBuilder settingsBuilder, String fieldName) {
+		return getDelegate( fieldName ).registerDefinitions( settingsBuilder, fieldName );
 	}
 
 	@Override

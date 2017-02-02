@@ -18,6 +18,8 @@ import org.apache.lucene.document.Field;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchBridgeDefinedField;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -297,8 +299,15 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 			}
 
 			if ( IndexType.ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
-				String analyzerName = settingsBuilder.registerAnalyzer( analyzerReference, propertyPath );
-				propertyMapping.setAnalyzer( analyzerName );
+				if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
+					LOG.analyzerIsNotElasticsearch( mappingBuilder.getBeanClass(), propertyPath, analyzerReference );
+				}
+				else {
+					ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
+					ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
+					String analyzerName = analyzer.registerDefinitions( settingsBuilder, propertyPath );
+					propertyMapping.setAnalyzer( analyzerName );
+				}
 			}
 		}
 	}

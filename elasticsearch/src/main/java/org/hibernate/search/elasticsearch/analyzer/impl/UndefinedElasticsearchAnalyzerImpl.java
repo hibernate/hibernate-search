@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
-import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 
 /**
  * An Elasticsearch analyzer for which no definition was found in the Hibernate Search mapping.
@@ -28,25 +28,43 @@ public class UndefinedElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer
 	}
 
 	@Override
-	public void close() {
-		// nothing to do
-	}
-
-	@Override
 	public String getName(String fieldName) {
 		return remoteName;
 	}
 
 	@Override
-	public AnalyzerDef getDefinition(String fieldName) {
-		// No definition
-		return null;
+	public String registerDefinitions(ElasticsearchIndexSettingsBuilder settingsBuilder, String fieldName) {
+		// Nothing to do; we expect the analyzer to be already defined on the server.
+		return remoteName;
 	}
 
 	@Override
-	public Class<?> getLuceneClass(String fieldName) {
-		// No analyzer class
-		return null;
+	public void close() {
+		// nothing to do
+	}
+
+	@Override
+	public int hashCode() {
+		return remoteName.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj instanceof UndefinedElasticsearchAnalyzerImpl ) {
+			UndefinedElasticsearchAnalyzerImpl other = (UndefinedElasticsearchAnalyzerImpl) obj;
+			return other.remoteName.equals( remoteName );
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( "<" );
+		sb.append( remoteName );
+		sb.append( ">" );
+		return sb.toString();
 	}
 
 }

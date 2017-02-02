@@ -7,7 +7,7 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
-import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 
 /**
  * A description of an Elasticsearch analyzer.
@@ -16,8 +16,11 @@ import org.hibernate.search.annotations.AnalyzerDef;
  */
 public interface ElasticsearchAnalyzer extends RemoteAnalyzer {
 
-	AnalyzerDef getDefinition(String fieldName);
-
-	Class<?> getLuceneClass(String fieldName);
+	/**
+	 * @param settingsBuilder The builder to which analysis definitions should be registered.
+	 * @param fieldName The name of the field whose analyzer definitions should be registered.
+	 * @return The name of the registered analyzer.
+	 */
+	String registerDefinitions(ElasticsearchIndexSettingsBuilder settingsBuilder, String fieldName);
 
 }

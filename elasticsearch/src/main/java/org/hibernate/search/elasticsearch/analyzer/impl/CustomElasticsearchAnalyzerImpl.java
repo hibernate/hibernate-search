@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 
 /**
  * A description of an Elasticsearch analyzer built through an analyzer definition.
@@ -31,19 +32,27 @@ public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 	}
 
 	@Override
-	public AnalyzerDef getDefinition(String fieldName) {
-		return definition;
-	}
-
-	@Override
-	public Class<?> getLuceneClass(String fieldName) {
-		// No analyzer class
-		return null;
+	public String registerDefinitions(ElasticsearchIndexSettingsBuilder settingsBuilder, String fieldName) {
+		return settingsBuilder.registerAnalyzer( definition );
 	}
 
 	@Override
 	public void close() {
 		// nothing to close
+	}
+
+	@Override
+	public int hashCode() {
+		return definition.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj instanceof CustomElasticsearchAnalyzerImpl ) {
+			CustomElasticsearchAnalyzerImpl other = (CustomElasticsearchAnalyzerImpl) obj;
+			return other.definition.equals( definition );
+		}
+		return false;
 	}
 
 	@Override

@@ -9,13 +9,10 @@ package org.hibernate.search.elasticsearch.settings.impl;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
@@ -89,33 +86,7 @@ public class ElasticsearchIndexSettingsBuilder {
 		return analysis;
 	}
 
-	public String registerAnalyzer(AnalyzerReference analyzerReference, String fieldName) {
-		if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
-			LOG.analyzerIsNotElasticsearch( getBeanClass(), fieldName, analyzerReference );
-			return null;
-		}
-		ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
-		ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
-
-		AnalyzerDef hibernateSearchDefinition = analyzer.getDefinition( fieldName );
-		if ( hibernateSearchDefinition != null ) {
-			return addAnalyzerDef( hibernateSearchDefinition );
-		}
-		else {
-			String name = analyzer.getName( fieldName );
-			if ( name != null ) {
-				// Assuming a reference to a builtin or pre-defined analyzer by its name
-				return analyzer.getName( fieldName );
-			}
-			else {
-				Class<?> luceneClass = analyzer.getLuceneClass( fieldName );
-				// Assuming a reference to a builtin analyzer by its Lucene class
-				return analyzerDefinitionTranslator.translate( luceneClass );
-			}
-		}
-	}
-
-	private String addAnalyzerDef(AnalyzerDef hibernateSearchDefinition) {
+	public String registerAnalyzer(AnalyzerDef hibernateSearchDefinition) {
 		AnalyzerDefinition analyzerDefinition = new AnalyzerDefinition();
 
 		String localName = hibernateSearchDefinition.name();
