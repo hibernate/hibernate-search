@@ -7,7 +7,6 @@
 package org.hibernate.search.analyzer.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.analyzer.spi.NamedAnalyzerReference;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -20,7 +19,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Davide D'Alto
  */
-public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference implements NamedAnalyzerReference {
+public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -38,7 +37,6 @@ public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference implem
 		this.analyzer = analyzer; // Initialized from the start
 	}
 
-	@Override
 	public String getAnalyzerName() {
 		return name;
 	}

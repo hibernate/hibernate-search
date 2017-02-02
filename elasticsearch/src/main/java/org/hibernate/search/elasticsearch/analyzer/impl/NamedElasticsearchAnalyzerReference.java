@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
-import org.hibernate.search.analyzer.spi.NamedAnalyzerReference;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -19,7 +18,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Yoann Rodiere
  */
-public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerReference implements NamedAnalyzerReference {
+public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerReference {
 
 	private static final Log LOG = LoggerFactory.make();
 
@@ -32,7 +31,6 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 		this.analyzer = null; // Not initialized yet
 	}
 
-	@Override
 	public String getAnalyzerName() {
 		return name;
 	}
