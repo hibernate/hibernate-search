@@ -17,7 +17,6 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
@@ -111,11 +110,8 @@ public class TypeMetadataTest {
 		@SortableField
 		private String name;
 
-		@SortableFields({
-			@SortableField(forField = "ageForStringSorting"),
-			@SortableField(forField = "ageForIntSorting")
-		})
-
+		@SortableField(forField = "ageForStringSorting")
+		@SortableField(forField = "ageForIntSorting")
 		@Fields({
 			@Field(name = "ageForStringSorting", analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class) ),
 			@Field(name = "ageForIntSorting", analyze = Analyze.NO),
