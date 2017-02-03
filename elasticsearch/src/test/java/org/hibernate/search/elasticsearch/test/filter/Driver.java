@@ -18,7 +18,6 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
-import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
@@ -29,16 +28,14 @@ import org.hibernate.search.test.filter.FieldConstraintFilterFactory;
  */
 @Entity
 @Indexed
-@FullTextFilterDefs({
-		@FullTextFilterDef(name = "bestDriver",
-				impl = BestDriversElasticsearchFilter.class,
-				cache = FilterCacheModeType.NONE),
-		@FullTextFilterDef(name = "namedDriver",
-				impl = DriversMatchingNameElasticsearchFilter.class),
-		@FullTextFilterDef(name = "fieldConstraintFilter-1",
-				impl = FieldConstraintFilterFactory.class,
-				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
-})
+@FullTextFilterDef(name = "bestDriver",
+		impl = BestDriversElasticsearchFilter.class,
+		cache = FilterCacheModeType.NONE)
+@FullTextFilterDef(name = "namedDriver",
+		impl = DriversMatchingNameElasticsearchFilter.class)
+@FullTextFilterDef(name = "fieldConstraintFilter-1",
+		impl = FieldConstraintFilterFactory.class,
+		cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS)
 public class Driver {
 	@Id
 	@DocumentId
