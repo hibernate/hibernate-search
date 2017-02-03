@@ -23,7 +23,6 @@ import javax.persistence.SequenceGenerator;
 
 import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.ClassBridge;
-import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -40,11 +39,9 @@ import org.hibernate.search.bridge.builtin.DoubleBridge;
  */
 @Entity
 @Indexed(index = "golfplayer")
-@ClassBridges({
-		@ClassBridge(name = "fullName", impl = NameConcatenationBridge.class),
-		@ClassBridge(name = "fullNameStored", index = Index.NO, store = Store.YES, impl = NameConcatenationBridge.class),
-		@ClassBridge(name = "age", impl = AgeBridge.class)
-})
+@ClassBridge(name = "fullName", impl = NameConcatenationBridge.class)
+@ClassBridge(name = "fullNameStored", index = Index.NO, store = Store.YES, impl = NameConcatenationBridge.class)
+@ClassBridge(name = "age", impl = AgeBridge.class)
 public class GolfPlayer {
 
 	@Id
