@@ -8,6 +8,7 @@ package org.hibernate.search.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -23,6 +24,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
+@Repeatable(ClassBridges.class)
 public @interface ClassBridge {
 	/**
 	 * @return default field name passed to your bridge implementation (see {@link org.hibernate.search.bridge.FieldBridge#set(String, Object, org.apache.lucene.document.Document, org.hibernate.search.bridge.LuceneOptions)}).
