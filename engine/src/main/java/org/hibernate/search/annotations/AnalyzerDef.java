@@ -10,6 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Documented;
 
 /**
@@ -26,6 +27,7 @@ import java.lang.annotation.Documented;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
+@Repeatable(AnalyzerDefs.class)
 public @interface AnalyzerDef {
 	/**
 	 * @return Reference name to be used on {#org.hibernate.search.annotations.Analyzer}
