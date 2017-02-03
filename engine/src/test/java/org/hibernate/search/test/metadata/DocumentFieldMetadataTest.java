@@ -21,7 +21,6 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
-import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
@@ -268,10 +267,8 @@ public class DocumentFieldMetadataTest {
 		@DocumentId
 		private Integer id;
 
-		@NumericFields({
-				@NumericField(forField = "name"),
-				@NumericField(forField = "name")
-		})
+		@NumericField(forField = "name")
+		@NumericField(forField = "name") //Intentionally illegal
 		@Field(name = "name")
 		private short name;
 	}
