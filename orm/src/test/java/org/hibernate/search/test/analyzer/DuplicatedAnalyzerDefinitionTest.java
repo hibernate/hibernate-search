@@ -18,11 +18,9 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -31,8 +29,6 @@ import static org.junit.Assert.fail;
  * @author Hardy Ferentschik
  */
 public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
-
-	public static final Log log = LoggerFactory.make();
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
@@ -50,9 +46,9 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
 		}
 		catch (SearchException e) {
-			assertTrue(
-					"Multiple analyzer definitions with the same name: my-analyzer"
-					.equals( e.getMessage() )
+			assertEquals(
+					"HSEARCH000330: Multiple analyzer definitions with the same name: 'my-analyzer'.",
+					e.getMessage()
 			);
 		}
 	}
@@ -67,9 +63,9 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestBase {
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
 		}
 		catch (SearchException e) {
-			assertTrue(
-					"Multiple analyzer definitions with the same name: english"
-					.equals( e.getMessage() )
+			assertEquals(
+					"HSEARCH000330: Multiple analyzer definitions with the same name: 'english'.",
+					e.getMessage()
 			);
 		}
 	}

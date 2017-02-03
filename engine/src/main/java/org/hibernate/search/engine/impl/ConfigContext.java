@@ -39,6 +39,8 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Provides access to some default configuration settings (eg default {@code Analyzer} or default
@@ -48,6 +50,8 @@ import org.hibernate.search.util.impl.ReflectionHelper;
  * @author Hardy Ferentschik
  */
 public final class ConfigContext {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	/**
 	 * The default token for indexing null values. See {@link org.hibernate.search.annotations.Field#indexNullAs()}
@@ -84,7 +88,7 @@ public final class ConfigContext {
 	 * Map of discovered analyzer definitions. The key of the map is the analyzer def name and the value is the
 	 * {@code AnalyzerDef} annotation.
 	 */
-	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
+	private final Map<String, AnalyzerDef> mappingAnalyzerDefs = new HashMap<String, AnalyzerDef>();
 
 	/**
 	 * Map of discovered filter definitions. The key of the map is the filter def name and the value is the
@@ -167,11 +171,11 @@ public final class ConfigContext {
 
 		if ( analyzerDefinitionPoints.containsKey( analyzerDefinitionName ) ) {
 			if ( !analyzerDefinitionPoints.get( analyzerDefinitionName ).equals( annotationDefinitionPoint ) ) {
-				throw new SearchException( "Multiple analyzer definitions with the same name: " + analyzerDef.name() );
+				throw LOG.analyzerDefinitionNamingConflict( analyzerDefinitionName );
 			}
 		}
 		else {
-			analyzerDefs.put( analyzerDefinitionName, analyzerDef );
+			mappingAnalyzerDefs.put( analyzerDefinitionName, analyzerDef );
 			analyzerDefinitionPoints.put( analyzerDefinitionName, annotationDefinitionPoint );
 		}
 	}
@@ -278,14 +282,14 @@ public final class ConfigContext {
 	public Map<IndexManagerType, AnalyzerRegistry> initAnalyzerRegistries(IndexManagerHolder indexesFactory) {
 
 		/*
-		 * For analyzer definitions that were not referenced in the mapping,
+		 * For analyzer defined in the mapping, but not referenced in this mapping,
 		 * we assume these are Lucene analyzer definitions that will be used
 		 * when querying.
 		 * Thus we create references to these definitions, so that the references
 		 * are initialized below, making the analyzers available through
 		 * SearchFactory.getAnalyzer(String).
 		 */
-		for ( String name : analyzerDefs.keySet() ) {
+		for ( String name : mappingAnalyzerDefs.keySet() ) {
 			if ( !hasAnalyzerReference( name ) ) {
 				MutableAnalyzerRegistry registry = getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE );
 				registry.getOrCreateAnalyzerReference( name );
@@ -302,7 +306,7 @@ public final class ConfigContext {
 
 		for ( IndexManagerType indexManagerType : indexManagerTypes ) {
 			MutableAnalyzerRegistry registry = getAnalyzerRegistry( indexManagerType );
-			registry.initialize( analyzerDefs );
+			registry.initialize( mappingAnalyzerDefs );
 			immutableAnalyzerRegistries.put( indexManagerType, new ImmutableAnalyzerRegistry( registry ) );
 		}
 

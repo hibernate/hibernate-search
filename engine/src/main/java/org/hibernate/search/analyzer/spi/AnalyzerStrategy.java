@@ -48,10 +48,10 @@ public interface AnalyzerStrategy {
 
 	/**
 	 * Initializes references created by this strategy, i.e. make them point to the actual analyzer definition.
-	 * @param references The references to initialize.
-	 * @param analyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
+	 * @param references The references to initialize, gathered through calls to methods of this strategy.
+	 * @param mappingAnalyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
 	 */
-	void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions);
+	void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> mappingAnalyzerDefinitions);
 
 	/**
 	 * Creates a {@link ScopedAnalyzerReference} builder.

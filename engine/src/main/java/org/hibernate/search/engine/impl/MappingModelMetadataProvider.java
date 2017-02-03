@@ -59,12 +59,15 @@ import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.PropertyDescriptor;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public class MappingModelMetadataProvider implements MetadataProvider {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private static final Filter FILTER = new Filter() {
 		@Override
@@ -120,7 +123,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		for ( Map<String, Object> analyzerDef : mapping.getAnalyzerDefs() ) {
 			AnalyzerDef def = createAnalyzerDef( analyzerDef );
 			if ( globalAnalyzerDefNames.contains( def.name() ) ) {
-				throw new SearchException( "Multiple analyzer definitions with the same name: " + def.name() );
+				throw LOG.analyzerDefinitionNamingConflict( def.name() );
 			}
 			globalAnalyzerDefNames.add( def.name() );
 			defs[index] = def;

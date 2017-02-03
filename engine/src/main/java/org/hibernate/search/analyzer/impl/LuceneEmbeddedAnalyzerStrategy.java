@@ -16,18 +16,21 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
+import org.hibernate.search.analyzer.definition.impl.LuceneAnalyzerDefinitionRegistryBuilderImpl;
+import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionProvider;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.exception.SearchException;
 
 
 /**
@@ -71,6 +74,33 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 			}
 		}
 		return version;
+	}
+
+	private Map<String, AnalyzerDef> createDefaultAnalyzerDefinitions() {
+		LuceneAnalyzerDefinitionRegistryBuilderImpl builder = new LuceneAnalyzerDefinitionRegistryBuilderImpl();
+
+		String providerClassName = cfg.getProperty( Environment.ANALYZER_DEFINITION_PROVIDER );
+		if ( providerClassName != null ) {
+			LuceneAnalyzerDefinitionProvider provider;
+			try {
+				Class<?> providerClazz = ClassLoaderHelper.classForName( providerClassName, serviceManager );
+				provider = (LuceneAnalyzerDefinitionProvider) ReflectionHelper.createInstance( providerClazz, true );
+			}
+			catch (RuntimeException e) {
+				throw log.invalidLuceneAnalyzerDefinitionProvider( providerClassName, e );
+			}
+			try {
+				provider.register( builder );
+			}
+			catch (SearchException e) { // Do not wrap our own exceptions (from the builder, for instance)
+				throw e;
+			}
+			catch (RuntimeException e) { // Do wrap any other exception
+				throw log.invalidLuceneAnalyzerDefinitionProvider( providerClassName, e );
+			}
+		}
+
+		return builder.build();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -118,8 +148,18 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
-	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
+	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
 		Map<String, Analyzer> initializedAnalyzers = new HashMap<>();
+		/*
+		 * Recreate the default definitions for each call,
+		 * so that the definition providers can add new definitions between two SearchFactory increments.
+		 * Changes to pre-existing default definitions don't matter if the definitions weren't used,
+		 * and are harmless if they were already used
+		 * (because in that case the reference is already initialized,
+		 * so the new version of the definition will be ignored).
+		 */
+		Map<String, AnalyzerDef> analyzerDefinitions = createDefaultAnalyzerDefinitions();
+		analyzerDefinitions.putAll( mappingAnalyzerDefinitions );
 		for ( AnalyzerReference reference : references ) {
 			if ( reference.is( NamedLuceneAnalyzerReference.class ) ) {
 				NamedLuceneAnalyzerReference namedReference = reference.unwrap( NamedLuceneAnalyzerReference.class );
