@@ -19,7 +19,6 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 
 import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -35,22 +34,20 @@ import org.hibernate.search.annotations.TokenizerDef;
  */
 @Entity
 @Indexed
-@AnalyzerDefs({
-		@AnalyzerDef(name = "en",
-				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-				filters = {
-						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-						@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
-							@Parameter(name = "language", value = "English")
-						})
-				}),
-		@AnalyzerDef(name = "de",
-				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-				filters = {
-						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-						@TokenFilterDef(factory = GermanStemFilterFactory.class)
+@AnalyzerDef(name = "en",
+		tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+		filters = {
+				@TokenFilterDef(factory = LowerCaseFilterFactory.class),
+				@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+					@Parameter(name = "language", value = "English")
 				})
-})
+		})
+@AnalyzerDef(name = "de",
+		tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+		filters = {
+				@TokenFilterDef(factory = LowerCaseFilterFactory.class),
+				@TokenFilterDef(factory = GermanStemFilterFactory.class)
+		})
 public class Article {
 
 	private Integer id;
