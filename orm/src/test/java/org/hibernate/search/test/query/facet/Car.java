@@ -69,10 +69,8 @@ public class Car {
 	private String make;
 
 	@Field(name = "cubicCapacity", analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class))
-	@Facets({
-			@Facet(name = "cubicCapacity", forField = "cubicCapacity", encoding = FacetEncodingType.STRING),
-			@Facet(name = "cubicCapacity_Numeric", forField = "cubicCapacity", encoding = FacetEncodingType.LONG)
-	})
+	@Facet(name = "cubicCapacity", forField = "cubicCapacity", encoding = FacetEncodingType.STRING)
+	@Facet(name = "cubicCapacity_Numeric", forField = "cubicCapacity", encoding = FacetEncodingType.LONG)
 	private Integer cubicCapacity;
 
 	public Car() {
