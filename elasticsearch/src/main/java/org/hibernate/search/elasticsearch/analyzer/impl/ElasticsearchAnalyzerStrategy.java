@@ -31,12 +31,12 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public ElasticsearchAnalyzerReference createDefaultAnalyzerReference() {
-		return new SimpleElasticsearchAnalyzerReference( new UndefinedElasticsearchAnalyzerImpl( "default" ) );
+		return new NamedElasticsearchAnalyzerReference( "default" );
 	}
 
 	@Override
 	public ElasticsearchAnalyzerReference createPassThroughAnalyzerReference() {
-		return new SimpleElasticsearchAnalyzerReference( new UndefinedElasticsearchAnalyzerImpl( "keyword" ) );
+		return new NamedElasticsearchAnalyzerReference( "keyword" );
 	}
 
 	@Override
