@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
-import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
-
 /**
  * An Elasticsearch analyzer for which no definition was found in the Hibernate Search mapping.
  * <p>
@@ -33,7 +31,7 @@ public class UndefinedElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer
 	}
 
 	@Override
-	public String registerDefinitions(ElasticsearchIndexSettingsBuilder settingsBuilder, String fieldName) {
+	public String registerDefinitions(ElasticsearchAnalysisDefinitionRegistry registry, String fieldName) {
 		// Nothing to do; we expect the analyzer to be already defined on the server.
 		return remoteName;
 	}

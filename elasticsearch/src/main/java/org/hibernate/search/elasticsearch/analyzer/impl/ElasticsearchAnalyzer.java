@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
-import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 
 /**
  * A description of an Elasticsearch analyzer.
@@ -17,10 +16,10 @@ import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettin
 public interface ElasticsearchAnalyzer extends RemoteAnalyzer {
 
 	/**
-	 * @param settingsBuilder The builder to which analysis definitions should be registered.
+	 * @param registry The registry analysis definitions should be registered to.
 	 * @param fieldName The name of the field whose analyzer definitions should be registered.
 	 * @return The name of the registered analyzer.
 	 */
-	String registerDefinitions(ElasticsearchIndexSettingsBuilder settingsBuilder, String fieldName);
+	String registerDefinitions(ElasticsearchAnalysisDefinitionRegistry registry, String fieldName);
 
 }

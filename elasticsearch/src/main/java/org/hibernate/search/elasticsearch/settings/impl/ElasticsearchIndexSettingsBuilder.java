@@ -6,70 +6,35 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.CharFilterDef;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
+import org.hibernate.search.elasticsearch.analyzer.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
-import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Yoann Rodiere
  */
 public class ElasticsearchIndexSettingsBuilder {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private final SimpleElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry = new SimpleElasticsearchAnalysisDefinitionRegistry();
 
-	private final ElasticsearchAnalyzerDefinitionTranslator analyzerDefinitionTranslator;
-
-	private final Map<String, AnalyzerDefinition> analyzers = new TreeMap<>();
-
-	private final Map<String, TokenizerDefinition> tokenizers = new TreeMap<>();
-
-	private final Map<String, TokenFilterDefinition> tokenFilters = new TreeMap<>();
-
-	private final Map<String, CharFilterDefinition> charFilters = new TreeMap<>();
-
-	private EntityIndexBinding binding;
-
-	public ElasticsearchIndexSettingsBuilder(ElasticsearchAnalyzerDefinitionTranslator analyzerDefinitionTranslator) {
-		super();
-		this.analyzerDefinitionTranslator = analyzerDefinitionTranslator;
-	}
-
-	public Class<?> getBeanClass() {
-		return binding.getDocumentBuilder().getBeanClass();
-	}
-
-	public void setBinding(EntityIndexBinding binding) {
-		this.binding = binding;
+	public String register(ElasticsearchAnalyzer analyzer, String fieldName) {
+		return analyzer.registerDefinitions( analysisDefinitionRegistry, fieldName );
 	}
 
 	public IndexSettings build() {
 		IndexSettings settings = new IndexSettings();
 
-		if ( !analyzers.isEmpty() ) {
-			getAnalysis( settings ).setAnalyzers( analyzers );
+		if ( !analysisDefinitionRegistry.getAnalyzerDefinitions().isEmpty() ) {
+			getAnalysis( settings ).setAnalyzers( analysisDefinitionRegistry.getAnalyzerDefinitions() );
 		}
-		if ( !tokenizers.isEmpty() ) {
-			getAnalysis( settings ).setTokenizers( tokenizers );
+		if ( !analysisDefinitionRegistry.getTokenizerDefinitions().isEmpty() ) {
+			getAnalysis( settings ).setTokenizers( analysisDefinitionRegistry.getTokenizerDefinitions() );
 		}
-		if ( !tokenFilters.isEmpty() ) {
-			getAnalysis( settings ).setTokenFilters( tokenFilters );
+		if ( !analysisDefinitionRegistry.getTokenFilterDefinitions().isEmpty() ) {
+			getAnalysis( settings ).setTokenFilters( analysisDefinitionRegistry.getTokenFilterDefinitions() );
 		}
-		if ( !charFilters.isEmpty() ) {
-			getAnalysis( settings ).setCharFilters( charFilters );
+		if ( !analysisDefinitionRegistry.getCharFilterDefinitions().isEmpty() ) {
+			getAnalysis( settings ).setCharFilters( analysisDefinitionRegistry.getCharFilterDefinitions() );
 		}
 
 		return settings;
@@ -85,107 +50,6 @@ public class ElasticsearchIndexSettingsBuilder {
 			settings.setAnalysis( analysis );
 		}
 		return analysis;
-	}
-
-	public String registerAnalyzer(AnalyzerDef hibernateSearchDefinition) {
-		AnalyzerDefinition analyzerDefinition = new AnalyzerDefinition();
-
-		String localName = hibernateSearchDefinition.name();
-		String remoteName = localName; // We use the same definition name in Elasticsearch
-		if ( analyzers.containsKey( remoteName ) ) {
-			/*
-			 * We already check for naming conflicts in the engine,
-			 * so we are sure that the pre-existing analyzer definition
-			 * is the same.
-			 */
-			return remoteName;
-		}
-
-		TokenizerDef hibernateSearchTokenizerDef = hibernateSearchDefinition.tokenizer();
-		String tokenizerName = addTokenizerDef( localName, hibernateSearchTokenizerDef );
-		analyzerDefinition.setTokenizer( tokenizerName );
-
-		for ( CharFilterDef hibernateSearchCharFilterDef : hibernateSearchDefinition.charFilters() ) {
-			String charFilterName = addCharFilterDef( localName, hibernateSearchCharFilterDef );
-			analyzerDefinition.addCharFilter( charFilterName );
-		}
-
-		for ( TokenFilterDef hibernateSearchTokenFilterDef : hibernateSearchDefinition.filters() ) {
-			String tokenFilterName = addTokenFilterDef( localName, hibernateSearchTokenFilterDef );
-			analyzerDefinition.addTokenFilter( tokenFilterName );
-		}
-
-		analyzers.put( remoteName, analyzerDefinition );
-
-		return remoteName;
-	}
-
-	private String addTokenizerDef(String analyzerDefinitionName, TokenizerDef hibernateSearchDef) {
-		String remoteName = hibernateSearchDef.name();
-
-		TokenizerDefinition elasticsearchDefinition = analyzerDefinitionTranslator.translate( hibernateSearchDef );
-		if ( remoteName.isEmpty() && !hasParameters( elasticsearchDefinition ) ) {
-			// No parameters, and no specific name was provided => Use the builtin, default definition
-			remoteName = elasticsearchDefinition.getType();
-		}
-		else {
-			if ( remoteName.isEmpty() ) {
-				remoteName = analyzerDefinitionName + "_" + hibernateSearchDef.factory().getSimpleName();
-			}
-			if ( tokenizers.containsKey( remoteName ) ) {
-				throw LOG.tokenizerNamingConflict( remoteName );
-			}
-			tokenizers.put( remoteName, elasticsearchDefinition );
-		}
-
-		return remoteName;
-	}
-
-	private String addCharFilterDef(String analyzerDefinitionName, CharFilterDef hibernateSearchDef) {
-		String remoteName = hibernateSearchDef.name();
-
-		CharFilterDefinition elasticsearchDefinition = analyzerDefinitionTranslator.translate( hibernateSearchDef );
-		if ( remoteName.isEmpty() && !hasParameters( elasticsearchDefinition ) ) {
-			// No parameters, and no specific name was provided => Use the builtin, default definition
-			remoteName = elasticsearchDefinition.getType();
-		}
-		else {
-			if ( remoteName.isEmpty() ) {
-				remoteName = analyzerDefinitionName + "_" + hibernateSearchDef.factory().getSimpleName();
-			}
-			if ( charFilters.containsKey( remoteName ) ) {
-				throw LOG.charFilterNamingConflict( remoteName );
-			}
-			charFilters.put( remoteName, elasticsearchDefinition );
-		}
-
-		return remoteName;
-	}
-
-	private String addTokenFilterDef(String analyzerDefinitionName, TokenFilterDef hibernateSearchDef) {
-		String remoteName = hibernateSearchDef.name();
-
-		TokenFilterDefinition elasticsearchDefinition = analyzerDefinitionTranslator.translate( hibernateSearchDef );
-		if ( remoteName.isEmpty() && !hasParameters( elasticsearchDefinition ) ) {
-			// No parameters, and no specific name was provided => Use the builtin, default definition
-			remoteName = elasticsearchDefinition.getType();
-		}
-		else {
-			if ( remoteName.isEmpty() ) {
-				remoteName = analyzerDefinitionName + "_" + hibernateSearchDef.factory().getSimpleName();
-			}
-			if ( tokenFilters.containsKey( remoteName ) ) {
-				throw LOG.tokenFilterNamingConflict( remoteName );
-			}
-			tokenFilters.put( remoteName, elasticsearchDefinition );
-		}
-
-		return remoteName;
-	}
-
-	private boolean hasParameters(AnalysisDefinition definition) {
-		Map<?, ?> parameters = definition.getParameters();
-		return parameters != null && !parameters.isEmpty();
 	}
 
 }

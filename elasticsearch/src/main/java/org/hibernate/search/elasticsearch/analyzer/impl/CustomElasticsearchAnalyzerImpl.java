@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
+import java.util.Map;
+import java.util.Objects;
+
+import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 
 /**
  * A description of an Elasticsearch analyzer built through an analyzer definition.
@@ -20,20 +25,44 @@ import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettin
  */
 public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 
-	private final AnalyzerDef definition;
+	private final String analyzerName;
+	private final AnalyzerDefinition analyzerDefinition;
+	private final TokenizerDefinition tokenizerDefinition;
+	private final Map<String, CharFilterDefinition> charFilters;
+	private final Map<String, TokenFilterDefinition> tokenFilters;
 
-	public CustomElasticsearchAnalyzerImpl(AnalyzerDef definition) {
-		this.definition = definition;
+	public CustomElasticsearchAnalyzerImpl(String analyzerName,
+			AnalyzerDefinition analyzerDefinition,
+			String tokenizerName,
+			TokenizerDefinition tokenizerDefinition,
+			Map<String, CharFilterDefinition> charFilters,
+			Map<String, TokenFilterDefinition> tokenFilters) {
+		super();
+		this.analyzerName = analyzerName;
+		this.analyzerDefinition = analyzerDefinition;
+		this.tokenizerDefinition = tokenizerDefinition;
+		this.charFilters = charFilters;
+		this.tokenFilters = tokenFilters;
 	}
 
 	@Override
 	public String getName(String fieldName) {
-		return definition.name();
+		return analyzerName;
 	}
 
 	@Override
-	public String registerDefinitions(ElasticsearchIndexSettingsBuilder settingsBuilder, String fieldName) {
-		return settingsBuilder.registerAnalyzer( definition );
+	public String registerDefinitions(ElasticsearchAnalysisDefinitionRegistry registry, String fieldName) {
+		registry.register( analyzerName, analyzerDefinition );
+		if ( tokenizerDefinition != null ) {
+			registry.register( analyzerDefinition.getTokenizer(), tokenizerDefinition );
+		}
+		for ( Map.Entry<String, CharFilterDefinition> entry : charFilters.entrySet() ) {
+			registry.register( entry.getKey(), entry.getValue() );
+		}
+		for ( Map.Entry<String, TokenFilterDefinition> entry : tokenFilters.entrySet() ) {
+			registry.register( entry.getKey(), entry.getValue() );
+		}
+		return analyzerName;
 	}
 
 	@Override
@@ -43,14 +72,25 @@ public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 
 	@Override
 	public int hashCode() {
-		return definition.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Objects.hashCode( analyzerName );
+		result = prime * result + Objects.hashCode( analyzerDefinition );
+		result = prime * result + Objects.hashCode( tokenizerDefinition );
+		result = prime * result + Objects.hashCode( charFilters );
+		result = prime * result + Objects.hashCode( tokenFilters );
+		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if ( obj instanceof CustomElasticsearchAnalyzerImpl ) {
 			CustomElasticsearchAnalyzerImpl other = (CustomElasticsearchAnalyzerImpl) obj;
-			return other.definition.equals( definition );
+			return Objects.equals( analyzerName, other.analyzerName )
+					&& Objects.equals( analyzerDefinition, other.analyzerDefinition )
+					&& Objects.equals( tokenizerDefinition, other.tokenizerDefinition )
+					&& Objects.equals( charFilters, other.charFilters )
+					&& Objects.equals( tokenFilters, other.tokenFilters );
 		}
 		return false;
 	}
@@ -60,7 +100,9 @@ public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() );
 		sb.append( "<" );
-		sb.append( definition );
+		sb.append( analyzerName );
+		sb.append( ", " );
+		sb.append( analyzerDefinition );
 		sb.append( ">" );
 		return sb.toString();
 	}

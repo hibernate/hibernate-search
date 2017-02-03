@@ -307,18 +307,21 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException indexedEmbeddedPrefixBypass(Class<?> entityType, String fieldPath, String expectedParent);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 55,
-			value = "The same tokenizer name '%1$s' is used multiple times. The tokenizer names must be unique."
-					+ " If this name was automatically generated, you may override it by using @TokenizerDef.name." )
+			value = "The same tokenizer name '%1$s' is assigned to multiple definitions. The tokenizer names must be unique."
+					+ " If you used the @TokenizerDef annotation and this name was automatically generated,"
+					+ " you may override this name by using @TokenizerDef.name." )
 	SearchException tokenizerNamingConflict(String remoteName);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 56,
-			value = "The same char filter name '%1$s' is used multiple times. The char filter names must be unique."
-					+ " If this name was automatically generated, you may override it by using @CharFilterDef.name." )
+			value = "The same char filter name '%1$s' is assigned to multiple definitions. The char filter names must be unique."
+					+ " If you used the @CharFilterDef annotation and this name was automatically generated,"
+					+ " you may override this name by using @CharFilterDef.name." )
 	SearchException charFilterNamingConflict(String remoteName);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 57,
-			value = "The same token filter name '%1$s' is used multiple times. The token filter names must be unique."
-					+ " If this name was automatically generated, you may override it by using @TokenFilterDef.name." )
+			value = "The same token filter name '%1$s' is assigned to multiple definitions. The token filter names must be unique."
+					+ " If you used the @TokenFilterDef annotation and this name was automatically generated,"
+					+ " you may override this name by using @TokenFilterDef.name." )
 	SearchException tokenFilterNamingConflict(String remoteName);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 58,
@@ -405,5 +408,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ " The password will be sent in clear text over the network."
 			)
 	void usingPasswordOverHttp(String serverUris);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 74,
+			value = "The same analyzer name '%1$s' is assigned to multiple definitions. The analyzer names must be unique." )
+	SearchException analyzerNamingConflict(String remoteName);
 
 }

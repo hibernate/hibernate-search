@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.document.Field;
@@ -30,7 +29,6 @@ import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
-import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.BoostStrategy;
@@ -43,15 +41,11 @@ import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spatial.impl.SpatialHelper;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
@@ -61,26 +55,9 @@ import com.google.gson.JsonPrimitive;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchemaTranslator, Startable, Stoppable {
+public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchemaTranslator {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
-
-	private ServiceManager serviceManager;
-
-	private ElasticsearchAnalyzerDefinitionTranslator analyzerDefinitionTranslator;
-
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		serviceManager = context.getServiceManager();
-		analyzerDefinitionTranslator = serviceManager.requestService( ElasticsearchAnalyzerDefinitionTranslator.class );
-	}
-
-	@Override
-	public void stop() {
-		analyzerDefinitionTranslator = null;
-		serviceManager.releaseService( ElasticsearchAnalyzerDefinitionTranslator.class );
-		serviceManager = null;
-	}
 
 	@Override
 	public IndexMetadata translate(String indexName, Collection<EntityIndexBinding> descriptors, ExecutionOptions executionOptions) {
@@ -88,11 +65,10 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 
 		indexMetadata.setName( indexName );
 
-		ElasticsearchIndexSettingsBuilder settingsBuilder = new ElasticsearchIndexSettingsBuilder( analyzerDefinitionTranslator );
+		ElasticsearchIndexSettingsBuilder settingsBuilder = new ElasticsearchIndexSettingsBuilder();
 		for ( EntityIndexBinding descriptor : descriptors ) {
 			String typeName = descriptor.getDocumentBuilder().getBeanClass().getName();
 
-			settingsBuilder.setBinding( descriptor );
 			TypeMapping mapping = translate( descriptor, settingsBuilder, executionOptions );
 
 			indexMetadata.putMapping( typeName, mapping );
@@ -305,7 +281,7 @@ public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchema
 				else {
 					ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
 					ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
-					String analyzerName = analyzer.registerDefinitions( settingsBuilder, propertyPath );
+					String analyzerName = settingsBuilder.register( analyzer, propertyPath );
 					propertyMapping.setAnalyzer( analyzerName );
 				}
 			}
