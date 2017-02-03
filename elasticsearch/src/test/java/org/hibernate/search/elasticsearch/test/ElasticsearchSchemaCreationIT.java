@@ -27,7 +27,6 @@ import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
@@ -406,13 +405,11 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 		@Id
 		Long id;
 
-		@Fields({
-				@Field(name = "myField1", analyzer = @Analyzer(definition = "analyzerWithSimpleComponents")),
-				@Field(name = "myField2", analyzer = @Analyzer(definition = "analyzerWithNamedSimpleComponents")),
-				@Field(name = "myField3", analyzer = @Analyzer(definition = "analyzerWithComplexComponents")),
-				@Field(name = "myField4", analyzer = @Analyzer(definition = "analyzerWithNamedComplexComponents")),
-				@Field(name = "myField5", analyzer = @Analyzer(definition = "analyzerWithElasticsearchFactories"))
-		})
+		@Field(name = "myField1", analyzer = @Analyzer(definition = "analyzerWithSimpleComponents"))
+		@Field(name = "myField2", analyzer = @Analyzer(definition = "analyzerWithNamedSimpleComponents"))
+		@Field(name = "myField3", analyzer = @Analyzer(definition = "analyzerWithComplexComponents"))
+		@Field(name = "myField4", analyzer = @Analyzer(definition = "analyzerWithNamedComplexComponents"))
+		@Field(name = "myField5", analyzer = @Analyzer(definition = "analyzerWithElasticsearchFactories"))
 		String myField;
 	}
 

@@ -24,7 +24,6 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.test.SearchTestBase;
@@ -166,9 +165,8 @@ public class ElasticsearchAnalyzerIT extends SearchTestBase {
 		@Analyzer(definition = "server-defined-custom-analyzer")
 		private String customTweet;
 
-		@Fields({
-				@Field(name = "tweetNotAnalyzed", analyze = Analyze.NO, store = Store.YES),
-				@Field(name = "tweetWithCustom", analyzer = @Analyzer(definition = "server-defined-custom-analyzer") ) })
+		@Field(name = "tweetNotAnalyzed", analyze = Analyze.NO, store = Store.YES)
+		@Field(name = "tweetWithCustom", analyzer = @Analyzer(definition = "server-defined-custom-analyzer") )
 		private String multipleTweets;
 
 		private String defaultAnalyzer;

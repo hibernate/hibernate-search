@@ -34,7 +34,6 @@ import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
@@ -187,23 +186,21 @@ public class Team {
 	@GeneratedValue
 	private Integer id;
 
-	@Fields({
-		@Field,
-		@Field(name = "name_customanalyzer", analyzer = @Analyzer(definition = "customanalyzer")),
-		@Field(name = "name_pattern_analyzer", analyzer = @Analyzer(definition = "pattern_analyzer")),
-		@Field(name = "name_standard_analyzer", analyzer = @Analyzer(definition = "standard_analyzer")),
-		@Field(name = "name_html_standard_analyzer", analyzer = @Analyzer(definition = "html_standard_analyzer")),
-		@Field(name = "name_html_whitespace_analyzer", analyzer = @Analyzer(definition = "html_whitespace_analyzer")),
-		@Field(name = "name_trim_analyzer", analyzer = @Analyzer(definition = "trim_analyzer")),
-		@Field(name = "name_length_analyzer", analyzer = @Analyzer(definition = "length_analyzer")),
-		@Field(name = "name_porter_analyzer", analyzer = @Analyzer(definition = "porter_analyzer")),
-		@Field(name = "name_word_analyzer", analyzer = @Analyzer(definition = "word_analyzer")),
-		@Field(name = "name_synonym_analyzer", analyzer = @Analyzer(definition = "synonym_analyzer")),
-		@Field(name = "name_shingle_analyzer", analyzer = @Analyzer(definition = "shingle_analyzer")),
-		@Field(name = "name_html_char_analyzer", analyzer = @Analyzer(definition = "html_char_analyzer")),
-		@Field(name = "name_mapping_char_analyzer", analyzer = @Analyzer(definition = "mapping_char_analyzer")),
-		@Field(name = "name_stemmer_override_analyzer", analyzer = @Analyzer(definition = "stemmer_override_analyzer"))
-	})
+	@Field
+	@Field(name = "name_customanalyzer", analyzer = @Analyzer(definition = "customanalyzer"))
+	@Field(name = "name_pattern_analyzer", analyzer = @Analyzer(definition = "pattern_analyzer"))
+	@Field(name = "name_standard_analyzer", analyzer = @Analyzer(definition = "standard_analyzer"))
+	@Field(name = "name_html_standard_analyzer", analyzer = @Analyzer(definition = "html_standard_analyzer"))
+	@Field(name = "name_html_whitespace_analyzer", analyzer = @Analyzer(definition = "html_whitespace_analyzer"))
+	@Field(name = "name_trim_analyzer", analyzer = @Analyzer(definition = "trim_analyzer"))
+	@Field(name = "name_length_analyzer", analyzer = @Analyzer(definition = "length_analyzer"))
+	@Field(name = "name_porter_analyzer", analyzer = @Analyzer(definition = "porter_analyzer"))
+	@Field(name = "name_word_analyzer", analyzer = @Analyzer(definition = "word_analyzer"))
+	@Field(name = "name_synonym_analyzer", analyzer = @Analyzer(definition = "synonym_analyzer"))
+	@Field(name = "name_shingle_analyzer", analyzer = @Analyzer(definition = "shingle_analyzer"))
+	@Field(name = "name_html_char_analyzer", analyzer = @Analyzer(definition = "html_char_analyzer"))
+	@Field(name = "name_mapping_char_analyzer", analyzer = @Analyzer(definition = "mapping_char_analyzer"))
+	@Field(name = "name_stemmer_override_analyzer", analyzer = @Analyzer(definition = "stemmer_override_analyzer"))
 	private String name;
 
 	@Field
