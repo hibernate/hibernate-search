@@ -297,7 +297,8 @@ public class Book {
 
 If there is a single `@Field` declared for a given property, `@SortableField` implicitly applies to this field.
 In case several fields exist for a single property, the `@Field` to be marked as sortable can be specified
-via `@SortableField#forField()`. Several sortable fields can be defined with help of the `@SortableFields` annotation.
+via `@SortableField#forField()`.
+Several sortable fields can be defined as the `@SortableField` annotation is repeatable.
 
 The field to be marked as sortable must not be analyzed.
 
@@ -440,20 +441,21 @@ document id, it is recommended to declare another field specifically for sorting
 Sometimes one has to map a property multiple times per index, with slightly different indexing
 strategies. For example, sorting a query by field requires the field to be un-analyzed. If one wants
 to search by words in this property and still sort it, one need to index it twice - once analyzed
-and once un-analyzed. `@Fields` allows to achieve this goal.
+and once un-analyzed.
+The `@Field` is repeatable, wich allows to achieve this goal.
+Alternatively you can use the legacy, explicit plural form `@Fields`.
 
 [[example-fields-annotation]]
-.Using `@Fields` to map a property multiple times
+.Using `@Field` repeatedly to map a property multiple times
 ====
 [source, JAVA]
 ----
 @Entity
 @Indexed(index = "Book")
 public class Book {
-    @Fields( {
-            @Field,
-            @Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
-    } )
+
+    @Field
+    @Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
     @SortableField(forField = "summary_forSort")
     public String getSummary() {
         return summary;
@@ -465,8 +467,8 @@ public class Book {
 ====
 
 In <<example-fields-annotation>> the field `summary` is indexed twice, once as `summary` in a
-tokenized way, and once as `summary_forSort` in an un-tokenized way. `@Field` supports 2 attributes
-useful when `@Fields` is used:
+tokenized way, and once as `summary_forSort` in an un-tokenized way.
+`@Field` supports two attributes which are particularly useful when the annotation is repeated:
 
 * `analyzer`: defines a `@Analyzer` annotation per field rather than per property
 * `bridge`: defines a `@FieldBridge` annotation per field rather than per property
@@ -1288,21 +1290,19 @@ annotation. <<example-analyzer-discriminator>> demonstrates the usage of this an
 ----
 @Entity
 @Indexed
-@AnalyzerDefs({
-  @AnalyzerDef(name = "en",
-    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-    filters = {
-      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-      @TokenFilterDef(factory = EnglishPorterFilterFactory.class
-      )
-    }),
-  @AnalyzerDef(name = "de",
-    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-    filters = {
-      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-      @TokenFilterDef(factory = GermanStemFilterFactory.class)
-    })
-})
+@AnalyzerDef(name = "en",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = EnglishPorterFilterFactory.class
+    )
+  })
+@AnalyzerDef(name = "de",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = GermanStemFilterFactory.class)
+  })
 public class BlogEntry {
 
     @Id
@@ -2403,8 +2403,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 ----
 ====
 
-The analyzer mapping defined above is equivalent to the annotation model using `@AnalyzerDef` in
-conjunction with `@AnalyzerDefs`:
+The analyzer mapping defined above is equivalent to the annotation model using `@AnalyzerDef`:
 
 .Analyzer definition using annotation
 ====
@@ -2412,31 +2411,27 @@ conjunction with `@AnalyzerDefs`:
 ----
 @Indexed
 @Entity
-@AnalyzerDefs({
-  @AnalyzerDef(name = "ngram",
-    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-    filters = {
-      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-      @TokenFilterDef(factory = NGramFilterFactory.class,
-        params = {
-          @Parameter(name = "minGramSize",value = "3"),
-          @Parameter(name = "maxGramSize",value = "3")
-       })
-   }),
-  @AnalyzerDef(name = "en",
-    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-    filters = {
-      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
-   }),
-
-  @AnalyzerDef(name = "de",
-    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-    filters = {
-      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-      @TokenFilterDef(factory = GermanStemFilterFactory.class)
-  })
-
+@AnalyzerDef(name = "ngram",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = NGramFilterFactory.class,
+      params = {
+        @Parameter(name = "minGramSize",value = "3"),
+        @Parameter(name = "maxGramSize",value = "3")
+     })
+ })
+@AnalyzerDef(name = "en",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+ })
+@AnalyzerDef(name = "de",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = GermanStemFilterFactory.class)
 })
 public class Address {
    // ...
@@ -2448,7 +2443,7 @@ public class Address {
 ==== Defining full text filter definitions
 
 The programmatic API provides easy mechanism for defining full text filter definitions which is
-available via `@FullTextFilterDef` and `@FullTextFilterDefs` (see <<query-filter>>). The next example
+available via `@FullTextFilterDef` (see <<query-filter>>). The next example
 depicts the creation of full text filter definition using the `fullTextFilterDef` method.
 
 
@@ -2491,17 +2486,13 @@ like below:
 ----
 @Entity
 @Indexed
-@AnalyzerDefs({
-  @AnalyzerDef(name = "en",
-    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-    filters = {
-      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
-   })
-})
-@FullTextFilterDefs({
- @FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_ONLY)
-})
+@AnalyzerDef(name = "en",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+ })
+@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_ONLY)
 public class Address {
 
  @Id
@@ -2509,10 +2500,8 @@ public class Address {
  @DocumentId(name="id")
  public Long getAddressId() {...};
 
- @Fields({
-      @Field(store=Store.YES, analyzer=@Analyzer(definition="en")),
-      @Field(name="address_data", analyzer=@Analyzer(definition="en"))
- })
+ @Field(store=Store.YES, analyzer=@Analyzer(definition="en"))
+ @Field(name="address_data", analyzer=@Analyzer(definition="en"))
  public String getAddress1() {...};
 
  // ...
@@ -2563,14 +2552,12 @@ seen below:
 ----
 @Entity
 @Indexed
-@AnalyzerDefs({
-  @AnalyzerDef(name = "en",
-    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-    filters = {
-      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
-   })
-})
+@AnalyzerDef(name = "en",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+ })
 public class Address {
 
  @Id
@@ -2578,10 +2565,8 @@ public class Address {
  @DocumentId(name="id")
  private Long getAddressId() {...};
 
- @Fields({
-      @Field(store=Store.YES, analyzer=@Analyzer(definition="en")),
-      @Field(name="address_data", analyzer=@Analyzer(definition="en"))
- })
+ @Field(store=Store.YES, analyzer=@Analyzer(definition="en"))
+ @Field(name="address_data", analyzer=@Analyzer(definition="en"))
  public String getAddress1() {...}
 
  // ...
@@ -2852,12 +2837,10 @@ public class Address {
  @DocumentId(name="id")
  private Long addressId;
 
- @Fields({
-      @Field,
-      @Field(name="street1_abridged",
-             bridge = @FieldBridge( impl = ConcatStringBridge.class,
-             params = @Parameter( name="size", value="4" ))
- })
+ @Field
+ @Field(name="street1_abridged",
+        bridge = @FieldBridge( impl = ConcatStringBridge.class,
+        params = @Parameter( name="size", value="4" ))
  private String address1;
 
  // ...
@@ -2905,19 +2888,17 @@ The above is similar to using `@ClassBridge` as seen in the next example:
 ----
 @Entity
 @Indexed
-@ClassBridges ( {
-  @ClassBridge(name="branchnetwork",
-     store= Store.YES,
-     impl = CatDeptsFieldsClassBridge.class,
-     params = @Parameter( name="sepChar", value=" " ) ),
-  @ClassBridge(name="equiptype",
-     store= Store.YES,
-     impl = EquipmentType.class,
-     params = {@Parameter( name="C", value="Cisco" ),
-        @Parameter( name="D", value="D-Link" ),
-        @Parameter( name="K", value="Kingston" ),
-        @Parameter( name="3", value="3Com" )
-   })
+@ClassBridge(name="branchnetwork",
+  store= Store.YES,
+  impl = CatDeptsFieldsClassBridge.class,
+  params = @Parameter( name="sepChar", value=" " ) ),
+@ClassBridge(name="equiptype",
+  store= Store.YES,
+  impl = EquipmentType.class,
+  params = {@Parameter( name="C", value="Cisco" ),
+     @Parameter( name="D", value="D-Link" ),
+     @Parameter( name="K", value="Kingston" ),
+     @Parameter( name="3", value="3Com" )
 })
 public class Departments {
    // ...

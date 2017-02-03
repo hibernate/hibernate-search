@@ -401,9 +401,10 @@ hibQuery.setSort(distanceSort);
 === Multiple Coordinate pairs
 
 You can associate multiple pairs of coordinates to the same entity, as long as each pair is
-uniquely identified by using a different name. This is achieved by stacking multiple `@Spatial`
-annotations within a single `@Spatials` annotation and specifying the `name` attribute on the individual `@Spatial`
-annotations.
+uniquely identified by using a different name.
+This is achieved by stacking multiple `@Spatial` annotations and specifying the `name` attribute
+on the individual `@Spatial` annotation.
+At most one of them will be allowed to use the default name.
 
 .Multiple sets of coordinates
 ====
@@ -413,10 +414,8 @@ import org.hibernate.search.annotations.*;
 
 @Entity
 @Indexed
-@Spatials({
-  @Spatial,
-  @Spatial(name="work",  spatialMode = SpatialMode.HASH)
-})
+@Spatial
+@Spatial(name="work",  spatialMode = SpatialMode.HASH)
 public class UserEx {
 
   @Id

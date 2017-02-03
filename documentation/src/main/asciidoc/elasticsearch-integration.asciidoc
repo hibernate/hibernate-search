@@ -291,15 +291,12 @@ public class Tweet {
     @Analyzer(definition = "whitespace") // Elasticsearch built-in analyzer
     private String whitespaceTweet;
 
-    @Fields({
-        @Field(name = "tweetNotAnalyzed", analyzer = Analyze.NO, store = Store.YES),
-
-        // Custom analyzer
-        @Field(
-            name = "tweetWithCustom",
-            analyzer = @Analyzer(definition = "custom-analyzer")
-        )
-    })
+    @Field(name = "tweetNotAnalyzed", analyzer = Analyze.NO, store = Store.YES)
+    // Custom analyzer:
+    @Field(
+        name = "tweetWithCustom",
+        analyzer = @Analyzer(definition = "custom-analyzer")
+    )
     private String multipleTweets;
 }
 --
@@ -378,36 +375,34 @@ to define the exact name to give to that definition in the Elasticsearch setting
 --
 @Entity
 @Indexed(index = "tweet")
-@AnalyzerDefs(
-	@AnalyzerDef(
-		name = "tweet_analyzer",
-		charFilters = {
-			@CharFilterDef(
-				name = "custom_html_strip",
-				factory = ElasticsearchCharFilterFactory.class,
-				params = {
-					@Parameter(name = "type", value = "'html_strip'"),
-					// One can use Json arrays
-					@Parameter(name = "escaped_tags", value = "['br', 'p']")
-				}
-			),
-			@CharFilterDef(
-				name = "p_br_as_space",
-				factory = ElasticsearchCharFilterFactory.class,
-				params = {
-					@Parameter(name = "type", value = "'pattern_replace'"),
-					@Parameter(name = "pattern", value = "'<p/?>|<br/?>'"),
-					@Parameter(name = "replacement", value = "' '"),
-					@Parameter(name = "tags", value = "'CASE_INSENSITIVE'")
-				}
-			)
-		},
-		tokenizer = @TokenizerDef(
-			factory = ElasticsearchTokenizerFactory.class,
+@AnalyzerDef(
+	name = "tweet_analyzer",
+	charFilters = {
+		@CharFilterDef(
+			name = "custom_html_strip",
+			factory = ElasticsearchCharFilterFactory.class,
 			params = {
-				@Parameter(name = "type", value = "'whitespace'"),
+				@Parameter(name = "type", value = "'html_strip'"),
+				// One can use Json arrays
+				@Parameter(name = "escaped_tags", value = "['br', 'p']")
+			}
+		),
+		@CharFilterDef(
+			name = "p_br_as_space",
+			factory = ElasticsearchCharFilterFactory.class,
+			params = {
+				@Parameter(name = "type", value = "'pattern_replace'"),
+				@Parameter(name = "pattern", value = "'<p/?>|<br/?>'"),
+				@Parameter(name = "replacement", value = "' '"),
+				@Parameter(name = "tags", value = "'CASE_INSENSITIVE'")
 			}
 		)
+	},
+	tokenizer = @TokenizerDef(
+		factory = ElasticsearchTokenizerFactory.class,
+		params = {
+			@Parameter(name = "type", value = "'whitespace'"),
+		}
 	)
 )
 public class Tweet {
@@ -456,29 +451,27 @@ moving from an embedded Lucene instance to an Elasticsearch cluster.
 --
 @Entity
 @Indexed(index = "tweet")
-@AnalyzerDefs(
-	@AnalyzerDef(
-		name = "tweet_analyzer",
-		charFilters = {
-			@CharFilterDef(
-				name = "custom_html_strip",
-				factory = HTMLStripCharFilterFactory.class,
-				params = {
-					@Parameter(name = "escapedTags", value = "br,p")
-				}
-			),
-			@CharFilterDef(
-				name = "p_br_as_space",
-				factory = PatternReplaceCharFilterFactory.class,
-				params = {
-					@Parameter(name = "pattern", value = "<p/?>|<br/?>"),
-					@Parameter(name = "replacement", value = " ")
-				}
-			)
-		},
-		tokenizer = @TokenizerDef(
-			factory = WhitespaceTokenizerFactory.class
+@AnalyzerDef(
+	name = "tweet_analyzer",
+	charFilters = {
+		@CharFilterDef(
+			name = "custom_html_strip",
+			factory = HTMLStripCharFilterFactory.class,
+			params = {
+				@Parameter(name = "escapedTags", value = "br,p")
+			}
+		),
+		@CharFilterDef(
+			name = "p_br_as_space",
+			factory = PatternReplaceCharFilterFactory.class,
+			params = {
+				@Parameter(name = "pattern", value = "<p/?>|<br/?>"),
+				@Parameter(name = "replacement", value = " ")
+			}
 		)
+	},
+	tokenizer = @TokenizerDef(
+		factory = WhitespaceTokenizerFactory.class
 	)
 )
 public class Tweet {
@@ -741,10 +734,8 @@ You can then declare the filter in your entity.
 --
 @Entity
 @Indexed
-@FullTextFilterDefs({
-        @FullTextFilterDef(name = "namedDriver",
-                impl = DriversMatchingNameElasticsearchFilter.class)
-})
+@FullTextFilterDef(name = "namedDriver",
+  impl = DriversMatchingNameElasticsearchFilter.class)
 public class Driver {
     @Id
     @DocumentId

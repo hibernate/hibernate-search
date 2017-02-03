@@ -1406,7 +1406,7 @@ In this example we enabled two filters on top of the query. You can enable (or d
 filters as you like.
 
 Declaring filters is done through the `@FullTextFilterDef` annotation.
-You can use  `@FullTextFilterDef` or `@FullTextFilterDefs` on any:
+You can use one or more `@FullTextFilterDef` on any:
 *`@Indexed` entity regardless of the query the filter is later applied to
 * Parent class of an `@Indexed` entity
 * package-info.java of a package containing an `@Indexed` entity
@@ -1422,10 +1422,8 @@ specify its actual filter implementation.
 ----
 @Entity
 @Indexed
-@FullTextFilterDefs( {
-    @FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class),
-    @FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class)
-})
+@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class),
+@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class)
 public class Driver { ... }
 ----
 
@@ -1736,9 +1734,9 @@ annotation. Also, the field itself cannot be analyzed.
 
 `@Facet` contains a `name` and `forField` parameter. The `name` is arbitrary and used to identify
 the facet. Per default it matches the field name it belongs to. `forField` is relevant in case the
-property is mapped to multiple fields using `@Fields` (see also <<fields-annotation>>). In this case
-`forField` can be used to identify the index field to which it applies. Mirroring `@Fields` there
-also exists a `@Facets` annotation in case multiple fields need to be targeted by faceting.
+property is mapped to multiple fields using `@Field` multiple times, as it is a repeatable annotation.
+In this case `forField` can be used to identify the index field to which it applies.
+Both `@Field` and `@Facet` are repeatable annotations.
 
 Last but not least, `@Facet` contains a
 `encoding` parameter. Usually, Hibernate Search automatically selects the encoding:
@@ -1818,12 +1816,10 @@ When you need conflicting options, we suggest to index the property twice and us
 
 [source, JAVA]
 ----
-@Fields({
-  @Field(name="price"),
-  @Field(name="price_facet",
-         analyze=Analyze.NO,
-         bridge=@FieldBridge(impl = IntegerBridge.class))
-})
+@Field(name="price")
+@Field(name="price_facet",
+       analyze=Analyze.NO,
+       bridge=@FieldBridge(impl = IntegerBridge.class))
 private int price;
 ----
 ====
