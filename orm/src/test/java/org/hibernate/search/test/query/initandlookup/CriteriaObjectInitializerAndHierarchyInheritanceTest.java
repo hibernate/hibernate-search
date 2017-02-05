@@ -46,6 +46,14 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+/**
+ * Memo to debug Byteman rules:
+ * -Dorg.jboss.byteman.transform.all=true -Dorg.jboss.byteman.verbose=true -Dorg.jboss.byteman.dump.generated.classes -Dorg.jboss.byteman.dump.generated.classes.directory=/home/sanne/bytemandump
+ *
+ * Dumping the compiled classes makes it easier to decompile them and figure out what's wrong,
+ * e.g. invoke javap -c -p -v BytemanHelper_HelperAdapter_Interpreted_1.class
+ * The directory to store the dumped classes must exist already.
+ */
 @RunWith(BMUnitRunner.class)
 @Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends SearchTestBase {
