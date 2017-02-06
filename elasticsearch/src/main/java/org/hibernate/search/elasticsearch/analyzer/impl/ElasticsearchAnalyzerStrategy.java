@@ -14,6 +14,11 @@ import java.util.TreeMap;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryBuilderImpl;
+import org.hibernate.search.elasticsearch.analyzer.definition.spi.ElasticsearchAnalysisDefinitionProvider;
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
@@ -21,6 +26,10 @@ import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinitio
 import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
 /**
@@ -28,10 +37,43 @@ import org.hibernate.search.engine.service.spi.ServiceReference;
  */
 public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
+	private static final Log LOG = LoggerFactory.make( Log.class );
+
 	private final ServiceManager serviceManager;
 
-	public ElasticsearchAnalyzerStrategy(ServiceManager serviceManager) {
+	private final SearchConfiguration cfg;
+
+	public ElasticsearchAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		this.serviceManager = serviceManager;
+		this.cfg = cfg;
+	}
+
+	private ElasticsearchAnalysisDefinitionRegistry createDefaultDefinitionRegistry() {
+		ElasticsearchAnalysisDefinitionRegistryBuilderImpl builder =
+				new ElasticsearchAnalysisDefinitionRegistryBuilderImpl();
+
+		String providerClassName = cfg.getProperty( ElasticsearchEnvironment.ANALYZER_DEFINITION_PROVIDER );
+		if ( providerClassName != null ) {
+			ElasticsearchAnalysisDefinitionProvider provider;
+			try {
+				Class<?> providerClazz = ClassLoaderHelper.classForName( providerClassName, serviceManager );
+				provider = (ElasticsearchAnalysisDefinitionProvider) ReflectionHelper.createInstance( providerClazz, true );
+			}
+			catch (RuntimeException e) {
+				throw LOG.invalidElasticsearchAnalyzerDefinitionProvider( providerClassName, e );
+			}
+			try {
+				provider.register( builder );
+			}
+			catch (SearchException e) { // Do not wrap our own exceptions (from the builder, for instance)
+				throw e;
+			}
+			catch (RuntimeException e) { // Do wrap any other exception
+				throw LOG.invalidLuceneAnalyzerDefinitionProvider( providerClassName, e );
+			}
+		}
+
+		return builder.build();
 	}
 
 	@Override
@@ -89,7 +131,26 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	private ElasticsearchAnalysisDefinitionRegistry createDefinitionRegistry(Collection<AnalyzerReference> references,
 			Map<String, AnalyzerDef> analyzerDefinitions, ElasticsearchAnalyzerDefinitionTranslator translator) {
-		ElasticsearchAnalysisDefinitionRegistry definitionRegistry = new SimpleElasticsearchAnalysisDefinitionRegistry();
+		/*
+		 * Recreate the default definitions for each call,
+		 * so that the definition providers can add new definitions between two SearchFactory increments.
+		 */
+		ElasticsearchAnalysisDefinitionRegistry defaultDefinitionRegistry = createDefaultDefinitionRegistry();
+
+		/*
+		 * Make default definitions accessible in the final definition registry.
+		 * This final registry has two scopes:
+		 *  - the "local" scope, which contains every definition gathered from pre-existing references (see below)
+		 *    and definitions from the mapping
+		 *  - the "default"/"global" scope, which contains definitions from the default registry (see above).
+		 *
+		 * When fetching definitions, the "local" scope takes precedence over the "default"/"global" scope.
+		 *
+		 * Note that thanks to this setup, changes to pre-existing default definitions are ignored
+		 * if the definitions were already used in pre-existing references.
+		 */
+		ElasticsearchAnalysisDefinitionRegistry definitionRegistry =
+				new ChainingElasticsearchAnalysisDefinitionRegistry( defaultDefinitionRegistry );
 
 		/*
 		 * First, populate the registry with definitions from already initialized references.

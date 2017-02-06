@@ -13,6 +13,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.client.impl.BulkRequestFailedException;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
@@ -412,5 +413,28 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 74,
 			value = "The same analyzer name '%1$s' is assigned to multiple definitions. The analyzer names must be unique." )
 	SearchException analyzerNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 75,
+			value = "Property '" + ElasticsearchEnvironment.ANALYZER_DEFINITION_PROVIDER + "' set to value '%1$s' is invalid."
+					+ " The value must be the fully-qualified name of a class with a public, no-arg constructor in your classpath."
+					+ " Also, the class must either implement ElasticsearchAnalyzerDefinitionProvider or expose a public,"
+					+ " @Factory-annotated method returning a ElasticsearchAnalyzerDefinitionProvider.")
+	SearchException invalidElasticsearchAnalyzerDefinitionProvider(String providerClassName, @Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 76,
+			value = "Invalid analyzer definition for name '%1$s'. Analyzer definitions must at least define the tokenizer." )
+	SearchException invalidElasticsearchAnalyzerDefinition(String name);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 77,
+			value = "Invalid tokenizer definition for name '%1$s'. Tokenizer definitions must at least define the tokenizer type." )
+	SearchException invalidElasticsearchTokenizerDefinition(String name);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 78,
+			value = "Invalid char filter definition for name '%1$s'. Char filter definitions must at least define the char filter type." )
+	SearchException invalidElasticsearchCharFilterDefinition(String name);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 79,
+			value = "Invalid token filter definition for name '%1$s'. Token filter definitions must at least define the token filter type." )
+	SearchException invalidElasticsearchTokenFilterDefinition(String name);
 
 }

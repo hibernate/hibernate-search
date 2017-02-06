@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.cfg;
 
+import org.hibernate.search.elasticsearch.analyzer.definition.spi.ElasticsearchAnalysisDefinitionProvider;
+
 /**
  * Configuration properties for Elasticsearch,
  *
@@ -257,6 +259,13 @@ public final class ElasticsearchEnvironment {
 	 * Defaults to {@code strict}.
 	 */
 	public static final String DYNAMIC_MAPPING = "elasticsearch.dynamic_mapping";
+
+	/**
+	 * Provider of default analyzer definitions for Elasticsearch.
+	 * <p>
+	 * The value must be the fully-qualified name of a class implementing {@link ElasticsearchAnalysisDefinitionProvider}.
+	 */
+	public static final String ANALYZER_DEFINITION_PROVIDER = "hibernate.search.elasticsearch.analyzer_definition_provider";
 
 	private ElasticsearchEnvironment() {
 	}
