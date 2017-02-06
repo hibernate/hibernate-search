@@ -11,6 +11,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -57,7 +59,7 @@ public final class ObjectLoaderHelper {
 			maybeProxy = session.load( entityInfo.getClazz(), entityInfo.getId() );
 		}
 		else {
-			Criteria criteria = session.createCriteria( entityInfo.getClazz() );
+			Criteria criteria = new CriteriaImpl( entityInfo.getClazz().getName(), (SharedSessionContractImplementor) session );
 			criteria.add( Restrictions.eq( entityInfo.getIdName(), entityInfo.getId() ) );
 			try {
 				maybeProxy = criteria.uniqueResult();

@@ -58,8 +58,8 @@ public class ObjectLoaderHelperTest extends SearchTestBase {
 	}
 
 	@Test
-	@BMRule(targetClass = "org.hibernate.internal.SessionImpl",
-			targetMethod = "createCriteria(java.lang.Class)",
+	@BMRule(targetClass = "org.hibernate.internal.CriteriaImpl",
+			targetMethod = "<init>(String, String, org.hibernate.engine.spi.SharedSessionContractImplementor)",
 			helper = "org.hibernate.search.testsupport.BytemanHelper",
 			action = "countInvocation()",
 			name = "testOnlyOneCriteriaQueryIsUsedToLoadMatchedEntities")

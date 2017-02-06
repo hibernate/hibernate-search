@@ -22,6 +22,8 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -128,7 +130,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 			Criteria criteria = objectInitializationContext.getCriteria();
 
 			if ( criteria == null ) {
-				criteria = objectInitializationContext.getSession().createCriteria( idSpace.getMostSpecificEntityType() );
+				criteria = createCriteria( idSpace, objectInitializationContext );
 			}
 
 			criteria.add( getIdListCriterion( idSpace.getEntityInfos(), objectInitializationContext ) );
@@ -146,14 +148,21 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 
 			for ( Entry<Class<?>, EntityInfoIdSpace> infosOfIdSpace : infosByIdSpace.entrySet() ) {
 				EntityInfoIdSpace idSpace = infosOfIdSpace.getValue();
-
-				Criteria criteria = objectInitializationContext.getSession().createCriteria( idSpace.getMostSpecificEntityType() );
+				Criteria criteria = createCriteria( idSpace, objectInitializationContext );
 				criteria.add( getIdListCriterion( idSpace.getEntityInfos(), objectInitializationContext ) );
 				criterias.add( criteria );
 			}
 
 			return criterias;
 		}
+	}
+
+	private Criteria createCriteria(EntityInfoIdSpace idSpace, ObjectInitializationContext objectInitializationContext) {
+		// Legacy Hibernate Criteria is constructed directly to avoid it logging a warning
+		// which is meant to suggest that end users need to move away from the legacy Criteria usage..
+		// We can't avoid the Criteria now w/o breacking backwards compatibility
+		// (Specifically, without removing "org.hibernate.search.FullTextQuery.setCriteriaQuery(Criteria)" )
+		return new CriteriaImpl( idSpace.getMostSpecificEntityType().getName(), (SharedSessionContractImplementor) objectInitializationContext.getSession() );
 	}
 
 	/**

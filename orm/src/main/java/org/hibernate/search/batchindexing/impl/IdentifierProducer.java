@@ -17,6 +17,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.exception.ErrorHandler;
@@ -130,8 +132,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	}
 
 	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
-		Number countAsNumber = (Number) session
-			.createCriteria( indexedType )
+		Number countAsNumber = (Number) createCriteria( session )
 			.setProjection( Projections.rowCount() )
 			.setCacheable( false )
 			.uniqueResult();
@@ -144,8 +145,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		}
 		monitor.addToTotalCount( totalCount );
 
-		Criteria criteria = session
-			.createCriteria( indexedType )
+		Criteria criteria = createCriteria( session )
 			.setProjection( Projections.id() )
 			.setCacheable( false )
 			.setFetchSize( idFetchSize );
@@ -178,6 +178,10 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			results.close();
 		}
 		enqueueList( destinationList );
+	}
+
+	private Criteria createCriteria(final StatelessSession session) {
+		return new CriteriaImpl( indexedType.getName(), (SharedSessionContractImplementor) session );
 	}
 
 	private void enqueueList(final List<Serializable> idsList) throws InterruptedException {
