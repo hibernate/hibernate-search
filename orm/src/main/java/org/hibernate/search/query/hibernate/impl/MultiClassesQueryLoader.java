@@ -131,7 +131,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 
 			objectInitializer.initializeObjects(
 					value, idToObjectMap, new ObjectInitializationContext(
-							key.criteria,
+							null,
 							key.rootEntity,
 							extendedIntegrator,
 							timeoutManager,
@@ -155,7 +155,6 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	private static class RootEntityMetadata {
 		public final Class<?> rootEntity;
 		public final Set<Class<?>> mappedSubclasses;
-		private final Criteria criteria;
 
 		RootEntityMetadata(Class<?> rootEntity, ExtendedSearchIntegrator extendedIntegrator) {
 			this.rootEntity = rootEntity;
@@ -164,7 +163,6 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 				throw new AssertionFailure( "Provider not found for class: " + rootEntity );
 			}
 			this.mappedSubclasses = provider.getDocumentBuilder().getMappedSubclasses();
-			this.criteria = null; //default
 		}
 	}
 }
