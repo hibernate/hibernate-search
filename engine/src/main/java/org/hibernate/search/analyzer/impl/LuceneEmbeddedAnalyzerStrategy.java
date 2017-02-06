@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -149,7 +148,6 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
-		Map<String, Analyzer> initializedAnalyzers = new HashMap<>();
 		/*
 		 * Recreate the default definitions for each call,
 		 * so that the definition providers can add new definitions between two SearchFactory increments.
@@ -163,7 +161,9 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		for ( AnalyzerReference reference : references ) {
 			if ( reference.is( NamedLuceneAnalyzerReference.class ) ) {
 				NamedLuceneAnalyzerReference namedReference = reference.unwrap( NamedLuceneAnalyzerReference.class );
-				initializeReference( initializedAnalyzers, namedReference, analyzerDefinitions );
+				if ( !namedReference.isInitialized() ) {
+					initializeReference( namedReference, analyzerDefinitions );
+				}
 			}
 			else if ( reference.is( ScopedLuceneAnalyzerReference.class ) ) {
 				ScopedLuceneAnalyzerReference scopedReference = reference.unwrap( ScopedLuceneAnalyzerReference.class );
@@ -174,25 +174,14 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		}
 	}
 
-	private void initializeReference(Map<String, Analyzer> initializedAnalyzers, NamedLuceneAnalyzerReference analyzerReference,
-			Map<String, AnalyzerDef> analyzerDefinitions) {
+	private void initializeReference(NamedLuceneAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
 		String name = analyzerReference.getAnalyzerName();
 
-		if ( analyzerReference.isInitialized() ) {
-			initializedAnalyzers.put( name, analyzerReference.getAnalyzer() );
-			return;
+		AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
+		if ( analyzerDefinition == null ) {
+			throw new SearchException( "Lucene analyzer found with an unknown definition: " + name );
 		}
-
-		Analyzer analyzer = initializedAnalyzers.get( name );
-
-		if ( analyzer == null ) {
-			AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
-			if ( analyzerDefinition == null ) {
-				throw new SearchException( "Lucene analyzer found with an unknown definition: " + name );
-			}
-			analyzer = buildAnalyzer( analyzerDefinition );
-			initializedAnalyzers.put( name, analyzer );
-		}
+		Analyzer analyzer = buildAnalyzer( analyzerDefinition );
 
 		analyzerReference.initialize( analyzer );
 	}

@@ -8,7 +8,6 @@ package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
@@ -43,11 +42,12 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
-		Map<String, ElasticsearchAnalyzer> initializedAnalyzers = new HashMap<>();
 		for ( AnalyzerReference reference : references ) {
 			if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
 				NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
-				initializeReference( initializedAnalyzers, namedReference, analyzerDefinitions );
+				if ( !namedReference.isInitialized() ) {
+					initializeReference( namedReference, analyzerDefinitions );
+				}
 			}
 			else if ( reference.is( ScopedElasticsearchAnalyzerReference.class ) ) {
 				ScopedElasticsearchAnalyzerReference scopedReference = reference.unwrap( ScopedElasticsearchAnalyzerReference.class );
@@ -58,26 +58,16 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		}
 	}
 
-	private void initializeReference(Map<String, ElasticsearchAnalyzer> initializedAnalyzers,
-			NamedElasticsearchAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
+	private void initializeReference(NamedElasticsearchAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
 		String name = analyzerReference.getAnalyzerName();
 
-		if ( analyzerReference.isInitialized() ) {
-			initializedAnalyzers.put( name, analyzerReference.getAnalyzer() );
-			return;
+		ElasticsearchAnalyzer analyzer;
+		AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
+		if ( analyzerDefinition == null ) {
+			analyzer = new UndefinedElasticsearchAnalyzerImpl( name );
 		}
-
-		ElasticsearchAnalyzer analyzer = initializedAnalyzers.get( name );
-
-		if ( analyzer == null ) {
-			AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
-			if ( analyzerDefinition == null ) {
-				analyzer = new UndefinedElasticsearchAnalyzerImpl( name );
-			}
-			else {
-				analyzer = new CustomElasticsearchAnalyzerImpl( analyzerDefinition );
-			}
-			initializedAnalyzers.put( name, analyzer );
+		else {
+			analyzer = new CustomElasticsearchAnalyzerImpl( analyzerDefinition );
 		}
 
 		analyzerReference.initialize( analyzer );
