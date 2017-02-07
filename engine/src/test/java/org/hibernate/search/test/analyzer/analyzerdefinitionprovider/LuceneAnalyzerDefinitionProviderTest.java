@@ -21,6 +21,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionRegistryBuilder;
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionProvider;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
@@ -125,6 +126,24 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		assertMatchesExactly( integrator, entity, "field", "foo" );
 	}
 
+	/**
+	 * Test that even when the analyzer isn't referenced from the mapping,
+	 * it is available in the registry.
+	 */
+	@Test
+	public void unreferencedAnalyzer() {
+		ExtendedSearchIntegrator integrator = init( CustomAnalyzerProvider.class, NoAnalyzerEntity.class );
+
+		assertThat( integrator.getAnalyzer( CUSTOM_ANALYZER_NAME ) )
+				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
+		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
+				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+	}
+
 	@Test
 	public void instantiation_factorymethod() {
 		ExtendedSearchIntegrator integrator = init( ProviderFactory.class, CustomAnalyzerEntity.class );
@@ -190,6 +209,20 @@ public class LuceneAnalyzerDefinitionProviderTest {
 
 	private interface Identifiable {
 		long getId();
+	}
+
+	@Indexed
+	static class NoAnalyzerEntity implements Identifiable {
+		@DocumentId
+		long id;
+
+		@Field(analyze = Analyze.NO)
+		String field;
+
+		@Override
+		public long getId() {
+			return id;
+		}
 	}
 
 	@Indexed

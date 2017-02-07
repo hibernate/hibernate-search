@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -142,12 +145,13 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
-	public LuceneAnalyzerReference createNamedAnalyzerReference(String name) {
+	public NamedLuceneAnalyzerReference createNamedAnalyzerReference(String name) {
 		return new NamedLuceneAnalyzerReference( name );
 	}
 
 	@Override
-	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references, Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
+	public Map<String, AnalyzerReference> initializeAnalyzerReferences(
+			Collection<AnalyzerReference> references, Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
 		/*
 		 * Recreate the default definitions for each call,
 		 * so that the definition providers can add new definitions between two SearchFactory increments.
@@ -156,14 +160,19 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		 * (because in that case the reference is already initialized,
 		 * so the new version of the definition will be ignored).
 		 */
-		Map<String, AnalyzerDef> analyzerDefinitions = createDefaultAnalyzerDefinitions();
+		Map<String, AnalyzerDef> defaultAnalyzerDefinitions = createDefaultAnalyzerDefinitions();
+		Map<String, AnalyzerDef> analyzerDefinitions = new HashMap<>( defaultAnalyzerDefinitions );
 		analyzerDefinitions.putAll( mappingAnalyzerDefinitions );
+
+		Set<String> existingNamedReferences = new HashSet<>();
+
 		for ( AnalyzerReference reference : references ) {
 			if ( reference.is( NamedLuceneAnalyzerReference.class ) ) {
 				NamedLuceneAnalyzerReference namedReference = reference.unwrap( NamedLuceneAnalyzerReference.class );
 				if ( !namedReference.isInitialized() ) {
 					initializeReference( namedReference, analyzerDefinitions );
 				}
+				existingNamedReferences.add( namedReference.getAnalyzerName() );
 			}
 			else if ( reference.is( ScopedLuceneAnalyzerReference.class ) ) {
 				ScopedLuceneAnalyzerReference scopedReference = reference.unwrap( ScopedLuceneAnalyzerReference.class );
@@ -172,6 +181,23 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 				}
 			}
 		}
+
+		/*
+		 * Create additional references for default definitions that
+		 * haven't any matching reference, so that they will be available when querying.
+		 * We don't do that for @AnalyzerDefs because they may not all be related to Lucene
+		 * (there may be definitions for another indexing service).
+		 */
+		Map<String, AnalyzerReference> additionalNamedReferences = new HashMap<>();
+		for ( String defaultAnalyzerName : defaultAnalyzerDefinitions.keySet() ) {
+			if ( !existingNamedReferences.contains( defaultAnalyzerName ) ) {
+				NamedLuceneAnalyzerReference reference = createNamedAnalyzerReference( defaultAnalyzerName );
+				initializeReference( reference, analyzerDefinitions );
+				additionalNamedReferences.put( defaultAnalyzerName, reference );
+			}
+		}
+
+		return additionalNamedReferences;
 	}
 
 	private void initializeReference(NamedLuceneAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {

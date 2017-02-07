@@ -125,7 +125,9 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 		references.addAll( referencesByLuceneClass.values() );
 		references.addAll( scopedReferences );
 
-		strategy.initializeAnalyzerReferences( references, mappingAnalyzerDefinitions );
+		Map<String, AnalyzerReference> additionalReferences =
+				strategy.initializeAnalyzerReferences( references, mappingAnalyzerDefinitions );
+		referencesByName.putAll( additionalReferences );
 	}
 
 	public ScopedAnalyzerReference.Builder buildScopedAnalyzerReference() {
