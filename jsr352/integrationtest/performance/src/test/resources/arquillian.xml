@@ -19,9 +19,16 @@
     <group qualifier="Grid" default="true">
         <container qualifier="container.active-1" mode="suite" default="true">
             <configuration>
-                <property name="jbossHome">${project.build.directory}/node1/wildfly-${org.wildfly}</property>
+                <property name="jbossHome">${project.build.directory}/node1/wildfly-${wildflyVersion}</property>
                 <!-- Needed for JMS tests -->
                 <property name="serverConfig">standalone-full-testqueues.xml</property>
+                <!-- To debug the Arquillian managed application server: -->
+                <!-- property name="javaVmArguments">
+                    -Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y 
+                    -Dorg.jboss.remoting-jmx.timeout=300
+                    -Djava.net.preferIPv4Stack=true
+                    -Djgroups.bind_addr=127.0.0.1
+                </property -->
             </configuration>
         </container>
     </group>

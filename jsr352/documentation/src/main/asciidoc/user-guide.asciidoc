@@ -12,9 +12,10 @@ container will be used. For Java SE users, we’ve chosen JBeret SE for you.
 .How to use the new MassIndexer?
 ====
 [source, JAVA]
-Long executionID = new MassIndexer()
-        .addRootEntity( MyEntity.class );
+----
+Long executionID = BatchIndexingJob.forEntity( MyEntity.class )
         .start();
+----
 ====
 
 This approach is optimized for best performance but requires to set the
@@ -30,8 +31,10 @@ which allows you to add one or multiple class types.
 .How to add entity type(s) to selection?
 ====
 [source, JAVA]
-massIndexer.addRootEntity( Company.class );
-massIndexer.addRootEntities( Company.class, Employee.class );
+----
+BatchIndexingJob.Builder builder1 = BatchIndexingJob.forEntity( Company.class );
+BatchIndexingJob.Builder builder2 = BatchIndexingJob.forEntities( Company.class, Employee.class );
+----
 ====
 
 [NOTE]
@@ -40,7 +43,6 @@ Please notice that for instant, only the root entity types are accepted. It
 should have no relationship between 2 root entities. Because relationships are
 not implemented in the framework yet, such as one-to-many, many-to-many.
 ====
-
 
 === Parallelism
 In order to maximize the performance, we highly recommend you to speed up the
@@ -62,7 +64,9 @@ value.
 
 ====
 [source, JAVA]
-massIndexer = massIndexer.maxThreads( 5 );
+----
+builder = builder.maxThreads( 5 );
+----
 ====
 
 [NOTE]
@@ -80,7 +84,9 @@ division.
 
 ====
 [source, JAVA]
-massIndexer = massIndexer.rowsPerPartition( 5000 );
+----
+builder = builder.rowsPerPartition( 5000 );
+----
 ====
 
 Each partition deals with one root entity type, so 2 different entity types will
@@ -95,37 +101,101 @@ requirement. By default, it is set to 3.
 
 ====
 [source, JAVA]
-massIndexer = massIndexer.checkpointFreq( 1000 );
+----
+builder = builder.checkpointFreq( 1000 );
+----
 ====
 
 Checkpoint a partition-scope algorithm, which means each partition has its own
 checkpoint counter and it is not shared with other partitions.
 
 
-=== Persistence
-The new mass indexer interacts with databases using JPA. We need you to
-configure a persistence unit and provide an entity manager factory, so that the
-new mass indexer can use it.
+=== Selecting the persistence unit (EntityManagerFactory)
 
-If you’re under Java EE, there’s no additional configuration before the job start.
-Entity manager factory will be injected by annotation
-`@PersistenceUnit(name = “massindex”)` for all the internal classes. However,
-you need to ensure the existence of persistence unit “massindex”, so that we can
-detect it and do the CDI. If you’re under Java SE, please confirm the SE
-environment and assign specifically the entity manager factory via massindexer’s
-related method.
+[CAUTION]
+====
+Regarless of how the entity manager factory is retrieved,
+you must make sure that the entity manager factory used by the mass indexer
+will stay open during the whole mass indexing process.
+====
 
+==== Plain java environment (no CDI)
 
-.Additional configuration in Java SE
+If you use only one persistence unit, the mass indexer will be able to access
+your database automatically without any special configuration:
+you only have to make sure to create the `EntityManagerFactory` (or `SessionFactory`)
+in your application before launching the mass indexer.
+
+If you want to use multiple persistence unit,
+you will have to add two parameters when launching the mass indexer:
+
+ * `entityManagerFactoryReference`: this is the string that will identify the `EntityManagerFactory`.
+ * `entityManagerFactoryScope`: this allows to select how you want to reference the `EntityManagerFactory`.
+   Possible values are:
+   
+ ** `persistence-unit-name` (the default): use the persistence unit name defined
+      in `persistence.xml`.
+ ** `session-factory-name`: use the session factory name
+      defined in the Hibernate configuration by the `hibernate.session_factory_name`
+      configuration property.
+      
+
+[CAUTION]
+====
+If you set the `hibernate.session_factory_name` property in the Hibernate configuration
+and you don't use JNDI, you will also have to set `hibernate.session_factory_name_is_jndi` to `false`.
+====
+
+==== CDI environment
+
+You can use CDI to retrieve the `EntityManagerFactory`.
+Unless you use an already packaged `hibernate-search-jsr352` module for your application container,
+this will require you to add the `hibernate-search-jsr352-cdi` jar to your classpath.
+
+If you use only one persistence unit, the mass indexer will be able to access
+your database automatically without any special configuration.
+
+If you want to use multiple persistence unit,
+you will have to register those as beans in the CDI context.
+Note that entity manager factories may not be considered as beans by default,
+in which case you will have to register them yourself.
+You may use an application-scoped bean to do so:
+
 ====
 [source, JAVA]
-massIndexer = massIndexer.isJavaSE( true )
-        .entityManagerFactory( emf );
+----
+@ApplicationScoped
+public class EntityManagerFactoriesProducer {
+	
+	@PersistenceUnit(unitName = "db1")
+	private EntityManagerFactory db1Factory;
+	
+	@PersistenceUnit(unitName = "db2")
+	private EntityManagerFactory db2Factory;
+	
+	@Produces
+	@Singleton
+	@Named("db1") // The name to use when referencing the bean
+	public EntityManagerFactory createEntityManagerFactoryForDb1() {
+		return db1Factory;
+	}
+	
+	@Produces
+	@Singleton
+	@Named("db2") // The name to use when referencing the bean
+	public EntityManagerFactory createEntityManagerFactoryForDb2() {
+		return db2Factory;
+	}
+}
+----
 ====
+
+Once the entity manager factories are registered in the CDI context,
+you can instruct the mass indexer to use one in particular by naming it
+using the `entityManagerReference` parameter.
 
 [NOTE]
 ====
-Please make sure that the entity manager factory provided is opened and won’t be
-closed during the mass indexing process.
+Due to limitations of the CDI APIs, it is not currently possible to reference
+an entity manager factory by its persistence unit name when using the mass indexer with CDI.
 ====
-

@@ -19,7 +19,7 @@
     <group qualifier="Grid" default="true">
         <container qualifier="container.active-1" mode="suite" default="true">
             <configuration>
-                <property name="jbossHome">${project.build.directory}/node1/wildfly-${org.wildfly}</property>
+                <property name="jbossHome">${project.build.directory}/node1/wildfly-${wildflyVersion}</property>
                 <!-- Needed for JMS tests -->
                 <property name="serverConfig">standalone-full-testqueues.xml</property>
                 <!-- Enable byteman -->

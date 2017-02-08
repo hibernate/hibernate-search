@@ -8,20 +8,48 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <parent>
         <groupId>org.hibernate</groupId>
-        <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>5.7.0.Beta2</version>
+        <artifactId>hibernate-search-jsr352-parent</artifactId>
+        <version>5.7.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hsearch-jsr352-test-performance</artifactId>
-    <name>GSoC JSR352 - Performance Tests in WildFly</name>
+    <artifactId>hibernate-search-jsr352-integrationtest-performance</artifactId>
 
+    <name>Hibernate Search JSR-352 Performance Testing</name>
+    <description>Performance testing for the Hibernate Search JSR-352 module</description>
+    
     <properties>
-        <hibernate.search.version>${project.version}</hibernate.search.version>
-        <path.tools_jar>${java.home}/../lib/tools.jar</path.tools_jar>
+        <!--
+        we disable the enforcer plugin for this module as it is not possible to maintain the dependency convergence
+        here due to dependency conflicts with specific versions of WildFly
+        -->
+        <enforcer.skip>true</enforcer.skip>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- We override the version of ShrinkWrap Maven Resolver from Arquillian BOM:
+             this section must be declared before the Arquillian bom import -->
+            <dependency>
+                <groupId>org.jboss.shrinkwrap.resolver</groupId>
+                <artifactId>shrinkwrap-resolver-bom</artifactId>
+                <version>${shrinkwrapResolverVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Imports compatible versions for each Arquillian module -->
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>${arquillianVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -32,7 +60,13 @@
         <!-- This integration test refers to classes in his parent -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hsearch-jsr352-core</artifactId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -50,6 +84,7 @@
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
+            <version>${arquillianContainerVersion}</version>
             <scope>test</scope>
             <exclusions>
                 <!-- Pulled in transitively; Neither available on Windows nor on JDK 9 -->
@@ -72,7 +107,6 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
         <testResources>
             <testResource>
                 <filtering>true</filtering>
@@ -104,16 +138,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.17</version>
                 <!-- enable execution to run an integration test -->
                 <executions>
                     <execution>
@@ -138,7 +163,7 @@
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
-                                    <version>${org.wildfly}</version>
+                                    <version>${wildflyVersion}</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/node1</outputDirectory>
@@ -146,30 +171,30 @@
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-orm-modules</artifactId>
-                                    <version>${org.hibernate}</version>
+                                    <version>${hibernateVersion}</version>
                                     <classifier>wildfly-10-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-search-modules</artifactId>
-                                    <version>${org.hibernate.search}</version>
+                                    <version>${project.version}</version>
                                     <classifier>wildfly-10-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                                 <!-- Provide the current project to WildFly as a new module -->
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
-                                    <artifactId>hsearch-jsr352-modules</artifactId>
+                                    <artifactId>hibernate-search-jsr352-modules</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>wildfly-10-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -188,7 +213,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}</outputDirectory>
+                            <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>

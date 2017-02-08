@@ -29,8 +29,8 @@
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <!-- include the core module of this project -->
-                <include>org.hibernate:hsearch-jsr352-core</include>
+                <include>org.hibernate:hibernate-search-jsr352-core</include>
+                <include>org.hibernate:hibernate-search-jsr352-cdi</include>
             </includes>
         </dependencySet>
     </dependencySets>

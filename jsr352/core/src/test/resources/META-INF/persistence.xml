@@ -11,8 +11,6 @@
         template -->
     <persistence-unit name="h2" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>org.hibernate.search.jsr352.entity.Company</class>
-        <class>org.hibernate.search.jsr352.entity.Person</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
             <property name="hibernate.connection.driver_class" value="org.h2.Driver" />
@@ -24,6 +22,25 @@
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
             <property name="hibernate.search.default.directory_provider" value="ram" />
             <property name="hibernate.search.indexing_strategy" value="manual" />
+            <property name="hibernate.session_factory_name" value="h2-entityManagerFactory" />
+            <property name="hibernate.session_factory_name_is_jndi" value="false" />
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="unused_pu" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+            <property name="hibernate.connection.driver_class" value="org.h2.Driver" />
+            <property name="hibernate.connection.url" value="jdbc:h2:mem:company" />
+            <property name="hibernate.connection.user" value="sa" />
+            <property name="hibernate.show_sql" value="false" />
+            <property name="hibernate.flushMode" value="FLUSH_AUTO" />
+            <property name="hibernate.format_sql" value="false" />
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+            <property name="hibernate.search.default.directory_provider" value="ram" />
+            <property name="hibernate.search.indexing_strategy" value="manual" />
+            <property name="hibernate.session_factory_name" value="h2-entityManagerFactory" />
+            <property name="hibernate.session_factory_name_is_jndi" value="false" />
         </properties>
     </persistence-unit>
 </persistence>
