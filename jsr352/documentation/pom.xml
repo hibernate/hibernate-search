@@ -9,16 +9,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>hsearch-jsr352-parent</artifactId>
+        <artifactId>hibernate-search-jsr352-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>5.7.0.Beta2</version>
+        <version>5.7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hsearch-jsr352-documentation</artifactId>
+    <artifactId>hibernate-search-jsr352-documentation</artifactId>
     <packaging>pom</packaging>
 
-    <name>GSoC JSR352 - Manual</name>
-    <description>The Hibernate Search JSR352 reference manual (Beta)</description>
+    <name>Hibernate Search JSR-352 Manual</name>
+    <description>The Hibernate Search JSR-352 reference manual</description>
 
     <properties>
         <!-- Skip artifact deployment -->
@@ -96,7 +96,7 @@
                                     <pluginExecutionFilter>
                                         <groupId>org.jboss.maven.plugins</groupId>
                                         <artifactId>maven-jdocbook-plugin</artifactId>
-                                        <versionRange>[2.3.5,)</versionRange>
+                                        <versionRange>[2.3.10,)</versionRange>
                                         <goals>
                                             <goal>resources</goal>
                                             <goal>generate</goal>

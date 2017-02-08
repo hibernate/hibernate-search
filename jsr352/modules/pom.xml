@@ -6,17 +6,18 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <parent>
         <groupId>org.hibernate</groupId>
-        <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>5.7.0.Beta2</version>
+        <artifactId>hibernate-search-jsr352-parent</artifactId>
+        <version>5.7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hsearch-jsr352-modules</artifactId>
+    <artifactId>hibernate-search-jsr352-modules</artifactId>
     <packaging>pom</packaging>
 
-    <name>GSoC JSR352 - Wildfly Module</name>
-    <description>Hibernate Search modules creation to use in JBoss AS / Wildfly</description>
+    <name>Hibernate Search JSR-352 Wildfly Module</name>
+    <description>Hibernate Search JSR-352 modules creation to use in JBoss AS / Wildfly</description>
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
@@ -52,7 +53,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hsearch-jsr352-core</artifactId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-cdi</artifactId>
         </dependency>
         <!-- TODO maybe we need JBeret here -->
     </dependencies>

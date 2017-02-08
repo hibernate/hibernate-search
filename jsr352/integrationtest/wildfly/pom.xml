@@ -8,22 +8,41 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <parent>
         <groupId>org.hibernate</groupId>
-        <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>5.7.0.Beta2</version>
+        <artifactId>hibernate-search-jsr352-parent</artifactId>
+        <version>5.7.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hsearch-jsr352-test-wildfly</artifactId>
-    <name>GSoC JSR352 - Integration Tests in WildFly</name>
+    <artifactId>hibernate-search-jsr352-integrationtest-wildfly</artifactId>
+    
+    <name>Hibernate Search JSR-352 Wildfly Integration Tests</name>
+    <description>Hibernate Search JSR-352 integration tests for Wildfly</description>
 
     <properties>
-        <path.tools_jar>${java.home}/../lib/tools.jar</path.tools_jar>
-        <byteman.version>3.0.6</byteman.version>
+        <!--
+        we disable the enforcer plugin for this module as it is not possible to maintain the dependency convergence
+        here due to dependency conflicts with specific versions of WildFly
+        -->
+        <enforcer.skip>true</enforcer.skip>
         <byteman.agent.path>${org.jboss.byteman:byteman:jar}</byteman.agent.path>
         <byteman.script.path>${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}JobInterruptor.btm</byteman.script.path>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Imports compatible versions for each Arquillian module -->
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>${arquillianVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -31,27 +50,21 @@
             <artifactId>hibernate-search-orm</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- This integration test refers to classes in his parent -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hsearch-jsr352-core</artifactId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.ejb3</groupId>
-            <artifactId>jboss-ejb3-ext-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.batch</groupId>
-            <artifactId>javax.batch-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.ejb</groupId>
-            <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
+            <version>${arquillianContainerVersion}</version>
             <scope>test</scope>
             <exclusions>
                 <!-- Pulled in transitively; Neither available on Windows nor on JDK 9 -->
@@ -66,22 +79,41 @@
             <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ejb3</groupId>
+            <artifactId>jboss-ejb3-ext-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.batch</groupId>
+            <artifactId>javax.batch-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- byteman -->
         <dependency>
             <groupId>org.jboss.byteman</groupId>
             <artifactId>byteman</artifactId>
-            <version>${byteman.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
         <testResources>
             <testResource>
                 <filtering>true</filtering>
@@ -113,17 +145,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.17</version>
-                <!-- enable execution to run an integration test -->
                 <executions>
                     <execution>
                         <goals>
@@ -147,7 +169,7 @@
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
-                                    <version>${org.wildfly}</version>
+                                    <version>${wildflyVersion}</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/node1</outputDirectory>
@@ -155,30 +177,30 @@
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-orm-modules</artifactId>
-                                    <version>${org.hibernate}</version>
+                                    <version>${hibernateVersion}</version>
                                     <classifier>wildfly-10-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-search-modules</artifactId>
-                                    <version>${org.hibernate.search}</version>
+                                    <version>${project.version}</version>
                                     <classifier>wildfly-10-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                                 <!-- Provide the current project to WildFly as a new module -->
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
-                                    <artifactId>hsearch-jsr352-modules</artifactId>
+                                    <artifactId>hibernate-search-jsr352-modules</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>wildfly-10-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -197,7 +219,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/node1/wildfly-${org.wildfly}</outputDirectory>
+                            <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>

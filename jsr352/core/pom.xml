@@ -8,26 +8,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <parent>
         <groupId>org.hibernate</groupId>
-        <artifactId>hsearch-jsr352-parent</artifactId>
-        <version>5.7.0.Beta2</version>
+        <artifactId>hibernate-search-jsr352-parent</artifactId>
+        <version>5.7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hsearch-jsr352-core</artifactId>
-    <name>GSoC JSR352 - Core</name>
-    <description>New implementation of mass-indexer using JSR 352</description>
-
-    <properties>
-        <org.jboss.byteman>3.0.6</org.jboss.byteman>
-    </properties>
+    <artifactId>hibernate-search-jsr352-core</artifactId>
+    
+    <name>Hibernate Search JSR-352</name>
+    <description>Core of the Hibernate Search JSR-352 integration</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${org.hibernate}</version>
-        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
@@ -56,19 +49,38 @@
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman-install</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman-bmunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- The JBeret artifacts declare all the dependencies as provided, so we have to redeclare them ourselves... -->
         <!-- JBeret minimal application dependencies -->
         <!-- https://jberet.gitbooks.io/jberet-user-guide/content/set_up_jberet/#minimal-application-dependencies -->
         <dependency>
             <groupId>org.jboss.spec.javax.transaction</groupId>
             <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-            <version>1.0.1.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jberet</groupId>
             <artifactId>jberet-core</artifactId>
-            <version>${org.jberet}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -92,16 +104,16 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>18.0</version>
             <scope>test</scope>
         </dependency>
-
+        
+        <!-- The JBeret artifacts declare all the dependencies as provided, so we have to redeclare them ourselves... -->
         <!-- Additional dependencies for Java SE batch applications -->
         <!-- https://jberet.gitbooks.io/jberet-user-guide/content/set_up_jberet/#additional-dependencies-for-java-se-batch-applications -->
         <dependency>
             <groupId>org.jberet</groupId>
             <artifactId>jberet-se</artifactId>
-            <version>${org.jberet}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -110,42 +122,9 @@
             <version>2.3.4.Final</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${com.h2database}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- bytemen -->
-        <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman</artifactId>
-            <version>${org.jboss.byteman}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman-submit</artifactId>
-            <version>${org.jboss.byteman}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman-install</artifactId>
-            <version>${org.jboss.byteman}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman-bmunit</artifactId>
-            <version>${org.jboss.byteman}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
         <testResources>
             <testResource>
                 <filtering>true</filtering>
@@ -154,20 +133,22 @@
         </testResources>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/test/util/*</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.17</version>
                 <!-- enable execution to run an integration test -->
                 <executions>
                     <execution>
@@ -178,21 +159,11 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <useSystemClassLoader>true</useSystemClassLoader>
-                    <useManifestOnlyJar>true</useManifestOnlyJar>
+                    <argLine>${additionalRuntimeArgLine}</argLine>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <systemPropertyVariables>
                         <jberet.tmp.dir>${project.build.directory}${file.separator}tmp</jberet.tmp.dir>
                     </systemPropertyVariables>
-                    <!-- ensure we don't inherit a byteman jar from any env settings -->
-                    <environmentVariables>
-                        <BYTEMAN_HOME></BYTEMAN_HOME>
-                    </environmentVariables>
-                    <systemProperties>
-                        <property>
-                            <name>org.jboss.byteman.home</name>
-                            <value></value>
-                        </property>
-                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>
