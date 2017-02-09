@@ -235,7 +235,7 @@
         <puppycrawl.checkstyle.version>7.4</puppycrawl.checkstyle.version>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.5.2.Final</previous.stable>
+        <previous.stable>5.6.0.Final</previous.stable>
     </properties>
 
     <dependencyManagement>
