@@ -17,7 +17,7 @@ import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ClearScrollWork;
 import org.hibernate.search.elasticsearch.work.impl.CloseIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.CreateIndexWork;
-import org.hibernate.search.elasticsearch.work.impl.DeleteByQueryWork;
+import org.hibernate.search.elasticsearch.work.impl.ES2DeleteByQueryWork;
 import org.hibernate.search.elasticsearch.work.impl.DeleteWork;
 import org.hibernate.search.elasticsearch.work.impl.DropIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.ExplainWork;
@@ -82,7 +82,7 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public DeleteByQueryWorkBuilder deleteByQuery(String indexName, JsonObject payload) {
-		return new DeleteByQueryWork.Builder( indexName, payload );
+		return new ES2DeleteByQueryWork.Builder( indexName, payload );
 	}
 
 	@Override

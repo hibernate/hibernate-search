@@ -21,11 +21,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 /**
+ * A delete by query work for ES2, using the delete-by-query plugin.
+ *
  * @author Yoann Rodiere
  */
-public class DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
+public class ES2DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 
-	protected DeleteByQueryWork(Builder builder) {
+	protected ES2DeleteByQueryWork(Builder builder) {
 		super( builder );
 	}
 
@@ -70,8 +72,8 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public DeleteByQueryWork build() {
-			return new DeleteByQueryWork( this );
+		public ES2DeleteByQueryWork build() {
+			return new ES2DeleteByQueryWork( this );
 		}
 	}
 
@@ -96,7 +98,7 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 			this.delegate.checkSuccess( context, request, response, parsedResponseBody );
 			if ( response.getStatusLine().getStatusCode() == NOT_FOUND_HTTP_STATUS_CODE ) {
 				GsonProvider gsonProvider = context.getGsonProvider();
-				throw LOG.elasticsearchRequestDeleteByQueryNotFound(
+				throw LOG.elasticsearch2RequestDeleteByQueryNotFound(
 						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
 						ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody )
 						);

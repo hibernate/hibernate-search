@@ -399,7 +399,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ "\n Request:\n========\n%1$s"
 					+ "Response:\n=========\n%2$s"
 			)
-	SearchException elasticsearchRequestDeleteByQueryNotFound(String request, String response);
+	SearchException elasticsearch2RequestDeleteByQueryNotFound(String request, String response);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 73,

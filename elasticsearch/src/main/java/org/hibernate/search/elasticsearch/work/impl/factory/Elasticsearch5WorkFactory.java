@@ -7,8 +7,12 @@
 package org.hibernate.search.elasticsearch.work.impl.factory;
 
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.work.impl.ES5DeleteByQueryWork;
 import org.hibernate.search.elasticsearch.work.impl.ES5FlushWork;
+import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.FlushWorkBuilder;
+
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
@@ -23,4 +27,10 @@ public class Elasticsearch5WorkFactory extends Elasticsearch2WorkFactory {
 	public FlushWorkBuilder flush() {
 		return new ES5FlushWork.Builder( this );
 	}
+
+	@Override
+	public DeleteByQueryWorkBuilder deleteByQuery(String indexName, JsonObject payload) {
+		return new ES5DeleteByQueryWork.Builder( indexName, payload );
+	}
+
 }
