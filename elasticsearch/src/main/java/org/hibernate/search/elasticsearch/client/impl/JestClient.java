@@ -83,8 +83,7 @@ public class JestClient implements Service, Startable, Stoppable {
 
 		Collection<String> serverUris = Arrays.asList( serverUrisString.trim().split( "\\s" ) );
 
-		factory.setHttpClientConfig(
-			new HttpClientConfig.Builder( serverUris )
+		HttpClientConfig.Builder builder = new HttpClientConfig.Builder( serverUris )
 				.multiThreaded( true )
 				.readTimeout( ConfigurationParseHelper.getIntValue(
 						properties,
@@ -119,9 +118,23 @@ public class JestClient implements Service, Startable, Stoppable {
 						),
 						TimeUnit.SECONDS
 				)
-				.gson( gsonService.getGson() )
-				.build()
+				.gson( gsonService.getGson() );
+
+		String username = ConfigurationParseHelper.getString(
+				properties,
+				CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_USERNAME,
+				null
 		);
+		if ( username != null ) {
+			String password = ConfigurationParseHelper.getString(
+					properties,
+					CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_PASSWORD,
+					null
+			);
+			builder = builder.defaultCredentials( username, password );
+		}
+
+		factory.setHttpClientConfig( builder.build() );
 
 		client = factory.getObject();
 	}
