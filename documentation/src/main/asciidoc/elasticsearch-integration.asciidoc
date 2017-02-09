@@ -124,6 +124,14 @@ You may also select multiple hosts (separated by whitespace characters), so that
 `hibernate.search.default.elasticsearch.host \http://es1.mycompany.com:9200 \http://es2.mycompany.com:9200`
 +
 In the example above, the first request will go to `es1`, the second to `es2`, the third to `es1`, and so on.
+Username for Elasticsearch connection:: `hibernate.search.default.elasticsearch.username ironman` (default is empty, meaning anonymous access)
+Password for Elasticsearch connection:: `hibernate.search.default.elasticsearch.password j@rV1s` (default is empty)
++
+[CAUTION]
+====
+If you used HTTP instead of HTTPS in any of the Elasticsearch host URLs (see above),
+your password will be transmitted in clear text over the network.
+====
 [[elasticsearch-schema-management-strategy]]Select the index creation strategy::
 `hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE` (default)
 +
@@ -207,7 +215,7 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`
 
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
-Excluded properties are `host`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled` and `discovery.refresh_interval`.
+Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled` and `discovery.refresh_interval`.
 --
 
 === Mapping and indexing

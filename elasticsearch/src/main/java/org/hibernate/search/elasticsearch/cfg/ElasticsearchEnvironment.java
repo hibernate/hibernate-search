@@ -49,9 +49,36 @@ public final class ElasticsearchEnvironment {
 	 * {@code hibernate.search.default.elasticsearch.host=http://myeshost.com:9200}), i.e. only a single Elasticsearch
 	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
 	 * Hibernate Search.
-	 * <p>
 	 */
 	public static final String SERVER_URI = "elasticsearch.host";
+
+	/**
+	 * Property for specifying the username to send when connecting to the Elasticsearch servers.
+	 * <p>
+	 * A string is expected.
+	 * <p>
+	 * Defaults to no username (anonymous access).
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.default.elasticsearch.username=ironman}), because. only a single Elasticsearch
+	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
+	 * Hibernate Search.
+	 */
+	public static final String SERVER_USERNAME = "elasticsearch.username";
+
+	/**
+	 * Property for specifying the password to send when connecting to the Elasticsearch servers.
+	 * <p>
+	 * A string is expected.
+	 * <p>
+	 * Defaults to no password at all.
+	 * <p>
+	 * Can only be given <b>globally</b> (e.g.
+	 * {@code hibernate.search.default.elasticsearch.password=j@rV1s}), because only a single Elasticsearch
+	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
+	 * Hibernate Search.
+	 */
+	public static final String SERVER_PASSWORD = "elasticsearch.password";
 
 	/**
 	 * Property for specifying the timeout when reading responses from an Elasticsearch server.
