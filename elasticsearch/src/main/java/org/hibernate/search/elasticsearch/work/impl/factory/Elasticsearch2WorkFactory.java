@@ -27,7 +27,7 @@ import org.hibernate.search.elasticsearch.work.impl.GetIndexTypeMappingsWork;
 import org.hibernate.search.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.elasticsearch.work.impl.OpenIndexWork;
-import org.hibernate.search.elasticsearch.work.impl.OptimizeWork;
+import org.hibernate.search.elasticsearch.work.impl.ES2OptimizeWork;
 import org.hibernate.search.elasticsearch.work.impl.PutIndexSettingsWork;
 import org.hibernate.search.elasticsearch.work.impl.PutIndexTypeMappingWork;
 import org.hibernate.search.elasticsearch.work.impl.RefreshWork;
@@ -97,7 +97,7 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public OptimizeWorkBuilder optimize() {
-		return new OptimizeWork.Builder();
+		return new ES2OptimizeWork.Builder();
 	}
 
 	@Override

@@ -15,11 +15,15 @@ import org.hibernate.search.elasticsearch.work.impl.builder.OptimizeWorkBuilder;
 import com.google.gson.JsonObject;
 
 /**
+ * An optimize work for ES2, using the ForceMerge API.
+ * <p>
+ * The ForceMerge API replaces the removed Optimize API in ES5.
+ *
  * @author Yoann Rodiere
  */
-public class OptimizeWork extends SimpleElasticsearchWork<Void> {
+public class ES5OptimizeWork extends SimpleElasticsearchWork<Void> {
 
-	protected OptimizeWork(Builder builder) {
+	protected ES5OptimizeWork(Builder builder) {
 		super( builder );
 	}
 
@@ -52,14 +56,14 @@ public class OptimizeWork extends SimpleElasticsearchWork<Void> {
 				builder.multiValuedPathComponent( indexNames );
 			}
 
-			builder.pathComponent( "_optimize" );
+			builder.pathComponent( "_forcemerge" );
 
 			return builder.build();
 		}
 
 		@Override
-		public OptimizeWork build() {
-			return new OptimizeWork( this );
+		public ES5OptimizeWork build() {
+			return new ES5OptimizeWork( this );
 		}
 	}
 }
