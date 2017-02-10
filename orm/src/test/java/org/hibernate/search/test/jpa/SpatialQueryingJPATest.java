@@ -34,6 +34,9 @@ import static org.hibernate.search.test.util.ResourceCleanupFunctions.withinTran
  */
 public class SpatialQueryingJPATest extends JPATestCase {
 
+	// Use a large, but reasonable distance: Elasticsearch 5 can't handle Double.MAX_VALUE for instance
+	private static final double LARGE_DISTANCE_KM = 40_000;
+
 	@After
 	public void cleanup() {
 		withinEntityManager( factory, em -> {
@@ -118,7 +121,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 
 				org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )
-						.within( Double.MAX_VALUE, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+						.within( LARGE_DISTANCE_KM, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );

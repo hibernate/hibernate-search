@@ -121,7 +121,7 @@ public class ElasticsearchSpatialIT extends SearchTestBase {
 							"'location' : {\n" +
 								"'top_left' : {\n" +
 									"'lat' : 24,\n" +
-									"'lon' : 31.9\n" +
+									"'lon' : 31.8\n" +
 								"},\n" +
 								"'bottom_right' : {\n" +
 									"'lat' : 23.8,\n" +
