@@ -399,4 +399,11 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			)
 	SearchException elasticsearchRequestDeleteByQueryNotFound(String request, String response);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 73,
+			value = "Hibernate Search will connect to Elasticsearch server '%1$s' with authentication over plain HTTP (not HTTPS)."
+					+ " The password will be sent in clear text over the network."
+			)
+	void usingPasswordOverHttp(String serverUris);
+
 }

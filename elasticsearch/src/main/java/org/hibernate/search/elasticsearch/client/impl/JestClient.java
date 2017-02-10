@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.client.impl;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +49,8 @@ import io.searchbox.params.Parameters;
 public class JestClient implements Service, Startable, Stoppable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
+	private static final String HTTP_SCHEME = "http";
 
 	/**
 	 * Prefix for accessing the client-related settings.
@@ -131,12 +134,25 @@ public class JestClient implements Service, Startable, Stoppable {
 					CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_PASSWORD,
 					null
 			);
+			if ( password != null ) {
+				warnPasswordsOverHttp( serverUris );
+			}
 			builder = builder.defaultCredentials( username, password );
 		}
 
 		factory.setHttpClientConfig( builder.build() );
 
 		client = factory.getObject();
+	}
+
+	private boolean warnPasswordsOverHttp(Collection<String> serverUris) {
+		for ( String serverUriAsString : serverUris ) {
+			URI uri = URI.create( serverUriAsString );
+			if ( HTTP_SCHEME.equals( uri.getScheme() ) ) {
+				LOG.usingPasswordOverHttp( serverUriAsString );
+			}
+		}
+		return false;
 	}
 
 	@Override
