@@ -11,10 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.spi.FieldType;
-import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
@@ -91,35 +88,6 @@ public class FieldHelper {
 		}
 	}
 
-	// TODO HSEARCH-2259 make it work with fields embedded types
-	private static NumericEncodingType getNumericEncodingType(DocumentFieldMetadata field) {
-		NumericEncodingType numericEncodingType = field.getNumericEncodingType();
-
-		if ( numericEncodingType == NumericEncodingType.UNKNOWN ) {
-			BridgeDefinedField bridgeDefinedField = field.getBridgeDefinedFields().get( field.getAbsoluteName() );
-			if ( bridgeDefinedField != null ) {
-				numericEncodingType = getNumericEncodingType( bridgeDefinedField.getType() );
-			}
-		}
-
-		return numericEncodingType;
-	}
-
-	private static NumericEncodingType getNumericEncodingType(FieldType fieldType) {
-		switch ( fieldType ) {
-			case FLOAT:
-				return NumericEncodingType.FLOAT;
-			case DOUBLE:
-				return NumericEncodingType.DOUBLE;
-			case INTEGER:
-				return NumericEncodingType.INTEGER;
-			case LONG:
-				return NumericEncodingType.LONG;
-			default:
-				return NumericEncodingType.UNKNOWN;
-		}
-	}
-
 	private static ExtendedFieldType toExtendedFieldType(NumericEncodingType numericEncodingType) {
 		switch ( numericEncodingType ) {
 			case INTEGER:
@@ -152,8 +120,8 @@ public class FieldHelper {
 		if ( boolean.class.equals( propertyClass ) || Boolean.class.isAssignableFrom( propertyClass ) ) {
 			return ExtendedFieldType.BOOLEAN;
 		}
-		else if ( isNumeric(fieldMetadata) ) {
-			return toExtendedFieldType( getNumericEncodingType( fieldMetadata ) );
+		else if ( fieldMetadata.isNumeric() ) {
+			return toExtendedFieldType( fieldMetadata.getNumericEncodingType() );
 		}
 		else if ( Date.class.isAssignableFrom( propertyClass ) ) {
 			return ExtendedFieldType.DATE;
@@ -223,15 +191,6 @@ public class FieldHelper {
 			default:
 				return ExtendedFieldType.UNKNOWN;
 		}
-	}
-
-	public static boolean isNumeric(DocumentFieldMetadata field) {
-		if ( field.isNumeric() ) {
-			return true;
-		}
-
-		FieldBridge fieldBridge = field.getFieldBridge();
-		return BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, NumericFieldBridge.class ) != null;
 	}
 
 	public static String[] getFieldNameParts(String fieldName) {
