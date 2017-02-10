@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
 
 import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.PartialDocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.PartialPropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -104,24 +105,30 @@ public class FieldHelper {
 		}
 	}
 
-	public static ExtendedFieldType getType(DocumentFieldMetadata fieldMetadata) {
+	public static ExtendedFieldType getType(PartialDocumentFieldMetadata fieldMetadata) {
 		// Always use user-provided type in priority
-		BridgeDefinedField overriddenField = fieldMetadata.getBridgeDefinedFields().get( fieldMetadata.getAbsoluteName() );
+		BridgeDefinedField overriddenField = fieldMetadata.getBridgeDefinedFields().get( fieldMetadata.getPath().getAbsoluteName() );
 		if ( overriddenField != null ) {
 			return getType( overriddenField );
 		}
 
-		PropertyMetadata propertyMetata = fieldMetadata.getSourceProperty();
+		PartialPropertyMetadata propertyMetata = fieldMetadata.getSourceProperty();
 		Class<?> propertyClass = propertyMetata == null ? null : propertyMetata.getPropertyClass();
 		if ( propertyClass == null ) {
 			return ExtendedFieldType.UNKNOWN;
 		}
 
+		if ( fieldMetadata.isNumeric() ) {
+			return toExtendedFieldType( fieldMetadata.getNumericEncodingType() );
+		}
+		else {
+			return getType( propertyClass );
+		}
+	}
+
+	public static ExtendedFieldType getType(Class<?> propertyClass) {
 		if ( boolean.class.equals( propertyClass ) || Boolean.class.isAssignableFrom( propertyClass ) ) {
 			return ExtendedFieldType.BOOLEAN;
-		}
-		else if ( fieldMetadata.isNumeric() ) {
-			return toExtendedFieldType( fieldMetadata.getNumericEncodingType() );
 		}
 		else if ( Date.class.isAssignableFrom( propertyClass ) ) {
 			return ExtendedFieldType.DATE;

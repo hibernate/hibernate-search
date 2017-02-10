@@ -15,11 +15,11 @@ import org.hibernate.search.bridge.spi.NullMarker;
 /**
  * @author Sanne Grinovero
  */
-public class ElasticsearchStringNullMarkerCodec extends ElasticsearchNullMarkerCodec {
+public class ElasticsearchAsNullStringNullMarkerCodec extends ElasticsearchAsNullNullMarkerCodec {
 
 	private final BytesRef encodedToken;
 
-	public ElasticsearchStringNullMarkerCodec(NullMarker nullMarker) {
+	public ElasticsearchAsNullStringNullMarkerCodec(NullMarker nullMarker) {
 		super( nullMarker );
 		this.encodedToken = new BytesRef( (String) nullMarker.nullEncoded() );
 	}

@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.nulls.impl;
 
 import org.hibernate.search.bridge.spi.NullMarker;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldPath;
+import org.hibernate.search.engine.metadata.impl.PartialDocumentFieldMetadata;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 
 /**
@@ -22,10 +22,11 @@ public interface MissingValueStrategy {
 
 	/**
 	 * @param entityType The entity on which the null marker is being used.
-	 * @param path The path of the field on which the null marker is being used.
+	 * @param fieldMetadata The field metadata we know about so far.
 	 * @param marker The null marker to use when indexing/querying null values.
 	 * @return A codec that will index and query the given marker.
 	 */
-	NullMarkerCodec createNullMarkerCodec(Class<?> entityType, DocumentFieldPath path, NullMarker marker);
+	NullMarkerCodec createNullMarkerCodec(Class<?> entityType,
+			PartialDocumentFieldMetadata fieldMetadata, NullMarker marker);
 
 }

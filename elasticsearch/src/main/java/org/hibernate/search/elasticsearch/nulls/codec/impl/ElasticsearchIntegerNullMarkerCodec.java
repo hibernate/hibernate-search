@@ -13,7 +13,7 @@ import org.hibernate.search.bridge.spi.NullMarker;
 /**
  * @author Sanne Grinovero
  */
-public class ElasticsearchIntegerNullMarkerCodec extends ElasticsearchNullMarkerCodec {
+public class ElasticsearchIntegerNullMarkerCodec extends ElasticsearchAsNullNullMarkerCodec {
 
 	public ElasticsearchIntegerNullMarkerCodec(final NullMarker nullMarker) {
 		super( nullMarker );

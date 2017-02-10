@@ -15,13 +15,15 @@ import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 
 
 /**
+ * A base class for {@link NullMarkerCodec}s that index null values as the JSON "null" value.
+ *
  * @author Yoann Rodiere
  */
-abstract class ElasticsearchNullMarkerCodec implements NullMarkerCodec {
+public abstract class ElasticsearchAsNullNullMarkerCodec implements NullMarkerCodec {
 
 	protected final NullMarker nullMarker;
 
-	public ElasticsearchNullMarkerCodec(NullMarker nullMarker) {
+	public ElasticsearchAsNullNullMarkerCodec(NullMarker nullMarker) {
 		super();
 		this.nullMarker = nullMarker;
 	}

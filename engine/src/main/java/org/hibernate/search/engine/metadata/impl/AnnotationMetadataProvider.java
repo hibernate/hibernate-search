@@ -272,7 +272,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
-						propertyMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath, Store.YES, index, termVector
 						)
 						.boost( AnnotationProcessingHelper.getBoost( member, null ) )
@@ -362,7 +362,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder idMetadataBuilder = new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
-						propertyMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -470,7 +470,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
-						propertyMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath,
 						Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -745,7 +745,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
-						BackReference.<PropertyMetadata>empty(), // Class bridge, there's no related property
+						// Class bridge, there's no related property
+						BackReference.<PropertyMetadata>empty(),
+						null,
 						fieldPath, store, index, termVector
 				)
 				.boost( classBridgeAnnotation.boost().value() )
@@ -796,7 +798,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
-						propertyMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath, store, index, termVector
 				)
 				.boost( AnnotationProcessingHelper.getBoost( member, spatialAnnotation ) )
@@ -844,7 +846,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
 						typeMetadataBuilder.getResultReference(),
-						BackReference.<PropertyMetadata>empty(), // Class-level spatial annotation, there's no related property
+						BackReference.<PropertyMetadata>empty(), null, // Class-level spatial annotation, there's no related property
 						fieldPath, store, index, termVector
 				)
 				.boost( spatialAnnotation.boost().value() )
@@ -1286,11 +1288,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		final NumericEncodingType numericEncodingType = determineNumericFieldEncoding( fieldBridge );
-		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldBridge, fieldAnnotation, configContext,
-				parseContext, typeMetadataBuilder.getIndexedType(), fieldPath );
-		if ( nullTokenCodec != NotEncodingCodec.SINGLETON && fieldBridge instanceof TwoWayFieldBridge ) {
-			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
-		}
 
 		AnalyzerReference analyzerReference;
 		if ( parseContext.skipAnalyzers() ) {
@@ -1313,7 +1310,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( isNumericField( numericFieldAnnotation, fieldBridge ) ) {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
 					typeMetadataBuilder.getResultReference(),
-					propertyMetadataBuilder.getResultReference(),
+					propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 					fieldPath,
 					store,
 					Field.Index.NO.equals( index ) ? index : Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -1321,7 +1318,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
 					.fieldBridge( fieldBridge )
 					.analyzerReference( analyzerReference )
-					.indexNullAs( nullTokenCodec )
 					.numeric()
 					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) )
 					.numericEncodingType( numericEncodingType );
@@ -1329,15 +1325,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		else {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
 					typeMetadataBuilder.getResultReference(),
-					propertyMetadataBuilder.getResultReference(),
+					propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 					fieldPath,
 					store,
 					index,
 					termVector
 			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
 					.fieldBridge( fieldBridge )
-					.analyzerReference( analyzerReference )
-					.indexNullAs( nullTokenCodec );
+					.analyzerReference( analyzerReference );
 			if ( fieldBridge instanceof SpatialFieldBridge ) {
 				fieldMetadataBuilder.spatial();
 			}
@@ -1375,6 +1370,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				fieldMetadataBuilder.addBridgeDefinedField( field );
 			}
 		}
+
+		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldMetadataBuilder,
+				fieldBridge, fieldAnnotation, configContext,
+				parseContext, typeMetadataBuilder.getIndexedType() );
+		if ( nullTokenCodec != NotEncodingCodec.SINGLETON && fieldBridge instanceof TwoWayFieldBridge ) {
+			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullTokenCodec );
+			fieldMetadataBuilder.fieldBridge( fieldBridge );
+		}
+		fieldMetadataBuilder.indexNullAs( nullTokenCodec );
 
 		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
@@ -1429,9 +1433,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private NullMarkerCodec determineNullMarkerCodec(FieldBridge fieldBridge,
-			org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context,
-			ParseContext parseContext, Class<?> indexedType, DocumentFieldPath fieldPath) {
+	private NullMarkerCodec determineNullMarkerCodec(PartialDocumentFieldMetadata fieldMetadata,
+			FieldBridge fieldBridge, org.hibernate.search.annotations.Field fieldAnnotation,
+			ConfigContext context, ParseContext parseContext, Class<?> indexedType) {
 		if ( parseContext.skipNullMarkerCodec() ) {
 			return NotEncodingCodec.SINGLETON;
 		}
@@ -1451,18 +1455,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
 				// Use the default null token
 				// This will require the global default to be an encodable value
-				nullMarker = createNullMarker( fieldBridge, context.getDefaultNullToken(), fieldPath );
+				nullMarker = createNullMarker( fieldBridge, context.getDefaultNullToken(), fieldMetadata.getPath() );
 			}
 			else {
 				// Use the default null token
 				// This will require 'indexNullAs' to be an encodable value
-				nullMarker = createNullMarker( fieldBridge, indexNullAs, fieldPath );
+				nullMarker = createNullMarker( fieldBridge, indexNullAs, fieldMetadata.getPath() );
 			}
 
 			IndexManagerType indexManagerType = parseContext.getIndexManagerType();
 			MissingValueStrategy missingValueStrategy = context.getMissingValueStrategy( indexManagerType );
 
-			return missingValueStrategy.createNullMarkerCodec( indexedType, fieldPath, nullMarker );
+			return missingValueStrategy.createNullMarkerCodec( indexedType, fieldMetadata, nullMarker );
 		}
 	}
 

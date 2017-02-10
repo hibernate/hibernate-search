@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.nulls.impl;
 
 import org.hibernate.search.bridge.spi.NullMarker;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldPath;
+import org.hibernate.search.engine.metadata.impl.PartialDocumentFieldMetadata;
 import org.hibernate.search.engine.nulls.codec.impl.LuceneDoubleNullMarkerCodec;
 import org.hibernate.search.engine.nulls.codec.impl.LuceneFloatNullMarkerCodec;
 import org.hibernate.search.engine.nulls.codec.impl.LuceneIntegerNullMarkerCodec;
@@ -31,7 +31,8 @@ public class LuceneMissingValueStrategy implements MissingValueStrategy {
 	}
 
 	@Override
-	public NullMarkerCodec createNullMarkerCodec(Class<?> entityType, DocumentFieldPath path, NullMarker nullMarker) {
+	public NullMarkerCodec createNullMarkerCodec(Class<?> entityType,
+			PartialDocumentFieldMetadata fieldMetadata, NullMarker nullMarker) {
 		Object nullEncoded = nullMarker.nullEncoded();
 		if ( nullEncoded instanceof String ) {
 			return new LuceneStringNullMarkerCodec( nullMarker );
@@ -49,7 +50,8 @@ public class LuceneMissingValueStrategy implements MissingValueStrategy {
 			return new LuceneDoubleNullMarkerCodec( nullMarker );
 		}
 		else {
-			throw LOG.unsupportedNullTokenType( entityType, path.getAbsoluteName(), nullEncoded.getClass() );
+			throw LOG.unsupportedNullTokenType( entityType, fieldMetadata.getPath().getAbsoluteName(),
+					nullEncoded.getClass() );
 		}
 	}
 

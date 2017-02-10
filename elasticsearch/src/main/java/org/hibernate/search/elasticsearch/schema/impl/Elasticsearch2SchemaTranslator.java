@@ -23,6 +23,7 @@ import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerRef
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchBridgeDefinedField;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchAsNullNullMarkerCodec;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
@@ -479,9 +480,15 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 	private void addNullValue(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {
 		NullMarkerCodec nullMarkerCodec = fieldMetadata.getNullMarkerCodec();
-		NullMarker nullMarker = nullMarkerCodec.getNullMarker();
-		if ( nullMarker != null ) {
-			JsonPrimitive nullTokenJson = convertIndexedNullTokenToJson( mappingBuilder, fieldMetadata.getPath(), nullMarker.nullEncoded() );
+		/*
+		 * We may have a codec that doesn't index null values as null,
+		 * because 'null_value' is not supported for the 'text' datatype.
+		 * See ElasticsearchMissingValueStrategy.
+		 */
+		if ( nullMarkerCodec instanceof ElasticsearchAsNullNullMarkerCodec ) {
+			NullMarker nullMarker = nullMarkerCodec.getNullMarker();
+			JsonPrimitive nullTokenJson = convertIndexedNullTokenToJson( mappingBuilder,
+					fieldMetadata.getPath(), nullMarker.nullEncoded() );
 			propertyMapping.setNullValue( nullTokenJson );
 		}
 	}

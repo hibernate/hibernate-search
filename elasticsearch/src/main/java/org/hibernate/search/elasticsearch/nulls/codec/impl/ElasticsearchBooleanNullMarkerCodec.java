@@ -15,7 +15,7 @@ import org.hibernate.search.bridge.spi.NullMarker;
 /**
  * @author Sanne Grinovero
  */
-public class ElasticsearchBooleanNullMarkerCodec extends ElasticsearchNullMarkerCodec {
+public class ElasticsearchBooleanNullMarkerCodec extends ElasticsearchAsNullNullMarkerCodec {
 
 	private final BytesRef encodedToken;
 

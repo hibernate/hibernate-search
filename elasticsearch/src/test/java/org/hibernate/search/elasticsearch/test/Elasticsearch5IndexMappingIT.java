@@ -152,8 +152,7 @@ public class Elasticsearch5IndexMappingIT extends SearchTestBase {
 							"'null_value':-1" +
 						"}," +
 						"'firstName':{" +
-							"'type':'text'," +
-							"'null_value':'<NULL>'" +
+							"'type':'text'" +
 						"}," +
 						"'fullName':{" +
 							"'type':'text'" +
@@ -437,7 +436,7 @@ public class Elasticsearch5IndexMappingIT extends SearchTestBase {
 					"\"dateOfBirth\": null," +
 					"\"subscriptionEndDate\":null," +
 					"\"driveWidth\": null," +
-					"\"firstName\": null," +
+					"\"firstName\": <NULL>," +
 					"\"handicap\": 0.0," + // not nullable
 					"\"id\": '3'," +
 					"\"puttingStrength\": \"0.0\"," + // not nullable

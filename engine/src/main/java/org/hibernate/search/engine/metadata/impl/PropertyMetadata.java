@@ -26,7 +26,7 @@ import org.hibernate.search.util.impl.ReflectionHelper;
  *
  * @author Hardy Ferentschik
  */
-public class PropertyMetadata {
+public class PropertyMetadata implements PartialPropertyMetadata {
 	private final BackReference<TypeMetadata> declaringType;
 	private final XProperty propertyAccessor;
 	private final Class<?> propertyClass;
@@ -72,6 +72,7 @@ public class PropertyMetadata {
 		return propertyAccessor;
 	}
 
+	@Override
 	public Class<?> getPropertyClass() {
 		return propertyClass;
 	}
@@ -109,7 +110,7 @@ public class PropertyMetadata {
 		return dynamicBoostStrategy;
 	}
 
-	public static class Builder {
+	public static class Builder implements PartialPropertyMetadata {
 		private final BackReference<PropertyMetadata> resultReference = new BackReference<>();
 
 		// required parameters
@@ -131,6 +132,11 @@ public class PropertyMetadata {
 			this.propertyClass = propertyClass;
 			this.fieldMetadataSet = new LinkedHashSet<>();
 			this.sortableFieldMetadata = new LinkedHashSet<>();
+		}
+
+		@Override
+		public Class<?> getPropertyClass() {
+			return propertyClass;
 		}
 
 		public Builder dynamicBoostStrategy(BoostStrategy boostStrategy) {

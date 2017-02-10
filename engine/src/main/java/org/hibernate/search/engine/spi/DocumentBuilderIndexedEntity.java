@@ -104,7 +104,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		DocumentFieldMetadata fieldMetadata =
 				new DocumentFieldMetadata.Builder(
 						BackReference.<TypeMetadata>empty(),
-						BackReference.<PropertyMetadata>empty(),
+						BackReference.<PropertyMetadata>empty(), null,
 						new DocumentFieldPath( "", "" ), // No field path
 						Store.NO,
 						Field.Index.NOT_ANALYZED_NO_NORMS,

@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
@@ -28,7 +29,7 @@ import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.Numer
  * @author Hardy Ferentschik
  */
 @SuppressWarnings("deprecation")
-public class DocumentFieldMetadata {
+public class DocumentFieldMetadata implements PartialDocumentFieldMetadata {
 	private final BackReference<TypeMetadata> sourceType;
 	private final BackReference<PropertyMetadata> sourceProperty;
 
@@ -91,6 +92,7 @@ public class DocumentFieldMetadata {
 	 * @return The property from which the value for this field is extracted.
 	 * {@code null} for class bridges.
 	 */
+	@Override
 	public PropertyMetadata getSourceProperty() {
 		return sourceProperty.get();
 	}
@@ -105,6 +107,7 @@ public class DocumentFieldMetadata {
 	/**
 	 * @return The path from the document root to this field.
 	 */
+	@Override
 	public DocumentFieldPath getPath() {
 		return path;
 	}
@@ -121,6 +124,7 @@ public class DocumentFieldMetadata {
 		return store;
 	}
 
+	@Override
 	public Field.Index getIndex() {
 		return index;
 	}
@@ -145,6 +149,7 @@ public class DocumentFieldMetadata {
 		return nullMarkerCodec;
 	}
 
+	@Override
 	public boolean isNumeric() {
 		return isNumeric;
 	}
@@ -157,6 +162,7 @@ public class DocumentFieldMetadata {
 		return precisionStep;
 	}
 
+	@Override
 	public NumericEncodingType getNumericEncodingType() {
 		return numericEncodingType;
 	}
@@ -169,6 +175,7 @@ public class DocumentFieldMetadata {
 		return facetMetadata;
 	}
 
+	@Override
 	public Map<String, BridgeDefinedField> getBridgeDefinedFields() {
 		return bridgeDefinedFields;
 	}
@@ -196,12 +203,13 @@ public class DocumentFieldMetadata {
 				'}';
 	}
 
-	public static class Builder {
+	public static class Builder implements PartialDocumentFieldMetadata {
 		protected final BackReference<DocumentFieldMetadata> resultReference = new BackReference<>();
 
 		// required parameters
 		private final BackReference<TypeMetadata> sourceType;
 		private final BackReference<PropertyMetadata> sourceProperty;
+		private final PartialPropertyMetadata partialSourceProperty;
 		private final DocumentFieldPath path;
 		private final Store store;
 		private final Field.Index index;
@@ -223,12 +231,14 @@ public class DocumentFieldMetadata {
 
 		public Builder(BackReference<TypeMetadata> sourceType,
 				BackReference<PropertyMetadata> sourceProperty,
+				PartialPropertyMetadata partialSourceProperty,
 				DocumentFieldPath path,
 				Store store,
 				Field.Index index,
 				Field.TermVector termVector) {
 			this.sourceType = sourceType;
 			this.sourceProperty = sourceProperty;
+			this.partialSourceProperty = partialSourceProperty;
 			this.path = path;
 			this.store = store;
 			this.index = index;
@@ -237,12 +247,27 @@ public class DocumentFieldMetadata {
 			this.bridgeDefinedFields = new LinkedHashMap<>();
 		}
 
+		@Override
+		public PartialPropertyMetadata getSourceProperty() {
+			return partialSourceProperty;
+		}
+
+		@Override
+		public DocumentFieldPath getPath() {
+			return path;
+		}
+
 		public String getAbsoluteName() {
 			return path.getAbsoluteName();
 		}
 
 		public String getRelativeName() {
 			return path.getRelativeName();
+		}
+
+		@Override
+		public Index getIndex() {
+			return index;
 		}
 
 		public Builder fieldBridge(FieldBridge fieldBridge) {
@@ -280,6 +305,11 @@ public class DocumentFieldMetadata {
 			return this;
 		}
 
+		@Override
+		public boolean isNumeric() {
+			return isNumeric;
+		}
+
 		public Builder spatial() {
 			this.isSpatial = true;
 			return this;
@@ -295,6 +325,11 @@ public class DocumentFieldMetadata {
 			return this;
 		}
 
+		@Override
+		public NumericEncodingType getNumericEncodingType() {
+			return numericEncodingType;
+		}
+
 		public Builder addFacetMetadata(FacetMetadata facetMetadata) {
 			this.facetMetadata.add( facetMetadata );
 			return this;
@@ -303,6 +338,11 @@ public class DocumentFieldMetadata {
 		public Builder addBridgeDefinedField(BridgeDefinedField bridgeDefinedField) {
 			this.bridgeDefinedFields.put( bridgeDefinedField.getAbsoluteName(), bridgeDefinedField );
 			return this;
+		}
+
+		@Override
+		public Map<String, BridgeDefinedField> getBridgeDefinedFields() {
+			return Collections.unmodifiableMap( bridgeDefinedFields );
 		}
 
 		public BackReference<DocumentFieldMetadata> getResultReference() {
