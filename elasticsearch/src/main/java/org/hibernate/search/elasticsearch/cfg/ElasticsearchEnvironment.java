@@ -45,10 +45,9 @@ public final class ElasticsearchEnvironment {
 	 * Multiple servers may be specified for load-balancing: requests will be assigned to each host in turns.
 	 * Failover is not supported yet.
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.host=http://myeshost.com:9200}), i.e. only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.host}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String SERVER_URI = "elasticsearch.host";
 
@@ -59,10 +58,9 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * Defaults to no username (anonymous access).
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.username=ironman}), because. only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.username}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String SERVER_USERNAME = "elasticsearch.username";
 
@@ -73,10 +71,9 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * Defaults to no password at all.
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.password=j@rV1s}), because only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.password}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String SERVER_PASSWORD = "elasticsearch.password";
 
@@ -87,10 +84,9 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * Defaults to {@link Defaults#SERVER_READ_TIMEOUT}.
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.read_timeout=60000}), because only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.read_timeout}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String SERVER_READ_TIMEOUT = "elasticsearch.read_timeout";
 
@@ -101,10 +97,9 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * Defaults to {@link Defaults#SERVER_CONNECTION_TIMEOUT}.
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.connection_timeout=2000}), because only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.connection_timeout}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String SERVER_CONNECTION_TIMEOUT = "elasticsearch.connection_timeout";
 
@@ -115,10 +110,9 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_TOTAL_CONNECTION}.
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.max_total_connection=30}), because only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.max_total_connection}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String MAX_TOTAL_CONNECTION = "elasticsearch.max_total_connection";
 
@@ -129,10 +123,9 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_TOTAL_CONNECTION_PER_ROUTE}.
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.max_total_connection_per_route=3}), because only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.max_total_connection_per_route}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String MAX_TOTAL_CONNECTION_PER_ROUTE = "elasticsearch.max_total_connection_per_route";
 
@@ -143,10 +136,9 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.discovery.enabled=true}), because only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.discovery.enabled}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String DISCOVERY_ENABLED = "elasticsearch.discovery.enabled";
 
@@ -157,10 +149,9 @@ public final class ElasticsearchEnvironment {
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
 	 * <p>
-	 * Can only be given <b>globally</b> (e.g.
-	 * {@code hibernate.search.default.elasticsearch.discovery.refresh_interval=20}), because only a single Elasticsearch
-	 * cluster is supported for all the indexed entities. This limitation will be removed in a future version of
-	 * Hibernate Search.
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.discovery.refresh_interval}).
+	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String DISCOVERY_REFRESH_INTERVAL = "elasticsearch.discovery.refresh_interval";
 
