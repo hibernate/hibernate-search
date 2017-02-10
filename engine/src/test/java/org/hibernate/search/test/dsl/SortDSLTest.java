@@ -809,7 +809,13 @@ public class SortDSLTest {
 		}
 	}
 
-	public static class WrappedStringValueFieldBridge implements org.hibernate.search.bridge.FieldBridge, StringBridge {
+	public static class WrappedStringValueFieldBridge implements MetadataProvidingFieldBridge, StringBridge {
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			builder.field( name, FieldType.STRING )
+					.sortable( true );
+		}
 
 		@Override
 		public String objectToString(Object object) {
@@ -831,6 +837,7 @@ public class SortDSLTest {
 			}
 
 			luceneOptions.addFieldToDocument( name, stringValue, document );
+			luceneOptions.addSortedDocValuesFieldToDocument( name, stringValue, document );
 		}
 
 	}
