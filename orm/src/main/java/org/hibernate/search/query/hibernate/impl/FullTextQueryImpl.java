@@ -50,7 +50,8 @@ import org.hibernate.type.Type;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements FullTextQuery<R> {
+@SuppressWarnings("rawtypes") // We extend the raw version of AbstractProducedQuery on purpose, see HSEARCH-2564
+public class FullTextQueryImpl extends AbstractProducedQuery implements FullTextQuery {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -100,7 +101,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	}
 
 	@Override
-	public List<R> getResultList() {
+	public List getResultList() {
 		return list();
 	}
 
@@ -289,11 +290,20 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 		return this;
 	}
 
+	/*
+	 * Implementation note: this method is defined as generic in the interface,
+	 * but we must implement it without generics (otherwise it won't compile).
+	 *
+	 * The actual reason is a bit hard to explain: basically we implement
+	 * javax.persistence.Query as a raw type at some point, and our superclass
+	 * (also extended as a raw type) also implements this interface, but as a non-raw type.
+	 * This seems to confuse the compiler, which thinks there are two different methods.
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T unwrap(Class<T> type) {
+	public Object unwrap(Class type) {
 		if ( type == org.apache.lucene.search.Query.class ) {
-			return (T) hSearchQuery.getLuceneQuery();
+			return hSearchQuery.getLuceneQuery();
 		}
 		throw new IllegalArgumentException( "Cannot unwrap " + type.getName() );
 	}
@@ -389,12 +399,12 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	}
 
 	@Override
-	public FullTextQuery<R> setEntity(int position, Object val) {
+	public FullTextQuery setEntity(int position, Object val) {
 		throw new UnsupportedOperationException( "setEntity(int,Object) is not implemented in Hibernate Search queries" );
 	}
 
 	@Override
-	public FullTextQuery<R> setEntity(String name, Object val) {
+	public FullTextQuery setEntity(String name, Object val) {
 		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
 	}
 

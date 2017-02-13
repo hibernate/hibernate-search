@@ -28,7 +28,8 @@ import org.hibernate.transform.ResultTransformer;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-public interface FullTextQuery<R> extends ProjectionConstants, QueryImplementor<R> {
+@SuppressWarnings("rawtypes") // We extend the raw version of QueryImplementor on purpose, see HSEARCH-2564
+public interface FullTextQuery extends ProjectionConstants, QueryImplementor {
 
 	/**
 	 * Allows to let lucene sort the results. This is useful when you have
