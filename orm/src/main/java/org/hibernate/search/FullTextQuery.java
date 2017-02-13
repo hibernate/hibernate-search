@@ -184,6 +184,7 @@ public interface FullTextQuery extends ProjectionConstants, QueryImplementor {
 	 *         <li>org.apache.lucene.search.Query the underlying lucene query</li>
 	 *         </ul>
 	 */
+	@Override
 	<T> T unwrap(Class<T> type);
 
 	/**
