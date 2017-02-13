@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
+import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -53,6 +54,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	private ErrorHandler errorHandler;
 	private ServiceManager serviceManager;
 	private JestClient jestClient;
+	private JestAPIFormatter jestAPIFormatter;
 
 	public BackendRequestProcessor() {
 		asyncProcessor = new AsyncBackendRequestProcessor();
@@ -63,13 +65,19 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		this.errorHandler = context.getErrorHandler();
 		this.serviceManager = context.getServiceManager();
 		this.jestClient = serviceManager.requestService( JestClient.class );
+		this.jestAPIFormatter = serviceManager.requestService( JestAPIFormatter.class );
 	}
 
 	@Override
 	public void stop() {
 		awaitAsyncProcessingCompletion();
 		asyncProcessor.shutdown();
+
+		jestAPIFormatter = null;
+		serviceManager.releaseService( JestAPIFormatter.class );
+		jestClient = null;
 		serviceManager.releaseService( JestClient.class );
+		serviceManager = null;
 	}
 
 	public void executeSync(Iterable<BackendRequest<?>> requests) {
@@ -321,7 +329,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 
 		private ExecutableRequest build(boolean refresh) {
 			if ( size > 1 ) {
-				return new BulkRequest( jestClient, errorHandler, bulk, indexNames, indexesNeedingRefresh, refresh );
+				return new BulkRequest( jestClient, jestAPIFormatter, errorHandler, bulk, indexNames, indexesNeedingRefresh, refresh );
 			}
 			else {
 				return new SingleRequest( jestClient, errorHandler, bulk.iterator().next() );

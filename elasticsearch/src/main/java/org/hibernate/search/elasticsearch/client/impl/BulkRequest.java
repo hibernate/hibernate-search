@@ -16,17 +16,30 @@ import java.util.Set;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.impl.NoOpBackendRequestResultAssessor;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
+import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import io.searchbox.action.BulkableAction;
+import io.searchbox.core.Bulk;
+import io.searchbox.core.BulkResult;
+import io.searchbox.core.Bulk.Builder;
 import io.searchbox.core.BulkResult.BulkResultItem;
+import io.searchbox.params.Parameters;
 
 /**
  * A request group backed by an actual bulk request.
  */
 public class BulkRequest implements ExecutableRequest {
 
+	private static final Log LOG = LoggerFactory.make( Log.class );
+
 	private final JestClient jestClient;
+	private final JestAPIFormatter jestAPIFormatter;
 	private final ErrorHandler errorHandler;
 	private final List<BackendRequest<?>> requests;
 
@@ -44,9 +57,11 @@ public class BulkRequest implements ExecutableRequest {
 	 */
 	private final Set<String> indexesNeedingRefresh;
 
-	public BulkRequest(JestClient jestClient, ErrorHandler errorHandler, List<BackendRequest<?>> requests,
+	public BulkRequest(JestClient jestClient, JestAPIFormatter jestAPIFormatter,
+			ErrorHandler errorHandler, List<BackendRequest<?>> requests,
 			Set<String> indexNames, Set<String> indexesNeedingRefresh, boolean refresh) {
 		this.jestClient = jestClient;
+		this.jestAPIFormatter = jestAPIFormatter;
 		this.errorHandler = errorHandler;
 		this.requests = requests;
 		this.indexNames = indexNames;
@@ -58,7 +73,7 @@ public class BulkRequest implements ExecutableRequest {
 	public void execute() {
 		Map<BackendRequest<?>, BulkResultItem> results = null;
 		try {
-			results = jestClient.executeBulkRequest( requests, refresh );
+			results = doExecute();
 			RuntimeException e = reportResults( results, null );
 			if ( e != null ) {
 				throw e; // Handle the exception below
@@ -83,6 +98,53 @@ public class BulkRequest implements ExecutableRequest {
 		}
 		catch (Exception e) {
 			errorHandler.handleException( "Bulk request failed", e );
+		}
+	}
+
+	private Map<BackendRequest<?>, BulkResultItem> doExecute() {
+		Builder bulkBuilder = new Bulk.Builder()
+				.setParameter( Parameters.REFRESH, refresh );
+
+		for ( BackendRequest<?> backendRequest : requests ) {
+			bulkBuilder.addAction( (BulkableAction<?>) backendRequest.getAction() );
+		}
+
+		Bulk request = bulkBuilder.build();
+
+		BulkResult response = jestClient.executeRequest( request, NoOpBackendRequestResultAssessor.INSTANCE );
+
+		Map<BackendRequest<?>, BulkResultItem> successfulItems =
+				CollectionHelper.newHashMap( requests.size() );
+
+		/*
+		 * We can't rely on the status of the bulk, since each backend request may consider specific
+		 * status codes as a success regardless of their usual meaning, which Elasticsearch doesn't
+		 * know about when computing the status of the bulk.
+		 */
+		List<BackendRequest<?>> erroneousItems = new ArrayList<>();
+		int i = 0;
+		for ( BulkResultItem resultItem : response.getItems() ) {
+			BackendRequest<?> backendRequest = requests.get( i );
+
+			if ( backendRequest.getResultAssessor().isSuccess( resultItem ) ) {
+				successfulItems.put( backendRequest, resultItem );
+			}
+			else {
+				erroneousItems.add( backendRequest );
+			}
+			++i;
+		}
+
+		if ( !erroneousItems.isEmpty() ) {
+			throw LOG.elasticsearchBulkRequestFailed(
+					jestAPIFormatter.formatRequest( request ),
+					jestAPIFormatter.formatResult( response ),
+					successfulItems,
+					erroneousItems
+			);
+		}
+		else {
+			return successfulItems;
 		}
 	}
 
