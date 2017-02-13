@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.client.impl;
+package org.hibernate.search.elasticsearch.processor.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
+import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
+import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.service.spi.Service;
@@ -123,7 +125,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	 */
 	private List<ExecutableRequest> createRequestGroups(Iterable<BackendRequest<?>> requests, boolean refreshAtEnd) {
 		List<ExecutableRequest> groups = new ArrayList<>();
-		BulkRequestBuilder bulkBuilder = new BulkRequestBuilder();
+		ExecutableRequestBuilder bulkBuilder = new ExecutableRequestBuilder();
 
 		for ( BackendRequest<?> request : requests ) {
 			boolean currentRequestBulkable = request.getAction() instanceof BulkableAction;
@@ -132,7 +134,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 			// finish up current bulk
 			if ( currentBulkNeedsFinishing ) {
 				groups.add( bulkBuilder.build( false ) );
-				bulkBuilder = new BulkRequestBuilder();
+				bulkBuilder = new ExecutableRequestBuilder();
 			}
 
 			// either add to current bulk...
@@ -304,7 +306,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		}
 	}
 
-	private class BulkRequestBuilder {
+	private class ExecutableRequestBuilder {
 
 		private final List<BackendRequest<?>> bulk = new ArrayList<>();
 		private final Set<String> indexNames = new HashSet<>();

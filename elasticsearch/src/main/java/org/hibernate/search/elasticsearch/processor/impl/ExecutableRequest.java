@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.client.impl;
+package org.hibernate.search.elasticsearch.processor.impl;
 
 import java.util.Set;
 
@@ -12,7 +12,7 @@ import java.util.Set;
  * A request which is executed against the Elasticsarch backend. May either be backed by a bulk request or by a single
  * request. Allows for uniform handling of these two cases.
  */
-public interface ExecutableRequest {
+interface ExecutableRequest {
 	void execute();
 	int getSize();
 
