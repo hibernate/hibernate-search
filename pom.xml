@@ -211,6 +211,10 @@
         <elasticsearchJestVersion>2.0.4</elasticsearchJestVersion>
         <elasticsearchCommonsLang3Version>3.4</elasticsearchCommonsLang3Version>
         <elasticsearchGsonVersion>2.6.2</elasticsearchGsonVersion>
+        
+        <!-- Tests -->
+        <!-- Fixes dependency convergence within Wiremock, see below -->
+        <jacksonVersion>2.6.1</jacksonVersion>
 
         <!-- Integration tests -->
         <arquillianVersion>1.1.11.Final</arquillianVersion>
@@ -591,6 +595,32 @@
                 <groupId>org.easytesting</groupId>
                 <artifactId>fest-assert</artifactId>
                 <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tomakehurst</groupId>
+                <artifactId>wiremock</artifactId>
+                <version>2.5.1</version>
+            </dependency>
+            <!--
+                Fix dependency convergence within jackson-databind 2.6 (used by wiremock).
+                Jackson databind 2.6.x has a packaging issue: it depends on jackson-annotations:2.6.0
+                for every version of databind (2.6.1, 2.6.2, ...).
+                We solve this by managing the version of jackson ourselves. 
+             -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jacksonVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jacksonVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jacksonVersion}</version>
             </dependency>
             <!--
             We need to keep the slf4j dependencies listed here even though we are not using slf4j anymore.
