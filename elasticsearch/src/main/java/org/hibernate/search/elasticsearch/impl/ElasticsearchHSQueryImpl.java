@@ -794,6 +794,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 									distance = hit.getAsJsonObject().get( "fields" ).getAsJsonObject().get( SPATIAL_DISTANCE_FIELD );
 								}
 							}
+							if ( distance != null && distance.isJsonArray() ) {
+								JsonArray array = distance.getAsJsonArray();
+								distance = array.size() >= 1 ? array.get( 0 ) : null;
+							}
 							if ( distance == null || distance.isJsonNull() ) {
 								projections[i] = null;
 							}
