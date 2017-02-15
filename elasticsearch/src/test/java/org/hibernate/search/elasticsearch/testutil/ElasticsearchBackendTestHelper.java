@@ -9,15 +9,22 @@ package org.hibernate.search.elasticsearch.testutil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
+import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
+import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestResultAssessor;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.NoopElasticsearchWorkSuccessReporter;
+import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.TestResourceManager;
 import org.hibernate.search.test.util.BackendTestHelper;
 
+import io.searchbox.action.Action;
+import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
 
@@ -48,13 +55,15 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 			indexNames.add( ( (ElasticsearchIndexManager)indexManager ).getActualIndexName() );
 		}
 
-		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
+		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
+				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
 			Count request = new Count.Builder()
 					.addIndex( indexNames )
 					.addType( entityType.getName() )
 					.build();
 
-			CountResult response = client.get().executeRequest( request );
+			ElasticsearchWork<CountResult> work = createSimpleWork( request );
+			CountResult response = processor.get().executeSyncUnsafe( work );
 
 			return response.getCount().intValue();
 		}
@@ -64,12 +73,14 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 	public int getNumberOfDocumentsInIndex(String indexName) {
 		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
 
-		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
+		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
+				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
 			Count request = new Count.Builder()
 					.addIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.build();
 
-			CountResult response = client.get().executeRequest( request );
+			ElasticsearchWork<CountResult> work = createSimpleWork( request );
+			CountResult response = processor.get().executeSyncUnsafe( work );
 
 			return response.getCount().intValue();
 		}
@@ -80,15 +91,28 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
 		String query = value.contains( "*" ) ? "wildcard" : "term";
 
-		try ( ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class ) ) {
+		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
+				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
 			Count request = new Count.Builder()
 					.addIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.query( "{ \"query\" : { \"" + query + "\" : { \"" + fieldName + "\" : \"" + value + "\" } } }" )
 					.build();
 
-			CountResult response = client.get().executeRequest( request );
+			ElasticsearchWork<CountResult> work = createSimpleWork( request );
+			CountResult response = processor.get().executeSyncUnsafe( work );
 
 			return response.getCount().intValue();
+		}
+	}
+
+	private <T extends JestResult> ElasticsearchWork<T> createSimpleWork(Action<T> action) {
+		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
+		try ( ServiceReference<JestAPIFormatter> jestAPIFormatter =
+				serviceManager.requestReference( JestAPIFormatter.class ) ) {
+			DefaultElasticsearchRequestResultAssessor defaultResultAssessor =
+					DefaultElasticsearchRequestResultAssessor.builder( jestAPIFormatter.get() ).build();
+			return new SimpleElasticsearchWork<>( action, null, null,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
 		}
 	}
 }

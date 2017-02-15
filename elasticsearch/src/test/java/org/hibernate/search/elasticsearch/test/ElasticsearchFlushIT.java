@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.elasticsearch.test;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Locale;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -17,10 +17,8 @@ import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -32,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
-import io.searchbox.indices.settings.UpdateSettings;
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 public class ElasticsearchFlushIT {
@@ -47,6 +44,8 @@ public class ElasticsearchFlushIT {
 			)
 			.withIdProvidedImplicit( true );
 
+	@Rule
+	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2491")
@@ -75,16 +74,10 @@ public class ElasticsearchFlushIT {
 	}
 
 
-	private void increaseRefreshTime(Class<?>... indexes) {
-		ServiceManager serviceManager = sfHolder.getSearchFactory().getServiceManager();
-		try (ServiceReference<JestClient> client = serviceManager.requestReference( JestClient.class )) {
-			JestClient jestClient = client.get();
-			String body = "{ \"index\" : { \"refresh_interval\" : \"3600s\"} }";
-			UpdateSettings.Builder builder = new UpdateSettings.Builder( body );
-			for ( Class<?> index : indexes ) {
-				builder.addIndex( index.getName().toLowerCase( Locale.getDefault() ) );
-			}
-			jestClient.executeRequest( builder.build() );
+	private void increaseRefreshTime(Class<?>... indexes) throws IOException {
+		for ( Class<?> index : indexes ) {
+			elasticsearchClient.index( index ).settings( "index.refresh_interval" ).put( "'3600s'" );
+			elasticsearchClient.index( index ).waitForRequiredIndexStatus();
 		}
 	}
 

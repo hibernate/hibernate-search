@@ -14,9 +14,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.impl.DefaultBackendRequestResultAssessor;
 import org.hibernate.search.elasticsearch.impl.GsonService;
-import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -56,15 +54,11 @@ public class JestClient implements Service, Startable, Stoppable {
 
 	private ServiceManager serviceManager;
 	private GsonService gsonService;
-	private JestAPIFormatter jestAPIFormatter;
-	private DefaultBackendRequestResultAssessor defaultResultAssessor;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
 		gsonService = serviceManager.requestService( GsonService.class );
-		jestAPIFormatter = serviceManager.requestService( JestAPIFormatter.class );
-		defaultResultAssessor = DefaultBackendRequestResultAssessor.builder( jestAPIFormatter ).build();
 
 		JestClientFactory factory = new JestClientFactory();
 
@@ -155,27 +149,12 @@ public class JestClient implements Service, Startable, Stoppable {
 		client.shutdownClient();
 		client = null;
 
-		jestAPIFormatter = null;
-		serviceManager.releaseService( JestAPIFormatter.class );
 		gsonService = null;
 		serviceManager.releaseService( GsonService.class );
 		serviceManager = null;
 	}
 
-	public <T extends JestResult> T executeRequest(Action<T> request) {
-		return executeRequest( request, defaultResultAssessor );
-	}
-
-	public <T extends JestResult> T executeRequest(Action<T> request, BackendRequestResultAssessor<? super T> resultAssessor) {
-		try {
-			T result = client.execute( request );
-
-			resultAssessor.checkSuccess( request, result );
-
-			return result;
-		}
-		catch (IOException e) {
-			throw LOG.elasticsearchRequestFailed( jestAPIFormatter.formatRequest( request ), null, e );
-		}
+	public <T extends JestResult> T executeRequest(Action<T> request) throws IOException {
+		return client.execute( request );
 	}
 }

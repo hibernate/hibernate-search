@@ -4,10 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.impl;
+package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
-import org.hibernate.search.elasticsearch.client.impl.BackendRequestSuccessReporter;
 
 import io.searchbox.core.BulkResult.BulkResultItem;
 import io.searchbox.core.DocumentResult;
@@ -16,11 +15,11 @@ import io.searchbox.core.DocumentResult;
 /**
  * @author Yoann Rodiere
  */
-class DocumentAddedBackendRequestSuccessReporter implements BackendRequestSuccessReporter<DocumentResult> {
+public class DocumentAddedElasticsearchWorkSuccessReporter implements ElasticsearchWorkSuccessReporter<DocumentResult> {
 
-	public static final DocumentAddedBackendRequestSuccessReporter INSTANCE = new DocumentAddedBackendRequestSuccessReporter();
+	public static final DocumentAddedElasticsearchWorkSuccessReporter INSTANCE = new DocumentAddedElasticsearchWorkSuccessReporter();
 
-	private DocumentAddedBackendRequestSuccessReporter() {
+	private DocumentAddedElasticsearchWorkSuccessReporter() {
 		// Private constructor
 	}
 

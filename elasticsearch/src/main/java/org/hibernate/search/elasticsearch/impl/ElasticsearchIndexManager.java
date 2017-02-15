@@ -25,9 +25,8 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
-import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.processor.impl.BackendRequestProcessor;
+import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaDropper;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaMigrator;
@@ -37,6 +36,7 @@ import org.hibernate.search.elasticsearch.schema.impl.ExecutionOptions;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -94,7 +94,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	private ServiceManager serviceManager;
 
 	private ElasticsearchIndexWorkVisitor visitor;
-	private BackendRequestProcessor requestProcessor;
+	private ElasticsearchWorkProcessor requestProcessor;
 
 	private ElasticsearchSchemaCreator schemaCreator;
 	private ElasticsearchSchemaDropper schemaDropper;
@@ -114,6 +114,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		final int indexManagementWaitTimeout = getIndexManagementWaitTimeout( properties );
 		final boolean multitenancyEnabled = context.isMultitenancyEnabled();
 		final DynamicType dynamicMapping = getDynamicMapping( properties );
+
 		this.schemaManagementExecutionOptions = new ExecutionOptions() {
 			@Override
 			public ElasticsearchIndexStatus getRequiredIndexStatus() {
@@ -154,7 +155,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 				context.getUninitializedSearchIntegrator(),
 				jestApiFormatter
 		);
-		this.requestProcessor = context.getServiceManager().requestService( BackendRequestProcessor.class );
+		this.requestProcessor = context.getServiceManager().requestService( ElasticsearchWorkProcessor.class );
 	}
 
 	private static String getOverriddenIndexName(String indexName, Properties properties) {
@@ -222,7 +223,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		serviceManager.releaseService( JestAPIFormatter.class );
 
 		requestProcessor = null;
-		serviceManager.releaseService( BackendRequestProcessor.class );
+		serviceManager.releaseService( ElasticsearchWorkProcessor.class );
 		schemaTranslator = null;
 		serviceManager.releaseService( ElasticsearchSchemaTranslator.class );
 		schemaValidator = null;
@@ -419,33 +420,33 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	@Override
 	public void performOperations(List<LuceneWork> workList, IndexingMonitor monitor) {
-		List<BackendRequest<?>> requests = new ArrayList<>( workList.size() );
+		List<ElasticsearchWork<?>> elasticsearchWorks = new ArrayList<>( workList.size() );
 		for ( LuceneWork luceneWork : workList ) {
-			requests.add( luceneWork.acceptIndexWorkVisitor( visitor, monitor ) );
+			elasticsearchWorks.add( luceneWork.acceptIndexWorkVisitor( visitor, monitor ) );
 		}
 
-		requestProcessor.executeSync( requests );
+		requestProcessor.executeSyncSafe( elasticsearchWorks );
 	}
 
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
-		BackendRequest<?> request = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
+		ElasticsearchWork<?> elasticsearchWork = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
 		if ( singleOperation instanceof FlushLuceneWork ) {
 			requestProcessor.awaitAsyncProcessingCompletion();
-			executeBackendRequest( request, true );
+			executeWork( elasticsearchWork, true );
 		}
 		else {
-			executeBackendRequest( request, false );
+			executeWork( elasticsearchWork, false );
 		}
 	}
 
-	private void executeBackendRequest(BackendRequest<?> backendRequest, boolean sync) {
-		if ( backendRequest != null ) {
+	private void executeWork(ElasticsearchWork<?> elasticsearchWork, boolean sync) {
+		if ( elasticsearchWork != null ) {
 			if ( sync ) {
-				requestProcessor.executeSync( Collections.<BackendRequest<?>>singletonList( backendRequest ) );
+				requestProcessor.executeSyncSafe( Collections.<ElasticsearchWork<?>>singletonList( elasticsearchWork ) );
 			}
 			else {
-				requestProcessor.executeAsync( backendRequest );
+				requestProcessor.executeAsync( elasticsearchWork );
 			}
 		}
 	}

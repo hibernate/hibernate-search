@@ -12,15 +12,18 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.search.elasticsearch.client.impl.BackendRequestResultAssessor;
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.elasticsearch.impl.DefaultBackendRequestResultAssessor;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
+import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestResultAssessor;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequestResultAssessor;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.NoopElasticsearchWorkSuccessReporter;
+import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
@@ -64,42 +67,48 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	private ServiceManager serviceManager;
 
-	private JestClient jestClient;
+	private ElasticsearchWorkProcessor workProcessor;
 
 	private GsonService gsonService;
 
 	private JestAPIFormatter jestApiFormatter;
 
-	private BackendRequestResultAssessor<JestResult> createIndexResultAssessor;
-	private BackendRequestResultAssessor<JestResult> indexExistsResultAssessor;
-	private BackendRequestResultAssessor<JestResult> healthResultAssessor;
+	private ElasticsearchRequestResultAssessor<JestResult> defaultResultAssessor;
+	private ElasticsearchRequestResultAssessor<JestResult> createIndexIfAbsentResultAssessor;
+	private ElasticsearchRequestResultAssessor<JestResult> indexExistsResultAssessor;
+	private ElasticsearchRequestResultAssessor<JestResult> healthResultAssessor;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
-		jestClient = serviceManager.requestService( JestClient.class );
+		workProcessor = serviceManager.requestService( ElasticsearchWorkProcessor.class );
 		gsonService = serviceManager.requestService( GsonService.class );
 		jestApiFormatter = serviceManager.requestService( JestAPIFormatter.class );
-		createIndexResultAssessor = DefaultBackendRequestResultAssessor.builder( jestApiFormatter )
+		defaultResultAssessor = DefaultElasticsearchRequestResultAssessor.builder( jestApiFormatter ).build();
+		createIndexIfAbsentResultAssessor = DefaultElasticsearchRequestResultAssessor.builder( jestApiFormatter )
 				.ignoreErrorTypes( "index_already_exists_exception" )
 				.build();
-		indexExistsResultAssessor = DefaultBackendRequestResultAssessor.builder( jestApiFormatter )
+		indexExistsResultAssessor = DefaultElasticsearchRequestResultAssessor.builder( jestApiFormatter )
 				.ignoreErrorStatuses( 404 )
 				.build();
-		healthResultAssessor = DefaultBackendRequestResultAssessor.builder( jestApiFormatter )
+		healthResultAssessor = DefaultElasticsearchRequestResultAssessor.builder( jestApiFormatter )
 				.ignoreErrorStatuses( 408 )
 				.build();
 	}
 
 	@Override
 	public void stop() {
-		createIndexResultAssessor = null;
+		defaultResultAssessor = null;
+		createIndexIfAbsentResultAssessor = null;
+		indexExistsResultAssessor = null;
+		healthResultAssessor = null;
+
 		jestApiFormatter = null;
 		serviceManager.releaseService( JestAPIFormatter.class );
-		jestClient = null;
-		serviceManager.releaseService( JestClient.class );
 		gsonService = null;
 		serviceManager.releaseService( GsonService.class );
+		workProcessor = null;
+		serviceManager.releaseService( ElasticsearchWorkProcessor.class );
 		serviceManager = null;
 	}
 
@@ -119,7 +128,9 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 				.settings( settingsAsJson )
 				.build();
 
-		jestClient.executeRequest( createIndex );
+		ElasticsearchWork<?> work = new SimpleElasticsearchWork<>( createIndex, null, indexName,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+		workProcessor.executeSyncUnsafe( work );
 	}
 
 	/**
@@ -132,7 +143,9 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 				.settings( settingsAsJson )
 				.build();
 
-		JestResult result = jestClient.executeRequest( createIndex, createIndexResultAssessor );
+		ElasticsearchWork<JestResult> work = new SimpleElasticsearchWork<>( createIndex, null, indexName,
+				createIndexIfAbsentResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+		JestResult result = workProcessor.executeSyncUnsafe( work );
 		if ( !result.isSucceeded() ) {
 			// The index was created just after we checked if it existed: just do as if it had been created when we checked.
 			return false;
@@ -142,7 +155,11 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	public boolean indexExists(String indexName) {
-		JestResult peekResult = jestClient.executeRequest( new IndicesExists.Builder( indexName ).build(), indexExistsResultAssessor );
+		IndicesExists indicesExists = new IndicesExists.Builder( indexName ).build();
+		ElasticsearchWork<JestResult> work = new SimpleElasticsearchWork<>( indicesExists, null, indexName,
+				indexExistsResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+
+		JestResult peekResult = workProcessor.executeSyncUnsafe( work );
 		return peekResult.getResponseCode() == 200;
 	}
 
@@ -153,8 +170,11 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		GetMapping getMapping = new GetMapping.Builder()
 				.addIndex( indexName )
 				.build();
+		ElasticsearchWork<JestResult> getMappingWork = new SimpleElasticsearchWork<>( getMapping, null, indexName,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+
 		try {
-			JestResult result = jestClient.executeRequest( getMapping );
+			JestResult result = workProcessor.executeSyncUnsafe( getMappingWork );
 			JsonObject resultJson = result.getJsonObject();
 			JsonElement index = result.getJsonObject().get( indexName );
 			if ( index == null || !index.isJsonObject() ) {
@@ -174,8 +194,11 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		GetSettings getSettings = new GetSettings.Builder()
 				.addIndex( indexName )
 				.build();
+		ElasticsearchWork<JestResult> getSettingsWork = new SimpleElasticsearchWork<>( getSettings, null, indexName,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+
 		try {
-			JestResult result = jestClient.executeRequest( getSettings );
+			JestResult result = workProcessor.executeSyncUnsafe( getSettingsWork );
 			JsonObject resultJson = result.getJsonObject();
 			JsonElement index = result.getJsonObject().get( indexName );
 			if ( index == null || !index.isJsonObject() ) {
@@ -209,9 +232,11 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		UpdateSettings putSettings = new UpdateSettings.Builder( settingsAsJson )
 				.addIndex( indexName )
 				.build();
+		ElasticsearchWork<JestResult> work = new SimpleElasticsearchWork<>( putSettings, null, indexName,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
 
 		try {
-			jestClient.executeRequest( putSettings );
+			workProcessor.executeSyncUnsafe( work );
 		}
 		catch (RuntimeException e) {
 			throw LOG.elasticsearchSettingsUpdateFailed( indexName, e );
@@ -227,9 +252,11 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 				mappingAsJson
 		)
 		.build();
+		ElasticsearchWork<JestResult> work = new SimpleElasticsearchWork<>( putMapping, null, indexName,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
 
 		try {
-			jestClient.executeRequest( putMapping );
+			workProcessor.executeSyncUnsafe( work );
 		}
 		catch (RuntimeException e) {
 			throw LOG.elasticsearchMappingCreationFailed( mappingName, e );
@@ -255,8 +282,10 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 				}
 			}
 		};
+		ElasticsearchWork<JestResult> work = new SimpleElasticsearchWork<>( health, null, theIndexName,
+				healthResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
 
-		JestResult result = jestClient.executeRequest( health, healthResultAssessor );
+		JestResult result = workProcessor.executeSyncUnsafe( work );
 
 		if ( !result.isSucceeded() ) {
 			String status = result.getJsonObject().get( "status" ).getAsString();
@@ -265,17 +294,29 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	public void dropIndex(String indexName, ExecutionOptions executionOptions) {
-		jestClient.executeRequest( new DeleteIndex.Builder( indexName ).build() );
+		DeleteIndex action = new DeleteIndex.Builder( indexName ).build();
+		ElasticsearchWork<JestResult> work = new SimpleElasticsearchWork<>( action, null, indexName,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+
+		workProcessor.executeSyncUnsafe( work );
 	}
 
 	public void closeIndex(String indexName) {
-		jestClient.executeRequest( new CloseIndex.Builder( indexName ).build() );
+		CloseIndex action = new CloseIndex.Builder( indexName ).build();
+		ElasticsearchWork<JestResult> work = new SimpleElasticsearchWork<>( action, null, indexName,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+
+		workProcessor.executeSyncUnsafe( work );
 		LOG.closedIndex( indexName );
 	}
 
 	public void openIndex(String indexName) {
 		try {
-			jestClient.executeRequest( new OpenIndex.Builder( indexName ).build() );
+			OpenIndex action = new OpenIndex.Builder( indexName ).build();
+			ElasticsearchWork<JestResult> work = new SimpleElasticsearchWork<>( action, null, indexName,
+					defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+
+			workProcessor.executeSyncUnsafe( work );
 		}
 		catch (RuntimeException e) {
 			LOG.openedIndex( indexName );

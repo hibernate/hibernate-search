@@ -26,7 +26,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
-import org.hibernate.search.elasticsearch.processor.impl.BulkRequestFailedException;
+import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;

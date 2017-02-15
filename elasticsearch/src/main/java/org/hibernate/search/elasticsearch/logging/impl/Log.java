@@ -14,9 +14,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
-import org.hibernate.search.elasticsearch.processor.impl.BulkRequestFailedException;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
+import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
+import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
 import org.jboss.logging.Logger.Level;
@@ -29,7 +29,6 @@ import org.jboss.logging.annotations.Param;
 
 import com.google.gson.JsonElement;
 
-import io.searchbox.client.JestResult;
 import io.searchbox.core.BulkResult.BulkResultItem;
 
 /**
@@ -74,7 +73,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
 	)
 	BulkRequestFailedException elasticsearchBulkRequestFailed(String request, String response,
-			@Param Map<BackendRequest<? extends JestResult>, BulkResultItem> successfulItems, @Param List<BackendRequest<? extends JestResult>> erroneousItems);
+			@Param Map<BulkableElasticsearchWork<?>, BulkResultItem> successfulItems, @Param List<BulkableElasticsearchWork<?>> erroneousItems);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,

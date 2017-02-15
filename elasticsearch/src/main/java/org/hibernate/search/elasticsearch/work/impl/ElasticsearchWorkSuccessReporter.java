@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.client.impl;
+package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
 
@@ -14,7 +14,7 @@ import io.searchbox.core.BulkResult.BulkResultItem;
 /**
  * @author Yoann Rodiere
  */
-public interface BackendRequestSuccessReporter<T extends JestResult> {
+public interface ElasticsearchWorkSuccessReporter<T extends JestResult> {
 
 	/**
 	 * Reports the given detailed result to the given monitor.

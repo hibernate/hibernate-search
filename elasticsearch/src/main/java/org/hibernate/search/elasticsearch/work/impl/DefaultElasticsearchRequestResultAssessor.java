@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.impl;
+package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.elasticsearch.client.impl.BackendRequestResultAssessor;
+import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -25,7 +25,7 @@ import io.searchbox.core.BulkResult.BulkResultItem;
 /**
  * @author Yoann Rodiere
  */
-public class DefaultBackendRequestResultAssessor implements BackendRequestResultAssessor<JestResult> {
+public class DefaultElasticsearchRequestResultAssessor implements ElasticsearchRequestResultAssessor<JestResult> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -59,8 +59,8 @@ public class DefaultBackendRequestResultAssessor implements BackendRequestResult
 			return this;
 		}
 
-		public DefaultBackendRequestResultAssessor build() {
-			return new DefaultBackendRequestResultAssessor( this );
+		public DefaultElasticsearchRequestResultAssessor build() {
+			return new DefaultElasticsearchRequestResultAssessor( this );
 		}
 	}
 
@@ -68,7 +68,7 @@ public class DefaultBackendRequestResultAssessor implements BackendRequestResult
 	private final Set<Integer> ignoredErrorStatuses;
 	private final Set<String> ignoredErrorTypes;
 
-	private DefaultBackendRequestResultAssessor(Builder builder) {
+	private DefaultElasticsearchRequestResultAssessor(Builder builder) {
 		this.formatter = builder.formatter;
 		this.ignoredErrorStatuses = Collections.unmodifiableSet( new HashSet<>( builder.ignoredErrorStatuses ) );
 		this.ignoredErrorTypes = Collections.unmodifiableSet( new HashSet<>( builder.ignoredErrorTypes ) );

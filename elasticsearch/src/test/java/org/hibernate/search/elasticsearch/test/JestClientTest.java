@@ -23,7 +23,6 @@ import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -49,9 +48,6 @@ public class JestClientTest {
 	private static final String URI_2 = "http://localhost:" + PORT_2;
 
 	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
-	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Rule
@@ -64,7 +60,7 @@ public class JestClientTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
-	public void simple() {
+	public void simple() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 );
 
@@ -88,15 +84,12 @@ public class JestClientTest {
 	}
 
 	@Test
-	public void error() {
+	public void error() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 );
 
 		String payload = "{ \"foo\": \"bar\" }";
 		String errorMessage = "ErrorMessageExplainingTheError";
-		thrown.expectMessage( "HSEARCH400007" );
-		thrown.expectMessage( "500" );
-		thrown.expectMessage( errorMessage );
 		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
@@ -108,7 +101,10 @@ public class JestClientTest {
 			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 
 			Index request = new Index.Builder( payload ).index( "myIndex" ).type( "myType" ).build();
-			jestClient.executeRequest( request );
+			DocumentResult result = jestClient.executeRequest( request );
+			assertThat( result.getResponseCode() ).as( "getResponseCode" ).isEqualTo( 500 );
+			assertThat( result.getErrorMessage() ).as( "getErrorMessage" ).contains( errorMessage );
+			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isFalse();
 		}
 		finally {
 			jestClient.stop();
@@ -117,7 +113,7 @@ public class JestClientTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2235")
-	public void multipleHosts() {
+	public void multipleHosts() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 );
 
@@ -193,7 +189,7 @@ public class JestClientTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2453")
-	public void authentication() {
+	public void authentication() throws Exception {
 		String username = "ironman";
 		String password = "j@rV1s";
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
@@ -236,15 +232,12 @@ public class JestClientTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2453")
-	public void authentication_error() {
+	public void authentication_error() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 );
 
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessageUnauthorized";
-		thrown.expectMessage( "HSEARCH400007" );
-		thrown.expectMessage( "401" );
-		thrown.expectMessage( statusMessage );
 		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType/_search" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
@@ -256,7 +249,10 @@ public class JestClientTest {
 			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 
 			Search request = new Search.Builder( payload ).addIndex( "myIndex" ).addType( "myType" ).build();
-			jestClient.executeRequest( request );
+			SearchResult result = jestClient.executeRequest( request );
+			assertThat( result.getResponseCode() ).as( "getResponseCode" ).isEqualTo( 401 );
+			assertThat( result.getErrorMessage() ).as( "getErrorMessage" ).contains( statusMessage );
+			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isFalse();
 		}
 		finally {
 			jestClient.stop();

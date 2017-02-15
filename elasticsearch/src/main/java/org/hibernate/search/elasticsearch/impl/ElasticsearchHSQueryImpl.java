@@ -39,11 +39,15 @@ import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
+import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestResultAssessor;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.NoopElasticsearchWorkSuccessReporter;
+import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
 import org.hibernate.search.elasticsearch.util.impl.Window;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -83,6 +87,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
+import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Explain;
@@ -208,7 +213,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				.get( documentId )
 				.getAsJsonObject();
 
-		try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
+		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
+				getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
 			/*
 			 * Do not add every property of the original payload: some properties, such as "_source", do not have the same syntax
 			 * and are not necessary to the explanation.
@@ -217,18 +223,31 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					.add( "query", searcher.payload.get( "query" ) )
 					.build();
 
+			String indexName = hit.get( "_index" ).getAsString();
 			Explain request = new Explain.Builder(
-					hit.get( "_index" ).getAsString(),
+					indexName,
 					hit.get( "_type" ).getAsString(),
 					hit.get( "_id" ).getAsString(),
 					explainPayload
 				)
 				.build();
 
-			DocumentResult response = client.get().executeRequest( request );
+			ElasticsearchWork<DocumentResult> work = createSimpleWork( request );
+
+			DocumentResult response = processor.get().executeSyncUnsafe( work );
 			JsonObject explanation = response.getJsonObject().get( "explanation" ).getAsJsonObject();
 
 			return convertExplanation( explanation );
+		}
+	}
+
+	private <T extends JestResult> ElasticsearchWork<T> createSimpleWork(Action<T> action) {
+		try ( ServiceReference<JestAPIFormatter> jestAPIFormatter =
+					getExtendedSearchIntegrator().getServiceManager().requestReference( JestAPIFormatter.class ) ) {
+			DefaultElasticsearchRequestResultAssessor defaultResultAssessor =
+					DefaultElasticsearchRequestResultAssessor.builder( jestAPIFormatter.get() ).build();
+			return new SimpleElasticsearchWork<>( action, null, null,
+				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
 		}
 	}
 
@@ -712,8 +731,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 
-			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
-				return client.get().executeRequest( search );
+			try ( ServiceReference<ElasticsearchWorkProcessor> processor =
+					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
+				ElasticsearchWork<SearchResult> work = createSimpleWork( search );
+				return processor.get().executeSyncUnsafe( work );
 			}
 		}
 
@@ -748,8 +769,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			SearchScroll.Builder builder = new SearchScroll.Builder( scrollId, getScrollTimeout() );
 
 			SearchScroll scroll = builder.build();
-			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
-				return client.get().executeRequest( scroll );
+			try ( ServiceReference<ElasticsearchWorkProcessor> processor =
+					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
+				ElasticsearchWork<JestResult> work = createSimpleWork( scroll );
+				return processor.get().executeSyncUnsafe( work );
 			}
 		}
 
@@ -763,8 +786,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 			};
 
-			try ( ServiceReference<JestClient> client = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
-				return client.get().executeRequest( scroll );
+			try ( ServiceReference<ElasticsearchWorkProcessor> processor =
+					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
+				ElasticsearchWork<JestResult> work = createSimpleWork( scroll );
+				return processor.get().executeSyncUnsafe( work );
 			}
 		}
 

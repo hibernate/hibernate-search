@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -34,23 +35,23 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
-import org.hibernate.search.engine.service.spi.ServiceReference;
+import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-
-import io.searchbox.core.SearchResult;
+import com.google.gson.JsonObject;
 
 /**
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
 public class ElasticsearchJavaTimeIT extends SearchTestBase {
+
+	@Rule
+	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
 	@After
 	public void deleteEntity() {
@@ -253,35 +254,26 @@ public class ElasticsearchJavaTimeIT extends SearchTestBase {
 		assertThatFieldIsFormatted( sample, "monthDay", "--12-01" );
 	}
 
-	private void assertThatFieldIsFormatted(Sample sample, String field, String expectedSourceAndFieldValue) {
+	private void assertThatFieldIsFormatted(Sample sample, String field, String expectedSourceAndFieldValue) throws IOException {
 		assertThatFieldIsFormatted( sample, field, expectedSourceAndFieldValue, expectedSourceAndFieldValue );
 
 	}
 
-	private void assertThatFieldIsFormatted(Sample sample, String field, String expectedSourceValue, String expectedFieldValue) {
+	private void assertThatFieldIsFormatted(Sample sample, String fieldName, String expectedSourceValue, String expectedFieldValue) throws IOException {
 		try (org.hibernate.Session s = openSession()) {
 			Transaction tx = s.beginTransaction();
 			s.persist( sample );
 			s.flush();
 			tx.commit();
 
-			try ( ServiceReference<JestClient> reference = getExtendedSearchIntegrator().getServiceManager().requestReference( JestClient.class ) ) {
-				JestClient client = reference.get();
-				SearchResult result = client.executeRequest(
-						new io.searchbox.core.Search.Builder( "{\"query\":{\"match_all\":{}},\"fields\":[\"_source\", \"" + field + "\"]}" )
-								.addIndex( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( Sample.class.getName() ) )
-								.build()
-						);
+			String documentId = String.valueOf( sample.id );
+			JsonObject source = elasticsearchClient.index( Sample.class ).document( documentId ).getSource();
+			JsonElement storedField = elasticsearchClient.index( Sample.class ).document( documentId ).getStoredField( fieldName );
 
-				JsonArray hits = result.getJsonObject().get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
-				assertEquals( "Unexpected number of indexed documents; indexing probably failed.", 1, hits.size() );
-
-				JsonElement hit = hits.get( 0 );
-				assertEquals( "Unexpected '_source' value", expectedSourceValue,
-						hit.getAsJsonObject().get( "_source" ).getAsJsonObject().get( field ).getAsString() );
-				assertEquals( "Unexpected 'fields' value", expectedFieldValue,
-						hit.getAsJsonObject().get( "fields" ).getAsJsonObject().get( field ).getAsJsonArray().get( 0 ).getAsString() );
-			}
+			assertEquals( "Unexpected '_source' value", expectedSourceValue,
+					source.get( fieldName ).getAsString() );
+			assertEquals( "Unexpected 'fields' value", expectedFieldValue,
+					storedField.getAsJsonArray().get( 0 ).getAsString() );
 		}
 	}
 

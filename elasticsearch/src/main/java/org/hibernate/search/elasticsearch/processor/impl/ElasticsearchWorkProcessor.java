@@ -7,43 +7,45 @@
 package org.hibernate.search.elasticsearch.processor.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
-import org.hibernate.search.elasticsearch.client.impl.BackendRequest;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.work.impl.BulkElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
+import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkAggregator;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import io.searchbox.action.BulkableAction;
-import io.searchbox.indices.Refresh;
-
 /**
- * Executes single or multiple {@link BackendRequest}s against the Elasticsearch server. When processing multiple
- * requests, bulk requests will be formed and executed as far as possible.
+ * Executes single or multiple {@link ElasticsearchWork}s against the Elasticsearch server.
+ * <p>
+ * When processing multiple requests, bulk requests will be formed and executed as far as possible.
  * <p>
  * Requests can be processed synchronously or asynchronously. In the latter case, incoming requests are added to a queue
  * via {@link AsyncBackendRequestProcessor} from where a worker runnable will process them in bulks.
  *
  * @author Gunnar Morling
  */
-public class BackendRequestProcessor implements Service, Startable, Stoppable {
+public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -57,8 +59,9 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	private ServiceManager serviceManager;
 	private JestClient jestClient;
 	private JestAPIFormatter jestAPIFormatter;
+	private ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
 
-	public BackendRequestProcessor() {
+	public ElasticsearchWorkProcessor() {
 		asyncProcessor = new AsyncBackendRequestProcessor();
 	}
 
@@ -68,6 +71,7 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		this.serviceManager = context.getServiceManager();
 		this.jestClient = serviceManager.requestService( JestClient.class );
 		this.jestAPIFormatter = serviceManager.requestService( JestAPIFormatter.class );
+		this.parallelWorkExecutionContext = new ParallelWorkExecutionContext( jestClient, jestAPIFormatter );
 	}
 
 	@Override
@@ -82,11 +86,24 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		serviceManager = null;
 	}
 
-	public void executeSync(Iterable<BackendRequest<?>> requests) {
-		doExecute( requests );
+	/**
+	 * Executes a work synchronously, potentially throwing exceptions (the error handler isn't used).
+	 */
+	public <T> T executeSyncUnsafe(ElasticsearchWork<T> work) {
+		return work.execute( parallelWorkExecutionContext );
 	}
 
-	public void executeAsync(BackendRequest<?> request) {
+	/**
+	 * Executes works synchronously, passing any thrown exception to the error handler.
+	 */
+	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> requests) {
+		executeSafely( requests );
+	}
+
+	/**
+	 * Executes a work asynchronously, passing any exception to the error handler.
+	 */
+	public void executeAsync(ElasticsearchWork<?> request) {
 		asyncProcessor.submitRequest( request );
 	}
 
@@ -102,83 +119,77 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	 * Groups the given work list into executable bulks and executes them. For each bulk, the error handler - if
 	 * registered - will be invoked with the items of that bulk.
 	 */
-	private void doExecute(Iterable<BackendRequest<?>> requests) {
-		ExecutableRequest nextBulk = null;
-		Set<String> indexesNeedingRefresh = new HashSet<>();
+	private void executeSafely(Iterable<ElasticsearchWork<?>> requests) {
+		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
+				this, jestClient, jestAPIFormatter, errorHandler );
 
-		for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests, true ) ) {
-			nextBulk = backendRequestGroup;
-
-			if ( LOG.isTraceEnabled() ) {
-				LOG.tracef( "Processing bulk of %s items on index(es) %s", (Integer) nextBulk.getSize(), nextBulk.getTouchedIndexes() );
-			}
-
-			nextBulk.execute();
-			indexesNeedingRefresh.addAll( backendRequestGroup.getIndexesNeedingRefresh() );
+		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
+			executeSafely( work, context );
 		}
 
-		refresh( indexesNeedingRefresh );
+		context.flush();
 	}
 
-	/**
-	 * Organizes the given work list into {@link ExecutableRequest}s to be executed.
-	 */
-	private List<ExecutableRequest> createRequestGroups(Iterable<BackendRequest<?>> requests, boolean refreshAtEnd) {
-		List<ExecutableRequest> groups = new ArrayList<>();
-		ExecutableRequestBuilder bulkBuilder = new ExecutableRequestBuilder();
-
-		for ( BackendRequest<?> request : requests ) {
-			boolean currentRequestBulkable = request.getAction() instanceof BulkableAction;
-			boolean currentBulkNeedsFinishing = ( !bulkBuilder.canAddMore() || !currentRequestBulkable ) && !bulkBuilder.isEmpty();
-
-			// finish up current bulk
-			if ( currentBulkNeedsFinishing ) {
-				groups.add( bulkBuilder.build( false ) );
-				bulkBuilder = new ExecutableRequestBuilder();
-			}
-
-			// either add to current bulk...
-			if ( currentRequestBulkable ) {
-				bulkBuilder.add( request );
-			}
-			// ...  or add single request for non-bulkable request
-			else {
-				groups.add( new SingleRequest( jestClient, errorHandler, request ) );
-			}
-		}
-
-		// finish up last bulk
-		if ( !bulkBuilder.isEmpty() ) {
-			groups.add( bulkBuilder.build( refreshAtEnd ) );
-		}
-
-		return groups;
-	}
-
-	/**
-	 * Performs an explicit refresh of the given index(es).
-	 */
-	private void refresh(Set<String> indexesNeedingRefresh) {
-		if ( indexesNeedingRefresh.isEmpty() ) {
-			return;
-		}
-
+	private void executeSafely(ElasticsearchWork<?> work, ElasticsearchWorkExecutionContext context) {
 		if ( LOG.isTraceEnabled() ) {
-			LOG.tracef( "Refreshing index(es) %s", indexesNeedingRefresh );
-		}
-
-		Refresh.Builder refreshBuilder = new Refresh.Builder();
-
-		for ( String index : indexesNeedingRefresh ) {
-			refreshBuilder.addIndex( index );
+			LOG.tracef( "Processing %s", work );
 		}
 
 		try {
-			jestClient.executeRequest( refreshBuilder.build() );
+			work.execute( context );
 		}
-		catch (SearchException e) {
-			errorHandler.handleException( "Refresh failed", e );
+		catch (BulkRequestFailedException brfe) {
+			ErrorContextBuilder builder = new ErrorContextBuilder();
+			List<LuceneWork> allWorks = new ArrayList<>();
+
+			for ( BulkableElasticsearchWork<?> successfulWork : brfe.getSuccessfulItems().keySet() ) {
+				successfulWork.getLuceneWorks().forEach( (w) -> {
+						allWorks.add( w );
+						builder.workCompleted( w );
+				});
+			}
+
+			for ( BulkableElasticsearchWork<?> failedWork : brfe.getErroneousItems() ) {
+				failedWork.getLuceneWorks().forEach( (w) -> {
+						allWorks.add( w );
+						builder.addWorkThatFailed( w );
+				});
+			}
+
+			builder.allWorkToBeDone( allWorks );
+
+			builder.errorThatOccurred( brfe );
+
+			errorHandler.handle( builder.createErrorContext() );
 		}
+		catch (RuntimeException e) {
+			ErrorContextBuilder builder = new ErrorContextBuilder();
+			List<LuceneWork> allWorks = new ArrayList<>();
+
+			work.getLuceneWorks().forEach( (w) -> {
+					allWorks.add( w );
+					builder.addWorkThatFailed( w );
+			});
+
+			builder.allWorkToBeDone( allWorks );
+
+			builder.errorThatOccurred( e );
+
+			errorHandler.handle( builder.createErrorContext() );
+		}
+	}
+
+	/**
+	 * Organizes the given work list into {@link ProcessorWork}s to be executed.
+	 */
+	private List<ElasticsearchWork<?>> createRequestGroups(Iterable<ElasticsearchWork<?>> requests, boolean refreshInBulkAPICall) {
+		ProcessorWorkGroupBuilder bulkBuilder = new ProcessorWorkGroupBuilder( refreshInBulkAPICall );
+
+		for ( ElasticsearchWork<?> request : requests ) {
+			request.aggregate( bulkBuilder );
+		}
+
+		return bulkBuilder.build();
 	}
 
 	/**
@@ -193,19 +204,19 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 	private class AsyncBackendRequestProcessor {
 
 		private final ScheduledExecutorService scheduler;
-		private final MultiWriteDrainableLinkedList<BackendRequest<?>> asyncRequestQueue;
+		private final MultiWriteDrainableLinkedList<ElasticsearchWork<?>> asyncWorkQueue;
 		private final AtomicBoolean asyncWorkerWasStarted;
 
 		private volatile CountDownLatch lastAsyncWorkLatch;
 
 		private AsyncBackendRequestProcessor() {
-			asyncRequestQueue = new MultiWriteDrainableLinkedList<>();
+			asyncWorkQueue = new MultiWriteDrainableLinkedList<>();
 			scheduler = Executors.newScheduledThreadPool( "Elasticsearch AsyncBackendRequestProcessor" );
 			asyncWorkerWasStarted = new AtomicBoolean( false );
 		}
 
-		public void submitRequest(BackendRequest<?> request) {
-			asyncRequestQueue.add( request );
+		public void submitRequest(ElasticsearchWork<?> request) {
+			asyncWorkQueue.add( request );
 
 			// Set up worker if needed
 			if ( !asyncWorkerWasStarted.get() ) {
@@ -286,56 +297,70 @@ public class BackendRequestProcessor implements Service, Startable, Stoppable {
 		}
 
 		private void processAsyncWork() {
-			Set<String> indexesNeedingFlush = new HashSet<>();
+			SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
+					ElasticsearchWorkProcessor.this, jestClient, jestAPIFormatter, errorHandler );
 			synchronized ( asyncProcessor ) {
 				while ( true ) {
-					Iterable<BackendRequest<?>> requests = asyncProcessor.asyncRequestQueue.drainToDetachedIterable();
-					if ( requests == null ) {
+					Iterable<ElasticsearchWork<?>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();
+					if ( works == null ) {
 						// Allow other async processors to be setup already as we're on our way to termination:
 						asyncProcessor.asyncWorkerWasStarted.set( false );
 						// Nothing more to do, flush and terminate:
-						refresh( indexesNeedingFlush );
+						context.flush();
 						return;
 					}
-					for ( ExecutableRequest backendRequestGroup : createRequestGroups( requests, false ) ) {
-						backendRequestGroup.execute();
-						indexesNeedingFlush.addAll( backendRequestGroup.getIndexesNeedingRefresh() );
+					for ( ElasticsearchWork<?> work : createRequestGroups( works, false ) ) {
+						work.execute( context );
 					}
 				}
 			}
 		}
 	}
 
-	private class ExecutableRequestBuilder {
+	private static class ProcessorWorkGroupBuilder implements ElasticsearchWorkAggregator {
 
-		private final List<BackendRequest<?>> bulk = new ArrayList<>();
-		private final Set<String> indexNames = new HashSet<>();
-		private final Set<String> indexesNeedingRefresh = new HashSet<>();
-		private int size = 0;
+		private final boolean refreshInBulkAPICall;
 
-		private void add(BackendRequest<?> request) {
-			bulk.add( request );
-			indexNames.add( request.getIndexName() );
-			if ( request.needsRefreshAfterWrite() ) {
-				indexesNeedingRefresh.add( request.getIndexName() );
+		private final List<ElasticsearchWork<?>> result = new ArrayList<>();
+		private final List<BulkableElasticsearchWork<?>> bulkInProgress = new ArrayList<>();
+
+		public ProcessorWorkGroupBuilder(boolean refreshInBulkAPICall) {
+			super();
+			this.refreshInBulkAPICall = refreshInBulkAPICall;
+		}
+
+		@Override
+		public void addBulkable(BulkableElasticsearchWork<?> work) {
+			bulkInProgress.add( work );
+			if ( bulkInProgress.size() >= MAX_BULK_SIZE ) {
+				flushBulkInProgress();
 			}
-			size++;
-		}
-		private boolean canAddMore() {
-			return size < MAX_BULK_SIZE;
 		}
 
-		private boolean isEmpty() {
-			return size == 0;
+		@Override
+		public void addNonBulkable(ElasticsearchWork<?> work) {
+			flushBulkInProgress();
+			result.add( work );
 		}
 
-		private ExecutableRequest build(boolean refresh) {
-			if ( size > 1 ) {
-				return new BulkRequest( jestClient, jestAPIFormatter, errorHandler, bulk, indexNames, indexesNeedingRefresh, refresh );
+		private void flushBulkInProgress() {
+			if ( bulkInProgress.isEmpty() ) {
+				return;
+			}
+
+			if ( bulkInProgress.size() == 1 ) {
+				ElasticsearchWork<?> work = bulkInProgress.iterator().next();
+				result.add( work );
 			}
 			else {
-				return new SingleRequest( jestClient, errorHandler, bulk.iterator().next() );
+				result.add( new BulkElasticsearchWork( bulkInProgress, refreshInBulkAPICall ) );
 			}
+			bulkInProgress.clear();
+		}
+
+		private List<ElasticsearchWork<?>> build() {
+			flushBulkInProgress();
+			return result;
 		}
 	}
 }

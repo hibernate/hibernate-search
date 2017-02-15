@@ -36,6 +36,8 @@ import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.Health.Builder;
+import io.searchbox.core.DocumentResult;
+import io.searchbox.core.Get;
 import io.searchbox.core.Index;
 import io.searchbox.indices.CloseIndex;
 import io.searchbox.indices.CreateIndex;
@@ -88,6 +90,10 @@ public class TestElasticsearchClient extends ExternalResource {
 			this.indexName = indexName;
 		}
 
+		public void waitForRequiredIndexStatus() throws IOException {
+			TestElasticsearchClient.this.waitForRequiredIndexStatus( indexName );
+		}
+
 		public IndexClient deleteAndCreate() throws IOException {
 			TestElasticsearchClient.this.deleteAndCreateIndex( indexName );
 			return this;
@@ -117,6 +123,10 @@ public class TestElasticsearchClient extends ExternalResource {
 
 		public SettingsClient settings(String settingsPath) {
 			return new SettingsClient( this, settingsPath );
+		}
+
+		public DocumentClient document(String id) {
+			return new DocumentClient( this, id );
 		}
 	}
 
@@ -166,6 +176,26 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 	}
 
+	public class DocumentClient {
+
+		private final IndexClient indexClient;
+
+		private final String id;
+
+		public DocumentClient(IndexClient indexClient, String id) {
+			this.indexClient = indexClient;
+			this.id = id;
+		}
+
+		public JsonObject getSource() throws IOException {
+			return TestElasticsearchClient.this.getDocumentSource( indexClient.indexName, id );
+		}
+
+		public JsonElement getStoredField(String fieldName) throws IOException {
+			return TestElasticsearchClient.this.getDocumentField( indexClient.indexName, id, fieldName );
+		}
+	}
+
 	public TemplateClient template(String templateName) {
 		return new TemplateClient( templateName );
 	}
@@ -199,7 +229,7 @@ public class TestElasticsearchClient extends ExternalResource {
 			throw new AssertionFailure( "Error while creating index '" + indexName + "' for tests:" + result.getErrorMessage() );
 		}
 
-		waitForIndexCreation( indexName );
+		waitForRequiredIndexStatus( indexName );
 	}
 
 	private void createTemplate(String templateName, String templateString, JsonObject settings) throws IOException {
@@ -233,7 +263,7 @@ public class TestElasticsearchClient extends ExternalResource {
 		createdTemplatesNames.add( templateName );
 	}
 
-	private void waitForIndexCreation(final String indexNameToWaitFor) throws IOException {
+	private void waitForRequiredIndexStatus(final String indexNameToWaitFor) throws IOException {
 		Builder healthBuilder = new Health.Builder()
 				.setParameter( "wait_for_status", requiredIndexStatus.getElasticsearchString() )
 				.setParameter( "timeout", ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_WAIT_TIMEOUT + "ms" );
@@ -349,6 +379,35 @@ public class TestElasticsearchClient extends ExternalResource {
 			throw new AssertionFailure( "Error while indexing '" + jsonDocument
 					+ "' on index '" + indexName + "' for tests:" + result.getErrorMessage() );
 		}
+	}
+
+	private JsonObject getDocumentSource(String indexName, String id) throws IOException {
+		DocumentResult result = client.execute(
+				new Get.Builder( indexName, id )
+						.build()
+				);
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while retrieving document '" + id
+					+ "' from index '" + indexName
+					+ "' for tests:" + result.getErrorMessage() );
+		}
+
+		return result.getJsonObject().get( "_source" ).getAsJsonObject();
+	}
+
+	private JsonElement getDocumentField(String indexName, String id, String fieldName) throws IOException {
+		DocumentResult result = client.execute(
+				new Get.Builder( indexName, id )
+						.setParameter( "fields", fieldName )
+						.build()
+				);
+		if ( !result.isSucceeded() ) {
+			throw new AssertionFailure( "Error while retrieving document '" + id
+					+ "' from index '" + indexName
+					+ "' for tests:" + result.getErrorMessage() );
+		}
+
+		return result.getJsonObject().get( "fields" ).getAsJsonObject().get( fieldName );
 	}
 
 	@Override
