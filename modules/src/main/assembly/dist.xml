@@ -129,6 +129,7 @@
                 <include>org.apache.lucene:lucene-queries</include>
                 <include>org.apache.lucene:lucene-facet</include>
                 <include>org.apache.lucene:lucene-analyzers-common</include>
+                <include>org.apache.lucene:lucene-grouping</include>
             </includes>
         </dependencySet>
 

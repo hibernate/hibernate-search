@@ -12,6 +12,7 @@
         <resource-root path="lucene-queries-${luceneVersion}.jar" />
         <resource-root path="lucene-facet-${luceneVersion}.jar" />
         <resource-root path="lucene-analyzers-common-${luceneVersion}.jar" />
+        <resource-root path="lucene-grouping-${luceneVersion}.jar" />
     </resources>
     <dependencies>
         <module name="javax.api" optional="true" />
