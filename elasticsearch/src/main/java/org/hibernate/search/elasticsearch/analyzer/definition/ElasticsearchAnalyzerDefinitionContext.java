@@ -9,6 +9,8 @@ package org.hibernate.search.elasticsearch.analyzer.definition;
 
 /**
  * @author Yoann Rodiere
+ *
+ * @hsearch.experimental The specific API of this DSL is a prototype.
  */
 public interface ElasticsearchAnalyzerDefinitionContext {
 

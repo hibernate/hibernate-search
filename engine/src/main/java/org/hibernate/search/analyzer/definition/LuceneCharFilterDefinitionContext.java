@@ -8,6 +8,8 @@ package org.hibernate.search.analyzer.definition;
 
 /**
  * @author Yoann Rodiere
+ *
+ * @hsearch.experimental The specific API of this DSL is a prototype.
  */
 public interface LuceneCharFilterDefinitionContext extends LuceneAnalyzerDefinitionWithTokenizerContext {
 
