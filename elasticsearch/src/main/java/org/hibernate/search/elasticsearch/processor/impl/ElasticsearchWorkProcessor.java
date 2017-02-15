@@ -19,8 +19,8 @@ import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.work.impl.BulkElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
+import org.hibernate.search.elasticsearch.work.impl.BulkWork;
 import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkAggregator;
@@ -121,7 +121,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	 */
 	private void executeSafely(Iterable<ElasticsearchWork<?>> requests) {
 		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-				this, jestClient, jestAPIFormatter, errorHandler );
+				jestClient, this, jestAPIFormatter, errorHandler );
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
 			executeSafely( work, context );
@@ -298,7 +298,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 
 		private void processAsyncWork() {
 			SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-					ElasticsearchWorkProcessor.this, jestClient, jestAPIFormatter, errorHandler );
+					jestClient, ElasticsearchWorkProcessor.this, jestAPIFormatter, errorHandler );
 			synchronized ( asyncProcessor ) {
 				while ( true ) {
 					Iterable<ElasticsearchWork<?>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();
@@ -317,7 +317,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 		}
 	}
 
-	private static class ProcessorWorkGroupBuilder implements ElasticsearchWorkAggregator {
+	private class ProcessorWorkGroupBuilder implements ElasticsearchWorkAggregator {
 
 		private final boolean refreshInBulkAPICall;
 
@@ -353,7 +353,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 				result.add( work );
 			}
 			else {
-				result.add( new BulkElasticsearchWork( bulkInProgress, refreshInBulkAPICall ) );
+				result.add( new BulkWork.Builder( bulkInProgress ).refresh( refreshInBulkAPICall ).build() );
 			}
 			bulkInProgress.clear();
 		}

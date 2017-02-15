@@ -30,15 +30,13 @@ import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponen
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
-import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestResultAssessor;
-import org.hibernate.search.elasticsearch.work.impl.DeleteByQueryResultAssessor;
-import org.hibernate.search.elasticsearch.work.impl.DocumentAddedElasticsearchWorkSuccessReporter;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequestResultAssessor;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.NoopElasticsearchWorkSuccessReporter;
-import org.hibernate.search.elasticsearch.work.impl.SimpleBulkableElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
 import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
+import org.hibernate.search.elasticsearch.work.impl.DeleteByQueryWork;
+import org.hibernate.search.elasticsearch.work.impl.DeleteWork;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.FlushWork;
+import org.hibernate.search.elasticsearch.work.impl.IndexWork;
+import org.hibernate.search.elasticsearch.work.impl.OptimizeWork;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -54,15 +52,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import io.searchbox.action.BulkableAction;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Delete;
-import io.searchbox.core.DeleteByQuery;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Index;
-import io.searchbox.indices.Flush;
-import io.searchbox.indices.Optimize;
-
 /**
  * Converts {@link LuceneWork}s into corresponding {@link ElasticsearchWork}s. Instances are specific
  * to one index.
@@ -77,53 +66,35 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 	private final boolean refreshAfterWrite;
 	private final ExtendedSearchIntegrator searchIntegrator;
 
-	private final ElasticsearchRequestResultAssessor<JestResult> defaultResultAssessor;
-	private final ElasticsearchRequestResultAssessor<JestResult> deleteResultAssessor;
-	private final ElasticsearchRequestResultAssessor<JestResult> deleteByQueryResultAssessor;
-
-	public ElasticsearchIndexWorkVisitor(String indexName, boolean refreshAfterWrite, ExtendedSearchIntegrator searchIntegrator,
-			JestAPIFormatter jestApiFormatter) {
+	public ElasticsearchIndexWorkVisitor(String indexName, boolean refreshAfterWrite,
+			ExtendedSearchIntegrator searchIntegrator) {
 		this.indexName = indexName;
 		this.refreshAfterWrite = refreshAfterWrite;
 		this.searchIntegrator = searchIntegrator;
-		this.defaultResultAssessor = DefaultElasticsearchRequestResultAssessor.builder( jestApiFormatter ).build();
-		this.deleteResultAssessor = DefaultElasticsearchRequestResultAssessor.builder( jestApiFormatter )
-				.ignoreErrorStatuses( 404 ).build();
-		this.deleteByQueryResultAssessor = new DeleteByQueryResultAssessor( jestApiFormatter );
 	}
 
 	@Override
 	public ElasticsearchWork<?> visitAddWork(AddLuceneWork work, IndexingMonitor monitor) {
-		BulkableAction<DocumentResult> index = indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() );
-		return new SimpleBulkableElasticsearchWork<>( index, work, indexName, defaultResultAssessor,
-				monitor, DocumentAddedElasticsearchWorkSuccessReporter.INSTANCE, refreshAfterWrite );
+		return indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() )
+				.monitor( monitor )
+				.luceneWork( work )
+				.markIndexDirty( refreshAfterWrite )
+				.build();
 	}
 
 	@Override
 	public ElasticsearchWork<?> visitDeleteWork(DeleteLuceneWork work, IndexingMonitor monitor) {
-		Delete delete = new Delete.Builder( getDocumentId( work ) )
-			.index( indexName )
-			.type( work.getEntityClass().getName() )
-			.build();
-
-		return new SimpleBulkableElasticsearchWork<>( delete, work, indexName, deleteResultAssessor,
-				monitor, NoopElasticsearchWorkSuccessReporter.INSTANCE, refreshAfterWrite );
+		return new DeleteWork.Builder( indexName, work.getEntityClass().getName(), getDocumentId( work ) )
+				.luceneWork( work )
+				.markIndexDirty( refreshAfterWrite )
+				.build();
 	}
 
 	@Override
 	public ElasticsearchWork<?> visitOptimizeWork(OptimizeLuceneWork work, IndexingMonitor monitor) {
-		/*
-		 * As of ES 2.1, the Optimize API has been renamed to ForceMerge,
-		 * but Jest still does not provide commands for the ForceMerge API as of
-		 * version 2.0.3
-		 * See https://github.com/searchbox-io/Jest/issues/292
-		 */
-		Optimize optimize = new Optimize.Builder()
-				.addIndex( indexName )
+		return new OptimizeWork.Builder().index( indexName )
+				.luceneWork( work )
 				.build();
-
-		return new SimpleElasticsearchWork<>( optimize, work, indexName, defaultResultAssessor,
-				monitor, NoopElasticsearchWorkSuccessReporter.INSTANCE, refreshAfterWrite );
 	}
 
 	@Override
@@ -133,40 +104,33 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				work.getTenantId()
 				);
 
-		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( payload.toString() )
-			.addIndex( indexName );
+		DeleteByQueryWork.Builder builder = new DeleteByQueryWork.Builder( indexName, payload )
+				.luceneWork( work )
+				.markIndexDirty( refreshAfterWrite );
 
 		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
 		for ( Class<?> typeToDelete : typesToDelete ) {
-			builder.addType( typeToDelete.getName() );
+			builder.type( typeToDelete.getName() );
 		}
 
-		return new SimpleElasticsearchWork<>( builder.build(), work, indexName, deleteByQueryResultAssessor,
-				monitor, NoopElasticsearchWorkSuccessReporter.INSTANCE, refreshAfterWrite );
+		return builder.build();
 	}
 
 	@Override
 	public ElasticsearchWork<?> visitUpdateWork(UpdateLuceneWork work, IndexingMonitor monitor) {
-		BulkableAction<DocumentResult> index = indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() );
-		return new SimpleBulkableElasticsearchWork<>( index, work, indexName, defaultResultAssessor,
-				monitor, DocumentAddedElasticsearchWorkSuccessReporter.INSTANCE, refreshAfterWrite );
+		return indexDocument( getDocumentId( work ), work.getDocument(), work.getEntityClass() )
+				.monitor( monitor )
+				.luceneWork( work )
+				.markIndexDirty( refreshAfterWrite )
+				.build();
 	}
 
 	@Override
 	public ElasticsearchWork<?> visitFlushWork(FlushLuceneWork work, IndexingMonitor monitor) {
-		Flush flush = new Flush.Builder().setParameter( "wait_if_ongoing", "true" )
-				.addIndex( indexName )
-				.refresh( true )
+		return new FlushWork.Builder()
+				.index( indexName )
+				.luceneWork( work )
 				.build();
-		return new SimpleElasticsearchWork<>(
-				flush,
-				work,
-				indexName,
-				defaultResultAssessor,
-				monitor,
-				NoopElasticsearchWorkSuccessReporter.INSTANCE,
-				false
-		);
 	}
 
 	@Override
@@ -175,17 +139,15 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				searchIntegrator.getIndexBinding( work.getEntityClass() ).getDocumentBuilder(),
 				work.getDeletionQuery()
 		);
-		String type = work.getEntityClass().getName();
+		String typeName = work.getEntityClass().getName();
 
 		JsonObject payload = createDeleteByQueryPayload( convertedQuery, work.getTenantId() );
 
-		DeleteByQuery deleteByQuery = new DeleteByQuery.Builder( payload.toString() )
-			.addIndex( indexName )
-			.addType( type )
-			.build();
-
-		return new SimpleElasticsearchWork<>( deleteByQuery, work, indexName, deleteByQueryResultAssessor,
-				monitor, NoopElasticsearchWorkSuccessReporter.INSTANCE, refreshAfterWrite );
+		return new DeleteByQueryWork.Builder( indexName, payload )
+				.luceneWork( work )
+				.type( typeName )
+				.markIndexDirty( refreshAfterWrite )
+				.build();
 	}
 
 	private JsonObject createDeleteByQueryPayload(JsonObject query, String tenantId) {
@@ -212,17 +174,11 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 	}
 
 
-	private BulkableAction<DocumentResult> indexDocument(String id, Document document, Class<?> entityType) {
+	private IndexWork.Builder indexDocument(String id, Document document, Class<?> entityType) {
 		JsonObject source = convertDocumentToJson( document, entityType );
-		String type = entityType.getName();
+		String typeName = entityType.getName();
 
-		Index index = new Index.Builder( source )
-			.index( indexName )
-			.type( type )
-			.id( id )
-			.build();
-
-		return index;
+		return new IndexWork.Builder( indexName, typeName, id, source );
 	}
 
 	private JsonObject convertDocumentToJson(Document document, Class<?> entityType) {

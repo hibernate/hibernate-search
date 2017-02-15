@@ -8,7 +8,7 @@ package org.hibernate.search.elasticsearch.settings.impl.translation;
 
 import org.hibernate.search.annotations.Parameter;
 
-interface AnalysisDefinitionFactory<D> {
+public interface AnalysisDefinitionFactory<D> {
 
 	String getType();
 

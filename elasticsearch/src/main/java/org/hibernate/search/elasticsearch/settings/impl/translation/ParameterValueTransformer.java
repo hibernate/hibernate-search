@@ -8,6 +8,6 @@ package org.hibernate.search.elasticsearch.settings.impl.translation;
 
 import com.google.gson.JsonElement;
 
-interface ParameterValueTransformer {
+public interface ParameterValueTransformer {
 	JsonElement transform(String parameterValue);
 }

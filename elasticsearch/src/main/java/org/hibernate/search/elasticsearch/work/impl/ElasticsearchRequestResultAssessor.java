@@ -19,17 +19,19 @@ public interface ElasticsearchRequestResultAssessor<T extends JestResult> {
 
 	/**
 	 * Checks the given detailed result, throwing an exception if the result is a failure.
+	 * @param context The context in which the request was executed.
 	 * @param request The request that produced the result.
 	 * @param result The detailed result.
 	 * @throws SearchException If the result is a failure.
 	 */
-	void checkSuccess(Action<? extends T> request, T result) throws SearchException;
+	void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends T> request, T result) throws SearchException;
 
 	/**
 	 * Checks the given summary result, return {@code true} if it is successful, {@code false} otherwise.
+	 * @param context The context in which the request was executed.
 	 * @param bulkResultItem The summary result.
 	 * @return {@code true} if the result is successful, {@code false} otherwise.
 	 */
-	boolean isSuccess(BulkResultItem bulkResultItem);
+	boolean isSuccess(ElasticsearchWorkExecutionContext context, BulkResultItem bulkResultItem);
 
 }

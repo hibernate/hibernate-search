@@ -26,9 +26,11 @@ import io.searchbox.params.Parameters;
 /**
  * @author Yoann Rodiere
  */
-public class BulkElasticsearchWork implements ElasticsearchWork<BulkResult> {
+public class BulkWork implements ElasticsearchWork<BulkResult> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
+
+	private final Bulk request;
 
 	private final List<BulkableElasticsearchWork<?>> works;
 
@@ -43,10 +45,11 @@ public class BulkElasticsearchWork implements ElasticsearchWork<BulkResult> {
 	 */
 	private final boolean refreshInAPICall;
 
-	public BulkElasticsearchWork(List<BulkableElasticsearchWork<?>> works, boolean refreshInAPICall) {
+	protected BulkWork(Builder builder) {
 		super();
-		this.works = new ArrayList<>( works );
-		this.refreshInAPICall = refreshInAPICall;
+		this.request = builder.buildAction();
+		this.works = new ArrayList<>( builder.bulkableWorks );
+		this.refreshInAPICall = builder.refreshInBulkAPICall;
 	}
 
 	@Override
@@ -62,9 +65,6 @@ public class BulkElasticsearchWork implements ElasticsearchWork<BulkResult> {
 
 	@Override
 	public BulkResult execute(ElasticsearchWorkExecutionContext context) {
-		Bulk.Builder bulkBuilder = new Bulk.Builder()
-				.setParameter( Parameters.REFRESH, refreshInAPICall );
-
 		if ( refreshInAPICall ) {
 			/*
 			 * Prevent bulked works to mark indexes as dirty,
@@ -72,12 +72,6 @@ public class BulkElasticsearchWork implements ElasticsearchWork<BulkResult> {
 			 */
 			context = new NoIndexDirtyBulkExecutionContext( context );
 		}
-
-		for ( BulkableElasticsearchWork<?> work : works ) {
-			bulkBuilder.addAction( work.getBulkableAction() );
-		}
-
-		Bulk request = bulkBuilder.build();
 
 		BulkResult response;
 		try {
@@ -176,4 +170,31 @@ public class BulkElasticsearchWork implements ElasticsearchWork<BulkResult> {
 		}
 	}
 
+	public static class Builder {
+		private final Bulk.Builder jestBuilder;
+		private final List<BulkableElasticsearchWork<?>> bulkableWorks;
+		private boolean refreshInBulkAPICall;
+
+		public Builder(List<BulkableElasticsearchWork<?>> bulkableWorks) {
+			this.bulkableWorks = bulkableWorks;
+			this.jestBuilder = new Bulk.Builder();
+		}
+
+		public Builder refresh(boolean refresh) {
+			this.refreshInBulkAPICall = refresh;
+			return this;
+		}
+
+		protected Bulk buildAction() {
+			for ( BulkableElasticsearchWork<?> work : bulkableWorks ) {
+				jestBuilder.addAction( work.getBulkableAction() );
+			}
+			jestBuilder.setParameter( Parameters.REFRESH, refreshInBulkAPICall );
+			return jestBuilder.build();
+		}
+
+		public BulkWork build() {
+			return new BulkWork( this );
+		}
+	}
 }

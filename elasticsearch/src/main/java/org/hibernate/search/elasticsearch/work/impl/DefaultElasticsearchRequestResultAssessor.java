@@ -31,19 +31,15 @@ public class DefaultElasticsearchRequestResultAssessor implements ElasticsearchR
 
 	private static final int TIME_OUT_HTTP_RESPONSE_CODE = 408;
 
-	public static Builder builder(JestAPIFormatter formatter) {
-		return new Builder( formatter );
+	public static final DefaultElasticsearchRequestResultAssessor INSTANCE = builder().build();
+
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	public static class Builder {
-		private final JestAPIFormatter formatter;
-
 		private final Set<Integer> ignoredErrorStatuses = new HashSet<>();
 		private final Set<String> ignoredErrorTypes = new HashSet<>();
-
-		private Builder(JestAPIFormatter formatter) {
-			this.formatter = formatter;
-		}
 
 		public Builder ignoreErrorStatuses(int ... ignoredErrorStatuses) {
 			for ( int ignoredErrorStatus : ignoredErrorStatuses ) {
@@ -64,12 +60,10 @@ public class DefaultElasticsearchRequestResultAssessor implements ElasticsearchR
 		}
 	}
 
-	private final JestAPIFormatter formatter;
 	private final Set<Integer> ignoredErrorStatuses;
 	private final Set<String> ignoredErrorTypes;
 
 	private DefaultElasticsearchRequestResultAssessor(Builder builder) {
-		this.formatter = builder.formatter;
 		this.ignoredErrorStatuses = Collections.unmodifiableSet( new HashSet<>( builder.ignoredErrorStatuses ) );
 		this.ignoredErrorTypes = Collections.unmodifiableSet( new HashSet<>( builder.ignoredErrorTypes ) );
 	}
@@ -85,8 +79,9 @@ public class DefaultElasticsearchRequestResultAssessor implements ElasticsearchR
 	}
 
 	@Override
-	public void checkSuccess(Action<? extends JestResult> request, JestResult result) throws SearchException {
+	public void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends JestResult> request, JestResult result) throws SearchException {
 		if ( !isSuccess( result ) ) {
+			JestAPIFormatter formatter = context.getJestAPIFormatter();
 			if ( result.getResponseCode() == TIME_OUT_HTTP_RESPONSE_CODE ) {
 				throw LOG.elasticsearchRequestTimeout( formatter.formatRequest( request ), formatter.formatResult( result ) );
 			}
@@ -97,7 +92,7 @@ public class DefaultElasticsearchRequestResultAssessor implements ElasticsearchR
 	}
 
 	@Override
-	public boolean isSuccess(BulkResultItem resultItem) {
+	public boolean isSuccess(ElasticsearchWorkExecutionContext context, BulkResultItem resultItem) {
 		// When getting a 404 for a DELETE, the error is null :(, so checking both
 		return (resultItem.error == null && resultItem.status < 400 )
 			|| ignoredErrorStatuses.contains( resultItem.status )

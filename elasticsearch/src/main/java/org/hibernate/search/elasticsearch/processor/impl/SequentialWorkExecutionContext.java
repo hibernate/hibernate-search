@@ -15,15 +15,11 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestResultAssessor;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
-import org.hibernate.search.elasticsearch.work.impl.NoopElasticsearchWorkSuccessReporter;
-import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.RefreshWork;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import io.searchbox.indices.Refresh;
 
 /**
  * The execution context used in {@link ElasticsearchWorkProcessor}
@@ -37,9 +33,9 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private final ElasticsearchWorkProcessor workProcessor;
-
 	private final JestClient client;
+
+	private final ElasticsearchWorkProcessor workProcessor;
 
 	private final JestAPIFormatter jestAPIFormatter;
 
@@ -53,11 +49,12 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private final Set<String> dirtyIndexes = new HashSet<>();
 
-	public SequentialWorkExecutionContext(ElasticsearchWorkProcessor workProcessor, JestClient client,
+	public SequentialWorkExecutionContext(JestClient client,
+			ElasticsearchWorkProcessor workProcessor,
 			JestAPIFormatter jestAPIFormatter, ErrorHandler errorHandler) {
 		super();
-		this.workProcessor = workProcessor;
 		this.client = client;
+		this.workProcessor = workProcessor;
 		this.jestAPIFormatter = jestAPIFormatter;
 		this.errorHandler = errorHandler;
 	}
@@ -106,14 +103,11 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 			log.tracef( "Refreshing index(es) %s", dirtyIndexes );
 		}
 
-		Refresh.Builder refreshBuilder = new Refresh.Builder();
+		RefreshWork.Builder builder = new RefreshWork.Builder();
 		for ( String index : dirtyIndexes ) {
-			refreshBuilder.addIndex( index );
+			builder.index( index );
 		}
-		DefaultElasticsearchRequestResultAssessor defaultResultAssessor =
-				DefaultElasticsearchRequestResultAssessor.builder( jestAPIFormatter ).build();
-		ElasticsearchWork<?> work = new SimpleElasticsearchWork<>( refreshBuilder.build(), null, null,
-				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
+		ElasticsearchWork<?> work = builder.build();
 
 		try {
 			workProcessor.executeSyncUnsafe( work );

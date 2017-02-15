@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
-import org.hibernate.search.backend.LuceneWork;
 
 import io.searchbox.action.BulkableAction;
 import io.searchbox.client.JestResult;
@@ -16,18 +15,12 @@ import io.searchbox.core.BulkResult.BulkResultItem;
 /**
  * @author Yoann Rodiere
  */
-public class SimpleBulkableElasticsearchWork<T extends JestResult>
-		extends SimpleElasticsearchWork<T>
-		implements BulkableElasticsearchWork<T> {
+public class SimpleBulkableElasticsearchWork<R extends JestResult>
+		extends SimpleElasticsearchWork<R>
+		implements BulkableElasticsearchWork<R> {
 
-	public SimpleBulkableElasticsearchWork(BulkableAction<T> action,
-			LuceneWork luceneWork,
-			String indexName,
-			ElasticsearchRequestResultAssessor<? super T> resultAssessor,
-			IndexingMonitor indexingMonitor,
-			ElasticsearchWorkSuccessReporter<? super T> successReporter,
-			boolean markIndexDirty) {
-		super( action, luceneWork, indexName, resultAssessor, indexingMonitor, successReporter, markIndexDirty );
+	protected SimpleBulkableElasticsearchWork(Builder<?, R> builder) {
+		super( builder );
 	}
 
 	@Override
@@ -42,14 +35,14 @@ public class SimpleBulkableElasticsearchWork<T extends JestResult>
 
 	@Override
 	public boolean handleBulkResult(ElasticsearchWorkExecutionContext context, BulkResultItem resultItem) {
-		if ( resultAssessor.isSuccess( resultItem ) ) {
+		if ( resultAssessor.isSuccess( context, resultItem ) ) {
 			if ( indexingMonitor != null ) {
 				IndexingMonitor bufferedIndexingMonitor = context.getBufferedIndexingMonitor( indexingMonitor );
 				successReporter.report( resultItem, bufferedIndexingMonitor );
 			}
 
 			if ( markIndexDirty ) {
-				context.setIndexDirty( indexName );
+				context.setIndexDirty( dirtiedIndexName );
 			}
 
 			return true;
@@ -59,4 +52,14 @@ public class SimpleBulkableElasticsearchWork<T extends JestResult>
 		}
 	}
 
+	protected abstract static class Builder<B, R extends JestResult>
+			extends SimpleElasticsearchWork.Builder<B, R> {
+
+		public Builder(String dirtiedIndexName,
+				ElasticsearchRequestResultAssessor<? super R> resultAssessor,
+				ElasticsearchWorkSuccessReporter<? super R> successReporter) {
+			super( dirtiedIndexName, resultAssessor, successReporter );
+		}
+
+	}
 }

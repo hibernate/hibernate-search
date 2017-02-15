@@ -44,11 +44,12 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
-import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestResultAssessor;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.NoopElasticsearchWorkSuccessReporter;
-import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
 import org.hibernate.search.elasticsearch.util.impl.Window;
+import org.hibernate.search.elasticsearch.work.impl.ClearScrollWork;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.ExplainWork;
+import org.hibernate.search.elasticsearch.work.impl.ScrollWork;
+import org.hibernate.search.elasticsearch.work.impl.SearchWork;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
@@ -78,7 +79,6 @@ import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -87,14 +87,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
-import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Explain;
-import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import io.searchbox.core.SearchScroll;
-import io.searchbox.params.Parameters;
 
 /**
  * Query implementation based on Elasticsearch.
@@ -106,7 +101,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private static final JsonParser JSON_PARSER = new JsonParser();
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
-	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, LogCategory.QUERY );
 
 	private static final Pattern DOT = Pattern.compile( "\\." );
 
@@ -214,7 +208,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				.getAsJsonObject();
 
 		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
-				getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
+						getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
 			/*
 			 * Do not add every property of the original payload: some properties, such as "_source", do not have the same syntax
 			 * and are not necessary to the explanation.
@@ -223,31 +217,17 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					.add( "query", searcher.payload.get( "query" ) )
 					.build();
 
-			String indexName = hit.get( "_index" ).getAsString();
-			Explain request = new Explain.Builder(
-					indexName,
+			ElasticsearchWork<DocumentResult> work = new ExplainWork.Builder(
+					hit.get( "_index" ).getAsString(),
 					hit.get( "_type" ).getAsString(),
 					hit.get( "_id" ).getAsString(),
-					explainPayload
-				)
-				.build();
-
-			ElasticsearchWork<DocumentResult> work = createSimpleWork( request );
+					explainPayload )
+					.build();
 
 			DocumentResult response = processor.get().executeSyncUnsafe( work );
 			JsonObject explanation = response.getJsonObject().get( "explanation" ).getAsJsonObject();
 
 			return convertExplanation( explanation );
-		}
-	}
-
-	private <T extends JestResult> ElasticsearchWork<T> createSimpleWork(Action<T> action) {
-		try ( ServiceReference<JestAPIFormatter> jestAPIFormatter =
-					getExtendedSearchIntegrator().getServiceManager().requestReference( JestAPIFormatter.class ) ) {
-			DefaultElasticsearchRequestResultAssessor defaultResultAssessor =
-					DefaultElasticsearchRequestResultAssessor.builder( jestAPIFormatter.get() ).build();
-			return new SimpleElasticsearchWork<>( action, null, null,
-				defaultResultAssessor, null, NoopElasticsearchWorkSuccessReporter.INSTANCE, false );
 		}
 	}
 
@@ -685,55 +665,46 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private SearchResult search(boolean enableScrolling) {
-			Search.Builder builder = new Search.Builder( payloadAsString );
-			builder.addIndex( indexNames );
-
-			if ( enableScrolling ) {
-				/*
-				 * Note: "firstResult" is currently being ignored by Elasticsearch when scrolling.
-				 * See https://github.com/elastic/elasticsearch/issues/9373
-				 * To work this around, we don't use the "from" parameter here, and the document
-				 * extractor will skip the results by scrolling until it gets the right index.
-				 */
-
-				builder.setParameter( Parameters.SCROLL, getScrollTimeout() );
-
-				/*
-				 * The "size" parameter has a slightly different meaning when scrolling: it defines the window
-				 * size for the first search *and* for the next calls to the scroll API.
-				 * We still reduce the number of results in accordance to "maxResults", but that's done on our side
-				 * in the document extractor.
-				 */
-				builder.setParameter( Parameters.SIZE, getScrollFetchSize() );
-			}
-			else {
-				builder.setParameter( "from", firstResult );
-
-				// If the user has given a value, take it as is, let ES itself complain if it's too high; if no value is
-				// given, I take as much as possible, as by default only 10 rows would be returned
-				builder.setParameter( Parameters.SIZE, maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult );
-			}
-
-			// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
-			if ( sort != null ) {
-				validateSortFields( extendedIntegrator, getQueriedEntityTypes() );
-				for ( SortField sortField : sort.getSort() ) {
-					builder.addSort( ToElasticsearch.fromLuceneSortField( sortField ) );
-				}
-			}
-			Search search = builder.build();
-
-			if ( QUERY_LOG.isDebugEnabled() ) {
-				try ( ServiceReference<JestAPIFormatter> jestAPIFormatter =
-						extendedIntegrator.getServiceManager().requestReference( JestAPIFormatter.class ) ) {
-					// We use getURI(), but the name is confusing: it's actually the path + query parts of the URL
-					QUERY_LOG.executingElasticsearchQuery( search.getURI(), jestAPIFormatter.get().formatRequestData( search) );
-				}
-			}
-
 			try ( ServiceReference<ElasticsearchWorkProcessor> processor =
-					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
-				ElasticsearchWork<SearchResult> work = createSimpleWork( search );
+							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
+				SearchWork.Builder builder = new SearchWork.Builder( payloadAsString ).indexes( indexNames );
+
+				if ( enableScrolling ) {
+					/*
+					 * Note: "firstResult" is currently being ignored by Elasticsearch when scrolling.
+					 * See https://github.com/elastic/elasticsearch/issues/9373
+					 * To work this around, we don't use the "from" parameter here, and the document
+					 * extractor will skip the results by scrolling until it gets the right index.
+					 */
+					builder.scrolling(
+							/*
+							 * The "size" parameter has a slightly different meaning when scrolling: it defines the window
+							 * size for the first search *and* for the next calls to the scroll API.
+							 * We still reduce the number of results in accordance to "maxResults", but that's done on our side
+							 * in the document extractor.
+							 */
+							getScrollFetchSize(),
+							getScrollTimeout()
+					);
+				}
+				else {
+					builder.paging(
+							firstResult,
+							// If the user has given a 'size' value, take it as is, let ES itself complain if it's too high; if no value is
+							// given, I take as much as possible, as by default only 10 rows would be returned
+							maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult
+					);
+				}
+
+				// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
+				if ( sort != null ) {
+					validateSortFields( extendedIntegrator, getQueriedEntityTypes() );
+					for ( SortField sortField : sort.getSort() ) {
+						builder.appendSort( ToElasticsearch.fromLuceneSortField( sortField ) );
+					}
+				}
+
+				ElasticsearchWork<SearchResult> work = builder.build();
 				return processor.get().executeSyncUnsafe( work );
 			}
 		}
@@ -766,30 +737,18 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		 * Scroll through search results, using a previously obtained scrollId.
 		 */
 		JestResult scroll(String scrollId) {
-			SearchScroll.Builder builder = new SearchScroll.Builder( scrollId, getScrollTimeout() );
-
-			SearchScroll scroll = builder.build();
 			try ( ServiceReference<ElasticsearchWorkProcessor> processor =
-					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
-				ElasticsearchWork<JestResult> work = createSimpleWork( scroll );
+							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
+				ElasticsearchWork<JestResult> work = new ScrollWork.Builder( scrollId, getScrollTimeout() ).build();
 				return processor.get().executeSyncUnsafe( work );
 			}
 		}
 
-		JestResult clearScroll(String scrollId) {
-			SearchScroll.Builder builder = new SearchScroll.Builder( scrollId, getScrollTimeout() );
-
-			SearchScroll scroll = new SearchScroll( builder ) {
-				@Override
-				public String getRestMethodName() {
-					return "DELETE";
-				}
-			};
-
+		void clearScroll(String scrollId) {
 			try ( ServiceReference<ElasticsearchWorkProcessor> processor =
-					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
-				ElasticsearchWork<JestResult> work = createSimpleWork( scroll );
-				return processor.get().executeSyncUnsafe( work );
+							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
+				ElasticsearchWork<?> work = new ClearScrollWork.Builder( scrollId ).build();
+				processor.get().executeSyncUnsafe( work );
 			}
 		}
 

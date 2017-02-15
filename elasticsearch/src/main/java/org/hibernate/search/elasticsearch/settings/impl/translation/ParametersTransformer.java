@@ -10,7 +10,7 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 
-interface ParametersTransformer {
+public interface ParametersTransformer {
 
 	/**
 	 * Extracts Lucene parameters from the given map and returns the corresponding Elasticsearch parameters.
