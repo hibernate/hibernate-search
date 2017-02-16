@@ -275,9 +275,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			execute();
 		}
 
-		List<EntityInfo> results = new ArrayList<>( searchResult.getTotal() );
 		JsonObject searchResultJsonObject = searchResult.getJsonObject();
 		JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+		List<EntityInfo> results = new ArrayList<>( hits.size() );
 
 		for ( JsonElement hit : hits ) {
 			EntityInfo entityInfo = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
