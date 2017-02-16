@@ -24,6 +24,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
@@ -58,8 +59,7 @@ public class SortDSLTest {
 
 	@Before
 	public void prepareTestData() {
-		storeData(
-				new IndexedEntry( 0 )
+		IndexedEntry entry0 = new IndexedEntry( 0 )
 				.setTextField(
 						"infrequent1 infrequent2 infrequent1"
 						+ " inMultipleDocsWithUniqueScores"
@@ -73,10 +73,8 @@ public class SortDSLTest {
 				 * - to (24,32) with arc method: 10.16km
 				 * - to (24,32) with plane method: 11.12km (exact same as entry 1)
 				 */
-				.setLocation( 24.0d, 31.9d )
-		);
-		storeData(
-				new IndexedEntry( 1 )
+				.setLocation( 24.0d, 31.9d );
+		IndexedEntry entry1 = new IndexedEntry( 1 )
 				.setTextField(
 						"inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores"
 						+ " inMultipleDocsWithVariousScores"
@@ -90,13 +88,11 @@ public class SortDSLTest {
 				 * - to (24,32) with plane method: 11.12km (exact same as entry 0)
 				 */
 				.setLocation( 23.9d, 32.0d )
-		);
-		storeData(
-				new IndexedEntry( 2 )
+				.setPrevious( entry0 );
+		IndexedEntry entry2 = new IndexedEntry( 2 )
 				.setNonUniqueIntgerField( 1 )
-		);
-		storeData(
-				new IndexedEntry( 3 )
+				.setPrevious( entry1 );
+		IndexedEntry entry3 = new IndexedEntry( 3 )
 				.setTextField(
 						"infrequent1"
 						+ " inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores"
@@ -111,7 +107,13 @@ public class SortDSLTest {
 				 * - to (24,32) with plane method: 15.73km
 				 */
 				.setLocation( 23.9d, 32.1d )
-		);
+				.setPrevious( entry2 );
+		entry0.setPrevious( entry3 );
+
+		storeData( entry0 );
+		storeData( entry1 );
+		storeData( entry2 );
+		storeData( entry3 );
 	}
 
 	private QueryBuilder builder() {
@@ -679,6 +681,40 @@ public class SortDSLTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2587")
+	public void embeddedField() throws Exception {
+		Query query = builder().all().createQuery();
+
+		// Missing value is not provided; the missing values should be considered as 0
+
+		Sort sort = builder().sort()
+				.byField( "previous.uniqueDoubleField" )
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 3, 2, 1, 0 )
+		);
+
+		sort = builder().sort()
+				.byField( "previous.uniqueDoubleField" )
+						.asc()
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 3, 2, 1, 0 )
+		);
+
+		sort = builder().sort()
+				.byField( "previous.uniqueDoubleField" )
+						.desc()
+				.createSort();
+		assertThat(
+				query( query, sort ),
+				returnsIDsInOrder( 0, 1, 2, 3 )
+		);
+	}
+
 	private Matcher<List<EntityInfo>> returnsIDsInOrder(Integer ... idsInOrder) {
 		final List<Integer> idsInOrderList = Arrays.asList( idsInOrder );
 		return new TypeSafeMatcher<List<EntityInfo>>() {
@@ -830,6 +866,9 @@ public class SortDSLTest {
 		@Field(bridge = @FieldBridge(impl = WrappedDoubleValueFieldBridge.class))
 		WrappedDoubleValue fieldBridgedNumericField;
 
+		@IndexedEmbedded(depth = 1)
+		IndexedEntry previous;
+
 		Double latitude;
 
 		Double longitude;
@@ -879,6 +918,11 @@ public class SortDSLTest {
 		public IndexedEntry setLocation(Double latitude, Double longitude) {
 			this.latitude = latitude;
 			this.longitude = longitude;
+			return this;
+		}
+
+		public IndexedEntry setPrevious(IndexedEntry previous) {
+			this.previous = previous;
 			return this;
 		}
 	}
