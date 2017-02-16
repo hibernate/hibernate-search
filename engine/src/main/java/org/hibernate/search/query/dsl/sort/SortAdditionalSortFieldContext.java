@@ -7,6 +7,7 @@
 package org.hibernate.search.query.dsl.sort;
 
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -39,13 +40,14 @@ public interface SortAdditionalSortFieldContext {
 	 * <p>The default order is <strong>ascending</strong>.
 	 * <p>The sort field type will be determined automatically if possible, and an exception will be thrown
 	 * if it is not possible. Automatically determining the type is impossible in particular if
-	 * a custom field bridge is defined on the given field.
+	 * a custom field bridge is defined on the given field and if this bridge doesn't implement
+	 * {@link MetadataProvidingFieldBridge}.
 	 *
 	 * @param fieldName The name of the index field to sort by
 	 * @throws SearchException If the sort field type could not be automatically determined.
 	 * @see SortContext#byField(String)
 	 * @see #andByField(String, org.apache.lucene.search.SortField.Type) The alternative for
-	 * numeric fields with custom field bridges.
+	 * numeric fields with custom field bridges that don't implement {@link MetadataProvidingFieldBridge}.
 	 */
 	SortFieldContext andByField(String fieldName);
 
@@ -54,8 +56,9 @@ public interface SortAdditionalSortFieldContext {
 	 *
 	 * <p>The default order is <strong>ascending</strong>.
 	 * <p><strong>Note:</strong> using this method is only required when sorting on a
-	 * field on which a custom field bridge is defined. Otherwise, one may simply use
-	 * {@link #andByField(String)}.
+	 * field on which a custom field bridge that doesn't implement
+	 * {@link MetadataProvidingFieldBridge} is defined.
+	 * Otherwise, one may simply use {@link #andByField(String)}.
 	 *
 	 * @param fieldName The name of the index field to sort by
 	 * @param sortFieldType The sort field type

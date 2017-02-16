@@ -331,7 +331,7 @@ public class SortDSLTest {
 		// Missing value is not provided; the missing values should be considered as 0
 
 		Sort sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
+				.byField( "fieldBridgedNumericField" )
 				.createSort();
 		assertThat(
 				query( query, sort ),
@@ -339,7 +339,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
+				.byField( "fieldBridgedNumericField" )
 						.asc()
 				.createSort();
 		assertThat(
@@ -348,7 +348,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
+				.byField( "fieldBridgedNumericField" )
 						.desc()
 				.createSort();
 		assertThat(
@@ -362,7 +362,7 @@ public class SortDSLTest {
 		Query query = builder().all().createQuery();
 
 		Sort sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
+				.byField( "fieldBridgedNumericField" )
 						.onMissingValue().use( 1.5d )
 				.createSort();
 		assertThat(
@@ -371,7 +371,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
+				.byField( "fieldBridgedNumericField" )
 						.asc()
 						.onMissingValue().use( 1.5d )
 				.createSort();
@@ -381,7 +381,7 @@ public class SortDSLTest {
 		);
 
 		sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
+				.byField( "fieldBridgedNumericField" )
 						.desc()
 						.onMissingValue().use( 1.5d )
 				.createSort();
@@ -396,7 +396,7 @@ public class SortDSLTest {
 		Query query = builder().all().createQuery();
 
 		Sort sort = builder().sort()
-				.byField( "fieldBridgedNumericField", SortField.Type.DOUBLE )
+				.byField( "fieldBridgedNumericField" )
 						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
 				.createSort();
 		query( query, sort );
