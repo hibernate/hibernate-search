@@ -14,6 +14,7 @@ import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponen
 import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
 import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor;
 import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor.ConsumptionLimit;
+import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 
 /**
@@ -102,11 +103,11 @@ final class JsonAccessorBuilder {
 		boolean consumeIndexes = !indexes.isEmpty();
 
 		while ( childName != null ) {
-			newAccessor = JsonAccessor.objectProperty( newAccessor, childName );
+			newAccessor = newAccessor.property( childName );
 
 			if ( consumeIndexes ) {
 				for ( Integer index : indexes ) {
-					newAccessor = JsonAccessor.arrayElement( newAccessor, index );
+					newAccessor = newAccessor.element( index );
 				}
 				consumeIndexes = false; // Only consume indexes once
 			}

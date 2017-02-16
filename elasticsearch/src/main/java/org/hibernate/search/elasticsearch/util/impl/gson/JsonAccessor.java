@@ -4,10 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.impl;
+package org.hibernate.search.elasticsearch.util.impl.gson;
 
 import java.util.Arrays;
 
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.exception.AssertionFailure;
 
 import com.google.gson.JsonArray;
@@ -21,7 +22,7 @@ import com.google.gson.JsonPrimitive;
  *
  * @author Yoann Rodiere
  */
-abstract class JsonAccessor {
+public abstract class JsonAccessor {
 
 	/**
 	 * Get the current value of the element this accessor points to for the given {@code root}.
@@ -227,8 +228,8 @@ abstract class JsonAccessor {
 		protected abstract void appendStaticRelativePath(StringBuilder path, boolean first);
 	}
 
-	public static JsonAccessor objectProperty(JsonAccessor parentAccessor, String propertyName) {
-		return new ObjectPropertyJsonAccessor( parentAccessor, propertyName );
+	public JsonAccessor property(String propertyName) {
+		return new ObjectPropertyJsonAccessor( this, propertyName );
 	}
 
 	private static class ObjectPropertyJsonAccessor extends NonRootAccessor<JsonObject> {
@@ -268,8 +269,8 @@ abstract class JsonAccessor {
 		}
 	}
 
-	public static JsonAccessor arrayElement(JsonAccessor parentAccessor, int index) {
-		return new ArrayElementJsonAccessor( parentAccessor, index );
+	public JsonAccessor element(int index) {
+		return new ArrayElementJsonAccessor( this, index );
 	}
 
 	private static class ArrayElementJsonAccessor extends NonRootAccessor<JsonArray> {

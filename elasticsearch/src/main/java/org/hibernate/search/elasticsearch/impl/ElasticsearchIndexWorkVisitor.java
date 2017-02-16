@@ -30,6 +30,9 @@ import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponen
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
+import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
+import org.hibernate.search.elasticsearch.util.impl.gson.JsonElementType;
+import org.hibernate.search.elasticsearch.util.impl.gson.UnexpectedJsonElementTypeException;
 import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
 import org.hibernate.search.elasticsearch.work.impl.DeleteByQueryWork;
 import org.hibernate.search.elasticsearch.work.impl.DeleteWork;
