@@ -170,7 +170,7 @@
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>5.5.2</luceneVersion>
+        <luceneVersion>5.5.4</luceneVersion>
         <infinispanVersion>8.2.4.Final</infinispanVersion>
         <jgroupsVersion>3.6.12.Final</jgroupsVersion>
 
