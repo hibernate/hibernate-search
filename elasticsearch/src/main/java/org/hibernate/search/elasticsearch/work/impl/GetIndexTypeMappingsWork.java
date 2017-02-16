@@ -10,9 +10,9 @@ import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.mapping.GetMapping;
 
-public class GetIndexMappingWork extends SimpleElasticsearchWork<JestResult> {
+public class GetIndexTypeMappingsWork extends SimpleElasticsearchWork<JestResult> {
 
-	protected GetIndexMappingWork(Builder builder) {
+	protected GetIndexTypeMappingsWork(Builder builder) {
 		super( builder );
 	}
 
@@ -31,8 +31,8 @@ public class GetIndexMappingWork extends SimpleElasticsearchWork<JestResult> {
 		}
 
 		@Override
-		public GetIndexMappingWork build() {
-			return new GetIndexMappingWork( this );
+		public GetIndexTypeMappingsWork build() {
+			return new GetIndexTypeMappingsWork( this );
 		}
 	}
 }

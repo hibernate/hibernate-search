@@ -8,7 +8,7 @@ package org.hibernate.search.elasticsearch.processor.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.exception.AssertionFailure;
 
@@ -26,12 +26,12 @@ import org.hibernate.search.exception.AssertionFailure;
 class ParallelWorkExecutionContext implements ElasticsearchWorkExecutionContext {
 
 	private final JestClient client;
-	private final JestAPIFormatter jestAPIFormatter;
+	private final GsonService gsonService;
 
-	public ParallelWorkExecutionContext(JestClient client, JestAPIFormatter jestAPIFormatter) {
+	public ParallelWorkExecutionContext(JestClient client, GsonService gsonService) {
 		super();
 		this.client = client;
-		this.jestAPIFormatter = jestAPIFormatter;
+		this.gsonService = gsonService;
 	}
 
 	@Override
@@ -40,8 +40,8 @@ class ParallelWorkExecutionContext implements ElasticsearchWorkExecutionContext 
 	}
 
 	@Override
-	public JestAPIFormatter getJestAPIFormatter() {
-		return jestAPIFormatter;
+	public GsonService getGsonService() {
+		return gsonService;
 	}
 
 	@Override

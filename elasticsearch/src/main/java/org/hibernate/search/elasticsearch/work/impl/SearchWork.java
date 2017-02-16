@@ -8,7 +8,9 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.Collection;
 
+import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
 import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -32,8 +34,12 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext) {
 		if ( QUERY_LOG.isDebugEnabled() ) {
 			Search search = (Search) action;
-			// We use getURI(), but the name is confusing: it's actually the path + query parts of the URL
-			QUERY_LOG.executingElasticsearchQuery( search.getURI(), executionContext.getJestAPIFormatter().formatRequestData( search) );
+			GsonService gsonService = executionContext.getGsonService();
+			QUERY_LOG.executingElasticsearchQuery(
+					// We use getURI(), but the name is confusing: it's actually the path + query parts of the URL
+					search.getURI(),
+					ElasticsearchRequestUtils.formatRequestData( gsonService, search )
+					);
 		}
 	}
 

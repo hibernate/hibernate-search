@@ -4,15 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.impl;
+package org.hibernate.search.elasticsearch.util.impl;
 
-import java.util.Properties;
-
-import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
-import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -27,25 +21,13 @@ import io.searchbox.core.BulkResult.BulkResultItem;
 /**
  * @author Yoann Rodiere
  */
-public class JestAPIFormatter implements Service, Startable, Stoppable {
+public class ElasticsearchRequestUtils {
 
-	private ServiceManager serviceManager;
-	private GsonService gsonService;
-
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		serviceManager = context.getServiceManager();
-		gsonService = serviceManager.requestService( GsonService.class );
+	private ElasticsearchRequestUtils() {
+		// Private constructor
 	}
 
-	@Override
-	public void stop() {
-		gsonService = null;
-		serviceManager.releaseService( GsonService.class );
-		serviceManager = null;
-	}
-
-	public String formatRequest(Action<?> action) {
+	public static String formatRequest(GsonService gsonService, Action<?> action) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append( "Operation: " ).append( action.getClass().getSimpleName() ).append( "\n" );
@@ -58,12 +40,12 @@ public class JestAPIFormatter implements Service, Startable, Stoppable {
 		}
 
 		sb.append( "Data:\n" );
-		sb.append( formatRequestData( action ) );
+		sb.append( formatRequestData( gsonService, action ) );
 		sb.append( "\n" );
 		return sb.toString();
 	}
 
-	public String formatRequestData(Action<?> search) {
+	public static String formatRequestData(GsonService gsonService, Action<?> search) {
 		Gson gson = gsonService.getGson();
 		/*
 		 * The Gson we use as an argument is not always used, which means we have to reformat
@@ -88,7 +70,7 @@ public class JestAPIFormatter implements Service, Startable, Stoppable {
 		}
 	}
 
-	public String formatResult(JestResult result) {
+	public static String formatResponse(GsonService gsonService, JestResult result) {
 		StringBuilder sb = new StringBuilder();
 		sb.append( "Status: " ).append( result.getResponseCode() ).append( "\n" );
 		sb.append( "Error message: " ).append( result.getErrorMessage() ).append( "\n" );
@@ -110,7 +92,7 @@ public class JestAPIFormatter implements Service, Startable, Stoppable {
 		return sb.toString();
 	}
 
-	private String property(JestResult result, String name) {
+	private static String property(JestResult result, String name) {
 		if ( result.getJsonObject() == null ) {
 			return null;
 		}

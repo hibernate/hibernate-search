@@ -11,7 +11,9 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import io.searchbox.action.Action;
@@ -62,7 +64,10 @@ public class SimpleElasticsearchWork<R extends JestResult> implements Elasticsea
 			result = executionContext.getClient().executeRequest( action );
 		}
 		catch (IOException e) {
-			throw LOG.elasticsearchRequestFailed( executionContext.getJestAPIFormatter().formatRequest( action ), null, e );
+			GsonService gsonService = executionContext.getGsonService();
+			throw LOG.elasticsearchRequestFailed(
+					ElasticsearchRequestUtils.formatRequest( gsonService, action ),
+					null, e );
 		}
 
 		resultAssessor.checkSuccess( executionContext, action, result );

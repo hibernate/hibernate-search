@@ -13,8 +13,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -78,7 +79,8 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 			response = context.getClient().executeRequest( request );
 		}
 		catch (IOException e) {
-			throw LOG.elasticsearchRequestFailed( context.getJestAPIFormatter().formatRequest( request ), null, e );
+			GsonService gsonService = context.getGsonService();
+			throw LOG.elasticsearchRequestFailed( ElasticsearchRequestUtils.formatRequest( gsonService, request ), null, e );
 		}
 
 		handleResults( context, request, response );
@@ -142,10 +144,10 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 		}
 
 		if ( !erroneousItems.isEmpty() ) {
-			JestAPIFormatter formatter = context.getJestAPIFormatter();
+			GsonService gsonService = context.getGsonService();
 			BulkRequestFailedException exception = LOG.elasticsearchBulkRequestFailed(
-					formatter.formatRequest( request ),
-					formatter.formatResult( result ),
+					ElasticsearchRequestUtils.formatRequest( gsonService, request ),
+					ElasticsearchRequestUtils.formatResponse( gsonService, result ),
 					successfulItems,
 					erroneousItems
 			);

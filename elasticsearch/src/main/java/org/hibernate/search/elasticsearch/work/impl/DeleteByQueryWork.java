@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -33,7 +34,7 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult> {
 		private final DeleteByQuery.Builder jestBuilder;
 
 		public Builder(String indexName, JsonObject payload) {
-			super( indexName, DeleteByQueryResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( indexName, ResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new DeleteByQuery.Builder( payload.toString() )
 					.addIndex( indexName );
 		}
@@ -54,17 +55,17 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult> {
 		}
 	}
 
-	private static class DeleteByQueryResultAssessor implements ElasticsearchRequestResultAssessor<JestResult> {
+	private static class ResultAssessor implements ElasticsearchRequestResultAssessor<JestResult> {
 
 		private static final Log LOG = LoggerFactory.make( Log.class );
 
 		private static final int NOT_FOUND_HTTP_STATUS_CODE = 404;
 
-		public static final DeleteByQueryResultAssessor INSTANCE = new DeleteByQueryResultAssessor();
+		public static final ResultAssessor INSTANCE = new ResultAssessor();
 
 		private final DefaultElasticsearchRequestResultAssessor delegate;
 
-		private DeleteByQueryResultAssessor() {
+		private ResultAssessor() {
 			this.delegate = DefaultElasticsearchRequestResultAssessor.builder( )
 					.ignoreErrorStatuses( NOT_FOUND_HTTP_STATUS_CODE ).build();
 		}
@@ -73,8 +74,11 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult> {
 		public void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends JestResult> request, JestResult result) throws SearchException {
 			this.delegate.checkSuccess( context, request, result );
 			if ( result.getResponseCode() == NOT_FOUND_HTTP_STATUS_CODE ) {
-				JestAPIFormatter formatter = context.getJestAPIFormatter();
-				throw LOG.elasticsearchRequestDeleteByQueryNotFound( formatter.formatRequest( request ), formatter.formatResult( result ) );
+				GsonService gsonService = context.getGsonService();
+				throw LOG.elasticsearchRequestDeleteByQueryNotFound(
+						ElasticsearchRequestUtils.formatRequest( gsonService, request ),
+						ElasticsearchRequestUtils.formatResponse( gsonService, result )
+						);
 			}
 		}
 

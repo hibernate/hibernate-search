@@ -8,7 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 
 
 /**
@@ -29,8 +29,8 @@ public class ForwardingElasticsearchWorkExecutionContext implements Elasticsearc
 	}
 
 	@Override
-	public JestAPIFormatter getJestAPIFormatter() {
-		return delegate.getJestAPIFormatter();
+	public GsonService getGsonService() {
+		return delegate.getGsonService();
 	}
 
 	@Override

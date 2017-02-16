@@ -10,8 +10,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -81,12 +82,18 @@ public class DefaultElasticsearchRequestResultAssessor implements ElasticsearchR
 	@Override
 	public void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends JestResult> request, JestResult result) throws SearchException {
 		if ( !isSuccess( result ) ) {
-			JestAPIFormatter formatter = context.getJestAPIFormatter();
+			GsonService gsonService = context.getGsonService();
 			if ( result.getResponseCode() == TIME_OUT_HTTP_RESPONSE_CODE ) {
-				throw LOG.elasticsearchRequestTimeout( formatter.formatRequest( request ), formatter.formatResult( result ) );
+				throw LOG.elasticsearchRequestTimeout(
+						ElasticsearchRequestUtils.formatRequest( gsonService, request ),
+						ElasticsearchRequestUtils.formatResponse( gsonService, result )
+						);
 			}
 			else {
-				throw LOG.elasticsearchRequestFailed( formatter.formatRequest( request ), formatter.formatResult( result ), null );
+				throw LOG.elasticsearchRequestFailed(
+						ElasticsearchRequestUtils.formatRequest( gsonService, request ),
+						ElasticsearchRequestUtils.formatResponse( gsonService, result ),
+						null );
 			}
 		}
 	}

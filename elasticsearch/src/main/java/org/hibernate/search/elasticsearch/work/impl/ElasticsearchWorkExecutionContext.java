@@ -8,7 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 
 /**
  * @author Yoann Rodiere
@@ -17,7 +17,7 @@ public interface ElasticsearchWorkExecutionContext {
 
 	JestClient getClient();
 
-	JestAPIFormatter getJestAPIFormatter();
+	GsonService getGsonService();
 
 	void setIndexDirty(String indexName);
 

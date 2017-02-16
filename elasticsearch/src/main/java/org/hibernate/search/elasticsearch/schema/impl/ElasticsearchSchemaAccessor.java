@@ -21,7 +21,7 @@ import org.hibernate.search.elasticsearch.work.impl.CloseIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.CreateIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.DropIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.GetIndexMappingWork;
+import org.hibernate.search.elasticsearch.work.impl.GetIndexTypeMappingsWork;
 import org.hibernate.search.elasticsearch.work.impl.GetIndexSettingsWork;
 import org.hibernate.search.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.elasticsearch.work.impl.OpenIndexWork;
@@ -110,7 +110,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setName( indexName );
 
-		ElasticsearchWork<JestResult> getMappingWork = new GetIndexMappingWork.Builder( indexName ).build();
+		ElasticsearchWork<JestResult> getMappingWork = new GetIndexTypeMappingsWork.Builder( indexName ).build();
 		try {
 			JestResult result = workProcessor.executeSyncUnsafe( getMappingWork );
 			JsonObject resultJson = result.getJsonObject();

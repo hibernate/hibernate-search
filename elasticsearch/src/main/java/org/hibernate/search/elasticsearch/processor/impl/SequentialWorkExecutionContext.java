@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
-import org.hibernate.search.elasticsearch.impl.JestAPIFormatter;
+import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
@@ -37,7 +37,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private final ElasticsearchWorkProcessor workProcessor;
 
-	private final JestAPIFormatter jestAPIFormatter;
+	private final GsonService gsonService;
 
 	private final ErrorHandler errorHandler;
 
@@ -51,11 +51,11 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	public SequentialWorkExecutionContext(JestClient client,
 			ElasticsearchWorkProcessor workProcessor,
-			JestAPIFormatter jestAPIFormatter, ErrorHandler errorHandler) {
+			GsonService gsonService, ErrorHandler errorHandler) {
 		super();
 		this.client = client;
 		this.workProcessor = workProcessor;
-		this.jestAPIFormatter = jestAPIFormatter;
+		this.gsonService = gsonService;
 		this.errorHandler = errorHandler;
 	}
 
@@ -65,8 +65,8 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 	}
 
 	@Override
-	public JestAPIFormatter getJestAPIFormatter() {
-		return jestAPIFormatter;
+	public GsonService getGsonService() {
+		return gsonService;
 	}
 
 	@Override
