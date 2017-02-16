@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
@@ -74,9 +73,6 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private static final String DELETE_ALL_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"match_all\" : { } } } } }";
-	private static final String DELETE_ALL_FOR_TENANT_QUERY = "{ \"query\" : { \"constant_score\" : { \"filter\" : { \"term\" : { \"" + DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME + "\" : \"%s\" } } } } }";
-
 	private final String indexName;
 	private final boolean refreshAfterWrite;
 	private final ExtendedSearchIntegrator searchIntegrator;
@@ -132,11 +128,12 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	@Override
 	public ElasticsearchWork<?> visitPurgeAllWork(PurgeAllLuceneWork work, IndexingMonitor monitor) {
-		String query = work.getTenantId() != null ?
-				String.format( Locale.ENGLISH, DELETE_ALL_FOR_TENANT_QUERY, work.getTenantId() ) :
-				DELETE_ALL_QUERY;
+		JsonObject payload = createDeleteByQueryPayload(
+				JsonBuilder.object().add( "match_all", new JsonObject() ).build(),
+				work.getTenantId()
+				);
 
-		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( query )
+		DeleteByQuery.Builder builder = new DeleteByQuery.Builder( payload.toString() )
 			.addIndex( indexName );
 
 		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
@@ -180,30 +177,9 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 		);
 		String type = work.getEntityClass().getName();
 
-		JsonObject query;
+		JsonObject payload = createDeleteByQueryPayload( convertedQuery, work.getTenantId() );
 
-		// Add filter on tenant id if needed
-		if ( work.getTenantId() != null ) {
-			query = JsonBuilder.object()
-				.add( "query", JsonBuilder.object()
-					.add( "bool", JsonBuilder.object()
-						.add( "filter", JsonBuilder.object()
-							.add( "term", JsonBuilder.object()
-								.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, work.getTenantId() )
-							)
-						)
-						.add( "must", convertedQuery )
-					)
-				)
-				.build();
-		}
-		else {
-			query = JsonBuilder.object()
-				.add( "query", convertedQuery )
-				.build();
-		}
-
-		DeleteByQuery deleteByQuery = new DeleteByQuery.Builder( query.toString() )
+		DeleteByQuery deleteByQuery = new DeleteByQuery.Builder( payload.toString() )
 			.addIndex( indexName )
 			.addType( type )
 			.build();
@@ -211,6 +187,30 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 		return new SimpleElasticsearchWork<>( deleteByQuery, work, indexName, deleteByQueryResultAssessor,
 				monitor, NoopElasticsearchWorkSuccessReporter.INSTANCE, refreshAfterWrite );
 	}
+
+	private JsonObject createDeleteByQueryPayload(JsonObject query, String tenantId) {
+		// Add filter on tenant id if needed
+		if ( tenantId != null ) {
+			return JsonBuilder.object()
+					.add( "query", JsonBuilder.object()
+							.add( "bool", JsonBuilder.object()
+									.add( "filter", JsonBuilder.object()
+											.add( "term", JsonBuilder.object()
+													.addProperty( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId )
+											)
+									)
+									.add( "must", query )
+							)
+					)
+					.build();
+		}
+		else {
+			return JsonBuilder.object()
+					.add( "query", query )
+					.build();
+		}
+	}
+
 
 	private BulkableAction<DocumentResult> indexDocument(String id, Document document, Class<?> entityType) {
 		JsonObject source = convertDocumentToJson( document, entityType );
