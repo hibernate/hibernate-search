@@ -55,8 +55,10 @@ public interface SortContext {
 	 *
 	 * @param fieldName The name of the index field to sort by
 	 * @param sortFieldType The sort field type
-	 * @see #byField(String, org.apache.lucene.search.SortField.Type)
+	 * @deprecated Using this method shouldn't be needed if your custom field bridges
+	 * implement {@link MetadataProvidingFieldBridge}. Use {@link #byField(String)} instead.
 	 */
+	@Deprecated
 	SortFieldContext byField(String fieldName, SortField.Type sortFieldType);
 
 	/**
