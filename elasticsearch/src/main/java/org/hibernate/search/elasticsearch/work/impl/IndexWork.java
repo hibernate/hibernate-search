@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.IndexWorkBuilder;
+
 import com.google.gson.JsonObject;
 
 import io.searchbox.action.BulkableAction;
@@ -27,7 +29,8 @@ public class IndexWork extends SimpleBulkableElasticsearchWork<DocumentResult, V
 	}
 
 	public static class Builder
-			extends SimpleBulkableElasticsearchWork.Builder<Builder, DocumentResult> {
+			extends SimpleBulkableElasticsearchWork.Builder<Builder, DocumentResult>
+			implements IndexWorkBuilder {
 		private final Index.Builder jestBuilder;
 
 		public Builder(String indexName, String typeName, String id, JsonObject document) {

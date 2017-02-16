@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
+import org.hibernate.search.elasticsearch.work.impl.builder.CreateIndexWorkBuilder;
 
 import com.google.gson.Gson;
 
@@ -36,7 +37,8 @@ public class CreateIndexWork extends SimpleElasticsearchWork<JestResult, CreateI
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements CreateIndexWorkBuilder {
 		private final GsonService gsonService;
 		private final CreateIndex.Builder jestBuilder;
 
@@ -46,6 +48,7 @@ public class CreateIndexWork extends SimpleElasticsearchWork<JestResult, CreateI
 			this.jestBuilder = new CreateIndex.Builder( indexName );
 		}
 
+		@Override
 		public Builder settings(IndexSettings settings) {
 			if ( settings != null ) {
 				/*
@@ -58,6 +61,7 @@ public class CreateIndexWork extends SimpleElasticsearchWork<JestResult, CreateI
 			return this;
 		}
 
+		@Override
 		public Builder ignoreExisting() {
 			this.resultAssessor = DefaultElasticsearchRequestSuccessAssessor.builder()
 					.ignoreErrorTypes( "index_already_exists_exception" )

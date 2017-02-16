@@ -12,6 +12,7 @@ import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
 import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
+import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
 import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -51,7 +52,8 @@ public class SearchWork extends SimpleElasticsearchWork<io.searchbox.core.Search
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, io.searchbox.core.SearchResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, io.searchbox.core.SearchResult>
+			implements SearchWorkBuilder {
 		private final Search.Builder jestBuilder;
 
 		public Builder(String payload) {
@@ -59,23 +61,27 @@ public class SearchWork extends SimpleElasticsearchWork<io.searchbox.core.Search
 			this.jestBuilder = new Search.Builder( payload );
 		}
 
+		@Override
 		public Builder indexes(Collection<String> indexNames) {
 			jestBuilder.addIndex( indexNames );
 			return this;
 		}
 
+		@Override
 		public Builder paging(int firstResult, int size) {
 			jestBuilder.setParameter( Parameters.FROM, firstResult );
 			jestBuilder.setParameter( Parameters.SIZE, size );
 			return this;
 		}
 
+		@Override
 		public Builder scrolling(int scrollSize, String scrollTimeout) {
 			jestBuilder.setParameter( Parameters.SIZE, scrollSize );
 			jestBuilder.setParameter( Parameters.SCROLL, scrollTimeout );
 			return this;
 		}
 
+		@Override
 		public Builder appendSort(Sort sort) {
 			jestBuilder.addSort( sort );
 			return this;

@@ -17,7 +17,8 @@ import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
-import org.hibernate.search.elasticsearch.work.impl.RefreshWork;
+import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -35,6 +36,8 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private final JestClient client;
 
+	private final ElasticsearchWorkFactory workFactory;
+
 	private final ElasticsearchWorkProcessor workProcessor;
 
 	private final GsonService gsonService;
@@ -50,10 +53,11 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 	private final Set<String> dirtyIndexes = new HashSet<>();
 
 	public SequentialWorkExecutionContext(JestClient client,
-			ElasticsearchWorkProcessor workProcessor,
+			ElasticsearchWorkFactory workFactory, ElasticsearchWorkProcessor workProcessor,
 			GsonService gsonService, ErrorHandler errorHandler) {
 		super();
 		this.client = client;
+		this.workFactory = workFactory;
 		this.workProcessor = workProcessor;
 		this.gsonService = gsonService;
 		this.errorHandler = errorHandler;
@@ -103,7 +107,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 			log.tracef( "Refreshing index(es) %s", dirtyIndexes );
 		}
 
-		RefreshWork.Builder builder = new RefreshWork.Builder();
+		RefreshWorkBuilder builder = workFactory.refresh();
 		for ( String index : dirtyIndexes ) {
 			builder.index( index );
 		}

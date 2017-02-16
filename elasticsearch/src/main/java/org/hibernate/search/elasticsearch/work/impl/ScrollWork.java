@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.ScrollWorkBuilder;
+
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.SearchScroll;
@@ -25,7 +27,8 @@ public class ScrollWork extends SimpleElasticsearchWork<JestResult, SearchResult
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements ScrollWorkBuilder {
 		private final SearchScroll.Builder jestBuilder;
 
 		public Builder(String scrollId, String scrollTimeout) {

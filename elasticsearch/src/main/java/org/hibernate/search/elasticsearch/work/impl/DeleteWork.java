@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.DeleteWorkBuilder;
+
 import io.searchbox.action.BulkableAction;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Delete;
@@ -29,7 +31,8 @@ public class DeleteWork extends SimpleBulkableElasticsearchWork<DocumentResult, 
 	}
 
 	public static class Builder
-			extends SimpleBulkableElasticsearchWork.Builder<Builder, DocumentResult> {
+			extends SimpleBulkableElasticsearchWork.Builder<Builder, DocumentResult>
+			implements DeleteWorkBuilder {
 		private final Delete.Builder jestBuilder;
 
 		public Builder(String indexName, String typeName, String id) {

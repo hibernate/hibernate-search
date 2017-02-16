@@ -11,6 +11,7 @@ import java.net.URLEncoder;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.work.impl.builder.WaitForIndexStatusWorkBuilder;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -36,7 +37,8 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<JestResult, 
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements WaitForIndexStatusWorkBuilder {
 		private final Health.Builder jestBuilder;
 		private final String indexName;
 

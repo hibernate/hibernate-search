@@ -34,12 +34,10 @@ import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.elasticsearch.util.impl.gson.JsonElementType;
 import org.hibernate.search.elasticsearch.util.impl.gson.UnexpectedJsonElementTypeException;
 import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
-import org.hibernate.search.elasticsearch.work.impl.DeleteByQueryWork;
-import org.hibernate.search.elasticsearch.work.impl.DeleteWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.FlushWork;
-import org.hibernate.search.elasticsearch.work.impl.IndexWork;
-import org.hibernate.search.elasticsearch.work.impl.OptimizeWork;
+import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.builder.IndexWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -68,12 +66,14 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 	private final String indexName;
 	private final boolean refreshAfterWrite;
 	private final ExtendedSearchIntegrator searchIntegrator;
+	private final ElasticsearchWorkFactory workFactory;
 
 	public ElasticsearchIndexWorkVisitor(String indexName, boolean refreshAfterWrite,
-			ExtendedSearchIntegrator searchIntegrator) {
+			ExtendedSearchIntegrator searchIntegrator, ElasticsearchWorkFactory workFactory) {
 		this.indexName = indexName;
 		this.refreshAfterWrite = refreshAfterWrite;
 		this.searchIntegrator = searchIntegrator;
+		this.workFactory = workFactory;
 	}
 
 	@Override
@@ -87,7 +87,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	@Override
 	public ElasticsearchWork<?> visitDeleteWork(DeleteLuceneWork work, IndexingMonitor monitor) {
-		return new DeleteWork.Builder( indexName, work.getEntityClass().getName(), getDocumentId( work ) )
+		return workFactory.delete( indexName, work.getEntityClass().getName(), getDocumentId( work ) )
 				.luceneWork( work )
 				.markIndexDirty( refreshAfterWrite )
 				.build();
@@ -95,7 +95,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	@Override
 	public ElasticsearchWork<?> visitOptimizeWork(OptimizeLuceneWork work, IndexingMonitor monitor) {
-		return new OptimizeWork.Builder().index( indexName )
+		return workFactory.optimize().index( indexName )
 				.luceneWork( work )
 				.build();
 	}
@@ -107,7 +107,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				work.getTenantId()
 				);
 
-		DeleteByQueryWork.Builder builder = new DeleteByQueryWork.Builder( indexName, payload )
+		DeleteByQueryWorkBuilder builder = workFactory.deleteByQuery( indexName, payload )
 				.luceneWork( work )
 				.markIndexDirty( refreshAfterWrite );
 
@@ -130,7 +130,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	@Override
 	public ElasticsearchWork<?> visitFlushWork(FlushLuceneWork work, IndexingMonitor monitor) {
-		return new FlushWork.Builder()
+		return workFactory.flush()
 				.index( indexName )
 				.luceneWork( work )
 				.build();
@@ -146,7 +146,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 		JsonObject payload = createDeleteByQueryPayload( convertedQuery, work.getTenantId() );
 
-		return new DeleteByQueryWork.Builder( indexName, payload )
+		return workFactory.deleteByQuery( indexName, payload )
 				.luceneWork( work )
 				.type( typeName )
 				.markIndexDirty( refreshAfterWrite )
@@ -177,11 +177,11 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 	}
 
 
-	private IndexWork.Builder indexDocument(String id, Document document, Class<?> entityType) {
+	private IndexWorkBuilder indexDocument(String id, Document document, Class<?> entityType) {
 		JsonObject source = convertDocumentToJson( document, entityType );
 		String typeName = entityType.getName();
 
-		return new IndexWork.Builder( indexName, typeName, id, source );
+		return workFactory.index( indexName, typeName, id, source );
 	}
 
 	private JsonObject convertDocumentToJson(Document document, Class<?> entityType) {

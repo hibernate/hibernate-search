@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.FlushWorkBuilder;
+
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.Flush;
@@ -25,7 +27,8 @@ public class FlushWork extends SimpleElasticsearchWork<JestResult, Void> {
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements FlushWorkBuilder {
 		private final Flush.Builder jestBuilder;
 
 		public Builder() {
@@ -35,6 +38,7 @@ public class FlushWork extends SimpleElasticsearchWork<JestResult, Void> {
 					.refresh( true );
 		}
 
+		@Override
 		public Builder index(String indexName) {
 			jestBuilder.addIndex( indexName );
 			return this;

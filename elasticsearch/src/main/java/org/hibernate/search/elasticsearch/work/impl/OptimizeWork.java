@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.OptimizeWorkBuilder;
+
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.Optimize;
@@ -25,7 +27,8 @@ public class OptimizeWork extends SimpleElasticsearchWork<JestResult, Void> {
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements OptimizeWorkBuilder {
 		private final Optimize.Builder jestBuilder;
 
 		public Builder() {
@@ -39,6 +42,7 @@ public class OptimizeWork extends SimpleElasticsearchWork<JestResult, Void> {
 			this.jestBuilder = new Optimize.Builder();
 		}
 
+		@Override
 		public Builder index(String indexName) {
 			jestBuilder.addIndex( indexName );
 			return this;

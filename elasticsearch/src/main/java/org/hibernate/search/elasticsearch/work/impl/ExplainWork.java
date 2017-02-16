@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.ExplainWorkBuilder;
+
 import com.google.gson.JsonObject;
 
 import io.searchbox.action.Action;
@@ -22,7 +24,8 @@ public class ExplainWork extends SimpleElasticsearchWork<DocumentResult, Explain
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, DocumentResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, DocumentResult>
+			implements ExplainWorkBuilder {
 		private final Explain.Builder jestBuilder;
 
 		public Builder(String indexName, String typeName, String id, JsonObject payload) {

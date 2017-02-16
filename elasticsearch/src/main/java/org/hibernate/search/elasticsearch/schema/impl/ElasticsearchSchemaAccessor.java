@@ -10,24 +10,14 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
-import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
-import org.hibernate.search.elasticsearch.work.impl.CloseIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.CreateIndexResult;
-import org.hibernate.search.elasticsearch.work.impl.CreateIndexWork;
-import org.hibernate.search.elasticsearch.work.impl.DropIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.GetIndexSettingsWork;
-import org.hibernate.search.elasticsearch.work.impl.GetIndexTypeMappingsWork;
-import org.hibernate.search.elasticsearch.work.impl.IndexExistsWork;
-import org.hibernate.search.elasticsearch.work.impl.OpenIndexWork;
-import org.hibernate.search.elasticsearch.work.impl.PutIndexSettingsWork;
-import org.hibernate.search.elasticsearch.work.impl.PutIndexTypeMappingWork;
-import org.hibernate.search.elasticsearch.work.impl.WaitForIndexStatusWork;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
@@ -46,28 +36,28 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	private ServiceManager serviceManager;
 
-	private ElasticsearchWorkProcessor workProcessor;
+	private ElasticsearchWorkFactory workFactory;
 
-	private GsonService gsonService;
+	private ElasticsearchWorkProcessor workProcessor;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
+		workFactory = serviceManager.requestService( ElasticsearchWorkFactory.class );
 		workProcessor = serviceManager.requestService( ElasticsearchWorkProcessor.class );
-		gsonService = serviceManager.requestService( GsonService.class );
 	}
 
 	@Override
 	public void stop() {
-		gsonService = null;
-		serviceManager.releaseService( GsonService.class );
 		workProcessor = null;
 		serviceManager.releaseService( ElasticsearchWorkProcessor.class );
+		workFactory = null;
+		serviceManager.releaseService( ElasticsearchWorkFactory.class );
 		serviceManager = null;
 	}
 
 	public void createIndex(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {
-		ElasticsearchWork<?> work = new CreateIndexWork.Builder( gsonService, indexName ).settings( settings ).build();
+		ElasticsearchWork<?> work = workFactory.createIndex( indexName ).settings( settings ).build();
 		workProcessor.executeSyncUnsafe( work );
 	}
 
@@ -75,7 +65,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
 	public boolean createIndexIfAbsent(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {
-		ElasticsearchWork<CreateIndexResult> work = new CreateIndexWork.Builder( gsonService, indexName )
+		ElasticsearchWork<CreateIndexResult> work = workFactory.createIndex( indexName )
 				.settings( settings )
 				.ignoreExisting()
 				.build();
@@ -84,7 +74,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	public boolean indexExists(String indexName) {
-		ElasticsearchWork<Boolean> work = new IndexExistsWork.Builder( indexName ).build();
+		ElasticsearchWork<Boolean> work = workFactory.indexExists( indexName ).build();
 		return workProcessor.executeSyncUnsafe( work );
 	}
 
@@ -92,7 +82,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setName( indexName );
 
-		ElasticsearchWork<Map<String, TypeMapping>> getMappingWork = new GetIndexTypeMappingsWork.Builder( indexName ).build();
+		ElasticsearchWork<Map<String, TypeMapping>> getMappingWork = workFactory.getIndexTypeMappings( indexName ).build();
 		try {
 			Map<String, TypeMapping> mappings = workProcessor.executeSyncUnsafe( getMappingWork );
 			indexMetadata.setMappings( mappings );
@@ -101,7 +91,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 			throw LOG.elasticsearchMappingRetrievalForValidationFailed( e );
 		}
 
-		ElasticsearchWork<IndexSettings> getSettingsWork = new GetIndexSettingsWork.Builder( indexName ).build();
+		ElasticsearchWork<IndexSettings> getSettingsWork = workFactory.getIndexSettings( indexName ).build();
 		try {
 			IndexSettings indexSettings = workProcessor.executeSyncUnsafe( getSettingsWork );
 			indexMetadata.setSettings( indexSettings );
@@ -114,7 +104,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	public void updateSettings(String indexName, IndexSettings settings) {
-		ElasticsearchWork<?> work = new PutIndexSettingsWork.Builder( gsonService, indexName, settings ).build();
+		ElasticsearchWork<?> work = workFactory.putIndexSettings( indexName, settings ).build();
 
 		try {
 			workProcessor.executeSyncUnsafe( work );
@@ -125,7 +115,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	}
 
 	public void putMapping(String indexName, String mappingName, TypeMapping mapping) {
-		ElasticsearchWork<?> work = new PutIndexTypeMappingWork.Builder( gsonService, indexName, mappingName, mapping ).build();
+		ElasticsearchWork<?> work = workFactory.putIndexTypeMapping( indexName, mappingName, mapping ).build();
 
 		try {
 			workProcessor.executeSyncUnsafe( work );
@@ -140,26 +130,26 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		String timeoutAndUnit = executionOptions.getIndexManagementTimeoutInMs() + "ms";
 
 		ElasticsearchWork<?> work =
-				new WaitForIndexStatusWork.Builder( indexName, requiredIndexStatus, timeoutAndUnit )
+				workFactory.waitForIndexStatusWork( indexName, requiredIndexStatus, timeoutAndUnit )
 				.build();
 
 		workProcessor.executeSyncUnsafe( work );
 	}
 
 	public void dropIndex(String indexName, ExecutionOptions executionOptions) {
-		ElasticsearchWork<?> work = new DropIndexWork.Builder( indexName ).build();
+		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).build();
 		workProcessor.executeSyncUnsafe( work );
 	}
 
 	public void closeIndex(String indexName) {
-		ElasticsearchWork<?> work = new CloseIndexWork.Builder( indexName ).build();
+		ElasticsearchWork<?> work = workFactory.closeIndex( indexName ).build();
 		workProcessor.executeSyncUnsafe( work );
 		LOG.closedIndex( indexName );
 	}
 
 	public void openIndex(String indexName) {
 		try {
-			ElasticsearchWork<?> work = new OpenIndexWork.Builder( indexName ).build();
+			ElasticsearchWork<?> work = workFactory.openIndex( indexName ).build();
 			workProcessor.executeSyncUnsafe( work );
 		}
 		catch (RuntimeException e) {

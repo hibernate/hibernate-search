@@ -16,6 +16,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
+import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -172,7 +173,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		}
 	}
 
-	public static class Builder {
+	public static class Builder implements BulkWorkBuilder {
 		private final Bulk.Builder jestBuilder;
 		private final List<BulkableElasticsearchWork<?>> bulkableWorks;
 		private boolean refreshInBulkAPICall;
@@ -182,6 +183,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			this.jestBuilder = new Bulk.Builder();
 		}
 
+		@Override
 		public Builder refresh(boolean refresh) {
 			this.refreshInBulkAPICall = refresh;
 			return this;
@@ -195,6 +197,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			return jestBuilder.build();
 		}
 
+		@Override
 		public BulkWork build() {
 			return new BulkWork( this );
 		}

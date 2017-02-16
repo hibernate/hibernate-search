@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
+import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -35,7 +36,8 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult, Void>
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements DeleteByQueryWorkBuilder {
 		private final DeleteByQuery.Builder jestBuilder;
 
 		public Builder(String indexName, JsonObject payload) {
@@ -44,6 +46,7 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult, Void>
 					.addIndex( indexName );
 		}
 
+		@Override
 		public Builder type(String typeName) {
 			jestBuilder.addType( typeName );
 			return this;

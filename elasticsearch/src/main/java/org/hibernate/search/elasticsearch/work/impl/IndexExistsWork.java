@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.IndexExistsWorkBuilder;
+
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.IndicesExists;
@@ -28,7 +30,8 @@ public class IndexExistsWork extends SimpleElasticsearchWork<JestResult, Boolean
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements IndexExistsWorkBuilder {
 		private final IndicesExists.Builder jestBuilder;
 
 		public Builder(String indexName) {

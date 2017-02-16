@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
+import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexTypeMappingsWorkBuilder;
 import org.hibernate.search.exception.AssertionFailure;
 
 import com.google.gson.JsonElement;
@@ -56,7 +57,8 @@ public class GetIndexTypeMappingsWork extends SimpleElasticsearchWork<JestResult
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements GetIndexTypeMappingsWorkBuilder {
 		private final String indexName;
 		private final GetMapping.Builder jestBuilder;
 

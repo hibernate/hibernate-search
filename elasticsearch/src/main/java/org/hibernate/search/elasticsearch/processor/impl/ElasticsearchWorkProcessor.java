@@ -20,11 +20,11 @@ import org.hibernate.search.elasticsearch.client.impl.JestClient;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
-import org.hibernate.search.elasticsearch.work.impl.BulkWork;
 import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
@@ -60,6 +60,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	private JestClient jestClient;
 	private GsonService gsonService;
 	private ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
+	private ElasticsearchWorkFactory workFactory;
 
 	public ElasticsearchWorkProcessor() {
 		asyncProcessor = new AsyncBackendRequestProcessor();
@@ -72,6 +73,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 		this.jestClient = serviceManager.requestService( JestClient.class );
 		this.gsonService = serviceManager.requestService( GsonService.class );
 		this.parallelWorkExecutionContext = new ParallelWorkExecutionContext( jestClient, gsonService );
+		this.workFactory = serviceManager.requestService( ElasticsearchWorkFactory.class );
 	}
 
 	@Override
@@ -79,6 +81,8 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 		awaitAsyncProcessingCompletion();
 		asyncProcessor.shutdown();
 
+		workFactory = null;
+		serviceManager.releaseService( ElasticsearchWorkFactory.class );
 		gsonService = null;
 		serviceManager.releaseService( GsonService.class );
 		jestClient = null;
@@ -121,7 +125,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	 */
 	private void executeSafely(Iterable<ElasticsearchWork<?>> requests) {
 		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-				jestClient, this, gsonService, errorHandler );
+				jestClient, workFactory, this, gsonService, errorHandler );
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
 			executeSafely( work, context );
@@ -298,7 +302,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 
 		private void processAsyncWork() {
 			SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-					jestClient, ElasticsearchWorkProcessor.this, gsonService, errorHandler );
+					jestClient, workFactory, ElasticsearchWorkProcessor.this, gsonService, errorHandler );
 			synchronized ( asyncProcessor ) {
 				while ( true ) {
 					Iterable<ElasticsearchWork<?>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();
@@ -353,7 +357,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 				result.add( work );
 			}
 			else {
-				result.add( new BulkWork.Builder( bulkInProgress ).refresh( refreshInBulkAPICall ).build() );
+				result.add( workFactory.bulk( bulkInProgress ).refresh( refreshInBulkAPICall ).build() );
 			}
 			bulkInProgress.clear();
 		}

@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
+import org.hibernate.search.elasticsearch.work.impl.builder.PutIndexMappingWorkBuilder;
 
 import com.google.gson.Gson;
 
@@ -30,7 +31,8 @@ public class PutIndexTypeMappingWork extends SimpleElasticsearchWork<JestResult,
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements PutIndexMappingWorkBuilder {
 		private final PutMapping.Builder jestBuilder;
 
 		public Builder(

@@ -37,6 +37,7 @@ import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -148,10 +149,12 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 		this.similarity = similarity;
 
+		ElasticsearchWorkFactory workFactory = serviceManager.requestService( ElasticsearchWorkFactory.class );
 		this.visitor = new ElasticsearchIndexWorkVisitor(
 				this.actualIndexName,
 				this.refreshAfterWrite,
-				context.getUninitializedSearchIntegrator()
+				context.getUninitializedSearchIntegrator(),
+				workFactory
 		);
 		this.requestProcessor = context.getServiceManager().requestService( ElasticsearchWorkProcessor.class );
 	}
@@ -219,6 +222,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		}
 
 		visitor = null;
+		serviceManager.releaseService( ElasticsearchWorkFactory.class );
 
 		requestProcessor = null;
 		serviceManager.releaseService( ElasticsearchWorkProcessor.class );

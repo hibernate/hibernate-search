@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
+import org.hibernate.search.elasticsearch.work.impl.builder.PutIndexSettingsWorkBuilder;
 
 import com.google.gson.Gson;
 
@@ -30,7 +31,8 @@ public class PutIndexSettingsWork extends SimpleElasticsearchWork<JestResult, Vo
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements PutIndexSettingsWorkBuilder {
 		private final UpdateSettings.Builder jestBuilder;
 
 		public Builder(

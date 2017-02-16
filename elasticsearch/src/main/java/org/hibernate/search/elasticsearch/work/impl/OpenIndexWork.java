@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.OpenIndexWorkBuilder;
+
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.OpenIndex;
@@ -25,7 +27,8 @@ public class OpenIndexWork extends SimpleElasticsearchWork<JestResult, Void> {
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements OpenIndexWorkBuilder {
 		private final OpenIndex.Builder jestBuilder;
 
 		public Builder(String indexName) {

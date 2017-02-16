@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.hibernate.search.elasticsearch.work.impl.builder.DropIndexWorkBuilder;
+
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.DeleteIndex;
@@ -25,7 +27,8 @@ public class DropIndexWork extends SimpleElasticsearchWork<JestResult, Void> {
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements DropIndexWorkBuilder {
 		private final DeleteIndex.Builder jestBuilder;
 
 		public Builder(String indexName) {

@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
+import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexSettingsWorkBuilder;
 import org.hibernate.search.exception.AssertionFailure;
 
 import com.google.gson.JsonElement;
@@ -51,7 +52,8 @@ public class GetIndexSettingsWork extends SimpleElasticsearchWork<JestResult, In
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			implements GetIndexSettingsWorkBuilder {
 		private final String indexName;
 		private final GetSettings.Builder jestBuilder;
 
