@@ -13,13 +13,18 @@ import io.searchbox.indices.IndicesExists;
 /**
  * @author Yoann Rodiere
  */
-public class IndexExistsWork extends SimpleElasticsearchWork<JestResult> {
+public class IndexExistsWork extends SimpleElasticsearchWork<JestResult, Boolean> {
 
-	private static final ElasticsearchRequestResultAssessor<? super JestResult> RESULT_ASSESSOR =
-			DefaultElasticsearchRequestResultAssessor.builder().ignoreErrorStatuses( 404 ).build();
+	private static final ElasticsearchRequestSuccessAssessor<? super JestResult> RESULT_ASSESSOR =
+			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
 	protected IndexExistsWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Boolean generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return response.getResponseCode() == 200;
 	}
 
 	public static class Builder

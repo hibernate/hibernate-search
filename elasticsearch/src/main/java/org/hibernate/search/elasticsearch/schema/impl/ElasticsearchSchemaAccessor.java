@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Properties;
 
@@ -18,29 +17,23 @@ import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.CloseIndexWork;
+import org.hibernate.search.elasticsearch.work.impl.CreateIndexResult;
 import org.hibernate.search.elasticsearch.work.impl.CreateIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.DropIndexWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.GetIndexTypeMappingsWork;
 import org.hibernate.search.elasticsearch.work.impl.GetIndexSettingsWork;
+import org.hibernate.search.elasticsearch.work.impl.GetIndexTypeMappingsWork;
 import org.hibernate.search.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.elasticsearch.work.impl.OpenIndexWork;
-import org.hibernate.search.elasticsearch.work.impl.PutIndexTypeMappingWork;
 import org.hibernate.search.elasticsearch.work.impl.PutIndexSettingsWork;
+import org.hibernate.search.elasticsearch.work.impl.PutIndexTypeMappingWork;
 import org.hibernate.search.elasticsearch.work.impl.WaitForIndexStatusWork;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-
-import io.searchbox.client.JestResult;
 
 /**
  * A utility implementing primitives for the various {@code DefaultElasticsearchSchema*}.
@@ -50,11 +43,6 @@ import io.searchbox.client.JestResult;
 public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
-
-	private static final TypeToken<Map<String, TypeMapping>> STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN =
-			new TypeToken<Map<String, TypeMapping>>() {
-				// Create a new class to capture generic parameters
-			};
 
 	private ServiceManager serviceManager;
 
@@ -87,70 +75,36 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
 	public boolean createIndexIfAbsent(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {
-		ElasticsearchWork<JestResult> work = new CreateIndexWork.Builder( gsonService, indexName )
+		ElasticsearchWork<CreateIndexResult> work = new CreateIndexWork.Builder( gsonService, indexName )
 				.settings( settings )
 				.ignoreExisting()
 				.build();
-		JestResult result = workProcessor.executeSyncUnsafe( work );
-		if ( !result.isSucceeded() ) {
-			// The index was created just after we checked if it existed: just do as if it had been created when we checked.
-			return false;
-		}
-
-		return true;
+		CreateIndexResult result = workProcessor.executeSyncUnsafe( work );
+		return CreateIndexResult.CREATED.equals( result );
 	}
 
 	public boolean indexExists(String indexName) {
-		ElasticsearchWork<JestResult> work = new IndexExistsWork.Builder( indexName ).build();
-		JestResult peekResult = workProcessor.executeSyncUnsafe( work );
-		return peekResult.getResponseCode() == 200;
+		ElasticsearchWork<Boolean> work = new IndexExistsWork.Builder( indexName ).build();
+		return workProcessor.executeSyncUnsafe( work );
 	}
 
 	public IndexMetadata getCurrentIndexMetadata(String indexName) {
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setName( indexName );
 
-		ElasticsearchWork<JestResult> getMappingWork = new GetIndexTypeMappingsWork.Builder( indexName ).build();
+		ElasticsearchWork<Map<String, TypeMapping>> getMappingWork = new GetIndexTypeMappingsWork.Builder( indexName ).build();
 		try {
-			JestResult result = workProcessor.executeSyncUnsafe( getMappingWork );
-			JsonObject resultJson = result.getJsonObject();
-			JsonElement index = result.getJsonObject().get( indexName );
-			if ( index == null || !index.isJsonObject() ) {
-				throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + resultJson );
-			}
-			JsonElement mappings = index.getAsJsonObject().get( "mappings" );
-
-			if ( mappings != null ) {
-				Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
-				indexMetadata.setMappings( gsonService.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType ) );
-			}
+			Map<String, TypeMapping> mappings = workProcessor.executeSyncUnsafe( getMappingWork );
+			indexMetadata.setMappings( mappings );
 		}
 		catch (RuntimeException e) {
 			throw LOG.elasticsearchMappingRetrievalForValidationFailed( e );
 		}
 
-		ElasticsearchWork<JestResult> getSettingsWork = new GetIndexSettingsWork.Builder( indexName ).build();
+		ElasticsearchWork<IndexSettings> getSettingsWork = new GetIndexSettingsWork.Builder( indexName ).build();
 		try {
-			JestResult result = workProcessor.executeSyncUnsafe( getSettingsWork );
-			JsonObject resultJson = result.getJsonObject();
-			JsonElement index = result.getJsonObject().get( indexName );
-			if ( index == null || !index.isJsonObject() ) {
-				throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + resultJson );
-			}
-
-			JsonElement settings = index.getAsJsonObject().get( "settings" );
-			if ( settings == null || !settings.isJsonObject() ) {
-				throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + resultJson );
-			}
-
-			JsonElement indexSettings = settings.getAsJsonObject().get( "index" );
-			if ( indexSettings != null ) {
-				indexMetadata.setSettings( gsonService.getGson().fromJson( indexSettings, IndexSettings.class ) );
-			}
-			else {
-				// Empty settings
-				indexMetadata.setSettings( new IndexSettings() );
-			}
+			IndexSettings indexSettings = workProcessor.executeSyncUnsafe( getSettingsWork );
+			indexMetadata.setSettings( indexSettings );
 		}
 		catch (RuntimeException e) {
 			throw LOG.elasticsearchIndexSettingsRetrievalForValidationFailed( e );
@@ -185,16 +139,11 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		ElasticsearchIndexStatus requiredIndexStatus = executionOptions.getRequiredIndexStatus();
 		String timeoutAndUnit = executionOptions.getIndexManagementTimeoutInMs() + "ms";
 
-		ElasticsearchWork<JestResult> work =
+		ElasticsearchWork<?> work =
 				new WaitForIndexStatusWork.Builder( indexName, requiredIndexStatus, timeoutAndUnit )
 				.build();
 
-		JestResult result = workProcessor.executeSyncUnsafe( work );
-
-		if ( !result.isSucceeded() ) {
-			String status = result.getJsonObject().get( "status" ).getAsString();
-			throw LOG.unexpectedIndexStatus( indexName, requiredIndexStatus.getElasticsearchString(), status, timeoutAndUnit );
-		}
+		workProcessor.executeSyncUnsafe( work );
 	}
 
 	public void dropIndex(String indexName, ExecutionOptions executionOptions) {

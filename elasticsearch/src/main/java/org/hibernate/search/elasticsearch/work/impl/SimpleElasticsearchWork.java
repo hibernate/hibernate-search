@@ -23,19 +23,19 @@ import io.searchbox.client.JestResult;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class SimpleElasticsearchWork<R extends JestResult> implements ElasticsearchWork<R> {
+public abstract class SimpleElasticsearchWork<J extends JestResult, R> implements ElasticsearchWork<R> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	protected final Action<R> action;
+	protected final Action<J> action;
 	private final LuceneWork luceneWork;
 	protected final String dirtiedIndexName;
 	protected final IndexingMonitor indexingMonitor;
-	protected final ElasticsearchRequestResultAssessor<? super R> resultAssessor;
-	protected final ElasticsearchWorkSuccessReporter<? super R> successReporter;
+	protected final ElasticsearchRequestSuccessAssessor<? super J> resultAssessor;
+	protected final ElasticsearchWorkSuccessReporter<? super J> successReporter;
 	protected final boolean markIndexDirty;
 
-	protected SimpleElasticsearchWork(Builder<?, R> builder) {
+	protected SimpleElasticsearchWork(Builder<?, J> builder) {
 		this.action = builder.buildAction();
 		this.luceneWork = builder.luceneWork;
 		this.dirtiedIndexName = builder.dirtiedIndexName;
@@ -58,10 +58,10 @@ public class SimpleElasticsearchWork<R extends JestResult> implements Elasticsea
 
 	@Override
 	public final R execute(ElasticsearchWorkExecutionContext executionContext) {
-		R result;
+		J response;
 		try {
 			beforeExecute( executionContext );
-			result = executionContext.getClient().executeRequest( action );
+			response = executionContext.getClient().executeRequest( action );
 		}
 		catch (IOException e) {
 			GsonService gsonService = executionContext.getGsonService();
@@ -70,23 +70,25 @@ public class SimpleElasticsearchWork<R extends JestResult> implements Elasticsea
 					null, e );
 		}
 
-		resultAssessor.checkSuccess( executionContext, action, result );
+		resultAssessor.checkSuccess( executionContext, action, response );
 
 		if ( indexingMonitor != null ) {
 			IndexingMonitor bufferedIndexingMonitor = executionContext.getBufferedIndexingMonitor( indexingMonitor );
-			successReporter.report( result, bufferedIndexingMonitor );
+			successReporter.report( response, bufferedIndexingMonitor );
 		}
 
 		if ( markIndexDirty ) {
 			executionContext.setIndexDirty( dirtiedIndexName );
 		}
 
-		return result;
+		return generateResult( executionContext, response );
 	}
 
 	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext) {
 		// Do nothing by default
 	}
+
+	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, J response);
 
 	@Override
 	public void aggregate(ElasticsearchWorkAggregator aggregator) {
@@ -105,18 +107,18 @@ public class SimpleElasticsearchWork<R extends JestResult> implements Elasticsea
 	}
 
 	@SuppressWarnings("unchecked") // By contract, subclasses must implement B
-	protected abstract static class Builder<B, R extends JestResult> {
+	protected abstract static class Builder<B, J extends JestResult> {
 		protected final String dirtiedIndexName;
-		protected ElasticsearchRequestResultAssessor<? super R> resultAssessor;
-		protected final ElasticsearchWorkSuccessReporter<? super R> successReporter;
+		protected ElasticsearchRequestSuccessAssessor<? super J> resultAssessor;
+		protected final ElasticsearchWorkSuccessReporter<? super J> successReporter;
 
 		protected LuceneWork luceneWork;
 		protected IndexingMonitor monitor;
 		protected boolean markIndexDirty;
 
 		public Builder(String dirtiedIndexName,
-				ElasticsearchRequestResultAssessor<? super R> resultAssessor,
-				ElasticsearchWorkSuccessReporter<? super R> successReporter) {
+				ElasticsearchRequestSuccessAssessor<? super J> resultAssessor,
+				ElasticsearchWorkSuccessReporter<? super J> successReporter) {
 			this.dirtiedIndexName = dirtiedIndexName;
 			this.resultAssessor = resultAssessor;
 			this.successReporter = successReporter;
@@ -137,8 +139,8 @@ public class SimpleElasticsearchWork<R extends JestResult> implements Elasticsea
 			return (B) this;
 		}
 
-		protected abstract Action<R> buildAction();
+		protected abstract Action<J> buildAction();
 
-		public abstract ElasticsearchWork<R> build();
+		public abstract ElasticsearchWork<?> build();
 	}
 }

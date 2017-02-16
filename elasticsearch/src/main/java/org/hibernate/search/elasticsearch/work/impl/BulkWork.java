@@ -27,7 +27,7 @@ import io.searchbox.params.Parameters;
 /**
  * @author Yoann Rodiere
  */
-public class BulkWork implements ElasticsearchWork<BulkResult> {
+public class BulkWork implements ElasticsearchWork<Void> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -65,7 +65,7 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 	}
 
 	@Override
-	public BulkResult execute(ElasticsearchWorkExecutionContext context) {
+	public Void execute(ElasticsearchWorkExecutionContext context) {
 		if ( refreshInAPICall ) {
 			/*
 			 * Prevent bulked works to mark indexes as dirty,
@@ -85,7 +85,7 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 
 		handleResults( context, request, response );
 
-		return response;
+		return null;
 	}
 
 	@Override

@@ -13,10 +13,15 @@ import io.searchbox.indices.Flush;
 /**
  * @author Yoann Rodiere
  */
-public class FlushWork extends SimpleElasticsearchWork<JestResult> {
+public class FlushWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected FlushWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -24,7 +29,7 @@ public class FlushWork extends SimpleElasticsearchWork<JestResult> {
 		private final Flush.Builder jestBuilder;
 
 		public Builder() {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new Flush.Builder()
 					.setParameter( "wait_if_ongoing", "true" )
 					.refresh( true );

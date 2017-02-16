@@ -10,10 +10,15 @@ import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.CloseIndex;
 
-public class CloseIndexWork extends SimpleElasticsearchWork<JestResult> {
+public class CloseIndexWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected CloseIndexWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -21,7 +26,7 @@ public class CloseIndexWork extends SimpleElasticsearchWork<JestResult> {
 		private final CloseIndex.Builder jestBuilder;
 
 		public Builder(String indexName) {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new CloseIndex.Builder( indexName );
 		}
 

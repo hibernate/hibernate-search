@@ -18,10 +18,21 @@ import io.searchbox.indices.CreateIndex;
 /**
  * @author Yoann Rodiere
  */
-public class CreateIndexWork extends SimpleElasticsearchWork<JestResult> {
+public class CreateIndexWork extends SimpleElasticsearchWork<JestResult, CreateIndexResult> {
 
 	protected CreateIndexWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected CreateIndexResult generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		int statusCode = response.getResponseCode();
+		if ( 200 <= statusCode && statusCode < 300 ) {
+			return CreateIndexResult.CREATED;
+		}
+		else {
+			return CreateIndexResult.ALREADY_EXISTS;
+		}
 	}
 
 	public static class Builder
@@ -30,7 +41,7 @@ public class CreateIndexWork extends SimpleElasticsearchWork<JestResult> {
 		private final CreateIndex.Builder jestBuilder;
 
 		public Builder(GsonService gsonService, String indexName) {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.gsonService = gsonService;
 			this.jestBuilder = new CreateIndex.Builder( indexName );
 		}
@@ -48,7 +59,7 @@ public class CreateIndexWork extends SimpleElasticsearchWork<JestResult> {
 		}
 
 		public Builder ignoreExisting() {
-			this.resultAssessor = DefaultElasticsearchRequestResultAssessor.builder()
+			this.resultAssessor = DefaultElasticsearchRequestSuccessAssessor.builder()
 					.ignoreErrorTypes( "index_already_exists_exception" )
 					.build();
 			return this;

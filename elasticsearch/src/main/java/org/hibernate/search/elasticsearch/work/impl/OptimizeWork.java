@@ -13,10 +13,15 @@ import io.searchbox.indices.Optimize;
 /**
  * @author Yoann Rodiere
  */
-public class OptimizeWork extends SimpleElasticsearchWork<JestResult> {
+public class OptimizeWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected OptimizeWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -24,7 +29,7 @@ public class OptimizeWork extends SimpleElasticsearchWork<JestResult> {
 		private final Optimize.Builder jestBuilder;
 
 		public Builder() {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			/*
 			 * As of ES 2.1, the Optimize API has been renamed to ForceMerge,
 			 * but Jest still does not provide commands for the ForceMerge API as of

@@ -18,10 +18,15 @@ import io.searchbox.indices.mapping.PutMapping;
 /**
  * @author Yoann Rodiere
  */
-public class PutIndexTypeMappingWork extends SimpleElasticsearchWork<JestResult> {
+public class PutIndexTypeMappingWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected PutIndexTypeMappingWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -31,7 +36,7 @@ public class PutIndexTypeMappingWork extends SimpleElasticsearchWork<JestResult>
 		public Builder(
 				GsonService gsonService,
 				String indexName, String typeName, TypeMapping typeMapping) {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 			 * We better not include the null fields.

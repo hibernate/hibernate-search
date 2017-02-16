@@ -23,10 +23,15 @@ import io.searchbox.core.DeleteByQuery;
 /**
  * @author Yoann Rodiere
  */
-public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult> {
+public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected DeleteByQueryWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -34,7 +39,7 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult> {
 		private final DeleteByQuery.Builder jestBuilder;
 
 		public Builder(String indexName, JsonObject payload) {
-			super( indexName, ResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( indexName, SuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new DeleteByQuery.Builder( payload.toString() )
 					.addIndex( indexName );
 		}
@@ -55,18 +60,18 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult> {
 		}
 	}
 
-	private static class ResultAssessor implements ElasticsearchRequestResultAssessor<JestResult> {
+	private static class SuccessAssessor implements ElasticsearchRequestSuccessAssessor<JestResult> {
 
 		private static final Log LOG = LoggerFactory.make( Log.class );
 
 		private static final int NOT_FOUND_HTTP_STATUS_CODE = 404;
 
-		public static final ResultAssessor INSTANCE = new ResultAssessor();
+		public static final SuccessAssessor INSTANCE = new SuccessAssessor();
 
-		private final DefaultElasticsearchRequestResultAssessor delegate;
+		private final DefaultElasticsearchRequestSuccessAssessor delegate;
 
-		private ResultAssessor() {
-			this.delegate = DefaultElasticsearchRequestResultAssessor.builder( )
+		private SuccessAssessor() {
+			this.delegate = DefaultElasticsearchRequestSuccessAssessor.builder( )
 					.ignoreErrorStatuses( NOT_FOUND_HTTP_STATUS_CODE ).build();
 		}
 

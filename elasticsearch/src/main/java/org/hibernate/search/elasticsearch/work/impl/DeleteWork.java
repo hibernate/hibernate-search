@@ -14,13 +14,18 @@ import io.searchbox.core.DocumentResult;
 /**
  * @author Yoann Rodiere
  */
-public class DeleteWork extends SimpleBulkableElasticsearchWork<DocumentResult> {
+public class DeleteWork extends SimpleBulkableElasticsearchWork<DocumentResult, Void> {
 
-	private static final ElasticsearchRequestResultAssessor<JestResult> RESULT_ASSESSOR =
-			DefaultElasticsearchRequestResultAssessor.builder().ignoreErrorStatuses( 404 ).build();
+	private static final ElasticsearchRequestSuccessAssessor<JestResult> RESULT_ASSESSOR =
+			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
 	public DeleteWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, DocumentResult response) {
+		return null;
 	}
 
 	public static class Builder

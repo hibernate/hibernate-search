@@ -47,8 +47,10 @@ import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldTyp
 import org.hibernate.search.elasticsearch.util.impl.Window;
 import org.hibernate.search.elasticsearch.work.impl.ClearScrollWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.ExplainResult;
 import org.hibernate.search.elasticsearch.work.impl.ExplainWork;
 import org.hibernate.search.elasticsearch.work.impl.ScrollWork;
+import org.hibernate.search.elasticsearch.work.impl.SearchResult;
 import org.hibernate.search.elasticsearch.work.impl.SearchWork;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -86,10 +88,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-
-import io.searchbox.client.JestResult;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.SearchResult;
 
 /**
  * Query implementation based on Elasticsearch.
@@ -217,15 +215,15 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					.add( "query", searcher.payload.get( "query" ) )
 					.build();
 
-			ElasticsearchWork<DocumentResult> work = new ExplainWork.Builder(
+			ElasticsearchWork<ExplainResult> work = new ExplainWork.Builder(
 					hit.get( "_index" ).getAsString(),
 					hit.get( "_type" ).getAsString(),
 					hit.get( "_id" ).getAsString(),
 					explainPayload )
 					.build();
 
-			DocumentResult response = processor.get().executeSyncUnsafe( work );
-			JsonObject explanation = response.getJsonObject().get( "explanation" ).getAsJsonObject();
+			ExplainResult result = processor.get().executeSyncUnsafe( work );
+			JsonObject explanation = result.getJsonObject().get( "explanation" ).getAsJsonObject();
 
 			return convertExplanation( explanation );
 		}
@@ -297,7 +295,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		searcher = new IndexSearcher();
 
 		searchResult = searcher.search();
-		resultSize = searchResult.getTotal();
+		resultSize = searchResult.getTotalHitCount();
 	}
 
 	/**
@@ -736,10 +734,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		/**
 		 * Scroll through search results, using a previously obtained scrollId.
 		 */
-		JestResult scroll(String scrollId) {
+		SearchResult scroll(String scrollId) {
 			try ( ServiceReference<ElasticsearchWorkProcessor> processor =
 							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
-				ElasticsearchWork<JestResult> work = new ScrollWork.Builder( scrollId, getScrollTimeout() ).build();
+				ElasticsearchWork<SearchResult> work = new ScrollWork.Builder( scrollId, getScrollTimeout() ).build();
 				return processor.get().executeSyncUnsafe( work );
 			}
 		}
@@ -1270,10 +1268,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		private void initResults() {
 			SearchResult searchResult = searcher.searchWithScrollEnabled();
-			totalResultCount = searchResult.getTotal();
-
-			JsonObject searchResultJsonObject = searchResult.getJsonObject();
-			extractWindow( searchResultJsonObject );
+			totalResultCount = searchResult.getTotalHitCount();
+			extractWindow( searchResult );
 		}
 
 		/**
@@ -1285,15 +1281,15 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				return false;
 			}
 
-			JestResult searchResult = searcher.scroll( scrollId );
-			JsonObject searchResultJsonObject = searchResult.getJsonObject();
-			return extractWindow( searchResultJsonObject );
+			SearchResult searchResult = searcher.scroll( scrollId );
+			return extractWindow( searchResult );
 		}
 
 		/**
 		 * @return {@code true} if at least one result was fetched, {@code false} otherwise.
 		 */
-		private boolean extractWindow(JsonObject searchResultJsonObject) {
+		private boolean extractWindow(SearchResult searchResult) {
+			JsonObject searchResultJsonObject = searchResult.getJsonObject();
 			boolean fetchedAtLeastOne = false;
 			scrollId = searchResultJsonObject.get( "_scroll_id" ).getAsString();
 			JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();

@@ -13,10 +13,15 @@ import io.searchbox.core.SearchScroll;
 /**
  * @author Yoann Rodiere
  */
-public class ClearScrollWork extends SimpleElasticsearchWork<JestResult> {
+public class ClearScrollWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected ClearScrollWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -24,7 +29,7 @@ public class ClearScrollWork extends SimpleElasticsearchWork<JestResult> {
 		private final SearchScroll.Builder jestBuilder;
 
 		public Builder(String scrollId) {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new SearchScroll.Builder( scrollId, "" );
 		}
 

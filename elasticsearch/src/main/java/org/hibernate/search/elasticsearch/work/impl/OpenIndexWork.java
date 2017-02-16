@@ -13,10 +13,15 @@ import io.searchbox.indices.OpenIndex;
 /**
  * @author Yoann Rodiere
  */
-public class OpenIndexWork extends SimpleElasticsearchWork<JestResult> {
+public class OpenIndexWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected OpenIndexWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -24,7 +29,7 @@ public class OpenIndexWork extends SimpleElasticsearchWork<JestResult> {
 		private final OpenIndex.Builder jestBuilder;
 
 		public Builder(String indexName) {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new OpenIndex.Builder( indexName );
 		}
 

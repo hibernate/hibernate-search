@@ -15,7 +15,7 @@ import io.searchbox.core.Explain;
 /**
  * @author Yoann Rodiere
  */
-public class ExplainWork extends SimpleElasticsearchWork<DocumentResult> {
+public class ExplainWork extends SimpleElasticsearchWork<DocumentResult, ExplainResult> {
 
 	protected ExplainWork(Builder builder) {
 		super( builder );
@@ -26,7 +26,7 @@ public class ExplainWork extends SimpleElasticsearchWork<DocumentResult> {
 		private final Explain.Builder jestBuilder;
 
 		public Builder(String indexName, String typeName, String id, JsonObject payload) {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new Explain.Builder( indexName, typeName, id, payload );
 		}
 
@@ -38,6 +38,26 @@ public class ExplainWork extends SimpleElasticsearchWork<DocumentResult> {
 		@Override
 		public ExplainWork build() {
 			return new ExplainWork( this );
+		}
+	}
+
+	@Override
+	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context, DocumentResult response) {
+		return new ExplainResultImpl( response.getJsonObject() );
+	}
+
+	private static class ExplainResultImpl implements ExplainResult {
+
+		private final JsonObject jsonObject;
+
+		public ExplainResultImpl(JsonObject jsonObject) {
+			super();
+			this.jsonObject = jsonObject;
+		}
+
+		@Override
+		public JsonObject getJsonObject() {
+			return jsonObject;
 		}
 	}
 }

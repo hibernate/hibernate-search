@@ -13,10 +13,15 @@ import io.searchbox.indices.Refresh;
 /**
  * @author Yoann Rodiere
  */
-public class RefreshWork extends SimpleElasticsearchWork<JestResult> {
+public class RefreshWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected RefreshWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -24,7 +29,7 @@ public class RefreshWork extends SimpleElasticsearchWork<JestResult> {
 		private final Refresh.Builder jestBuilder;
 
 		public Builder() {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new Refresh.Builder();
 		}
 

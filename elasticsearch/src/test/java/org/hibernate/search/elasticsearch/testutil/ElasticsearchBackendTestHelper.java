@@ -14,8 +14,8 @@ import java.util.List;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
-import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestResultAssessor;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestSuccessAssessor;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.elasticsearch.work.impl.NoopElasticsearchWorkSuccessReporter;
 import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -57,12 +57,10 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
 				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
-			ElasticsearchWork<CountResult> work = new CountWork.Builder( indexNames )
+			CountWork work = new CountWork.Builder( indexNames )
 					.type( entityType.getName() )
 					.build();
-			CountResult response = processor.get().executeSyncUnsafe( work );
-
-			return response.getCount().intValue();
+			return processor.get().executeSyncUnsafe( work );
 		}
 	}
 
@@ -72,11 +70,9 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
 				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
-			ElasticsearchWork<CountResult> work = new CountWork.Builder( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
+			CountWork work = new CountWork.Builder( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.build();
-			CountResult response = processor.get().executeSyncUnsafe( work );
-
-			return response.getCount().intValue();
+			return processor.get().executeSyncUnsafe( work );
 		}
 	}
 
@@ -87,19 +83,22 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
 				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
-			ElasticsearchWork<CountResult> work = new CountWork.Builder( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
+			CountWork work = new CountWork.Builder( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.query( "{ \"query\" : { \"" + query + "\" : { \"" + fieldName + "\" : \"" + value + "\" } } }" )
 					.build();
-			CountResult response = processor.get().executeSyncUnsafe( work );
-
-			return response.getCount().intValue();
+			return processor.get().executeSyncUnsafe( work );
 		}
 	}
 
-	private static class CountWork extends SimpleElasticsearchWork<CountResult> {
+	private static class CountWork extends SimpleElasticsearchWork<CountResult, Integer> {
 
 		protected CountWork(Builder builder) {
 			super( builder );
+		}
+
+		@Override
+		protected Integer generateResult(ElasticsearchWorkExecutionContext context, CountResult response) {
+			return response.getCount().intValue();
 		}
 
 		private static class Builder extends SimpleElasticsearchWork.Builder<Builder, CountResult> {
@@ -111,7 +110,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 			}
 
 			public Builder(Collection<String> indexNames) {
-				super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+				super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 				this.jestBuilder = new Count.Builder().addIndex( indexNames );
 			}
 

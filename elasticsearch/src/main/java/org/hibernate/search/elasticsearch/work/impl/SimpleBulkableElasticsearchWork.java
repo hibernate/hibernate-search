@@ -15,11 +15,11 @@ import io.searchbox.core.BulkResult.BulkResultItem;
 /**
  * @author Yoann Rodiere
  */
-public class SimpleBulkableElasticsearchWork<R extends JestResult>
-		extends SimpleElasticsearchWork<R>
+public abstract class SimpleBulkableElasticsearchWork<J extends JestResult, R>
+		extends SimpleElasticsearchWork<J, R>
 		implements BulkableElasticsearchWork<R> {
 
-	protected SimpleBulkableElasticsearchWork(Builder<?, R> builder) {
+	protected SimpleBulkableElasticsearchWork(Builder<?, J> builder) {
 		super( builder );
 	}
 
@@ -52,12 +52,12 @@ public class SimpleBulkableElasticsearchWork<R extends JestResult>
 		}
 	}
 
-	protected abstract static class Builder<B, R extends JestResult>
-			extends SimpleElasticsearchWork.Builder<B, R> {
+	protected abstract static class Builder<B, J extends JestResult>
+			extends SimpleElasticsearchWork.Builder<B, J> {
 
 		public Builder(String dirtiedIndexName,
-				ElasticsearchRequestResultAssessor<? super R> resultAssessor,
-				ElasticsearchWorkSuccessReporter<? super R> successReporter) {
+				ElasticsearchRequestSuccessAssessor<? super J> resultAssessor,
+				ElasticsearchWorkSuccessReporter<? super J> successReporter) {
 			super( dirtiedIndexName, resultAssessor, successReporter );
 		}
 

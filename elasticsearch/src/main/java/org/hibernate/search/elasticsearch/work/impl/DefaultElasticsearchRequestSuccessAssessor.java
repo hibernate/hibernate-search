@@ -26,13 +26,13 @@ import io.searchbox.core.BulkResult.BulkResultItem;
 /**
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchRequestResultAssessor implements ElasticsearchRequestResultAssessor<JestResult> {
+public class DefaultElasticsearchRequestSuccessAssessor implements ElasticsearchRequestSuccessAssessor<JestResult> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private static final int TIME_OUT_HTTP_RESPONSE_CODE = 408;
 
-	public static final DefaultElasticsearchRequestResultAssessor INSTANCE = builder().build();
+	public static final DefaultElasticsearchRequestSuccessAssessor INSTANCE = builder().build();
 
 	public static Builder builder() {
 		return new Builder();
@@ -56,15 +56,15 @@ public class DefaultElasticsearchRequestResultAssessor implements ElasticsearchR
 			return this;
 		}
 
-		public DefaultElasticsearchRequestResultAssessor build() {
-			return new DefaultElasticsearchRequestResultAssessor( this );
+		public DefaultElasticsearchRequestSuccessAssessor build() {
+			return new DefaultElasticsearchRequestSuccessAssessor( this );
 		}
 	}
 
 	private final Set<Integer> ignoredErrorStatuses;
 	private final Set<String> ignoredErrorTypes;
 
-	private DefaultElasticsearchRequestResultAssessor(Builder builder) {
+	private DefaultElasticsearchRequestSuccessAssessor(Builder builder) {
 		this.ignoredErrorStatuses = Collections.unmodifiableSet( new HashSet<>( builder.ignoredErrorStatuses ) );
 		this.ignoredErrorTypes = Collections.unmodifiableSet( new HashSet<>( builder.ignoredErrorTypes ) );
 	}

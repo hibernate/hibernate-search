@@ -10,23 +10,29 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import io.searchbox.action.AbstractAction;
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
+import io.searchbox.core.BulkResult.BulkResultItem;
 
 /**
  * @author Yoann Rodiere
  */
-public class WaitForIndexStatusWork extends SimpleElasticsearchWork<JestResult> {
-
-	private static final ElasticsearchRequestResultAssessor<? super JestResult> RESULT_ASSESSOR =
-			DefaultElasticsearchRequestResultAssessor.builder().ignoreErrorStatuses( 408 ).build();
+public class WaitForIndexStatusWork extends SimpleElasticsearchWork<JestResult, Void> {
 
 	protected WaitForIndexStatusWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -35,7 +41,7 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<JestResult> 
 		private final String indexName;
 
 		public Builder(String indexName, ElasticsearchIndexStatus requiredStatus, String timeout) {
-			super( null, RESULT_ASSESSOR, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, new SuccessAssessor( indexName, requiredStatus, timeout ), NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.indexName = indexName;
 			this.jestBuilder = new Health.Builder()
 					.setParameter( "wait_for_status", requiredStatus.getElasticsearchString() )
@@ -67,5 +73,46 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<JestResult> 
 				throw new AssertionFailure( "Unexpectedly unsupported charset", e );
 			}
 		}
+	}
+
+	private static class SuccessAssessor implements ElasticsearchRequestSuccessAssessor<JestResult> {
+
+		private static final Log LOG = LoggerFactory.make( Log.class );
+
+		private static final int TIMED_OUT_HTTP_STATUS_CODE = 408;
+
+		private final String indexName;
+
+		private final ElasticsearchIndexStatus requiredIndexStatus;
+
+		private final String timeoutAndUnit;
+
+		private final DefaultElasticsearchRequestSuccessAssessor delegate;
+
+		public SuccessAssessor(String indexName,
+				ElasticsearchIndexStatus requiredIndexStatus,
+				String timeoutAndUnit) {
+			super();
+			this.indexName = indexName;
+			this.requiredIndexStatus = requiredIndexStatus;
+			this.timeoutAndUnit = timeoutAndUnit;
+			this.delegate = DefaultElasticsearchRequestSuccessAssessor.builder( )
+					.ignoreErrorStatuses( TIMED_OUT_HTTP_STATUS_CODE ).build();
+		}
+
+		@Override
+		public void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends JestResult> request, JestResult result) throws SearchException {
+			this.delegate.checkSuccess( context, request, result );
+			if ( result.getResponseCode() == TIMED_OUT_HTTP_STATUS_CODE ) {
+				String status = result.getJsonObject().get( "status" ).getAsString();
+				throw LOG.unexpectedIndexStatus( indexName, requiredIndexStatus.getElasticsearchString(), status, timeoutAndUnit );
+			}
+		}
+
+		@Override
+		public boolean isSuccess(ElasticsearchWorkExecutionContext context, BulkResultItem bulkResultItem) {
+			throw new AssertionFailure( "This method should never be called, because WaitForIndexStatus actions are not Bulkable" );
+		}
+
 	}
 }

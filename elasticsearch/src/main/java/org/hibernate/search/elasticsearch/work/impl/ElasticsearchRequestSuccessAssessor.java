@@ -15,23 +15,23 @@ import io.searchbox.core.BulkResult.BulkResultItem;
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchRequestResultAssessor<T extends JestResult> {
+public interface ElasticsearchRequestSuccessAssessor<R extends JestResult> {
 
 	/**
-	 * Checks the given detailed result, throwing an exception if the result is a failure.
+	 * Check the given response, throwing an exception if the reponse indicates a failure.
 	 * @param context The context in which the request was executed.
-	 * @param request The request that produced the result.
-	 * @param result The detailed result.
+	 * @param request The request whose success is to be assessed.
+	 * @param response The response, containing information about the outcome of the request.
 	 * @throws SearchException If the result is a failure.
 	 */
-	void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends T> request, T result) throws SearchException;
+	void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends R> request, R response) throws SearchException;
 
 	/**
-	 * Checks the given summary result, return {@code true} if it is successful, {@code false} otherwise.
+	 * Check the given response, return {@code true} if it is successful, {@code false} otherwise.
 	 * @param context The context in which the request was executed.
-	 * @param bulkResultItem The summary result.
+	 * @param bulkResponseItem The part of the response concerning the request whose success is to be assessed.
 	 * @return {@code true} if the result is successful, {@code false} otherwise.
 	 */
-	boolean isSuccess(ElasticsearchWorkExecutionContext context, BulkResultItem bulkResultItem);
+	boolean isSuccess(ElasticsearchWorkExecutionContext context, BulkResultItem bulkResponseItem);
 
 }

@@ -11,18 +11,20 @@ import java.util.Collection;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
+import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonObject;
+
 import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
 
 /**
  * @author Yoann Rodiere
  */
-public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
+public class SearchWork extends SimpleElasticsearchWork<io.searchbox.core.SearchResult, SearchResult> {
 
 	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, LogCategory.QUERY );
 
@@ -43,12 +45,17 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 		}
 	}
 
+	@Override
+	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, io.searchbox.core.SearchResult response) {
+		return new SearchResultImpl( response.getJsonObject() );
+	}
+
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, SearchResult> {
+			extends SimpleElasticsearchWork.Builder<Builder, io.searchbox.core.SearchResult> {
 		private final Search.Builder jestBuilder;
 
 		public Builder(String payload) {
-			super( null, DefaultElasticsearchRequestResultAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new Search.Builder( payload );
 		}
 
@@ -83,5 +90,28 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 		public ElasticsearchWork<SearchResult> build() {
 			return new SearchWork( this );
 		}
+	}
+
+	static class SearchResultImpl implements SearchResult {
+
+		private static final JsonAccessor COUNT_ACCESSOR = JsonAccessor.root().property( "hits" ).property( "total" );
+
+		private final JsonObject jsonObject;
+
+		public SearchResultImpl(JsonObject jsonObject) {
+			super();
+			this.jsonObject = jsonObject;
+		}
+
+		@Override
+		public JsonObject getJsonObject() {
+			return jsonObject;
+		}
+
+		@Override
+		public int getTotalHitCount() {
+			return COUNT_ACCESSOR.get( jsonObject ).getAsInt();
+		}
+
 	}
 }

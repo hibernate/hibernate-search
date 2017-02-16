@@ -15,10 +15,15 @@ import io.searchbox.core.Index;
 /**
  * @author Yoann Rodiere
  */
-public class IndexWork extends SimpleBulkableElasticsearchWork<DocumentResult> {
+public class IndexWork extends SimpleBulkableElasticsearchWork<DocumentResult, Void> {
 
 	public IndexWork(Builder builder) {
 		super( builder );
+	}
+
+	@Override
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, DocumentResult response) {
+		return null;
 	}
 
 	public static class Builder
@@ -26,7 +31,7 @@ public class IndexWork extends SimpleBulkableElasticsearchWork<DocumentResult> {
 		private final Index.Builder jestBuilder;
 
 		public Builder(String indexName, String typeName, String id, JsonObject document) {
-			super( indexName, DefaultElasticsearchRequestResultAssessor.INSTANCE, DocumentAddedElasticsearchWorkSuccessReporter.INSTANCE );
+			super( indexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, DocumentAddedElasticsearchWorkSuccessReporter.INSTANCE );
 			this.jestBuilder = new Index.Builder( document )
 					.index( indexName )
 					.type( typeName )
