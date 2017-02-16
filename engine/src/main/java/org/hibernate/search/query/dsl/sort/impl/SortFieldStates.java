@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
+import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.SearchException;
@@ -150,11 +151,55 @@ public class SortFieldStates {
 	}
 
 	private SortField.Type getCurrentSortFieldTypeFromMetamodel() {
+		SortField.Type type = null;
+
 		TypeMetadata typeMetadata = queryContext.getExtendedSearchIntegrator()
 				.getIndexBinding( queryContext.getEntityType() )
 				.getDocumentBuilder()
 				.getTypeMetadata();
-		DocumentFieldMetadata documentFieldMetadata = typeMetadata.getDocumentFieldMetadataFor( currentName );
+
+		BridgeDefinedField bridgeDefinedFieldMetadata = typeMetadata.getBridgeDefinedFieldMetadataFor( currentName );
+		if ( bridgeDefinedFieldMetadata != null ) {
+			type = getSortFieldType( bridgeDefinedFieldMetadata );
+		}
+
+		if ( type == null ) {
+			DocumentFieldMetadata documentFieldMetadata = typeMetadata.getDocumentFieldMetadataFor( currentName );
+			if ( documentFieldMetadata != null ) {
+				type = getSortFieldType( documentFieldMetadata );
+			}
+		}
+
+		if ( type != null ) {
+			return type;
+		}
+		else {
+			throw new SearchException( "Cannot automatically determine the field type for field '" + currentName
+					+ "'. Use byField(String, Sort.Type) to provide the sort type explicitly." );
+		}
+	}
+
+	private SortField.Type getSortFieldType(BridgeDefinedField bridgeDefinedFieldMetadata) {
+		switch ( bridgeDefinedFieldMetadata.getType() ) {
+			case DOUBLE:
+				return SortField.Type.DOUBLE;
+			case FLOAT:
+				return SortField.Type.FLOAT;
+			case LONG:
+			case DATE:
+				return SortField.Type.LONG;
+			case INTEGER:
+				return SortField.Type.INT;
+			case BOOLEAN:
+			case STRING:
+				return SortField.Type.STRING;
+			case OBJECT:
+			default:
+				return null;
+		}
+	}
+
+	private SortField.Type getSortFieldType(DocumentFieldMetadata documentFieldMetadata) {
 		if ( documentFieldMetadata.isSpatial() ) {
 			throw new SearchException( "Field '" + currentName + "' is a spatial field."
 					+ " For spatial fields, use .byDistance() and not .byField()." );
@@ -170,15 +215,13 @@ public class SortFieldStates {
 				case INTEGER:
 					return SortField.Type.INT;
 				case UNKNOWN:
-					break; // Fail below
+				default:
+					return null;
 			}
 		}
 		else {
 			return SortField.Type.STRING;
 		}
-
-		throw new SearchException( "Cannot automatically determine the field type for field '" + currentName
-				+ "'. Use byField(String, Sort.Type) to provide the sort type explicitly." );
 	}
 
 	private void processMissingValue(SortField sortField) {
