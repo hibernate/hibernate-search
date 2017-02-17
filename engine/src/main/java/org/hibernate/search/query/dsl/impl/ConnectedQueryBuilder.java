@@ -59,7 +59,7 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 
 	@Override
 	public FacetContext facet() {
-		return new ConnectedFacetContext( new FacetBuildingContext( context.getFactory(), context.getEntityType() ) );
+		return new ConnectedFacetContext( new FacetBuildingContext( context.getExtendedSearchIntegrator(), context.getEntityType() ) );
 	}
 
 	@Override

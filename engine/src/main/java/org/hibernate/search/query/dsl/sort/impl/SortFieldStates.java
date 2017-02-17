@@ -20,7 +20,6 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
-import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Holds the list of @{link SortField}s as well as the state of the one being constructed.
@@ -151,8 +150,7 @@ public class SortFieldStates {
 	}
 
 	private SortField.Type getCurrentSortFieldTypeFromMetamodel() {
-		TypeMetadata typeMetadata = queryContext.getFactory()
-				.unwrap( SearchIntegrator.class )
+		TypeMetadata typeMetadata = queryContext.getExtendedSearchIntegrator()
 				.getIndexBinding( queryContext.getEntityType() )
 				.getDocumentBuilder()
 				.getTypeMetadata();
