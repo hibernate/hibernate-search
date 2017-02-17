@@ -14,12 +14,13 @@ import java.util.Map;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.metadata.FieldDescriptor;
-import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Holds the list of @{link SortField}s as well as the state of the one being constructed.
@@ -150,30 +151,32 @@ public class SortFieldStates {
 	}
 
 	private SortField.Type getCurrentSortFieldTypeFromMetamodel() {
-		FieldDescriptor fieldDescriptor = queryContext.getFactory()
-				.getIndexedTypeDescriptor( queryContext.getEntityType() )
-				.getIndexedField( currentName );
-		switch ( fieldDescriptor.getType() ) {
-			case SPATIAL:
-				throw new SearchException( "Field '" + currentName + "' is a spatial field."
-						+ " For spatial fields, use .byDistance() and not .byField()." );
-			case NUMERIC:
-				NumericFieldSettingsDescriptor nfd = fieldDescriptor.as( NumericFieldSettingsDescriptor.class );
-				switch ( nfd.encodingType() ) {
-					case DOUBLE:
-						return SortField.Type.DOUBLE;
-					case FLOAT:
-						return SortField.Type.FLOAT;
-					case LONG:
-						return SortField.Type.LONG;
-					case INTEGER:
-						return SortField.Type.INT;
-					case UNKNOWN:
-						break; // Fail below
-				}
-				break;
-			case BASIC:
-				return SortField.Type.STRING;
+		TypeMetadata typeMetadata = queryContext.getFactory()
+				.unwrap( SearchIntegrator.class )
+				.getIndexBinding( queryContext.getEntityType() )
+				.getDocumentBuilder()
+				.getTypeMetadata();
+		DocumentFieldMetadata documentFieldMetadata = typeMetadata.getDocumentFieldMetadataFor( currentName );
+		if ( documentFieldMetadata.isSpatial() ) {
+			throw new SearchException( "Field '" + currentName + "' is a spatial field."
+					+ " For spatial fields, use .byDistance() and not .byField()." );
+		}
+		else if ( documentFieldMetadata.isNumeric() ) {
+			switch ( documentFieldMetadata.getNumericEncodingType() ) {
+				case DOUBLE:
+					return SortField.Type.DOUBLE;
+				case FLOAT:
+					return SortField.Type.FLOAT;
+				case LONG:
+					return SortField.Type.LONG;
+				case INTEGER:
+					return SortField.Type.INT;
+				case UNKNOWN:
+					break; // Fail below
+			}
+		}
+		else {
+			return SortField.Type.STRING;
 		}
 
 		throw new SearchException( "Cannot automatically determine the field type for field '" + currentName
