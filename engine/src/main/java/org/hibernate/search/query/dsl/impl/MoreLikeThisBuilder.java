@@ -163,7 +163,7 @@ public class MoreLikeThisBuilder<T> {
 			return null;
 		}
 		findById = new TermQuery( new Term( documentBuilder.getIdFieldName(), id ) );
-		HSQuery query = queryContext.getFactory().createHSQuery( findById, queryContext.getEntityType() );
+		HSQuery query = queryContext.getExtendedSearchIntegrator().createHSQuery( findById, queryContext.getEntityType() );
 		List<EntityInfo> entityInfos = query
 				.maxResults( 1 )
 				.projection( HSQuery.DOCUMENT_ID )

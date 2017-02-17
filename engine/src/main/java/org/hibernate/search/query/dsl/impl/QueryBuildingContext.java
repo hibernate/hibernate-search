@@ -36,7 +36,7 @@ public class QueryBuildingContext {
 		documentBuilder = indexBinding.getDocumentBuilder();
 	}
 
-	public ExtendedSearchIntegrator getFactory() {
+	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
 		return factory;
 	}
 
