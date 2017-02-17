@@ -28,8 +28,7 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 
 import com.google.gson.JsonElement;
-
-import io.searchbox.core.BulkResult.BulkResultItem;
+import com.google.gson.JsonObject;
 
 /**
  * Hibernate Search log abstraction for the Elasticsearch integration.
@@ -73,7 +72,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Elasticsearch request failed.\n Request:\n========\n%1$sResponse:\n=========\n%2$s"
 	)
 	BulkRequestFailedException elasticsearchBulkRequestFailed(String request, String response,
-			@Param Map<BulkableElasticsearchWork<?>, BulkResultItem> successfulItems, @Param List<BulkableElasticsearchWork<?>> erroneousItems);
+			@Param Map<BulkableElasticsearchWork<?>, JsonObject> successfulItems, @Param List<BulkableElasticsearchWork<?>> erroneousItems);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 9,
@@ -293,8 +292,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 53,
-			value = "Executing Elasticsearch query on '%s':\n%s" )
-	void executingElasticsearchQuery(String pathAndQueryAsString, String queryAsString);
+			value = "Executing Elasticsearch query on '%s' with parameters '%s' :\n%s" )
+	void executingElasticsearchQuery(String path, Map<String, String> parameters, String queryAsString);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 54,
 			value = "Invalid field path detected for field '%2$s' on entity '%1$s':"

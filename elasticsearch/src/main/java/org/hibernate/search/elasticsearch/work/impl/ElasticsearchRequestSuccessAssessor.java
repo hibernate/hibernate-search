@@ -6,32 +6,33 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.exception.SearchException;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.BulkResult.BulkResultItem;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchRequestSuccessAssessor<R extends JestResult> {
+public interface ElasticsearchRequestSuccessAssessor {
 
 	/**
 	 * Check the given response, throwing an exception if the reponse indicates a failure.
 	 * @param context The context in which the request was executed.
 	 * @param request The request whose success is to be assessed.
 	 * @param response The response, containing information about the outcome of the request.
+	 * @param parsedResponseBody The response body parsed as JSON.
 	 * @throws SearchException If the result is a failure.
 	 */
-	void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends R> request, R response) throws SearchException;
+	void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, Response response,
+			JsonObject parsedResponseBody) throws SearchException;
 
 	/**
 	 * Check the given response, return {@code true} if it is successful, {@code false} otherwise.
 	 * @param context The context in which the request was executed.
-	 * @param bulkResponseItem The part of the response concerning the request whose success is to be assessed.
+	 * @param bulkResponseItem The part of the response body concerning the request whose success is to be assessed.
 	 * @return {@code true} if the result is successful, {@code false} otherwise.
 	 */
-	boolean isSuccess(ElasticsearchWorkExecutionContext context, BulkResultItem bulkResponseItem);
+	boolean isSuccess(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem);
 
 }

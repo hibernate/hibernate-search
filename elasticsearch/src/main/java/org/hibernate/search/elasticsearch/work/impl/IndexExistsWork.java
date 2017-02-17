@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.IndexExistsWorkBuilder;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.IndicesExists;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class IndexExistsWork extends SimpleElasticsearchWork<JestResult, Boolean> {
+public class IndexExistsWork extends SimpleElasticsearchWork<Boolean> {
 
-	private static final ElasticsearchRequestSuccessAssessor<? super JestResult> RESULT_ASSESSOR =
+	private static final ElasticsearchRequestSuccessAssessor RESULT_ASSESSOR =
 			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
 	protected IndexExistsWork(Builder builder) {
@@ -25,23 +25,27 @@ public class IndexExistsWork extends SimpleElasticsearchWork<JestResult, Boolean
 	}
 
 	@Override
-	protected Boolean generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
-		return response.getResponseCode() == 200;
+	protected Boolean generateResult(ElasticsearchWorkExecutionContext context,
+			Response response, JsonObject parsedResponseBody) {
+		return ElasticsearchClientUtils.isSuccessCode( response.getStatusLine().getStatusCode() );
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements IndexExistsWorkBuilder {
-		private final IndicesExists.Builder jestBuilder;
+		private final String indexName;
 
 		public Builder(String indexName) {
-			super( null, RESULT_ASSESSOR, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new IndicesExists.Builder( indexName );
+			super( null, RESULT_ASSESSOR );
+			this.indexName = indexName;
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.head()
+					.pathComponent( indexName );
+			return builder.build();
 		}
 
 		@Override

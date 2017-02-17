@@ -6,46 +6,47 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.CreateIndexWorkBuilder;
 
 import com.google.gson.Gson;
-
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.CreateIndex;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class CreateIndexWork extends SimpleElasticsearchWork<JestResult, CreateIndexResult> {
+public class CreateIndexWork extends SimpleElasticsearchWork<CreateIndexResult> {
 
 	protected CreateIndexWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected CreateIndexResult generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
-		int statusCode = response.getResponseCode();
-		if ( 200 <= statusCode && statusCode < 300 ) {
+	protected CreateIndexResult generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+		int statusCode = response.getStatusLine().getStatusCode();
+		if ( ElasticsearchClientUtils.isSuccessCode( statusCode ) ) {
 			return CreateIndexResult.CREATED;
 		}
 		else {
+			// Can only happen if ignoreExisting() was called on the builder
 			return CreateIndexResult.ALREADY_EXISTS;
 		}
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements CreateIndexWorkBuilder {
 		private final GsonService gsonService;
-		private final CreateIndex.Builder jestBuilder;
+		private final String indexName;
+		private JsonObject payload;
 
 		public Builder(GsonService gsonService, String indexName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.gsonService = gsonService;
-			this.jestBuilder = new CreateIndex.Builder( indexName );
+			this.indexName = indexName;
 		}
 
 		@Override
@@ -56,7 +57,7 @@ public class CreateIndexWork extends SimpleElasticsearchWork<JestResult, CreateI
 				 * We better not include the null fields.
 				 */
 				Gson gson = gsonService.getGsonNoSerializeNulls();
-				jestBuilder.settings( gson.toJson( settings ) );
+				this.payload = gson.toJsonTree( settings ).getAsJsonObject();
 			}
 			return this;
 		}
@@ -70,8 +71,16 @@ public class CreateIndexWork extends SimpleElasticsearchWork<JestResult, CreateI
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.put()
+					.pathComponent( indexName );
+
+			if ( payload != null ) {
+				builder.body( payload );
+			}
+
+			return builder.build();
 		}
 
 		@Override

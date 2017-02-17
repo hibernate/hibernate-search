@@ -6,39 +6,43 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.work.impl.builder.OpenIndexWorkBuilder;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.OpenIndex;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class OpenIndexWork extends SimpleElasticsearchWork<JestResult, Void> {
+public class OpenIndexWork extends SimpleElasticsearchWork<Void> {
 
 	protected OpenIndexWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements OpenIndexWorkBuilder {
-		private final OpenIndex.Builder jestBuilder;
+		private final String indexName;
 
 		public Builder(String indexName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new OpenIndex.Builder( indexName );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.indexName = indexName;
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.post()
+					.pathComponent( indexName )
+					.pathComponent( "_open" );
+
+			return builder.build();
 		}
 
 		@Override

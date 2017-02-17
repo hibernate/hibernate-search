@@ -6,44 +6,82 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
+import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.IndexWorkBuilder;
 
 import com.google.gson.JsonObject;
 
-import io.searchbox.action.BulkableAction;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Index;
-
 /**
  * @author Yoann Rodiere
  */
-public class IndexWork extends SimpleBulkableElasticsearchWork<DocumentResult, Void> {
+public class IndexWork extends SimpleBulkableElasticsearchWork<Void> {
+
+	protected final IndexingMonitor indexingMonitor;
 
 	public IndexWork(Builder builder) {
 		super( builder );
+		this.indexingMonitor = builder.monitor;
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, DocumentResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
+	@Override
+	protected void afterSuccess(ElasticsearchWorkExecutionContext context) {
+		if ( indexingMonitor != null ) {
+			IndexingMonitor bufferedIndexingMonitor = context.getBufferedIndexingMonitor( indexingMonitor );
+			bufferedIndexingMonitor.documentsAdded( 1 );
+		}
+	}
+
 	public static class Builder
-			extends SimpleBulkableElasticsearchWork.Builder<Builder, DocumentResult>
+			extends SimpleBulkableElasticsearchWork.Builder<Builder>
 			implements IndexWorkBuilder {
-		private final Index.Builder jestBuilder;
+		private final String indexName;
+		private final String typeName;
+		private final String id;
+		private final JsonObject document;
+
+		protected IndexingMonitor monitor;
 
 		public Builder(String indexName, String typeName, String id, JsonObject document) {
-			super( indexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, DocumentAddedElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new Index.Builder( document )
-					.index( indexName )
-					.type( typeName )
-					.id( id );
+			super( indexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.indexName = indexName;
+			this.typeName = typeName;
+			this.id = id;
+			this.document = document;
 		}
 
 		@Override
-		protected BulkableAction<DocumentResult> buildAction() {
-			return jestBuilder.build();
+		public Builder monitor(IndexingMonitor monitor) {
+			this.monitor = monitor;
+			return this;
+		}
+
+		@Override
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.put()
+					.pathComponent( indexName )
+					.pathComponent( typeName )
+					.pathComponent( id )
+					.body( document );
+			return builder.build();
+		}
+
+		@Override
+		protected JsonObject buildBulkableActionMetadata() {
+			return JsonBuilder.object()
+					.add( "index", JsonBuilder.object()
+							.addProperty( "_index", indexName )
+							.addProperty( "_type", typeName )
+							.addProperty( "_id", id )
+					)
+					.build();
 		}
 
 		@Override

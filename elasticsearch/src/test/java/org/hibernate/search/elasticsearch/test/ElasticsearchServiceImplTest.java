@@ -13,9 +13,17 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.io.IOException;
+import java.util.Collections;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.eclipse.jetty.http.HttpHeader;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchServiceImpl;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -23,21 +31,17 @@ import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.JsonObject;
 
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Index;
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
-
 /**
  * @author Yoann Rodiere
  */
-public class JestClientTest {
+public class ElasticsearchServiceImplTest {
 
 	private static final String CLIENT_PROPERTY_PREFIX = "hibernate.search.default.";
 
@@ -48,6 +52,9 @@ public class JestClientTest {
 	private static final String URI_2 = "http://localhost:" + PORT_2;
 
 	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Rule
@@ -56,7 +63,7 @@ public class JestClientTest {
 	@Rule
 	public WireMockRule wireMockRule2 = new WireMockRule( PORT_2 );
 
-	private JestClient jestClient = new JestClient();
+	private ElasticsearchServiceImpl esService = new ElasticsearchServiceImpl();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
@@ -70,16 +77,15 @@ public class JestClientTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 		try {
-			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
+			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 
-			Index request = new Index.Builder( payload ).index( "myIndex" ).type( "myType" ).build();
-			DocumentResult result = jestClient.executeRequest( request );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
+			Response result = doPost( "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 		}
 		finally {
-			jestClient.stop();
+			esService.stop();
 		}
 	}
 
@@ -98,16 +104,22 @@ public class JestClientTest {
 				) );
 
 		try {
-			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
+			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 
-			Index request = new Index.Builder( payload ).index( "myIndex" ).type( "myType" ).build();
-			DocumentResult result = jestClient.executeRequest( request );
-			assertThat( result.getResponseCode() ).as( "getResponseCode" ).isEqualTo( 500 );
-			assertThat( result.getErrorMessage() ).as( "getErrorMessage" ).contains( errorMessage );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isFalse();
+			ResponseException exception = null;
+			try {
+				doPost( "/myIndex/myType", payload );
+			}
+			catch (ResponseException e) {
+				exception = e;
+			}
+			assertThat( exception ).as( "ResponseException" ).isNotNull();
+			Response result = exception.getResponse();
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 500 );
+			assertThat( IOUtils.toString( result.getEntity().getContent() ) ).as( "response body" ).contains( errorMessage );
 		}
 		finally {
-			jestClient.stop();
+			esService.stop();
 		}
 	}
 
@@ -126,19 +138,18 @@ public class JestClientTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 		try {
-			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
+			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 
-			Index request = new Index.Builder( payload ).index( "myIndex" ).type( "myType" ).build();
-			DocumentResult result = jestClient.executeRequest( request );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
-			result = jestClient.executeRequest( request );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
+			Response result = doPost( "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 		}
 		finally {
-			jestClient.stop();
+			esService.stop();
 		}
 	}
 
@@ -166,24 +177,23 @@ public class JestClientTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 		try {
-			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
+			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 
-			Index request = new Index.Builder( payload ).index( "myIndex" ).type( "myType" ).build();
-			DocumentResult result = jestClient.executeRequest( request );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
+			Response result = doPost( "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			Thread.sleep( 2000 ); // Wait for the refresh to occur
 
-			result = jestClient.executeRequest( request );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
-			result = jestClient.executeRequest( request );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
+			result = doPost( "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 		}
 		finally {
-			jestClient.stop();
+			esService.stop();
 		}
 	}
 
@@ -217,16 +227,15 @@ public class JestClientTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 		try {
-			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
+			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 
-			Search request = new Search.Builder( payload ).addIndex( "myIndex" ).addType( "myType" ).build();
-			SearchResult result = jestClient.executeRequest( request );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
+			Response result = doPost( "/myIndex/myType/_search", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType/_search" ) ) );
 		}
 		finally {
-			jestClient.stop();
+			esService.stop();
 		}
 	}
 
@@ -246,16 +255,22 @@ public class JestClientTest {
 				) );
 
 		try {
-			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
+			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 
-			Search request = new Search.Builder( payload ).addIndex( "myIndex" ).addType( "myType" ).build();
-			SearchResult result = jestClient.executeRequest( request );
-			assertThat( result.getResponseCode() ).as( "getResponseCode" ).isEqualTo( 401 );
-			assertThat( result.getErrorMessage() ).as( "getErrorMessage" ).contains( statusMessage );
-			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isFalse();
+			ResponseException exception = null;
+			try {
+				doPost( "/myIndex/myType/_search", payload );
+			}
+			catch (ResponseException e) {
+				exception = e;
+			}
+			assertThat( exception ).as( "ResponseException" ).isNotNull();
+			Response result = exception.getResponse();
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 401 );
+			assertThat( result.getStatusLine().getReasonPhrase() ).as( "reason phrase" ).contains( statusMessage );
 		}
 		finally {
-			jestClient.stop();
+			esService.stop();
 		}
 	}
 
@@ -273,11 +288,18 @@ public class JestClientTest {
 		logged.expectMessage( "HSEARCH400073", httpUri );
 
 		try {
-			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
+			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
 		}
 		finally {
-			jestClient.stop();
+			esService.stop();
 		}
+	}
+
+	private Response doPost(String path, String payload) throws IOException, ResponseException {
+		return esService.getClient().performRequest(
+				"POST", path, Collections.emptyMap(),
+				payload == null ? null : new StringEntity( payload, ContentType.APPLICATION_JSON )
+				);
 	}
 
 	private static ResponseDefinitionBuilder elasticsearchResponse() {
@@ -302,10 +324,9 @@ public class JestClientTest {
 	private JsonObject dummyNodeInfo(int port) {
 		return JsonBuilder.object()
 				.addProperty( "name", "nodeForPort" + port )
-				.addProperty( "transport_address", "inet[/localhost:" + (port + 100) + "]" )
-				.addProperty( "hostname", "localhost" )
-				.addProperty( "version", "2.4.4" )
-				.addProperty( "http_address", "inet[/localhost:" + port + "]" )
+				.add( "http", JsonBuilder.object()
+						.addProperty( "publish_address", "localhost:" + port )
+				)
 				.add( "plugins", JsonBuilder.array().build() )
 				.build();
 	}

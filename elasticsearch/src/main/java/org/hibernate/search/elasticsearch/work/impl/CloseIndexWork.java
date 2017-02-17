@@ -6,36 +6,40 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.work.impl.builder.CloseIndexWorkBuilder;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.CloseIndex;
+import com.google.gson.JsonObject;
 
-public class CloseIndexWork extends SimpleElasticsearchWork<JestResult, Void> {
+public class CloseIndexWork extends SimpleElasticsearchWork<Void> {
 
 	protected CloseIndexWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements CloseIndexWorkBuilder {
-		private final CloseIndex.Builder jestBuilder;
+		private final String indexName;
 
 		public Builder(String indexName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new CloseIndex.Builder( indexName );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.indexName = indexName;
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.post()
+					.pathComponent( indexName )
+					.pathComponent( "_close" );
+
+			return builder.build();
 		}
 
 		@Override

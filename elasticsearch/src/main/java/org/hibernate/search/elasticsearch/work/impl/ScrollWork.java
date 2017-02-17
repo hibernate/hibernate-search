@@ -6,39 +6,51 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.ScrollWorkBuilder;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.SearchScroll;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class ScrollWork extends SimpleElasticsearchWork<JestResult, SearchResult> {
+public class ScrollWork extends SimpleElasticsearchWork<SearchResult> {
 
 	protected ScrollWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
-		return new SearchWork.SearchResultImpl( response.getJsonObject() );
+	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+		return new SearchWork.SearchResultImpl( parsedResponseBody );
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements ScrollWorkBuilder {
-		private final SearchScroll.Builder jestBuilder;
+		private final String scrollId;
+		private final String scrollTimeout;
 
 		public Builder(String scrollId, String scrollTimeout) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new SearchScroll.Builder( scrollId, scrollTimeout );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.scrollId = scrollId;
+			this.scrollTimeout = scrollTimeout;
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.post()
+					.pathComponent( "_search" )
+					.pathComponent( "scroll" )
+					.body(JsonBuilder.object()
+							.addProperty( "scroll_id", scrollId )
+							.addProperty( "scroll", scrollTimeout )
+							.build()
+					);
+
+			return builder.build();
 		}
 
 		@Override

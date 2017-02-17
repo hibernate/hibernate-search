@@ -206,11 +206,12 @@
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <activeMQVersion>5.13.3</activeMQVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
+        <commonsLang3Version>3.5</commonsLang3Version>
 
         <!-- Elasticsearch -->
-        <elasticsearchJestVersion>2.0.4</elasticsearchJestVersion>
-        <elasticsearchCommonsLang3Version>3.4</elasticsearchCommonsLang3Version>
-        <elasticsearchGsonVersion>2.6.2</elasticsearchGsonVersion>
+        <elasticsearchClientVersion>5.2.1</elasticsearchClientVersion>
+        <elasticsearchSnifferVersion>5.2.1</elasticsearchSnifferVersion>
+        <elasticsearchGsonVersion>2.8.0</elasticsearchGsonVersion>
         
         <!-- Tests -->
         <!-- Fixes dependency convergence within Wiremock, see below -->
@@ -464,6 +465,12 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>${commonsLangVersion}</version>
+            </dependency>
+            <dependency>
+                <!-- Dependency management is necessary for Wiremock in particular (it has internal dependency convergence) -->
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commonsLang3Version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>

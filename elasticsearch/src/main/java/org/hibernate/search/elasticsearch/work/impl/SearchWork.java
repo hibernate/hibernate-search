@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
 import org.hibernate.search.util.logging.impl.LogCategory;
@@ -18,14 +21,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import io.searchbox.core.Search;
-import io.searchbox.core.search.sort.Sort;
-import io.searchbox.params.Parameters;
-
 /**
  * @author Yoann Rodiere
  */
-public class SearchWork extends SimpleElasticsearchWork<io.searchbox.core.SearchResult, SearchResult> {
+public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 
 	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, LogCategory.QUERY );
 
@@ -34,62 +33,76 @@ public class SearchWork extends SimpleElasticsearchWork<io.searchbox.core.Search
 	}
 
 	@Override
-	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext) {
+	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
 		if ( QUERY_LOG.isDebugEnabled() ) {
-			Search search = (Search) action;
 			GsonService gsonService = executionContext.getGsonService();
 			QUERY_LOG.executingElasticsearchQuery(
-					// We use getURI(), but the name is confusing: it's actually the path + query parts of the URL
-					search.getURI(),
-					ElasticsearchRequestUtils.formatRequestData( gsonService, search )
+					request.getPath(),
+					request.getParameters(),
+					ElasticsearchClientUtils.formatRequestData( gsonService, request )
 					);
 		}
 	}
 
 	@Override
-	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, io.searchbox.core.SearchResult response) {
-		return new SearchResultImpl( response.getJsonObject() );
+	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+		return new SearchResultImpl( parsedResponseBody );
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, io.searchbox.core.SearchResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements SearchWorkBuilder {
-		private final Search.Builder jestBuilder;
+		private final JsonObject payload;
+		private final List<String> indexes = new ArrayList<>();
+		private Integer from;
+		private Integer size;
+		private Integer scrollSize;
+		private String scrollTimeout;
 
-		public Builder(String payload) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new Search.Builder( payload );
+		public Builder(JsonObject payload) {
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.payload = payload;
 		}
 
 		@Override
 		public Builder indexes(Collection<String> indexNames) {
-			jestBuilder.addIndex( indexNames );
+			indexes.addAll( indexNames );
 			return this;
 		}
 
 		@Override
 		public Builder paging(int firstResult, int size) {
-			jestBuilder.setParameter( Parameters.FROM, firstResult );
-			jestBuilder.setParameter( Parameters.SIZE, size );
+			this.from = firstResult;
+			this.size = size;
 			return this;
 		}
 
 		@Override
 		public Builder scrolling(int scrollSize, String scrollTimeout) {
-			jestBuilder.setParameter( Parameters.SIZE, scrollSize );
-			jestBuilder.setParameter( Parameters.SCROLL, scrollTimeout );
+			this.scrollSize = scrollSize;
+			this.scrollTimeout = scrollTimeout;
 			return this;
 		}
 
 		@Override
-		public Builder appendSort(Sort sort) {
-			jestBuilder.addSort( sort );
-			return this;
-		}
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.post()
+					.multiValuedPathComponent( indexes )
+					.pathComponent( "_search" )
+					.body( payload );
 
-		@Override
-		protected Search buildAction() {
-			return jestBuilder.build();
+			if ( from != null && size != null ) {
+				builder.param( "from", from );
+				builder.param( "size", size );
+			}
+
+			if ( scrollSize != null && scrollTimeout != null ) {
+				builder.param( "size", scrollSize );
+				builder.param( "scroll", scrollTimeout );
+			}
+
+			return builder.build();
 		}
 
 		@Override

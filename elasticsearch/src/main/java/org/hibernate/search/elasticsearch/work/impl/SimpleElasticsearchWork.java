@@ -9,39 +9,38 @@ package org.hibernate.search.elasticsearch.work.impl;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import org.hibernate.search.backend.IndexingMonitor;
+import org.apache.http.HttpEntity;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public abstract class SimpleElasticsearchWork<J extends JestResult, R> implements ElasticsearchWork<R> {
+public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	protected final Action<J> action;
+	protected final ElasticsearchRequest request;
 	private final LuceneWork luceneWork;
 	protected final String dirtiedIndexName;
-	protected final IndexingMonitor indexingMonitor;
-	protected final ElasticsearchRequestSuccessAssessor<? super J> resultAssessor;
-	protected final ElasticsearchWorkSuccessReporter<? super J> successReporter;
+	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
 	protected final boolean markIndexDirty;
 
-	protected SimpleElasticsearchWork(Builder<?, J> builder) {
-		this.action = builder.buildAction();
+	protected SimpleElasticsearchWork(Builder<?> builder) {
+		this.request = builder.buildRequest();
 		this.luceneWork = builder.luceneWork;
 		this.dirtiedIndexName = builder.dirtiedIndexName;
 		this.resultAssessor = builder.resultAssessor;
-		this.indexingMonitor = builder.monitor;
-		this.successReporter = builder.successReporter;
 		this.markIndexDirty = builder.markIndexDirty;
 	}
 
@@ -50,7 +49,7 @@ public abstract class SimpleElasticsearchWork<J extends JestResult, R> implement
 		return new StringBuilder()
 				.append( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "action = " ).append( action )
+				.append( "path = " ).append( request.getPath() )
 				.append( ", dirtiedIndexName = " ).append( dirtiedIndexName )
 				.append( "]" )
 				.toString();
@@ -58,37 +57,62 @@ public abstract class SimpleElasticsearchWork<J extends JestResult, R> implement
 
 	@Override
 	public final R execute(ElasticsearchWorkExecutionContext executionContext) {
-		J response;
+		Response response;
+		GsonService gsonService = executionContext.getGsonService();
+		JsonObject parsedResponseBody;
 		try {
-			beforeExecute( executionContext );
-			response = executionContext.getClient().executeRequest( action );
+			beforeExecute( executionContext, request );
+			response = performRequest( executionContext );
+			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonService, response );
 		}
-		catch (IOException e) {
-			GsonService gsonService = executionContext.getGsonService();
+		catch (IOException | RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed(
-					ElasticsearchRequestUtils.formatRequest( gsonService, action ),
+					ElasticsearchClientUtils.formatRequest( gsonService, request ),
 					null, e );
 		}
 
-		resultAssessor.checkSuccess( executionContext, action, response );
+		resultAssessor.checkSuccess( executionContext, request, response, parsedResponseBody );
 
-		if ( indexingMonitor != null ) {
-			IndexingMonitor bufferedIndexingMonitor = executionContext.getBufferedIndexingMonitor( indexingMonitor );
-			successReporter.report( response, bufferedIndexingMonitor );
-		}
+		afterSuccess( executionContext );
 
 		if ( markIndexDirty ) {
 			executionContext.setIndexDirty( dirtiedIndexName );
 		}
 
-		return generateResult( executionContext, response );
+		return generateResult( executionContext, response, parsedResponseBody );
 	}
 
-	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext) {
+	private Response performRequest(ElasticsearchWorkExecutionContext context) throws IOException {
+		Gson gson = context.getGsonService().getGson();
+		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
+		RestClient client = context.getClient();
+		try {
+			return client.performRequest(
+					request.getMethod(),
+					request.getPath(),
+					request.getParameters(),
+					entity
+			);
+		}
+		catch (ResponseException e) {
+			/*
+			 * The client tries to guess what's an error and what's not, but it's too naive.
+			 * A 404 on DELETE is not always important to us, for instance.
+			 * Thus we ignore the exception and do our own checks afterwards.
+			 */
+			return e.getResponse();
+		}
+	}
+
+	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
 		// Do nothing by default
 	}
 
-	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, J response);
+	protected void afterSuccess(ElasticsearchWorkExecutionContext executionContext) {
+		// Do nothing by default
+	}
+
+	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody);
 
 	@Override
 	public void aggregate(ElasticsearchWorkAggregator aggregator) {
@@ -107,30 +131,20 @@ public abstract class SimpleElasticsearchWork<J extends JestResult, R> implement
 	}
 
 	@SuppressWarnings("unchecked") // By contract, subclasses must implement B
-	protected abstract static class Builder<B, J extends JestResult> {
+	protected abstract static class Builder<B> {
 		protected final String dirtiedIndexName;
-		protected ElasticsearchRequestSuccessAssessor<? super J> resultAssessor;
-		protected final ElasticsearchWorkSuccessReporter<? super J> successReporter;
+		protected ElasticsearchRequestSuccessAssessor resultAssessor;
 
 		protected LuceneWork luceneWork;
-		protected IndexingMonitor monitor;
 		protected boolean markIndexDirty;
 
-		public Builder(String dirtiedIndexName,
-				ElasticsearchRequestSuccessAssessor<? super J> resultAssessor,
-				ElasticsearchWorkSuccessReporter<? super J> successReporter) {
+		public Builder(String dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
 			this.dirtiedIndexName = dirtiedIndexName;
 			this.resultAssessor = resultAssessor;
-			this.successReporter = successReporter;
 		}
 
 		public B luceneWork(LuceneWork luceneWork) {
 			this.luceneWork = luceneWork;
-			return (B) this;
-		}
-
-		public B monitor(IndexingMonitor monitor) {
-			this.monitor = monitor;
 			return (B) this;
 		}
 
@@ -139,7 +153,7 @@ public abstract class SimpleElasticsearchWork<J extends JestResult, R> implement
 			return (B) this;
 		}
 
-		protected abstract Action<J> buildAction();
+		protected abstract ElasticsearchRequest buildRequest();
 
 		public abstract ElasticsearchWork<?> build();
 	}

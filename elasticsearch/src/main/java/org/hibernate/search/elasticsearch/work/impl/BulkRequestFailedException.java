@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.exception.SearchException;
 
-import io.searchbox.core.BulkResult.BulkResultItem;
+import com.google.gson.JsonObject;
 
 /**
  * A failure during applying a bulk of index changes. Provides access to the failed requests and in turn Lucene works.
@@ -21,18 +21,18 @@ import io.searchbox.core.BulkResult.BulkResultItem;
  */
 public class BulkRequestFailedException extends SearchException {
 
-	private final Map<BulkableElasticsearchWork<?>, BulkResultItem> successfulItems;
+	private final Map<BulkableElasticsearchWork<?>, JsonObject> successfulItems;
 
 	private final List<BulkableElasticsearchWork<?>> erroneousItems;
 
-	public BulkRequestFailedException(String message, Map<BulkableElasticsearchWork<?>, BulkResultItem> successfulItems,
+	public BulkRequestFailedException(String message, Map<BulkableElasticsearchWork<?>, JsonObject> successfulItems,
 			List<BulkableElasticsearchWork<?>> erroneousItems) {
 		super( message );
 		this.successfulItems = Collections.unmodifiableMap( successfulItems );
 		this.erroneousItems = Collections.unmodifiableList( erroneousItems );
 	}
 
-	public Map<BulkableElasticsearchWork<?>, BulkResultItem> getSuccessfulItems() {
+	public Map<BulkableElasticsearchWork<?>, JsonObject> getSuccessfulItems() {
 		return successfulItems;
 	}
 

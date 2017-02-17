@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
-import org.hibernate.search.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchService;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
@@ -57,7 +57,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	private final AsyncBackendRequestProcessor asyncProcessor;
 	private ErrorHandler errorHandler;
 	private ServiceManager serviceManager;
-	private JestClient jestClient;
+	private ElasticsearchService elasticsearchService;
 	private GsonService gsonService;
 	private ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
 	private ElasticsearchWorkFactory workFactory;
@@ -70,9 +70,10 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	public void start(Properties properties, BuildContext context) {
 		this.errorHandler = context.getErrorHandler();
 		this.serviceManager = context.getServiceManager();
-		this.jestClient = serviceManager.requestService( JestClient.class );
+		this.elasticsearchService = serviceManager.requestService( ElasticsearchService.class );
 		this.gsonService = serviceManager.requestService( GsonService.class );
-		this.parallelWorkExecutionContext = new ParallelWorkExecutionContext( jestClient, gsonService );
+		this.parallelWorkExecutionContext =
+				new ParallelWorkExecutionContext( elasticsearchService.getClient(), gsonService );
 		this.workFactory = serviceManager.requestService( ElasticsearchWorkFactory.class );
 	}
 
@@ -85,8 +86,8 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 		serviceManager.releaseService( ElasticsearchWorkFactory.class );
 		gsonService = null;
 		serviceManager.releaseService( GsonService.class );
-		jestClient = null;
-		serviceManager.releaseService( JestClient.class );
+		elasticsearchService = null;
+		serviceManager.releaseService( ElasticsearchService.class );
 		serviceManager = null;
 	}
 
@@ -125,7 +126,8 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	 */
 	private void executeSafely(Iterable<ElasticsearchWork<?>> requests) {
 		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-				jestClient, workFactory, this, gsonService, errorHandler );
+				elasticsearchService.getClient(),
+				workFactory, this, gsonService, errorHandler );
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
 			executeSafely( work, context );
@@ -302,7 +304,8 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 
 		private void processAsyncWork() {
 			SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-					jestClient, workFactory, ElasticsearchWorkProcessor.this, gsonService, errorHandler );
+					elasticsearchService.getClient(),
+					workFactory, ElasticsearchWorkProcessor.this, gsonService, errorHandler );
 			synchronized ( asyncProcessor ) {
 				while ( true ) {
 					Iterable<ElasticsearchWork<?>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();

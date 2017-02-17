@@ -6,21 +6,22 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import io.searchbox.action.BulkableAction;
-import io.searchbox.core.BulkResult.BulkResultItem;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
 public interface BulkableElasticsearchWork<T> extends ElasticsearchWork<T> {
 
-	BulkableAction<?> getBulkableAction();
+	JsonObject getBulkableActionMetadata();
+
+	JsonObject getBulkableActionBody();
 
 	/**
 	 * @param context
 	 * @param resultItem
 	 * @return {@code true} if the result is considered a success, {@code false} otherwise.
 	 */
-	boolean handleBulkResult(ElasticsearchWorkExecutionContext context, BulkResultItem resultItem);
+	boolean handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject resultItem);
 
 }

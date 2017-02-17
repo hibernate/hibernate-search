@@ -10,27 +10,29 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
+import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import com.google.gson.JsonElement;
-
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.BulkResult.BulkResultItem;
+import com.google.gson.JsonObject;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchRequestSuccessAssessor implements ElasticsearchRequestSuccessAssessor<JestResult> {
+public class DefaultElasticsearchRequestSuccessAssessor implements ElasticsearchRequestSuccessAssessor {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private static final int TIME_OUT_HTTP_RESPONSE_CODE = 408;
+	private static final JsonAccessor ROOT_ERROR_TYPE = JsonAccessor.root().property( "error" ).property( "type" );
+	private static final JsonAccessor BULK_ITEM_STATUS_CODE = JsonAccessor.root().property( "status" );
+	private static final JsonAccessor BULK_ITEM_ERROR_TYPE = JsonAccessor.root().property( "error" ).property( "type" );
+
+	private static final int TIME_OUT_HTTP_STATUS_CODE = 408;
 
 	public static final DefaultElasticsearchRequestSuccessAssessor INSTANCE = builder().build();
 
@@ -80,50 +82,40 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 	}
 
 	@Override
-	public void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends JestResult> request, JestResult result) throws SearchException {
-		if ( !isSuccess( result ) ) {
+	public void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, Response response,
+			JsonObject parsedResponseBody) throws SearchException {
+		if ( !isSuccess( response, parsedResponseBody ) ) {
 			GsonService gsonService = context.getGsonService();
-			if ( result.getResponseCode() == TIME_OUT_HTTP_RESPONSE_CODE ) {
+			if ( response.getStatusLine().getStatusCode() == TIME_OUT_HTTP_STATUS_CODE ) {
 				throw LOG.elasticsearchRequestTimeout(
-						ElasticsearchRequestUtils.formatRequest( gsonService, request ),
-						ElasticsearchRequestUtils.formatResponse( gsonService, result )
+						ElasticsearchClientUtils.formatRequest( gsonService, request ),
+						ElasticsearchClientUtils.formatResponse( gsonService, response, parsedResponseBody )
 						);
 			}
 			else {
 				throw LOG.elasticsearchRequestFailed(
-						ElasticsearchRequestUtils.formatRequest( gsonService, request ),
-						ElasticsearchRequestUtils.formatResponse( gsonService, result ),
+						ElasticsearchClientUtils.formatRequest( gsonService, request ),
+						ElasticsearchClientUtils.formatResponse( gsonService, response, parsedResponseBody ),
 						null );
 			}
 		}
 	}
 
 	@Override
-	public boolean isSuccess(ElasticsearchWorkExecutionContext context, BulkResultItem resultItem) {
-		// When getting a 404 for a DELETE, the error is null :(, so checking both
-		return (resultItem.error == null && resultItem.status < 400 )
-			|| ignoredErrorStatuses.contains( resultItem.status )
-			|| ignoredErrorTypes.contains( resultItem.errorType );
+	public boolean isSuccess(ElasticsearchWorkExecutionContext context, JsonObject resultItem) {
+		// Result items have the following format: { "actionName" : { "status" : 201, ... } }
+		JsonObject content = resultItem.entrySet().iterator().next().getValue().getAsJsonObject();
+		int statusCode = BULK_ITEM_STATUS_CODE.get( content ).getAsInt();
+		return ElasticsearchClientUtils.isSuccessCode( statusCode )
+			|| ignoredErrorStatuses.contains( statusCode )
+			|| ignoredErrorTypes.contains( BULK_ITEM_ERROR_TYPE.get( content ).getAsString() );
 	}
 
-	private boolean isSuccess(JestResult result) {
-		return result.isSucceeded()
-				|| ignoredErrorStatuses.contains( result.getResponseCode() )
-				|| ignoredErrorTypes.contains( getErrorType( result ) );
-	}
-
-	private String getErrorType(JestResult result) {
-		JsonElement error = result.getJsonObject().get( "error" );
-		if ( error == null || !error.isJsonObject() ) {
-			return null;
-		}
-
-		JsonElement errorType = error.getAsJsonObject().get( "type" );
-		if ( errorType == null || !errorType.isJsonPrimitive() ) {
-			return null;
-		}
-
-		return errorType.getAsString();
+	private boolean isSuccess(Response response, JsonObject parsedResponseBody) {
+		int code = response.getStatusLine().getStatusCode();
+		return ElasticsearchClientUtils.isSuccessCode( code )
+				|| ignoredErrorStatuses.contains( code )
+				|| ignoredErrorTypes.contains( ROOT_ERROR_TYPE.get( parsedResponseBody ).getAsString() );
 	}
 
 }

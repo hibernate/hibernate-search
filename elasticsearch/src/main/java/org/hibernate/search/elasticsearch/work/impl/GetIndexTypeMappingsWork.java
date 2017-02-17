@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexTypeMappingsWorkBuilder;
@@ -19,11 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.mapping.GetMapping;
-
-public class GetIndexTypeMappingsWork extends SimpleElasticsearchWork<JestResult, Map<String, TypeMapping>> {
+public class GetIndexTypeMappingsWork extends SimpleElasticsearchWork<Map<String, TypeMapping>> {
 
 	private static final TypeToken<Map<String, TypeMapping>> STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN =
 			new TypeToken<Map<String, TypeMapping>>() {
@@ -38,11 +35,11 @@ public class GetIndexTypeMappingsWork extends SimpleElasticsearchWork<JestResult
 	}
 
 	@Override
-	protected Map<String, TypeMapping> generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
-		JsonObject resultJson = response.getJsonObject();
-		JsonElement index = response.getJsonObject().get( indexName );
+	protected Map<String, TypeMapping> generateResult(ElasticsearchWorkExecutionContext context,
+			Response response, JsonObject parsedResponseBody) {
+		JsonElement index = parsedResponseBody.get( indexName );
 		if ( index == null || !index.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + resultJson );
+			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + parsedResponseBody );
 		}
 		JsonElement mappings = index.getAsJsonObject().get( "mappings" );
 
@@ -57,20 +54,22 @@ public class GetIndexTypeMappingsWork extends SimpleElasticsearchWork<JestResult
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements GetIndexTypeMappingsWorkBuilder {
 		private final String indexName;
-		private final GetMapping.Builder jestBuilder;
 
 		public Builder(String indexName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
-			this.jestBuilder = new GetMapping.Builder().addIndex( indexName );
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.get()
+					.pathComponent( indexName )
+					.pathComponent( "_mapping" );
+			return builder.build();
 		}
 
 		@Override

@@ -123,7 +123,7 @@ public class ElasticsearchWorkFactoryImpl implements ElasticsearchWorkFactory, S
 	}
 
 	@Override
-	public SearchWorkBuilder search(String payload) {
+	public SearchWorkBuilder search(JsonObject payload) {
 		return new SearchWork.Builder( payload );
 	}
 

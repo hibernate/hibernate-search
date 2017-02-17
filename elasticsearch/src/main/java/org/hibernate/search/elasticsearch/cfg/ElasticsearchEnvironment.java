@@ -27,7 +27,7 @@ public final class ElasticsearchEnvironment {
 		public static final int MAX_TOTAL_CONNECTION = 20;
 		public static final int MAX_TOTAL_CONNECTION_PER_ROUTE = 2;
 		public static final boolean DISCOVERY_ENABLED = false;
-		public static final long DISCOVERY_REFRESH_INTERVAL = 10L;
+		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final String DISCOVERY_SCHEME = "http";
 		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.CREATE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;

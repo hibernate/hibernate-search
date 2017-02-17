@@ -6,21 +6,24 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.IndexingMonitor;
+import java.util.List;
 
-import io.searchbox.action.BulkableAction;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.BulkResult.BulkResultItem;
+import org.hibernate.search.exception.AssertionFailure;
+
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public abstract class SimpleBulkableElasticsearchWork<J extends JestResult, R>
-		extends SimpleElasticsearchWork<J, R>
+public abstract class SimpleBulkableElasticsearchWork<R>
+		extends SimpleElasticsearchWork<R>
 		implements BulkableElasticsearchWork<R> {
 
-	protected SimpleBulkableElasticsearchWork(Builder<?, J> builder) {
+	private final JsonObject bulkableActionMetadata;
+
+	protected SimpleBulkableElasticsearchWork(Builder<?> builder) {
 		super( builder );
+		this.bulkableActionMetadata = builder.buildBulkableActionMetadata();
 	}
 
 	@Override
@@ -29,17 +32,28 @@ public abstract class SimpleBulkableElasticsearchWork<J extends JestResult, R>
 	}
 
 	@Override
-	public BulkableAction<?> getBulkableAction() {
-		return (BulkableAction<?>) action;
+	public JsonObject getBulkableActionMetadata() {
+		return bulkableActionMetadata;
 	}
 
 	@Override
-	public boolean handleBulkResult(ElasticsearchWorkExecutionContext context, BulkResultItem resultItem) {
-		if ( resultAssessor.isSuccess( context, resultItem ) ) {
-			if ( indexingMonitor != null ) {
-				IndexingMonitor bufferedIndexingMonitor = context.getBufferedIndexingMonitor( indexingMonitor );
-				successReporter.report( resultItem, bufferedIndexingMonitor );
+	public JsonObject getBulkableActionBody() {
+		List<JsonObject> bodyParts = request.getBodyParts();
+		if ( !bodyParts.isEmpty() ) {
+			if ( bodyParts.size() > 1 ) {
+				throw new AssertionFailure( "Found a bulkable action with multiple body parts: " + bodyParts );
 			}
+			return bodyParts.get( 0 );
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	public boolean handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
+		if ( resultAssessor.isSuccess( context, bulkResponseItem ) ) {
+			afterSuccess( context );
 
 			if ( markIndexDirty ) {
 				context.setIndexDirty( dirtiedIndexName );
@@ -52,14 +66,14 @@ public abstract class SimpleBulkableElasticsearchWork<J extends JestResult, R>
 		}
 	}
 
-	protected abstract static class Builder<B, J extends JestResult>
-			extends SimpleElasticsearchWork.Builder<B, J> {
+	protected abstract static class Builder<B>
+			extends SimpleElasticsearchWork.Builder<B> {
 
-		public Builder(String dirtiedIndexName,
-				ElasticsearchRequestSuccessAssessor<? super J> resultAssessor,
-				ElasticsearchWorkSuccessReporter<? super J> successReporter) {
-			super( dirtiedIndexName, resultAssessor, successReporter );
+		public Builder(String dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
+			super( dirtiedIndexName, resultAssessor );
 		}
+
+		protected abstract JsonObject buildBulkableActionMetadata();
 
 	}
 }

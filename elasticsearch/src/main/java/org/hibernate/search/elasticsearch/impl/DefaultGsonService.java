@@ -9,19 +9,18 @@ package org.hibernate.search.elasticsearch.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.searchbox.client.AbstractJestClient;
-
 /**
  * @author Guillaume Smet
  */
 public class DefaultGsonService implements GsonService {
 
+	private static final String ELASTIC_SEARCH_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+
 	private static GsonBuilder builderBase() {
-		return new GsonBuilder()
-				.setDateFormat( AbstractJestClient.ELASTIC_SEARCH_DATE_FORMAT );
+		return new GsonBuilder().setDateFormat( ELASTIC_SEARCH_DATE_FORMAT );
 	}
 
-	// TODO find out and document why null serialization needs to be turned on...
+	// Null serialization needs to be enabled to index null fields
 	private final Gson gson = builderBase()
 			.serializeNulls()
 			.create();

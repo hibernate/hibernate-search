@@ -12,18 +12,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.apache.http.HttpEntity;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import io.searchbox.core.Bulk;
-import io.searchbox.core.BulkResult;
-import io.searchbox.core.BulkResult.BulkResultItem;
-import io.searchbox.params.Parameters;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
@@ -32,7 +34,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private final Bulk request;
+	private final ElasticsearchRequest request;
 
 	private final List<BulkableElasticsearchWork<?>> works;
 
@@ -49,7 +51,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 
 	protected BulkWork(Builder builder) {
 		super();
-		this.request = builder.buildAction();
+		this.request = builder.buildRequest();
 		this.works = new ArrayList<>( builder.bulkableWorks );
 		this.refreshInAPICall = builder.refreshInBulkAPICall;
 	}
@@ -75,18 +77,32 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			context = new NoIndexDirtyBulkExecutionContext( context );
 		}
 
-		BulkResult response;
+		Response response;
+		JsonObject parsedResponseBody;
 		try {
-			response = context.getClient().executeRequest( request );
+			response = performRequest( context );
+			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( context.getGsonService(), response );
 		}
-		catch (IOException e) {
+		catch (IOException | RuntimeException e) {
 			GsonService gsonService = context.getGsonService();
-			throw LOG.elasticsearchRequestFailed( ElasticsearchRequestUtils.formatRequest( gsonService, request ), null, e );
+			throw LOG.elasticsearchRequestFailed( ElasticsearchClientUtils.formatRequest( gsonService, request ), null, e );
 		}
 
-		handleResults( context, request, response );
+		handleResults( context, response, parsedResponseBody );
 
 		return null;
+	}
+
+	private Response performRequest(ElasticsearchWorkExecutionContext context) throws IOException {
+		Gson gson = context.getGsonService().getGson();
+		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
+		RestClient client = context.getClient();
+		return client.performRequest(
+				request.getMethod(),
+				request.getPath(),
+				request.getParameters(),
+				entity
+		);
 	}
 
 	@Override
@@ -111,16 +127,18 @@ public class BulkWork implements ElasticsearchWork<Void> {
 	 * If at least one work or its result handler failed,
 	 * an exception will be thrown after every result has been handled.
 	 */
-	private void handleResults(ElasticsearchWorkExecutionContext context, Bulk request, BulkResult result) {
-		Map<BulkableElasticsearchWork<?>, BulkResultItem> successfulItems =
+	private void handleResults(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+		Map<BulkableElasticsearchWork<?>, JsonObject> successfulItems =
 				CollectionHelper.newHashMap( works.size() );
 
 		List<BulkableElasticsearchWork<?>> erroneousItems = new ArrayList<>();
 		int i = 0;
 
+		JsonArray resultItems = parsedResponseBody.has( "items" ) ? parsedResponseBody.get( "items" ).getAsJsonArray() : null;
+
 		List<RuntimeException> resultHandlingExceptions = null;
-		for ( BulkResultItem resultItem : result.getItems() ) {
-			BulkableElasticsearchWork<?> work = works.get( i );
+		for ( BulkableElasticsearchWork<?> work : works ) {
+			JsonObject resultItem = resultItems != null ? resultItems.get( i ).getAsJsonObject() : null;
 
 			boolean success;
 			try {
@@ -147,8 +165,8 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		if ( !erroneousItems.isEmpty() ) {
 			GsonService gsonService = context.getGsonService();
 			BulkRequestFailedException exception = LOG.elasticsearchBulkRequestFailed(
-					ElasticsearchRequestUtils.formatRequest( gsonService, request ),
-					ElasticsearchRequestUtils.formatResponse( gsonService, result ),
+					ElasticsearchClientUtils.formatRequest( gsonService, request ),
+					ElasticsearchClientUtils.formatResponse( gsonService, response, parsedResponseBody ),
 					successfulItems,
 					erroneousItems
 			);
@@ -174,13 +192,11 @@ public class BulkWork implements ElasticsearchWork<Void> {
 	}
 
 	public static class Builder implements BulkWorkBuilder {
-		private final Bulk.Builder jestBuilder;
 		private final List<BulkableElasticsearchWork<?>> bulkableWorks;
 		private boolean refreshInBulkAPICall;
 
 		public Builder(List<BulkableElasticsearchWork<?>> bulkableWorks) {
 			this.bulkableWorks = bulkableWorks;
-			this.jestBuilder = new Bulk.Builder();
 		}
 
 		@Override
@@ -189,12 +205,21 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			return this;
 		}
 
-		protected Bulk buildAction() {
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.post()
+					.pathComponent( "_bulk" )
+					.param( "refresh", refreshInBulkAPICall );
+
 			for ( BulkableElasticsearchWork<?> work : bulkableWorks ) {
-				jestBuilder.addAction( work.getBulkableAction() );
+				builder.body( work.getBulkableActionMetadata() );
+				JsonObject actionBody = work.getBulkableActionBody();
+				if ( actionBody != null ) {
+					builder.body( actionBody );
+				}
 			}
-			jestBuilder.setParameter( Parameters.REFRESH, refreshInBulkAPICall );
-			return jestBuilder.build();
+
+			return builder.build();
 		}
 
 		@Override

@@ -22,14 +22,13 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.search.backend.spi.DeletionQuery;
-import org.hibernate.search.elasticsearch.client.impl.ArbitrarySort;
-import org.hibernate.search.elasticsearch.client.impl.DistanceSort;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -43,6 +42,7 @@ import org.hibernate.search.query.dsl.impl.RemotePhraseQuery;
 import org.hibernate.search.query.dsl.sort.impl.NativeSortField;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.spatial.impl.DistanceFilter;
 import org.hibernate.search.spatial.impl.SpatialHashFilter;
@@ -53,10 +53,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import io.searchbox.core.search.sort.Sort;
-import io.searchbox.core.search.sort.Sort.Missing;
-import io.searchbox.core.search.sort.Sort.Sorting;
+import com.google.gson.JsonPrimitive;
 
 /**
  * Various utilities to transform Hibernate Search API into Elasticsearch JSON.
@@ -79,10 +76,15 @@ public class ToElasticsearch {
 
 	private static final JsonParser JSON_PARSER = new JsonParser();
 
-	private static final Map<SortField.Type, Object> SORT_FIELD_SCALAR_MINIMUMS = new EnumMap<>( SortField.Type.class );
-	private static final Map<SortField.Type, Object> SORT_FIELD_SCALAR_DEFAULTS = new EnumMap<>( SortField.Type.class );
-	private static final Map<SortField.Type, Object> SORT_FIELD_SCALAR_MAXIMUMS = new EnumMap<>( SortField.Type.class );
-	private static final Map<SortField.Type, Class<?>> SORT_FIELD_SCALAR_TYPES = new EnumMap<>( SortField.Type.class );
+	private static final JsonPrimitive SORT_ORDER_ASC = new JsonPrimitive( "asc" );
+	private static final JsonPrimitive SORT_ORDER_DESC = new JsonPrimitive( "desc" );
+	private static final JsonPrimitive SORT_MISSING_LAST = new JsonPrimitive( "_last" );
+	private static final JsonPrimitive SORT_MISSING_FIRST = new JsonPrimitive( "_first" );
+
+	private static final Map<SortField.Type, Number> SORT_FIELD_SCALAR_MINIMUMS = new EnumMap<>( SortField.Type.class );
+	private static final Map<SortField.Type, Number> SORT_FIELD_SCALAR_DEFAULTS = new EnumMap<>( SortField.Type.class );
+	private static final Map<SortField.Type, Number> SORT_FIELD_SCALAR_MAXIMUMS = new EnumMap<>( SortField.Type.class );
+	private static final Map<SortField.Type, Class<? extends Number>> SORT_FIELD_SCALAR_TYPES = new EnumMap<>( SortField.Type.class );
 	static {
 		initSortFieldScalarValues( SortField.Type.DOUBLE, Double.class, Double.MIN_VALUE, 0.0d, Double.MAX_VALUE );
 		initSortFieldScalarValues( SortField.Type.FLOAT, Float.class, Float.MIN_VALUE, 0.0f, Float.MAX_VALUE );
@@ -90,7 +92,8 @@ public class ToElasticsearch {
 		initSortFieldScalarValues( SortField.Type.INT, Integer.class, Integer.MIN_VALUE, 0, Integer.MAX_VALUE );
 	}
 
-	private static void initSortFieldScalarValues(Type type, Class<?> clazz, Object minValue, Object defaultValue, Object maxValue) {
+	private static void initSortFieldScalarValues(Type type, Class<? extends Number> clazz,
+			Number minValue, Number defaultValue, Number maxValue) {
 		SORT_FIELD_SCALAR_MINIMUMS.put( type, minValue );
 		SORT_FIELD_SCALAR_DEFAULTS.put( type, defaultValue );
 		SORT_FIELD_SCALAR_MAXIMUMS.put( type, maxValue );
@@ -623,28 +626,42 @@ public class ToElasticsearch {
 	}
 
 	/**
-	 * Convert a Lucene {@link SortField} to an Elasticsearch {@link Sort}, trying to preserve
-	 * the exact same meaning as the SortField would have in Lucene.
+	 * Convert a Lucene {@link Sort} to an Elasticsearch sort, trying to preserve
+	 * the exact same meaning as the Sort would have in Lucene.
 	 *
 	 * <p>For instance, missing values on numeric fields are implicitly 0 in Lucene, so this
 	 * method will add it explicitly on any numeric Elasticsearch sort.
 	 *
-	 * @param sortField The Lucene {@link SortField} to convert
-	 * @return The equivalent Elasticsearch {@link Sort}
+	 * @param sort The Lucene {@link Sort} to convert
+	 * @return The equivalent Elasticsearch sort, as a {@link JsonArray}
 	 */
-	public static Sort fromLuceneSortField(SortField sortField) {
+	public static JsonArray fromLuceneSort(Sort sort) {
+		JsonBuilder.Array builder = JsonBuilder.array();
+		for ( SortField field : sort.getSort() ) {
+			builder.add( fromLuceneSortField( field ) );
+		}
+		return builder.build();
+	}
+
+	private static JsonBuilder.Object fromLuceneSortField(SortField sortField) {
 		if ( sortField instanceof DistanceSortField ) {
 			DistanceSortField distanceSortField = (DistanceSortField) sortField;
-			return new DistanceSort( distanceSortField.getField(),
-					distanceSortField.getCenter(),
-					distanceSortField.getReverse() ? Sorting.DESC : Sorting.ASC );
+			Coordinates center = distanceSortField.getCenter();
+			return JsonBuilder.object().add( "_geo_distance", JsonBuilder.object()
+					.add( "order", fromLuceneSortFieldOrder( sortField.getType(), sortField.getReverse() ) )
+					.add( sortField.getField(), JsonBuilder.object()
+							.addProperty( "lat", center.getLatitude() )
+							.addProperty( "lon", center.getLongitude() )
+					)
+					.addProperty( "unit", "km" )
+					.addProperty( "distance_type", "arc" ) );
 		}
 		else if ( sortField instanceof NativeSortField ) {
 			NativeSortField nativeSortField = (NativeSortField) sortField;
 			String sortFieldName = nativeSortField.getField();
 			String sortDescriptionAsString = nativeSortField.getNativeSortDescription();
 			JsonElement sortDescription = JSON_PARSER.parse( sortDescriptionAsString );
-			return new ArbitrarySort( sortFieldName, sortDescription );
+			return JsonBuilder.object().add( sortFieldName, sortDescription );
 		}
 		else {
 			SortField.Type sortFieldType = sortField.getType();
@@ -667,23 +684,31 @@ public class ToElasticsearch {
 			}
 
 			boolean reverse = sortField.getReverse();
-			Sort sort = new Sort( sortFieldName, fromLuceneSortFieldOrder( sortFieldType, reverse ) );
-			sort.setMissing( fromLuceneSortFieldMissing( sortFieldType, sortField.missingValue, reverse ) );
+			JsonElement order = fromLuceneSortFieldOrder( sortField.getType(), reverse );
 
-			return sort;
+			JsonBuilder.Object contentBuilder = JsonBuilder.object()
+					.add( "order", order );
+
+			JsonElement missing = fromLuceneSortFieldMissing( sortFieldType, sortField.missingValue, reverse );
+			if ( missing != null ) {
+				contentBuilder.add( "missing", missing );
+			}
+
+
+			return JsonBuilder.object().add( sortFieldName, contentBuilder );
 		}
 	}
 
-	private static Sorting fromLuceneSortFieldOrder(Type sortFieldType, boolean reverse) {
+	private static JsonPrimitive fromLuceneSortFieldOrder(Type sortFieldType, boolean reverse) {
 		switch ( sortFieldType ) {
 			case SCORE:
-				return reverse ? Sorting.ASC : Sorting.DESC;
+				return reverse ? SORT_ORDER_ASC : SORT_ORDER_DESC;
 			default:
-				return reverse ? Sorting.DESC : Sorting.ASC;
+				return reverse ? SORT_ORDER_DESC : SORT_ORDER_ASC;
 		}
 	}
 
-	private static Object fromLuceneSortFieldMissing(Type sortFieldType, Object luceneMissing, boolean reverse) {
+	private static JsonPrimitive fromLuceneSortFieldMissing(Type sortFieldType, Object luceneMissing, boolean reverse) {
 		if ( luceneMissing == null ) {
 			/*
 			 * Simulate Lucene's behavior of assigning default missing values when none is explicitly provided.
@@ -711,22 +736,22 @@ public class ToElasticsearch {
 			case LONG:
 				// Use a more natural representation of the missing value, if possible
 				if ( luceneMissing.equals( SORT_FIELD_SCALAR_MINIMUMS.get( sortFieldType ) ) ) {
-					return reverse ? Missing.LAST : Missing.FIRST;
+					return reverse ? SORT_MISSING_LAST : SORT_MISSING_FIRST;
 				}
 				else if ( luceneMissing.equals( SORT_FIELD_SCALAR_MAXIMUMS.get( sortFieldType ) ) ) {
-					return reverse ? Missing.FIRST : Missing.LAST;
+					return reverse ? SORT_MISSING_FIRST : SORT_MISSING_LAST;
 				}
 				else {
 					// Make sure the correct type is used (and throw a ClassCastException if not, as Lucene does)
-					return SORT_FIELD_SCALAR_TYPES.get( sortFieldType ).cast( luceneMissing );
+					return new JsonPrimitive( SORT_FIELD_SCALAR_TYPES.get( sortFieldType ).cast( luceneMissing ) );
 				}
 			case STRING:
 			case STRING_VAL:
 				if ( SortField.STRING_LAST.equals( luceneMissing ) ) {
-					return Missing.LAST;
+					return SORT_MISSING_LAST;
 				}
 				else if ( SortField.STRING_FIRST.equals( luceneMissing ) ) {
-					return Missing.FIRST;
+					return SORT_MISSING_FIRST;
 				}
 				else if ( luceneMissing != null ) {
 					throw new AssertionFailure( "Unexpected missing value specified on a String SortField: " + luceneMissing );

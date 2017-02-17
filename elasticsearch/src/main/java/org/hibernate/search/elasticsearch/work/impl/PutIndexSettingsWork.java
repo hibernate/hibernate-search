@@ -6,51 +6,55 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.builder.PutIndexSettingsWorkBuilder;
 
 import com.google.gson.Gson;
-
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.settings.UpdateSettings;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class PutIndexSettingsWork extends SimpleElasticsearchWork<JestResult, Void> {
+public class PutIndexSettingsWork extends SimpleElasticsearchWork<Void> {
 
 	protected PutIndexSettingsWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements PutIndexSettingsWorkBuilder {
-		private final UpdateSettings.Builder jestBuilder;
+		private final String indexName;
+		private final JsonObject payload;
 
 		public Builder(
 				GsonService gsonService,
 				String indexName, IndexSettings settings) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.indexName = indexName;
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 			 * We better not include the null fields.
 			 */
 			Gson gson = gsonService.getGsonNoSerializeNulls();
-			String serializedSettings = gson.toJson( settings );
-			this.jestBuilder = new UpdateSettings.Builder( serializedSettings ).addIndex( indexName );
+			this.payload = gson.toJsonTree( settings ).getAsJsonObject();
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.put()
+					.pathComponent( indexName )
+					.pathComponent( "_settings" )
+					.body( payload );
+			return builder.build();
 		}
 
 		@Override

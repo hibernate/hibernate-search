@@ -6,45 +6,55 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.Refresh;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class RefreshWork extends SimpleElasticsearchWork<JestResult, Void> {
+public class RefreshWork extends SimpleElasticsearchWork<Void> {
 
 	protected RefreshWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements RefreshWorkBuilder {
-		private final Refresh.Builder jestBuilder;
+		private List<String> indexNames = new ArrayList<>();
 
 		public Builder() {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new Refresh.Builder();
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 		}
 
 		@Override
 		public Builder index(String indexName) {
-			jestBuilder.addIndex( indexName );
+			indexNames.add( indexName );
 			return this;
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.post();
+
+			if ( !indexNames.isEmpty() ) {
+				builder.multiValuedPathComponent( indexNames );
+			}
+
+			builder.pathComponent( "_refresh" );
+
+			return builder.build();
 		}
 
 		@Override

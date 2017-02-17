@@ -56,7 +56,7 @@ public interface ElasticsearchWorkFactory extends Service {
 
 	BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks);
 
-	SearchWorkBuilder search(String payload);
+	SearchWorkBuilder search(JsonObject payload);
 
 	ExplainWorkBuilder explain(String indexName, String typeName, String id, JsonObject payload);
 

@@ -6,39 +6,42 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.work.impl.builder.DropIndexWorkBuilder;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.DeleteIndex;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class DropIndexWork extends SimpleElasticsearchWork<JestResult, Void> {
+public class DropIndexWork extends SimpleElasticsearchWork<Void> {
 
 	protected DropIndexWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements DropIndexWorkBuilder {
-		private final DeleteIndex.Builder jestBuilder;
+		private final String indexName;
 
 		public Builder(String indexName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new DeleteIndex.Builder( indexName );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.indexName = indexName;
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.delete()
+					.pathComponent( indexName );
+
+			return builder.build();
 		}
 
 		@Override

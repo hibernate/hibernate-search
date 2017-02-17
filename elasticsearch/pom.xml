@@ -26,13 +26,23 @@
             <artifactId>hibernate-search-engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.searchbox</groupId>
-            <artifactId>jest</artifactId>
-            <version>${elasticsearchJestVersion}</version>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>rest</artifactId>
+            <version>${elasticsearchClientVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>sniffer</artifactId>
+            <version>${elasticsearchSnifferVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${elasticsearchGsonVersion}</version>
         </dependency>
 
         <!-- Test -->
@@ -99,14 +109,10 @@
             <artifactId>wiremock</artifactId>
             <scope>test</scope>
             <exclusions>
-                <!-- Exclude dependencies that conflict with io.searchbox:jest -->
+                <!-- Exclude dependencies that conflict with the ES Rest client -->
                 <exclusion>
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpclient</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

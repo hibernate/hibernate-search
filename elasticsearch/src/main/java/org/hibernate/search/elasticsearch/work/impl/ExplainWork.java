@@ -6,47 +6,58 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.work.impl.builder.ExplainWorkBuilder;
 
 import com.google.gson.JsonObject;
 
-import io.searchbox.action.Action;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Explain;
-
 /**
  * @author Yoann Rodiere
  */
-public class ExplainWork extends SimpleElasticsearchWork<DocumentResult, ExplainResult> {
+public class ExplainWork extends SimpleElasticsearchWork<ExplainResult> {
 
 	protected ExplainWork(Builder builder) {
 		super( builder );
 	}
 
+	@Override
+	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context,
+			Response response, JsonObject parsedResponseBody) {
+		return new ExplainResultImpl( parsedResponseBody );
+	}
+
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, DocumentResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements ExplainWorkBuilder {
-		private final Explain.Builder jestBuilder;
+		private final String indexName;
+		private final String typeName;
+		private final String id;
+		private final JsonObject payload;
 
 		public Builder(String indexName, String typeName, String id, JsonObject payload) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new Explain.Builder( indexName, typeName, id, payload );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.indexName = indexName;
+			this.typeName = typeName;
+			this.id = id;
+			this.payload = payload;
 		}
 
 		@Override
-		protected Action<DocumentResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.get()
+					.pathComponent( indexName )
+					.pathComponent( typeName )
+					.pathComponent( id )
+					.pathComponent( "_explain" )
+					.body( payload );
+			return builder.build();
 		}
 
 		@Override
 		public ExplainWork build() {
 			return new ExplainWork( this );
 		}
-	}
-
-	@Override
-	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context, DocumentResult response) {
-		return new ExplainResultImpl( response.getJsonObject() );
 	}
 
 	private static class ExplainResultImpl implements ExplainResult {

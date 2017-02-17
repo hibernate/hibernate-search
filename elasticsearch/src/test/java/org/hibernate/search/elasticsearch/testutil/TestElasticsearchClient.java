@@ -7,18 +7,26 @@
 package org.hibernate.search.elasticsearch.testutil;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.entity.ContentType;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.RestClient;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.impl.DefaultGsonService;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
+import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequest;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.rules.ExternalResource;
@@ -29,27 +37,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import io.searchbox.action.AbstractAction;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.JestResult;
-import io.searchbox.client.config.HttpClientConfig;
-import io.searchbox.cluster.Health;
-import io.searchbox.cluster.Health.Builder;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Get;
-import io.searchbox.core.Index;
-import io.searchbox.indices.CloseIndex;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.DeleteIndex;
-import io.searchbox.indices.OpenIndex;
-import io.searchbox.indices.mapping.GetMapping;
-import io.searchbox.indices.mapping.PutMapping;
-import io.searchbox.indices.settings.GetSettings;
-import io.searchbox.indices.settings.UpdateSettings;
-import io.searchbox.indices.template.DeleteTemplate;
-import io.searchbox.indices.template.PutTemplate;
-
 /**
  * @author Yoann Rodiere
  */
@@ -57,7 +44,9 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private JestClient client;
+	private RestClient client;
+
+	private Gson gson;
 
 	private final List<String> createdIndicesNames = Lists.newArrayList();
 
@@ -223,11 +212,8 @@ public class TestElasticsearchClient extends ExternalResource {
 		// Ignore the result: if the deletion fails, we don't care unless the creation just after also fails
 		tryDeleteESIndex( indexName );
 
-		JestResult result = client.execute( new CreateIndex.Builder( indexName ).build() );
 		registerIndexForCleanup( indexName );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while creating index '" + indexName + "' for tests:" + result.getErrorMessage() );
-		}
+		performRequest( ElasticsearchRequest.put().pathComponent( indexName ).build() );
 
 		waitForRequiredIndexStatus( indexName );
 	}
@@ -237,21 +223,24 @@ public class TestElasticsearchClient extends ExternalResource {
 				.addProperty( "template", templateString )
 				.add( "settings", settings )
 				.build();
-		JestResult result = client.execute( new PutTemplate.Builder( templateName, source ).build() );
+
 		registerTemplateForCleanup( templateName );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while creating template '" + templateName + "' for tests:" + result.getErrorMessage() );
-		}
+		performRequest( ElasticsearchRequest.put()
+				.pathComponent( "_template" ).pathComponent( templateName )
+				.body( source )
+				.build() );
 	}
 
 	private void ensureIndexDoesNotExist(String indexName) throws IOException {
-		JestResult result = client.execute( new DeleteIndex.Builder( indexName ).build() );
-		if ( !result.isSucceeded() && result.getResponseCode() != 404 /* Index not found is ok */ ) {
-			throw new AssertionFailure( String.format(
-					Locale.ENGLISH,
-					"Error while trying to delete index '%s' as part of test initialization: %s",
-					indexName, result.getErrorMessage()
-					) );
+		try {
+			performRequest( ElasticsearchRequest.delete()
+					.pathComponent( indexName )
+					.build() );
+		}
+		catch (ResponseException e) {
+			if ( e.getResponse().getStatusLine().getStatusCode() != 404 /* Index not found is ok */ ) {
+				throw e;
+			}
 		}
 	}
 
@@ -263,48 +252,29 @@ public class TestElasticsearchClient extends ExternalResource {
 		createdTemplatesNames.add( templateName );
 	}
 
-	private void waitForRequiredIndexStatus(final String indexNameToWaitFor) throws IOException {
-		Builder healthBuilder = new Health.Builder()
-				.setParameter( "wait_for_status", requiredIndexStatus.getElasticsearchString() )
-				.setParameter( "timeout", ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_WAIT_TIMEOUT + "ms" );
-
-		Health health = new Health( healthBuilder ) {
-			@Override
-			protected String buildURI() {
-				try {
-					return super.buildURI() + URLEncoder.encode(indexNameToWaitFor, AbstractAction.CHARSET);
-				}
-				catch (UnsupportedEncodingException e) {
-					throw new AssertionFailure( "Unexpectedly unsupported charset", e );
-				}
-			}
-		};
-
-		JestResult result = client.execute( health );
-		if ( !result.isSucceeded() ) {
-			String status = result.getJsonObject().get( "status" ).getAsString();
-			throw new AssertionFailure( "Error while waiting for creation of index '" + indexNameToWaitFor
-					+ "' for tests (status was '" + status + "'):" + result.getErrorMessage() );
-		}
+	private void waitForRequiredIndexStatus(final String indexName) throws IOException {
+		performRequest( ElasticsearchRequest.get()
+				.pathComponent( "_cluster" ).pathComponent( "health" ).pathComponent( indexName )
+				.param( "wait_for_status", requiredIndexStatus.getElasticsearchString() )
+				.param( "timeout", ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_WAIT_TIMEOUT + "ms" )
+				.build() );
 	}
 
 	private void putMapping(String indexName, String mappingName, String mappingJson) throws IOException {
-		JsonElement mappingJsonElement = toJsonElement( mappingJson );
+		JsonObject mappingJsonObject = toJsonElement( mappingJson ).getAsJsonObject();
 
-		JestResult result = client.execute( new PutMapping.Builder( indexName, mappingName, mappingJsonElement ).build() );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while putting mapping '" + mappingName
-					+ "' on index '" + indexName + "' for tests:" + result.getErrorMessage() );
-		}
+		performRequest( ElasticsearchRequest.put()
+				.pathComponent( indexName ).pathComponent( "_mapping" ).pathComponent( mappingName )
+				.body( mappingJsonObject )
+				.build() );
 	}
 
 	private String getMapping(String indexName, String mappingName) throws IOException {
-		JestResult result = client.execute( new GetMapping.Builder().addIndex( indexName ).addType( mappingName ).build() );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while getting mapping '" + mappingName
-					+ "' on index '" + indexName + "' for tests:" + result.getErrorMessage() );
-		}
-		JsonElement index = result.getJsonObject().get( indexName );
+		Response response = performRequest( ElasticsearchRequest.get()
+				.pathComponent( indexName ).pathComponent( "_mapping" ).pathComponent( mappingName )
+				.build() );
+		JsonObject result = toJsonObject( response );
+		JsonElement index = result.get( indexName );
 		if ( index == null ) {
 			return new JsonObject().toString();
 		}
@@ -326,30 +296,28 @@ public class TestElasticsearchClient extends ExternalResource {
 			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
 		}
 
-		JestResult result = client.execute( new CloseIndex.Builder( indexName ).build() );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while closing index '" + indexName
-					+ "' for tests:" + result.getErrorMessage() );
-		}
-		result = client.execute( new UpdateSettings.Builder( settingsJsonElement ).addIndex( indexName ).build() );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while putting settings on index '" + indexName
-					+ "' for tests:" + result.getErrorMessage() );
-		}
-		result = client.execute( new OpenIndex.Builder( indexName ).build() );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while re-opening index '" + indexName
-					+ "' for tests:" + result.getErrorMessage() );
-		}
+		performRequest( ElasticsearchRequest.post()
+				.pathComponent( indexName )
+				.pathComponent( "_close" )
+				.build() );
+
+		performRequest( ElasticsearchRequest.put()
+				.pathComponent( indexName ).pathComponent( "_settings" )
+				.body( settingsJsonElement.getAsJsonObject() )
+				.build() );
+
+		performRequest( ElasticsearchRequest.post()
+				.pathComponent( indexName )
+				.pathComponent( "_open" )
+				.build() );
 	}
 
 	private String getSettings(String indexName, String path) throws IOException {
-		JestResult result = client.execute( new GetSettings.Builder().addIndex( indexName ).build() );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while getting settings on index '" + indexName +
-					"' for tests:" + result.getErrorMessage() );
-		}
-		JsonElement index = result.getJsonObject().get( indexName );
+		Response response = performRequest( ElasticsearchRequest.get()
+				.pathComponent( indexName ).pathComponent( "_settings" )
+				.build() );
+		JsonObject result = toJsonObject( response );
+		JsonElement index = result.get( indexName );
 		if ( index == null ) {
 			return new JsonObject().toString();
 		}
@@ -367,66 +335,42 @@ public class TestElasticsearchClient extends ExternalResource {
 	}
 
 	private void index(String indexName, String typeName, String id, String jsonDocument) throws IOException {
-		JsonElement documentJsonElement = toJsonElement( jsonDocument );
-
-		JestResult result = client.execute( new Index.Builder( documentJsonElement )
-				.index( indexName )
-				.type( typeName )
-				.id( id )
-				.refresh( true )
+		JsonObject documentJsonObject = toJsonElement( jsonDocument ).getAsJsonObject();
+		performRequest( ElasticsearchRequest.put()
+				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
+				.body( documentJsonObject )
+				.param( "refresh", true )
 				.build() );
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while indexing '" + jsonDocument
-					+ "' on index '" + indexName + "' for tests:" + result.getErrorMessage() );
-		}
 	}
 
 	private JsonObject getDocumentSource(String indexName, String typeName, String id) throws IOException {
-		DocumentResult result = client.execute(
-				new Get.Builder( indexName, id )
-						.type( typeName )
-						.build()
-				);
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while retrieving document '" + id
-					+ "' from index '" + indexName
-					+ "' for tests:" + result.getErrorMessage() );
-		}
-
-		return result.getJsonObject().get( "_source" ).getAsJsonObject();
+		Response response = performRequest( ElasticsearchRequest.get()
+				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
+				.build() );
+		JsonObject result = toJsonObject( response );
+		return result.get( "_source" ).getAsJsonObject();
 	}
 
 	private JsonElement getDocumentField(String indexName, String typeName, String id, String fieldName) throws IOException {
-		DocumentResult result = client.execute(
-				new Get.Builder( indexName, id )
-						.type( typeName )
-						.setParameter( "fields", fieldName )
-						.build()
-				);
-		if ( !result.isSucceeded() ) {
-			throw new AssertionFailure( "Error while retrieving document '" + id
-					+ "' from index '" + indexName
-					+ "' for tests:" + result.getErrorMessage() );
-		}
-
-		return result.getJsonObject().get( "fields" ).getAsJsonObject().get( fieldName );
+		Response response = performRequest( ElasticsearchRequest.get()
+				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
+				.param( "fields", fieldName )
+				.build() );
+		JsonObject result = toJsonObject( response );
+		return result.get( "fields" ).getAsJsonObject().get( fieldName );
 	}
 
 	@Override
 	protected void before() throws Throwable {
-		JestClientFactory factory = new JestClientFactory();
+		gson = new DefaultGsonService().getGson();
 
-		Gson gson = new DefaultGsonService().getGson();
-
-		factory.setHttpClientConfig(
-			new HttpClientConfig.Builder( ElasticsearchEnvironment.Defaults.SERVER_URI )
-				.readTimeout( ElasticsearchEnvironment.Defaults.SERVER_READ_TIMEOUT )
-				.connTimeout( ElasticsearchEnvironment.Defaults.SERVER_CONNECTION_TIMEOUT )
-				.gson( gson )
-				.build()
-		);
-
-		client = factory.getObject();
+		this.client = RestClient.builder( HttpHost.create( ElasticsearchEnvironment.Defaults.SERVER_URI ) )
+				.setRequestConfigCallback( (builder) -> {
+					return builder
+							.setSocketTimeout( ElasticsearchEnvironment.Defaults.SERVER_READ_TIMEOUT )
+							.setConnectTimeout( ElasticsearchEnvironment.Defaults.SERVER_CONNECTION_TIMEOUT );
+				} )
+				.build();
 	}
 
 	@Override
@@ -439,15 +383,25 @@ public class TestElasticsearchClient extends ExternalResource {
 			tryDeleteESTemplate( templateName );
 		}
 		createdTemplatesNames.clear();
-		client.shutdownClient();
-		client = null;
+
+		try {
+			client.close();
+			client = null;
+		}
+		catch (IOException e) {
+			throw new AssertionFailure( "Unexpected exception when closing the RestClient", e );
+		}
 	}
 
 	private void tryDeleteESIndex(String indexName) {
 		try {
-			JestResult result = client.execute( new DeleteIndex.Builder( indexName ).build() );
-			if ( !result.isSucceeded() && result.getResponseCode() != 404 /* Index not found is ok */ ) {
-				LOG.warnf( "Error while trying to delete index '%s' as part of test cleanup: %s", indexName, result.getErrorMessage() );
+			performRequest( ElasticsearchRequest.delete()
+					.pathComponent( indexName )
+					.build() );
+		}
+		catch (ResponseException e) {
+			if ( e.getResponse().getStatusLine().getStatusCode() != 404 /* Index not found is ok */ ) {
+				LOG.warnf( e, "Error while trying to delete index '%s' as part of test cleanup", indexName );
 			}
 		}
 		catch (IOException | RuntimeException e) {
@@ -457,13 +411,37 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	private void tryDeleteESTemplate(String templateName) {
 		try {
-			JestResult result = client.execute( new DeleteTemplate.Builder( templateName ).build() );
-			if ( !result.isSucceeded() && result.getResponseCode() != 404 /* Index not found is ok */ ) {
-				LOG.warnf( "Error while trying to delete template '%s' as part of test cleanup: %s", templateName, result.getErrorMessage() );
+			performRequest( ElasticsearchRequest.delete()
+					.pathComponent( "_template" ).pathComponent( templateName )
+					.build() );
+		}
+		catch (ResponseException e) {
+			if ( e.getResponse().getStatusLine().getStatusCode() != 404 /* Template not found is ok */ ) {
+				LOG.warnf( e, "Error while trying to delete template '%s' as part of test cleanup", templateName );
 			}
 		}
 		catch (IOException | RuntimeException e) {
 			LOG.warnf( e, "Error while trying to delete template '%s' as part of test cleanup", templateName );
+		}
+	}
+
+	private Response performRequest(ElasticsearchRequest request) throws IOException {
+		return client.performRequest(
+				request.getMethod(), request.getPath(), request.getParameters(),
+				ElasticsearchClientUtils.toEntity( gson, request )
+				);
+	}
+
+	private JsonObject toJsonObject(Response response) throws IOException {
+		HttpEntity entity = response.getEntity();
+		if ( entity == null ) {
+			return null;
+		}
+
+		ContentType contentType = ContentType.get( entity );
+		try ( InputStream inputStream = entity.getContent();
+				Reader reader = new InputStreamReader( inputStream, contentType.getCharset() ) ) {
+			return gson.fromJson( reader, JsonObject.class );
 		}
 	}
 

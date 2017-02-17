@@ -6,19 +6,18 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteWorkBuilder;
 
-import io.searchbox.action.BulkableAction;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Delete;
-import io.searchbox.core.DocumentResult;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class DeleteWork extends SimpleBulkableElasticsearchWork<DocumentResult, Void> {
+public class DeleteWork extends SimpleBulkableElasticsearchWork<Void> {
 
-	private static final ElasticsearchRequestSuccessAssessor<JestResult> RESULT_ASSESSOR =
+	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
 			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
 	public DeleteWork(Builder builder) {
@@ -26,25 +25,43 @@ public class DeleteWork extends SimpleBulkableElasticsearchWork<DocumentResult, 
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, DocumentResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
 	public static class Builder
-			extends SimpleBulkableElasticsearchWork.Builder<Builder, DocumentResult>
+			extends SimpleBulkableElasticsearchWork.Builder<Builder>
 			implements DeleteWorkBuilder {
-		private final Delete.Builder jestBuilder;
+		private final String indexName;
+		private final String typeName;
+		private final String id;
 
 		public Builder(String indexName, String typeName, String id) {
-			super( indexName, RESULT_ASSESSOR, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new Delete.Builder( id )
-					.index( indexName )
-					.type( typeName );
+			super( indexName, SUCCESS_ASSESSOR );
+			this.indexName = indexName;
+			this.typeName = typeName;
+			this.id = id;
 		}
 
 		@Override
-		protected BulkableAction<DocumentResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.delete()
+					.pathComponent( indexName )
+					.pathComponent( typeName )
+					.pathComponent( id );
+			return builder.build();
+		}
+
+		@Override
+		protected JsonObject buildBulkableActionMetadata() {
+			return JsonBuilder.object()
+					.add( "delete", JsonBuilder.object()
+							.addProperty( "_index", indexName )
+							.addProperty( "_type", typeName )
+							.addProperty( "_id", id )
+					)
+					.build();
 		}
 
 		@Override

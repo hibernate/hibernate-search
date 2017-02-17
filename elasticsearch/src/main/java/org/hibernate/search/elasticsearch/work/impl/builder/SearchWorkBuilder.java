@@ -11,8 +11,6 @@ import java.util.Collection;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.SearchResult;
 
-import io.searchbox.core.search.sort.Sort;
-
 /**
  * @author Yoann Rodiere
  */
@@ -23,7 +21,5 @@ public interface SearchWorkBuilder extends ElasticsearchWorkBuilder<Elasticsearc
 	SearchWorkBuilder paging(int firstResult, int size);
 
 	SearchWorkBuilder scrolling(int scrollSize, String scrollTimeout);
-
-	SearchWorkBuilder appendSort(Sort sort);
 
 }

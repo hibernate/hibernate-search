@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexSettingsWorkBuilder;
@@ -14,11 +15,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.indices.settings.GetSettings;
-
-public class GetIndexSettingsWork extends SimpleElasticsearchWork<JestResult, IndexSettings> {
+public class GetIndexSettingsWork extends SimpleElasticsearchWork<IndexSettings> {
 
 	private final String indexName;
 
@@ -28,16 +25,16 @@ public class GetIndexSettingsWork extends SimpleElasticsearchWork<JestResult, In
 	}
 
 	@Override
-	protected IndexSettings generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
-		JsonObject resultJson = response.getJsonObject();
-		JsonElement index = resultJson.get( indexName );
+	protected IndexSettings generateResult(ElasticsearchWorkExecutionContext context,
+			Response response, JsonObject parsedResponseBody) {
+		JsonElement index = parsedResponseBody.get( indexName );
 		if ( index == null || !index.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + resultJson );
+			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + parsedResponseBody );
 		}
 
 		JsonElement settings = index.getAsJsonObject().get( "settings" );
 		if ( settings == null || !settings.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + resultJson );
+			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + parsedResponseBody );
 		}
 
 		JsonElement indexSettings = settings.getAsJsonObject().get( "index" );
@@ -52,20 +49,22 @@ public class GetIndexSettingsWork extends SimpleElasticsearchWork<JestResult, In
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements GetIndexSettingsWorkBuilder {
 		private final String indexName;
-		private final GetSettings.Builder jestBuilder;
 
 		public Builder(String indexName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
-			this.jestBuilder = new GetSettings.Builder().addIndex( indexName );
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.get()
+					.pathComponent( indexName )
+					.pathComponent( "_settings" );
+			return builder.build();
 		}
 
 		@Override

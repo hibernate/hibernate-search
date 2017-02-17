@@ -141,9 +141,8 @@
             <includes>
                 <include>org.hibernate:hibernate-search-elasticsearch</include>
                 <include>com.google.code.gson:gson</include>
-                <include>io.searchbox:jest</include>
-                <include>io.searchbox:jest-common</include>
-                <include>org.apache.commons:commons-lang3</include>
+                <include>org.elasticsearch.client:rest</include>
+                <include>org.elasticsearch.client:sniffer</include>
             </includes>
         </dependencySet>
 

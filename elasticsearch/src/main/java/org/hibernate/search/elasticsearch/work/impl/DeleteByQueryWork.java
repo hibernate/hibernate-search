@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.util.impl.ElasticsearchRequestUtils;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
@@ -16,45 +20,53 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.BulkResult.BulkResultItem;
-import io.searchbox.core.DeleteByQuery;
-
 /**
  * @author Yoann Rodiere
  */
-public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult, Void> {
+public class DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 
 	protected DeleteByQueryWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements DeleteByQueryWorkBuilder {
-		private final DeleteByQuery.Builder jestBuilder;
+		private final String indexName;
+		private final JsonObject payload;
+		private List<String> typeNames = new ArrayList<>();
 
 		public Builder(String indexName, JsonObject payload) {
-			super( indexName, SuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new DeleteByQuery.Builder( payload.toString() )
-					.addIndex( indexName );
+			super( indexName, SuccessAssessor.INSTANCE );
+			this.indexName = indexName;
+			this.payload = payload;
 		}
 
 		@Override
 		public Builder type(String typeName) {
-			jestBuilder.addType( typeName );
+			typeNames.add( typeName );
 			return this;
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return jestBuilder.build();
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.delete()
+					.pathComponent( indexName );
+
+			if ( !typeNames.isEmpty() ) {
+				builder.multiValuedPathComponent( typeNames );
+			}
+
+			builder.pathComponent( "_query" )
+					.body( payload );
+
+			return builder.build();
 		}
 
 		@Override
@@ -63,7 +75,7 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult, Void>
 		}
 	}
 
-	private static class SuccessAssessor implements ElasticsearchRequestSuccessAssessor<JestResult> {
+	private static class SuccessAssessor implements ElasticsearchRequestSuccessAssessor {
 
 		private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -79,19 +91,20 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<JestResult, Void>
 		}
 
 		@Override
-		public void checkSuccess(ElasticsearchWorkExecutionContext context, Action<? extends JestResult> request, JestResult result) throws SearchException {
-			this.delegate.checkSuccess( context, request, result );
-			if ( result.getResponseCode() == NOT_FOUND_HTTP_STATUS_CODE ) {
+		public void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request,
+				Response response, JsonObject parsedResponseBody) throws SearchException {
+			this.delegate.checkSuccess( context, request, response, parsedResponseBody );
+			if ( response.getStatusLine().getStatusCode() == NOT_FOUND_HTTP_STATUS_CODE ) {
 				GsonService gsonService = context.getGsonService();
 				throw LOG.elasticsearchRequestDeleteByQueryNotFound(
-						ElasticsearchRequestUtils.formatRequest( gsonService, request ),
-						ElasticsearchRequestUtils.formatResponse( gsonService, result )
+						ElasticsearchClientUtils.formatRequest( gsonService, request ),
+						ElasticsearchClientUtils.formatResponse( gsonService, response, parsedResponseBody )
 						);
 			}
 		}
 
 		@Override
-		public boolean isSuccess(ElasticsearchWorkExecutionContext context, BulkResultItem bulkResultItem) {
+		public boolean isSuccess(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
 			throw new AssertionFailure( "This method should never be called, because DeleteByQuery actions are not Bulkable" );
 		}
 	}

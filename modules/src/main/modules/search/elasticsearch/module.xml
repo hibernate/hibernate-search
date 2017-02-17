@@ -8,18 +8,17 @@
 <module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.elasticsearch" slot="${hibernate.search.version}">
     <resources>
         <resource-root path="hibernate-search-elasticsearch-${hibernate.search.version}.jar" />
-        <resource-root path="jest-${elasticsearchJestVersion}.jar" />
-        <resource-root path="jest-common-${elasticsearchJestVersion}.jar" />
-        <resource-root path="commons-lang3-${elasticsearchCommonsLang3Version}.jar" />
+        <resource-root path="rest-${elasticsearchClientVersion}.jar" />
+        <resource-root path="sniffer-${elasticsearchClientVersion}.jar" />
         <resource-root path="gson-${elasticsearchGsonVersion}.jar" />
     </resources>
     <dependencies>
-        <module name="com.google.guava" />
         <module name="org.hibernate.search.engine" slot="${hibernate.search.version}" />
         <module name="org.hibernate.commons-annotations" />
         <module name="javax.xml.bind.api"/>
         <module name="org.apache.httpcomponents" />
         <module name="org.jboss.logging" />
+        <module name="org.slf4j.jcl-over-slf4j" /><!-- Used by the Elasticsearch client -->
         <module name="org.slf4j" />
     </dependencies>
 </module>

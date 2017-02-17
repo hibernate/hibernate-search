@@ -807,5 +807,3 @@ Here is a list of known Elasticsearch bugs, and what to do about it.
 
 More information about Elasticsearch can be found on the https://www.elastic.co/products/elasticsearch[Elasticsearch website]
 and its https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html[reference documentation].
-
-Hibernate Search uses https://github.com/searchbox-io/Jest[Jest] to communicate with Elasticsearch.

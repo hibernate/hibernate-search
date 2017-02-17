@@ -307,7 +307,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
 		private final Set<String> indexNames = new HashSet<>();
 		private final JsonObject payload;
-		private final String payloadAsString;
 
 		private IndexSearcher() {
 			JsonArray typeFilters = new JsonArray();
@@ -357,8 +356,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			sortByDistanceIndex = getSortByDistanceIndex();
 			addScriptFields( payloadBuilder );
 
+			// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
+			if ( sort != null ) {
+				validateSortFields( extendedIntegrator, getQueriedEntityTypes() );
+				payloadBuilder.add( "sort", ToElasticsearch.fromLuceneSort( sort ) );
+			}
+
 			this.payload = payloadBuilder.build();
-			payloadAsString = payloadBuilder.build().toString();
 		}
 
 		private JsonObject getFilteredQuery(JsonElement originalQuery, JsonArray typeFilters) {
@@ -667,7 +671,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkFactory.class );
 					ServiceReference<ElasticsearchWorkProcessor> processor =
 							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
-				SearchWorkBuilder builder = factory.get().search( payloadAsString ).indexes( indexNames );
+				SearchWorkBuilder builder = factory.get().search( payload ).indexes( indexNames );
 
 				if ( enableScrolling ) {
 					/*
@@ -694,14 +698,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							// given, I take as much as possible, as by default only 10 rows would be returned
 							maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult
 					);
-				}
-
-				// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
-				if ( sort != null ) {
-					validateSortFields( extendedIntegrator, getQueriedEntityTypes() );
-					for ( SortField sortField : sort.getSort() ) {
-						builder.appendSort( ToElasticsearch.fromLuceneSortField( sortField ) );
-					}
 				}
 
 				ElasticsearchWork<SearchResult> work = builder.build();

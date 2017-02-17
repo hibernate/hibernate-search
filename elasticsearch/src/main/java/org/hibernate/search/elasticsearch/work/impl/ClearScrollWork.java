@@ -6,55 +6,53 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.ClearScrollWorkBuilder;
 
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.SearchScroll;
+import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class ClearScrollWork extends SimpleElasticsearchWork<JestResult, Void> {
+public class ClearScrollWork extends SimpleElasticsearchWork<Void> {
 
 	protected ClearScrollWork(Builder builder) {
 		super( builder );
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JestResult response) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
 		return null;
 	}
 
 	public static class Builder
-			extends SimpleElasticsearchWork.Builder<Builder, JestResult>
+			extends SimpleElasticsearchWork.Builder<Builder>
 			implements ClearScrollWorkBuilder {
-		private final SearchScroll.Builder jestBuilder;
+		private final String scrollId;
 
 		public Builder(String scrollId) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE, NoopElasticsearchWorkSuccessReporter.INSTANCE );
-			this.jestBuilder = new SearchScroll.Builder( scrollId, "" );
+			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.scrollId = scrollId;
 		}
 
 		@Override
-		protected Action<JestResult> buildAction() {
-			return new ClearScrollAction( jestBuilder );
+		protected ElasticsearchRequest buildRequest() {
+			ElasticsearchRequest.Builder builder =
+					ElasticsearchRequest.delete()
+					.pathComponent( "_search" )
+					.pathComponent( "scroll" )
+					.body(JsonBuilder.object()
+							.addProperty( "scroll_id", scrollId )
+							.build()
+					);
+
+			return builder.build();
 		}
 
 		@Override
 		public ClearScrollWork build() {
 			return new ClearScrollWork( this );
-		}
-	}
-
-	private static class ClearScrollAction extends SearchScroll {
-		protected ClearScrollAction(Builder builder) {
-			super( builder );
-		}
-
-		@Override
-		public String getRestMethodName() {
-			return "DELETE";
 		}
 	}
 }
