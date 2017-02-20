@@ -1,5 +1,5 @@
 RULE Enable the job interruptor as needed
-CLASS org.hibernate.search.jsr352.massindexing.test.util.JobInterruptorUtil
+CLASS org.hibernate.search.test.integration.jsr352.massindexing.test.util.JobInterruptorUtil
 METHOD enable
 AT ENTRY
 IF true
@@ -8,7 +8,7 @@ return
 ENDRULE
 
 RULE Disable the job interruptor as needed
-CLASS org.hibernate.search.jsr352.massindexing.test.util.JobInterruptorUtil
+CLASS org.hibernate.search.test.integration.jsr352.massindexing.test.util.JobInterruptorUtil
 METHOD disable
 AT ENTRY
 IF true
