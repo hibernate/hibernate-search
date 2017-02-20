@@ -20,7 +20,7 @@
             <property name="hibernate.search.indexing_strategy" value="manual" />
             <property name="hibernate.search.lucene_version" value="LUCENE_CURRENT" />
             <property name="jboss.as.jpa.providerModule" value="org.hibernate:${hibernate-orm.module.slot}"/>
-            <property name="wildfly.jpa.hibernate.search.module" value="org.hibernate.search.orm:${hibernate.search.module.slot}"/>
+            <property name="wildfly.jpa.hibernate.search.module" value="org.hibernate.search.orm:${hibernate-search.module.slot}"/>
         </properties>
     </persistence-unit>
 </persistence>

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.jsr352.massindexing;
+package org.hibernate.search.test.integration.jsr352.massindexing;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,10 +24,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.jsr352.massindexing.test.common.Message;
-import org.hibernate.search.jsr352.massindexing.test.common.MessageManager;
-import org.hibernate.search.jsr352.massindexing.test.util.JobInterruptorUtil;
+import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
+import org.hibernate.search.test.integration.jsr352.massindexing.test.common.Message;
+import org.hibernate.search.test.integration.jsr352.massindexing.test.common.MessageManager;
+import org.hibernate.search.test.integration.jsr352.massindexing.test.util.JobInterruptorUtil;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -66,8 +67,8 @@ public class RestartIT {
 	public static WebArchive createDeployment() {
 		WebArchive war = ShrinkWrap
 				.create( WebArchive.class, RestartIT.class.getSimpleName() + ".war" )
-				.addAsResource( "META-INF/persistence.xml" )
-				.addAsWebInfResource( "jboss-deployment-structure.xml" )
+				.addAsResource( "jsr352/persistence.xml", "META-INF/persistence.xml" )
+				.addAsWebInfResource( "jboss-deployment-structure-jsr352.xml", "/jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addPackage( JobTestUtil.class.getPackage() )
 				.addPackage( JobInterruptorUtil.class.getPackage() )

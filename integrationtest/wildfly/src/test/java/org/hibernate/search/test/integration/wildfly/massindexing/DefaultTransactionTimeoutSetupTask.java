@@ -15,7 +15,8 @@ import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.dmr.ModelNode;
 
 /**
- * Sets the default transaction timeout to 2000 milliseconds.
+ * Sets the default transaction timeout to 300_000 milliseconds,
+ * to avoid timeouts while mass indexing (was 2000ms before we introduced JSR-352).
  */
 public class DefaultTransactionTimeoutSetupTask implements ServerSetupTask {
 
@@ -25,7 +26,7 @@ public class DefaultTransactionTimeoutSetupTask implements ServerSetupTask {
 
 	@Override
 	public void setup(ManagementClient managementClient, String s) throws Exception {
-		ModelNode op = Operations.createWriteAttributeOperation( ADDRESS_TRANSACTIONS_SUBSYSTEM, "default-timeout", 2000 );
+		ModelNode op = Operations.createWriteAttributeOperation( ADDRESS_TRANSACTIONS_SUBSYSTEM, "default-timeout", 300_000 );
 		ModelNode result = managementClient.getControllerClient().execute( op );
 		if ( !Operations.isSuccessfulOutcome( result ) ) {
 			logger.warning( "Can't set default transaction timeout: " + result.toJSONString( false ) );

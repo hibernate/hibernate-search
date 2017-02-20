@@ -35,27 +35,37 @@ public class LoggingConfigurator {
 			.append( "logger", "org.hibernate.search" )
 			.toModelNode();
 
-	public void afterStart(@Observes AfterStart event, ArquillianDescriptor descriptor) throws IOException {
-		final ModelNode result = managementClient.get().getControllerClient()
-				.execute( createAddLoggerOperation( "DEBUG" ) );
-		if ( !Operations.isSuccessfulOutcome( result ) ) {
-			logger.warning( "Can't create org.hibernate.search logger: " + result.toJSONString( false ) );
-		}
+	private final ModelNode ADDRESS_WELD_CLASS_LOADING_LOGGER = PathAddress
+			.pathAddress( "subsystem", "logging" )
+			.append( "logger", "org.jboss.weld.ClassLoading" )
+			.toModelNode();
 
+	public void afterStart(@Observes AfterStart event, ArquillianDescriptor descriptor) throws IOException {
+		addLogger( ADDRESS_HIBERNATE_SEARCH_LOGGER, "DEBUG" );
+		addLogger( ADDRESS_WELD_CLASS_LOADING_LOGGER, "DEBUG" );
 	}
 
 	public void beforeShutdown(@Observes BeforeStop event, ArquillianDescriptor descriptor) throws IOException {
+		removeLogger( ADDRESS_WELD_CLASS_LOADING_LOGGER );
+		removeLogger( ADDRESS_HIBERNATE_SEARCH_LOGGER );
+	}
+
+	private void addLogger(ModelNode node, String loggerLevel) throws IOException {
+		ModelNode op = Operations.createAddOperation( node );
+		op.get( "level" ).set( loggerLevel );
 		final ModelNode result = managementClient.get().getControllerClient()
-				.execute( Operations.createRemoveOperation( ADDRESS_HIBERNATE_SEARCH_LOGGER ) );
+				.execute( op );
 		if ( !Operations.isSuccessfulOutcome( result ) ) {
-			logger.warning( "Can't remove org.hibernate.search logger: " + result.toJSONString( false ) );
+			logger.warning( "Can't create " + node + " logger: " + result.toJSONString( false ) );
 		}
 	}
 
-	private ModelNode createAddLoggerOperation(String loggerLevel) {
-		ModelNode op = Operations.createAddOperation( ADDRESS_HIBERNATE_SEARCH_LOGGER );
-		op.get( "level" ).set( loggerLevel );
-		return op;
+	private void removeLogger(ModelNode node) throws IOException {
+		final ModelNode result = managementClient.get().getControllerClient()
+				.execute( Operations.createRemoveOperation( node ) );
+		if ( !Operations.isSuccessfulOutcome( result ) ) {
+			logger.warning( "Can't remove " + node + " logger: " + result.toJSONString( false ) );
+		}
 	}
 
 }
