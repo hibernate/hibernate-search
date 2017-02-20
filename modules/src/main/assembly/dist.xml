@@ -90,6 +90,16 @@
             <outputDirectory>org/hibernate/search/aws-v4-signer-java/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
+        <file>
+            <source>${module.xml.basedir}/search/jsr352/module.xml</source>
+            <outputDirectory>org/hibernate/search/jsr352/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${aliases.xml.basedir}/search/jsr352/module.xml</source>
+            <outputDirectory>org/hibernate/search/jsr352/${hibernate.search.module.slot}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
     </files>
 
     <dependencySets>
@@ -226,6 +236,17 @@
             <includes>
                 <include>org.apache.lucene:lucene-backward-codecs</include>
                 <include>org.apache.lucene:lucene-misc</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/jsr352/${hibernate.search.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-search-jsr352-core</include>
+                <include>org.hibernate:hibernate-search-jsr352-cdi</include>
             </includes>
         </dependencySet>
 
