@@ -19,7 +19,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
-import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.jboss.logging.Logger;

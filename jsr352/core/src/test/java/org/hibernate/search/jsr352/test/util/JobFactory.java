@@ -12,11 +12,15 @@ import javax.batch.runtime.BatchRuntime;
 /**
  * @author Mincong Huang
  */
-public class JobFactory {
+public final class JobFactory {
 
-	private static JobOperator jobOperator = BatchRuntime.getJobOperator();
+	private static final JobOperator OPERATOR = BatchRuntime.getJobOperator();
 
 	public static JobOperator getJobOperator() {
-		return jobOperator;
+		return OPERATOR;
+	}
+
+	private JobFactory() {
+		// Private constructor, don't use it
 	}
 }

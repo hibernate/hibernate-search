@@ -21,7 +21,6 @@ import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.inject.Inject;
 
-import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
 import org.hibernate.search.jsr352.massindexing.test.common.Message;
 import org.hibernate.search.jsr352.massindexing.test.common.MessageManager;
 import org.hibernate.search.jsr352.massindexing.test.config.MultipleEntityManagerFactoriesProducer;

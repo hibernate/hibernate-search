@@ -22,9 +22,13 @@ import org.jboss.logging.Logger;
 /**
  * @author Mincong Huang
  */
-public class MassIndexerUtil {
+public final class MassIndexerUtil {
 
 	public static final Logger LOGGER = Logger.getLogger( MassIndexerUtil.class );
+
+	private MassIndexerUtil() {
+		// Private constructor, do not use it.
+	}
 
 	public static String serializeCriteria(Set<Criterion> criteria)
 			throws IOException {

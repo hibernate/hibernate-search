@@ -18,7 +18,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
-import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.jboss.logging.Logger;

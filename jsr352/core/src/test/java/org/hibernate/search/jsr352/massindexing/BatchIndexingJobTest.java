@@ -19,7 +19,6 @@ import javax.batch.operations.JobOperator;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

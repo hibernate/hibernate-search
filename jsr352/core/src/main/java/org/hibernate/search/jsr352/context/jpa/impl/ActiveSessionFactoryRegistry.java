@@ -109,7 +109,7 @@ public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegist
 			case PERSISTENCE_UNIT_NAME_SCOPE_NAME:
 				factory = sessionFactoriesByPUName.get( reference );
 				if ( factory == null ) {
-					throw new SearchException( "No entity manager factory has been created with this persistence unit name yet: '" + reference +"'."
+					throw new SearchException( "No entity manager factory has been created with this persistence unit name yet: '" + reference + "'."
 							+ " Make sure you use the JPA API to create your entity manager factory (use a 'persistence.xml' file)"
 							+ " and that the entity manager factory has already been created and wasn't closed before"
 							+ " you launch the job." );
@@ -118,7 +118,7 @@ public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegist
 			case SESSION_FACTORY_NAME_SCOPE_NAME:
 				factory = sessionFactoriesByName.get( reference );
 				if ( factory == null ) {
-					throw new SearchException( "No entity manager factory has been created with this name yet: '" + reference +"'."
+					throw new SearchException( "No entity manager factory has been created with this name yet: '" + reference + "'."
 							+ " Make sure your entity manager factory is named"
 							+ " (for instance by setting the '" + org.hibernate.cfg.AvailableSettings.SESSION_FACTORY_NAME + "' option)"
 							+ " and that the entity manager factory has already been created and wasn't closed before"

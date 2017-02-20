@@ -24,7 +24,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
 import org.hibernate.search.jsr352.massindexing.test.common.Message;
 import org.hibernate.search.jsr352.massindexing.test.common.MessageManager;
 import org.hibernate.search.jsr352.massindexing.test.util.JobInterruptorUtil;
