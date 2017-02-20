@@ -34,8 +34,10 @@ over its REST API.
 This version of Hibernate Search requires:
 
 * Java SE 8
-* Hibernate ORM 5.2.x
+* Hibernate ORM 5.2.3.Final or a later 5.2.x
 * Apache Lucene 5.5.x
+
+Hibernate ORM versions 5.2.0.Final, 5.2.1.Final and 5.2.2.Final are NOT fully compatible.
 
 ## Instructions
 
