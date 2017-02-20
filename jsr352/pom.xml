@@ -34,7 +34,6 @@
         <module>documentation</module>
         <module>modules</module>
         <module>integrationtest/wildfly</module>
-        <module>integrationtest/performance</module>
     </modules>
 
     <issueManagement>
