@@ -1,0 +1,53 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.jsr352.cdi.impl;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
+
+import org.jberet.spi.JobXmlResolver;
+import org.jberet.tools.AbstractJobXmlResolver;
+
+public final class HibernateSearchJobXmlResolver extends AbstractJobXmlResolver implements JobXmlResolver {
+
+	private static final String XML_SUFFIX = ".xml";
+
+	private static final Map<String, String> JOB_XML_NAMES_TO_JOB_NAMES = Collections.unmodifiableMap(
+			Arrays.asList( BatchIndexingJob.JOB_NAME ).stream()
+					.collect( Collectors.toMap( s -> s.concat( XML_SUFFIX ), Function.identity() ) )
+	);
+
+	@Override
+	public Collection<String> getJobXmlNames(ClassLoader classLoader) {
+		return JOB_XML_NAMES_TO_JOB_NAMES.keySet();
+	}
+
+	@Override
+	public String resolveJobName(String jobXml, ClassLoader classLoader) {
+		return JOB_XML_NAMES_TO_JOB_NAMES.get( jobXml );
+	}
+
+	@Override
+	public InputStream resolveJobXml(final String jobXml, final ClassLoader classLoader) throws IOException {
+		if ( JOB_XML_NAMES_TO_JOB_NAMES.containsKey( jobXml ) ) {
+			final String path = DEFAULT_PATH + jobXml;
+			return classLoader.getResourceAsStream( path );
+		}
+		else {
+			throw new SearchException( "Not a Hibernate Search JSR-352 job: " + jobXml );
+		}
+	}
+}

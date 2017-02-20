@@ -63,7 +63,6 @@ public class MultipleEntityManagerFactoryBeansIT {
 		WebArchive war = ShrinkWrap
 				.create( WebArchive.class, MultipleEntityManagerFactoryBeansIT.class.getSimpleName() + ".war" )
 				.addAsResource( "META-INF/persistence_multiple.xml", "META-INF/persistence.xml" )
-				.addAsResource( "META-INF/batch-jobs/make-deployment-as-batch-app.xml" ) // WFLY-7000
 				.addAsWebInfResource( "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addPackage( JobTestUtil.class.getPackage() )

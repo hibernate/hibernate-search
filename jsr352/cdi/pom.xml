@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search-jsr352-parent</artifactId>
-        <version>5.7.0-SNAPSHOT</version>
+        <version>5.9.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>hibernate-search-jsr352-cdi</artifactId>
@@ -32,6 +32,12 @@
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jberet</groupId>
+            <artifactId>jberet-core</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
