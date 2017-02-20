@@ -30,6 +30,7 @@
         <module>elasticsearch</module>
         <module>elasticsearch-aws</module>
         <module>orm</module>
+        <module>jsr352</module>
         <module>testing</module>
         <module>infinispan</module>
         <module>modules</module>
