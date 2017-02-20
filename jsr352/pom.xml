@@ -32,7 +32,6 @@
         <module>core</module>
         <module>cdi</module>
         <module>documentation</module>
-        <module>modules</module>
         <module>integrationtest/wildfly</module>
     </modules>
 
@@ -72,25 +71,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- HSearch JSR-352 modules -->
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-jsr352-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-jsr352-core</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-jsr352-cdi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- Java EE -->
             <dependency>
                 <groupId>javax.batch</groupId>

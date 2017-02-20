@@ -82,6 +82,14 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-backend-jgroups</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-jsr352-cdi</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
