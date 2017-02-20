@@ -1387,6 +1387,17 @@ The modules system in WildFly allows to safely run multiple versions of Hibernat
 Hibernate Search in parallel, but if you download an alternative version make sure the Hibernate Search version you choose
 is compatible with the Hibernate ORM version you choose.
 
+[WARNING]
+====
+This version of Hibernate Search `{hibernateSearchVersion}` requires an Hibernate ORM version `5.2.3.Final` or a later version
+of the 5.2 branch, such as `5.2.8.Final`.
+
+WildFly includes an older version of Hibernate ORM, so you will need to upgrade this dependency as well.
+The Hibernate ORM / WildFly update instructions can be found http://docs.jboss.org/hibernate/orm/5.2/topical/html_single/wildfly/Wildfly.html[here].
+
+Not least, as the same guide explains you might need to exclude the Javassist version.
+====
+
 [[using-wildfly-provided-hibernatesearch-versions]]
 ==== Use the Hibernate Search version included in WildFly
 
@@ -1436,16 +1447,6 @@ wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:{hibernateSearchVer
 
 See also link:https://docs.jboss.org/author/display/WFLY10/JPA+Reference+Guide#JPAReferenceGuide-UsingHibernateSearch[the WildFly JPA configuration]
 
-[WARNING]
-====
-This version of Hibernate Search `{hibernateSearchVersion}` requires Hibernate ORM 5.
-At the time of writing this paragraph the only version of WildFly compatible with Hibernate ORM 5 is WildFly version 10.
-
-If you need an Hibernate Search version for WildFly versions 9 or earlier, you can either include
-a version of Hibernate ORM 5 in custom modules, but this requires some expertise with the modules system;
-In such a scenario it might be easier to use a previous version of Hibernate Search, or simply use the
-Hibernate Search version included in each WildFly release (see <<using-wildfly-provided-hibernatesearch-versions>>).
-====
 
 ==== More about modules
 
@@ -1454,15 +1455,14 @@ link:https://docs.jboss.org/author/display/WFLY10/Class+Loading+in+WildFly[Class
 
 [TIP]
 ====
-Modular classloading is a feature of JBoss EAP 6 as well, but if you are using JBoss EAP, you're
+Modular classloading is a feature of JBoss EAP 7 as well, but if you are using JBoss EAP, you're
 reading the wrong version of the user guide! JBoss EAP subscriptions include official support for
 Hibernate Search and come with a different edition of this guide specifically tailored for EAP users.
+
+See the https://access.redhat.com/documentation/en/red-hat-jboss-enterprise-application-platform/7.0/paged/development-guide/chapter-14-hibernate-search[Chapter 14 of the Red Hat JBoss Enterprise Application Platform 7 Development Guide].
 ====
 
 ==== Using Infinispan with Hibernate Search on WildFly
-
-The Infinispan project is also included in WildFly so you can use the feature without
-additional downloads.
 
 If you are updating the version of Hibernate Search in WildFly as described in the previous paragraph,
 you might need to update Infinispan as well.
@@ -1475,6 +1475,6 @@ Hibernate Search version `{hibernateSearchVersion}` was compiled and tested with
 compatible for cross-project integration purposes as long as they have the same "major.minor" family
 version.
 
-For example for a version of Hibernate Search depending on Infinispan `7.0.3.Final` it should be
-safe to upgrade Infinispan to `7.0.6.Final`, but an upgrade to `7.1.0.Final` might not work.
+For example for a version of Hibernate Search depending on Infinispan `8.2.4.Final` it should be
+safe to upgrade Infinispan to `8.2.6.Final`, but an upgrade to `8.3.0.Final` might not work.
 
