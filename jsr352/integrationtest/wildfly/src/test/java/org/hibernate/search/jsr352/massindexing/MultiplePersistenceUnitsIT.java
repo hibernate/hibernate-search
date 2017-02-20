@@ -16,7 +16,6 @@ import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 
-import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
 import org.hibernate.search.jsr352.massindexing.test.common.Message;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.jboss.arquillian.container.test.api.Deployment;

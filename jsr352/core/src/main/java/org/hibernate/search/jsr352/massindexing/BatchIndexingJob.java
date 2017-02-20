@@ -23,9 +23,13 @@ import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
  *
  * @author Mincong Huang
  */
-public class BatchIndexingJob {
+public final class BatchIndexingJob {
 
 	public static final String JOB_NAME = "BatchIndexingJob";
+
+	private BatchIndexingJob() {
+		// Private constructor, do not use it.
+	}
 
 	public static Builder forEntity(Class<?> rootEntity) {
 		return new Builder( rootEntity );

@@ -126,7 +126,7 @@ public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegi
 			case CDI_SCOPE_NAME:
 				Instance<EntityManagerFactory> instance = entityManagerFactoryInstance.select( new NamedQualifier( reference ) );
 				if ( instance.isUnsatisfied() ) {
-					throw new SearchException( "No entity manager factory available in the CDI context with this bean name: '" + reference +"'."
+					throw new SearchException( "No entity manager factory available in the CDI context with this bean name: '" + reference + "'."
 							+ " Make sure your entity manager factory is a named bean." );
 				}
 				factory = instance.get();
