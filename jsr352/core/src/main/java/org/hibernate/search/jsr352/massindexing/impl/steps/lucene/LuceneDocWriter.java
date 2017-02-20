@@ -8,7 +8,7 @@ package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
 import java.io.Serializable;
 import java.util.List;
-
+import java.util.Set;
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.runtime.context.JobContext;
@@ -23,10 +23,13 @@ import org.hibernate.search.backend.impl.StreamingOperationExecutor;
 import org.hibernate.search.backend.impl.StreamingOperationExecutorSelector;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
+
 import org.jboss.logging.Logger;
 
 /**
@@ -54,7 +57,8 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	private EntityManagerFactory emf;
 
 	private EntityManager em;
-	private EntityIndexBinding entityIndexBinding;
+
+	private IndexManagerSelector indexManagerSelector;
 
 	/**
 	 * The close method marks the end of use of the ItemWriter. This method is called when the job stops for any reason.
@@ -89,11 +93,13 @@ public class LuceneDocWriter extends AbstractItemWriter {
 		em = emf.createEntityManager();
 
 		Class<?> entityType = jobData.getIndexedType( entityName );
-		entityIndexBinding = Search
+		IndexedTypeIdentifier typeIdentifier = new PojoIndexedTypeIdentifier( entityType );
+		EntityIndexBinding entityIndexBinding = Search
 				.getFullTextEntityManager( em )
 				.getSearchFactory()
 				.unwrap( SearchIntegrator.class )
-				.getIndexBinding( entityType );
+				.getIndexBinding( typeIdentifier );
+		indexManagerSelector = entityIndexBinding.getIndexManagerSelector();
 	}
 
 	/**
@@ -104,21 +110,19 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	 */
 	@Override
 	public void writeItems(List<Object> items) throws Exception {
-		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-
 		for ( Object item : items ) {
 			AddLuceneWork addWork = (AddLuceneWork) item;
 			StreamingOperationExecutor executor = addWork.acceptIndexWorkVisitor(
 					StreamingOperationExecutorSelector.INSTANCE, null );
 			executor.performStreamOperation(
 					addWork,
-					shardingStrategy,
+					indexManagerSelector,
 					null, // monitor,
 					FORCE_ASYNC );
 		}
 
 		// flush after write operation
-		IndexManager[] indexManagers = entityIndexBinding.getIndexManagers();
+		Set<IndexManager> indexManagers = indexManagerSelector.all();
 		for ( IndexManager im : indexManagers ) {
 			im.performStreamOperation( FlushLuceneWork.INSTANCE, null, false );
 		}

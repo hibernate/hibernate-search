@@ -11,24 +11,22 @@ import java.io.Serializable;
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.runtime.context.JobContext;
-import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.SessionFactory;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
-import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.jboss.logging.Logger;
 
 /**
@@ -45,20 +43,16 @@ public class LuceneDocProducer implements ItemProcessor {
 	private JobContext jobContext;
 
 	@Inject
-	private StepContext stepContext;
-
-	@Inject
 	@BatchProperty
 	private String entityName;
 
 	private EntityManagerFactory emf;
 
-	private Session session;
 	private ExtendedSearchIntegrator searchIntegrator;
 	private EntityIndexBinding entityIndexBinding;
 	private DocumentBuilderIndexedEntity docBuilder;
 	private boolean isSetup = false;
-	private Class<?> entityType;
+	private IndexedTypeIdentifier entityTypeIdentifier;
 
 	@Override
 	public Object processItem(Object item) throws Exception {
@@ -67,7 +61,7 @@ public class LuceneDocProducer implements ItemProcessor {
 			setup();
 			isSetup = true;
 		}
-		AddLuceneWork addWork = buildAddLuceneWork( item, entityType );
+		AddLuceneWork addWork = buildAddLuceneWork( item );
 		return addWork;
 	}
 
@@ -78,27 +72,22 @@ public class LuceneDocProducer implements ItemProcessor {
 	 * @throws NamingException if JNDI lookup for entity manager failed
 	 */
 	private void setup() throws ClassNotFoundException, NamingException {
-
-		entityType = ( (JobContextData) jobContext.getTransientUserData() )
-				.getIndexedType( entityName );
-		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
-		session = partitionData.getSession();
-		searchIntegrator = ContextHelper.getSearchIntegrator( session );
-		entityIndexBinding = searchIntegrator.getIndexBindings().get( entityType );
+		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
+		Class<?> entityType = jobContextData.getIndexedType( entityName );
+		entityTypeIdentifier = new PojoIndexedTypeIdentifier( entityType );
+		emf = jobContextData.getEntityManagerFactory();
+		searchIntegrator = ContextHelper.getSearchIntegratorBySF( emf.unwrap( SessionFactory.class ) );
+		entityIndexBinding = searchIntegrator.getIndexBindings().get( entityTypeIdentifier );
 		docBuilder = entityIndexBinding.getDocumentBuilder();
-
-		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-		emf = jobData.getEntityManagerFactory();
 	}
 
 	/**
 	 * Build addLuceneWork using input entity. This method is inspired by the current mass indexer implementation.
 	 *
 	 * @param entity selected entity, obtained from JPA entity manager. It is used to build Lucene work.
-	 * @param entityType the class type of selected entity
 	 * @return an addLuceneWork
 	 */
-	private AddLuceneWork buildAddLuceneWork(Object entity, Class<?> entityType) {
+	private AddLuceneWork buildAddLuceneWork(Object entity) {
 		// TODO: tenant ID should not be null
 		// Or may it be fine to be null? Gunnar's integration test in Hibernate
 		// Search: MassIndexingTimeoutIT does not mention the tenant ID neither
@@ -106,8 +95,6 @@ public class LuceneDocProducer implements ItemProcessor {
 		// ConcertManager)
 		String tenantId = null;
 		ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
-		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
-				(SessionImplementor) session );
 
 		Serializable id = (Serializable) emf.getPersistenceUnitUtil()
 				.getIdentifier( entity );
@@ -116,7 +103,7 @@ public class LuceneDocProducer implements ItemProcessor {
 		String idInString = null;
 		try {
 			idInString = conversionContext
-					.setClass( entityType )
+					.setConvertedTypeId( entityTypeIdentifier )
 					.twoWayConversionContext( idBridge )
 					.objectToString( id );
 			LOGGER.debugf( "idInString=%s", idInString );
@@ -126,11 +113,17 @@ public class LuceneDocProducer implements ItemProcessor {
 		}
 		AddLuceneWork addWork = docBuilder.createAddWork(
 				tenantId,
-				entityType,
+				entityTypeIdentifier,
 				entity,
 				id,
 				idInString,
-				sessionInitializer,
+				/*
+				 * Use the default instance initializer (likely HibernateStatelessInitializer),
+				 * because we don't need the fancy features provided by HibernateSessionLoadingInitializer:
+				 * in our case, we never mix entities from different sessions, since
+				 * each partition uses its own session.
+				 */
+				null,
 				conversionContext );
 		return addWork;
 	}
