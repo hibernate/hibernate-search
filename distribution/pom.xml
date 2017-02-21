@@ -101,6 +101,7 @@
                         ${basedir}/../serialization/avro/src/main/java;
                         ${basedir}/../backends/jgroups/src/main/java;
                         ${basedir}/../backends/jms/src/main/java;
+                        ${basedir}/../elasticsearch/src/main/java;
                     </sourcepath>
                     <docfilessubdirs>true</docfilessubdirs>
                     <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
