@@ -26,6 +26,7 @@ public final class ElasticsearchEnvironment {
 		public static final int MAX_TOTAL_CONNECTION_PER_ROUTE = 2;
 		public static final boolean DISCOVERY_ENABLED = false;
 		public static final long DISCOVERY_REFRESH_INTERVAL = 10L;
+		public static final String DISCOVERY_SCHEME = "http";
 		public static final IndexSchemaManagementStrategy INDEX_SCHEMA_MANAGEMENT_STRATEGY = IndexSchemaManagementStrategy.CREATE;
 		public static final int INDEX_MANAGEMENT_WAIT_TIMEOUT = 10_000;
 		public static final ElasticsearchIndexStatus REQUIRED_INDEX_STATUS = ElasticsearchIndexStatus.GREEN;
@@ -154,6 +155,19 @@ public final class ElasticsearchEnvironment {
 	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String DISCOVERY_REFRESH_INTERVAL = "elasticsearch.discovery.refresh_interval";
+
+	/**
+	 * Property for specifying the default scheme to use when connecting to automatically discovered nodes.
+	 * <p>
+	 * Either "http" or "https" is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#DISCOVERY_SCHEME}.
+	 * <p>
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.discovery.scheme}).
+	 * This limitation will be removed in a future version of Hibernate Search.
+	 */
+	public static final String DISCOVERY_SCHEME = "elasticsearch.discovery.default_scheme";
 
 	/**
 	 * Property for specifying the strategy for maintaining the Elasticsearch index.
