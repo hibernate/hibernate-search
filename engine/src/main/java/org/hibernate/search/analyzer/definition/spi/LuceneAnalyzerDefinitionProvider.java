@@ -18,7 +18,9 @@ import org.hibernate.search.cfg.Environment;
  * or a public static method annotated with {@link Factory}.
  * <p>
  * Users can select a definition provider through the
- * {@link Environment#ANALYZER_DEFINITION_PROVIDER configuration properties}.
+ * {@link Environment#ANALYZER_DEFINITION_PROVIDER configuration properties}, while
+ * framework integrators also have the option to inject an alternative implementation
+ * of a {@link LuceneAnalyzerDefinitionSourceService}.
  *
  * @author Yoann Rodiere
  */

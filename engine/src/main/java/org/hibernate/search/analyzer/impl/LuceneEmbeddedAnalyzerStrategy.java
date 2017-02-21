@@ -20,17 +20,18 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 import org.hibernate.search.analyzer.definition.impl.LuceneAnalyzerDefinitionRegistryBuilderImpl;
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionProvider;
+import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
-import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -79,30 +80,27 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	private Map<String, AnalyzerDef> createDefaultAnalyzerDefinitions() {
+		final LuceneAnalyzerDefinitionProvider definitionsProvider = getLuceneAnalyzerDefinitionProvider();
 		LuceneAnalyzerDefinitionRegistryBuilderImpl builder = new LuceneAnalyzerDefinitionRegistryBuilderImpl();
-
-		String providerClassName = cfg.getProperty( Environment.ANALYZER_DEFINITION_PROVIDER );
-		if ( providerClassName != null ) {
-			LuceneAnalyzerDefinitionProvider provider;
+		if ( definitionsProvider != null ) {
 			try {
-				Class<?> providerClazz = ClassLoaderHelper.classForName( providerClassName, serviceManager );
-				provider = (LuceneAnalyzerDefinitionProvider) ReflectionHelper.createInstance( providerClazz, true );
-			}
-			catch (RuntimeException e) {
-				throw log.invalidLuceneAnalyzerDefinitionProvider( providerClassName, e );
-			}
-			try {
-				provider.register( builder );
+				definitionsProvider.register( builder );
 			}
 			catch (SearchException e) { // Do not wrap our own exceptions (from the builder, for instance)
 				throw e;
 			}
 			catch (RuntimeException e) { // Do wrap any other exception
-				throw log.invalidLuceneAnalyzerDefinitionProvider( providerClassName, e );
+				throw log.invalidLuceneAnalyzerDefinitionProvider( definitionsProvider.getClass().getName(), e );
 			}
 		}
-
 		return builder.build();
+	}
+
+	private LuceneAnalyzerDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
+		// Uses a Service so that integrators can inject alternative Lucene Analyzer definition providers
+		try ( ServiceReference<LuceneAnalyzerDefinitionSourceService> serviceRef = serviceManager.requestReference( LuceneAnalyzerDefinitionSourceService.class ) ) {
+			return serviceRef.get().getLuceneAnalyzerDefinitionProvider();
+		}
 	}
 
 	@SuppressWarnings("unchecked")

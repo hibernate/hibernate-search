@@ -21,6 +21,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionRegistryBuilder;
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionProvider;
+import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -83,6 +84,26 @@ public class LuceneAnalyzerDefinitionProviderTest {
 	}
 
 	@Test
+	public void usingServiceOverride() {
+		ExtendedSearchIntegrator integrator = initUsingService( new CustomAnalyzerProvider(), CustomAnalyzerEntity.class );
+
+		assertThat( integrator.getAnalyzer( CUSTOM_ANALYZER_NAME ) )
+				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
+		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
+				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
+		CustomAnalyzerEntity entity = new CustomAnalyzerEntity();
+		entity.id = 0;
+		entity.field = "charFilterShouldReplace|foo";
+		index( integrator, entity );
+		assertMatchesExactly( integrator, entity, "field", "charfilterdidreplace" );
+	}
+
+	@Test
 	public void override() {
 		ExtendedSearchIntegrator integrator = init( CustomAnalyzerProvider.class, AnalyzerDefAnnotationEntity.class );
 
@@ -100,30 +121,6 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		entity.field = "charFilterShouldReplace|foo";
 		index( integrator, entity );
 		assertMatchesExactly( integrator, entity, "field", "charFilterShouldReplace|foo" );
-	}
-
-	@Test
-	public void searchFactoryIncrement() {
-		MutatingProviderFactory.provider = new CustomAnalyzerProvider();
-		ExtendedSearchIntegrator integrator = init( MutatingProviderFactory.class, CustomAnalyzerEntity.class );
-
-		MutatingProviderFactory.provider = new CustomAnalyzer2Provider();
-		integrator.addClasses( CustomAnalyzer2Entity.class );
-
-		assertThat( integrator.getAnalyzer( CUSTOM_ANALYZER_2_NAME ) )
-				.as( "Analyzer for '" + CUSTOM_ANALYZER_2_NAME + "' fetched from the integrator" )
-				.isNotNull();
-
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
-						.getAnalyzerReference( CUSTOM_ANALYZER_2_NAME ) )
-				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_2_NAME + "' fetched from the integrator" )
-				.isNotNull();
-
-		CustomAnalyzer2Entity entity = new CustomAnalyzer2Entity();
-		entity.id = 0;
-		entity.field = "foo bar";
-		index( integrator, entity );
-		assertMatchesExactly( integrator, entity, "field", "foo" );
 	}
 
 	/**
@@ -171,6 +168,23 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		thrown.expectMessage( "HSEARCH000330" );
 
 		init( ProviderWithInternalNamingConflict.class, CustomAnalyzerEntity.class );
+	}
+
+	private ExtendedSearchIntegrator initUsingService(LuceneAnalyzerDefinitionProvider analyzerProvider, Class<?> ... entityClasses) {
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		for ( Class<?> entityClass : entityClasses ) {
+			cfg.addClass( entityClass );
+		}
+		cfg.getProvidedServices().put( LuceneAnalyzerDefinitionSourceService.class, new LuceneAnalyzerDefinitionSourceService() {
+
+					@Override
+					public LuceneAnalyzerDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
+						return analyzerProvider;
+					}
+
+				});
+		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator()
+				.unwrap( ExtendedSearchIntegrator.class );
 	}
 
 	private ExtendedSearchIntegrator init(Class<?> providerClass, Class<?> ... entityClasses) {
@@ -285,14 +299,6 @@ public class LuceneAnalyzerDefinitionProviderTest {
 			builder
 					.analyzer( CUSTOM_ANALYZER_2_NAME )
 							.tokenizer( WhitespaceTokenizerFactory.class );
-		}
-	}
-
-	public static class MutatingProviderFactory {
-		private static LuceneAnalyzerDefinitionProvider provider;
-		@Factory
-		public static LuceneAnalyzerDefinitionProvider create() {
-			return provider;
 		}
 	}
 
