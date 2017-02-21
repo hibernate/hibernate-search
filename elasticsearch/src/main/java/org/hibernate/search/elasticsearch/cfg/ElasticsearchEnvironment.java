@@ -166,7 +166,7 @@ public final class ElasticsearchEnvironment {
 	 * Defaults to {@link Defaults#DISCOVERY_SCHEME}.
 	 * <p>
 	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
-	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.discovery.scheme}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.discovery.default_scheme}).
 	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String DISCOVERY_SCHEME = "elasticsearch.discovery.default_scheme";
