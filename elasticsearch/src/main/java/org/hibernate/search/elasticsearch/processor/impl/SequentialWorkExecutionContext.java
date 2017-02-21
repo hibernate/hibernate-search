@@ -13,12 +13,12 @@ import java.util.Set;
 
 import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
-import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -36,7 +36,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private final RestClient client;
 
-	private final ElasticsearchWorkFactory workFactory;
+	private final ElasticsearchDialect dialect;
 
 	private final ElasticsearchWorkProcessor workProcessor;
 
@@ -53,11 +53,11 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 	private final Set<String> dirtyIndexes = new HashSet<>();
 
 	public SequentialWorkExecutionContext(RestClient client,
-			ElasticsearchWorkFactory workFactory, ElasticsearchWorkProcessor workProcessor,
+			ElasticsearchDialect dialect, ElasticsearchWorkProcessor workProcessor,
 			GsonService gsonService, ErrorHandler errorHandler) {
 		super();
 		this.client = client;
-		this.workFactory = workFactory;
+		this.dialect = dialect;
 		this.workProcessor = workProcessor;
 		this.gsonService = gsonService;
 		this.errorHandler = errorHandler;
@@ -107,7 +107,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 			log.tracef( "Refreshing index(es) %s", dirtyIndexes );
 		}
 
-		RefreshWorkBuilder builder = workFactory.refresh();
+		RefreshWorkBuilder builder = dialect.getWorkFactory().refresh();
 		for ( String index : dirtyIndexes ) {
 			builder.index( index );
 		}

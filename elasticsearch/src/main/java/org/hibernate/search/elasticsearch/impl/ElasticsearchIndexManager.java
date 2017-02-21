@@ -25,6 +25,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
+import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
@@ -37,7 +38,6 @@ import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -149,12 +149,12 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 		this.similarity = similarity;
 
-		ElasticsearchWorkFactory workFactory = serviceManager.requestService( ElasticsearchWorkFactory.class );
+		ElasticsearchDialectProvider dialectProvider = serviceManager.requestService( ElasticsearchDialectProvider.class );
 		this.visitor = new ElasticsearchIndexWorkVisitor(
 				this.actualIndexName,
 				this.refreshAfterWrite,
 				context.getUninitializedSearchIntegrator(),
-				workFactory
+				dialectProvider.getDialect().getWorkFactory()
 		);
 		this.requestProcessor = context.getServiceManager().requestService( ElasticsearchWorkProcessor.class );
 	}
@@ -222,7 +222,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		}
 
 		visitor = null;
-		serviceManager.releaseService( ElasticsearchWorkFactory.class );
+		serviceManager.releaseService( ElasticsearchDialectProvider.class );
 
 		requestProcessor = null;
 		serviceManager.releaseService( ElasticsearchWorkProcessor.class );

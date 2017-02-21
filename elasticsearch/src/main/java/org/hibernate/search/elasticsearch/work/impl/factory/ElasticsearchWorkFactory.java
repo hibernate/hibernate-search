@@ -33,14 +33,13 @@ import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.ScrollWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.WaitForIndexStatusWorkBuilder;
-import org.hibernate.search.engine.service.spi.Service;
 
 import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchWorkFactory extends Service {
+public interface ElasticsearchWorkFactory {
 
 	IndexWorkBuilder index(String indexName, String typeName, String id, JsonObject document);
 

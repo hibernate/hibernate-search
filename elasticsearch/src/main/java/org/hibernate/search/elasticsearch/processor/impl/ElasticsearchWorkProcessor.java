@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchService;
+import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
+import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectProvider;
 import org.hibernate.search.elasticsearch.impl.GsonService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
@@ -24,7 +26,6 @@ import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
-import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
@@ -60,7 +61,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	private ElasticsearchService elasticsearchService;
 	private GsonService gsonService;
 	private ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
-	private ElasticsearchWorkFactory workFactory;
+	private ElasticsearchDialect dialect;
 
 	public ElasticsearchWorkProcessor() {
 		asyncProcessor = new AsyncBackendRequestProcessor();
@@ -74,7 +75,8 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 		this.gsonService = serviceManager.requestService( GsonService.class );
 		this.parallelWorkExecutionContext =
 				new ParallelWorkExecutionContext( elasticsearchService.getClient(), gsonService );
-		this.workFactory = serviceManager.requestService( ElasticsearchWorkFactory.class );
+		ElasticsearchDialectProvider dialectProvider = serviceManager.requestService( ElasticsearchDialectProvider.class );
+		this.dialect = dialectProvider.getDialect();
 	}
 
 	@Override
@@ -82,8 +84,8 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 		awaitAsyncProcessingCompletion();
 		asyncProcessor.shutdown();
 
-		workFactory = null;
-		serviceManager.releaseService( ElasticsearchWorkFactory.class );
+		dialect = null;
+		serviceManager.releaseService( ElasticsearchDialectProvider.class );
 		gsonService = null;
 		serviceManager.releaseService( GsonService.class );
 		elasticsearchService = null;
@@ -127,7 +129,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	private void executeSafely(Iterable<ElasticsearchWork<?>> requests) {
 		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
 				elasticsearchService.getClient(),
-				workFactory, this, gsonService, errorHandler );
+				dialect, this, gsonService, errorHandler );
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
 			executeSafely( work, context );
@@ -305,7 +307,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 		private void processAsyncWork() {
 			SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
 					elasticsearchService.getClient(),
-					workFactory, ElasticsearchWorkProcessor.this, gsonService, errorHandler );
+					dialect, ElasticsearchWorkProcessor.this, gsonService, errorHandler );
 			synchronized ( asyncProcessor ) {
 				while ( true ) {
 					Iterable<ElasticsearchWork<?>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();
@@ -360,7 +362,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 				result.add( work );
 			}
 			else {
-				result.add( workFactory.bulk( bulkInProgress ).refresh( refreshInBulkAPICall ).build() );
+				result.add( dialect.getWorkFactory().bulk( bulkInProgress ).refresh( refreshInBulkAPICall ).build() );
 			}
 			bulkInProgress.clear();
 		}

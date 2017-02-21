@@ -39,6 +39,7 @@ import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectProvider;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
@@ -49,7 +50,6 @@ import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ExplainResult;
 import org.hibernate.search.elasticsearch.work.impl.SearchResult;
 import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
-import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
@@ -203,8 +203,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				.get( documentId )
 				.getAsJsonObject();
 
-		try ( ServiceReference<ElasticsearchWorkFactory> factory =
-						getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkFactory.class );
+		try ( ServiceReference<ElasticsearchDialectProvider> dialectProvider =
+						getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchDialectProvider.class );
 				ServiceReference<ElasticsearchWorkProcessor> processor =
 						getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
 			/*
@@ -215,7 +215,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					.add( "query", searcher.payload.get( "query" ) )
 					.build();
 
-			ElasticsearchWork<ExplainResult> work = factory.get().explain(
+			ElasticsearchWork<ExplainResult> work = dialectProvider.get().getDialect().getWorkFactory().explain(
 					hit.get( "_index" ).getAsString(),
 					hit.get( "_type" ).getAsString(),
 					hit.get( "_id" ).getAsString(),
@@ -667,11 +667,12 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private SearchResult search(boolean enableScrolling) {
-			try ( ServiceReference<ElasticsearchWorkFactory> factory =
-							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkFactory.class );
+			try ( ServiceReference<ElasticsearchDialectProvider> dialectProvider =
+							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchDialectProvider.class );
 					ServiceReference<ElasticsearchWorkProcessor> processor =
 							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
-				SearchWorkBuilder builder = factory.get().search( payload ).indexes( indexNames );
+				SearchWorkBuilder builder = dialectProvider.get().getDialect().getWorkFactory()
+						.search( payload ).indexes( indexNames );
 
 				if ( enableScrolling ) {
 					/*
@@ -733,21 +734,23 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		 * Scroll through search results, using a previously obtained scrollId.
 		 */
 		SearchResult scroll(String scrollId) {
-			try ( ServiceReference<ElasticsearchWorkFactory> factory =
-							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkFactory.class );
+			try ( ServiceReference<ElasticsearchDialectProvider> dialectProvider =
+							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchDialectProvider.class );
 					ServiceReference<ElasticsearchWorkProcessor> processor =
 							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
-				ElasticsearchWork<SearchResult> work = factory.get().scroll( scrollId, getScrollTimeout() ).build();
+				ElasticsearchWork<SearchResult> work = dialectProvider.get().getDialect().getWorkFactory()
+						.scroll( scrollId, getScrollTimeout() ).build();
 				return processor.get().executeSyncUnsafe( work );
 			}
 		}
 
 		void clearScroll(String scrollId) {
-			try ( ServiceReference<ElasticsearchWorkFactory> factory =
-							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkFactory.class );
+			try ( ServiceReference<ElasticsearchDialectProvider> dialectProvider =
+							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchDialectProvider.class );
 					ServiceReference<ElasticsearchWorkProcessor> processor =
 							getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchWorkProcessor.class ) ) {
-				ElasticsearchWork<?> work = factory.get().clearScroll( scrollId ).build();
+				ElasticsearchWork<?> work = dialectProvider.get().getDialect().getWorkFactory()
+						.clearScroll( scrollId ).build();
 				processor.get().executeSyncUnsafe( work );
 			}
 		}

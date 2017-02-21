@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
@@ -36,6 +37,8 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	private ServiceManager serviceManager;
 
+	private ElasticsearchDialectProvider dialectProvider;
+
 	private ElasticsearchWorkFactory workFactory;
 
 	private ElasticsearchWorkProcessor workProcessor;
@@ -43,7 +46,8 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
-		workFactory = serviceManager.requestService( ElasticsearchWorkFactory.class );
+		dialectProvider = serviceManager.requestService( ElasticsearchDialectProvider.class );
+		workFactory = dialectProvider.getDialect().getWorkFactory();
 		workProcessor = serviceManager.requestService( ElasticsearchWorkProcessor.class );
 	}
 
@@ -52,7 +56,8 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 		workProcessor = null;
 		serviceManager.releaseService( ElasticsearchWorkProcessor.class );
 		workFactory = null;
-		serviceManager.releaseService( ElasticsearchWorkFactory.class );
+		dialectProvider = null;
+		serviceManager.releaseService( ElasticsearchDialectProvider.class );
 		serviceManager = null;
 	}
 

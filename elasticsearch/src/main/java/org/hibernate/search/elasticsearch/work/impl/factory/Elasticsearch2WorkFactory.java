@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.work.impl.factory.impl;
+package org.hibernate.search.elasticsearch.work.impl.factory;
 
 import java.util.List;
 import java.util.Properties;
@@ -44,8 +44,8 @@ import org.hibernate.search.elasticsearch.work.impl.builder.DeleteWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.DropIndexWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.ExplainWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.FlushWorkBuilder;
-import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexTypeMappingsWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexSettingsWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexTypeMappingsWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.IndexExistsWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.IndexWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.OpenIndexWorkBuilder;
@@ -56,10 +56,7 @@ import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.ScrollWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.WaitForIndexStatusWorkBuilder;
-import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
 
 import com.google.gson.JsonObject;
@@ -67,20 +64,20 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchWorkFactoryImpl implements ElasticsearchWorkFactory, Startable, Stoppable {
+public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactoryImplementor {
 
 	private ServiceManager serviceManager;
 
 	private GsonService gsonService;
 
 	@Override
-	public void start(Properties properties, BuildContext context) {
+	public void init(Properties properties, BuildContext context) {
 		this.serviceManager = context.getServiceManager();
 		this.gsonService = serviceManager.requestService( GsonService.class );
 	}
 
 	@Override
-	public void stop() {
+	public void close() {
 		this.gsonService = null;
 		this.serviceManager.releaseService( GsonService.class );
 
