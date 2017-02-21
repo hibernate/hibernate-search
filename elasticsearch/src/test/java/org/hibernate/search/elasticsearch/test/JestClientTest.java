@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -15,6 +16,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import org.eclipse.jetty.http.HttpHeader;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.JestClient;
+import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
@@ -24,7 +26,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.google.gson.JsonObject;
 
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
@@ -143,6 +147,51 @@ public class JestClientTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2449")
+	public void discovery() throws Exception {
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.DISCOVERY_ENABLED, "true" )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.DISCOVERY_REFRESH_INTERVAL, "1" );
+
+		String nodesInfoResult = dummyNodeInfoResponse( PORT_1, PORT_2 );
+
+		wireMockRule1.stubFor( get( WireMock.urlMatching( "/_nodes.*" ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ).withBody( nodesInfoResult ) ) );
+		wireMockRule2.stubFor( get( WireMock.urlMatching( "/_nodes.*" ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ).withBody( nodesInfoResult ) ) );
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+
+		try {
+			jestClient.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
+
+			Index request = new Index.Builder( payload ).index( "myIndex" ).type( "myType" ).build();
+			DocumentResult result = jestClient.executeRequest( request );
+			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
+
+			Thread.sleep( 2000 ); // Wait for the refresh to occur
+
+			result = jestClient.executeRequest( request );
+			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
+			result = jestClient.executeRequest( request );
+			assertThat( result.isSucceeded() ).as( "isSucceeded" ).isTrue();
+
+			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+		}
+		finally {
+			jestClient.stop();
+		}
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	public void authentication() {
 		String username = "ironman";
@@ -237,6 +286,32 @@ public class JestClientTest {
 
 	private static ResponseDefinitionBuilder elasticsearchResponse() {
 		return ResponseDefinitionBuilder.okForEmptyJson();
+	}
+
+	private String dummyNodeInfoResponse(int... ports) {
+		JsonBuilder.Object nodesBuilder = JsonBuilder.object();
+		int index = 1;
+		for ( int port : ports ) {
+			nodesBuilder.add( "hJLXmY_NTrCytiIMbX4_" + index + "g", dummyNodeInfo( port ) );
+			++index;
+		}
+
+		return JsonBuilder.object()
+				.addProperty( "cluster_name", "foo-cluster.local" )
+				.add( "nodes", nodesBuilder.build() )
+				.build()
+				.toString();
+	}
+
+	private JsonObject dummyNodeInfo(int port) {
+		return JsonBuilder.object()
+				.addProperty( "name", "nodeForPort" + port )
+				.addProperty( "transport_address", "inet[/localhost:" + (port + 100) + "]" )
+				.addProperty( "hostname", "localhost" )
+				.addProperty( "version", "2.4.4" )
+				.addProperty( "http_address", "inet[/localhost:" + port + "]" )
+				.add( "plugins", JsonBuilder.array().build() )
+				.build();
 	}
 
 }
