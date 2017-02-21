@@ -121,6 +121,11 @@ public class JestClient implements Service, Startable, Stoppable {
 						),
 						TimeUnit.SECONDS
 				)
+				.defaultSchemeForDiscoveredNodes( ConfigurationParseHelper.getString(
+						properties,
+						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.DISCOVERY_SCHEME,
+						ElasticsearchEnvironment.Defaults.DISCOVERY_SCHEME
+				) )
 				.gson( gsonService.getGson() );
 
 		String username = ConfigurationParseHelper.getString(
