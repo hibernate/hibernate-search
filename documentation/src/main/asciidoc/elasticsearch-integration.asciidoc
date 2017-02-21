@@ -186,6 +186,9 @@ and will remove them from the server list if they don't.
 Time interval between two executions of the automatic discovery (in seconds):: `hibernate.search.default.elasticsearch.discovery.refresh_interval 10` (default)
 +
 This setting will only be taken into account if automatic discovery is enabled (see above).
+Scheme to use when connecting to automatically discovered nodes (`http` or `https`):: `hibernate.search.default.elasticsearch.discovery.scheme http` (default)
++
+This setting will only be taken into account if automatic discovery is enabled (see above).
 Maximum time to wait for the indexes to become available before failing (in ms):: `hibernate.search.default.elasticsearch.index_management_wait_timeout 10000` (default)
 +
 This setting is ignored when the `NONE` strategy is selected, since the index will not be checked on startup (see above).
@@ -215,7 +218,7 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`
 
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
-Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled` and `discovery.refresh_interval`.
+Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled`, `discovery.refresh_interval` and `discovery.scheme`.
 --
 
 === Mapping and indexing
