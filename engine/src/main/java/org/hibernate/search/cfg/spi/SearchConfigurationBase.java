@@ -60,4 +60,10 @@ public abstract class SearchConfigurationBase implements SearchConfiguration {
 	public boolean isMultitenancyEnabled() {
 		return false;
 	}
+
+	@Override
+	public boolean isJPAAnnotationsProcessingEnabled() {
+		return false;
+	}
+
 }

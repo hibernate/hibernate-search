@@ -9,9 +9,9 @@ package org.hibernate.search.test.jmx;
 import java.nio.file.Path;
 
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class MutableSearchFactoryAndJMXTest {
 	public void testRebuildFactory() {
 		Path jndiStorage = SimpleJNDIHelper.makeTestingJndiDirectory( MutableSearchFactoryAndJMXTest.class );
 
-		SearchConfigurationForTest configuration = new HibernateManualConfiguration()
+		SearchConfiguration configuration = new HibernateManualConfiguration()
 				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
 				.addProperty( Environment.JMX_ENABLED, "true" );
 		SimpleJNDIHelper.enableSimpleJndi( configuration, jndiStorage );

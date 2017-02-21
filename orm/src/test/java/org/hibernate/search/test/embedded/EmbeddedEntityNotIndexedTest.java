@@ -21,9 +21,9 @@ import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
+import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,7 +40,7 @@ public class EmbeddedEntityNotIndexedTest {
 
 	@Before
 	public void setUp() {
-		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
+		SearchConfiguration searchConfiguration = new HibernateManualConfiguration();
 		ConfigContext configContext = new ConfigContext(
 				searchConfiguration,
 				new BuildContextForTest( searchConfiguration )

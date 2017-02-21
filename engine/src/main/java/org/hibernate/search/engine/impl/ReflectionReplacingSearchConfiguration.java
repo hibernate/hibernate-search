@@ -13,18 +13,17 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
- * Wraps another SearchConfiguration to override it's ReflectionManager
+ * Wraps another SearchConfiguration to override its ReflectionManager
  *
  * @author Sanne Grinovero
  * @since 4.1
  */
-public final class ReflectionReplacingSearchConfiguration extends SearchConfigurationBase {
+public final class ReflectionReplacingSearchConfiguration implements SearchConfiguration {
 
 	private final ReflectionManager reflectionManager;
 	private final SearchConfiguration searchConfiguration;
@@ -105,5 +104,15 @@ public final class ReflectionReplacingSearchConfiguration extends SearchConfigur
 	@Override
 	public ClassLoaderService getClassLoaderService() {
 		return searchConfiguration.getClassLoaderService();
+	}
+
+	@Override
+	public boolean isMultitenancyEnabled() {
+		return searchConfiguration.isMultitenancyEnabled();
+	}
+
+	@Override
+	public boolean isJPAAnnotationsProcessingEnabled() {
+		return searchConfiguration.isJPAAnnotationsProcessingEnabled();
 	}
 }

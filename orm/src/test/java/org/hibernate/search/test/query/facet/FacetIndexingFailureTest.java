@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 @Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 public class FacetIndexingFailureTest {
 	@Rule
-	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Car.class );
+	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Car.class ).enableJPAAnnotationsProcessing( true );
 
 
 	@Test

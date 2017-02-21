@@ -194,4 +194,9 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		return props;
 	}
 
+	@Override
+	public boolean isJPAAnnotationsProcessingEnabled() {
+		return true;
+	}
+
 }

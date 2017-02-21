@@ -40,13 +40,15 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	private boolean idProvidedImplicit = false;
 	private boolean multitenancyEnabled = false;
 	private ClassLoaderService classLoaderService;
+	private boolean enableJPAAnnotationsProcessing;
 
 	public SearchConfigurationForTest() {
-		this( DefaultInstanceInitializer.DEFAULT_INITIALIZER );
+		this( DefaultInstanceInitializer.DEFAULT_INITIALIZER, false );
 	}
 
-	public SearchConfigurationForTest(InstanceInitializer init) {
+	public SearchConfigurationForTest(InstanceInitializer init, boolean expectsJPAAnnotations) {
 		this.initializer = init;
+		this.enableJPAAnnotationsProcessing = expectsJPAAnnotations;
 		this.classes = new HashMap<String, Class<?>>();
 		this.properties = TestDefaults.getProperties();
 		this.providedServices = new HashMap<Class<? extends Service>, Object>();
@@ -169,4 +171,14 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	public void setClassLoaderService(ClassLoaderService classLoaderService) {
 		this.classLoaderService = classLoaderService;
 	}
+
+	@Override
+	public boolean isJPAAnnotationsProcessingEnabled() {
+		return enableJPAAnnotationsProcessing;
+	}
+
+	public void setEnableJPAAnnotationsPRocessing(boolean enableJPAAnnotationsProcessing) {
+		this.enableJPAAnnotationsProcessing = enableJPAAnnotationsProcessing;
+	}
+
 }
