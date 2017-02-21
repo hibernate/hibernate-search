@@ -23,12 +23,12 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
 /**
@@ -73,7 +73,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 
 	@Test(expected = SearchException.class)
 	public void testAgainstInfiniteTypeLoop() throws Exception {
-		final SearchConfigurationForTest configuration = new HibernateManualConfiguration()
+		final SearchConfiguration configuration = new HibernateManualConfiguration()
 				.addClass( BrokenMammal.class );
 		try {
 			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();

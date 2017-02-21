@@ -25,9 +25,9 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.spi.DefaultInstanceInitializer;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
+import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
 /**
@@ -59,7 +59,7 @@ public class UnorderedIdScanTest {
 	}
 
 	private static void tryCreatingDocumentBuilder(XClass mappedXClass, ReflectionManager reflectionManager) {
-		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
+		SearchConfiguration searchConfiguration = new HibernateManualConfiguration();
 		ConfigContext context = new ConfigContext( searchConfiguration, new BuildContextForTest( searchConfiguration ) );
 		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, context );
 		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( mappedXClass ),

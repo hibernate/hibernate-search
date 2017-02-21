@@ -48,6 +48,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	private int numberOfSessionFactories = 1;
 	private boolean idProvidedImplicit = false;
 	private boolean multitenancyEnabled = false;
+	private boolean enableJPAAnnotationsProcessing = false;
 	private DefaultBatchBackend batchBackend;
 
 	public SearchFactoryHolder(Class<?>... entities) {
@@ -86,6 +87,7 @@ public class SearchFactoryHolder extends ExternalResource {
 		}
 		cfg.setIdProvidedImplicit( idProvidedImplicit );
 		cfg.setMultitenancyEnabled( multitenancyEnabled );
+		cfg.setEnableJPAAnnotationsProcessing( enableJPAAnnotationsProcessing );
 		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 	}
 
@@ -150,6 +152,16 @@ public class SearchFactoryHolder extends ExternalResource {
 			batchBackend = new DefaultBatchBackend( getSearchFactory(), null );
 		}
 		return batchBackend;
+	}
+
+	/**
+	 * The default for the tests in hibernate-search-engine is to not rely on JPA
+	 * specific annotations. These are typically used though when integrating
+	 * with Hibernate, so some tests might want to explicitly enable this.
+	 */
+	public SearchFactoryHolder enableJPAAnnotationsProcessing(boolean enableJPAAnnotationsProcessing) {
+		this.enableJPAAnnotationsProcessing = enableJPAAnnotationsProcessing;
+		return this;
 	}
 
 }

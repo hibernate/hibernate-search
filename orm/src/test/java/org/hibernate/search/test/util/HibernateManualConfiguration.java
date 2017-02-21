@@ -16,7 +16,7 @@ import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 public class HibernateManualConfiguration extends SearchConfigurationForTest implements SearchConfiguration {
 
 	public HibernateManualConfiguration() {
-		super( HibernateStatelessInitializer.INSTANCE );
+		super( HibernateStatelessInitializer.INSTANCE, true );
 	}
 
 }

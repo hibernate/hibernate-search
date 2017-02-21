@@ -37,7 +37,6 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -114,7 +113,7 @@ public final class ConfigContext {
 	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping,
 			Map<IndexManagerType, AnalyzerRegistry> previousAnalyzerRegistries) {
 		this.serviceManager = buildContext.getServiceManager();
-		this.jpaPresent = isPresent( "javax.persistence.Id" );
+		this.jpaPresent = searchConfiguration.isJPAAnnotationsProcessingEnabled();
 		this.nullToken = initNullToken( searchConfiguration );
 		this.implicitProvidedId = searchConfiguration.isIdProvidedImplicit();
 		this.searchMapping = searchMapping;
@@ -328,16 +327,6 @@ public final class ConfigContext {
 
 	public boolean isJpaPresent() {
 		return jpaPresent;
-	}
-
-	private boolean isPresent(String className) {
-		try {
-			ClassLoaderHelper.classForName( className, serviceManager );
-			return true;
-		}
-		catch (Exception e) {
-			return false;
-		}
 	}
 
 	/**

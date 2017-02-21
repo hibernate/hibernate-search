@@ -7,20 +7,15 @@
 
 package org.hibernate.search.test.bridge.provider;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Emmanuel Bernard
@@ -48,29 +43,6 @@ public class BridgeProviderTest extends SearchTestBase {
 		s.getTransaction().commit();
 
 		s.clear();
-
-		s.getTransaction().begin();
-		for ( Object o : s.createQuery( "from java.lang.Object o" ).list() ) {
-			s.delete( o );
-		}
-		s.getTransaction().commit();
-	}
-
-	@Test
-	public void testMultipleMatchingFieldBridges() throws Exception {
-		SearchConfiguration conf = new HibernateManualConfiguration()
-				.addClass( Theater.class )
-				.addClass( Chain.class );
-		boolean throwException = false;
-		try {
-			SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( conf ).buildSearchIntegrator();
-			searchIntegrator.close();
-		}
-		catch (SearchException e) {
-			assertThat( e.getMessage() ).contains( "TheaterBridgeProvider1" );
-			throwException = true;
-		}
-		assertThat( throwException ).isTrue();
 	}
 
 	@Override

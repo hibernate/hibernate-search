@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
@@ -130,4 +131,14 @@ public interface SearchConfiguration {
 	 * {@link org.hibernate.search.engine.service.spi.ServiceManager}
 	 */
 	ClassLoaderService getClassLoaderService();
+
+	/**
+	 * @return {@code true} if the Hibernate Search mapping should look for JPA annotations to affect the mapping.
+	 * Disable this if the JPA API is not available, or to ignore them.
+	 * Ignoring them implies to ignore, among others, the {@literal javax.persistence.Id} annotation, which
+	 * implies the primary identifiers will require explicit mapping over the "provided id" mechanism or
+	 * the use of {@link DocumentId}.
+	 */
+	boolean isJPAAnnotationsProcessingEnabled();
+
 }
