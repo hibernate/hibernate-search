@@ -20,7 +20,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * A simple implementation of {@link ElasticsearchAnalysisDefinitionRegistry}.
  * <p>
- * This class also provides access to the full name => definition maps.
+ * This class also provides access to the mapping from full names to definitions.
  *
  * @author Yoann Rodiere
  */
