@@ -26,7 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * point to a custom implementation of {@link org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionProvider}.
  *
  * Integrators which prefer to inject an alternative service by reference rather than setting a configuration
- * property can provide an alternative Service implementation by overriding {@link org.hibernate.search.cfg.spi.SearchConfiguration.getProvidedServices()}.
+ * property can provide an alternative Service implementation by overriding {@link org.hibernate.search.cfg.spi.SearchConfiguration#getProvidedServices}.
  *
  * @author Sanne Grinovero
  */
