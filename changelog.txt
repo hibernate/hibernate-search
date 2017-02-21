@@ -1,6 +1,24 @@
 Hibernate Search Changelog
 ==========================
 
+5.6.1.Final (21-02-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2593 Node discovery uses the HTTP (not HTTPS) scheme by default and isn't configurable
+    * HSEARCH-2590 ElasticsearchHSQueryImpl allocates too much memory for query results
+    * HSEARCH-2587 Sort DSL on embedded fields throws NPE
+    * HSEARCH-2569 The "delete-by-query" plugin requirement for Elasticsearch isn't clear
+
+** Improvement
+    * HSEARCH-2591 Upgrade to Apache Lucene 5.5.4
+    * HSEARCH-2572 Missing labels for cross references in documentation
+    * HSEARCH-2453 Add support for Elasticsearch authentication
+
+** Task
+    * HSEARCH-2573 Upgrade the Elasticsearch version used for tests to 2.4.4
+    * HSEARCH-2558 Remove obsolete entries from the "limitations" section of the Elasticsearch integration documentation 
+
 5.6.0.Final (22-01-2017)
 -------------------------
 
