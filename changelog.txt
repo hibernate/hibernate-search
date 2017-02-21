@@ -1,6 +1,49 @@
 Hibernate Search Changelog
 ==========================
 
+5.7.0.Final (21-02-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2593 Node discovery uses the HTTP (not HTTPS) scheme by default and isn't configurable
+    * HSEARCH-2590 ElasticsearchHSQueryImpl allocates too much memory for query results
+    * HSEARCH-2587 Sort DSL on embedded fields throws NPE
+    * HSEARCH-2569 The "delete-by-query" plugin requirement for Elasticsearch isn't clear
+
+** Improvement
+    * HSEARCH-2591 Upgrade to Apache Lucene 5.5.4
+    * HSEARCH-2588 Make byField(String) in the sort DSL automatically determine the sort type for metadata providing field bridges
+    * HSEARCH-2577 Separate the namespaces for Lucene and Elasticsearch analyzers
+    * HSEARCH-2576 FacetingManager should allocate maps lazily
+    * HSEARCH-2574 Java 8: Make the repeatable annotations actually Repeatable
+    * HSEARCH-2572 Missing labels for cross references in documentation
+    * HSEARCH-2568 IndexSchemaManagementStrategy#NONE throws an exception if index does not exist
+    * HSEARCH-2453 Add support for Elasticsearch authentication
+    * HSEARCH-2447 Make it easier to add sortable fields from custom field bridges
+
+** New Feature
+    * HSEARCH-2585 Allow injecting Analyzer definitions using a Service
+    * HSEARCH-2418 Allow registering Analyzer definitions at bootstrap via an extension point
+
+** Task
+    * HSEARCH-2597 Do not rely on automatic detection of JPA annotations from the classpath
+    * HSEARCH-2596 Point to the Hibernate ORM / WildFly modules documentation
+    * HSEARCH-2595 Upgrade to Hibernate ORM 5.2.8.Final
+    * HSEARCH-2580 Update of the "previous.stable" property following the 5.6.0.Final release
+    * HSEARCH-2578 Include the lucene-grouping artifact in the WildFly modules
+    * HSEARCH-2575 Update usage of deprecated options of Forbidden APIs code check
+    * HSEARCH-2573 Upgrade the Elasticsearch version used for tests to 2.4.4
+    * HSEARCH-2571 Upgrade the maven plugin dependencies
+    * HSEARCH-2570 Upgrade maven plugins to support Java 8 code
+    * HSEARCH-2564 Generic type signature of FullTextQuery should not be as flexible as the JPA Query
+    * HSEARCH-2563 Update some outdated information in the pom (CI and authors)
+    * HSEARCH-2562 Integrators can not use the AnalyzerDiscriminator to override analyzer mapping dynamically
+    * HSEARCH-2561 Allow sorting metadata to be overriden during query execution
+    * HSEARCH-2559 Switch to Asciidoctor output for the documentation
+    * HSEARCH-2558 Remove obsolete entries from the "limitations" section of the Elasticsearch integration documentation 
+    * HSEARCH-2381 Avoid logging warnings caused by internal usage of the legacy Criteria API
+    * HSEARCH-2141 Improve reliability of JGroups integration tests
+
 5.7.0.CR1 (22-01-2017)
 -------------------------
 
