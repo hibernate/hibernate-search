@@ -798,6 +798,13 @@ List results = query.list();
 ----
 ====
 
+[WARNING]
+====
+If you use the Sort DSL (like in the example above) to target fields indexed through *custom* ``FieldBridge``s,
+then those field bridges must implement <<metadata-providing-field-bridge,`MetadataProvidingFieldBridge`>>,
+so as to define the type of those fields and to mention that they are sortable.
+====
+
 Alternatively, you may build your sort using the Lucene `SortField` class directly. Then you will have to always specify the sort field type manually.
 
 .Sorting the results with a custom-built Lucene `Sort`
@@ -817,29 +824,6 @@ List results = query.list();
 ====
 Be aware that fields used for sorting must not be tokenized (see <<field-annotation>>). Also they should
 be marked as sortable field using the `@SortableField` annotation (see <<sortablefield-annotation>>).
-====
-
-
-[WARNING]
-====
-In the special case of numeric fields indexed through *custom* ``FieldBridge``s, you must provide the SortField type along with the field name.
-This does not apply to numeric fields using default field bridges.
-=====
-[source, JAVA]
------
-QueryBuilder builder = fullTextSession.getSearchFactory()
-    .buildQueryBuilder().forEntity(Book.class).get();
-Query luceneQuery = /* ... */;
-FullTextQuery query = s.createFullTextQuery(luceneQuery, Book.class);
-Sort sort = builder
-  .sort()
-    .byField("authorId", SortField.Type.LONG)//Defining Sort type
-    .andByField("title")
-  .createSort();
-query.setSort(sort);
-List results = query.list();
------
-=====
 ====
 
 ====== Handling missing values
