@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl.model;
 
-import org.hibernate.search.elasticsearch.util.impl.gson.AbstractConfiguredExtraPropertiesJsonAdapterFactory;
+import org.hibernate.search.elasticsearch.gson.impl.AbstractConfiguredExtraPropertiesJsonAdapterFactory;
 
 /**
  * @author Yoann Rodiere

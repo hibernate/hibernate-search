@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.elasticsearch.client.Response;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexTypeMappingsWorkBuilder;
 import org.hibernate.search.exception.AssertionFailure;
@@ -44,9 +44,9 @@ public class GetIndexTypeMappingsWork extends SimpleElasticsearchWork<Map<String
 		JsonElement mappings = index.getAsJsonObject().get( "mappings" );
 
 		if ( mappings != null ) {
-			GsonService gsonService = context.getGsonService();
+			GsonProvider gsonProvider = context.getGsonProvider();
 			Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
-			return gsonService.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType );
+			return gsonProvider.getGson().<Map<String, TypeMapping>>fromJson( mappings, mapType );
 		}
 		else {
 			return Collections.emptyMap();

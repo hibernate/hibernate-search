@@ -8,7 +8,7 @@ package org.hibernate.search.elasticsearch.settings.impl.model;
 
 import java.util.Map;
 
-import org.hibernate.search.elasticsearch.util.impl.gson.SerializeExtraProperties;
+import org.hibernate.search.elasticsearch.gson.impl.SerializeExtraProperties;
 
 import com.google.gson.JsonElement;
 

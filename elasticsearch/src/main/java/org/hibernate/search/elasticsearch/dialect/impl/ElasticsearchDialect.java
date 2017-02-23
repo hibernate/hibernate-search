@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl;
 
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 
 /**
@@ -15,6 +16,8 @@ import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFac
  * @author Yoann Rodiere
  */
 public interface ElasticsearchDialect {
+
+	GsonProvider getGsonProvider();
 
 	ElasticsearchWorkFactory getWorkFactory();
 

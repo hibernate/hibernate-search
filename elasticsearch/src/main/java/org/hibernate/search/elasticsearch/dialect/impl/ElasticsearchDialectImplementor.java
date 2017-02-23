@@ -6,16 +6,10 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl;
 
-import java.util.Properties;
-
-import org.hibernate.search.spi.BuildContext;
-
 /**
  * @author Yoann Rodiere
  */
 public interface ElasticsearchDialectImplementor extends ElasticsearchDialect, AutoCloseable {
-
-	void init(Properties properties, BuildContext context);
 
 	@Override
 	void close();

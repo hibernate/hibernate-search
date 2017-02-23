@@ -18,7 +18,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.elasticsearch.client.Response;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequest;
 
 import com.google.gson.Gson;
@@ -53,13 +53,13 @@ public class ElasticsearchClientUtils {
 		return new StringEntity( builder.toString(), JSON_CONTENT_TYPE );
 	}
 
-	public static JsonObject parseJsonResponse(GsonService gsonService, Response response) throws IOException {
+	public static JsonObject parseJsonResponse(GsonProvider gsonProvider, Response response) throws IOException {
 		HttpEntity entity = response.getEntity();
 		if ( entity == null ) {
 			return null;
 		}
 
-		Gson gson = gsonService.getGson();
+		Gson gson = gsonProvider.getGson();
 		ContentType contentType = ContentType.get( entity );
 		try ( InputStream inputStream = entity.getContent();
 				Reader reader = new InputStreamReader( inputStream, contentType.getCharset() ) ) {
@@ -67,21 +67,21 @@ public class ElasticsearchClientUtils {
 		}
 	}
 
-	public static String formatRequest(GsonService gsonService, ElasticsearchRequest request) {
+	public static String formatRequest(GsonProvider gsonProvider, ElasticsearchRequest request) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append( "Method: " ).append( request.getMethod() ).append( "\n" );
 		sb.append( "Path: " ).append( request.getPath() ).append( "\n" );
 
 		sb.append( "Data:\n" );
-		sb.append( formatRequestData( gsonService, request ) );
+		sb.append( formatRequestData( gsonProvider, request ) );
 		sb.append( "\n" );
 		return sb.toString();
 	}
 
-	public static String formatRequestData(GsonService gsonService, ElasticsearchRequest request) {
+	public static String formatRequestData(GsonProvider gsonProvider, ElasticsearchRequest request) {
 		List<JsonObject> bodyParts = request.getBodyParts();
-		Gson gson = gsonService.getGsonPrettyPrinting();
+		Gson gson = gsonProvider.getGsonPrettyPrinting();
 		StringBuilder builder = new StringBuilder();
 		for ( JsonObject bodyPart : bodyParts ) {
 			gson.toJson( bodyPart, builder );
@@ -90,12 +90,12 @@ public class ElasticsearchClientUtils {
 		return builder.toString();
 	}
 
-	public static String formatRequestData(GsonService gsonService, JsonObject body) {
-		Gson gson = gsonService.getGsonPrettyPrinting();
+	public static String formatRequestData(GsonProvider gsonProvider, JsonObject body) {
+		Gson gson = gsonProvider.getGsonPrettyPrinting();
 		return gson.toJson( body );
 	}
 
-	public static String formatResponse(GsonService gsonService, Response response, JsonObject parsedResponse) {
+	public static String formatResponse(GsonProvider gsonProvider, Response response, JsonObject parsedResponse) {
 		StringBuilder sb = new StringBuilder();
 		StatusLine statusLine = response.getStatusLine();
 		sb.append( "Status: " ).append( statusLine.getStatusCode() ).append( " " ).append( statusLine.getReasonPhrase() ).append( "\n" );

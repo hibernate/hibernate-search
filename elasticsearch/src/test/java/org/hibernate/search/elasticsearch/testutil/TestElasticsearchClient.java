@@ -21,7 +21,7 @@ import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
-import org.hibernate.search.elasticsearch.impl.DefaultGsonService;
+import org.hibernate.search.elasticsearch.dialect.impl.DialectIndependentGsonProvider;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -362,7 +362,7 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	@Override
 	protected void before() throws Throwable {
-		gson = new DefaultGsonService().getGson();
+		gson = DialectIndependentGsonProvider.INSTANCE.getGson();
 
 		this.client = RestClient.builder( HttpHost.create( ElasticsearchEnvironment.Defaults.SERVER_URI ) )
 				.setRequestConfigCallback( (builder) -> {

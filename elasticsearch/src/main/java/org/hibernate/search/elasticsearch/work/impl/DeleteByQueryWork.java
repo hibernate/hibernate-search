@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.elasticsearch.client.Response;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
@@ -95,10 +95,10 @@ public class DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 				Response response, JsonObject parsedResponseBody) throws SearchException {
 			this.delegate.checkSuccess( context, request, response, parsedResponseBody );
 			if ( response.getStatusLine().getStatusCode() == NOT_FOUND_HTTP_STATUS_CODE ) {
-				GsonService gsonService = context.getGsonService();
+				GsonProvider gsonProvider = context.getGsonProvider();
 				throw LOG.elasticsearchRequestDeleteByQueryNotFound(
-						ElasticsearchClientUtils.formatRequest( gsonService, request ),
-						ElasticsearchClientUtils.formatResponse( gsonService, response, parsedResponseBody )
+						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
+						ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody )
 						);
 			}
 		}

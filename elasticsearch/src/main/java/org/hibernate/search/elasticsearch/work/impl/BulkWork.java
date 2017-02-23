@@ -16,7 +16,7 @@ import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
@@ -77,15 +77,16 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			context = new NoIndexDirtyBulkExecutionContext( context );
 		}
 
+		GsonProvider gsonProvider = context.getGsonProvider();
+
 		Response response;
 		JsonObject parsedResponseBody;
 		try {
 			response = performRequest( context );
-			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( context.getGsonService(), response );
+			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
 		}
 		catch (IOException | RuntimeException e) {
-			GsonService gsonService = context.getGsonService();
-			throw LOG.elasticsearchRequestFailed( ElasticsearchClientUtils.formatRequest( gsonService, request ), null, e );
+			throw LOG.elasticsearchRequestFailed( ElasticsearchClientUtils.formatRequest( gsonProvider, request ), null, e );
 		}
 
 		handleResults( context, response, parsedResponseBody );
@@ -94,7 +95,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 	}
 
 	private Response performRequest(ElasticsearchWorkExecutionContext context) throws IOException {
-		Gson gson = context.getGsonService().getGson();
+		Gson gson = context.getGsonProvider().getGson();
 		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
 		RestClient client = context.getClient();
 		return client.performRequest(
@@ -163,10 +164,10 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		}
 
 		if ( !erroneousItems.isEmpty() ) {
-			GsonService gsonService = context.getGsonService();
+			GsonProvider gsonProvider = context.getGsonProvider();
 			BulkRequestFailedException exception = LOG.elasticsearchBulkRequestFailed(
-					ElasticsearchClientUtils.formatRequest( gsonService, request ),
-					ElasticsearchClientUtils.formatResponse( gsonService, response, parsedResponseBody ),
+					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
+					ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
 					successfulItems,
 					erroneousItems
 			);

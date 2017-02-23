@@ -14,7 +14,7 @@ import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -58,16 +58,16 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 	@Override
 	public final R execute(ElasticsearchWorkExecutionContext executionContext) {
 		Response response;
-		GsonService gsonService = executionContext.getGsonService();
+		GsonProvider gsonProvider = executionContext.getGsonProvider();
 		JsonObject parsedResponseBody;
 		try {
 			beforeExecute( executionContext, request );
 			response = performRequest( executionContext );
-			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonService, response );
+			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
 		}
 		catch (IOException | RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed(
-					ElasticsearchClientUtils.formatRequest( gsonService, request ),
+					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
 					null, e );
 		}
 
@@ -83,7 +83,7 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 	}
 
 	private Response performRequest(ElasticsearchWorkExecutionContext context) throws IOException {
-		Gson gson = context.getGsonService().getGson();
+		Gson gson = context.getGsonProvider().getGson();
 		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
 		RestClient client = context.getClient();
 		try {

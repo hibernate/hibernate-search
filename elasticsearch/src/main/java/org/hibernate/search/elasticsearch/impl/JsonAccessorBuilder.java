@@ -10,11 +10,11 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
+import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
 import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor;
 import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor.ConsumptionLimit;
-import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 
 /**

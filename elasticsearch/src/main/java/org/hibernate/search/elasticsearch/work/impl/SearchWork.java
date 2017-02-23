@@ -11,10 +11,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.elasticsearch.client.Response;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
-import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
 import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -35,11 +35,11 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 	@Override
 	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
 		if ( QUERY_LOG.isDebugEnabled() ) {
-			GsonService gsonService = executionContext.getGsonService();
+			GsonProvider gsonProvider = executionContext.getGsonProvider();
 			QUERY_LOG.executingElasticsearchQuery(
 					request.getPath(),
 					request.getParameters(),
-					ElasticsearchClientUtils.formatRequestData( gsonService, request )
+					ElasticsearchClientUtils.formatRequestData( gsonProvider, request )
 					);
 		}
 	}

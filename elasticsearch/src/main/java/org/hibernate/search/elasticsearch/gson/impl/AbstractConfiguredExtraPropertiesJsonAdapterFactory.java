@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.util.impl.gson;
+package org.hibernate.search.elasticsearch.gson.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -15,8 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.elasticsearch.util.impl.gson.AbstractExtraPropertiesJsonAdapter.ExtraPropertyAdapter;
-import org.hibernate.search.elasticsearch.util.impl.gson.AbstractExtraPropertiesJsonAdapter.FieldAdapter;
+import org.hibernate.search.elasticsearch.gson.impl.AbstractExtraPropertiesJsonAdapter.ExtraPropertyAdapter;
+import org.hibernate.search.elasticsearch.gson.impl.AbstractExtraPropertiesJsonAdapter.FieldAdapter;
 import org.hibernate.search.exception.AssertionFailure;
 
 import com.google.gson.Gson;

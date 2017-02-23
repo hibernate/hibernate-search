@@ -4,18 +4,16 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.impl;
-
-import org.hibernate.search.engine.service.spi.Service;
+package org.hibernate.search.elasticsearch.gson.impl;
 
 import com.google.gson.Gson;
 
 /**
- * Centralizes the configuration of the Gson object.
+ * Centralizes the configuration of the Gson objects.
  *
  * @author Guillaume Smet
  */
-public interface GsonService extends Service {
+public interface GsonProvider {
 
 	Gson getGson();
 

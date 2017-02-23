@@ -11,10 +11,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.elasticsearch.client.Response;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
-import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -85,17 +85,17 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 	public void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, Response response,
 			JsonObject parsedResponseBody) throws SearchException {
 		if ( !isSuccess( response, parsedResponseBody ) ) {
-			GsonService gsonService = context.getGsonService();
+			GsonProvider gsonProvider = context.getGsonProvider();
 			if ( response.getStatusLine().getStatusCode() == TIME_OUT_HTTP_STATUS_CODE ) {
 				throw LOG.elasticsearchRequestTimeout(
-						ElasticsearchClientUtils.formatRequest( gsonService, request ),
-						ElasticsearchClientUtils.formatResponse( gsonService, response, parsedResponseBody )
+						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
+						ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody )
 						);
 			}
 			else {
 				throw LOG.elasticsearchRequestFailed(
-						ElasticsearchClientUtils.formatRequest( gsonService, request ),
-						ElasticsearchClientUtils.formatResponse( gsonService, response, parsedResponseBody ),
+						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
+						ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
 						null );
 			}
 		}

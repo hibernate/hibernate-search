@@ -7,7 +7,7 @@
 package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.CreateIndexWorkBuilder;
@@ -39,13 +39,13 @@ public class CreateIndexWork extends SimpleElasticsearchWork<CreateIndexResult> 
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements CreateIndexWorkBuilder {
-		private final GsonService gsonService;
+		private final GsonProvider gsonProvider;
 		private final String indexName;
 		private JsonObject payload;
 
-		public Builder(GsonService gsonService, String indexName) {
+		public Builder(GsonProvider gsonProvider, String indexName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
-			this.gsonService = gsonService;
+			this.gsonProvider = gsonProvider;
 			this.indexName = indexName;
 		}
 
@@ -56,7 +56,7 @@ public class CreateIndexWork extends SimpleElasticsearchWork<CreateIndexResult> 
 				 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 				 * We better not include the null fields.
 				 */
-				Gson gson = gsonService.getGsonNoSerializeNulls();
+				Gson gson = gsonProvider.getGsonNoSerializeNulls();
 				this.payload = gson.toJsonTree( settings ).getAsJsonObject();
 			}
 			return this;

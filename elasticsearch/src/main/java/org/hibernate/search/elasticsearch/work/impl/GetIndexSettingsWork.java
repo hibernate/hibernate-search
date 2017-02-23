@@ -7,7 +7,7 @@
 package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexSettingsWorkBuilder;
 import org.hibernate.search.exception.AssertionFailure;
@@ -39,8 +39,8 @@ public class GetIndexSettingsWork extends SimpleElasticsearchWork<IndexSettings>
 
 		JsonElement indexSettings = settings.getAsJsonObject().get( "index" );
 		if ( indexSettings != null ) {
-			GsonService gsonService = context.getGsonService();
-			return gsonService.getGson().fromJson( indexSettings, IndexSettings.class );
+			GsonProvider gsonProvider = context.getGsonProvider();
+			return gsonProvider.getGson().fromJson( indexSettings, IndexSettings.class );
 		}
 		else {
 			// Empty settings

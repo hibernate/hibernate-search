@@ -7,10 +7,9 @@
 package org.hibernate.search.elasticsearch.work.impl.factory;
 
 import java.util.List;
-import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
-import org.hibernate.search.elasticsearch.impl.GsonService;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.BulkWork;
@@ -56,32 +55,19 @@ import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.ScrollWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.WaitForIndexStatusWorkBuilder;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.spi.BuildContext;
 
 import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactoryImplementor {
+public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactory {
 
-	private ServiceManager serviceManager;
+	private final GsonProvider gsonProvider;
 
-	private GsonService gsonService;
-
-	@Override
-	public void init(Properties properties, BuildContext context) {
-		this.serviceManager = context.getServiceManager();
-		this.gsonService = serviceManager.requestService( GsonService.class );
-	}
-
-	@Override
-	public void close() {
-		this.gsonService = null;
-		this.serviceManager.releaseService( GsonService.class );
-
-		this.serviceManager = null;
+	public Elasticsearch2WorkFactory(GsonProvider gsonProvider) {
+		super();
+		this.gsonProvider = gsonProvider;
 	}
 
 	@Override
@@ -141,7 +127,7 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactoryImplem
 
 	@Override
 	public CreateIndexWorkBuilder createIndex(String indexName) {
-		return new CreateIndexWork.Builder( gsonService, indexName );
+		return new CreateIndexWork.Builder( gsonProvider, indexName );
 	}
 
 	@Override
@@ -171,7 +157,7 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactoryImplem
 
 	@Override
 	public PutIndexSettingsWorkBuilder putIndexSettings(String indexName, IndexSettings settings) {
-		return new PutIndexSettingsWork.Builder( gsonService, indexName, settings );
+		return new PutIndexSettingsWork.Builder( gsonProvider, indexName, settings );
 	}
 
 	@Override
@@ -181,7 +167,7 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactoryImplem
 
 	@Override
 	public PutIndexMappingWorkBuilder putIndexTypeMapping(String indexName, String typeName, TypeMapping mapping) {
-		return new PutIndexTypeMappingWork.Builder( gsonService, indexName, typeName, mapping );
+		return new PutIndexTypeMappingWork.Builder( gsonProvider, indexName, typeName, mapping );
 	}
 
 	@Override

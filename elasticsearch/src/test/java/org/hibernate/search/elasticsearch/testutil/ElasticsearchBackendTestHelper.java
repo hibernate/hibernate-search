@@ -12,11 +12,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
-import org.hibernate.search.elasticsearch.util.impl.gson.JsonAccessor;
 import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestSuccessAssessor;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;

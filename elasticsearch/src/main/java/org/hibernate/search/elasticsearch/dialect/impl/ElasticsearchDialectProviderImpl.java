@@ -24,8 +24,6 @@ public class ElasticsearchDialectProviderImpl implements ElasticsearchDialectPro
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		this.dialect = new Elasticsearch2Dialect();
-		this.dialect.init( properties, context );
-
 	}
 
 	@Override
