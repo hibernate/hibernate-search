@@ -70,7 +70,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 	public void nothingToDo() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class )
 				.deleteAndCreate()
-				.mapping( SimpleDateEntity.class ).put(
+				.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -93,7 +93,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 				);
 		elasticSearchClient.index( SimpleBooleanEntity.class )
 				.deleteAndCreate()
-				.mapping( SimpleBooleanEntity.class ).put(
+				.type( SimpleBooleanEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -151,7 +151,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.mapping( AnalyzedEntity.class ).put(
+		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -190,7 +190,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( SimpleDateEntity.class ).get()
+				elasticSearchClient.type( SimpleDateEntity.class ).getMapping()
 				);
 		assertJsonEquals(
 				"{"
@@ -209,7 +209,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( SimpleBooleanEntity.class ).get()
+				elasticSearchClient.type( SimpleBooleanEntity.class ).getMapping()
 				);
 
 		assertJsonEquals(
@@ -265,7 +265,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( AnalyzedEntity.class ).get()
+				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
 				);
 	}
 
@@ -289,7 +289,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( SimpleBooleanEntity.class ).get()
+				elasticSearchClient.type( SimpleBooleanEntity.class ).getMapping()
 				);
 	}
 
@@ -297,7 +297,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 	public void rootMapping_attribute_missing() throws Exception {
 		elasticSearchClient.index( SimpleBooleanEntity.class )
 				.deleteAndCreate()
-				.mapping(SimpleBooleanEntity.class).put(
+				.type(SimpleBooleanEntity.class).putMapping(
 				"{"
 					+ "'properties': {"
 							+ "'id': {"
@@ -336,7 +336,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( SimpleBooleanEntity.class ).get()
+				elasticSearchClient.type( SimpleBooleanEntity.class ).getMapping()
 				);
 	}
 
@@ -344,7 +344,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 	public void property_missing() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class )
 				.deleteAndCreate()
-				.mapping( SimpleDateEntity.class ).put(
+				.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -382,7 +382,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( SimpleDateEntity.class ).get()
+				elasticSearchClient.type( SimpleDateEntity.class ).getMapping()
 				);
 	}
 
@@ -390,7 +390,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 	public void property_attribute_invalid() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class )
 				.deleteAndCreate()
-				.mapping( SimpleDateEntity.class ).put(
+				.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -424,7 +424,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 	@Test
 	public void property_attribute_invalid_conflictingAnalyzer() throws Exception {
 		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( AnalyzedEntity.class ).put(
+		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -483,7 +483,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.mapping( AnalyzedEntity.class ).put(
+		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -557,7 +557,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( AnalyzedEntity.class ).get()
+				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
 				);
 	}
 
@@ -586,7 +586,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.mapping( AnalyzedEntity.class ).put(
+		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -660,7 +660,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( AnalyzedEntity.class ).get()
+				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
 				);
 	}
 
@@ -699,7 +699,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.mapping( AnalyzedEntity.class ).put(
+		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -771,7 +771,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( AnalyzedEntity.class ).get()
+				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
 				);
 	}
 
@@ -807,7 +807,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.mapping( AnalyzedEntity.class ).put(
+		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -879,7 +879,7 @@ public class ElasticsearchSchemaMigrationIT extends SearchInitializationTestBase
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( AnalyzedEntity.class ).get()
+				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
 				);
 	}
 	@Indexed

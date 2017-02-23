@@ -228,7 +228,7 @@ public class ElasticsearchIndexMappingIT extends SearchTestBase {
 						"}" +
 					"}" +
 				"}",
-				elasticsearchClient.index( "golfplayer" ).mapping( GolfPlayer.class.getName() ).get()
+				elasticsearchClient.index( "golfplayer" ).type( GolfPlayer.class.getName() ).getMapping()
 		);
 
 		// Check we send correctly formatted data when indexing

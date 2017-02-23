@@ -267,8 +267,8 @@ public class ElasticsearchJavaTimeIT extends SearchTestBase {
 			tx.commit();
 
 			String documentId = String.valueOf( sample.id );
-			JsonObject source = elasticsearchClient.index( Sample.class ).document( documentId ).getSource();
-			JsonElement storedField = elasticsearchClient.index( Sample.class ).document( documentId ).getStoredField( fieldName );
+			JsonObject source = elasticsearchClient.type( Sample.class ).document( documentId ).getSource();
+			JsonElement storedField = elasticsearchClient.type( Sample.class ).document( documentId ).getStoredField( fieldName );
 
 			assertEquals( "Unexpected '_source' value", expectedSourceValue,
 					source.get( fieldName ).getAsString() );

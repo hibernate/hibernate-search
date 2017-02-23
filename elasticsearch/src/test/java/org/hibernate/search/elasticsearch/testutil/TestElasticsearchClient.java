@@ -78,8 +78,8 @@ public class TestElasticsearchClient extends ExternalResource {
 		return new IndexClient( indexName );
 	}
 
-	public MappingClient mapping(Class<?> rootClass) {
-		return index( rootClass ).mapping( rootClass );
+	public TypeClient type(Class<?> rootClass) {
+		return index( rootClass ).type( rootClass );
 	}
 
 	public class IndexClient {
@@ -109,12 +109,12 @@ public class TestElasticsearchClient extends ExternalResource {
 			return this;
 		}
 
-		public MappingClient mapping(Class<?> mappingClass) {
-			return mapping( mappingClass.getName() );
+		public TypeClient type(Class<?> mappingClass) {
+			return type( mappingClass.getName() );
 		}
 
-		public MappingClient mapping(String mappingName) {
-			return new MappingClient( this, mappingName );
+		public TypeClient type(String mappingName) {
+			return new TypeClient( this, mappingName );
 		}
 
 		public SettingsClient settings() {
@@ -124,35 +124,35 @@ public class TestElasticsearchClient extends ExternalResource {
 		public SettingsClient settings(String settingsPath) {
 			return new SettingsClient( this, settingsPath );
 		}
-
-		public DocumentClient document(String id) {
-			return new DocumentClient( this, id );
-		}
 	}
 
-	public class MappingClient {
+	public class TypeClient {
 
 		private final IndexClient indexClient;
 
-		private final String mappingName;
+		private final String typeName;
 
-		public MappingClient(IndexClient indexClient, String mappingName) {
+		public TypeClient(IndexClient indexClient, String mappingName) {
 			this.indexClient = indexClient;
-			this.mappingName = mappingName;
+			this.typeName = mappingName;
 		}
 
-		public MappingClient put(String mappingJson) throws IOException {
-			TestElasticsearchClient.this.putMapping( indexClient.indexName, mappingName, mappingJson );
+		public TypeClient putMapping(String mappingJson) throws IOException {
+			TestElasticsearchClient.this.putMapping( indexClient.indexName, typeName, mappingJson );
 			return this;
 		}
 
-		public String get() throws IOException {
-			return TestElasticsearchClient.this.getMapping( indexClient.indexName, mappingName );
+		public String getMapping() throws IOException {
+			return TestElasticsearchClient.this.getMapping( indexClient.indexName, typeName );
 		}
 
-		public MappingClient index(String id, String jsonDocument) throws IOException {
-			TestElasticsearchClient.this.index( indexClient.indexName, mappingName, id, jsonDocument );
+		public TypeClient index(String id, String jsonDocument) throws IOException {
+			TestElasticsearchClient.this.index( indexClient.indexName, typeName, id, jsonDocument );
 			return this;
+		}
+
+		public DocumentClient document(String id) {
+			return new DocumentClient( this, id );
 		}
 	}
 
@@ -178,21 +178,21 @@ public class TestElasticsearchClient extends ExternalResource {
 
 	public class DocumentClient {
 
-		private final IndexClient indexClient;
+		private final TypeClient typeClient;
 
 		private final String id;
 
-		public DocumentClient(IndexClient indexClient, String id) {
-			this.indexClient = indexClient;
+		public DocumentClient(TypeClient typeClient, String id) {
+			this.typeClient = typeClient;
 			this.id = id;
 		}
 
 		public JsonObject getSource() throws IOException {
-			return TestElasticsearchClient.this.getDocumentSource( indexClient.indexName, id );
+			return TestElasticsearchClient.this.getDocumentSource( typeClient.indexClient.indexName, typeClient.typeName, id );
 		}
 
 		public JsonElement getStoredField(String fieldName) throws IOException {
-			return TestElasticsearchClient.this.getDocumentField( indexClient.indexName, id, fieldName );
+			return TestElasticsearchClient.this.getDocumentField( typeClient.indexClient.indexName, typeClient.typeName, id, fieldName );
 		}
 	}
 
@@ -381,9 +381,10 @@ public class TestElasticsearchClient extends ExternalResource {
 		}
 	}
 
-	private JsonObject getDocumentSource(String indexName, String id) throws IOException {
+	private JsonObject getDocumentSource(String indexName, String typeName, String id) throws IOException {
 		DocumentResult result = client.execute(
 				new Get.Builder( indexName, id )
+						.type( typeName )
 						.build()
 				);
 		if ( !result.isSucceeded() ) {
@@ -395,9 +396,10 @@ public class TestElasticsearchClient extends ExternalResource {
 		return result.getJsonObject().get( "_source" ).getAsJsonObject();
 	}
 
-	private JsonElement getDocumentField(String indexName, String id, String fieldName) throws IOException {
+	private JsonElement getDocumentField(String indexName, String typeName, String id, String fieldName) throws IOException {
 		DocumentResult result = client.execute(
 				new Get.Builder( indexName, id )
+						.type( typeName )
 						.setParameter( "fields", fieldName )
 						.build()
 				);

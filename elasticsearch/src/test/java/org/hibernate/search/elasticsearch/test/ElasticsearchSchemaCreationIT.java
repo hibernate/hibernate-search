@@ -108,7 +108,7 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( SimpleDateEntity.class ).get()
+				elasticSearchClient.type( SimpleDateEntity.class ).getMapping()
 				);
 	}
 
@@ -133,7 +133,7 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( SimpleBooleanEntity.class ).get()
+				elasticSearchClient.type( SimpleBooleanEntity.class ).getMapping()
 				);
 	}
 
@@ -275,7 +275,7 @@ public class ElasticsearchSchemaCreationIT extends SearchInitializationTestBase 
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.mapping( SimpleAnalyzedEntity.class ).get()
+				elasticSearchClient.type( SimpleAnalyzedEntity.class ).getMapping()
 				);
 	}
 

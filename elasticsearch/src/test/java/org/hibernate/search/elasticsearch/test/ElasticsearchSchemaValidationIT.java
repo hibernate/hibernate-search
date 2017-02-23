@@ -71,7 +71,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void success_simple() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -93,7 +93,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				+ "}"
 				);
 		elasticSearchClient.index( SimpleBooleanEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleBooleanEntity.class ).put(
+		elasticSearchClient.type( SimpleBooleanEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -114,7 +114,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				+ "}"
 				);
 		elasticSearchClient.index( FacetedDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( FacetedDateEntity.class ).put(
+		elasticSearchClient.type( FacetedDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -189,7 +189,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.mapping( AnalyzedEntity.class ).put(
+		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -228,7 +228,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void rootMapping_attribute_missing() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'properties': {"
 							+ "'id': {"
@@ -257,7 +257,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void rootMapping_attribute_dynamic_invalid() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': false,"
 					+ "'properties': {"
@@ -287,7 +287,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void properties_missing() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -314,7 +314,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_missing() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -345,7 +345,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_attribute_missing() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -375,7 +375,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_attribute_invalid() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -406,7 +406,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_format_invalidOutputFormat() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -437,7 +437,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_format_missingInputFormat() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -469,7 +469,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_format_unexpectedInputFormat() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -504,7 +504,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_attribute_leniency() throws Exception {
 		elasticSearchClient.index( SimpleLenientEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleLenientEntity.class ).put(
+		elasticSearchClient.type( SimpleLenientEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -528,7 +528,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void multipleErrors_singleIndexManagers() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': false,"
 					+ "'properties': {"
@@ -562,7 +562,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void multipleErrors_multipleIndexManagers() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleDateEntity.class ).put(
+		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': false,"
 					+ "'properties': {"
@@ -578,7 +578,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 				+ "}"
 				);
 		elasticSearchClient.index( SimpleBooleanEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( SimpleBooleanEntity.class ).put(
+		elasticSearchClient.type( SimpleBooleanEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': false,"
 					+ "'properties': {"
@@ -621,7 +621,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_fields_missing() throws Exception {
 		elasticSearchClient.index( FacetedDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( FacetedDateEntity.class ).put(
+		elasticSearchClient.type( FacetedDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -652,7 +652,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_field_missing() throws Exception {
 		elasticSearchClient.index( FacetedDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( FacetedDateEntity.class ).put(
+		elasticSearchClient.type( FacetedDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -689,7 +689,7 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 	@Test
 	public void property_field_attribute_invalid() throws Exception {
 		elasticSearchClient.index( FacetedDateEntity.class ).deleteAndCreate();
-		elasticSearchClient.mapping( FacetedDateEntity.class ).put(
+		elasticSearchClient.type( FacetedDateEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
