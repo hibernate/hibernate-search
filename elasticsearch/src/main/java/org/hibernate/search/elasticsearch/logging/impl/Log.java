@@ -435,4 +435,13 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Invalid token filter definition for name '%1$s'. Token filter definitions must at least define the token filter type." )
 	SearchException invalidElasticsearchTokenFilterDefinition(String name);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 80,
+			value = "Failed to detect the Elasticsearch version running on the cluster." )
+	SearchException failedToDetectElasticsearchVersion(@Cause Exception e);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 81,
+			value = "An unexpected Elasticsearch version runs on the Elasticsearch cluster: '%s'."
+					+ " Please refer to the documentation to know which versions are supported." )
+	SearchException unexpectedElasticsearchVersion(String name);
+
 }
