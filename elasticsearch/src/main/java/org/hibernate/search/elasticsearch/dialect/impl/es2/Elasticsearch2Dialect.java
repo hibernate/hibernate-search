@@ -7,7 +7,7 @@
 package org.hibernate.search.elasticsearch.dialect.impl.es2;
 
 import org.hibernate.search.elasticsearch.dialect.impl.DialectIndependentGsonProvider;
-import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectImplementor;
+import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.work.impl.factory.Elasticsearch2WorkFactory;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
@@ -15,29 +15,16 @@ import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFac
 /**
  * @author Yoann Rodiere
  */
-public class Elasticsearch2Dialect implements ElasticsearchDialectImplementor {
+public class Elasticsearch2Dialect implements ElasticsearchDialect {
 
-	private GsonProvider gsonProvider;
-	private ElasticsearchWorkFactory workFactory;
-
-	public Elasticsearch2Dialect() {
-		this.gsonProvider = DialectIndependentGsonProvider.INSTANCE;
-		this.workFactory = new Elasticsearch2WorkFactory( gsonProvider );
+	@Override
+	public GsonProvider createGsonProvider() {
+		return DialectIndependentGsonProvider.INSTANCE;
 	}
 
 	@Override
-	public void close() {
-		// Nothing to do
-	}
-
-	@Override
-	public GsonProvider getGsonProvider() {
-		return gsonProvider;
-	}
-
-	@Override
-	public ElasticsearchWorkFactory getWorkFactory() {
-		return workFactory;
+	public ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider) {
+		return new Elasticsearch2WorkFactory( gsonProvider );
 	}
 
 }

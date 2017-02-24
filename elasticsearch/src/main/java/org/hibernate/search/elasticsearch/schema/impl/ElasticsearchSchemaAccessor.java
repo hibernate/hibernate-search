@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
-import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectProvider;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
@@ -37,7 +37,7 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 
 	private ServiceManager serviceManager;
 
-	private ElasticsearchDialectProvider dialectProvider;
+	private ElasticsearchService elasticsearchService;
 
 	private ElasticsearchWorkFactory workFactory;
 
@@ -46,18 +46,17 @@ public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppabl
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		serviceManager = context.getServiceManager();
-		dialectProvider = serviceManager.requestService( ElasticsearchDialectProvider.class );
-		workFactory = dialectProvider.getDialect().getWorkFactory();
-		workProcessor = serviceManager.requestService( ElasticsearchWorkProcessor.class );
+		elasticsearchService = serviceManager.requestService( ElasticsearchService.class );
+		workFactory = elasticsearchService.getWorkFactory();
+		workProcessor = elasticsearchService.getWorkProcessor();
 	}
 
 	@Override
 	public void stop() {
 		workProcessor = null;
-		serviceManager.releaseService( ElasticsearchWorkProcessor.class );
 		workFactory = null;
-		dialectProvider = null;
-		serviceManager.releaseService( ElasticsearchDialectProvider.class );
+		elasticsearchService = null;
+		serviceManager.releaseService( ElasticsearchService.class );
 		serviceManager = null;
 	}
 

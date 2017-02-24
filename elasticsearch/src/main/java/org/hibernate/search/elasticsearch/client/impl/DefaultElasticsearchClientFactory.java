@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.client.impl;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 
@@ -20,44 +19,33 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
-import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Provides access to the JEST client.
- *
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class ElasticsearchServiceImpl implements ElasticsearchService, Startable, Stoppable {
+public class DefaultElasticsearchClientFactory implements ElasticsearchClientFactory {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private static final String HTTP_SCHEME = "http";
 
 	/**
 	 * Prefix for accessing the client-related settings.
-	 * That's currently needed as we only have a single client for all
-	 * index managers.
-	 * The prefix is used to have the property name in line with the other
-	 * index-related property names, even though this property can not yet
-	 * be overridden on a per-index basis.
+	 * To be suffixed by a scope (currently always "default")
+	 * and the name of the property to access.
 	 */
-	private static final String CLIENT_PROP_PREFIX = "hibernate.search.default.";
-
-	private RestClient client;
-
-	private Sniffer sniffer;
+	private static final String CLIENT_PROP_PREFIX = "hibernate.search.";
 
 	@Override
-	public void start(Properties properties, BuildContext context) {
+	public RestClient createClient(String scopeName, Properties properties) {
+		String propertyPrefix = propertyPrefix( scopeName );
+
 		String serverUrisString = ConfigurationParseHelper.getString(
 				properties,
-				CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_URI,
+				propertyPrefix + ElasticsearchEnvironment.SERVER_URI,
 				ElasticsearchEnvironment.Defaults.SERVER_URI
 		);
 
@@ -67,53 +55,61 @@ public class ElasticsearchServiceImpl implements ElasticsearchService, Startable
 			hosts[i] = HttpHost.create( serverUris[i] );
 		}
 
-		this.client = RestClient.builder( hosts )
-				.setRequestConfigCallback( (b) -> customizeRequestConfig( properties, b ) )
-				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( properties, serverUris, b ) )
+		return RestClient.builder( hosts )
+				.setRequestConfigCallback( (b) -> customizeRequestConfig( propertyPrefix, properties, b ) )
+				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( propertyPrefix, properties, serverUris, b ) )
 				.build();
+	}
+
+	@Override
+	public Sniffer createSniffer(String scopeName, RestClient client, Properties properties) {
+		String propertyPrefix = propertyPrefix( scopeName );
 
 		boolean discoveryEnabled = ConfigurationParseHelper.getBooleanValue(
 				properties,
-				CLIENT_PROP_PREFIX + ElasticsearchEnvironment.DISCOVERY_ENABLED,
+				propertyPrefix + ElasticsearchEnvironment.DISCOVERY_ENABLED,
 				ElasticsearchEnvironment.Defaults.DISCOVERY_ENABLED
 		);
 		if ( discoveryEnabled ) {
-			this.sniffer = Sniffer.builder( client )
+			return Sniffer.builder( client )
 					.setSniffIntervalMillis(
 							ConfigurationParseHelper.getIntValue(
 									properties,
-									CLIENT_PROP_PREFIX + ElasticsearchEnvironment.DISCOVERY_REFRESH_INTERVAL,
+									propertyPrefix + ElasticsearchEnvironment.DISCOVERY_REFRESH_INTERVAL,
 									ElasticsearchEnvironment.Defaults.DISCOVERY_REFRESH_INTERVAL
 							)
 							* 1_000 // The configured value is in seconds
 					)
 					.build();
 		}
-
+		else {
+			return null;
+		}
 	}
 
-	private HttpAsyncClientBuilder customizeHttpClientConfig(Properties properties, String[] serverUris, HttpAsyncClientBuilder builder) {
+	private HttpAsyncClientBuilder customizeHttpClientConfig(String propertyPrefix,
+			Properties properties, String[] serverUris, HttpAsyncClientBuilder builder) {
 		builder = builder
 				.setMaxConnTotal( ConfigurationParseHelper.getIntValue(
 						properties,
-						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION,
+						propertyPrefix + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION,
 						ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION
 				) )
 				.setMaxConnPerRoute( ConfigurationParseHelper.getIntValue(
 						properties,
-						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION_PER_ROUTE,
+						propertyPrefix + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION_PER_ROUTE,
 						ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE
 				) );
 
 		String username = ConfigurationParseHelper.getString(
 				properties,
-				CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_USERNAME,
+				propertyPrefix + ElasticsearchEnvironment.SERVER_USERNAME,
 				null
 		);
 		if ( username != null ) {
 			String password = ConfigurationParseHelper.getString(
 					properties,
-					CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_PASSWORD,
+					propertyPrefix + ElasticsearchEnvironment.SERVER_PASSWORD,
 					null
 			);
 			if ( password != null ) {
@@ -132,47 +128,33 @@ public class ElasticsearchServiceImpl implements ElasticsearchService, Startable
 		return builder;
 	}
 
-	private RequestConfig.Builder customizeRequestConfig(Properties properties, RequestConfig.Builder builder) {
+	private RequestConfig.Builder customizeRequestConfig(String propertyPrefix, Properties properties, RequestConfig.Builder builder) {
 		return builder
 				.setSocketTimeout( ConfigurationParseHelper.getIntValue(
 						properties,
-						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT,
+						propertyPrefix + ElasticsearchEnvironment.SERVER_READ_TIMEOUT,
 						ElasticsearchEnvironment.Defaults.SERVER_READ_TIMEOUT
 				) )
 				.setConnectTimeout( ConfigurationParseHelper.getIntValue(
 						properties,
-						CLIENT_PROP_PREFIX + ElasticsearchEnvironment.SERVER_CONNECTION_TIMEOUT,
+						propertyPrefix + ElasticsearchEnvironment.SERVER_CONNECTION_TIMEOUT,
 						ElasticsearchEnvironment.Defaults.SERVER_CONNECTION_TIMEOUT
 				) );
+	}
+
+	private String propertyPrefix(String scopeName) {
+		return new StringBuilder( CLIENT_PROP_PREFIX )
+				.append( scopeName ).append( "." )
+				.toString();
 	}
 
 	private boolean warnPasswordsOverHttp(String[] serverUris) {
 		for ( String serverUriAsString : serverUris ) {
 			URI uri = URI.create( serverUriAsString );
 			if ( HTTP_SCHEME.equals( uri.getScheme() ) ) {
-				LOG.usingPasswordOverHttp( serverUriAsString );
+				log.usingPasswordOverHttp( serverUriAsString );
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public void stop() {
-		try ( RestClient client = this.client;
-				Sniffer sniffer = this.sniffer ) {
-			/*
-			 * Nothing to do: we simply take advantage of Java's auto-closing,
-			 * which adds suppressed exceptions as needed and always tries
-			 * to close every resource.
-			 */
-		}
-		catch (IOException | RuntimeException e) {
-			throw new SearchException( "Failed to shut down the Elasticsearch service", e );
-		}
-	}
-
-	@Override
-	public RestClient getClient() {
-		return client;
 	}
 }

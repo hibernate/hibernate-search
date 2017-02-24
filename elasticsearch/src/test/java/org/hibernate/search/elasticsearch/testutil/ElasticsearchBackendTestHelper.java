@@ -15,8 +15,8 @@ import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchService;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
-import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.work.impl.DefaultElasticsearchRequestSuccessAssessor;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
@@ -56,12 +56,12 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 			indexNames.add( ( (ElasticsearchIndexManager)indexManager ).getActualIndexName() );
 		}
 
-		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
-				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
+		try ( ServiceReference<ElasticsearchService> esService =
+				serviceManager.requestReference( ElasticsearchService.class ) ) {
 			CountWork work = new CountWork.Builder( indexNames )
 					.type( entityType.getName() )
 					.build();
-			return processor.get().executeSyncUnsafe( work );
+			return esService.get().getWorkProcessor().executeSyncUnsafe( work );
 		}
 	}
 
@@ -69,11 +69,11 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 	public int getNumberOfDocumentsInIndex(String indexName) {
 		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
 
-		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
-				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
+		try ( ServiceReference<ElasticsearchService> esService =
+				serviceManager.requestReference( ElasticsearchService.class ) ) {
 			CountWork work = new CountWork.Builder( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.build();
-			return processor.get().executeSyncUnsafe( work );
+			return esService.get().getWorkProcessor().executeSyncUnsafe( work );
 		}
 	}
 
@@ -82,8 +82,8 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
 		String query = value.contains( "*" ) ? "wildcard" : "term";
 
-		try ( ServiceReference<ElasticsearchWorkProcessor> processor =
-				serviceManager.requestReference( ElasticsearchWorkProcessor.class ) ) {
+		try ( ServiceReference<ElasticsearchService> esService =
+				serviceManager.requestReference( ElasticsearchService.class ) ) {
 			CountWork work = new CountWork.Builder( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( indexName ) )
 					.query( JsonBuilder.object()
 							.add( "query", JsonBuilder.object()
@@ -93,7 +93,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 							).build()
 					)
 					.build();
-			return processor.get().executeSyncUnsafe( work );
+			return esService.get().getWorkProcessor().executeSyncUnsafe( work );
 		}
 	}
 

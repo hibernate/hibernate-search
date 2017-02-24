@@ -25,7 +25,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
-import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectProvider;
+import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
@@ -95,7 +95,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	private ServiceManager serviceManager;
 
 	private ElasticsearchIndexWorkVisitor visitor;
-	private ElasticsearchWorkProcessor requestProcessor;
+	private ElasticsearchWorkProcessor workProcessor;
 
 	private ElasticsearchSchemaCreator schemaCreator;
 	private ElasticsearchSchemaDropper schemaDropper;
@@ -149,14 +149,14 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 		this.similarity = similarity;
 
-		ElasticsearchDialectProvider dialectProvider = serviceManager.requestService( ElasticsearchDialectProvider.class );
+		ElasticsearchService elasticsearchService = serviceManager.requestService( ElasticsearchService.class );
 		this.visitor = new ElasticsearchIndexWorkVisitor(
 				this.actualIndexName,
 				this.refreshAfterWrite,
 				context.getUninitializedSearchIntegrator(),
-				dialectProvider.getDialect().getWorkFactory()
+				elasticsearchService.getWorkFactory()
 		);
-		this.requestProcessor = context.getServiceManager().requestService( ElasticsearchWorkProcessor.class );
+		this.workProcessor = elasticsearchService.getWorkProcessor();
 	}
 
 	private static String getOverriddenIndexName(String indexName, Properties properties) {
@@ -221,11 +221,10 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			schemaDropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
 		}
 
+		workProcessor = null;
 		visitor = null;
-		serviceManager.releaseService( ElasticsearchDialectProvider.class );
+		serviceManager.releaseService( ElasticsearchDialectFactory.class );
 
-		requestProcessor = null;
-		serviceManager.releaseService( ElasticsearchWorkProcessor.class );
 		schemaTranslator = null;
 		serviceManager.releaseService( ElasticsearchSchemaTranslator.class );
 		schemaValidator = null;
@@ -427,14 +426,14 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			elasticsearchWorks.add( luceneWork.acceptIndexWorkVisitor( visitor, monitor ) );
 		}
 
-		requestProcessor.executeSyncSafe( elasticsearchWorks );
+		workProcessor.executeSyncSafe( elasticsearchWorks );
 	}
 
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
 		ElasticsearchWork<?> elasticsearchWork = singleOperation.acceptIndexWorkVisitor( visitor, monitor );
 		if ( singleOperation instanceof FlushLuceneWork ) {
-			requestProcessor.awaitAsyncProcessingCompletion();
+			workProcessor.awaitAsyncProcessingCompletion();
 			executeWork( elasticsearchWork, true );
 		}
 		else {
@@ -445,17 +444,17 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	private void executeWork(ElasticsearchWork<?> elasticsearchWork, boolean sync) {
 		if ( elasticsearchWork != null ) {
 			if ( sync ) {
-				requestProcessor.executeSyncSafe( Collections.<ElasticsearchWork<?>>singletonList( elasticsearchWork ) );
+				workProcessor.executeSyncSafe( Collections.<ElasticsearchWork<?>>singletonList( elasticsearchWork ) );
 			}
 			else {
-				requestProcessor.executeAsync( elasticsearchWork );
+				workProcessor.executeAsync( elasticsearchWork );
 			}
 		}
 	}
 
 	@Override
 	public void awaitAsyncProcessingCompletion() {
-		requestProcessor.awaitAsyncProcessingCompletion();
+		workProcessor.awaitAsyncProcessingCompletion();
 	}
 
 	@Override

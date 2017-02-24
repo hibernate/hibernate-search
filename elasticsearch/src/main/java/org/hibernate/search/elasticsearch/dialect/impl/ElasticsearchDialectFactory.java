@@ -6,16 +6,19 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl;
 
+import java.util.Properties;
+
+import org.elasticsearch.client.RestClient;
 import org.hibernate.search.engine.service.spi.Service;
 
 
 /**
- * A service providing the Elasticserach dialect to use.
+ * A service allowing to create an Elasticserach dialect to use with a given client.
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchDialectProvider extends Service {
+public interface ElasticsearchDialectFactory extends Service {
 
-	ElasticsearchDialect getDialect();
+	ElasticsearchDialect createDialect(RestClient client, Properties properties);
 
 }

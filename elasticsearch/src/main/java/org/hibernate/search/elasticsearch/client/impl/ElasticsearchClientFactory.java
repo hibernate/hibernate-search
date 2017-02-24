@@ -6,15 +6,22 @@
  */
 package org.hibernate.search.elasticsearch.client.impl;
 
+import java.util.Properties;
+
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.engine.service.spi.Service;
 
 
 /**
+ * Creates the Elasticsearch client and sniffer.
+ *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchService extends Service {
+public interface ElasticsearchClientFactory extends Service {
 
-	RestClient getClient();
+	RestClient createClient(String scopeName, Properties properties);
+
+	Sniffer createSniffer(String scopeName, RestClient client, Properties properties);
 
 }

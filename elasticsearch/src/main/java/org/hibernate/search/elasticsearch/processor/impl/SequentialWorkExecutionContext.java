@@ -13,12 +13,12 @@ import java.util.Set;
 
 import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.IndexingMonitor;
-import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -36,7 +36,9 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private final RestClient client;
 
-	private final ElasticsearchDialect dialect;
+	private final GsonProvider gsonProvider;
+
+	private final ElasticsearchWorkFactory workFactory;
 
 	private final ElasticsearchWorkProcessor workProcessor;
 
@@ -51,11 +53,13 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 	private final Set<String> dirtyIndexes = new HashSet<>();
 
 	public SequentialWorkExecutionContext(RestClient client,
-			ElasticsearchDialect dialect, ElasticsearchWorkProcessor workProcessor,
+			GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory,
+			ElasticsearchWorkProcessor workProcessor,
 			ErrorHandler errorHandler) {
 		super();
 		this.client = client;
-		this.dialect = dialect;
+		this.gsonProvider = gsonProvider;
+		this.workFactory = workFactory;
 		this.workProcessor = workProcessor;
 		this.errorHandler = errorHandler;
 	}
@@ -67,7 +71,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	@Override
 	public GsonProvider getGsonProvider() {
-		return dialect.getGsonProvider();
+		return gsonProvider;
 	}
 
 	@Override
@@ -104,7 +108,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 			log.tracef( "Refreshing index(es) %s", dirtyIndexes );
 		}
 
-		RefreshWorkBuilder builder = dialect.getWorkFactory().refresh();
+		RefreshWorkBuilder builder = workFactory.refresh();
 		for ( String index : dirtyIndexes ) {
 			builder.index( index );
 		}

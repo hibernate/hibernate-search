@@ -8,7 +8,6 @@ package org.hibernate.search.elasticsearch.processor.impl;
 
 import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.IndexingMonitor;
-import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.exception.AssertionFailure;
@@ -29,10 +28,10 @@ class ParallelWorkExecutionContext implements ElasticsearchWorkExecutionContext 
 	private final RestClient client;
 	private final GsonProvider gsonProvider;
 
-	public ParallelWorkExecutionContext(RestClient client, ElasticsearchDialect dialect) {
+	public ParallelWorkExecutionContext(RestClient client, GsonProvider gsonProvider) {
 		super();
 		this.client = client;
-		this.gsonProvider = dialect.getGsonProvider();
+		this.gsonProvider = gsonProvider;
 	}
 
 	@Override

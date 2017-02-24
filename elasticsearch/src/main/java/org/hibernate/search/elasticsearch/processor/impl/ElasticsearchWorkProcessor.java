@@ -8,27 +8,22 @@ package org.hibernate.search.elasticsearch.processor.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
-import org.hibernate.search.elasticsearch.client.impl.ElasticsearchService;
-import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
-import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectProvider;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
 import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
-import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
+import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.spi.BuildContext;
@@ -45,7 +40,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Gunnar Morling
  */
-public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable {
+public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -55,37 +50,27 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	private static final int MAX_BULK_SIZE = 250;
 
 	private final AsyncBackendRequestProcessor asyncProcessor;
-	private ErrorHandler errorHandler;
-	private ServiceManager serviceManager;
-	private ElasticsearchService elasticsearchService;
-	private ElasticsearchDialect dialect;
-	private ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
+	private final ErrorHandler errorHandler;
+	private final RestClient restClient;
+	private final GsonProvider gsonProvider;
+	private final ElasticsearchWorkFactory workFactory;
+	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
 
-	public ElasticsearchWorkProcessor() {
+	public ElasticsearchWorkProcessor(BuildContext context,
+			RestClient restClient, GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory) {
 		asyncProcessor = new AsyncBackendRequestProcessor();
-	}
-
-	@Override
-	public void start(Properties properties, BuildContext context) {
 		this.errorHandler = context.getErrorHandler();
-		this.serviceManager = context.getServiceManager();
-		this.elasticsearchService = serviceManager.requestService( ElasticsearchService.class );
-		ElasticsearchDialectProvider dialectProvider = serviceManager.requestService( ElasticsearchDialectProvider.class );
-		this.dialect = dialectProvider.getDialect();
+		this.restClient = restClient;
+		this.gsonProvider = gsonProvider;
+		this.workFactory = workFactory;
 		this.parallelWorkExecutionContext =
-				new ParallelWorkExecutionContext( elasticsearchService.getClient(), this.dialect );
+				new ParallelWorkExecutionContext( restClient, gsonProvider );
 	}
 
 	@Override
-	public void stop() {
+	public void close() {
 		awaitAsyncProcessingCompletion();
 		asyncProcessor.shutdown();
-
-		dialect = null;
-		serviceManager.releaseService( ElasticsearchDialectProvider.class );
-		elasticsearchService = null;
-		serviceManager.releaseService( ElasticsearchService.class );
-		serviceManager = null;
 	}
 
 	/**
@@ -123,8 +108,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 	 */
 	private void executeSafely(Iterable<ElasticsearchWork<?>> requests) {
 		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-				elasticsearchService.getClient(),
-				dialect, this, errorHandler );
+				restClient, gsonProvider, workFactory, this, errorHandler );
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
 			executeSafely( work, context );
@@ -301,8 +285,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 
 		private void processAsyncWork() {
 			SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-					elasticsearchService.getClient(),
-					dialect, ElasticsearchWorkProcessor.this, errorHandler );
+					restClient, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler );
 			synchronized ( asyncProcessor ) {
 				while ( true ) {
 					Iterable<ElasticsearchWork<?>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();
@@ -357,7 +340,7 @@ public class ElasticsearchWorkProcessor implements Service, Startable, Stoppable
 				result.add( work );
 			}
 			else {
-				result.add( dialect.getWorkFactory().bulk( bulkInProgress ).refresh( refreshInBulkAPICall ).build() );
+				result.add( workFactory.bulk( bulkInProgress ).refresh( refreshInBulkAPICall ).build() );
 			}
 			bulkInProgress.clear();
 		}

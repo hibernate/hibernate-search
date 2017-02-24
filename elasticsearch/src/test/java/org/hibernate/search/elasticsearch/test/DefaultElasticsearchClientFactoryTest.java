@@ -22,12 +22,13 @@ import org.apache.http.entity.StringEntity;
 import org.eclipse.jetty.http.HttpHeader;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.client.impl.ElasticsearchServiceImpl;
+import org.hibernate.search.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,8 +42,9 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchServiceImplTest {
+public class DefaultElasticsearchClientFactoryTest {
 
+	private static final String CLIENT_SCOPE_NAME = "default";
 	private static final String CLIENT_PROPERTY_PREFIX = "hibernate.search.default.";
 
 	private static final int PORT_1 = 9201;
@@ -63,7 +65,7 @@ public class ElasticsearchServiceImplTest {
 	@Rule
 	public WireMockRule wireMockRule2 = new WireMockRule( PORT_2 );
 
-	private ElasticsearchServiceImpl esService = new ElasticsearchServiceImpl();
+	private DefaultElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
@@ -76,16 +78,11 @@ public class ElasticsearchServiceImplTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try {
-			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
-
-			Response result = doPost( "/myIndex/myType", payload );
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-		}
-		finally {
-			esService.stop();
 		}
 	}
 
@@ -103,12 +100,10 @@ public class ElasticsearchServiceImplTest {
 						.withBody( "{ \"error\": \"" + errorMessage + "\" }" )
 				) );
 
-		try {
-			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
-
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			ResponseException exception = null;
 			try {
-				doPost( "/myIndex/myType", payload );
+				doPost( client, "/myIndex/myType", payload );
 			}
 			catch (ResponseException e) {
 				exception = e;
@@ -117,9 +112,6 @@ public class ElasticsearchServiceImplTest {
 			Response result = exception.getResponse();
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 500 );
 			assertThat( IOUtils.toString( result.getEntity().getContent() ) ).as( "response body" ).contains( errorMessage );
-		}
-		finally {
-			esService.stop();
 		}
 	}
 
@@ -137,19 +129,14 @@ public class ElasticsearchServiceImplTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try {
-			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
-
-			Response result = doPost( "/myIndex/myType", payload );
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
-			result = doPost( "/myIndex/myType", payload );
+			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-		}
-		finally {
-			esService.stop();
 		}
 	}
 
@@ -176,24 +163,20 @@ public class ElasticsearchServiceImplTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try {
-			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
-
-			Response result = doPost( "/myIndex/myType", payload );
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() );
+				Sniffer sniffer = clientFactory.createSniffer( CLIENT_SCOPE_NAME, client, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			Thread.sleep( 2000 ); // Wait for the refresh to occur
 
-			result = doPost( "/myIndex/myType", payload );
+			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
-			result = doPost( "/myIndex/myType", payload );
+			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-		}
-		finally {
-			esService.stop();
 		}
 	}
 
@@ -226,16 +209,11 @@ public class ElasticsearchServiceImplTest {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try {
-			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
-
-			Response result = doPost( "/myIndex/myType/_search", payload );
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType/_search", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType/_search" ) ) );
-		}
-		finally {
-			esService.stop();
 		}
 	}
 
@@ -254,12 +232,10 @@ public class ElasticsearchServiceImplTest {
 						.withStatusMessage( statusMessage )
 				) );
 
-		try {
-			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
-
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			ResponseException exception = null;
 			try {
-				doPost( "/myIndex/myType/_search", payload );
+				doPost( client, "/myIndex/myType/_search", payload );
 			}
 			catch (ResponseException e) {
 				exception = e;
@@ -269,14 +245,11 @@ public class ElasticsearchServiceImplTest {
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 401 );
 			assertThat( result.getStatusLine().getReasonPhrase() ).as( "reason phrase" ).contains( statusMessage );
 		}
-		finally {
-			esService.stop();
-		}
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2453")
-	public void authentication_http_password() {
+	public void authentication_http_password() throws Exception {
 		String username = "ironman";
 		String password = "j@rV1s";
 		String httpUri = "http://foo.com/";
@@ -287,16 +260,13 @@ public class ElasticsearchServiceImplTest {
 
 		logged.expectMessage( "HSEARCH400073", httpUri );
 
-		try {
-			esService.start( configuration.getProperties(), new BuildContextForTest( configuration ) );
-		}
-		finally {
-			esService.stop();
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			// Nothing to do here
 		}
 	}
 
-	private Response doPost(String path, String payload) throws IOException, ResponseException {
-		return esService.getClient().performRequest(
+	private Response doPost(RestClient client, String path, String payload) throws IOException, ResponseException {
+		return client.performRequest(
 				"POST", path, Collections.emptyMap(),
 				payload == null ? null : new StringEntity( payload, ContentType.APPLICATION_JSON )
 				);
