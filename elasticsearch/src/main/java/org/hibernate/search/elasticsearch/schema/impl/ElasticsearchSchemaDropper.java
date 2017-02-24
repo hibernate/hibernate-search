@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
-import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -14,7 +13,7 @@ import org.hibernate.search.exception.SearchException;
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchSchemaDropper extends Service {
+public interface ElasticsearchSchemaDropper {
 
 	/**
 	 * Drops an index, throwing an exception if dropping fails.

@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.schema.impl;
 
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
-import org.hibernate.search.engine.service.spi.Service;
 
 /**
  * An object responsible for validating type mappings retrieved from an existing Elasticsearch instance
@@ -15,7 +14,7 @@ import org.hibernate.search.engine.service.spi.Service;
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchSchemaValidator extends Service {
+public interface ElasticsearchSchemaValidator {
 
 	/**
 	 * Retrieves and validate actual index metadata, throwing an exception if validation fails.

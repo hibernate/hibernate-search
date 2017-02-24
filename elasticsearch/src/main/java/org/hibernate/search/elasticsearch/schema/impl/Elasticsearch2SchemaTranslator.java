@@ -51,11 +51,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import com.google.gson.JsonPrimitive;
 
 /**
- * The default {@link ElasticsearchSchemaTranslator} implementation.
+ * An {@link ElasticsearchSchemaTranslator} implementation for Elasticsearch 2.
+ *
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchSchemaTranslator implements ElasticsearchSchemaTranslator {
+public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTranslator {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 

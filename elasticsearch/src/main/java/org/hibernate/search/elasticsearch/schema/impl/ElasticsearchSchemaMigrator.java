@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.schema.impl;
 
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
-import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -15,7 +14,7 @@ import org.hibernate.search.exception.SearchException;
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchSchemaMigrator extends Service {
+public interface ElasticsearchSchemaMigrator {
 
 	/**
 	 * Merge metadata with the existing schema: for each mapping, merge the existing mapping

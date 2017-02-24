@@ -7,17 +7,12 @@
 package org.hibernate.search.elasticsearch.schema.impl;
 
 import java.util.Map;
-import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -25,28 +20,18 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMigrator, Startable, Stoppable {
+public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMigrator {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private ServiceManager serviceManager;
-	private ElasticsearchSchemaAccessor schemaAccessor;
-	private ElasticsearchSchemaValidator schemaValidator;
+	private final ElasticsearchSchemaAccessor schemaAccessor;
+	private final ElasticsearchSchemaValidator schemaValidator;
 
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		serviceManager = context.getServiceManager();
-		schemaAccessor = serviceManager.requestService( ElasticsearchSchemaAccessor.class );
-		schemaValidator = serviceManager.requestService( ElasticsearchSchemaValidator.class );
-	}
-
-	@Override
-	public void stop() {
-		schemaValidator = null;
-		serviceManager.releaseService( ElasticsearchSchemaValidator.class );
-		schemaAccessor = null;
-		serviceManager.releaseService( ElasticsearchSchemaAccessor.class );
-		serviceManager = null;
+	public DefaultElasticsearchSchemaMigrator(ElasticsearchSchemaAccessor schemaAccessor,
+			ElasticsearchSchemaValidator schemaValidator) {
+		super();
+		this.schemaAccessor = schemaAccessor;
+		this.schemaValidator = schemaValidator;
 	}
 
 	@Override

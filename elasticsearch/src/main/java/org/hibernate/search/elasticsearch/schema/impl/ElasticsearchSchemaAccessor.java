@@ -7,10 +7,8 @@
 package org.hibernate.search.elasticsearch.schema.impl;
 
 import java.util.Map;
-import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
-import org.hibernate.search.elasticsearch.impl.ElasticsearchService;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
@@ -19,11 +17,6 @@ import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.CreateIndexResult;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
-import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -31,33 +24,18 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class ElasticsearchSchemaAccessor implements Service, Startable, Stoppable {
+public class ElasticsearchSchemaAccessor {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private ServiceManager serviceManager;
+	private final ElasticsearchWorkFactory workFactory;
 
-	private ElasticsearchService elasticsearchService;
+	private final ElasticsearchWorkProcessor workProcessor;
 
-	private ElasticsearchWorkFactory workFactory;
-
-	private ElasticsearchWorkProcessor workProcessor;
-
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		serviceManager = context.getServiceManager();
-		elasticsearchService = serviceManager.requestService( ElasticsearchService.class );
-		workFactory = elasticsearchService.getWorkFactory();
-		workProcessor = elasticsearchService.getWorkProcessor();
-	}
-
-	@Override
-	public void stop() {
-		workProcessor = null;
-		workFactory = null;
-		elasticsearchService = null;
-		serviceManager.releaseService( ElasticsearchService.class );
-		serviceManager = null;
+	public ElasticsearchSchemaAccessor(ElasticsearchWorkFactory workFactory,
+			ElasticsearchWorkProcessor workProcessor) {
+		this.workFactory = workFactory;
+		this.workProcessor = workProcessor;
 	}
 
 	public void createIndex(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {

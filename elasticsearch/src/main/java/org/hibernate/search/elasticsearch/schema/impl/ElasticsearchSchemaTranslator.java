@@ -9,7 +9,6 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import java.util.Collection;
 
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
-import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 
@@ -18,7 +17,7 @@ import org.hibernate.search.exception.SearchException;
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchSchemaTranslator extends Service {
+public interface ElasticsearchSchemaTranslator {
 
 	/**
 	 * Translates index metadata, throwing an exception if translation fails.

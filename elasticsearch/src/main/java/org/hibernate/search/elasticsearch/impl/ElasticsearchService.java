@@ -8,6 +8,11 @@ package org.hibernate.search.elasticsearch.impl;
 
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaDropper;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaMigrator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.service.spi.Service;
 
@@ -22,5 +27,15 @@ public interface ElasticsearchService extends Service {
 	ElasticsearchWorkFactory getWorkFactory();
 
 	ElasticsearchWorkProcessor getWorkProcessor();
+
+	ElasticsearchSchemaCreator getSchemaCreator();
+
+	ElasticsearchSchemaDropper getSchemaDropper();
+
+	ElasticsearchSchemaMigrator getSchemaMigrator();
+
+	ElasticsearchSchemaValidator getSchemaValidator();
+
+	ElasticsearchSchemaTranslator getSchemaTranslator();
 
 }

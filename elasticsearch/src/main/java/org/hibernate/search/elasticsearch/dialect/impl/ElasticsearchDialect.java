@@ -7,6 +7,9 @@
 package org.hibernate.search.elasticsearch.dialect.impl;
 
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaAccessor;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 
 /**
@@ -20,5 +23,9 @@ public interface ElasticsearchDialect {
 	GsonProvider createGsonProvider();
 
 	ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider);
+
+	ElasticsearchSchemaTranslator createSchemaTranslator();
+
+	ElasticsearchSchemaValidator createSchemaValidator(ElasticsearchSchemaAccessor schemaAccessor);
 
 }

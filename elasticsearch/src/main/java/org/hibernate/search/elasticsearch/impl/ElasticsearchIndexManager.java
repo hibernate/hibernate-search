@@ -25,7 +25,6 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
-import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
@@ -94,14 +93,9 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	private ServiceManager serviceManager;
 
+	private ElasticsearchService elasticsearchService;
 	private ElasticsearchIndexWorkVisitor visitor;
 	private ElasticsearchWorkProcessor workProcessor;
-
-	private ElasticsearchSchemaCreator schemaCreator;
-	private ElasticsearchSchemaDropper schemaDropper;
-	private ElasticsearchSchemaMigrator schemaMigrator;
-	private ElasticsearchSchemaValidator schemaValidator;
-	private ElasticsearchSchemaTranslator schemaTranslator;
 
 	// Lifecycle
 
@@ -137,11 +131,6 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 				return dynamicMapping;
 			}
 		};
-		this.schemaCreator = serviceManager.requestService( ElasticsearchSchemaCreator.class );
-		this.schemaDropper = serviceManager.requestService( ElasticsearchSchemaDropper.class );
-		this.schemaMigrator = serviceManager.requestService( ElasticsearchSchemaMigrator.class );
-		this.schemaValidator = serviceManager.requestService( ElasticsearchSchemaValidator.class );
-		this.schemaTranslator = serviceManager.requestService( ElasticsearchSchemaTranslator.class );
 
 		String overriddenIndexName = getOverriddenIndexName( indexName, properties );
 		this.actualIndexName = ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( overriddenIndexName );
@@ -149,7 +138,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 		this.similarity = similarity;
 
-		ElasticsearchService elasticsearchService = serviceManager.requestService( ElasticsearchService.class );
+		this.elasticsearchService = serviceManager.requestService( ElasticsearchService.class );
 		this.visitor = new ElasticsearchIndexWorkVisitor(
 				this.actualIndexName,
 				this.refreshAfterWrite,
@@ -218,23 +207,13 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	@Override
 	public void destroy() {
 		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
-			schemaDropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
+			elasticsearchService.getSchemaDropper().dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
 		}
 
 		workProcessor = null;
 		visitor = null;
-		serviceManager.releaseService( ElasticsearchDialectFactory.class );
-
-		schemaTranslator = null;
-		serviceManager.releaseService( ElasticsearchSchemaTranslator.class );
-		schemaValidator = null;
-		serviceManager.releaseService( ElasticsearchSchemaValidator.class );
-		schemaMigrator = null;
-		serviceManager.releaseService( ElasticsearchSchemaMigrator.class );
-		schemaDropper = null;
-		serviceManager.releaseService( ElasticsearchSchemaDropper.class );
-		schemaCreator = null;
-		serviceManager.releaseService( ElasticsearchSchemaCreator.class );
+		elasticsearchService = null;
+		serviceManager.releaseService( ElasticsearchService.class );
 
 		schemaManagementExecutionOptions = null;
 
@@ -284,6 +263,8 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 		boolean createdIndex;
 
+		ElasticsearchSchemaCreator schemaCreator = elasticsearchService.getSchemaCreator();
+
 		IndexMetadata indexMetadata = createIndexMetadata( entityTypesToInitialize );
 		switch ( schemaManagementStrategy ) {
 			case CREATE:
@@ -294,6 +275,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 				break;
 			case RECREATE:
 			case RECREATE_DELETE:
+				ElasticsearchSchemaDropper schemaDropper = elasticsearchService.getSchemaDropper();
 				schemaDropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
 				schemaCreator.createIndex( indexMetadata, schemaManagementExecutionOptions );
 				schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
@@ -305,10 +287,12 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 					schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
 				}
 				else {
+					ElasticsearchSchemaMigrator schemaMigrator = elasticsearchService.getSchemaMigrator();
 					schemaMigrator.merge( indexMetadata, schemaManagementExecutionOptions );
 				}
 				break;
 			case VALIDATE:
+				ElasticsearchSchemaValidator schemaValidator = elasticsearchService.getSchemaValidator();
 				schemaCreator.checkIndexExists( actualIndexName, schemaManagementExecutionOptions );
 				schemaValidator.validate( indexMetadata, schemaManagementExecutionOptions );
 				createdIndex = false;
@@ -335,6 +319,9 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
 			return;
 		}
+
+		ElasticsearchSchemaCreator schemaCreator = elasticsearchService.getSchemaCreator();
+
 		IndexMetadata indexMetadata = createIndexMetadata( entityTypesToInitialize );
 		switch ( schemaManagementStrategy ) {
 			case CREATE:
@@ -347,9 +334,11 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 				schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
 				break;
 			case MERGE:
+				ElasticsearchSchemaMigrator schemaMigrator = elasticsearchService.getSchemaMigrator();
 				schemaMigrator.merge( indexMetadata, schemaManagementExecutionOptions );
 				break;
 			case VALIDATE:
+				ElasticsearchSchemaValidator schemaValidator = elasticsearchService.getSchemaValidator();
 				schemaValidator.validate( indexMetadata, schemaManagementExecutionOptions );
 				break;
 			default:
@@ -363,6 +352,8 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			EntityIndexBinding descriptor = searchIntegrator.getIndexBinding( entityType );
 			descriptors.add( descriptor );
 		}
+
+		ElasticsearchSchemaTranslator schemaTranslator = elasticsearchService.getSchemaTranslator();
 		return schemaTranslator.translate( actualIndexName, descriptors, schemaManagementExecutionOptions );
 	}
 

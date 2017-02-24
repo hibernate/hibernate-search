@@ -7,15 +7,10 @@
 package org.hibernate.search.elasticsearch.schema.impl;
 
 import java.util.Map;
-import java.util.Properties;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -23,24 +18,15 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCreator, Startable, Stoppable {
+public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCreator {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private ServiceManager serviceManager;
-	private ElasticsearchSchemaAccessor schemaAccessor;
+	private final ElasticsearchSchemaAccessor schemaAccessor;
 
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		serviceManager = context.getServiceManager();
-		schemaAccessor = serviceManager.requestService( ElasticsearchSchemaAccessor.class );
-	}
-
-	@Override
-	public void stop() {
-		schemaAccessor = null;
-		serviceManager.releaseService( ElasticsearchSchemaAccessor.class );
-		serviceManager = null;
+	public DefaultElasticsearchSchemaCreator(ElasticsearchSchemaAccessor schemaAccessor) {
+		super();
+		this.schemaAccessor = schemaAccessor;
 	}
 
 	@Override

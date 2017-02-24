@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -30,11 +29,7 @@ import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefiniti
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jboss.logging.Messages;
@@ -43,13 +38,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 /**
- * The default {@link ElasticsearchSchemaValidator} implementation.
+ * An {@link ElasticsearchSchemaValidator} implementation for Elasticsearch 2.
+ * <p>
  * <strong>Important implementation note:</strong> unexpected attributes (i.e. those not mapped to a field in TypeMapping)
  * are totally ignored. This allows users to leverage Elasticsearch features that are not supported in
  * Hibernate Search, by setting those attributes manually.
+ *
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaValidator, Startable, Stoppable {
+public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidator {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -111,8 +108,7 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 					.end()
 					.build();
 
-	private ServiceManager serviceManager;
-	private ElasticsearchSchemaAccessor schemaAccessor;
+	private final ElasticsearchSchemaAccessor schemaAccessor;
 
 	private final Validator<TypeMapping> typeMappingValidator = new TypeMappingValidator( new PropertyMappingValidator() );
 	private final Validator<AnalyzerDefinition> analyzerDefinitionValidator = new AnalyzerDefinitionValidator( ANALYZER_EQUIVALENCES );
@@ -120,17 +116,9 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	private final Validator<TokenizerDefinition> tokenizerDefinitionValidator = new AnalysisDefinitionValidator<>( TOKENIZER_EQUIVALENCES );
 	private final Validator<TokenFilterDefinition> tokenFilterDefinitionValidator = new AnalysisDefinitionValidator<>( TOKEN_FILTER_EQUIVALENCES );
 
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		serviceManager = context.getServiceManager();
-		schemaAccessor = serviceManager.requestService( ElasticsearchSchemaAccessor.class );
-	}
-
-	@Override
-	public void stop() {
-		schemaAccessor = null;
-		serviceManager.releaseService( ElasticsearchSchemaAccessor.class );
-		serviceManager = null;
+	public Elasticsearch2SchemaValidator(ElasticsearchSchemaAccessor schemaAccessor) {
+		super();
+		this.schemaAccessor = schemaAccessor;
 	}
 
 	@Override

@@ -16,6 +16,15 @@ import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
+import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaCreator;
+import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaDropper;
+import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaMigrator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaAccessor;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaDropper;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaMigrator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
@@ -48,6 +57,16 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 	private ElasticsearchWorkProcessor workProcessor;
 
+	private ElasticsearchSchemaCreator schemaCreator;
+
+	private ElasticsearchSchemaDropper schemaDropper;
+
+	private ElasticsearchSchemaMigrator schemaMigrator;
+
+	private ElasticsearchSchemaValidator schemaValidator;
+
+	private ElasticsearchSchemaTranslator schemaTranslator;
+
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		ServiceManager serviceManager = context.getServiceManager();
@@ -63,9 +82,18 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 			ElasticsearchDialect dialect = dialectFactory.get().createDialect( client, properties );
 			this.gsonProvider = dialect.createGsonProvider();
 			this.workFactory = dialect.createWorkFactory( gsonProvider );
-		}
 
-		this.workProcessor = new ElasticsearchWorkProcessor( context, client, gsonProvider, workFactory );
+			this.workProcessor = new ElasticsearchWorkProcessor( context, client, gsonProvider, workFactory );
+
+			ElasticsearchSchemaAccessor schemaAccessor = new ElasticsearchSchemaAccessor( workFactory, workProcessor );
+
+			this.schemaValidator = dialect.createSchemaValidator( schemaAccessor );
+			this.schemaTranslator = dialect.createSchemaTranslator();
+
+			this.schemaCreator = new DefaultElasticsearchSchemaCreator( schemaAccessor );
+			this.schemaDropper = new DefaultElasticsearchSchemaDropper( schemaAccessor );
+			this.schemaMigrator = new DefaultElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
+		}
 	}
 
 	@Override
@@ -82,8 +110,6 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 		catch (IOException | RuntimeException e) {
 			throw new SearchException( "Failed to shut down the Elasticsearch service", e );
 		}
-		this.workFactory = null;
-		this.gsonProvider = null;
 		this.sniffer = null;
 		this.client = null;
 	}
@@ -101,5 +127,30 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public ElasticsearchWorkProcessor getWorkProcessor() {
 		return workProcessor;
+	}
+
+	@Override
+	public ElasticsearchSchemaCreator getSchemaCreator() {
+		return schemaCreator;
+	}
+
+	@Override
+	public ElasticsearchSchemaDropper getSchemaDropper() {
+		return schemaDropper;
+	}
+
+	@Override
+	public ElasticsearchSchemaMigrator getSchemaMigrator() {
+		return schemaMigrator;
+	}
+
+	@Override
+	public ElasticsearchSchemaValidator getSchemaValidator() {
+		return schemaValidator;
+	}
+
+	@Override
+	public ElasticsearchSchemaTranslator getSchemaTranslator() {
+		return schemaTranslator;
 	}
 }
