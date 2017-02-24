@@ -571,7 +571,7 @@ public class Elasticsearch5SchemaValidationIT extends SearchInitializationTestBa
 							+ "'myField': {"
 									+ "'type': 'long',"
 									+ "'index': true,"
-									+ "'store': 'yes'"
+									+ "'store': true"
 							+ "}"
 					+ "}"
 				+ "}"

@@ -540,7 +540,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromQueryString( "abstract:important OR title:important" );
 		result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
-		assertThat( result ).onProperty( "title" ).containsExactly(
+		assertThat( result ).onProperty( "title" ).containsOnly(
 				"Very important research on Hibernate",
 				"Some research"
 		);
@@ -588,7 +588,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		Object[] projection = (Object[]) result.iterator().next();
 		assertThat( projection[0] ).describedAs( "id" ).isEqualTo( 1L );
 		assertThat( projection[1] ).describedAs( "object class" ).isEqualTo( GolfPlayer.class );
-		assertThat( projection[2] ).describedAs( "score" ).isEqualTo( 0.30685282F );
+		assertThat( projection[2] ).describedAs( "score" ).isInstanceOf( Float.class );
 		assertThat( projection[3] ).describedAs( "this" ).isInstanceOf( GolfPlayer.class );
 		assertThat( ( (GolfPlayer) projection[3] ).getId() ).isEqualTo( 1L );
 		assertThat( projection[4] ).describedAs( "firstName" ).isEqualTo( "Klaus" );

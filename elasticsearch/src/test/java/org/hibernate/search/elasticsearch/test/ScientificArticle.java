@@ -15,6 +15,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.SortableField;
 
 /**
  * @author Richard Hallier
@@ -32,6 +33,7 @@ public class ScientificArticle {
 			@Field(name = "title", analyze = Analyze.NO),
 			@Field(name = "titleAnalyzed")
 	})
+	@SortableField(forField = "title")
 	private String title;
 
 	@Field(name = "abstract")
