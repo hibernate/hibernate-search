@@ -648,9 +648,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							)
 						)
 				);
-				// in this case, the _source field is not present in the Elasticsearch results
-				// we need to ask for it explicitely
-				payloadBuilder.add( "fields", JsonBuilder.array().add( new JsonPrimitive( "_source" ) ) );
 			}
 		}
 
