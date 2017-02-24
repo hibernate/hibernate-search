@@ -183,12 +183,10 @@ public class Elasticsearch5SchemaMigrationIT extends SearchInitializationTestBas
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'format': 'strict_date_optional_time||epoch_millis',"
 									+ "'ignore_malformed': true" // Assert it was not removed
 							+ "},"
 							+ "'NOTmyField': {" // Assert it was not removed
-									+ "'type': 'date',"
-									+ "'format': 'strict_date_optional_time||epoch_millis'"
+									+ "'type': 'date'"
 							+ "}"
 					+ "}"
 				+ "}",
@@ -370,12 +368,10 @@ public class Elasticsearch5SchemaMigrationIT extends SearchInitializationTestBas
 									+ "'store': true"
 							+ "},"
 							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': 'strict_date_optional_time||epoch_millis'"
+									+ "'type': 'date'"
 							+ "},"
 							+ "'NOTmyField': {" // Assert it was not removed
-									+ "'type': 'date',"
-									+ "'format': 'strict_date_optional_time||epoch_millis'"
+									+ "'type': 'date'"
 							+ "}"
 					+ "}"
 				+ "}",

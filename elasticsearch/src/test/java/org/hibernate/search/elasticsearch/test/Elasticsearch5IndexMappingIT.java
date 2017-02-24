@@ -145,7 +145,6 @@ public class Elasticsearch5IndexMappingIT extends SearchTestBase {
 						"}," +
 						"'dateOfBirth':{" +
 							"'type':'date'," +
-							"'format':'strict_date_optional_time||epoch_millis'," +
 							"'null_value': '" + toElasticsearchDateHelperDateString("1970-01-01+00:00") + "'" +
 						"}," +
 						"'driveWidth':{" +
@@ -209,7 +208,6 @@ public class Elasticsearch5IndexMappingIT extends SearchTestBase {
 						"}," +
 						"'subscriptionEndDate':{" +
 							"'type':'date'," +
-							"'format':'strict_date_optional_time||epoch_millis'," +
 							"'null_value': '" + toElasticsearchDateHelperDateString("1970-01-01+00:00") + "'" +
 						"}," +
 						"'won_holes':{" +
