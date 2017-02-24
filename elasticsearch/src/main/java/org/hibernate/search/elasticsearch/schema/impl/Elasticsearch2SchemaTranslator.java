@@ -193,7 +193,22 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			BridgeDefinedField bridgeDefinedField) {
 		String propertyPath = bridgeDefinedField.getAbsoluteName();
 
-		if ( !SpatialHelper.isSpatialField( propertyPath ) ) {
+		if ( SpatialHelper.isSpatialFieldLongitude( propertyPath ) ) {
+			// we ignore the longitude field, we will create the geo_point mapping only once with the latitude field
+			return;
+		}
+		else if ( SpatialHelper.isSpatialFieldLatitude( propertyPath ) ) {
+			// we only add the geo_point for the latitude field
+			PropertyMapping propertyMapping = new PropertyMapping();
+
+			propertyMapping.setType( DataType.GEO_POINT );
+
+			// in this case, the spatial field has precedence over an already defined field
+			mappingBuilder.setPropertyAbsolute( SpatialHelper.stripSpatialFieldSuffix( propertyPath ), propertyMapping );
+		}
+		else {
+			// This includes the fields potentially created for the spatial hash queries
+
 			// we don't overwrite already defined fields. Typically, in the case of spatial, the geo_point field
 			// is defined before the double field and we want to keep the geo_point one
 			if ( !mappingBuilder.hasPropertyAbsolute( propertyPath ) ) {
@@ -209,29 +224,6 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			else {
 				TypeMapping propertyMapping = mappingBuilder.getPropertyAbsolute( propertyPath );
 				addDynamicOption( bridgeDefinedField, propertyMapping );
-			}
-		}
-		else {
-			if ( SpatialHelper.isSpatialFieldLongitude( propertyPath ) ) {
-				// we ignore the longitude field, we will create the geo_point mapping only once with the latitude field
-				return;
-			}
-			else if ( SpatialHelper.isSpatialFieldLatitude( propertyPath ) ) {
-				// we only add the geo_point for the latitude field
-				PropertyMapping propertyMapping = new PropertyMapping();
-
-				propertyMapping.setType( DataType.GEO_POINT );
-
-				// in this case, the spatial field has precedence over an already defined field
-				mappingBuilder.setPropertyAbsolute( SpatialHelper.stripSpatialFieldSuffix( propertyPath ), propertyMapping );
-			}
-			else {
-				// the fields potentially created for the spatial hash queries
-				PropertyMapping propertyMapping = new PropertyMapping();
-				propertyMapping.setType( DataType.STRING );
-				propertyMapping.setIndex( IndexType.NOT_ANALYZED );
-
-				mappingBuilder.setPropertyAbsolute( propertyPath, propertyMapping );
 			}
 		}
 	}
