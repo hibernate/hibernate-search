@@ -11,6 +11,7 @@ import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaAccesso
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
+import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 
 /**
  * An entry point to all operations that may be implemented differently depending
@@ -27,5 +28,7 @@ public interface ElasticsearchDialect {
 	ElasticsearchSchemaTranslator createSchemaTranslator();
 
 	ElasticsearchSchemaValidator createSchemaValidator(ElasticsearchSchemaAccessor schemaAccessor);
+
+	MissingValueStrategy createMissingValueStrategy();
 
 }

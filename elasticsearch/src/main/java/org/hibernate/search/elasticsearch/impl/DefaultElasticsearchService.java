@@ -26,6 +26,7 @@ import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaMigrato
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
+import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.service.spi.Startable;
@@ -67,6 +68,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 	private ElasticsearchSchemaTranslator schemaTranslator;
 
+	private MissingValueStrategy missingValueStrategy;
+
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		ServiceManager serviceManager = context.getServiceManager();
@@ -93,6 +96,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 			this.schemaCreator = new DefaultElasticsearchSchemaCreator( schemaAccessor );
 			this.schemaDropper = new DefaultElasticsearchSchemaDropper( schemaAccessor );
 			this.schemaMigrator = new DefaultElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
+
+			this.missingValueStrategy = dialect.createMissingValueStrategy();
 		}
 	}
 
@@ -152,5 +157,10 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public ElasticsearchSchemaTranslator getSchemaTranslator() {
 		return schemaTranslator;
+	}
+
+	@Override
+	public MissingValueStrategy getMissingValueStrategy() {
+		return missingValueStrategy;
 	}
 }

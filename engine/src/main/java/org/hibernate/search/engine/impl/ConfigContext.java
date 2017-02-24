@@ -29,6 +29,7 @@ import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
@@ -95,9 +96,9 @@ public final class ConfigContext {
 	 */
 	private final Map<String, FilterDef> filterDefs = new HashMap<String, FilterDef>();
 
+	private final Map<IndexManagerType, MissingValueStrategy> missingValueStrategies = new HashMap<>();
 
-	private final Map<IndexManagerType, MutableAnalyzerRegistry> analyzerRegistries =
-			new HashMap<IndexManagerType, MutableAnalyzerRegistry>();
+	private final Map<IndexManagerType, MutableAnalyzerRegistry> analyzerRegistries = new HashMap<>();
 
 	private final boolean jpaPresent;
 	private final String nullToken;
@@ -177,6 +178,15 @@ public final class ConfigContext {
 			mappingAnalyzerDefs.put( analyzerDefinitionName, analyzerDef );
 			analyzerDefinitionPoints.put( analyzerDefinitionName, annotationDefinitionPoint );
 		}
+	}
+
+	public MissingValueStrategy getMissingValueStrategy(IndexManagerType type) {
+		MissingValueStrategy strategy = missingValueStrategies.get( type );
+		if ( strategy == null ) {
+			strategy = type.createMissingValueStrategy( serviceManager, searchConfiguration );
+			missingValueStrategies.put( type, strategy );
+		}
+		return strategy;
 	}
 
 	public MutableAnalyzerRegistry getAnalyzerRegistry(IndexManagerType type) {

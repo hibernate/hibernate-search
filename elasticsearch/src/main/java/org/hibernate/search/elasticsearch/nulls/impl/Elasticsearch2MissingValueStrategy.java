@@ -19,10 +19,10 @@ import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-public final class ElasticsearchMissingValueStrategy implements MissingValueStrategy {
+public final class Elasticsearch2MissingValueStrategy implements MissingValueStrategy {
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	public static final ElasticsearchMissingValueStrategy INSTANCE = new ElasticsearchMissingValueStrategy();
+	public static final Elasticsearch2MissingValueStrategy INSTANCE = new Elasticsearch2MissingValueStrategy();
 
 	@Override
 	public NullMarkerCodec createNullMarkerCodec(Class<?> entityType, DocumentFieldPath path, NullMarker nullMarker) {

@@ -9,9 +9,10 @@ package org.hibernate.search.elasticsearch.spi;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategy;
-import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchMissingValueStrategy;
+import org.hibernate.search.elasticsearch.impl.ElasticsearchService;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 
 public final class ElasticsearchIndexManagerType implements IndexManagerType {
@@ -28,7 +29,9 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType {
 	}
 
 	@Override
-	public MissingValueStrategy getMissingValueStrategy() {
-		return ElasticsearchMissingValueStrategy.INSTANCE;
+	public MissingValueStrategy createMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
+		try ( ServiceReference<ElasticsearchService> esService = serviceManager.requestReference( ElasticsearchService.class ) ) {
+			return esService.get().getMissingValueStrategy();
+		}
 	}
 }

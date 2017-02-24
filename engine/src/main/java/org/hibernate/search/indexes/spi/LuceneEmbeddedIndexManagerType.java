@@ -27,7 +27,7 @@ public final class LuceneEmbeddedIndexManagerType implements IndexManagerType {
 	}
 
 	@Override
-	public MissingValueStrategy getMissingValueStrategy() {
+	public MissingValueStrategy createMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		return LuceneMissingValueStrategy.INSTANCE;
 	}
 }

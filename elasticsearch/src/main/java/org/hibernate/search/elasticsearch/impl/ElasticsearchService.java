@@ -14,6 +14,7 @@ import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaMigrato
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
+import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.Service;
 
 
@@ -37,5 +38,7 @@ public interface ElasticsearchService extends Service {
 	ElasticsearchSchemaValidator getSchemaValidator();
 
 	ElasticsearchSchemaTranslator getSchemaTranslator();
+
+	MissingValueStrategy getMissingValueStrategy();
 
 }
