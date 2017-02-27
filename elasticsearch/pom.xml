@@ -228,6 +228,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>elasticsearch-it</id>
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
@@ -266,7 +267,6 @@
                                 <!-- HSEARCH-2404 Enable CollectionUpdateEventTest for Elasticsearch -->
                                 <exclude>**/CollectionUpdateEventTest.java</exclude><!-- Only fails on CI (Travis) -->
                             </excludes>
-                            <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress</excludedGroups>
                         </configuration>
                     </execution>
                 </executions>
@@ -314,6 +314,18 @@
                                             <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>elasticsearch-it</id>
+                                <configuration>
+                                <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch2</excludedGroups>
                                 </configuration>
                             </execution>
                         </executions>
@@ -404,6 +416,18 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>elasticsearch-it</id>
+                                <configuration>
+                                <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch2</excludedGroups>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
                         <configuration>
@@ -436,6 +460,18 @@
             <id>elasticsearch-5.0</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>elasticsearch-it</id>
+                                <configuration>
+                                <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5</excludedGroups>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
