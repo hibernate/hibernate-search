@@ -62,22 +62,14 @@ doing your queries on object properties with a nice DSL.
 To experiment with the Elasticsearch integration you will have to download Elasticsearch and run it:
 Hibernate Search connects to an Elasticsearch node but does not provide one.
 
-One option is to use the link:https://hub.docker.com/r/library/elasticsearch/[Elasticsearch Docker image].
-
-[source, bash]
-.Start an Elasticsearch node via Docker
---
-docker pull elasticsearch
-docker run -p 9200:9200 -d -v "$PWD/plugin_dir":/usr/share/elasticsearch/plugins \
-    -v "$PWD/config/elasticsearch.yml":/usr/share/elasticsearch/config/elasticsearch.yml \
-    elasticsearch
---
+One option is to use the https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html[Elasticsearch Docker image] (see https://hub.docker.com/r/library/elasticsearch/[here for Elasticsearch 2]).
 
 [NOTE]
 .Elasticsearch version
 --
-Hibernate Search expects an Elasticsearch node version 2.0 at least. 5.0 is not supported yet.
-Hibernate Search internal tests run against Elasticsearch {testElasticsearchVersion}.
+Hibernate Search expects an Elasticsearch cluster running version 2.x or 5.x.
+
+Hibernate Search internal tests run against Elasticsearch {testElasticsearchVersion} by default.
 --
 
 ==== Dependencies in your Java application
@@ -789,6 +781,10 @@ Here is a list of known limitations.
 
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
+* The `VALIDATE` and `MERGE` strategies don't work for "legacy" mappings,
+  e.g. mappings imported from Elasticsearch 2 to Elasticsearch 5,
+  that can contain properties with the `string` datatype where Hibernate expects either `text` or `keyword`:
+  https://hibernate.atlassian.net/browse/HSEARCH-2605[HSEARCH-2605].
 * Query timeouts: https://hibernate.atlassian.net/browse/HSEARCH-2399[HSEARCH-2399]
 * MoreLikeThis queries: https://hibernate.atlassian.net/browse/HSEARCH-2395[HSEARCH-2395]
 * `@IndexedEmbedded.indexNullAs`: https://hibernate.atlassian.net/browse/HSEARCH-2389[HSEARCH-2389]
