@@ -51,16 +51,3 @@ index.number_of_replicas: 0
 
 # Enable Groovy scripting support for search: useful for spatial queries
 script.engine.groovy.inline.search: on
-
-# Custom analyzer used in tests
-# See ElasticsearchAnalyzerIT
-index.analysis:
-  analyzer:
-    server-defined-custom-analyzer:
-      type: custom
-      tokenizer: standard
-      filter: [server-defined-custom-filter, lowercase]
-  filter:
-    server-defined-custom-filter:
-      type : stop
-      stopwords : [test1, close]

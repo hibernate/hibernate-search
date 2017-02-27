@@ -26,8 +26,13 @@ import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.test.SearchTestBase;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+
+import com.google.gson.JsonParser;
 
 /**
  * Test the use of Elasticsearch built-in and server-defined, custom analyzers,
@@ -36,6 +41,43 @@ import org.junit.Test;
  * @author Davide D'Alto
  */
 public class ElasticsearchAnalyzerIT extends SearchTestBase {
+
+	@Rule
+	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		// Make sure automatically created indexes will have the "server-defined-custom-analyzer" analyzer definition
+		elasticsearchClient.template( "server-defined-custom-analyzer" )
+				.create(
+						"*",
+						new JsonParser().parse(
+								"{"
+									+ "'index': {"
+										+ "'analysis': {"
+											+ "'analyzer': {"
+												+ "'server-defined-custom-analyzer': {"
+														+ "'char_filter': ['html_strip'],"
+														+ "'tokenizer': 'standard',"
+														+ "'filter': ['server-defined-custom-filter', 'lowercase']"
+												+ "}"
+											+ "},"
+											+ "'filter': {"
+												+ "'server-defined-custom-filter': {"
+														+ "'type': 'stop',"
+														+ "'stopwords': ['test1', 'close']"
+												+ "}"
+											+ "}"
+										+ "}"
+									+ "}"
+								+ "}"
+						)
+								.getAsJsonObject()
+					);
+
+		super.setUp();
+	}
 
 	@Test
 	public void testDefaultAnalyzer() throws Exception {
