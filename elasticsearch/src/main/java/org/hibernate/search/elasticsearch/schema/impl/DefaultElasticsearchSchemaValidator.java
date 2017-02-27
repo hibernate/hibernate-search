@@ -315,7 +315,7 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	}
 
 	/**
-	 * Variation of {@link #validateEqualWithDefault(String, Object, Object, Object)} for floats.
+	 * Variation of {@link #validateEqualWithDefault(ValidationErrorCollector, String, Object, Object, Object)} for floats.
 	 */
 	private static <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Float expectedValue, Float actualValue, float delta, Float defaultValueForNulls) {
@@ -348,7 +348,7 @@ public class DefaultElasticsearchSchemaValidator implements ElasticsearchSchemaV
 	}
 
 	/**
-	 * Variation of {@link #validateEqualWithDefault(String, Object, Object, Object)} for doubles.
+	 * Variation of {@link #validateEqualWithDefault(ValidationErrorCollector, String, Object, Object, Object)} for doubles.
 	 */
 	private static <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Double expectedValue, Double actualValue, double delta, Double defaultValueForNulls) {
