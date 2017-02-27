@@ -395,12 +395,6 @@
         </profile>
         <profile>
             <id>elasticsearch-2.2</id>
-            <!-- Activation rules are not inherited from the profile definition in the parent, so we must copy them here -->
-            <activation>
-                <property>
-                    <name>!testElasticsearchVersion</name>
-                </property>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -434,6 +428,12 @@
         </profile>
         <profile>
             <id>elasticsearch-5.0</id>
+            <!-- Activation rules are not inherited from the profile definition in the parent, so we must copy them here -->
+            <activation>
+                <property>
+                    <name>!testElasticsearchVersion</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

@@ -83,8 +83,8 @@ You may redefine the version to use by specifying the right profile and using th
 The following profiles are available:
 
  * `elasticsearch-2.0` for 2.0.x and 2.1.x
- * `elasticsearch-2.2` for 2.2.x and later 2.x (the default)
- * `elasticsearch-5.0` for 5.x
+ * `elasticsearch-2.2` for 2.2.x and later 2.x
+ * `elasticsearch-5.0` for 5.x (the default)
 
 A list of available versions for `testElasticsearchVersion` can be found on
 [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.elasticsearch%22%20AND%20a%3A%22elasticsearch%22).
