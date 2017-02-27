@@ -596,12 +596,16 @@ public class ElasticsearchSchemaValidationIT extends SearchInitializationTestBas
 
 		thrown.expect(
 				isException( ElasticsearchSchemaValidationException.class )
+				.withMainOrSuppressed(
+						isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage(
 								"\nindex 'org.hibernate.search.elasticsearch.test.elasticsearchschemavalidationit$simplebooleanentity', mapping 'org.hibernate.search.elasticsearch.test.ElasticsearchSchemaValidationIT$SimpleBooleanEntity':"
 								+ "\n\tInvalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
 						)
-				.withSuppressed(
+						.build()
+				)
+				.withMainOrSuppressed(
 						isException( ElasticsearchSchemaValidationException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage(

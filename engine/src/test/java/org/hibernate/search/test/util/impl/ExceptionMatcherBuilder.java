@@ -15,7 +15,9 @@ import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
  * @author Yoann Rodiere
@@ -34,6 +36,10 @@ public class ExceptionMatcherBuilder {
 		matchers.add( CoreMatchers.<Throwable>instanceOf( clazz ) );
 	}
 
+	public ExceptionMatcherBuilder withMainOrSuppressed(Matcher<?> matcher) {
+		return matching( mainOrSuppressed( matcher ) );
+	}
+
 	public ExceptionMatcherBuilder withSuppressed(Matcher<?> matcher) {
 		suppressedMatchers.add( matcher );
 		return this;
@@ -44,16 +50,16 @@ public class ExceptionMatcherBuilder {
 	}
 
 	public Matcher<? super Throwable> build() {
-		if ( matchers.size() == 1 && suppressedMatchers.isEmpty() ) {
+		if ( !suppressedMatchers.isEmpty() ) {
+			@SuppressWarnings("unchecked")
+			Matcher<? super Throwable>[] suppressedMatchersAsArray = castedSuppressedMatchers().toArray( new Matcher[suppressedMatchers.size()] );
+			ExceptionMatcherBuilder.this.matching( hasSuppressed( CoreMatchers.hasItems( suppressedMatchersAsArray ) ) );
+			suppressedMatchers.clear();
+		}
+		if ( matchers.size() == 1 ) {
 			return castedMatchers().get( 0 );
 		}
 		else {
-			if ( !suppressedMatchers.isEmpty() ) {
-				@SuppressWarnings("unchecked")
-				Matcher<? super Throwable>[] suppressedMatchersAsArray = castedSuppressedMatchers().toArray( new Matcher[suppressedMatchers.size()] );
-				ExceptionMatcherBuilder.this.matching( hasSuppressed( CoreMatchers.hasItems( suppressedMatchersAsArray ) ) );
-				suppressedMatchers.clear();
-			}
 			return CoreMatchers.allOf( castedMatchers() );
 		}
 	}
@@ -68,8 +74,8 @@ public class ExceptionMatcherBuilder {
 		return new ArrayList<Matcher<? super Throwable>>( (List) suppressedMatchers );
 	}
 
-	public ExceptionMatcherBuilder matching(final Matcher<?> messageMatcher) {
-		matchers.add( messageMatcher );
+	public ExceptionMatcherBuilder matching(final Matcher<?> throwableMatcher) {
+		matchers.add( throwableMatcher );
 		return this;
 	}
 
@@ -193,5 +199,47 @@ public class ExceptionMatcherBuilder {
 
 	private static Matcher<Throwable> hasSuppressed(Matcher<?> suppressedMatcher) {
 		return new ThrowableSuppressedMatcher( suppressedMatcher );
+	}
+
+	public static class ThrowableMainOrSuppressedMatcher extends TypeSafeDiagnosingMatcher<Throwable> {
+
+		private final Matcher<?> mainOrSuppressedMatcher;
+
+		public ThrowableMainOrSuppressedMatcher(Matcher<?> suppressedMatcher) {
+			this.mainOrSuppressedMatcher = suppressedMatcher;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText( "exception (or one of its suppressed exceptions) " );
+			description.appendDescriptionOf( mainOrSuppressedMatcher );
+		}
+
+		@Override
+		protected boolean matchesSafely(Throwable item, Description mismatchDescription) {
+			Throwable[] suppressedArray = item.getSuppressed();
+			List<Throwable> mainAndSuppressed = CollectionHelper.newArrayList( suppressedArray.length + 1 );
+			mainAndSuppressed.add( item );
+			for ( Throwable suppressed : suppressedArray ) {
+				mainAndSuppressed.add( suppressed );
+			}
+
+			boolean first = true;
+			for ( Throwable element : mainAndSuppressed ) {
+				if ( mainOrSuppressedMatcher.matches( element ) ) {
+					return true;
+				}
+				if ( !first ) {
+					mismatchDescription.appendText( ", " );
+				}
+				mainOrSuppressedMatcher.describeMismatch( element, mismatchDescription );
+				first = false;
+			}
+			return false;
+		}
+	}
+
+	private static Matcher<Throwable> mainOrSuppressed(Matcher<?> mainOrSuppressedMatcher) {
+		return new ThrowableMainOrSuppressedMatcher( mainOrSuppressedMatcher );
 	}
 }
