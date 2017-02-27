@@ -118,6 +118,14 @@ You may also select multiple hosts (separated by whitespace characters), so that
 `hibernate.search.default.elasticsearch.host \http://es1.mycompany.com:9200 \http://es2.mycompany.com:9200`
 +
 In the example above, the first request will go to `es1`, the second to `es2`, the third to `es1`, and so on.
++
+Also note having multiple hosts will enable failover:
+if one node happens to fail to serve a request (timeout, server error, invalid HTTP response, ...),
+the same request will be sent to the next one; if the second request is served without error,
+the failure will be blamed on the node and no error will be reported to the application.
++
+The failover feature will also be enabled when you only have one configured host
+but other hosts have been added thanks to automatic discovery (see below).
 Username for Elasticsearch connection:: `hibernate.search.default.elasticsearch.username ironman` (default is empty, meaning anonymous access)
 Password for Elasticsearch connection:: `hibernate.search.default.elasticsearch.password j@rV1s` (default is empty)
 +
@@ -794,7 +802,6 @@ Please check with JIRA and the mailing lists for updates, but at the time of wri
 * Hibernate Search does not make use of nested objects nor parent child relationship mapping https://hibernate.atlassian.net/browse/HSEARCH-2263[HSEARCH-2263].
   This is largely mitigated by the fact that Hibernate Search does the denormalization itself and maintain data consistency when nested objects are updated.
 * There is room for improvements in the performances of the MassIndexer implementation
-* There is no failover to the next host when multiple hosts are configured and one host happens to fail: https://hibernate.atlassian.net/browse/HSEARCH-2469[HSEARCH-2469]
 * Our new Elasticsearch integration module does not work in OSGi environments. If you need this, please vote for: https://hibernate.atlassian.net/browse/HSEARCH-2524[HSEARCH-2524].
 
 === Known bugs in Elasticsearch

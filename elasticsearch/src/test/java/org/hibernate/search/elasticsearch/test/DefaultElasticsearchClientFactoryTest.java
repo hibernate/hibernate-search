@@ -36,6 +36,7 @@ import org.junit.rules.ExpectedException;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.JsonObject;
 
@@ -181,6 +182,132 @@ public class DefaultElasticsearchClientFactoryTest {
 
 			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2469")
+	public void multipleHosts_failover_serverError() throws Exception {
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 );
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 503 ) ) );
+
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+
+			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 1, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+
+			wireMockRule1.resetRequests();
+			wireMockRule2.resetRequests();
+
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+
+			// Must not use the failing node anymore
+			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 0, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2469")
+	public void multipleHosts_failover_timeout() throws Exception {
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ).withFixedDelay( 10_000 /* 10s => will time out */ ) ) );
+
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+
+			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			/*
+			 * Wiremock introduces the delay *before* registering the request to the journal,
+			 * so we should have no request in the journal if we time out.
+			 */
+			wireMockRule2.verify( 0, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+
+			wireMockRule1.resetRequests();
+			wireMockRule2.resetRequests();
+
+			/*
+			 * Remove the failure in the previously failing node,
+			 * so that we can detect if requests are sent to this node.
+			 */
+			wireMockRule2.resetMappings();
+			wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+					.withRequestBody( equalToJson( payload ) )
+					.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+
+			// Must not use the failing node anymore
+			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 0, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2469")
+	public void multipleHosts_failover_fault() throws Exception {
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ).withFault( Fault.MALFORMED_RESPONSE_CHUNK ) ) );
+
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+
+			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 1, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+
+			wireMockRule1.resetRequests();
+			wireMockRule2.resetRequests();
+
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+
+			// Must not use the failing node anymore
+			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 0, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
 		}
 	}
 
