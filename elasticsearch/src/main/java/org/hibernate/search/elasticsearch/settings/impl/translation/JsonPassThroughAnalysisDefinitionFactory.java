@@ -8,8 +8,8 @@ package org.hibernate.search.elasticsearch.settings.impl.translation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
 import org.hibernate.search.exception.AssertionFailure;
@@ -41,7 +41,7 @@ class JsonPassThroughAnalysisDefinitionFactory<D extends AnalysisDefinition> imp
 	}
 
 	@Override
-	public D create(Parameter[] parameters) {
+	public D create(Map<String,String> parameters) {
 		D result;
 		try {
 			result = targetClass.newInstance();
@@ -52,19 +52,16 @@ class JsonPassThroughAnalysisDefinitionFactory<D extends AnalysisDefinition> imp
 
 		Map<String, JsonElement> parameterMap = new LinkedHashMap<>();
 
-		if ( parameters != null && parameters.length > 0 ) {
-			for ( Parameter parameter : parameters ) {
-				String name = parameter.name();
-				String value = parameter.value();
-				switch ( name ) {
-				case "type":
-					result.setType( parseJsonString( name, value ) );
-					break;
-				default:
-					parameterMap.put( name, parseJson( name, value ) );
-					break;
-				}
-
+		for ( Entry<String, String> parameter : parameters.entrySet() ) {
+			String name = parameter.getKey();
+			String value = parameter.getValue();
+			switch ( name ) {
+			case "type":
+				result.setType( parseJsonString( name, value ) );
+				break;
+			default:
+				parameterMap.put( name, parseJson( name, value ) );
+				break;
 			}
 		}
 

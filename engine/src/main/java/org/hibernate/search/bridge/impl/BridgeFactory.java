@@ -20,7 +20,6 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
@@ -33,6 +32,7 @@ import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
 import org.hibernate.search.bridge.spi.IndexManagerTypeSpecificBridgeProvider;
 import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.cfg.spi.ParameterAnnotationsReader;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -134,10 +134,7 @@ public final class BridgeFactory {
 	 */
 	public void injectParameters(ClassBridge classBridgeConfiguration, Object classBridge) {
 		if ( classBridgeConfiguration.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( classBridge.getClass() ) ) {
-			Map<String, String> params = new HashMap<>( classBridgeConfiguration.params().length );
-			for ( Parameter param : classBridgeConfiguration.params() ) {
-				params.put( param.name(), param.value() );
-			}
+			Map<String, String> params = ParameterAnnotationsReader.toNewMutableMap( classBridgeConfiguration.params() );
 			( (ParameterizedBridge) classBridge ).setParameterValues( params );
 		}
 	}
@@ -376,10 +373,7 @@ public final class BridgeFactory {
 				throw LOG.noFieldBridgeInterfaceImplementedByFieldBridge( fieldBridgeClass.getName(), appliedOnName );
 			}
 			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
-				Map<String, String> params = new HashMap<>( bridgeAnn.params().length );
-				for ( Parameter param : bridgeAnn.params() ) {
-					params.put( param.name(), param.value() );
-				}
+				Map<String, String> params = ParameterAnnotationsReader.toNewMutableMap( bridgeAnn.params() );
 				( (ParameterizedBridge) instance ).setParameterValues( params );
 			}
 			populateReturnType( appliedOnType, fieldBridgeClass, instance );

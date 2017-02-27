@@ -1024,4 +1024,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 336, value = "A file could not be deleted: likely lock contention. Not a problem for index replications as it will be attempted again in the future.")
 	void fileDeleteFailureIgnored(@Cause IOException e);
 
+	@Message(id = 337, value = "Conflicting usage of @Parameter annotation for parameter name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
+	SearchException conflictingParameterDefined(String name, String value1, String value2);
+
 }

@@ -142,6 +142,7 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.cfg.spi.ParameterAnnotationsReader;
 import org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory;
 import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory;
 import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenizerFactory;
@@ -521,7 +522,8 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 		if ( factory == null ) {
 			throw LOG.unsupportedCharFilterFactory( factoryType );
 		}
-		return factory.create( hibernateSearchDef.params() );
+		Map<String, String> map = ParameterAnnotationsReader.toNewMutableMap( hibernateSearchDef.params() );
+		return factory.create( map );
 	}
 
 	@Override
@@ -531,7 +533,8 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 		if ( factory == null ) {
 			throw LOG.unsupportedTokenizerFactory( factoryType );
 		}
-		return factory.create( hibernateSearchDef.params() );
+		Map<String, String> map = ParameterAnnotationsReader.toNewMutableMap( hibernateSearchDef.params() );
+		return factory.create( map );
 	}
 
 	@Override
@@ -541,7 +544,8 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 		if ( factory == null ) {
 			throw LOG.unsupportedTokenFilterFactory( factoryType );
 		}
-		return factory.create( hibernateSearchDef.params() );
+		Map<String, String> map = ParameterAnnotationsReader.toNewMutableMap( hibernateSearchDef.params() );
+		return factory.create( map );
 	}
 
 	private class TokenizerClassNameToElasticsearchTypeNameTransformer implements ParameterValueTransformer {

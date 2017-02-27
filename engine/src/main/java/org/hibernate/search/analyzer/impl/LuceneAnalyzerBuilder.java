@@ -7,7 +7,6 @@
 package org.hibernate.search.analyzer.impl;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -22,9 +21,12 @@ import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.cfg.spi.ParameterAnnotationsReader;
 import org.hibernate.search.engine.impl.TokenizerChain;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass;
 
@@ -37,6 +39,8 @@ import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass
 final class LuceneAnalyzerBuilder {
 
 	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
+
+	private static final Log log = LoggerFactory.make();
 
 	private LuceneAnalyzerBuilder() {
 	}
@@ -102,11 +106,9 @@ final class LuceneAnalyzerBuilder {
 	}
 
 	private static Map<String, String> getMapOfParameters(Parameter[] params, Version luceneMatchVersion) {
-		Map<String, String> mapOfParams = new HashMap<String, String>( params.length );
-		for ( Parameter param : params ) {
-			mapOfParams.put( param.name(), param.value() );
-		}
+		Map<String, String> mapOfParams = ParameterAnnotationsReader.toNewMutableMap( params );
 		mapOfParams.put( LUCENE_VERSION_PARAM, luceneMatchVersion.toString() );
 		return mapOfParams;
 	}
+
 }

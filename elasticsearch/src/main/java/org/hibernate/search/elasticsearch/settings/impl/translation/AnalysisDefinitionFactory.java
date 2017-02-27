@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl.translation;
 
-import org.hibernate.search.annotations.Parameter;
+import java.util.Map;
 
 public interface AnalysisDefinitionFactory<D> {
 
 	String getType();
 
-	D create(Parameter[] parameters);
+	D create(Map<String,String> parameters);
 
 }

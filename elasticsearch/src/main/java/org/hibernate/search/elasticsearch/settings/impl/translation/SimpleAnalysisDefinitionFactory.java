@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
 import org.hibernate.search.exception.AssertionFailure;
 
@@ -34,7 +33,7 @@ class SimpleAnalysisDefinitionFactory<D extends AnalysisDefinition> implements A
 	}
 
 	@Override
-	public D create(Parameter[] parameters) {
+	public D create(Map<String,String> parameters) {
 		D result;
 		try {
 			result = targetClass.newInstance();
@@ -44,16 +43,9 @@ class SimpleAnalysisDefinitionFactory<D extends AnalysisDefinition> implements A
 		}
 		result.setType( type );
 
-		Map<String, String> luceneParameterMap = new LinkedHashMap<>();
-		if ( parameters != null ) {
-			for ( Parameter parameter : parameters ) {
-				luceneParameterMap.put( parameter.name(), parameter.value() );
-			}
-		}
-
 		Map<String, JsonElement> elasticsearchParameterMap = new LinkedHashMap<>();
 		for ( ParametersTransformer transformer : parameterTransformers ) {
-			elasticsearchParameterMap.putAll( transformer.transform( luceneParameterMap ) );
+			elasticsearchParameterMap.putAll( transformer.transform( parameters ) );
 		}
 
 		if ( !elasticsearchParameterMap.isEmpty() ) {
