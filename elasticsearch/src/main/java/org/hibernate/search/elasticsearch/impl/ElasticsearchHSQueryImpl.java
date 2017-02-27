@@ -801,12 +801,20 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							if ( distance == null || distance.isJsonNull() ) {
 								projections[i] = null;
 							}
-							else if ( distance.getAsDouble() == Double.MAX_VALUE ) {
-								// When we extract the distance from the sort, its default value is Double.MAX_VALUE
-								projections[i] = null;
-							}
 							else {
-								projections[i] = distance.getAsDouble();
+								Double distanceAsDouble = distance.getAsDouble();
+
+								if ( distanceAsDouble == Double.MAX_VALUE || distanceAsDouble.isInfinite() ) {
+									/*
+									 * When we extract the distance from the sort, its default value is:
+									 *  - Double.MAX_VALUE on older ES versions (5.0 and lower)
+									 *  - Double.POSITIVE_INFINITY on newer ES versions (from somewhere around 5.2 onwards)
+									 */
+									projections[i] = null;
+								}
+								else {
+									projections[i] = distance.getAsDouble();
+								}
 							}
 							break;
 						case ElasticsearchProjectionConstants.TOOK:
