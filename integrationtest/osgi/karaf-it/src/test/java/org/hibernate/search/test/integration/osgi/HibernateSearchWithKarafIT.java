@@ -76,6 +76,10 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
  * }
  * </pre>
  *
+ * If/when investigating strange failures due to RMI registries, remember to check that
+ * your local hostname resolves to 127.0.0.1.
+ * In Fedora this isn't the case by default, and causes problems with Karaf.
+ *
  * @author Hardy Ferentschik
  */
 @RunWith(PaxExam.class)
