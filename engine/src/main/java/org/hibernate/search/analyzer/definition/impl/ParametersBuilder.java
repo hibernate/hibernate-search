@@ -19,6 +19,8 @@ import org.hibernate.search.annotations.Parameter;
  */
 class ParametersBuilder implements LuceneAnalysisDefinitionBuilder<Parameter[]> {
 
+	private static final String VALUE = "value";
+	private static final String NAME = "name";
 	private final Map<String, String> params = new LinkedHashMap<>();
 
 	public void put(String name, String value) {
@@ -32,8 +34,8 @@ class ParametersBuilder implements LuceneAnalysisDefinitionBuilder<Parameter[]> 
 
 		int index = 0;
 		for ( Map.Entry<String, String> entry : params.entrySet() ) {
-			descriptor.setValue( "name" , entry.getKey() );
-			descriptor.setValue( "value", entry.getValue() );
+			descriptor.setValue( NAME , entry.getKey() );
+			descriptor.setValue( VALUE, entry.getValue() );
 			result[index] = AnnotationFactory.create( descriptor );
 			++index;
 		}
