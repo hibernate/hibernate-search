@@ -38,9 +38,9 @@ public final class MassIndexingJobParameters {
 
 	public static final String CHECKPOINT_INTERVAL = "checkpointInterval";
 
-	public static final String HQL = "hql";
+	public static final String CUSTOM_QUERY_HQL = "customQueryHQL";
 
-	public static final String CRITERIA = "criteria";
+	public static final String CUSTOM_QUERY_CRITERIA = "customQueryCriteria";
 
-	public static final String MAX_RESULTS = "maxResults";
+	public static final String CUSTOM_QUERY_LIMIT = "customQueryLimit";
 }

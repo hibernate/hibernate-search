@@ -75,11 +75,11 @@ public final class MassIndexingJob {
 		private boolean purgeAllOnStart = false;
 		private int fetchSize = 200 * 1000;
 		private int checkpointInterval = 200;
-		private int maxResults = 1000 * 1000;
 		private int rowsPerPartition = 250;
 		private int maxThreads = 1;
-		private Set<Criterion> criteria;
-		private String hql;
+		private Set<Criterion> customQueryCriteria;
+		private String customQueryHql;
+		private int customQueryLimit = 1000 * 1000;
 
 		private ParametersBuilder(Class<?> rootEntity, Class<?>... rootEntities) {
 			if ( rootEntity == null ) {
@@ -90,8 +90,8 @@ public final class MassIndexingJob {
 			for ( Class<?> clz : rootEntities ) {
 				this.rootEntities.add( clz );
 			}
-			criteria = new HashSet<>();
-			hql = "";
+			customQueryCriteria = new HashSet<>();
+			customQueryHql = "";
 		}
 
 		public ParametersBuilder entityManagerFactoryScope(String scope) {
@@ -148,14 +148,14 @@ public final class MassIndexingJob {
 		 * The maximum number of results will be return from the HQL / criteria. It is equivalent to keyword `LIMIT` in
 		 * SQL.
 		 *
-		 * @param maxResults
+		 * @param customQueryLimit
 		 * @return
 		 */
-		public ParametersBuilder maxResults(int maxResults) {
-			if ( maxResults < 1 ) {
-				throw new IllegalArgumentException( "maxResults must be at least 1" );
+		public ParametersBuilder customQueryLimit(int customQueryLimit) {
+			if ( customQueryLimit < 1 ) {
+				throw new IllegalArgumentException( "customQueryLimit must be at least 1" );
 			}
-			this.maxResults = maxResults;
+			this.customQueryLimit = customQueryLimit;
 			return this;
 		}
 
@@ -220,14 +220,14 @@ public final class MassIndexingJob {
 		 * @return
 		 */
 		public ParametersBuilder restrictedBy(Criterion criterion) {
-			if ( !hql.isEmpty() ) {
+			if ( !customQueryHql.isEmpty() ) {
 				throw new IllegalArgumentException( "Cannot use HQL approach "
 						+ "and Criteria approach in the same time." );
 			}
 			if ( criterion == null ) {
 				throw new NullPointerException( "The criterion is null." );
 			}
-			criteria.add( criterion );
+			customQueryCriteria.add( criterion );
 			return this;
 		}
 
@@ -241,11 +241,11 @@ public final class MassIndexingJob {
 			if ( hql == null ) {
 				throw new NullPointerException( "The HQL is null." );
 			}
-			if ( criteria.size() > 0 ) {
+			if ( customQueryCriteria.size() > 0 ) {
 				throw new IllegalArgumentException( "Cannot use HQL approach "
 						+ "and Criteria approach in the same time." );
 			}
-			this.hql = hql;
+			this.customQueryHql = hql;
 			return this;
 		}
 
@@ -281,9 +281,9 @@ public final class MassIndexingJob {
 			}
 			jobParams.put( MassIndexingJobParameters.CACHEABLE, String.valueOf( cacheable ) );
 			jobParams.put( MassIndexingJobParameters.FETCH_SIZE, String.valueOf( fetchSize ) );
-			jobParams.put( MassIndexingJobParameters.HQL, hql );
+			jobParams.put( MassIndexingJobParameters.CUSTOM_QUERY_HQL, customQueryHql );
 			jobParams.put( MassIndexingJobParameters.CHECKPOINT_INTERVAL, String.valueOf( checkpointInterval ) );
-			jobParams.put( MassIndexingJobParameters.MAX_RESULTS, String.valueOf( maxResults ) );
+			jobParams.put( MassIndexingJobParameters.CUSTOM_QUERY_LIMIT, String.valueOf( customQueryLimit ) );
 			jobParams.put( MassIndexingJobParameters.MAX_THREADS, String.valueOf( maxThreads ) );
 			jobParams.put( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, String.valueOf( optimizeAfterPurge ) );
 			jobParams.put( MassIndexingJobParameters.OPTIMIZE_ON_FINISH, String.valueOf( optimizeOnFinish ) );
@@ -291,9 +291,9 @@ public final class MassIndexingJob {
 			jobParams.put( MassIndexingJobParameters.ROOT_ENTITIES, getRootEntitiesAsString() );
 			jobParams.put( MassIndexingJobParameters.ROWS_PER_PARTITION, String.valueOf( rowsPerPartition ) );
 
-			if ( !criteria.isEmpty() ) {
+			if ( !customQueryCriteria.isEmpty() ) {
 				try {
-					jobParams.put( MassIndexingJobParameters.CRITERIA, MassIndexerUtil.serializeCriteria( criteria ) );
+					jobParams.put( MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA, MassIndexerUtil.serializeCriteria( customQueryCriteria ) );
 				}
 				catch (IOException e) {
 					throw new SearchException( "Failed to serialize Criteria", e );

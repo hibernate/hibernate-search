@@ -61,8 +61,8 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String rootEntities;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CRITERIA)
-	private String serializedCriteria;
+	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA)
+	private String serializedCustomQueryCriteria;
 
 	@Override
 	public void beforeJob() throws Exception {
@@ -120,12 +120,12 @@ public class JobContextSetupListener extends AbstractJobListener {
 					.filter( clz -> entityNamesToIndex.contains( clz.getName() ) )
 					.collect( Collectors.toCollection( HashSet::new ) );
 
-			Set<Criterion> criteria = MassIndexerUtil.deserializeCriteria( serializedCriteria );
+			Set<Criterion> criteria = MassIndexerUtil.deserializeCriteria( serializedCustomQueryCriteria );
 			LOGGER.infof( "%d criteria found.", criteria.size() );
 
 			JobContextData jobContextData = new JobContextData();
 			jobContextData.setEntityManagerFactory( emf );
-			jobContextData.setCriteria( criteria );
+			jobContextData.setCustomQueryCriteria( criteria );
 			jobContextData.setEntityTypes( entityTypesToIndex );
 			jobContext.setTransientUserData( jobContextData );
 		}

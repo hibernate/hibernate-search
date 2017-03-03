@@ -46,7 +46,7 @@ public class JobContextData {
 	 */
 	private List<PartitionBound> partitionBounds;
 
-	private Set<Criterion> criteria;
+	private Set<Criterion> customQueryCriteria;
 
 	public JobContextData() {
 		entityTypeMap = new HashMap<>();
@@ -88,8 +88,8 @@ public class JobContextData {
 		return totalEntityToIndex;
 	}
 
-	public Set<Criterion> getCriteria() {
-		return criteria;
+	public Set<Criterion> getCustomQueryCriteria() {
+		return customQueryCriteria;
 	}
 
 	public void setTotalEntityToIndex(long totalEntityToIndex) {
@@ -113,8 +113,8 @@ public class JobContextData {
 		return partitionBounds.get( partitionId );
 	}
 
-	public void setCriteria(Set<Criterion> criteria) {
-		this.criteria = criteria;
+	public void setCustomQueryCriteria(Set<Criterion> criteria) {
+		this.customQueryCriteria = criteria;
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class JobContextData {
 				.append( ", entityTypeMap=" ).append( entityTypeMap )
 				.append( ", totalEntityToIndex=" ).append( totalEntityToIndex )
 				.append( ", partitionBounds=" ).append( partitionBounds )
-				.append( ", criteria=" ).append( criteria )
+				.append( ", customQueryCriteria=" ).append( customQueryCriteria )
 				.append( "]" )
 				.toString();
 	}

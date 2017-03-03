@@ -21,7 +21,7 @@
                 <property name="entityManagerFactoryScope" value="#{jobParameters['entityManagerFactoryScope']}" />
                 <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
                 <property name="rootEntities" value="#{jobParameters['rootEntities']}" />
-                <property name="criteria" value="#{jobParameters['criteria']}" />
+                <property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />
             </properties>
         </listener>
     </listeners>
@@ -50,9 +50,9 @@
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
                     <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
-                    <property name="hql" value="#{jobParameters['hql']}" />
+                    <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="isJavaSE" value="#{jobParameters['isJavaSE']}" />
-                    <property name="maxResults" value="#{jobParameters['maxResults']}?:10000000;" />
+                    <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}?:10000000;" />
                 </properties>
             </reader>
             <processor ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocProducer">
@@ -77,7 +77,7 @@
             <mapper ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper">
                 <properties>
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
-                    <property name="hql" value="#{jobParameters['hql']}" />
+                    <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
                     <property name="maxThreads" value="#{jobParameters['threads']}?:8;" />
                     <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:0;" />
