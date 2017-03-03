@@ -74,7 +74,7 @@ public final class MassIndexingJob {
 		private boolean optimizeOnFinish = false;
 		private boolean purgeAllOnStart = false;
 		private int fetchSize = 200 * 1000;
-		private int itemCount = 200;
+		private int checkpointInterval = 200;
 		private int maxResults = 1000 * 1000;
 		private int rowsPerPartition = 250;
 		private int maxThreads = 1;
@@ -118,14 +118,15 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Checkpoint frequency during the mass index process. The checkpoint will be done every N items read, where N
-		 * is the given item count.
+		 * Checkpoint interval during the mass index process.
 		 *
-		 * @param itemCount the number of item count before starting the next checkpoint.
+		 * The checkpoint will be done every N items read, where N is the given item count.
+		 *
+		 * @param checkpointInterval the number of item count before starting the next checkpoint.
 		 * @return
 		 */
-		public ParametersBuilder checkpointFreq(int itemCount) {
-			this.itemCount = itemCount;
+		public ParametersBuilder checkpointInterval(int checkpointInterval) {
+			this.checkpointInterval = checkpointInterval;
 			return this;
 		}
 
@@ -281,7 +282,7 @@ public final class MassIndexingJob {
 			jobParams.put( MassIndexingJobParameters.CACHEABLE, String.valueOf( cacheable ) );
 			jobParams.put( MassIndexingJobParameters.FETCH_SIZE, String.valueOf( fetchSize ) );
 			jobParams.put( MassIndexingJobParameters.HQL, hql );
-			jobParams.put( MassIndexingJobParameters.ITEM_COUNT, String.valueOf( itemCount ) );
+			jobParams.put( MassIndexingJobParameters.CHECKPOINT_INTERVAL, String.valueOf( checkpointInterval ) );
 			jobParams.put( MassIndexingJobParameters.MAX_RESULTS, String.valueOf( maxResults ) );
 			jobParams.put( MassIndexingJobParameters.MAX_THREADS, String.valueOf( maxThreads ) );
 			jobParams.put( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, String.valueOf( optimizeAfterPurge ) );

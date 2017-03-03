@@ -110,7 +110,7 @@ public class RestartChunkIT {
 				MassIndexingJob.parameters()
 						.forEntities( Company.class, Person.class )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-						.checkpointFreq( 10 )
+						.checkpointInterval( 10 )
 						.build()
 				);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );

@@ -36,7 +36,7 @@ public final class MassIndexingJobParameters {
 
 	public static final String ROWS_PER_PARTITION = "rowsPerPartition";
 
-	public static final String ITEM_COUNT = "itemCount";
+	public static final String CHECKPOINT_INTERVAL = "checkpointInterval";
 
 	public static final String HQL = "hql";
 
