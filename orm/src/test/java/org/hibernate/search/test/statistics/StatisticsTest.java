@@ -32,6 +32,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.After;
 import org.junit.Test;
@@ -178,6 +179,36 @@ public class StatisticsTest extends SearchTestBase {
 			assertNotEquals( 0, getStatistics().getObjectLoadingExecutionAvgTime() );
 			assertNotEquals( 0, getStatistics().getObjectLoadingExecutionMaxTime() );
 			assertNotEquals( 0, getStatistics().getObjectLoadingTotalTime() );
+		}
+		finally {
+			s.close();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2630")
+	public void objectLoading_multiClassesQueryLoader_singleResult() {
+		Session s = openSession();
+		try {
+			Transaction tx = s.beginTransaction();
+			A entity = new A();
+			entity.id = 1L;
+			s.persist( entity );
+			tx.commit();
+
+			FullTextSession session = Search.getFullTextSession( s );
+			FullTextQuery query = session.createFullTextQuery( matchAll(), A.class, B.class );
+
+			assertEquals( 0, getStatistics().getObjectsLoadedCount() );
+
+			query.getResultList();
+
+			assertEquals( 1, getStatistics().getObjectsLoadedCount() );
+
+			query = session.createFullTextQuery( matchAll(), A.class, B.class );
+			query.getResultList();
+
+			assertEquals( 2, getStatistics().getObjectsLoadedCount() );
 		}
 		finally {
 			s.close();
