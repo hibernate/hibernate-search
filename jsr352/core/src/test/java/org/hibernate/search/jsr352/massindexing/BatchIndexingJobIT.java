@@ -119,10 +119,13 @@ public class BatchIndexingJobIT {
 		assertEquals( 0, people.size() );
 		assertEquals( 0, whos.size() );
 
-		long executionId = BatchIndexingJob.forEntities( Company.class, Person.class, WhoAmI.class )
-				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-				.underJavaSE( jobOperator )
-				.start();
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntities( Company.class, Person.class, WhoAmI.class )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
@@ -148,11 +151,14 @@ public class BatchIndexingJobIT {
 		List<Company> companies = findClass( Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
-		long executionId = BatchIndexingJob.forEntities( Company.class )
-				.entityManagerFactoryScope( "persistence-unit-name" )
-				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-				.underJavaSE( jobOperator )
-				.start();
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.entityManagerFactoryScope( "persistence-unit-name" )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
@@ -169,11 +175,14 @@ public class BatchIndexingJobIT {
 		List<Company> companies = findClass( Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
-		long executionId = BatchIndexingJob.forEntities( Company.class )
-				.entityManagerFactoryScope( "session-factory-name" )
-				.entityManagerFactoryReference( SESSION_FACTORY_NAME )
-				.underJavaSE( jobOperator )
-				.start();
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.entityManagerFactoryScope( "session-factory-name" )
+						.entityManagerFactoryReference( SESSION_FACTORY_NAME )
+						.build()
+				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
@@ -200,11 +209,14 @@ public class BatchIndexingJobIT {
 		assertEquals( 0, findClass( Company.class, "name", "Red Hat" ).size() );
 		assertEquals( 0, findClass( Company.class, "name", "Microsoft" ).size() );
 
-		long executionId = BatchIndexingJob.forEntity( Company.class )
-				.restrictedBy( Restrictions.in( "name", "Google", "Red Hat" ) )
-				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-				.underJavaSE( jobOperator )
-				.start();
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.restrictedBy( Restrictions.in( "name", "Google", "Red Hat" ) )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
@@ -232,11 +244,14 @@ public class BatchIndexingJobIT {
 		assertEquals( 0, findClass( Company.class, "name", "Red Hat" ).size() );
 		assertEquals( 0, findClass( Company.class, "name", "Microsoft" ).size() );
 
-		long executionId = BatchIndexingJob.forEntity( Company.class )
-				.restrictedBy( "select c from Company c where c.name in ( 'Google', 'Red Hat' )" )
-				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-				.underJavaSE( jobOperator )
-				.start();
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Company.class )
+						.restrictedBy( "select c from Company c where c.name in ( 'Google', 'Red Hat' )" )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 

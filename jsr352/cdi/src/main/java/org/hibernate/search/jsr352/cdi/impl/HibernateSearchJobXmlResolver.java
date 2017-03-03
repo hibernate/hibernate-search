@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJob;
 
 import org.jberet.spi.JobXmlResolver;
 import org.jberet.tools.AbstractJobXmlResolver;
@@ -26,7 +26,7 @@ public final class HibernateSearchJobXmlResolver extends AbstractJobXmlResolver 
 	private static final String XML_SUFFIX = ".xml";
 
 	private static final Map<String, String> JOB_XML_NAMES_TO_JOB_NAMES = Collections.unmodifiableMap(
-			Arrays.asList( BatchIndexingJob.JOB_NAME ).stream()
+			Arrays.asList( MassIndexingJob.NAME ).stream()
 					.collect( Collectors.toMap( s -> s.concat( XML_SUFFIX ), Function.identity() ) )
 	);
 

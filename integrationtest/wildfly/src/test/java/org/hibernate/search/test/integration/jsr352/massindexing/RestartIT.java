@@ -24,7 +24,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJob;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.Message;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.MessageManager;
@@ -102,13 +102,18 @@ public class RestartIT {
 
 		// The 1st execution. Keep it alive and wait Byteman to stop it
 		JobInterruptorUtil.enable();
-		long execId1 = BatchIndexingJob.forEntity( Message.class ).start();
+		long execId1 = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Message.class )
+						.build()
+				);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
 		jobExec1 = JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 		JobInterruptorUtil.disable();
 
 		// Restart the job. This is the 2nd execution.
-		long execId2 = BatchIndexingJob.restart( execId1 );
+		long execId2 = jobOperator.restart( execId1, null );
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
 		jobExec2 = JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
 
@@ -126,15 +131,19 @@ public class RestartIT {
 
 		// The 1st execution. Keep it alive and wait Byteman to stop it
 		JobInterruptorUtil.enable();
-		long execId1 = BatchIndexingJob.forEntity( Message.class )
-				.restrictedBy( Restrictions.ge( "date", SDF.parse( "01/09/2016" ) ) )
-				.start();
+		long execId1 = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Message.class )
+						.restrictedBy( Restrictions.ge( "date", SDF.parse( "01/09/2016" ) ) )
+						.build()
+				);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
 		jobExec1 = JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 		JobInterruptorUtil.disable();
 
 		// Restart the job. This is the 2nd execution.
-		long execId2 = BatchIndexingJob.restart( execId1 );
+		long execId2 = jobOperator.restart( execId1, null );
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
 		jobExec2 = JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
 
@@ -151,9 +160,13 @@ public class RestartIT {
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
 
 		JobInterruptorUtil.enable();
-		long execId1 = BatchIndexingJob.forEntity( Message.class )
-				.restrictedBy( "select m from Message m where day( m.date ) = 31" )
-				.start();
+		long execId1 = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Message.class )
+						.restrictedBy( "select m from Message m where day( m.date ) = 31" )
+						.build()
+				);
 		JobExecution jobExec1 = BatchRuntime.getJobOperator().getJobExecution( execId1 );
 		jobExec1 = JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 		JobInterruptorUtil.disable();
