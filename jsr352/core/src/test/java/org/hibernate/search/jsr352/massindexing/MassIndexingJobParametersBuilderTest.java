@@ -47,16 +47,16 @@ public class MassIndexingJobParametersBuilderTest {
 				.purgeAtStart( PURGE_AT_START )
 				.build();
 
-		assertEquals( SESSION_FACTORY_NAME, props.getProperty( "entityManagerFactoryReference" ) );
-		assertEquals( FETCH_SIZE, Integer.parseInt( props.getProperty( "fetchSize" ) ) );
-		assertEquals( MAX_RESULTS, Integer.parseInt( props.getProperty( "maxResults" ) ) );
-		assertEquals( OPTIMIZE_AFTER_PURGE, Boolean.parseBoolean( props.getProperty( "optimizeAfterPurge" ) ) );
-		assertEquals( OPTIMIZE_AT_END, Boolean.parseBoolean( props.getProperty( "optimizeAtEnd" ) ) );
-		assertEquals( ROWS_PER_PARTITION, Integer.parseInt( props.getProperty( "rowsPerPartition" ) ) );
-		assertEquals( PURGE_AT_START, Boolean.parseBoolean( props.getProperty( "purgeAtStart" ) ) );
-		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( "maxThreads" ) ) );
+		assertEquals( SESSION_FACTORY_NAME, props.getProperty( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE ) );
+		assertEquals( FETCH_SIZE, Integer.parseInt( props.getProperty( MassIndexingJobParameters.FETCH_SIZE ) ) );
+		assertEquals( MAX_RESULTS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_RESULTS ) ) );
+		assertEquals( OPTIMIZE_AFTER_PURGE, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE ) ) );
+		assertEquals( OPTIMIZE_AT_END, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_AT_END ) ) );
+		assertEquals( ROWS_PER_PARTITION, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ROWS_PER_PARTITION ) ) );
+		assertEquals( PURGE_AT_START, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_AT_START ) ) );
+		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) );
 
-		String rootEntities = props.getProperty( "rootEntities" );
+		String rootEntities = props.getProperty( MassIndexingJobParameters.ROOT_ENTITIES );
 		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
 		assertTrue( entityNames.contains( Integer.class.getName() ) );
@@ -70,7 +70,7 @@ public class MassIndexingJobParametersBuilderTest {
 				.entityManagerFactoryReference( SESSION_FACTORY_NAME )
 				.build();
 
-		String rootEntities = props.getProperty( "rootEntities" );
+		String rootEntities = props.getProperty( MassIndexingJobParameters.ROOT_ENTITIES );
 		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
 		assertTrue( entityNames.contains( Integer.class.getName() ) );
@@ -83,7 +83,7 @@ public class MassIndexingJobParametersBuilderTest {
 				.forEntity( Integer.class )
 				.build();
 
-		String rootEntities = props.getProperty( "rootEntities" );
+		String rootEntities = props.getProperty( MassIndexingJobParameters.ROOT_ENTITIES );
 		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
 		assertTrue( entityNames.contains( Integer.class.getName() ) );

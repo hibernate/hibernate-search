@@ -49,19 +49,19 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE)
 	private String entityManagerFactoryScope;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE)
 	private String entityManagerFactoryReference;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.ROOT_ENTITIES)
 	private String rootEntities;
 
 	@Inject
-	@BatchProperty(name = "criteria")
+	@BatchProperty(name = MassIndexingJobParameters.CRITERIA)
 	private String serializedCriteria;
 
 	@Override

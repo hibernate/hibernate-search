@@ -17,6 +17,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.jboss.logging.Logger;
 
@@ -33,11 +34,11 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.PURGE_AT_START)
 	private String purgeAtStart;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE)
 	private String optimizeAfterPurge;
 
 	private Session session;

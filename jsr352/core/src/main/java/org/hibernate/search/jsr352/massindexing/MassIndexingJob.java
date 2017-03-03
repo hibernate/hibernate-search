@@ -273,26 +273,26 @@ public final class MassIndexingJob {
 			Properties jobParams = new Properties();
 
 			if ( entityManagerFactoryScope != null ) {
-				jobParams.put( "entityManagerFactoryScope", entityManagerFactoryScope );
+				jobParams.put( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE, entityManagerFactoryScope );
 			}
 			if ( entityManagerFactoryReference != null ) {
-				jobParams.put( "entityManagerFactoryReference", entityManagerFactoryReference );
+				jobParams.put( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE, entityManagerFactoryReference );
 			}
-			jobParams.put( "cacheable", String.valueOf( cacheable ) );
-			jobParams.put( "fetchSize", String.valueOf( fetchSize ) );
-			jobParams.put( "hql", hql );
-			jobParams.put( "itemCount", String.valueOf( itemCount ) );
-			jobParams.put( "maxResults", String.valueOf( maxResults ) );
-			jobParams.put( "maxThreads", String.valueOf( maxThreads ) );
-			jobParams.put( "optimizeAfterPurge", String.valueOf( optimizeAfterPurge ) );
-			jobParams.put( "optimizeAtEnd", String.valueOf( optimizeAtEnd ) );
-			jobParams.put( "purgeAtStart", String.valueOf( purgeAtStart ) );
-			jobParams.put( "rootEntities", getRootEntitiesAsString() );
-			jobParams.put( "rowsPerPartition", String.valueOf( rowsPerPartition ) );
+			jobParams.put( MassIndexingJobParameters.CACHEABLE, String.valueOf( cacheable ) );
+			jobParams.put( MassIndexingJobParameters.FETCH_SIZE, String.valueOf( fetchSize ) );
+			jobParams.put( MassIndexingJobParameters.HQL, hql );
+			jobParams.put( MassIndexingJobParameters.ITEM_COUNT, String.valueOf( itemCount ) );
+			jobParams.put( MassIndexingJobParameters.MAX_RESULTS, String.valueOf( maxResults ) );
+			jobParams.put( MassIndexingJobParameters.MAX_THREADS, String.valueOf( maxThreads ) );
+			jobParams.put( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, String.valueOf( optimizeAfterPurge ) );
+			jobParams.put( MassIndexingJobParameters.OPTIMIZE_AT_END, String.valueOf( optimizeAtEnd ) );
+			jobParams.put( MassIndexingJobParameters.PURGE_AT_START, String.valueOf( purgeAtStart ) );
+			jobParams.put( MassIndexingJobParameters.ROOT_ENTITIES, getRootEntitiesAsString() );
+			jobParams.put( MassIndexingJobParameters.ROWS_PER_PARTITION, String.valueOf( rowsPerPartition ) );
 
 			if ( !criteria.isEmpty() ) {
 				try {
-					jobParams.put( "criteria", MassIndexerUtil.serializeCriteria( criteria ) );
+					jobParams.put( MassIndexingJobParameters.CRITERIA, MassIndexerUtil.serializeCriteria( criteria ) );
 				}
 				catch (IOException e) {
 					throw new SearchException( "Failed to serialize Criteria", e );
