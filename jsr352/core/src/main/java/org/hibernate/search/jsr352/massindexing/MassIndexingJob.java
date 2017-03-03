@@ -12,60 +12,59 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
-
 import org.hibernate.criterion.Criterion;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
 
 /**
- * An alternative to the current mass indexer, using the Java Batch architecture as defined by JSR 352.
+ * A utility class to start the Hibernate Search JSR-352 mass indexing job.
+ * <p>
+ * Use it like this:
+ * <code><pre>
+ * jobOperator.start(
+ *		MassIndexingJob.NAME,
+ *		MassIndexingJob.parameters()
+ *			.forEntities( String.class, Integer.class )
+ *			.fetchSize( 1000 )
+ *			.rowsPerPartition( 10_000 )
+ *			.maxResults( 1000 )
+ *			.maxThreads( 30 )
+ *			.purgeAtStart( true )
+ *			.build()
+ * );
+ * </pre></code>
  *
  * @author Mincong Huang
  */
-public final class BatchIndexingJob {
+public final class MassIndexingJob {
 
-	public static final String JOB_NAME = "hibernate-search-mass-indexing";
+	public static final String NAME = "hibernate-search-mass-indexing";
 
-	private BatchIndexingJob() {
+	private MassIndexingJob() {
 		// Private constructor, do not use it.
 	}
 
-	public static Builder forEntity(Class<?> rootEntity) {
-		return new Builder( rootEntity );
+	public static ParametersBuilderInitialStep parameters() {
+		return ParametersBuilderInitialStep.INSTANCE;
 	}
 
-	public static Builder forEntities(Class<?> rootEntity, Class<?>... rootEntities) {
-		return new Builder( rootEntity, rootEntities );
-	}
+	public static class ParametersBuilderInitialStep {
+		private static final ParametersBuilderInitialStep INSTANCE = new ParametersBuilderInitialStep();
 
-	/**
-	 * This method should only be used in Java EE.
-	 *
-	 * @param executionId
-	 * @return
-	 */
-	public static long restart(long executionId) {
-		return BatchRuntime.getJobOperator().restart( executionId, null );
-	}
-
-	/**
-	 * This method should only be used in Java SE.
-	 *
-	 * @param executionId
-	 * @param entityManagerFactorySE
-	 * @param jobOperatorSE
-	 * @return
-	 */
-	public static long restart(long executionId, JobOperator jobOperatorSE) {
-		if ( jobOperatorSE == null ) {
-			throw new NullPointerException( "You're under a Java SE environment. "
-					+ "Please assign the jobOperator before the job start." );
+		private ParametersBuilderInitialStep() {
+			// Private constructor, do not use it.
 		}
-		return jobOperatorSE.restart( executionId, null );
+
+		public ParametersBuilder forEntity(Class<?> rootEntity) {
+			return new ParametersBuilder( rootEntity );
+		}
+
+		public ParametersBuilder forEntities(Class<?> rootEntity, Class<?>... rootEntities) {
+			return new ParametersBuilder( rootEntity, rootEntities );
+		}
 	}
 
-	public static class Builder {
+	public static class ParametersBuilder {
 
 		private final Set<Class<?>> rootEntities;
 		private String entityManagerFactoryScope;
@@ -79,11 +78,10 @@ public final class BatchIndexingJob {
 		private int maxResults = 1000 * 1000;
 		private int rowsPerPartition = 250;
 		private int maxThreads = 1;
-		private JobOperator jobOperator;
 		private Set<Criterion> criteria;
 		private String hql;
 
-		private Builder(Class<?> rootEntity, Class<?>... rootEntities) {
+		private ParametersBuilder(Class<?> rootEntity, Class<?>... rootEntities) {
 			if ( rootEntity == null ) {
 				throw new IllegalArgumentException( "rootEntities must have at least 1 element." );
 			}
@@ -96,12 +94,12 @@ public final class BatchIndexingJob {
 			hql = "";
 		}
 
-		public Builder entityManagerFactoryScope(String scope) {
+		public ParametersBuilder entityManagerFactoryScope(String scope) {
 			this.entityManagerFactoryScope = scope;
 			return this;
 		}
 
-		public Builder entityManagerFactoryReference(String reference) {
+		public ParametersBuilder entityManagerFactoryReference(String reference) {
 			this.entityManagerFactoryReference = reference;
 			return this;
 		}
@@ -114,7 +112,7 @@ public final class BatchIndexingJob {
 		 * @param cacheable
 		 * @return
 		 */
-		public Builder cacheable(boolean cacheable) {
+		public ParametersBuilder cacheable(boolean cacheable) {
 			this.cacheable = cacheable;
 			return this;
 		}
@@ -126,20 +124,8 @@ public final class BatchIndexingJob {
 		 * @param itemCount the number of item count before starting the next checkpoint.
 		 * @return
 		 */
-		public Builder checkpointFreq(int itemCount) {
+		public ParametersBuilder checkpointFreq(int itemCount) {
 			this.itemCount = itemCount;
-			return this;
-		}
-
-		/**
-		 * Configure additional parameters for Java SE: assign the job operator.
-		 * You should NOT use this method if you're under Java EE.
-		 */
-		public Builder underJavaSE(JobOperator jobOperator) {
-			if ( jobOperator == null ) {
-				throw new NullPointerException( "The jobOperator cannot be null." );
-			}
-			this.jobOperator = jobOperator;
 			return this;
 		}
 
@@ -149,7 +135,7 @@ public final class BatchIndexingJob {
 		 * @param fetchSize
 		 * @return
 		 */
-		public Builder fetchSize(int fetchSize) {
+		public ParametersBuilder fetchSize(int fetchSize) {
 			if ( fetchSize < 1 ) {
 				throw new IllegalArgumentException( "fetchSize must be at least 1" );
 			}
@@ -164,7 +150,7 @@ public final class BatchIndexingJob {
 		 * @param maxResults
 		 * @return
 		 */
-		public Builder maxResults(int maxResults) {
+		public ParametersBuilder maxResults(int maxResults) {
 			if ( maxResults < 1 ) {
 				throw new IllegalArgumentException( "maxResults must be at least 1" );
 			}
@@ -180,7 +166,7 @@ public final class BatchIndexingJob {
 		 * @param maxThreads
 		 * @return
 		 */
-		public Builder maxThreads(int maxThreads) {
+		public ParametersBuilder maxThreads(int maxThreads) {
 			if ( maxThreads < 1 ) {
 				throw new IllegalArgumentException( "threads must be at least 1." );
 			}
@@ -196,7 +182,7 @@ public final class BatchIndexingJob {
 		 * @param optimizeAfterPurge
 		 * @return
 		 */
-		public Builder optimizeAfterPurge(boolean optimizeAfterPurge) {
+		public ParametersBuilder optimizeAfterPurge(boolean optimizeAfterPurge) {
 			this.optimizeAfterPurge = optimizeAfterPurge;
 			return this;
 		}
@@ -209,7 +195,7 @@ public final class BatchIndexingJob {
 		 * @param optimizeAtEnd
 		 * @return
 		 */
-		public Builder optimizeAtEnd(boolean optimizeAtEnd) {
+		public ParametersBuilder optimizeAtEnd(boolean optimizeAtEnd) {
 			this.optimizeAtEnd = optimizeAtEnd;
 			return this;
 		}
@@ -221,7 +207,7 @@ public final class BatchIndexingJob {
 		 * @param purgeAtStart
 		 * @return
 		 */
-		public Builder purgeAtStart(boolean purgeAtStart) {
+		public ParametersBuilder purgeAtStart(boolean purgeAtStart) {
 			this.purgeAtStart = purgeAtStart;
 			return this;
 		}
@@ -232,7 +218,7 @@ public final class BatchIndexingJob {
 		 * @param criterion
 		 * @return
 		 */
-		public Builder restrictedBy(Criterion criterion) {
+		public ParametersBuilder restrictedBy(Criterion criterion) {
 			if ( !hql.isEmpty() ) {
 				throw new IllegalArgumentException( "Cannot use HQL approach "
 						+ "and Criteria approach in the same time." );
@@ -250,7 +236,7 @@ public final class BatchIndexingJob {
 		 * @param hql
 		 * @return
 		 */
-		public Builder restrictedBy(String hql) {
+		public ParametersBuilder restrictedBy(String hql) {
 			if ( hql == null ) {
 				throw new NullPointerException( "The HQL is null." );
 			}
@@ -268,7 +254,7 @@ public final class BatchIndexingJob {
 		 * @param partitionCapacity
 		 * @return
 		 */
-		public Builder rowsPerPartition(int rowsPerPartition) {
+		public ParametersBuilder rowsPerPartition(int rowsPerPartition) {
 			if ( rowsPerPartition < 1 ) {
 				throw new IllegalArgumentException(
 						"rowsPerPartition must be at least 1" );
@@ -278,19 +264,13 @@ public final class BatchIndexingJob {
 		}
 
 		/**
-		 * Start the job.
+		 * Build the parameters.
 		 *
-		 * @return
-		 * @throws IOException if the serialization of JobContextData fails.
+		 * @return The parameters.
+		 * @throws SearchException if the serialization of some parameters fail.
 		 */
-		public long start() throws IOException {
-
+		public Properties build() {
 			Properties jobParams = new Properties();
-
-			// check different variables
-			if ( jobOperator == null ) {
-				jobOperator = BatchRuntime.getJobOperator();
-			}
 
 			if ( entityManagerFactoryScope != null ) {
 				jobParams.put( "entityManagerFactoryScope", entityManagerFactoryScope );
@@ -309,11 +289,17 @@ public final class BatchIndexingJob {
 			jobParams.put( "purgeAtStart", String.valueOf( purgeAtStart ) );
 			jobParams.put( "rootEntities", getRootEntitiesAsString() );
 			jobParams.put( "rowsPerPartition", String.valueOf( rowsPerPartition ) );
+
 			if ( !criteria.isEmpty() ) {
-				jobParams.put( "criteria", MassIndexerUtil.serializeCriteria( criteria ) );
+				try {
+					jobParams.put( "criteria", MassIndexerUtil.serializeCriteria( criteria ) );
+				}
+				catch (IOException e) {
+					throw new SearchException( "Failed to serialize Criteria", e );
+				}
 			}
-			long executionId = jobOperator.start( JOB_NAME, jobParams );
-			return executionId;
+
+			return jobParams;
 		}
 
 		private String getRootEntitiesAsString() {

@@ -105,11 +105,14 @@ public class RestartChunkIT {
 		assertEquals( 0, people.size() );
 
 		// start the job
-		long execId1 = BatchIndexingJob.forEntities( Company.class, Person.class )
-				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-				.underJavaSE( jobOperator )
-				.checkpointFreq( 10 )
-				.start();
+		long execId1 = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntities( Company.class, Person.class )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.checkpointFreq( 10 )
+						.build()
+				);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
 		jobExec1 = JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 		// job will be stopped by the byteman
@@ -120,7 +123,7 @@ public class RestartChunkIT {
 		}
 
 		// restart the job
-		long execId2 = BatchIndexingJob.restart( execId1, jobOperator );
+		long execId2 = jobOperator.restart( execId1, null );
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
 		jobExec2 = JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
 		for ( StepExecution stepExec : jobOperator.getStepExecutions( execId2 ) ) {

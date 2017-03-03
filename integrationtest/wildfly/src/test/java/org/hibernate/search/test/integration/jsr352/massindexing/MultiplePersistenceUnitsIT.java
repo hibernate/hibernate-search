@@ -16,7 +16,7 @@ import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 
-import org.hibernate.search.jsr352.massindexing.BatchIndexingJob;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJob;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.test.integration.jsr352.massindexing.test.common.Message;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -57,9 +57,13 @@ public class MultiplePersistenceUnitsIT {
 	public void testJob() throws InterruptedException, IOException, ParseException {
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
 
-		long execId1 = BatchIndexingJob.forEntity( Message.class )
-				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-				.start();
+		long execId1 = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntity( Message.class )
+						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						.build()
+				);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 
