@@ -30,7 +30,7 @@
         <batchlet ref="org.hibernate.search.jsr352.massindexing.impl.steps.beforechunk.BeforeChunkBatchlet">
             <properties>
                 <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
-                <property name="purgeAtStart" value="#{jobParameters['purgeAtStart']}" />
+                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
             </properties>
         </batchlet>
     </step>
@@ -91,7 +91,7 @@
     <step id="afterChunk">
         <batchlet ref="org.hibernate.search.jsr352.massindexing.impl.steps.afterchunk.AfterChunkBatchlet">
             <properties>
-                <property name="optimizeAtEnd" value="#{jobParameters['optimizeAtEnd']}" />
+                <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}" />
             </properties>
         </batchlet>
     </step>

@@ -34,8 +34,8 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.PURGE_AT_START)
-	private String purgeAtStart;
+	@BatchProperty(name = MassIndexingJobParameters.PURGE_ALL_ON_START)
+	private String purgeAllOnStart;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE)
@@ -46,7 +46,7 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-		if ( Boolean.parseBoolean( this.purgeAtStart ) ) {
+		if ( Boolean.parseBoolean( this.purgeAllOnStart ) ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			session = emf.unwrap( SessionFactory.class ).openSession();
