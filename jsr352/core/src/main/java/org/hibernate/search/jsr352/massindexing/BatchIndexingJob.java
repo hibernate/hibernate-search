@@ -25,7 +25,7 @@ import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
  */
 public final class BatchIndexingJob {
 
-	public static final String JOB_NAME = "BatchIndexingJob";
+	public static final String JOB_NAME = "hibernate-search-mass-indexing";
 
 	private BatchIndexingJob() {
 		// Private constructor, do not use it.
