@@ -69,7 +69,7 @@
             </writer>
             <checkpoint-algorithm ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.CheckpointAlgorithm">
                 <properties>
-                    <property name="itemCount" value="#{jobParameters['itemCount']}?:200;" />
+                    <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}?:200;" />
                 </properties>
             </checkpoint-algorithm>
         </chunk>

@@ -27,7 +27,7 @@ public class CheckpointAlgorithm extends AbstractCheckpointAlgorithm {
 	private StepContext stepContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ITEM_COUNT)
+	@BatchProperty(name = MassIndexingJobParameters.CHECKPOINT_INTERVAL)
 	private String itemCount;
 
 	@Override
