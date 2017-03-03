@@ -71,8 +71,8 @@ public final class MassIndexingJob {
 		private String entityManagerFactoryReference;
 		private boolean cacheable = false;
 		private boolean optimizeAfterPurge = false;
-		private boolean optimizeAtEnd = false;
-		private boolean purgeAtStart = false;
+		private boolean optimizeOnFinish = false;
+		private boolean purgeAllOnStart = false;
 		private int fetchSize = 200 * 1000;
 		private int itemCount = 200;
 		private int maxResults = 1000 * 1000;
@@ -192,11 +192,11 @@ public final class MassIndexingJob {
 		 * the step of lucene document production. The default value is false. TODO: specify what is the optimization
 		 * exactly
 		 *
-		 * @param optimizeAtEnd
+		 * @param optimizeOnFinish
 		 * @return
 		 */
-		public ParametersBuilder optimizeAtEnd(boolean optimizeAtEnd) {
-			this.optimizeAtEnd = optimizeAtEnd;
+		public ParametersBuilder optimizeOnFinish(boolean optimizeOnFinish) {
+			this.optimizeOnFinish = optimizeOnFinish;
 			return this;
 		}
 
@@ -204,11 +204,11 @@ public final class MassIndexingJob {
 		 * Specify whether the existing lucene index should be purged at the beginning of the job. This operation takes
 		 * place before the step of lucene document production. The default value is false.
 		 *
-		 * @param purgeAtStart
+		 * @param purgeAllOnStart
 		 * @return
 		 */
-		public ParametersBuilder purgeAtStart(boolean purgeAtStart) {
-			this.purgeAtStart = purgeAtStart;
+		public ParametersBuilder purgeAllOnStart(boolean purgeAllOnStart) {
+			this.purgeAllOnStart = purgeAllOnStart;
 			return this;
 		}
 
@@ -285,8 +285,8 @@ public final class MassIndexingJob {
 			jobParams.put( MassIndexingJobParameters.MAX_RESULTS, String.valueOf( maxResults ) );
 			jobParams.put( MassIndexingJobParameters.MAX_THREADS, String.valueOf( maxThreads ) );
 			jobParams.put( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, String.valueOf( optimizeAfterPurge ) );
-			jobParams.put( MassIndexingJobParameters.OPTIMIZE_AT_END, String.valueOf( optimizeAtEnd ) );
-			jobParams.put( MassIndexingJobParameters.PURGE_AT_START, String.valueOf( purgeAtStart ) );
+			jobParams.put( MassIndexingJobParameters.OPTIMIZE_ON_FINISH, String.valueOf( optimizeOnFinish ) );
+			jobParams.put( MassIndexingJobParameters.PURGE_ALL_ON_START, String.valueOf( purgeAllOnStart ) );
 			jobParams.put( MassIndexingJobParameters.ROOT_ENTITIES, getRootEntitiesAsString() );
 			jobParams.put( MassIndexingJobParameters.ROWS_PER_PARTITION, String.valueOf( rowsPerPartition ) );
 

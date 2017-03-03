@@ -32,14 +32,14 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_AT_END)
-	private String optimizeAtEnd;
+	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_ON_FINISH)
+	private String optimizeOnFinish;
 
 	private Session session;
 
 	@Override
 	public String process() throws Exception {
-		if ( Boolean.parseBoolean( this.optimizeAtEnd ) ) {
+		if ( Boolean.parseBoolean( this.optimizeOnFinish ) ) {
 			LOGGER.info( "optimizing all entities ..." );
 
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();

@@ -26,8 +26,8 @@ public class MassIndexingJobParametersBuilderTest {
 	private static final String SESSION_FACTORY_NAME = "someUniqueString";
 
 	private static final boolean OPTIMIZE_AFTER_PURGE = true;
-	private static final boolean OPTIMIZE_AT_END = true;
-	private static final boolean PURGE_AT_START = true;
+	private static final boolean OPTIMIZE_ON_FINISH = true;
+	private static final boolean PURGE_ALL_ON_START = true;
 	private static final int FETCH_SIZE = 100000;
 	private static final int MAX_RESULTS = 1000000;
 	private static final int MAX_THREADS = 2;
@@ -42,18 +42,18 @@ public class MassIndexingJobParametersBuilderTest {
 				.maxResults( MAX_RESULTS )
 				.maxThreads( MAX_THREADS )
 				.optimizeAfterPurge( OPTIMIZE_AFTER_PURGE )
-				.optimizeAtEnd( OPTIMIZE_AT_END )
+				.optimizeOnFinish( OPTIMIZE_ON_FINISH )
 				.rowsPerPartition( ROWS_PER_PARTITION )
-				.purgeAtStart( PURGE_AT_START )
+				.purgeAllOnStart( PURGE_ALL_ON_START )
 				.build();
 
 		assertEquals( SESSION_FACTORY_NAME, props.getProperty( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE ) );
 		assertEquals( FETCH_SIZE, Integer.parseInt( props.getProperty( MassIndexingJobParameters.FETCH_SIZE ) ) );
 		assertEquals( MAX_RESULTS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_RESULTS ) ) );
 		assertEquals( OPTIMIZE_AFTER_PURGE, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE ) ) );
-		assertEquals( OPTIMIZE_AT_END, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_AT_END ) ) );
+		assertEquals( OPTIMIZE_ON_FINISH, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_ON_FINISH ) ) );
 		assertEquals( ROWS_PER_PARTITION, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ROWS_PER_PARTITION ) ) );
-		assertEquals( PURGE_AT_START, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_AT_START ) ) );
+		assertEquals( PURGE_ALL_ON_START, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_ALL_ON_START ) ) );
 		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) );
 
 		String rootEntities = props.getProperty( MassIndexingJobParameters.ROOT_ENTITIES );

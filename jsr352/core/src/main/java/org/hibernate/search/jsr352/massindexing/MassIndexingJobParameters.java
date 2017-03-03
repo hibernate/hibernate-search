@@ -28,11 +28,11 @@ public final class MassIndexingJobParameters {
 
 	public static final String CACHEABLE = "cacheable";
 
-	public static final String OPTIMIZE_AT_END = "optimizeAtEnd";
+	public static final String OPTIMIZE_ON_FINISH = "optimizeOnFinish";
 
 	public static final String OPTIMIZE_AFTER_PURGE = "optimizeAfterPurge";
 
-	public static final String PURGE_AT_START = "purgeAtStart";
+	public static final String PURGE_ALL_ON_START = "purgeAllOnStart";
 
 	public static final String ROWS_PER_PARTITION = "rowsPerPartition";
 
