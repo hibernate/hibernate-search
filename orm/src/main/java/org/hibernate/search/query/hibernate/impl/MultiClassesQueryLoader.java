@@ -87,7 +87,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		}
 
 		if ( entityInfos.size() == 1 ) {
-			final Object entity = load( entityInfos.get( 0 ) );
+			final Object entity = executeLoad( entityInfos.get( 0 ) );
 			if ( entity == null ) {
 				return Collections.EMPTY_LIST;
 			}
