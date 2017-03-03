@@ -23,7 +23,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.jboss.logging.Logger;
 
@@ -55,27 +57,27 @@ public class EntityReader extends AbstractItemReader {
 	private StepContext stepContext;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.CACHEABLE)
 	private String cacheable;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
 	private String entityName;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.FETCH_SIZE)
 	private String fetchSize;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.HQL)
 	private String hql;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.MAX_RESULTS)
 	private String maxResults;
 
 	@Inject
-	@BatchProperty(name = "partitionId")
+	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
 	private String partitionIdStr;
 
 	private EntityManagerFactory emf;

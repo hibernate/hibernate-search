@@ -26,6 +26,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
@@ -51,7 +52,7 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	private StepContext stepContext;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
 	private String entityName;
 
 	private EntityManagerFactory emf;

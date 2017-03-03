@@ -12,6 +12,8 @@ import javax.batch.runtime.Metric;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
+
 /**
  * This checkpoint algorithm is used to provide a checkpoint decision based on the item count N given by the user. So,
  * the job is ready to checkpoint each N items. If user does not specify the itemCount value, default value described in
@@ -25,7 +27,7 @@ public class CheckpointAlgorithm extends AbstractCheckpointAlgorithm {
 	private StepContext stepContext;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.ITEM_COUNT)
 	private String itemCount;
 
 	@Override

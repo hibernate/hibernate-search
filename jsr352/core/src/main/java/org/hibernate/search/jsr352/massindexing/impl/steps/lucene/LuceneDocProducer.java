@@ -25,6 +25,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.jboss.logging.Logger;
@@ -43,7 +44,7 @@ public class LuceneDocProducer implements ItemProcessor {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
 	private String entityName;
 
 	private EntityManagerFactory emf;

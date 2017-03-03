@@ -27,7 +27,9 @@ import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.jboss.logging.Logger;
 
@@ -49,19 +51,19 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.FETCH_SIZE)
 	private String fetchSize;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.HQL)
 	private String hql;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.MAX_THREADS)
 	private String maxThreads;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.ROWS_PER_PARTITION)
 	private String rowsPerPartition;
 
 	private EntityManagerFactory emf;
@@ -138,8 +140,8 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 			for ( int i = 0; i < partitionBounds.size(); i++ ) {
 				props[i] = new Properties();
-				props[i].setProperty( "entityName", partitionBounds.get( i ).getEntityName() );
-				props[i].setProperty( "partitionId", String.valueOf( i ) );
+				props[i].setProperty( MassIndexingPartitionProperties.ENTITY_NAME, partitionBounds.get( i ).getEntityName() );
+				props[i].setProperty( MassIndexingPartitionProperties.PARTITION_ID, String.valueOf( i ) );
 			}
 
 			PartitionPlan partitionPlan = new PartitionPlanImpl();

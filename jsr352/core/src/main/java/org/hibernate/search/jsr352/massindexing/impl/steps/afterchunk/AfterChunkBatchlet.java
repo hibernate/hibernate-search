@@ -15,6 +15,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.jboss.logging.Logger;
 
@@ -31,7 +32,7 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty
+	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_AT_END)
 	private String optimizeAtEnd;
 
 	private Session session;
