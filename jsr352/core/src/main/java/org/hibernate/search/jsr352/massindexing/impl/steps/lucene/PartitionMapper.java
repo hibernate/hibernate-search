@@ -55,7 +55,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	private String fetchSize;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.HQL)
+	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
 	private String hql;
 
 	@Inject
@@ -111,7 +111,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			List<PartitionBound> partitionBounds = new ArrayList<>();
 			Class<?> entityType;
 
-			switch ( typeOfSelection( hql, jobData.getCriteria() ) ) {
+			switch ( typeOfSelection( hql, jobData.getCustomQueryCriteria() ) ) {
 				case HQL:
 					entityType = rootEntities.get( 0 );
 					partitionBounds.add( new PartitionBound( entityType, null, null ) );
@@ -119,7 +119,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 				case CRITERIA:
 					entityType = rootEntities.get( 0 );
-					scroll = buildScrollableResults( ss, session, entityType, jobData.getCriteria() );
+					scroll = buildScrollableResults( ss, session, entityType, jobData.getCustomQueryCriteria() );
 					partitionBounds = buildPartitionUnitsFrom( scroll, entityType );
 					break;
 

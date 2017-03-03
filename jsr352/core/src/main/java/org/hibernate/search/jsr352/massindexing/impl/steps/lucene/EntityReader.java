@@ -69,12 +69,12 @@ public class EntityReader extends AbstractItemReader {
 	private String fetchSize;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.HQL)
-	private String hql;
+	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
+	private String customQueryHql;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.MAX_RESULTS)
-	private String maxResults;
+	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_LIMIT)
+	private String customQueryLimit;
 
 	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
@@ -111,8 +111,8 @@ public class EntityReader extends AbstractItemReader {
 		this.cacheable = cacheable;
 		this.entityName = entityName;
 		this.fetchSize = fetchSize;
-		this.hql = hql;
-		this.maxResults = maxResults;
+		this.customQueryHql = hql;
+		this.customQueryLimit = maxResults;
 		this.partitionIdStr = partitionIdStr;
 	}
 
@@ -192,11 +192,11 @@ public class EntityReader extends AbstractItemReader {
 		// HQL approach
 		// In this approach, the checkpoint mechanism is disabled, because we
 		// don't know if the selection is ordered by ID ascendingly in the query.
-		if ( hql != null && !hql.isEmpty() ) {
+		if ( customQueryHql != null && !customQueryHql.isEmpty() ) {
 			// TODO should I worry about the Lucene AddWork? If this is a
 			// restart, will it create duplicate index for the same entity,
 			// since there's no purge?
-			scroll = buildScrollUsingHQL( ss, hql );
+			scroll = buildScrollUsingHQL( ss, customQueryHql );
 			partitionData = new PartitionContextData( partitionId, entityName );
 		}
 		// Criteria approach
@@ -218,7 +218,7 @@ public class EntityReader extends AbstractItemReader {
 				.setReadOnly( true )
 				.setCacheable( Boolean.parseBoolean( cacheable ) )
 				.setFetchSize( Integer.parseInt( fetchSize ) )
-				.setMaxResults( Integer.parseInt( maxResults ) )
+				.setMaxResults( Integer.parseInt( customQueryLimit ) )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
@@ -250,13 +250,13 @@ public class EntityReader extends AbstractItemReader {
 		}
 
 		// build criteria using job context data
-		jobData.getCriteria().forEach( c -> criteria.add( c ) );
+		jobData.getCustomQueryCriteria().forEach( c -> criteria.add( c ) );
 
 		return criteria.addOrder( Order.asc( idName ) )
 				.setReadOnly( true )
 				.setCacheable( Boolean.parseBoolean( cacheable ) )
 				.setFetchSize( Integer.parseInt( fetchSize ) )
-				.setMaxResults( Integer.parseInt( maxResults ) )
+				.setMaxResults( Integer.parseInt( customQueryLimit ) )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
