@@ -447,13 +447,6 @@ Properties jobProps3 = MassIndexingJob
 ----
 ====
 
-[NOTE]
-====
-Please notice that for instant, only the root entity types are accepted. It
-should have no relationship between 2 root entities. Because relationships are
-not implemented in the framework yet, such as one-to-many, many-to-many.
-====
-
 ==== Parallelism
 In order to maximize the performance, we highly recommend you to speed up the mass indexer using
 parallelism. Parallelism is activated by default. Under the standard JSR 352, the exact word is
