@@ -7,5 +7,4 @@ Mincong Huang; Gunnar Morling; Emmanuel Bernard
 include::preface.asciidoc[]
 
 :numbered:
-include::user-guide.asciidoc[]
 include::developer-guide.asciidoc[]
