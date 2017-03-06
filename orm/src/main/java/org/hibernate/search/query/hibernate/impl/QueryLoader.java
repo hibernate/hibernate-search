@@ -60,7 +60,7 @@ public class QueryLoader extends AbstractLoader {
 	public final Object executeLoad(EntityInfo entityInfo) {
 		//if explicit criteria, make sure to use it to load the objects
 		if ( isExplicitCriteria ) {
-			load( Collections.singletonList( entityInfo ) );
+			executeLoad( Collections.singletonList( entityInfo ) );
 		}
 		final Object result = ObjectLoaderHelper.load( entityInfo, session );
 		timeoutManager.isTimedOut();
