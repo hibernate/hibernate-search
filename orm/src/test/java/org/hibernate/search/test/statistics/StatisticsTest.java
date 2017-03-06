@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -207,6 +208,40 @@ public class StatisticsTest extends SearchTestBase {
 
 			query = session.createFullTextQuery( matchAll(), A.class, B.class );
 			query.getResultList();
+
+			assertEquals( 2, getStatistics().getObjectsLoadedCount() );
+		}
+		finally {
+			s.close();
+		}
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	@TestForIssue(jiraKey = "HSEARCH-2631")
+	public void objectLoading_singleClassQueryLoader_criteria_iterate() {
+		Session s = openSession();
+		try {
+			Transaction tx = s.beginTransaction();
+			A entity = new A();
+			entity.id = 1L;
+			s.persist( entity );
+			tx.commit();
+
+			FullTextSession session = Search.getFullTextSession( s );
+			FullTextQuery query = session.createFullTextQuery( matchAll() )
+					.setCriteriaQuery( session.createCriteria( A.class ) );
+
+			assertEquals( 0, getStatistics().getObjectsLoadedCount() );
+
+			Iterator<?> iterator = query.iterate();
+			iterator.next();
+
+			assertEquals( 1, getStatistics().getObjectsLoadedCount() );
+
+			query = session.createFullTextQuery( matchAll(), A.class );
+			iterator = query.iterate();
+			iterator.next();
 
 			assertEquals( 2, getStatistics().getObjectsLoadedCount() );
 		}
