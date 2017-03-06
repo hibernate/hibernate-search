@@ -128,7 +128,7 @@ public class StatisticsTest extends SearchTestBase {
 			assertEquals( 0, getStatistics().getSearchQueryExecutionMaxTime() );
 			assertNull( getStatistics().getSearchQueryExecutionMaxTimeQueryString() );
 
-			query.getResultList();
+			query.list();
 
 			assertEquals( 1, getStatistics().getSearchQueryExecutionCount() );
 			assertNotEquals( 0, getStatistics().getSearchQueryExecutionAvgTime() );
@@ -136,7 +136,7 @@ public class StatisticsTest extends SearchTestBase {
 			assertNotNull( getStatistics().getSearchQueryExecutionMaxTimeQueryString() );
 
 			query = session.createFullTextQuery( matchAll(), A.class );
-			query.getResultList();
+			query.list();
 
 			assertEquals( 2, getStatistics().getSearchQueryExecutionCount() );
 			assertNotEquals( 0, getStatistics().getSearchQueryExecutionAvgTime() );
@@ -166,7 +166,7 @@ public class StatisticsTest extends SearchTestBase {
 			assertEquals( 0, getStatistics().getObjectLoadingExecutionMaxTime() );
 			assertEquals( 0, getStatistics().getObjectLoadingTotalTime() );
 
-			query.getResultList();
+			query.list();
 
 			assertEquals( 1, getStatistics().getObjectsLoadedCount() );
 			assertNotEquals( 0, getStatistics().getObjectLoadingExecutionAvgTime() );
@@ -174,7 +174,7 @@ public class StatisticsTest extends SearchTestBase {
 			assertNotEquals( 0, getStatistics().getObjectLoadingTotalTime() );
 
 			query = session.createFullTextQuery( matchAll(), A.class );
-			query.getResultList();
+			query.list();
 
 			assertEquals( 2, getStatistics().getObjectsLoadedCount() );
 			assertNotEquals( 0, getStatistics().getObjectLoadingExecutionAvgTime() );
@@ -202,12 +202,12 @@ public class StatisticsTest extends SearchTestBase {
 
 			assertEquals( 0, getStatistics().getObjectsLoadedCount() );
 
-			query.getResultList();
+			query.list();
 
 			assertEquals( 1, getStatistics().getObjectsLoadedCount() );
 
 			query = session.createFullTextQuery( matchAll(), A.class, B.class );
-			query.getResultList();
+			query.list();
 
 			assertEquals( 2, getStatistics().getObjectsLoadedCount() );
 		}
