@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -46,7 +47,7 @@ public abstract class AbstractLoader implements Loader {
 		return executeLoad( entityInfo );
 	}
 
-	public abstract Object executeLoad(EntityInfo entityInfo);
+	protected abstract Object executeLoad(EntityInfo entityInfo);
 
 	@Override
 	public List load(List<EntityInfo> entityInfos) {
@@ -55,7 +56,22 @@ public abstract class AbstractLoader implements Loader {
 			startTime = System.nanoTime();
 		}
 
-		List loadedObjects = executeLoad( entityInfos );
+		List loadedObjects;
+		if ( entityInfos.isEmpty() ) {
+			loadedObjects = Collections.EMPTY_LIST;
+		}
+		else if ( entityInfos.size() == 1 ) {
+			final Object entity = executeLoad( entityInfos.get( 0 ) );
+			if ( entity == null ) {
+				loadedObjects = Collections.EMPTY_LIST;
+			}
+			else {
+				loadedObjects = Collections.singletonList( entity );
+			}
+		}
+		else {
+			loadedObjects = executeLoad( entityInfos );
+		}
 
 		if ( takeTimings ) {
 			statisticsImplementor.objectLoadExecuted( loadedObjects.size(), System.nanoTime() - startTime );
@@ -63,7 +79,7 @@ public abstract class AbstractLoader implements Loader {
 		return loadedObjects;
 	}
 
-	public abstract List executeLoad(List<EntityInfo> entityInfo);
+	protected abstract List executeLoad(List<EntityInfo> entityInfo);
 }
 
 
