@@ -73,10 +73,6 @@ public class QueryLoader extends AbstractLoader {
 			throw new AssertionFailure( "EntityType not defined" );
 		}
 
-		if ( entityInfos.isEmpty() ) {
-			return Collections.EMPTY_LIST;
-		}
-
 		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.size() / 0.75 ) + 1 );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			idToObjectMap.put(

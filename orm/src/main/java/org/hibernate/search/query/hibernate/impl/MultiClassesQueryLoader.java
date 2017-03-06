@@ -7,7 +7,6 @@
 package org.hibernate.search.query.hibernate.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -81,20 +80,6 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 
 	@Override
 	protected List executeLoad(List<EntityInfo> entityInfos) {
-		if ( entityInfos.isEmpty() ) {
-			return Collections.EMPTY_LIST;
-		}
-
-		if ( entityInfos.size() == 1 ) {
-			final Object entity = executeLoad( entityInfos.get( 0 ) );
-			if ( entity == null ) {
-				return Collections.EMPTY_LIST;
-			}
-			else {
-				return Collections.singletonList( entity );
-			}
-		}
-
 		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.size() / 0.75 ) + 1 );
 
 		// split EntityInfo per root entity
