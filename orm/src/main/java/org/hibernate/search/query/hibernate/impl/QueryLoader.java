@@ -57,7 +57,7 @@ public class QueryLoader extends AbstractLoader {
 	}
 
 	@Override
-	public final Object executeLoad(EntityInfo entityInfo) {
+	protected final Object executeLoad(EntityInfo entityInfo) {
 		//if explicit criteria, make sure to use it to load the objects
 		if ( isExplicitCriteria ) {
 			executeLoad( Collections.singletonList( entityInfo ) );
@@ -68,7 +68,7 @@ public class QueryLoader extends AbstractLoader {
 	}
 
 	@Override
-	public final List executeLoad(List<EntityInfo> entityInfos) {
+	protected final List executeLoad(List<EntityInfo> entityInfos) {
 		if ( entityType == null ) {
 			throw new AssertionFailure( "EntityType not defined" );
 		}

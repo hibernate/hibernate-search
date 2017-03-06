@@ -46,7 +46,7 @@ public abstract class AbstractLoader implements Loader {
 		return executeLoad( entityInfo );
 	}
 
-	public abstract Object executeLoad(EntityInfo entityInfo);
+	protected abstract Object executeLoad(EntityInfo entityInfo);
 
 	@Override
 	public List load(List<EntityInfo> entityInfos) {
@@ -63,7 +63,7 @@ public abstract class AbstractLoader implements Loader {
 		return loadedObjects;
 	}
 
-	public abstract List executeLoad(List<EntityInfo> entityInfo);
+	protected abstract List executeLoad(List<EntityInfo> entityInfo);
 }
 
 

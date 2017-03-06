@@ -73,14 +73,14 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	}
 
 	@Override
-	public Object executeLoad(EntityInfo entityInfo) {
+	protected Object executeLoad(EntityInfo entityInfo) {
 		final Object result = ObjectLoaderHelper.load( entityInfo, session );
 		timeoutManager.isTimedOut();
 		return result;
 	}
 
 	@Override
-	public List executeLoad(List<EntityInfo> entityInfos) {
+	protected List executeLoad(List<EntityInfo> entityInfos) {
 		if ( entityInfos.isEmpty() ) {
 			return Collections.EMPTY_LIST;
 		}
