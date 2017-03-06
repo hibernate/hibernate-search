@@ -56,7 +56,7 @@ public final class ObjectLoaderHelper {
 		Object maybeProxy;
 		if ( areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
 			// be sure to get an initialized object but save from ONFE and ENFE
-			maybeProxy = session.load( entityInfo.getClazz(), entityInfo.getId() );
+			maybeProxy = session.byId( entityInfo.getClazz() ).load( entityInfo.getId() );
 		}
 		else {
 			Criteria criteria = new CriteriaImpl( entityInfo.getClazz().getName(), (SharedSessionContractImplementor) session );
