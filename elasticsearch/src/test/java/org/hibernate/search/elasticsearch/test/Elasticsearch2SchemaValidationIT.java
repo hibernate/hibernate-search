@@ -116,6 +116,28 @@ public class Elasticsearch2SchemaValidationIT extends SearchInitializationTestBa
 					+ "}"
 				+ "}"
 				);
+		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate();
+		elasticSearchClient.type( SimpleStringEntity.class ).putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'string',"
+									+ "'index': 'analyzed',"
+									+ "'analyzer': 'default'"
+							+ "},"
+							+ "'NOTmyField': {" // Ignored during validation
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
 		elasticSearchClient.index( FacetedDateEntity.class ).deleteAndCreate();
 		elasticSearchClient.type( FacetedDateEntity.class ).putMapping(
 				"{"
@@ -209,7 +231,8 @@ public class Elasticsearch2SchemaValidationIT extends SearchInitializationTestBa
 				+ "}"
 				);
 
-		init( SimpleDateEntity.class, SimpleBooleanEntity.class, FacetedDateEntity.class, AnalyzedEntity.class );
+		init( SimpleDateEntity.class, SimpleBooleanEntity.class, SimpleStringEntity.class,
+				FacetedDateEntity.class, AnalyzedEntity.class );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
@@ -404,6 +427,38 @@ public class Elasticsearch2SchemaValidationIT extends SearchInitializationTestBa
 		);
 
 		init( SimpleDateEntity.class );
+	}
+
+	@Test
+	public void property_analyzer_invalid() throws Exception {
+		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate();
+		elasticSearchClient.type( SimpleStringEntity.class ).putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': not_analyzed,"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'string',"
+									+ "'index': analyzed,"
+									+ "'analyzer': 'keyword'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( ElasticsearchSchemaValidationException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tInvalid value for attribute 'analyzer'. Expected 'default', actual is 'keyword'" )
+				.build()
+		);
+
+		init( SimpleStringEntity.class );
 	}
 
 	@Test
@@ -1268,6 +1323,17 @@ public class Elasticsearch2SchemaValidationIT extends SearchInitializationTestBa
 
 		@Field
 		Date myField;
+	}
+
+	@Indexed
+	@Entity
+	public static class SimpleStringEntity {
+		@DocumentId
+		@Id
+		Long id;
+
+		@Field
+		String myField;
 	}
 
 	@Indexed
