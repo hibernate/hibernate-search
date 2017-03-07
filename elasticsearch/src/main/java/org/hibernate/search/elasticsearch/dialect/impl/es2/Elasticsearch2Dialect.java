@@ -17,8 +17,10 @@ import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTransla
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
 import org.hibernate.search.elasticsearch.schema.impl.model.FieldDataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
+import org.hibernate.search.elasticsearch.schema.impl.model.NormsType;
 import org.hibernate.search.elasticsearch.util.impl.gson.ES2FieldDataTypeJsonAdapter;
 import org.hibernate.search.elasticsearch.util.impl.gson.ES2IndexTypeJsonAdapter;
+import org.hibernate.search.elasticsearch.util.impl.gson.ES2NormsTypeJsonAdapter;
 import org.hibernate.search.elasticsearch.work.impl.factory.Elasticsearch2WorkFactory;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
@@ -35,7 +37,8 @@ public class Elasticsearch2Dialect implements ElasticsearchDialect {
 		return DefaultGsonProvider.create( () -> {
 			return new GsonBuilder()
 					.registerTypeAdapter( IndexType.class, new ES2IndexTypeJsonAdapter().nullSafe() )
-					.registerTypeAdapter( FieldDataType.class, new ES2FieldDataTypeJsonAdapter().nullSafe() );
+					.registerTypeAdapter( FieldDataType.class, new ES2FieldDataTypeJsonAdapter().nullSafe() )
+					.registerTypeAdapter( NormsType.class, new ES2NormsTypeJsonAdapter().nullSafe() );
 		} );
 	}
 

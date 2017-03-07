@@ -33,6 +33,8 @@ public class PropertyMapping extends TypeMapping {
 
 	private IndexType index;
 
+	private NormsType norms;
+
 	@SerializedName("doc_values")
 	private Boolean docValues;
 
@@ -105,6 +107,14 @@ public class PropertyMapping extends TypeMapping {
 
 	public void setIndex(IndexType index) {
 		this.index = index;
+	}
+
+	public NormsType getNorms() {
+		return norms;
+	}
+
+	public void setNorms(NormsType norms) {
+		this.norms = norms;
 	}
 
 	public Boolean getDocValues() {

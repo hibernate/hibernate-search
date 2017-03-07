@@ -15,6 +15,7 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.FieldDataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
+import org.hibernate.search.elasticsearch.schema.impl.model.NormsType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
@@ -75,6 +76,11 @@ public class Elasticsearch5SchemaTranslator extends Elasticsearch2SchemaTranslat
 				String analyzerName = settingsBuilder.register( analyzer, propertyPath );
 				propertyMapping.setAnalyzer( analyzerName );
 			}
+		}
+
+		// Only text and keyword fields can have norms
+		if ( DataType.TEXT.equals( type ) || DataType.KEYWORD.equals( type ) ) {
+			propertyMapping.setNorms( index.omitNorms() ? NormsType.FALSE : NormsType.TRUE );
 		}
 	}
 

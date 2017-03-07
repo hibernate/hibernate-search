@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.FieldDataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
+import org.hibernate.search.elasticsearch.schema.impl.model.NormsType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 
 import com.google.gson.JsonPrimitive;
@@ -45,6 +46,13 @@ public class Elasticsearch5SchemaValidator extends Elasticsearch2SchemaValidator
 			// From ES 5.0 on, all indexable fields are indexed by default
 			IndexType indexDefault = IndexType.TRUE;
 			validateEqualWithDefault( errorCollector, "index", expectedIndex, actualMapping.getIndex(), indexDefault );
+		}
+
+		NormsType expectedNorms = expectedMapping.getNorms();
+		if ( NormsType.TRUE.equals( expectedNorms ) ) { // If we don't need norms, we don't care
+			// From ES 5.0 on, norms are enabled by default on text fields only
+			NormsType normsDefault = DataType.TEXT.equals( expectedMapping.getType() ) ? NormsType.TRUE : NormsType.FALSE;
+			validateEqualWithDefault( errorCollector, "norms", expectedNorms, actualMapping.getNorms(), normsDefault );
 		}
 
 		FieldDataType expectedFieldData = expectedMapping.getFieldData();
