@@ -11,12 +11,10 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +24,6 @@ import static org.junit.Assert.assertEquals;
  *
  * @author gustavonalle
  */
-@Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class AsyncBackendFlushTest {
 
 	private static final int ENTITIES = 100;
