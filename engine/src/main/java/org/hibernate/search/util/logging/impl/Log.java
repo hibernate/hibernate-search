@@ -1016,4 +1016,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 331, value = "Can't build query for type '%1$s' which is neither configured nor has any configured sub-types.")
 	SearchException cantQueryUnconfiguredType(String canonicalEntityName);
+
+	@Message(id = 332, value = "None of the specified entity types ('%s') or any of their subclasses are configured." )
+	IllegalArgumentException targetedEntityTypesNotConfigured(String targetedEntities);
 }

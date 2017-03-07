@@ -122,7 +122,13 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		final Class<?>[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
 		this.indexedTargetedEntities = extendedIntegrator.getIndexedTypesPolymorphic( classesAsArray );
 		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
-			throw LOG.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ) );
+			Set<Class<?>> configuredTargetEntities = extendedIntegrator.getConfiguredTypesPolymorphic( classesAsArray );
+			if ( configuredTargetEntities.isEmpty() ) {
+				throw LOG.targetedEntityTypesNotConfigured( StringHelper.join( targetedEntities, "," ) );
+			}
+			else {
+				throw LOG.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ) );
+			}
 		}
 	}
 
