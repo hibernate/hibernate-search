@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
+import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -80,6 +81,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	private String actualIndexName;
 
 	private boolean refreshAfterWrite;
+	private boolean sync;
 	private IndexSchemaManagementStrategy schemaManagementStrategy;
 	private ExecutionOptions schemaManagementExecutionOptions;
 
@@ -136,6 +138,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		String overriddenIndexName = getOverriddenIndexName( indexName, properties );
 		this.actualIndexName = ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( overriddenIndexName );
 		this.refreshAfterWrite = getRefreshAfterWrite( properties );
+		this.sync = BackendFactory.isConfiguredAsSync( properties );
 
 		this.similarity = similarity;
 
@@ -409,7 +412,11 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	@Override
 	public void flushAndReleaseResources() {
-		// no-op
+		ElasticsearchWork<?> flushWork = elasticsearchService.getWorkFactory().flush()
+				.index( actualIndexName )
+				.build();
+		workProcessor.awaitAsyncProcessingCompletion();
+		workProcessor.executeSyncSafe( Collections.singletonList( flushWork ) );
 	}
 
 	@Override
@@ -430,7 +437,14 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			elasticsearchWorks.add( luceneWork.acceptIndexWorkVisitor( visitor, monitor ) );
 		}
 
-		workProcessor.executeSyncSafe( elasticsearchWorks );
+		if ( sync ) {
+			workProcessor.executeSyncSafe( elasticsearchWorks );
+		}
+		else {
+			for ( ElasticsearchWork<?> work : elasticsearchWorks ) {
+				workProcessor.executeAsync( work );
+			}
+		}
 	}
 
 	@Override
