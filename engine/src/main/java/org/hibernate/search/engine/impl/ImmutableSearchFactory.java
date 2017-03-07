@@ -67,7 +67,7 @@ import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.impl.StatisticsImpl;
@@ -102,7 +102,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
-	private final PolymorphicIndexHierarchy indexHierarchy;
+	private final TypeHierarchy configuredTypeHierarchy;
+	private final TypeHierarchy indexedTypeHierarchy;
 	private final StatisticsImpl statistics;
 	private final boolean transactionManagerExpected;
 	private final IndexManagerHolder allIndexesManager;
@@ -139,7 +140,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.documentBuildersContainedEntities = state.getDocumentBuildersContainedEntities();
 		this.filterCachingStrategy = state.getFilterCachingStrategy();
 		this.filterDefinitions = state.getFilterDefinitions();
-		this.indexHierarchy = state.getIndexHierarchy();
+		this.configuredTypeHierarchy = state.getConfiguredTypeHierarchy();
+		this.indexedTypeHierarchy = state.getIndexedTypeHierarchy();
 		this.indexingMode = state.getIndexingMode();
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
@@ -461,8 +463,13 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
+	public Set<Class<?>> getConfiguredTypesPolymorphic(Class<?>[] classes) {
+		return configuredTypeHierarchy.getConfiguredClasses( classes );
+	}
+
+	@Override
 	public Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes) {
-		return indexHierarchy.getIndexedClasses( classes );
+		return indexedTypeHierarchy.getConfiguredClasses( classes );
 	}
 
 	@Override
@@ -471,8 +478,13 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public PolymorphicIndexHierarchy getIndexHierarchy() {
-		return indexHierarchy;
+	public TypeHierarchy getConfiguredTypeHierarchy() {
+		return configuredTypeHierarchy;
+	}
+
+	@Override
+	public TypeHierarchy getIndexedTypeHierarchy() {
+		return indexedTypeHierarchy;
 	}
 
 	@Override

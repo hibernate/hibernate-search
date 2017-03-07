@@ -1013,4 +1013,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 330, value = "Multiple analyzer definitions with the same name: '%1$s'." )
 	SearchException analyzerDefinitionNamingConflict(String analyzerDefinitionName);
+
+	@Message(id = 331, value = "Can't build query for type '%1$s' which is neither configured nor has any configured sub-types.")
+	SearchException cantQueryUnconfiguredType(String canonicalEntityName);
 }

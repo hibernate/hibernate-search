@@ -67,7 +67,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.IndexNameNormalizer;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -279,7 +279,8 @@ public class SearchIntegratorBuilder {
 			rootFactory = new MutableSearchFactory();
 			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinding>() );
 			factoryState.setDocumentBuildersContainedEntities( new ConcurrentHashMap<Class<?>, DocumentBuilderContainedEntity>() );
-			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
+			factoryState.setConfiguredTypeHierarchy( new TypeHierarchy() );
+			factoryState.setIndexedTypeHierarchy( new TypeHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
 			factoryState.setServiceManager(
 					new StandardServiceManager(
@@ -310,7 +311,8 @@ public class SearchIntegratorBuilder {
 
 		initProgrammaticAnalyzers( configContext, searchConfiguration.getReflectionManager() );
 		initProgrammaticallyDefinedFilterDef( configContext, searchConfiguration.getReflectionManager() );
-		final PolymorphicIndexHierarchy indexingHierarchy = factoryState.getIndexHierarchy();
+		final TypeHierarchy configuredTypeHierarchy = factoryState.getConfiguredTypeHierarchy();
+		final TypeHierarchy indexedTypeHierarchy = factoryState.getIndexedTypeHierarchy();
 		final Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
 		final Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
@@ -335,7 +337,8 @@ public class SearchIntegratorBuilder {
 				}
 
 				rootIndexedEntities.add( mappedXClass );
-				indexingHierarchy.addIndexedClass( mappedClass );
+				configuredTypeHierarchy.addConfiguredClass( mappedClass );
+				indexedTypeHierarchy.addConfiguredClass( mappedClass );
 			}
 			else if ( metadataProvider.containsSearchMetadata( mappedClass ) ) {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
@@ -356,6 +359,10 @@ public class SearchIntegratorBuilder {
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
 					documentBuildersContainedEntities.put( mappedClass, documentBuilder );
 				}
+				configuredTypeHierarchy.addConfiguredClass( mappedClass );
+			}
+			else {
+				configuredTypeHierarchy.addConfiguredClass( mappedClass );
 			}
 		}
 
