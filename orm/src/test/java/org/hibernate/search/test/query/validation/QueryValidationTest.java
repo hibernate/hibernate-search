@@ -93,11 +93,23 @@ public class QueryValidationTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void testTargetingNonConfiguredEntityThrowsException() {
+		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
+		try {
+			fullTextSession.createFullTextQuery( query, D.class );
+		}
+		catch (IllegalArgumentException e) {
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000332" ) );
+		}
+	}
+
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				A.class,
-				B.class
+				B.class,
+				C.class
 		};
 	}
 
@@ -125,6 +137,13 @@ public class QueryValidationTest extends SearchTestBase {
 
 	@Entity
 	public static class C {
+		@Id
+		@GeneratedValue
+		private long id;
+	}
+
+	@Entity
+	public static class D {
 		@Id
 		@GeneratedValue
 		private long id;
