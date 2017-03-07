@@ -17,7 +17,7 @@ import org.apache.lucene.search.Query;
 public interface BooleanJunction<T extends BooleanJunction> extends QueryCustomization<T>, Termination {
 	/**
 	 * The boolean query results should match the subquery
-	 * @param query the query to match
+	 * @param query the query to match (nulls are ignored)
 	 * @return a {@link BooleanJunction}
 	 */
 	BooleanJunction should(Query query);
@@ -26,7 +26,7 @@ public interface BooleanJunction<T extends BooleanJunction> extends QueryCustomi
 	 * The boolean query results must (or must not) match the subquery
 	 * Call the .not() method to ensure results of the boolean query do NOT match the subquery.
 	 *
-	 * @param query the query to match
+	 * @param query the query to match (nulls are ignored)
 	 * @return a {@link MustJunction}
 	 */
 	MustJunction must(Query query);

@@ -31,6 +31,7 @@ class BooleanQueryBuilder implements MustJunction {
 	private static final Log log = LoggerFactory.make();
 
 	private final List<BooleanClause> clauses;
+	private BooleanClause lastClause;
 	private final QueryCustomizer queryCustomizer;
 
 	BooleanQueryBuilder() {
@@ -51,23 +52,37 @@ class BooleanQueryBuilder implements MustJunction {
 	}
 
 	private void replaceLastMustWith(Occur replacementOccur) {
-		final int lastIndex = clauses.size() - 1;
-		final BooleanClause last = clauses.get( lastIndex );
-		if ( ! last.getOccur().equals( BooleanClause.Occur.MUST ) ) {
-			throw new AssertionFailure( "Cannot negate or disable scoring on class: " + last.getOccur() );
+		if ( lastClause == null ) {
+			return;
 		}
-		clauses.set( lastIndex, new BooleanClause( last.getQuery(), replacementOccur ) );
+		if ( ! lastClause.getOccur().equals( BooleanClause.Occur.MUST ) ) {
+			throw new AssertionFailure( "Cannot negate or disable scoring on class: " + lastClause.getOccur() );
+		}
+		final int lastIndex = clauses.size() - 1;
+		clauses.set( lastIndex, new BooleanClause( lastClause.getQuery(), replacementOccur ) );
 	}
 
 	@Override
 	public BooleanJunction should(Query query) {
-		clauses.add( new BooleanClause( query, BooleanClause.Occur.SHOULD ) );
+		if ( query == null ) {
+			lastClause = null;
+		}
+		else {
+			lastClause = new BooleanClause( query, BooleanClause.Occur.SHOULD );
+			clauses.add( lastClause );
+		}
 		return this;
 	}
 
 	@Override
 	public MustJunction must(Query query) {
-		clauses.add( new BooleanClause( query, BooleanClause.Occur.MUST ) );
+		if ( query == null ) {
+			lastClause = null;
+		}
+		else {
+			lastClause = new BooleanClause( query, BooleanClause.Occur.MUST );
+			clauses.add( lastClause );
+		}
 		return this;
 	}
 
