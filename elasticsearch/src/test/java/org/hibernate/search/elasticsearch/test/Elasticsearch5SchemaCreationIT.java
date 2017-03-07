@@ -28,6 +28,7 @@ import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
@@ -134,6 +135,55 @@ public class Elasticsearch5SchemaCreationIT extends SearchInitializationTestBase
 					+ "}"
 				+ "}",
 				elasticSearchClient.type( SimpleBooleanEntity.class ).getMapping()
+				);
+	}
+
+	@Test
+	public void textField() throws Exception {
+		elasticSearchClient.index( SimpleTextEntity.class )
+				.ensureDoesNotExist().registerForCleanup();
+
+		init( SimpleTextEntity.class );
+
+		assertJsonEquals(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'keyword',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'text'"
+							+ "}"
+					+ "}"
+				+ "}",
+				elasticSearchClient.type( SimpleTextEntity.class ).getMapping()
+				);
+	}
+
+	@Test
+	public void textField_noNorms() throws Exception {
+		elasticSearchClient.index( NoNormsTextEntity.class )
+				.ensureDoesNotExist().registerForCleanup();
+
+		init( NoNormsTextEntity.class );
+
+		assertJsonEquals(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'keyword',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'norms': false"
+							+ "}"
+					+ "}"
+				+ "}",
+				elasticSearchClient.type( NoNormsTextEntity.class ).getMapping()
 				);
 	}
 
@@ -298,6 +348,28 @@ public class Elasticsearch5SchemaCreationIT extends SearchInitializationTestBase
 
 		@Field
 		Date myField;
+	}
+
+	@Indexed
+	@Entity
+	private static class SimpleTextEntity {
+		@DocumentId
+		@Id
+		Long id;
+
+		@Field
+		String myField;
+	}
+
+	@Indexed
+	@Entity
+	private static class NoNormsTextEntity {
+		@DocumentId
+		@Id
+		Long id;
+
+		@Field(norms = Norms.NO)
+		String myField;
 	}
 
 	@Indexed

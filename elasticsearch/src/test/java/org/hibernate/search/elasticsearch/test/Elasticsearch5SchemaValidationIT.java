@@ -24,6 +24,7 @@ import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
@@ -459,6 +460,37 @@ public class Elasticsearch5SchemaValidationIT extends SearchInitializationTestBa
 	}
 
 	@Test
+	public void property_norms_invalid() throws Exception {
+		elasticSearchClient.index( SimpleTextEntity.class ).deleteAndCreate();
+		elasticSearchClient.type( SimpleTextEntity.class ).putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'norms': false"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( ElasticsearchSchemaValidationException.class )
+						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
+						.withMessage( "property 'myField'" )
+						.withMessage( "\n\tInvalid value for attribute 'norms'. Expected 'TRUE', actual is 'FALSE'" )
+				.build()
+		);
+
+		init( SimpleTextEntity.class );
+	}
+
+	@Test
 	public void property_format_invalidOutputFormat() throws Exception {
 		elasticSearchClient.index( SimpleDateEntity.class ).deleteAndCreate();
 		elasticSearchClient.type( SimpleDateEntity.class ).putMapping(
@@ -566,12 +598,18 @@ public class Elasticsearch5SchemaValidationIT extends SearchInitializationTestBa
 							+ "'id': {"
 									+ "'type': 'keyword',"
 									+ "'index': true,"
-									+ "'store': true"
+									+ "'store': true,"
+									+ "'norms': true"
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'long',"
 									+ "'index': true,"
 									+ "'store': true"
+							+ "},"
+							+ "'myTextField': {"
+									+ "'type': 'text',"
+									+ "'index': true,"
+									+ "'norms': true"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -1333,6 +1371,9 @@ public class Elasticsearch5SchemaValidationIT extends SearchInitializationTestBa
 
 		@Field(index = Index.NO, store = Store.NO)
 		Long myField;
+
+		@Field(norms = Norms.NO)
+		String myTextField;
 	}
 
 	@Indexed
