@@ -34,6 +34,7 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
+import org.hamcrest.CoreMatchers;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -455,6 +456,46 @@ public class DSLTest extends SearchTestBase {
 		assertTrue( booleanJunction.isEmpty() );
 		booleanJunction.createQuery();
 		Assert.fail( "should not reach this point" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2565")
+	public void testBooleanWithNullClauses() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		// must/should with null clauses
+		Query query = monthQb
+				.bool()
+				.must( null )
+				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+				.should( null )
+				.createQuery();
+
+		Assert.assertThat( query, CoreMatchers.instanceOf( BooleanQuery.class ) );
+		Assert.assertEquals( 1, ( (BooleanQuery) query ).clauses().size() );
+
+		List<Month> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 1, results.size() );
+		assertEquals( "January", results.get( 0 ).getName() );
+
+		// must not / filter with null clauses
+		query = monthQb
+				.bool()
+					.must( null ).not()
+					.must( null ).disableScoring()
+					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+					.createQuery();
+
+		Assert.assertThat( query, CoreMatchers.instanceOf( BooleanQuery.class ) );
+		Assert.assertEquals( 1, ( (BooleanQuery) query ).clauses().size() );
+
+		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 1, results.size() );
+		assertEquals( "January", results.get( 0 ).getName() );
+
+		transaction.commit();
 	}
 
 	@Test
