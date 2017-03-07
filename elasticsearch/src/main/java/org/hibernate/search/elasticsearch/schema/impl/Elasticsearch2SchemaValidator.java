@@ -616,7 +616,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 			validateJsonPrimitive( errorCollector, expectedMapping.getType(), "null_value",
 					expectedMapping.getNullValue(), actualMapping.getNullValue() );
 
-			validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), null );
+			validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), "default" );
 
 			super.validate( errorCollector, expectedMapping, actualMapping );
 
