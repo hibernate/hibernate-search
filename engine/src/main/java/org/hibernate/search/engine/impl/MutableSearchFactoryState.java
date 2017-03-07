@@ -29,7 +29,7 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -51,7 +51,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<IndexManagerType, AnalyzerRegistry> analyzerRegistries = new ConcurrentHashMap<>();
 	private int cacheBitResultsSize;
 	private Properties configurationProperties;
-	private PolymorphicIndexHierarchy indexHierarchy;
+	private TypeHierarchy configuredTypeHierarchy;
+	private TypeHierarchy indexedTypeHierarchy;
 	private ServiceManager serviceManager;
 	private boolean transactionManagerExpected;
 	private IndexManagerHolder allIndexesManager;
@@ -80,7 +81,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		analyzerRegistries.putAll( oldFactoryState.getAnalyzerRegistries() );
 		cacheBitResultsSize = oldFactoryState.getCacheBitResultsSize();
 		configurationProperties = oldFactoryState.getConfigurationProperties();
-		indexHierarchy = oldFactoryState.getIndexHierarchy();
+		configuredTypeHierarchy = oldFactoryState.getConfiguredTypeHierarchy();
+		indexedTypeHierarchy = oldFactoryState.getIndexedTypeHierarchy();
 		serviceManager = oldFactoryState.getServiceManager();
 		transactionManagerExpected = oldFactoryState.isTransactionManagerExpected();
 		allIndexesManager = oldFactoryState.getAllIndexesManager();
@@ -158,8 +160,13 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	@Override
-	public PolymorphicIndexHierarchy getIndexHierarchy() {
-		return indexHierarchy;
+	public TypeHierarchy getConfiguredTypeHierarchy() {
+		return configuredTypeHierarchy;
+	}
+
+	@Override
+	public TypeHierarchy getIndexedTypeHierarchy() {
+		return indexedTypeHierarchy;
 	}
 
 	public void setDocumentBuildersContainedEntities(Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities) {
@@ -205,8 +212,12 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		);
 	}
 
-	public void setIndexHierarchy(PolymorphicIndexHierarchy indexHierarchy) {
-		this.indexHierarchy = indexHierarchy;
+	public void setConfiguredTypeHierarchy(TypeHierarchy configuredTypeHierarchy) {
+		this.configuredTypeHierarchy = configuredTypeHierarchy;
+	}
+
+	public void setIndexedTypeHierarchy(TypeHierarchy indexedTypeHierarchy) {
+		this.indexedTypeHierarchy = indexedTypeHierarchy;
 	}
 
 	@Override

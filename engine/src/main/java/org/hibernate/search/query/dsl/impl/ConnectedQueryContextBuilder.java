@@ -51,7 +51,13 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 			indexBoundType = getIndexBoundType( entityType, factory );
 
 			if ( indexBoundType == null ) {
-				throw log.cantQueryUnindexedType( entityType.getCanonicalName() );
+				Set<Class<?>> configuredSubTypes = factory.getConfiguredTypesPolymorphic( new Class<?>[] { entityType } );
+				if ( configuredSubTypes.isEmpty() ) {
+					throw log.cantQueryUnconfiguredType( entityType.getCanonicalName() );
+				}
+				else {
+					throw log.cantQueryUnindexedType( entityType.getCanonicalName() );
+				}
 			}
 
 			queryAnalyzerReferenceBuilder = factory.getAnalyzerReference( indexBoundType ).startCopy();

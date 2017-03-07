@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -52,17 +53,30 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	int getFilterCacheBitResultsSize();
 
 	/**
-	 * Given a set of target entities, return the set of indexed types following our
-	 * polymorphism rules for propagation of the {@code Indexed} annotation:
-	 * It returns an empty set if none of the target entities is indexed, nor any of their sub types.
-	 * Each of the classes of the argument is returned iff explicitly marked as indexed.
-	 * Each of the known subtypes of these classes which are explicitly marked as indexed are
-	 * added to the returned set.
-	 * The {@code Indexed} annotation is not inherited by subtypes which don't explicitly have it.
-	 * Passing {@code Object.class} among the parameters will have the returned set contain all known indexed types.
+	 * Given a set of target entities, return the set of configured subtypes.
+	 * <p>
+	 * "Configured" types are types that Hibernate Search was instructed to take into consideration,
+	 * i.e. types returned by {@link SearchConfiguration#getClassMappings()}.
 	 *
-	 * @param classes a list of types
-	 * @return a set containing the types as in the above rules
+	 * @param classes an array of types
+	 * @return the set of configured subtypes
+	 */
+	Set<Class<?>> getConfiguredTypesPolymorphic(Class<?>[] classes);
+
+	/**
+	 * Given a set of target entities, return the set of configured subtypes that are indexed.
+	 * <p>
+	 * "Configured" types are types that Hibernate Search was instructed to take into consideration,
+	 * i.e. types returned by {@link SearchConfiguration#getClassMappings()}.
+	 * <p>
+	 * "Indexed" types are configured types that happened to be annotated with {@code @Indexed},
+	 * or similarly configured through a programmatic mapping.
+	 * <p>
+	 * Note: the fact that a given type is configured or indexed doesn't mean that its subtypes are, too.
+	 * Each type must be configured explicitly.
+	 *
+	 * @param classes an array of types
+	 * @return the set of configured subtypes that are indexed
 	 */
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
 

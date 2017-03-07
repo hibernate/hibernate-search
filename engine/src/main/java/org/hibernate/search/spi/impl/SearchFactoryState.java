@@ -53,7 +53,16 @@ public interface SearchFactoryState {
 
 	Properties getConfigurationProperties();
 
-	PolymorphicIndexHierarchy getIndexHierarchy();
+	/**
+	 * @return The type hierarchy for all configured types, indexed or not.
+	 */
+	TypeHierarchy getConfiguredTypeHierarchy();
+
+	/**
+	 * @return The type hierarchy for configured types that are indexed
+	 * (for instance because they are annotated with @Indexed)
+	 */
+	TypeHierarchy getIndexedTypeHierarchy();
 
 	ServiceManager getServiceManager();
 

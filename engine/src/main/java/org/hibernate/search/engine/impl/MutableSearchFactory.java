@@ -45,7 +45,7 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
@@ -163,6 +163,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
+	public Set<Class<?>> getConfiguredTypesPolymorphic(Class<?>[] classes) {
+		return delegate.getConfiguredTypesPolymorphic( classes );
+	}
+
+	@Override
 	public Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes) {
 		return delegate.getIndexedTypesPolymorphic( classes );
 	}
@@ -183,8 +188,13 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public PolymorphicIndexHierarchy getIndexHierarchy() {
-		return delegate.getIndexHierarchy();
+	public TypeHierarchy getConfiguredTypeHierarchy() {
+		return delegate.getConfiguredTypeHierarchy();
+	}
+
+	@Override
+	public TypeHierarchy getIndexedTypeHierarchy() {
+		return delegate.getIndexedTypeHierarchy();
 	}
 
 	@Override

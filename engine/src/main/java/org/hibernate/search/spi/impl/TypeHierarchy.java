@@ -19,46 +19,45 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Helper class which keeps track of all super classes and interfaces of the indexed entities.
+ * Helper class which keeps track of all super classes and interfaces of known entities.
  */
-//FIXME make it immutable (builder pattern)
-public class PolymorphicIndexHierarchy {
+public class TypeHierarchy {
 	private static final Log log = LoggerFactory.make();
 
-	private Map<Class<?>, Set<Class<?>>> classToIndexedClass;
+	private Map<Class<?>, Set<Class<?>>> classToConfiguredClass;
 
-	public PolymorphicIndexHierarchy() {
-		classToIndexedClass = new HashMap<Class<?>, Set<Class<?>>>();
+	public TypeHierarchy() {
+		classToConfiguredClass = new HashMap<Class<?>, Set<Class<?>>>();
 	}
 
-	public void addIndexedClass(Class<?> indexedClass) {
-		addClass( indexedClass, indexedClass );
-		Class<?> superClass = indexedClass.getSuperclass();
+	public void addConfiguredClass(Class<?> configuredClass) {
+		addClass( configuredClass, configuredClass );
+		Class<?> superClass = configuredClass.getSuperclass();
 		while ( superClass != null ) {
-			addClass( superClass, indexedClass );
+			addClass( superClass, configuredClass );
 			superClass = superClass.getSuperclass();
 		}
-		for ( Class<?> clazz : indexedClass.getInterfaces() ) {
-			addClass( clazz, indexedClass );
+		for ( Class<?> clazz : configuredClass.getInterfaces() ) {
+			addClass( clazz, configuredClass );
 		}
 	}
 
 	private void addClass(Class<?> superclass, Class<?> indexedClass) {
-		Set<Class<?>> classesSet = classToIndexedClass.get( superclass );
+		Set<Class<?>> classesSet = classToConfiguredClass.get( superclass );
 		if ( classesSet == null ) {
 			classesSet = new HashSet<Class<?>>();
-			classToIndexedClass.put( superclass, classesSet );
+			classToConfiguredClass.put( superclass, classesSet );
 		}
 		classesSet.add( indexedClass );
 	}
 
-	public Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
+	public Set<Class<?>> getConfiguredClasses(Class<?>[] classes) {
 		if ( classes == null ) {
 			return Collections.<Class<?>>emptySet();
 		}
 		Set<Class<?>> indexedClasses = new HashSet<Class<?>>();
 		for ( Class<?> clazz : classes ) {
-			Set<Class<?>> set = classToIndexedClass.get( clazz );
+			Set<Class<?>> set = classToConfiguredClass.get( clazz );
 			if ( set != null ) {
 				// at this point we don't have to care about including indexed subclasses of a indexed class
 				// MultiClassesQueryLoader will take care of this later and optimise the queries
