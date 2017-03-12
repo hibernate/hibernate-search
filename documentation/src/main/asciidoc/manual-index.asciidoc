@@ -390,16 +390,17 @@ This feature is a work in progress.
 The integration with JSR-352, Batch Applications for the Java Platform, is in development. We do
 think we have the basics covered and we are looking for feedback.
 
-Hibernate Search provides a new mass indexing approach using batch job introduced by JSR352.
-It covers not only the existing functionality of the previous indexer, but also benefits the
-powerful standard based facilities of the Java Batch Platform (JSR-352), such as checkpoint and
-step partitioning. However, it requires a batch runtime for the execution:
+Hibernate Search provides a JSR-352 job to perform mass indexing.
+It covers not only the existing functionality of the mass indexer described above, but also benefits from
+some powerful standard features of the Java Batch Platform (JSR-352), such as failure recovery using checkpoints
+However, it requires a batch runtime for the execution. Please notice that we
+don't provide any batch runtime, you are free to choose one that fits you needs, e.g. the default
+batch runtime embedded in your Java EE container. We provide integration to any CDI-enabled JSR-352
+implementation (see <<jsr-352-emf-cdi,how to configure it here>>).
+As for other implementations, they can also be used, but will require a
+bit more configuration on your side.
 
-* For Java EE users, we use the batch runtime provided by your Java EE container.
-* For Java SE users, we use the batch runtime
-  https://github.com/jberet/jsr352/tree/master/jberet-se[JBeret SE].
-
-.How to use the new mass-indexer?
+.How to use the JSR-352 mass-indexing job?
 ====
 [source, JAVA]
 ----
@@ -413,15 +414,13 @@ long executionId = BatchRuntime
 ----
 ====
 
-In the following paragraphs, we will explain why JSR-352 standard is a good choice, and how to
-configure different parameters in order to bootstrap the mass-indexing job.
+==== Define entities to be indexed
 
-==== Define your indexing scope
-Our job allows you to define your own indexing scope—you can start a full indexation or a partial
-indexation through 3 different methods: selecting the desired entity types, using HQL, or using
-Hibernate criteria.
+The mass indexing job allows you to define your own entities to be indexed -- you can start a full
+indexation or a partial indexation through 3 different methods: selecting the desired entity types,
+using HQL, or using Hibernate criteria.
 
-.How to add define the indexing scope in different methods?
+.How to define the indexing scope?
 ====
 [source, JAVA]
 ----
@@ -438,7 +437,7 @@ Properties jobProps2 = MassIndexingJob
         .restrictedBy( "select c from MyClass c where c.name in ( 'Foo', 'Bar' )" )
         .build();
 
-// partial indexation using HQL
+// partial indexation using Criteria
 Properties jobProps3 = MassIndexingJob
         .parameters()
         .forEntity( MyClass.class )
@@ -447,21 +446,56 @@ Properties jobProps3 = MassIndexingJob
 ----
 ====
 
-==== Parallelism
-In order to maximize the performance, we highly recommend you to speed up the mass indexer using
-parallelism. Parallelism is activated by default. Under the standard JSR 352, the exact word is
-_"partitioning"_: The indexing step may run as multiple partitions, one per thread. Each partition
-has its own partition ID and parameters. If there’re more partitions than threads, partitions are\
-considered as a queue to consume: each thread can only run one partition at a time and won’t consume
-the next partition until the previous one is finished.
+While the full indexation is useful when you perform the very first indexation, or
+after extensive changes to your whole database, it may also be time consuming.
+If your want to reindex only part of your data, you need to add restrictions using HQL or criteria:
+they help you to define a customized selection, and only the entities inside that selection will be indexed. A typical
+use-case is to index the new entities appeared since yesterday.
+
+Note that, as detailed below, some features may not be supported depending on the restrictions.
+
+.Comparaison of each method
+|===
+| Method | Indexation | Parallel Indexing | Checkpoint
+
+| Full Indexation
+| Full Indexation
+| Supported
+| Supported
+
+| HQL
+| Partial Indexation
+| Not Supported
+| Not Supported
+
+| Criteria
+| Partial Indexation
+| Supported
+| Supported
+|===
+
+==== Parallel indexing
+
+For better performance, indexation is performed in parallel using multiple threads. The set of
+entities to index is split into multiple partitions. Each thread processes one partition at a time.
+
+The following section will explain how to tune the parallel execution.
+
+[TIP]
+====
+The "sweet spot" of number of threads, fetch size, partition size, etc. to achieve best performance
+is highly dependent on your overall architecture, database design and even data values.
+
+You should experiment with these settings to find out what's best in your particular case.
+====
 
 ===== Threads
+
 The maximum number of threads used by the job execution is defined through method `maxThreads()`.
 Within the N threads given, there’s 1 thread reserved for the core, so only N - 1 threads are
-available for different partitions. The default number of threads used in Hibernate Search is 10,
-which correspond to the max number of threads in JBeret. You can overwrite you maximum number used
-by Hibernate Search batch job, but we cannot guarantee that your batch runtime can provide the
-requested number.
+available for different partitions. If N = 1, the program will work, and all batch elements will run
+in the same thread. The default number of threads used in Hibernate Search is 10. You can overwrite
+it with your preferred number.
 
 ====
 [source, JAVA]
@@ -475,18 +509,37 @@ MassIndexingJob.parameters()
 [NOTE]
 ====
 Note that the batch runtime cannot guarantee the requested number of threads are available, it will
-use as it can up to the requested maximum. (JSR352 v1.0 Final Release, page 34)
+use as many as possible up to the requested maximum (JSR352 v1.0 Final Release, page 34). Note also that all
+batch jobs share the same thread pool—so it's a good idea to execute jobs separately.
 ====
 
-This approach is optimized for best performance but requires to set the application in maintenance
-mode. Running a mass indexer in busy hours is not recommended. You also need to ensure the batch
-runtime has enough available threads for the execution, because all the batch jobs share the same
-thread pool.
-
 ===== Row per partitions
-Mass indexer defines dynamically the number of partitions, but you need to tell it the number of
-rows per partitions so that it can calculate the partitions by division. Each partition deals with
-one root entity type, so 2 different entity types will never run under the same partition.
+
+Each partition consists of a fix number of elements to index. You may tune exactly how many elements
+a partition will hold with `rowsPerPartition`.
+
+[NOTE]
+====
+This property has nothing to do with checkpoint algorithms.
+
+Please see the <<jsr-352-checkpoint,Checkpoint section>> to see how to tune checkpoint algorithms.
+====
+
+When `rowsPerPartition` is low, there will be many small partitions,
+so processing threads will be less likely to starve (stay idle because there's no more partition to process),
+but on the other hand you will only be able to use a small fetch size,
+which will increase the number of database accesses.
+
+When `rowsPerPartition` is high, there will be a few big partitions,
+so you will be able to take advantage of a higher fetch size,
+which will reduce the number of database accesses,
+but on the other hand the processing of each partition will require to hold more objects in memory.
+
+[NOTE]
+====
+Each partition deals with one root entity type, so two different entity types will never run under
+the same partition.
+====
 
 ====
 [source, JAVA]
@@ -497,10 +550,11 @@ MassIndexingJob.parameters()
 ----
 ====
 
-==== Checkpoint
-Mass indexer supports checkpoint algorithm, which helps you to restart your suspended or failed job
-from the last successful checkpoint. Assume that N is the value of checkpoint interval, then a
-partition will reach the checkpoint at every N items processed. You can overwrite the default
+==== [[jsr-352-checkpoint]] Checkpoint
+
+The mass indexing job supports checkpoint algorithm, which helps you to restart your suspended or
+failed job from the last successful checkpoint. Assuming that N is the value of checkpoint interval,
+a partition will reach the checkpoint at every N items processed. You can overwrite the default
 interval to adapt your business requirement. By default, it is set to 500.
 
 ====
@@ -512,15 +566,14 @@ MassIndexingJob.parameters()
 ----
 ====
 
-Checkpoint a partition-scope algorithm, which means each partition has its own checkpoint counter
+Checkpoint algorithms are partition-scoped, meaning each partition has its own checkpoint counter
 and it is not shared with other partitions.
-
 
 ==== Selecting the persistence unit (EntityManagerFactory)
 
 [CAUTION]
 ====
-Regarless of how the entity manager factory is retrieved,
+Regardless of how the entity manager factory is retrieved,
 you must make sure that the entity manager factory used by the mass indexer
 will stay open during the whole mass indexing process.
 ====
@@ -531,7 +584,7 @@ If you use only one persistence unit, the mass indexer will be able to access yo
 automatically without any special configuration: you only have to make sure to create the
 `EntityManagerFactory` (or `SessionFactory`) in your application before launching the mass indexer.
 
-If you want to use multiple persistence unit, you will have to add two parameters when launching the
+If you want to use multiple persistence units, you will have to add two parameters when launching the
 mass indexer:
 
 * `entityManagerFactoryReference`: this is the string that will identify the `EntityManagerFactory`.
@@ -550,7 +603,7 @@ If you set the `hibernate.session_factory_name` property in the Hibernate config
 and you don't use JNDI, you will also have to set `hibernate.session_factory_name_is_jndi` to `false`.
 ====
 
-===== CDI environment
+===== [[jsr-352-emf-cdi]] CDI environment
 
 You can use CDI to retrieve the `EntityManagerFactory`. Unless you use an already packaged
 `hibernate-search-jsr352` module for your application container, this will require you to add the
@@ -559,8 +612,9 @@ You can use CDI to retrieve the `EntityManagerFactory`. Unless you use an alread
 If you use only one persistence unit, the mass indexer will be able to access your database
 automatically without any special configuration.
 
-If you want to use multiple persistence unit, you will have to register those as beans in the CDI
-context. Note that entity manager factories may not be considered as beans by default, in which case
+If you want to use multiple persistence units, you will have to register the `EntityManagerFactories`
+as beans in the CDI context.
+Note that entity manager factories may not be considered as beans by default, in which case
 you will have to register them yourself. You may use an application-scoped bean to do so:
 
 ====
