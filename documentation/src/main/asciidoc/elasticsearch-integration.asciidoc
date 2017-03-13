@@ -16,7 +16,8 @@ We do think we have the basics covered and we are looking for feedback.
 
 Patches can be sent as pull requests to the https://github.com/hibernate/hibernate-search[Github repository],
 but also general feedback, suggestions and questions are very welcome.
-To get in touch or find other interesting links for contributors, see the http://hibernate.org/community/[Hibernate Community].
+To get in touch or find other interesting links for contributors, see the http://hibernate.org/community/[Community page]
+of the Hibernate website.
 
 === Goal of the Elasticsearch integration
 
@@ -31,10 +32,10 @@ There could be various reasons to prefer this over an "embedded Lucene" approach
 * benefit from Elasticsearch's out of the box horizontal scalability features
 * explore the data updated by an Hibernate powered application using the Elasticsearch dashboard integrations such as Kibana
 
-There are a couple drawbacks compared to the embedded Lucene approach though:
+There are a couple of drawbacks compared to the embedded Lucene approach though:
 
 * incur a performance penalty of remote RPCs both for index updates and to run queries
-* need to buy and manage additional servers
+* need to manage an additional service
 
 Which solution is best will depend on the specific needs of your system.
 
@@ -52,7 +53,7 @@ All changes done to your objects will trigger the necessary index changes transp
 
 There is no more paradigm shift in your code.
 You are working on Hibernate ORM managed objects,
-doing your queries on object properties with a nice DSL,
+doing your queries on object properties with a nice DSL.
 --
 
 === Getting started and configuration
@@ -102,8 +103,8 @@ Hibernate Search can work with an Elasticsearch server without altering its conf
 
 However some features offered by Hibernate Search require specific configuration:
 
-* if you want to be able to use the Hibernate Search <<search-batchindex-massindexer,MassIndexer>> with `purgeAllOnStart` enabled,
-  or to use `FullTextSession.purge()` or `FullTextSession.purgeAll()`,
+* if you want to be able to use the Hibernate Search <<search-batchindex-massindexer,MassIndexer>>
+with `purgeAllOnStart` enabled - the default behavior -, or to use `FullTextSession.purge()` or `FullTextSession.purgeAll()`,
   install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query` plugin]
 * if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
   see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
@@ -150,7 +151,7 @@ Caution: if analyzer definitions have to be updated, the index will be closed au
 |`CREATE`|**The default**: existing indexes will not be altered, missing indexes will be created along with their mappings and analyzer definitions.
 |`RECREATE`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions.
 This will delete all content from the indexes!
-|`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
+|`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the indexes at shutdown. Commonly used for tests.
 |===============
 +
 [CAUTION]
@@ -441,9 +442,9 @@ never allow you to take full advantage of Elasticsearch analysis capabilities.
 Here are the known limitations of the automatic translation:
 
  * a few factories have unsupported parameters, because those have no equivalent in Elasticsearch.
-   An exception will be raised on startup a parameter is not supported.
+   An exception will be raised on startup if a parameter is not supported.
  * the `hyphenator` parameter for `HyphenatedWordsFilterFactory` must refer to
-   a file on the Elasticsearch servers, on contrary to other factories
+   a file on the Elasticsearch servers, on the contrary to other factories
    where the files are accessed by Hibernate Search directly.
    This is due to an Elasticsearch limitation
    (there is no way to forward the content of a local hyphenation pattern file).
