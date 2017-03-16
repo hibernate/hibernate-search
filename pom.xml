@@ -1585,6 +1585,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                             <version>${testElasticsearchMavenPluginVersion}</version>
                             <configuration>
                                 <version>${testElasticsearchVersion}</version>
+                                <timeout>90</timeout><!-- Make it work on our slow CI -->
                             </configuration>
                             <dependencies>
                                 <!-- The next two are used to get ES log output into the Maven console -->
