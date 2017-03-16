@@ -1,0 +1,20 @@
+# Spring Boot configuration
+# See https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# for a list of available properties
+
+spring.jpa.properties:
+  hibernate:
+    dialect: org.hibernate.dialect.H2Dialect
+    ddl-auto: create-drop
+  hibernate.search:
+    default:
+      directory_provider: ram
+
+spring.datasource:
+  url: jdbc:h2:mem:foobar
+  username: sa
+  password: sa
+
+logging.level:
+  org.hibernate.SQL: DEBUG
+  org.hibernate.search.batchindexing: INFO

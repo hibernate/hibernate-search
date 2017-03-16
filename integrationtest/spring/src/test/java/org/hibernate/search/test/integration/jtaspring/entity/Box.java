@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.integration.jtaspring;
+package org.hibernate.search.test.integration.jtaspring.entity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +17,6 @@ import javax.persistence.OneToMany;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.ForeignKey;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Indexed;
 
@@ -28,11 +27,9 @@ import org.hibernate.search.annotations.Indexed;
 public class Box extends Container {
 
 	@OneToMany(mappedBy = "box", cascade = { CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST }, fetch = FetchType.LAZY)
-	@ForeignKey(name = "FK_Box_Muffins")
 	private Set<Muffin> muffinSet;
 
 	@OneToMany(mappedBy = "box", cascade = { CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST }, fetch = FetchType.LAZY)
-	@ForeignKey(name = "FK_Box_Doughnuts")
 	private Set<Doughnut> doughnutSet;
 
 	public Box() {
