@@ -6,29 +6,12 @@ spring.jpa.properties:
   hibernate:
     connection.isolation: 2
     current_session_context_class: jta
-    jdbc:
-      batch-size: 400
-      fetch-size: 200
-      wrap_result_sets: true
-      generate-statistics: true
     cache:
       use_second_level_cache: false
       use_query_cache: false
-      region_prefix: integration
-      # Infinispan
-      #region.factory_class: org.hibernate.cache.infinispan.InfinispanRegionFactory
-      #With statistics on transaction would not commit
-      #infinispan.statistics: true
-    # Atomikos JTA for Hibernate, required to get this JPA provider involved in JTA
-    # no value should be setup for hibernate.transaction.factory_class, it is not required
-    transaction.manager_lookup_class: org.hibernate.transaction.BTMTransactionManagerLookup
   hibernate.search:
-    default:
-      optimizer.transaction_limit.max: 100
     worker:
       execution: async
-      thread_pool.size: 1
-      buffer_queue.max: 1000000
 
 spring.datasource:
   driver-class-name: org.h2.jdbcx.JdbcDataSource
@@ -39,7 +22,5 @@ spring.jta.bitronix:
     allow-local-transactions: true
     min-pool-size: 5
     max-pool-size: 100
-    max-idle-time: 100
-    test-query: select 1+1 as sum
   properties:
     journal: 'null'
