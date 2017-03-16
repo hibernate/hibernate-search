@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.integration.jtaspring;
+package org.hibernate.search.test.integration.jtaspring.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,24 +14,21 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Indexed;
 
-//Hibernate
+// Hibernate
 @Entity
-@Table(name = "doughnut")
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region = "doughnut")
+@Table(name = "muffin")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region = "muffin")
 // Hibernate Search
-@Indexed(index = "Doughnut")
-@Analyzer(impl = StandardAnalyzer.class)
-public class Doughnut {
+//@Indexed(index="Muffin")
+//@Analyzer(impl = StandardAnalyzer.class)
+public class Muffin {
 
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long doughnutId;
+	private Long muffinId;
 
 	@ManyToOne
 	private Box box;
@@ -39,18 +36,21 @@ public class Doughnut {
 	@Column(length = 255, nullable = false)
 	private String kind;
 
-	/**
-	 * @return the doughnutId
-	 */
-	public Long getDoughnutId() {
-		return doughnutId;
+	public Muffin() {
 	}
 
 	/**
-	 * @param doughnutId the doughnutId to set
+	 * @return the muffinId
 	 */
-	public void setDoughnutId(Long doughnutId) {
-		this.doughnutId = doughnutId;
+	public Long getMuffinId() {
+		return muffinId;
+	}
+
+	/**
+	 * @param muffinId the muffinId to set
+	 */
+	public void setMuffinId(Long muffinId) {
+		this.muffinId = muffinId;
 	}
 
 	/**

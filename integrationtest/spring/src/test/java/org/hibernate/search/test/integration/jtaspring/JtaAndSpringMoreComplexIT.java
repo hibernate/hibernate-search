@@ -8,14 +8,20 @@ package org.hibernate.search.test.integration.jtaspring;
 
 import javax.inject.Inject;
 
+import org.hibernate.search.test.integration.jtaspring.dao.BoxDAO;
+import org.hibernate.search.test.integration.jtaspring.entity.Box;
+import org.hibernate.search.test.integration.jtaspring.entity.Doughnut;
+import org.hibernate.search.test.integration.jtaspring.entity.Muffin;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath*:beans.xml" })
-public class JtaAndSpringMoreComplexTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JtaAndSpringApplicationConfiguration.class)
+@ActiveProfiles("jta")
+public class JtaAndSpringMoreComplexIT {
 	@Inject
 	private BoxDAO boxDAO;
 

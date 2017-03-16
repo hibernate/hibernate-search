@@ -8,18 +8,18 @@ package org.hibernate.search.test.integration.jtaspring;
 
 import javax.inject.Inject;
 
+import org.hibernate.search.test.integration.jtaspring.dao.SnertDAO;
+import org.hibernate.search.test.integration.jtaspring.entity.Snert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath*:beans.xml" })
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
-@Transactional
-public class JtaAndSpringTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JtaAndSpringApplicationConfiguration.class)
+@ActiveProfiles("jta")
+public class JtaAndSpringIT {
 
 	@Inject
 	private SnertDAO snertDAO;
