@@ -57,6 +57,16 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 		}
 
 		return RestClient.builder( hosts )
+				/*
+				 * Note: this timeout is not only used on retries,
+				 * but also when executing requests synchronously.
+				 * See https://github.com/elastic/elasticsearch/issues/21789#issuecomment-287399115
+				 */
+				.setMaxRetryTimeoutMillis( ConfigurationParseHelper.getIntValue(
+						properties,
+						propertyPrefix + ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT,
+						ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT
+				) )
 				.setRequestConfigCallback( (b) -> customizeRequestConfig( propertyPrefix, properties, b ) )
 				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( propertyPrefix, properties, serverUris, b ) )
 				.build();

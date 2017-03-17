@@ -116,6 +116,50 @@ public class DefaultElasticsearchClientFactoryTest {
 	}
 
 	@Test
+	public void timeout_read() throws Exception {
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT, "99999" );
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn(
+						elasticsearchResponse()
+						.withFixedDelay( 2000 )
+				) );
+
+		thrown.expect( IOException.class );
+
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			doPost( client, "/myIndex/myType", payload );
+		}
+	}
+
+	@Test
+	public void timeout_request() throws Exception {
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "99999" )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT, "1000" );
+
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn(
+						elasticsearchResponse()
+						.withFixedDelay( 2000 )
+				) );
+
+		thrown.expect( IOException.class );
+
+		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			doPost( client, "/myIndex/myType", payload );
+		}
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2235")
 	public void multipleHosts() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()

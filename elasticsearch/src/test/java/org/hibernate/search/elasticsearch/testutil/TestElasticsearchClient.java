@@ -366,6 +366,12 @@ public class TestElasticsearchClient extends ExternalResource {
 		gson = DialectIndependentGsonProvider.INSTANCE.getGson();
 
 		this.client = RestClient.builder( HttpHost.create( ElasticsearchEnvironment.Defaults.SERVER_URI ) )
+				/*
+				 * Note: this timeout is not only used on retries,
+				 * but also when executing requests synchronously.
+				 * See https://github.com/elastic/elasticsearch/issues/21789#issuecomment-287399115
+				 */
+				.setMaxRetryTimeoutMillis( ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT )
 				.setHttpClientConfigCallback( (builder) -> {
 					return builder
 							.setMaxConnTotal( ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION )
