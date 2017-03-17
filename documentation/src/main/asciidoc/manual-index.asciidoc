@@ -397,8 +397,8 @@ However, it requires a batch runtime for the execution. Please notice that we
 don't provide any batch runtime, you are free to choose one that fits you needs, e.g. the default
 batch runtime embedded in your Java EE container. We provide integration to any CDI-enabled JSR-352
 implementation (see <<jsr-352-emf-cdi,how to configure it here>>).
-As for other implementations, they can also be used, but will require a
-bit more configuration on your side.
+As for other implementations, they can also be used, but will require
+<<jsr-352-emf-other-di,a bit more configuration on your side>>.
 
 .How to use the JSR-352 mass-indexing job?
 ====
@@ -578,31 +578,6 @@ you must make sure that the entity manager factory used by the mass indexer
 will stay open during the whole mass indexing process.
 ====
 
-===== Plain Java environment (no CDI)
-
-If you use only one persistence unit, the mass indexer will be able to access your database
-automatically without any special configuration: you only have to make sure to create the
-`EntityManagerFactory` (or `SessionFactory`) in your application before launching the mass indexer.
-
-If you want to use multiple persistence units, you will have to add two parameters when launching the
-mass indexer:
-
-* `entityManagerFactoryReference`: this is the string that will identify the `EntityManagerFactory`.
-* `entityManagerFactoryScope`: this allows to select how you want to reference the
-  `EntityManagerFactory`. Possible values are:
-
-** `persistence-unit-name` (the default): use the persistence unit name defined in
-   `persistence.xml`.
-** `session-factory-name`: use the session factory name defined in the Hibernate configuration by
-   the `hibernate.session_factory_name` configuration property.
-
-
-[CAUTION]
-====
-If you set the `hibernate.session_factory_name` property in the Hibernate configuration
-and you don't use JNDI, you will also have to set `hibernate.session_factory_name_is_jndi` to `false`.
-====
-
 ===== [[jsr-352-emf-cdi]] CDI environment
 
 You can use CDI to retrieve the `EntityManagerFactory`. Unless you use an already packaged
@@ -653,4 +628,45 @@ indexer to use one in particular by naming it using the `entityManagerReference`
 ====
 Due to limitations of the CDI APIs, it is not currently possible to reference
 an entity manager factory by its persistence unit name when using the mass indexer with CDI.
+====
+
+===== [[jsr-352-emf-other-di]] Other dependency injection mechanisms
+
+You can use different dependency injection mechanisms to retrieve the `EntityManagerFactory`,
+under the following conditions:
+
+ 1. The JSR-352 runtime must use this dependency injection mechanism
+ 2. You must register a bean in the dependency injection context
+ that will implement the `EntityManagerFactory` retrieval.
+
+Your bean must:
+
+ 1. extend `org.hibernate.search.jsr352.massindexing.JobContextSetupListener`;
+ 2. override `getEntityManagerFactoryRegistry()` to return a registry of your own that will perform the actual retrieval;
+ 3. and be registered in the dependency injection context as a named bean with this exact name:
+ `org.hibernate.search.jsr352.massindexing.JobContextSetupListener`.
+
+===== Plain Java environment (no dependency injection at all)
+
+If you use only one persistence unit, the mass indexer will be able to access your database
+automatically without any special configuration: you only have to make sure to create the
+`EntityManagerFactory` (or `SessionFactory`) in your application before launching the mass indexer.
+
+If you want to use multiple persistence units, you will have to add two parameters when launching the
+mass indexer:
+
+* `entityManagerFactoryReference`: this is the string that will identify the `EntityManagerFactory`.
+* `entityManagerFactoryScope`: this allows to select how you want to reference the
+  `EntityManagerFactory`. Possible values are:
+
+** `persistence-unit-name` (the default): use the persistence unit name defined in
+   `persistence.xml`.
+** `session-factory-name`: use the session factory name defined in the Hibernate configuration by
+   the `hibernate.session_factory_name` configuration property.
+
+
+[CAUTION]
+====
+If you set the `hibernate.session_factory_name` property in the Hibernate configuration
+and you don't use JNDI, you will also have to set `hibernate.session_factory_name_is_jndi` to `false`.
 ====
