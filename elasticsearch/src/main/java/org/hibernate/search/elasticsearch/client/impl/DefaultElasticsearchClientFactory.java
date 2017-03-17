@@ -21,6 +21,7 @@ import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.SearchThreadFactory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -102,6 +103,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 						propertyPrefix + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION_PER_ROUTE,
 						ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE
 				) )
+				.setThreadFactory( new SearchThreadFactory( "Elasticsearch transport thread " ) )
 				.setDefaultIOReactorConfig( IOReactorConfig.custom()
 						/*
 						 * The RestClient uses the async HTTP client even for synchronous calls,
