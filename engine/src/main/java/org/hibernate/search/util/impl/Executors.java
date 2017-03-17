@@ -13,10 +13,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Helper class to create threads;
@@ -27,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class Executors {
 
 	public static final int QUEUE_MAX_LENGTH = 1000;
-	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
 
 	private static final Log log = LoggerFactory.make();
 
@@ -99,29 +96,6 @@ public final class Executors {
 				new SearchThreadFactory( groupname ),
 				new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy()
 				);
-	}
-
-	/**
-	 * The thread factory, used to customize thread names
-	 */
-	private static class SearchThreadFactory implements ThreadFactory {
-
-		final ThreadGroup group;
-		final AtomicInteger threadNumber = new AtomicInteger( 1 );
-		final String namePrefix;
-
-		SearchThreadFactory(String groupname) {
-			SecurityManager s = System.getSecurityManager();
-			group = ( s != null ) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-			namePrefix = THREAD_GROUP_PREFIX + groupname + "-";
-		}
-
-		@Override
-		public Thread newThread(Runnable r) {
-			Thread t = new Thread( group, r, namePrefix + threadNumber.getAndIncrement(), 0 );
-			return t;
-		}
-
 	}
 
 	/**

@@ -28,6 +28,7 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequest;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.impl.SearchThreadFactory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.rules.ExternalResource;
 
@@ -365,6 +366,12 @@ public class TestElasticsearchClient extends ExternalResource {
 		gson = DialectIndependentGsonProvider.INSTANCE.getGson();
 
 		this.client = RestClient.builder( HttpHost.create( ElasticsearchEnvironment.Defaults.SERVER_URI ) )
+				.setHttpClientConfigCallback( (builder) -> {
+					return builder
+							.setMaxConnTotal( ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION )
+							.setMaxConnPerRoute( ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE )
+							.setThreadFactory( new SearchThreadFactory( "Test Elasticsearch client transport thread" ) );
+				} )
 				.setRequestConfigCallback( (builder) -> {
 					return builder
 							.setSocketTimeout( ElasticsearchEnvironment.Defaults.SERVER_READ_TIMEOUT )
