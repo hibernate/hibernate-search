@@ -175,6 +175,11 @@ Mapping validation is as permissive as possible. Fields or mappings that are unk
 
 One exception should be noted, though: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
 --
+Maximum time to wait for the successful execution of a request to the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.request_timeout 60000` (default)
++
+The execution time of a request includes the time needed to establish a connection,
+to send the request, and to receive the whole response,
+optionally retrying in case of node failures.
 Maximum time to wait for a connection to the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.connection_timeout 3000` (default)
 Maximum time to wait for a response from the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.read_timeout 60000` (default)
 Maximum number of simultaneous connections to the Elasticsearch cluster:: `hibernate.search.default.elasticsearch.max_total_connection 20` (default)
