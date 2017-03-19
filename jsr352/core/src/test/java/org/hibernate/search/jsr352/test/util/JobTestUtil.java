@@ -6,11 +6,19 @@
  */
 package org.hibernate.search.jsr352.test.util;
 
+import java.util.List;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.Search;
 
 import org.jboss.logging.Logger;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Yoann Rodiere
@@ -44,6 +52,19 @@ public final class JobTestUtil {
 		}
 
 		return jobExecution;
+	}
+
+	public static <T> List<T> findIndexedResults(EntityManagerFactory emf, Class<T> clazz, String key, String value) {
+		EntityManager em = emf.createEntityManager();
+		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
+		Query luceneQuery = ftem.getSearchFactory().buildQueryBuilder()
+				.forEntity( clazz ).get()
+				.keyword().onField( key ).matching( value )
+				.createQuery();
+		@SuppressWarnings("unchecked")
+		List<T> result = ftem.createFullTextQuery( luceneQuery ).getResultList();
+		em.close();
+		return result;
 	}
 
 }

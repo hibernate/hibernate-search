@@ -24,7 +24,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
@@ -102,6 +101,11 @@ public class BatchIndexingJobIT {
 		}
 	}
 
+	@After
+	public void shutdown() {
+		emf.close();
+	}
+
 	@Test
 	public void simple() throws InterruptedException,
 			IOException {
@@ -112,9 +116,9 @@ public class BatchIndexingJobIT {
 		ftem.purgeAll( WhoAmI.class );
 		ftem.flushToIndexes();
 		em.close();
-		List<Company> companies = findClass( Company.class, "name", "Google" );
-		List<Person> people = findClass( Person.class, "firstName", "Linus" );
-		List<WhoAmI> whos = findClass( WhoAmI.class, "id", "id01" );
+		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
+		List<WhoAmI> whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
 		assertEquals( 0, companies.size() );
 		assertEquals( 0, people.size() );
 		assertEquals( 0, whos.size() );
@@ -127,16 +131,16 @@ public class BatchIndexingJobIT {
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
 		for ( StepExecution stepExecution : stepExecutions ) {
 			LOGGER.infof( "step %s executed.", stepExecution.getStepName() );
 			testBatchStatus( stepExecution );
 		}
 
-		companies = findClass( Company.class, "name", "Google" );
-		people = findClass( Person.class, "firstName", "Linus" );
-		whos = findClass( WhoAmI.class, "id", "id01" );
+		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
+		whos = JobTestUtil.findIndexedResults( emf, WhoAmI.class, "id", "id01" );
 		assertEquals( 1, companies.size() );
 		assertEquals( 1, people.size() );
 		assertEquals( 1, whos.size() );
@@ -148,7 +152,7 @@ public class BatchIndexingJobIT {
 		EntityManager em = emf.createEntityManager();
 		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
 		ftem.purgeAll( Company.class );
-		List<Company> companies = findClass( Company.class, "name", "Google" );
+		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
 		long executionId = jobOperator.start(
@@ -160,9 +164,9 @@ public class BatchIndexingJobIT {
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
-		companies = findClass( Company.class, "name", "Google" );
+		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 1, companies.size() );
 	}
 
@@ -172,7 +176,7 @@ public class BatchIndexingJobIT {
 		EntityManager em = emf.createEntityManager();
 		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
 		ftem.purgeAll( Company.class );
-		List<Company> companies = findClass( Company.class, "name", "Google" );
+		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
 		long executionId = jobOperator.start(
@@ -184,9 +188,9 @@ public class BatchIndexingJobIT {
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
-		companies = findClass( Company.class, "name", "Google" );
+		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 1, companies.size() );
 	}
 
@@ -205,9 +209,9 @@ public class BatchIndexingJobIT {
 
 		// searches before mass index,
 		// expected no results for each search
-		assertEquals( 0, findClass( Company.class, "name", "Google" ).size() );
-		assertEquals( 0, findClass( Company.class, "name", "Red Hat" ).size() );
-		assertEquals( 0, findClass( Company.class, "name", "Microsoft" ).size() );
+		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
+		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
+		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
 
 		long executionId = jobOperator.start(
 				MassIndexingJob.NAME,
@@ -218,11 +222,11 @@ public class BatchIndexingJobIT {
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
-		assertEquals( 1, findClass( Company.class, "name", "Google" ).size() );
-		assertEquals( 1, findClass( Company.class, "name", "Red Hat" ).size() );
-		assertEquals( 0, findClass( Company.class, "name", "Microsoft" ).size() );
+		assertEquals( 1, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
+		assertEquals( 1, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
+		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
 	}
 
 	@Test
@@ -240,9 +244,9 @@ public class BatchIndexingJobIT {
 
 		// searches before mass index,
 		// expected no results for each search
-		assertEquals( 0, findClass( Company.class, "name", "Google" ).size() );
-		assertEquals( 0, findClass( Company.class, "name", "Red Hat" ).size() );
-		assertEquals( 0, findClass( Company.class, "name", "Microsoft" ).size() );
+		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
+		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
+		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
 
 		long executionId = jobOperator.start(
 				MassIndexingJob.NAME,
@@ -253,24 +257,11 @@ public class BatchIndexingJobIT {
 						.build()
 				);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		jobExecution = JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
-		assertEquals( 1, findClass( Company.class, "name", "Google" ).size() );
-		assertEquals( 1, findClass( Company.class, "name", "Red Hat" ).size() );
-		assertEquals( 0, findClass( Company.class, "name", "Microsoft" ).size() );
-	}
-
-	private <T> List<T> findClass(Class<T> clazz, String key, String value) {
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		Query luceneQuery = ftem.getSearchFactory().buildQueryBuilder()
-				.forEntity( clazz ).get()
-				.keyword().onField( key ).matching( value )
-				.createQuery();
-		@SuppressWarnings("unchecked")
-		List<T> result = ftem.createFullTextQuery( luceneQuery ).getResultList();
-		em.close();
-		return result;
+		assertEquals( 1, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
+		assertEquals( 1, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
+		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
 	}
 
 	private void testBatchStatus(StepExecution stepExecution) {
@@ -307,8 +298,4 @@ public class BatchIndexingJobIT {
 		return metricsMap;
 	}
 
-	@After
-	public void shutdown() {
-		emf.close();
-	}
 }

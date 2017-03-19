@@ -7,6 +7,7 @@
 package org.hibernate.search.jsr352.massindexing;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -22,15 +23,15 @@ import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
  * Use it like this:
  * <code><pre>
  * jobOperator.start(
- *		MassIndexingJob.NAME,
- *		MassIndexingJob.parameters()
- *			.forEntities( String.class, Integer.class )
- *			.fetchSize( 1000 )
- *			.rowsPerPartition( 10_000 )
- *			.maxResults( 1000 )
- *			.maxThreads( 30 )
- *			.purgeAtStart( true )
- *			.build()
+ * 		MassIndexingJob.NAME,
+ * 		MassIndexingJob.parameters()
+ * 			.forEntities( String.class, Integer.class )
+ * 			.fetchSize( 1000 )
+ * 			.rowsPerPartition( 10_000 )
+ * 			.maxResults( 1000 )
+ * 			.maxThreads( 30 )
+ * 			.purgeAtStart( true )
+ * 			.build()
  * );
  * </pre></code>
  *
@@ -87,9 +88,7 @@ public final class MassIndexingJob {
 			}
 			this.rootEntities = new HashSet<>();
 			this.rootEntities.add( rootEntity );
-			for ( Class<?> clz : rootEntities ) {
-				this.rootEntities.add( clz );
-			}
+			Collections.addAll( this.rootEntities, rootEntities );
 			customQueryCriteria = new HashSet<>();
 			customQueryHql = "";
 		}
@@ -106,10 +105,11 @@ public final class MassIndexingJob {
 
 		/**
 		 * Whether the Hibernate queries are cacheable. This setting will be applied to
-		 * {@link org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader} . The default value is false. Set it
-		 * to true when reading a complex graph with relations.
+		 * {@link org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader} . The default value is false.
+		 * Set it to true when reading a complex graph with relations.
 		 *
 		 * @param cacheable
+		 *
 		 * @return
 		 */
 		public ParametersBuilder cacheable(boolean cacheable) {
@@ -119,10 +119,11 @@ public final class MassIndexingJob {
 
 		/**
 		 * Checkpoint interval during the mass index process.
-		 *
+		 * <p>
 		 * The checkpoint will be done every N items read, where N is the given item count.
 		 *
 		 * @param checkpointInterval the number of item count before starting the next checkpoint.
+		 *
 		 * @return
 		 */
 		public ParametersBuilder checkpointInterval(int checkpointInterval) {
@@ -134,6 +135,7 @@ public final class MassIndexingJob {
 		 * The fetch size for the result fetching.
 		 *
 		 * @param fetchSize
+		 *
 		 * @return
 		 */
 		public ParametersBuilder fetchSize(int fetchSize) {
@@ -149,6 +151,7 @@ public final class MassIndexingJob {
 		 * SQL.
 		 *
 		 * @param customQueryLimit
+		 *
 		 * @return
 		 */
 		public ParametersBuilder customQueryLimit(int customQueryLimit) {
@@ -165,6 +168,7 @@ public final class MassIndexingJob {
 		 * maximum. This an an optional attribute. The default is the number of partitions.
 		 *
 		 * @param maxThreads
+		 *
 		 * @return
 		 */
 		public ParametersBuilder maxThreads(int maxThreads) {
@@ -181,6 +185,7 @@ public final class MassIndexingJob {
 		 * TODO: specify what is the optimization exactly
 		 *
 		 * @param optimizeAfterPurge
+		 *
 		 * @return
 		 */
 		public ParametersBuilder optimizeAfterPurge(boolean optimizeAfterPurge) {
@@ -194,6 +199,7 @@ public final class MassIndexingJob {
 		 * exactly
 		 *
 		 * @param optimizeOnFinish
+		 *
 		 * @return
 		 */
 		public ParametersBuilder optimizeOnFinish(boolean optimizeOnFinish) {
@@ -206,6 +212,7 @@ public final class MassIndexingJob {
 		 * place before the step of lucene document production. The default value is false.
 		 *
 		 * @param purgeAllOnStart
+		 *
 		 * @return
 		 */
 		public ParametersBuilder purgeAllOnStart(boolean purgeAllOnStart) {
@@ -217,12 +224,12 @@ public final class MassIndexingJob {
 		 * Add criterion to choose the set of entities to index.
 		 *
 		 * @param criterion
+		 *
 		 * @return
 		 */
 		public ParametersBuilder restrictedBy(Criterion criterion) {
 			if ( !customQueryHql.isEmpty() ) {
-				throw new IllegalArgumentException( "Cannot use HQL approach "
-						+ "and Criteria approach in the same time." );
+				throw new IllegalArgumentException( "Cannot use HQL approach and Criteria approach in the same time." );
 			}
 			if ( criterion == null ) {
 				throw new NullPointerException( "The criterion is null." );
@@ -235,6 +242,7 @@ public final class MassIndexingJob {
 		 * Use HQL / JPQL to select to entities to index
 		 *
 		 * @param hql
+		 *
 		 * @return
 		 */
 		public ParametersBuilder restrictedBy(String hql) {
@@ -242,8 +250,7 @@ public final class MassIndexingJob {
 				throw new NullPointerException( "The HQL is null." );
 			}
 			if ( customQueryCriteria.size() > 0 ) {
-				throw new IllegalArgumentException( "Cannot use HQL approach "
-						+ "and Criteria approach in the same time." );
+				throw new IllegalArgumentException( "Cannot use HQL approach and Criteria approach in the same time." );
 			}
 			this.customQueryHql = hql;
 			return this;
@@ -252,7 +259,8 @@ public final class MassIndexingJob {
 		/**
 		 * Define the max number of rows to process per partition.
 		 *
-		 * @param partitionCapacity
+		 * @param rowsPerPartition
+		 *
 		 * @return
 		 */
 		public ParametersBuilder rowsPerPartition(int rowsPerPartition) {
@@ -268,6 +276,7 @@ public final class MassIndexingJob {
 		 * Build the parameters.
 		 *
 		 * @return The parameters.
+		 *
 		 * @throws SearchException if the serialization of some parameters fail.
 		 */
 		public Properties build() {
@@ -277,7 +286,10 @@ public final class MassIndexingJob {
 				jobParams.put( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE, entityManagerFactoryScope );
 			}
 			if ( entityManagerFactoryReference != null ) {
-				jobParams.put( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE, entityManagerFactoryReference );
+				jobParams.put(
+						MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE,
+						entityManagerFactoryReference
+				);
 			}
 			jobParams.put( MassIndexingJobParameters.CACHEABLE, String.valueOf( cacheable ) );
 			jobParams.put( MassIndexingJobParameters.FETCH_SIZE, String.valueOf( fetchSize ) );
@@ -293,7 +305,10 @@ public final class MassIndexingJob {
 
 			if ( !customQueryCriteria.isEmpty() ) {
 				try {
-					jobParams.put( MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA, MassIndexerUtil.serializeCriteria( customQueryCriteria ) );
+					jobParams.put(
+							MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA,
+							MassIndexerUtil.serializeCriteria( customQueryCriteria )
+					);
 				}
 				catch (IOException e) {
 					throw new SearchException( "Failed to serialize Criteria", e );
@@ -305,8 +320,9 @@ public final class MassIndexingJob {
 
 		private String getRootEntitiesAsString() {
 			return rootEntities.stream()
-					.map( (e) -> e.getName() )
+					.map( Class::getName )
 					.collect( Collectors.joining( "," ) );
 		}
 	}
+
 }
