@@ -65,22 +65,26 @@ public final class MassIndexingJob {
 		}
 	}
 
+	/**
+	 * Parameter builder for mass-indexing job. The default value of each parameter is defined in the job XML file
+	 * {@code hibernate-search-mass-indexing.xml}.
+	 */
 	public static class ParametersBuilder {
 
 		private final Set<Class<?>> rootEntities;
 		private String entityManagerFactoryScope;
 		private String entityManagerFactoryReference;
-		private boolean cacheable = false;
-		private boolean optimizeAfterPurge = false;
-		private boolean optimizeOnFinish = false;
-		private boolean purgeAllOnStart = false;
-		private int fetchSize = 200 * 1000;
-		private int checkpointInterval = 200;
-		private int rowsPerPartition = 250;
-		private int maxThreads = 1;
+		private Boolean cacheable;
+		private Boolean optimizeAfterPurge;
+		private Boolean optimizeOnFinish;
+		private Boolean purgeAllOnStart;
+		private Integer fetchSize;
+		private Integer checkpointInterval;
+		private Integer rowsPerPartition;
+		private Integer maxThreads;
 		private Set<Criterion> customQueryCriteria;
 		private String customQueryHql;
-		private int customQueryLimit = 1000 * 1000;
+		private Integer customQueryLimit;
 
 		private ParametersBuilder(Class<?> rootEntity, Class<?>... rootEntities) {
 			if ( rootEntity == null ) {
@@ -90,7 +94,6 @@ public final class MassIndexingJob {
 			this.rootEntities.add( rootEntity );
 			Collections.addAll( this.rootEntities, rootEntities );
 			customQueryCriteria = new HashSet<>();
-			customQueryHql = "";
 		}
 
 		public ParametersBuilder entityManagerFactoryScope(String scope) {
@@ -228,7 +231,7 @@ public final class MassIndexingJob {
 		 * @return
 		 */
 		public ParametersBuilder restrictedBy(Criterion criterion) {
-			if ( !customQueryHql.isEmpty() ) {
+			if ( customQueryHql != null ) {
 				throw new IllegalArgumentException( "Cannot use HQL approach and Criteria approach in the same time." );
 			}
 			if ( criterion == null ) {
@@ -282,26 +285,19 @@ public final class MassIndexingJob {
 		public Properties build() {
 			Properties jobParams = new Properties();
 
-			if ( entityManagerFactoryScope != null ) {
-				jobParams.put( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE, entityManagerFactoryScope );
-			}
-			if ( entityManagerFactoryReference != null ) {
-				jobParams.put(
-						MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE,
-						entityManagerFactoryReference
-				);
-			}
-			jobParams.put( MassIndexingJobParameters.CACHEABLE, String.valueOf( cacheable ) );
-			jobParams.put( MassIndexingJobParameters.FETCH_SIZE, String.valueOf( fetchSize ) );
-			jobParams.put( MassIndexingJobParameters.CUSTOM_QUERY_HQL, customQueryHql );
-			jobParams.put( MassIndexingJobParameters.CHECKPOINT_INTERVAL, String.valueOf( checkpointInterval ) );
-			jobParams.put( MassIndexingJobParameters.CUSTOM_QUERY_LIMIT, String.valueOf( customQueryLimit ) );
-			jobParams.put( MassIndexingJobParameters.MAX_THREADS, String.valueOf( maxThreads ) );
-			jobParams.put( MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, String.valueOf( optimizeAfterPurge ) );
-			jobParams.put( MassIndexingJobParameters.OPTIMIZE_ON_FINISH, String.valueOf( optimizeOnFinish ) );
-			jobParams.put( MassIndexingJobParameters.PURGE_ALL_ON_START, String.valueOf( purgeAllOnStart ) );
-			jobParams.put( MassIndexingJobParameters.ROOT_ENTITIES, getRootEntitiesAsString() );
-			jobParams.put( MassIndexingJobParameters.ROWS_PER_PARTITION, String.valueOf( rowsPerPartition ) );
+			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE, entityManagerFactoryScope );
+			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE, entityManagerFactoryReference );
+			addIfNotNull( jobParams, MassIndexingJobParameters.CACHEABLE, cacheable );
+			addIfNotNull( jobParams, MassIndexingJobParameters.FETCH_SIZE, fetchSize );
+			addIfNotNull( jobParams, MassIndexingJobParameters.CUSTOM_QUERY_HQL, customQueryHql );
+			addIfNotNull( jobParams, MassIndexingJobParameters.CHECKPOINT_INTERVAL, checkpointInterval );
+			addIfNotNull( jobParams, MassIndexingJobParameters.CUSTOM_QUERY_LIMIT, customQueryLimit );
+			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_THREADS, maxThreads );
+			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, optimizeAfterPurge );
+			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_ON_FINISH, optimizeOnFinish );
+			addIfNotNull( jobParams, MassIndexingJobParameters.PURGE_ALL_ON_START, purgeAllOnStart );
+			addIfNotNull( jobParams, MassIndexingJobParameters.ROOT_ENTITIES, getRootEntitiesAsString() );
+			addIfNotNull( jobParams, MassIndexingJobParameters.ROWS_PER_PARTITION, rowsPerPartition );
 
 			if ( !customQueryCriteria.isEmpty() ) {
 				try {
@@ -322,6 +318,12 @@ public final class MassIndexingJob {
 			return rootEntities.stream()
 					.map( Class::getName )
 					.collect( Collectors.joining( "," ) );
+		}
+
+		private void addIfNotNull(Properties properties, String key, Object value) {
+			if ( value != null ) {
+				properties.put( key, String.valueOf( value ) );
+			}
 		}
 	}
 

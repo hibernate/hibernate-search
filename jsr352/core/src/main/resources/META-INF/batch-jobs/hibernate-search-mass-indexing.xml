@@ -29,8 +29,8 @@
     <step id="beforeChunk" next="produceLuceneDoc">
         <batchlet ref="org.hibernate.search.jsr352.massindexing.impl.steps.beforechunk.BeforeChunkBatchlet">
             <properties>
-                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
-                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
+                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:false;" />
+                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}?:false;" />
             </properties>
         </batchlet>
     </step>
@@ -39,7 +39,7 @@
         <listeners>
             <listener ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgressSetupListener">
                 <properties>
-                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
                 </properties>
             </listener>
         </listeners>
@@ -51,7 +51,7 @@
                     <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
-                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}" />
+                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
                     <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}?:10000000;" />
                 </properties>
             </reader>
@@ -79,8 +79,8 @@
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
-                    <property name="maxThreads" value="#{jobParameters['threads']}?:8;" />
-                    <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:0;" />
+                    <property name="maxThreads" value="#{jobParameters['maxThreads']}?:8;" />
+                    <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:250;" />
                 </properties>
             </mapper>
             <collector ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.ProgressCollector" />
@@ -91,7 +91,7 @@
     <step id="afterChunk">
         <batchlet ref="org.hibernate.search.jsr352.massindexing.impl.steps.afterchunk.AfterChunkBatchlet">
             <properties>
-                <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}" />
+                <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:false;" />
             </properties>
         </batchlet>
     </step>
