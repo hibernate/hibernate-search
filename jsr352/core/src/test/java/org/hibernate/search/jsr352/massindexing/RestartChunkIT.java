@@ -20,15 +20,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.apache.lucene.search.Query;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.test.util.JobFactory;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
+
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMRules;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,8 +68,7 @@ public class RestartChunkIT {
 
 	@Before
 	public void setup() {
-
-		String[][] str = new String[][]{
+		String[][] str = new String[][] {
 				{ "Google", "Sundar", "Pichai" },
 				{ "Red Hat", "James", "M. Whitehurst" },
 				{ "Microsoft", "Satya", "Nadella" },
@@ -96,11 +94,15 @@ public class RestartChunkIT {
 		em.close();
 	}
 
+	@After
+	public void shutdownJPA() {
+		emf.close();
+	}
+
 	@Test
 	public void testJob() throws InterruptedException, IOException {
-
-		List<Company> companies = findClasses( Company.class, "name", "Google" );
-		List<Person> people = findClasses( Person.class, "firstName", "Sundar" );
+		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Sundar" );
 		assertEquals( 0, companies.size() );
 		assertEquals( 0, people.size() );
 
@@ -112,9 +114,9 @@ public class RestartChunkIT {
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 						.checkpointInterval( 10 )
 						.build()
-				);
+		);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
-		jobExec1 = JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 		// job will be stopped by the byteman
 		for ( StepExecution stepExec : jobOperator.getStepExecutions( execId1 ) ) {
 			if ( stepExec.getStepName().equals( "produceLuceneDoc" ) ) {
@@ -125,33 +127,16 @@ public class RestartChunkIT {
 		// restart the job
 		long execId2 = jobOperator.restart( execId1, null );
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
-		jobExec2 = JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
 		for ( StepExecution stepExec : jobOperator.getStepExecutions( execId2 ) ) {
 			assertEquals( BatchStatus.COMPLETED, stepExec.getBatchStatus() );
 		}
 
 		// search again
-		companies = findClasses( Company.class, "name", "google" );
-		people = findClasses( Person.class, "firstName", "Sundar" );
+		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "google" );
+		people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Sundar" );
 		assertEquals( DB_COMP_ROWS / 5, companies.size() );
 		assertEquals( DB_PERS_ROWS / 5, people.size() );
 	}
 
-	private <T> List<T> findClasses(Class<T> clazz, String key, String value) {
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		Query luceneQuery = ftem.getSearchFactory().buildQueryBuilder()
-				.forEntity( clazz ).get()
-				.keyword().onField( key ).matching( value )
-				.createQuery();
-		@SuppressWarnings("unchecked")
-		List<T> result = ftem.createFullTextQuery( luceneQuery ).getResultList();
-		em.close();
-		return result;
-	}
-
-	@After
-	public void shutdownJPA() {
-		emf.close();
-	}
 }
