@@ -56,7 +56,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
-	private String hql;
+	private String customQueryHql;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.MAX_THREADS)
@@ -76,18 +76,18 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	 *
 	 * @param emf
 	 * @param fetchSize
-	 * @param hql
+	 * @param customQueryHql
 	 * @param maxThreads
 	 * @param rowsPerPartition
 	 */
 	PartitionMapper(EntityManagerFactory emf,
 			String fetchSize,
-			String hql,
+			String customQueryHql,
 			String rowsPerPartition,
 			String maxThreads) {
 		this.emf = emf;
 		this.fetchSize = fetchSize;
-		this.hql = hql;
+		this.customQueryHql = customQueryHql;
 		this.maxThreads = maxThreads;
 		this.rowsPerPartition = rowsPerPartition;
 	}
@@ -111,7 +111,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			List<PartitionBound> partitionBounds = new ArrayList<>();
 			Class<?> entityType;
 
-			switch ( typeOfSelection( hql, jobData.getCustomQueryCriteria() ) ) {
+			switch ( typeOfSelection( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
 				case HQL:
 					entityType = rootEntities.get( 0 );
 					partitionBounds.add( new PartitionBound( entityType, null, null ) );

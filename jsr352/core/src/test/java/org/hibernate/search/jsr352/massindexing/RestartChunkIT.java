@@ -43,7 +43,7 @@ import org.junit.runner.RunWith;
 				targetClass = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper",
 				targetMethod = "mapPartitions",
 				targetLocation = "AT EXIT",
-				action = "createCountDown(\"beforeRestart\", 100)"
+				action = "createCountDown(\"beforeRestart\", " + RestartChunkIT.ITEMS_BEFORE_SIMULATED_FAILURE + ")"
 		),
 		@BMRule(
 				name = "Count down for each item read, interrupt the job when counter is 0",
@@ -55,6 +55,8 @@ import org.junit.runner.RunWith;
 		)
 })
 public class RestartChunkIT {
+
+	static final int ITEMS_BEFORE_SIMULATED_FAILURE = 100;
 
 	private static final String PERSISTENCE_UNIT_NAME = "h2";
 
@@ -112,6 +114,7 @@ public class RestartChunkIT {
 				MassIndexingJob.parameters()
 						.forEntities( Company.class, Person.class )
 						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+						// must be smaller than ITEMS_BEFORE_SIMULATED_FAILURE to trigger the restart
 						.checkpointInterval( 10 )
 						.build()
 		);
