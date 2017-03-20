@@ -22,6 +22,7 @@ public final class ElasticsearchEnvironment {
 
 		public static final DynamicType DYNAMIC_MAPPING = DynamicType.STRICT;
 		public static final String SERVER_URI = "http://localhost:9200";
+		public static final int SERVER_REQUEST_TIMEOUT = 60000;
 		public static final int SERVER_READ_TIMEOUT = 60000;
 		public static final int SERVER_CONNECTION_TIMEOUT = 3000;
 		public static final int MAX_TOTAL_CONNECTION = 20;
@@ -79,6 +80,22 @@ public final class ElasticsearchEnvironment {
 	 * This limitation will be removed in a future version of Hibernate Search.
 	 */
 	public static final String SERVER_PASSWORD = "elasticsearch.password";
+
+	/**
+	 * Property for specifying the timeout when executing a request to an Elasticsearch server.
+	 * <p>
+	 * This includes the time needed to establish a connection, send the request and receive the whole response,
+	 * optionally re-trying multiple times in case of node failure.
+	 * <p>
+	 * A numeric value in milliseconds, such as 60000 is expected.
+	 * <p>
+	 * Defaults to {@link Defaults#SERVER_REQUEST_TIMEOUT}.
+	 * <p>
+	 * To be given <b>globally</b> only (i.e. prefixed with {@code hibernate.search.default.}).
+	 * <b>Cannot</b> be specified per index (e.g. {@code hibernate.search.myIndex.elasticsearch.request_timeout}).
+	 * This limitation will be removed in a future version of Hibernate Search.
+	 */
+	public static final String SERVER_REQUEST_TIMEOUT = "elasticsearch.request_timeout";
 
 	/**
 	 * Property for specifying the timeout when reading responses from an Elasticsearch server.

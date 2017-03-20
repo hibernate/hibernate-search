@@ -15,11 +15,13 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.SearchThreadFactory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -56,6 +58,16 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 		}
 
 		return RestClient.builder( hosts )
+				/*
+				 * Note: this timeout is not only used on retries,
+				 * but also when executing requests synchronously.
+				 * See https://github.com/elastic/elasticsearch/issues/21789#issuecomment-287399115
+				 */
+				.setMaxRetryTimeoutMillis( ConfigurationParseHelper.getIntValue(
+						properties,
+						propertyPrefix + ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT,
+						ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT
+				) )
 				.setRequestConfigCallback( (b) -> customizeRequestConfig( propertyPrefix, properties, b ) )
 				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( propertyPrefix, properties, serverUris, b ) )
 				.build();
@@ -89,17 +101,31 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 
 	private HttpAsyncClientBuilder customizeHttpClientConfig(String propertyPrefix,
 			Properties properties, String[] serverUris, HttpAsyncClientBuilder builder) {
+		int maxConnections = ConfigurationParseHelper.getIntValue(
+				properties,
+				propertyPrefix + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION,
+				ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION
+		);
 		builder = builder
-				.setMaxConnTotal( ConfigurationParseHelper.getIntValue(
-						properties,
-						propertyPrefix + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION,
-						ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION
-				) )
+				.setMaxConnTotal( maxConnections )
 				.setMaxConnPerRoute( ConfigurationParseHelper.getIntValue(
 						properties,
 						propertyPrefix + ElasticsearchEnvironment.MAX_TOTAL_CONNECTION_PER_ROUTE,
 						ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE
-				) );
+				) )
+				.setThreadFactory( new SearchThreadFactory( "Elasticsearch transport thread " ) )
+				.setDefaultIOReactorConfig( IOReactorConfig.custom()
+						/*
+						 * The RestClient uses the async HTTP client even for synchronous calls,
+						 * so the number of threads in the async HTTP client basically defines
+						 * the maximum number of concurrent Elasticsearch calls.
+						 *
+						 * Thus we'd better make it at least as high as the maximum number of
+						 * connections, or we'll have unused connections.
+						 */
+						.setIoThreadCount( maxConnections )
+						.build()
+				);
 
 		String username = ConfigurationParseHelper.getString(
 				properties,
