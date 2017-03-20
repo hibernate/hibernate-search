@@ -33,10 +33,12 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
+import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.Version;
+import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
@@ -67,8 +69,8 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.IndexNameNormalizer;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
-import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
+import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -186,6 +188,39 @@ public class SearchIntegratorBuilder {
 
 	private ExtendedSearchIntegrator buildNewSearchFactory() {
 		BuildContext buildContext = new BuildContext();
+
+		try {
+			createNewFactoryState( cfg, buildContext);
+		}
+		catch (RuntimeException initializationException) {
+			try {
+				cleanupFactoryState();
+			}
+			catch (RuntimeException e) {
+				initializationException.addSuppressed( e );
+			}
+			throw initializationException;
+		}
+
+		final ExtendedSearchIntegratorWithShareableState factory = new ImmutableSearchFactory( factoryState );
+		try {
+			factoryState.setActiveSearchIntegrator( factory );
+			rootFactory.setDelegate( factory );
+			return rootFactory;
+		}
+		catch (RuntimeException initializationException) {
+			// Let the factory do its own cleanup (it may have allocated resource of its own in its constructor)
+			try {
+				factory.close();
+			}
+			catch (RuntimeException e) {
+				initializationException.addSuppressed( e );
+			}
+			throw initializationException;
+		}
+	}
+
+	private void createNewFactoryState(SearchConfiguration cfg2, BuildContext buildContext) {
 		createCleanFactoryState( cfg, buildContext );
 
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
@@ -226,10 +261,23 @@ public class SearchIntegratorBuilder {
 						cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 				)
 		);
-		ExtendedSearchIntegratorWithShareableState factory = new ImmutableSearchFactory( factoryState );
-		factoryState.setActiveSearchIntegrator( factory );
-		rootFactory.setDelegate( factory );
-		return rootFactory;
+	}
+
+	private void cleanupFactoryState() {
+		Worker worker = factoryState.getWorker();
+		if ( worker != null ) {
+			worker.close();
+		}
+
+		factoryState.getAllIndexesManager().stop();
+
+		factoryState.getTimingSource().stop();
+
+		factoryState.getServiceManager().releaseAllServices();
+
+		for ( AnalyzerRegistry an : factoryState.getAnalyzerRegistries().values() ) {
+			an.close();
+		}
 	}
 
 	/**
