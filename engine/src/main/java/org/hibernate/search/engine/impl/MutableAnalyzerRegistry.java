@@ -18,6 +18,7 @@ import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference.Builder;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.util.impl.Closeables;
 
 /**
  * This class gives access to the set of analyzer references created for a given index manager type,
@@ -79,6 +80,11 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 	}
 
 	@Override
+	public Collection<AnalyzerReference> getScopedAnalyzerReferences() {
+		return Collections.unmodifiableCollection( scopedReferences );
+	}
+
+	@Override
 	public AnalyzerReference getAnalyzerReference(String name) {
 		return referencesByName.get( name );
 	}
@@ -108,23 +114,11 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 
 	@Override
 	public void close() {
-		close( referencesByLuceneClass.values() );
-	}
-
-	private void close(Collection<AnalyzerReference> references) {
-		for ( AnalyzerReference reference : references ) {
-			reference.close();
-		}
+		Closeables.closeQuietly( getAllReferences() );
 	}
 
 	public void initialize(Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
-		List<AnalyzerReference> references = new ArrayList<>();
-		references.add( defaultReference );
-		references.add( passThroughReference );
-		references.addAll( referencesByName.values() );
-		references.addAll( referencesByLuceneClass.values() );
-		references.addAll( scopedReferences );
-
+		List<AnalyzerReference> references = getAllReferences();
 		Map<String, AnalyzerReference> additionalReferences =
 				strategy.initializeAnalyzerReferences( references, mappingAnalyzerDefinitions );
 		referencesByName.putAll( additionalReferences );
@@ -134,6 +128,16 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 		return new ScopedAnalyzerReferenceBuilderRegisteringWrapper(
 				strategy.buildScopedAnalyzerReference( getDefaultAnalyzerReference() )
 				);
+	}
+
+	private List<AnalyzerReference> getAllReferences() {
+		List<AnalyzerReference> references = new ArrayList<>();
+		references.add( defaultReference );
+		references.add( passThroughReference );
+		references.addAll( referencesByName.values() );
+		references.addAll( referencesByLuceneClass.values() );
+		references.addAll( scopedReferences );
+		return references;
 	}
 
 	/**

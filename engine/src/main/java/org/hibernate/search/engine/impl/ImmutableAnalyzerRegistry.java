@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.util.impl.Closeables;
 
 /**
  * An immutable {@link AnalyzerRegistry}.
@@ -28,11 +30,14 @@ public class ImmutableAnalyzerRegistry implements AnalyzerRegistry {
 
 	private final Map<Class<?>, AnalyzerReference> referencesByClass;
 
+	private final Collection<AnalyzerReference> scopedReferences;
+
 	ImmutableAnalyzerRegistry(AnalyzerRegistry registryState) {
 		this.defaultReference = registryState.getDefaultAnalyzerReference();
 		this.passThroughReference = registryState.getPassThroughAnalyzerReference();
 		this.referencesByName = Collections.unmodifiableMap( new HashMap<>( registryState.getNamedAnalyzerReferences() ) );
 		this.referencesByClass = Collections.unmodifiableMap( new HashMap<>( registryState.getLuceneClassAnalyzerReferences() ) );
+		this.scopedReferences = Collections.unmodifiableList( new ArrayList<>( registryState.getScopedAnalyzerReferences() ) );
 	}
 
 	@Override
@@ -56,6 +61,11 @@ public class ImmutableAnalyzerRegistry implements AnalyzerRegistry {
 	}
 
 	@Override
+	public Collection<AnalyzerReference> getScopedAnalyzerReferences() {
+		return scopedReferences;
+	}
+
+	@Override
 	public AnalyzerReference getAnalyzerReference(String name) {
 		return referencesByName.get( name );
 	}
@@ -67,13 +77,10 @@ public class ImmutableAnalyzerRegistry implements AnalyzerRegistry {
 
 	@Override
 	public void close() {
-		close( referencesByClass.values() );
-	}
-
-	private void close(Collection<AnalyzerReference> references) {
-		for ( AnalyzerReference reference : references ) {
-			reference.close();
-		}
+		Closeables.closeQuietly( defaultReference );
+		Closeables.closeQuietly( passThroughReference );
+		Closeables.closeQuietly( referencesByName.values(), referencesByClass.values(),
+				scopedReferences );
 	}
 
 }

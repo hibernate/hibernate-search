@@ -17,7 +17,6 @@ import java.util.Set;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
@@ -453,15 +452,5 @@ public abstract class AbstractDocumentBuilder {
 	 */
 	public void forceStateInspectionOptimizationsDisabled() {
 		typeMetadata.disableStateInspectionOptimizations();
-	}
-
-	/**
-	 * Closes any resource
-	 */
-	public void close() {
-		AnalyzerReference reference = typeMetadata.getDefaultAnalyzerReference();
-		if ( reference != null ) {
-			reference.close();
-		}
 	}
 }

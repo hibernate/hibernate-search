@@ -31,7 +31,6 @@ import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
-import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -273,12 +272,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 			for ( AnalyzerRegistry an : this.analyzerRegistries.values() ) {
 				an.close();
-			}
-			for ( AbstractDocumentBuilder documentBuilder : this.documentBuildersContainedEntities.values() ) {
-				documentBuilder.close();
-			}
-			for ( EntityIndexBinding entityIndexBinding : this.indexBindingForEntities.values() ) {
-				entityIndexBinding.getDocumentBuilder().close();
 			}
 
 			// unregister statistic mbean

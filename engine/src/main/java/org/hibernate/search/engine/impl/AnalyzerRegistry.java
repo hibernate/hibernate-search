@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
@@ -28,6 +29,8 @@ public interface AnalyzerRegistry {
 	AnalyzerReference getAnalyzerReference(Class<?> luceneAnalyzerClass);
 
 	Map<Class<?>, AnalyzerReference> getLuceneClassAnalyzerReferences();
+
+	Collection<AnalyzerReference> getScopedAnalyzerReferences();
 
 	/**
 	 * Close analyzers if possible

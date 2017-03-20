@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.analyzer.spi;
 
+import java.io.Closeable;
+
 /**
  * Reference to an analyzer implementation.
  *
@@ -13,7 +15,7 @@ package org.hibernate.search.analyzer.spi;
  * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You should be
  * prepared for incompatible changes in future releases.
  */
-public interface AnalyzerReference {
+public interface AnalyzerReference extends Closeable {
 
 	/**
 	 * @return The referenced analyzer.
@@ -40,5 +42,6 @@ public interface AnalyzerReference {
 	/**
 	 * Close analyzer if possible
 	 */
+	@Override
 	void close();
 }
