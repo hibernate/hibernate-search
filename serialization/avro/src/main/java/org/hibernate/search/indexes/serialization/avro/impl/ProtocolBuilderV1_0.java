@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.avro.Protocol;
 import org.hibernate.search.indexes.serialization.avro.logging.impl.Log;
+import org.hibernate.search.util.impl.Closeables;
 import org.hibernate.search.util.impl.StreamHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -120,7 +121,7 @@ class ProtocolBuilderV1_0 {
 			throw log.unableToLoadResource( resourceName );
 		}
 		finally {
-			StreamHelper.closeResource( inputStream );
+			Closeables.closeQuietly( inputStream );
 		}
 		return resource;
 	}
