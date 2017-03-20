@@ -9,8 +9,8 @@ package org.hibernate.search.backend.jgroups.impl;
 
 import org.hibernate.search.engine.service.spi.Service;
 import org.jgroups.Address;
-import org.jgroups.Message;
 import org.jgroups.View;
+import org.jgroups.util.Buffer;
 
 /**
  * Abstract away message submission.
@@ -20,15 +20,16 @@ import org.jgroups.View;
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public interface MessageSenderService extends Service {
+
 	/**
 	 * Send message.
 	 *
-	 * @param message the JGroups message
+	 * @param data the serialized message to transmit
 	 * @param synchronous set to true if we need to block until an ACK is received
 	 * @param messageTimeout in milliseconds
 	 * @throws java.lang.Exception for any error
 	 */
-	void send(Message message, boolean synchronous, long messageTimeout) throws Exception;
+	void send(Buffer data, boolean synchronous, long messageTimeout) throws Exception;
 
 	/**
 	 * Get sender's address.

@@ -19,7 +19,6 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.jgroups.Channel;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.MessageDispatcher;
 import org.junit.After;
@@ -37,7 +36,7 @@ public class JGroupsSlaveTest extends SearchTestBase {
 
 	private static final Poller POLLER = JGroupsCommonTest.POLLER;
 
-	private Channel channel;
+	private JChannel channel;
 
 	/** makes sure that different tests don't join **/
 	private final String CHANNEL_NAME = UUID.randomUUID().toString();
@@ -101,7 +100,7 @@ public class JGroupsSlaveTest extends SearchTestBase {
 		channel.connect( CHANNEL_NAME );
 		JGroupsReceiver listener = new JGroupsReceiver( getExtendedSearchIntegrator() );
 		MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( listener );
-		MessageDispatcher standardDispatcher = new MessageDispatcher( channel, listener, listener, adapter );
+		MessageDispatcher standardDispatcher = new MessageDispatcher( channel, adapter );
 	}
 
 	@Override

@@ -16,7 +16,7 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
-import org.jgroups.Message;
+import org.jgroups.util.Buffer;
 
 /**
  * Responsible for sending Lucene works from slave nodes to master node
@@ -76,8 +76,8 @@ public class JGroupsBackendQueueTask {
 		data = MessageSerializationHelper.prependString( indexName, data );
 
 		try {
-			Message message = masterNodeSelector.createMessage( data );
-			messageSender.send( message, blockForACK, messageTimeout );
+			Buffer buffer = new Buffer( data );
+			messageSender.send( buffer, blockForACK, messageTimeout );
 			if ( trace ) {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", messageSender.getAddress() );
 			}

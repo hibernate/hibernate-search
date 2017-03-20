@@ -75,6 +75,7 @@ public class JGroupsReceivingMockBackend implements Backend {
 		}
 
 		private void receivedSomething() {
+			System.out.println( " ************** Received something! *****************" );
 			receivedAnything = true;
 		}
 

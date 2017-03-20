@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.jgroups.logging.impl;
 
 import java.util.Properties;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.BaseHibernateSearchLogger;
 import org.hibernate.search.util.logging.impl.ClassFormatter;
@@ -19,8 +18,7 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.ValidIdRange;
 import org.jgroups.Address;
-import org.jgroups.SuspectedException;
-import org.jgroups.TimeoutException;
+import org.jgroups.View;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
@@ -37,11 +35,10 @@ import static org.jboss.logging.Logger.Level.WARN;
 @ValidIdRange(min = 200001, max = 299999)
 public interface Log extends BaseHibernateSearchLogger {
 
-	@Message(id = 200001, value = "Remote JGroups peer '%1$s' is suspected to have left '")
-	SuspectedException jgroupsSuspectingPeer(Address sender);
-
-	@Message(id = 200002, value = "Timeout sending synchronous message to JGroups peer '%1$s''")
-	TimeoutException jgroupsRpcTimeout(Address sender);
+	@LogMessage(level = WARN)
+	@Message(id = 200001,
+			value = "Remote JGroups peer '%1$s' is suspected to have left '")
+	void jgroupsSuspectingPeer(Address sender);
 
 	@Message(id = 200003, value = "Exception reported from remote JGroups node '%1$s' : '%2$s'")
 	SearchException jgroupsRemoteException(Address sender, Throwable exception, @Cause Throwable cause);
@@ -121,4 +118,15 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 200023, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
 			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/5.0/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
+
+	@LogMessage(level = WARN)
+	@Message(id = 200024,
+			value = "The configuration property '" + org.hibernate.search.backend.jgroups.impl.DispatchMessageSender.MUX_ID + "' is now ignored: JGroups 4 no longer supports Mux Channels."
+					+ " Use the FORK protocol instead.")
+	void muxIdPropertyIsIgnored();
+
+	@LogMessage(level = INFO)
+	@Message(id = 200025, value = "JGroups election: accepting new cluster view [%s]. Master is now %s for index '%s'")
+	void acceptingNewClusterView(View view, Address masterAddress, String indexName);
+
 }

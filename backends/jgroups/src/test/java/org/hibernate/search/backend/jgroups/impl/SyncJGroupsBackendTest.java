@@ -17,14 +17,9 @@ import org.hibernate.search.backend.jgroups.impl.JGroupsReceivingMockBackend.JGr
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
-import org.jgroups.TimeoutException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +28,10 @@ import org.junit.Test;
  * Verifies sync / async guarantees of the JGroups backend.
  * The JGroups stack used needs to have the RSVP protocol with ack_on_delivery enabled
  * (the default configuration we use does).
+ * N.B. even though we block the receiver, this is not going to cause a Timeout
+ * on the sender side but it should mark the message as "not received"; this is
+ * by design in JGroups when using multicast based message dispatching (as opposed
+ * to unicast, which would throw a Timeout exception).
  *
  * @author Sanne Grinovero (C) 2013 Red Hat Inc.
  * @since 4.3
@@ -40,7 +39,6 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-1296")
 public class SyncJGroupsBackendTest {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 	private static final String JGROUPS_CONFIGURATION = "testing-flush-loopback.xml";
 	private static final long JGROUPS_MESSAGES_TIMEOUT = 1000;
 
@@ -62,6 +60,10 @@ public class SyncJGroupsBackendTest {
 
 	@Test
 	public void testSynchAsConfigured() {
+		// FIXME this is a legacy test which is no longer able to test if the backend is actually "synch" blocking
+		// as JGroups no longer blocks.
+		// Decided to not delete the test yet as it happens to test some other things by side-effect:
+		// we should delete this test as soon as we add some more useful integration tests for this module.
 		JGroupsBackendQueueProcessor dvdsBackend = extractJGroupsBackend( "dvds" );
 		Assert.assertTrue( "dvds index was configured with a syncronous JGroups backend", dvdsBackend.blocksForACK() );
 		JGroupsBackendQueueProcessor booksBackend = extractJGroupsBackend( "books" );
@@ -74,52 +76,20 @@ public class SyncJGroupsBackendTest {
 		JGroupsReceivingMockBackendQueueProcessor dvdBackendMock = extractMockBackend( "dvds" );
 
 		dvdBackendMock.resetThreadTrap();
-		boolean timeoutTriggered = false;
 		try {
 			//DVDs are sync operations so they will timeout:
 			final long presendTimestamp = System.nanoTime();
-			log.trace( "[PRESEND] Timestamp: " + presendTimestamp );
+			System.out.println( "[PRESEND] Timestamp: " + presendTimestamp );
 			storeDvd( 1, "Hibernate Search in Action" );
 			final long postsendTimestamp = System.nanoTime();
 			final long differenceInMilliseconds = TimeUnit.MILLISECONDS.convert( (postsendTimestamp - presendTimestamp), TimeUnit.NANOSECONDS );
-			log.trace( "[POSTSEND] Timestamp: " + postsendTimestamp + " Diff: " + differenceInMilliseconds + " ms." );
-		}
-		catch (SearchException se) {
-			//Expected: we're inducing the RPC into timeout by blocking receiver processing
-			Throwable cause = se.getCause();
-			Assert.assertTrue( "Cause was not a TimeoutException but a " + cause, cause instanceof TimeoutException );
-			timeoutTriggered = true;
+			System.out.println( "[POSTSEND] Timestamp: " + postsendTimestamp + " Diff: " + differenceInMilliseconds + " ms." );
 		}
 		finally {
 			//release the receiver
 			dvdBackendMock.releaseBlockedThreads();
 		}
 		Assert.assertTrue( "The backend didn't receive any message: something wrong with the test setup of network configuration", dvdBackendMock.wasSomethingReceived() );
-		Assert.assertTrue( timeoutTriggered );
-
-		JGroupsReceivingMockBackendQueueProcessor booksBackendMock = extractMockBackend( "books" );
-		booksBackendMock.resetThreadTrap();
-		//Books are async so they should not timeout
-		storeBook( 1, "Hibernate Search in Action" );
-
-		//Block our own thread awaiting for the receiver.
-		//If we raced past it we would release the receiver, not bad either
-		//as it would also proof we are async.
-		booksBackendMock.countDownAndJoin();
-
-		dvdBackendMock.induceFailure();
-		boolean npeTriggered = false;
-		try {
-			storeDvd( 2, "Byteman in Action" ); //not actually needing Byteman here
-		}
-		catch (SearchException se) {
-			//Expected: we're inducing the RPC into NPE
-			Throwable cause = se.getCause().getCause().getCause();
-			Assert.assertTrue( "Cause was not a NullPointerException but a " + cause, cause instanceof NullPointerException );
-			Assert.assertEquals( "Simulated Failure", cause.getMessage() );
-			npeTriggered = true;
-		}
-		Assert.assertTrue( npeTriggered );
 	}
 
 	@Test

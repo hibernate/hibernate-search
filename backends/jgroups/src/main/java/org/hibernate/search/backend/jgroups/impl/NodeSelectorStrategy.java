@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.jgroups.impl;
 
 import org.jgroups.Address;
-import org.jgroups.Message;
 import org.jgroups.View;
 
 
@@ -47,14 +46,5 @@ public interface NodeSelectorStrategy {
 	 * @param view contains information on the current members of the cluster group
 	 */
 	void viewAccepted(View view);
-
-	/**
-	 * Different message options can be applied using different constructors,
-	 * hence we delegate Message construction to the strategy.
-	 *
-	 * @param data the information to be sent to the master.
-	 * @return the message to be sent.
-	 */
-	Message createMessage(byte[] data);
 
 }

@@ -21,15 +21,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
-import org.jgroups.Message;
-import org.jgroups.MessageListener;
-import org.jgroups.UpHandler;
+import org.jgroups.Message.TransientFlag;
 import org.jgroups.View;
 import org.jgroups.blocks.MessageDispatcher;
 import org.jgroups.blocks.RequestOptions;
-import org.jgroups.blocks.mux.MuxMessageDispatcher;
-import org.jgroups.blocks.mux.Muxer;
-import org.jgroups.util.Rsp;
+import org.jgroups.util.Buffer;
 import org.jgroups.util.RspList;
 
 /**
@@ -51,6 +47,11 @@ public final class DispatchMessageSender implements MessageSenderService, Starta
 	public static final String CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
 	public static final String CHANNEL_INJECT = JGROUPS_PREFIX + "providedChannel";
 	public static final String CLASSLOADER = JGROUPS_PREFIX + "classloader";
+
+	/**
+	 * @deprecated the MUX channels are no longer supported in JGroups 4: this property will be ignored.
+	 */
+	@Deprecated
 	public static final String MUX_ID = JGROUPS_PREFIX + "mux_id";
 
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
@@ -71,30 +72,36 @@ public final class DispatchMessageSender implements MessageSenderService, Starta
 	}
 
 	@Override
-	public void send(final Message message, final boolean synchronous, final long timeout) throws Exception {
+	public void send(final Buffer data, final boolean synchronous, final long timeout) throws Exception {
 		final RequestOptions options = synchronous ? RequestOptions.SYNC() : RequestOptions.ASYNC();
-		options.setExclusionList( dispatcher.getChannel().getAddress() );
+		options.exclusionList( dispatcher.getChannel().getAddress() );
+		options.setTransientFlags( TransientFlag.DONT_LOOPBACK );
 		options.setTimeout( timeout );
-		RspList<Object> rspList = dispatcher.castMessage( null, message, options );
-		//JGroups won't throw these automatically as it would with a JChannel usage,
-		//so we provide the same semantics by throwing the JGroups specific exceptions
-		//as appropriate
 		if ( synchronous ) {
-			for ( Rsp rsp : rspList.values() ) {
-				if ( !rsp.wasReceived() ) {
-					if ( rsp.wasSuspected() ) {
-						throw log.jgroupsSuspectingPeer( rsp.getSender() );
-					}
-					else {
-						throw log.jgroupsRpcTimeout( rsp.getSender() );
-					}
-				}
-				else {
-					if ( rsp.hasException() ) {
-						throw log.jgroupsRemoteException( rsp.getSender(), rsp.getException(), rsp.getException() );
-					}
-				}
+			try {
+				RspList<Object> rspList = dispatcher.castMessage( null, data, options );
+				handleResponseProblems( rspList, null );
 			}
+			catch (Exception e) {
+				throw log.unableToSendWorkViaJGroups( e );
+			}
+		}
+		else {
+			try {
+				dispatcher.castMessageWithFuture( null, data, options );
+			}
+			catch (RuntimeException e) {
+				throw log.unableToSendWorkViaJGroups( e );
+			}
+		}
+	}
+
+	private void handleResponseProblems(RspList<Object> response, Throwable e) {
+		for ( Address suspected : response.getSuspectedMembers() ) {
+			log.jgroupsSuspectingPeer( suspected );
+		}
+		if ( e != null ) {
+			throw log.unableToSendWorkViaJGroups( e );
 		}
 	}
 
@@ -104,7 +111,7 @@ public final class DispatchMessageSender implements MessageSenderService, Starta
 		serviceManager = context.getServiceManager();
 
 		channelContainer = buildChannel( props );
-		channelContainer.start();
+		checkForOldProperties( props );
 
 		NodeSelectorService masterNodeSelector = serviceManager.requestService( NodeSelectorService.class );
 		LuceneWorkSerializer luceneWorkSerializer = serviceManager.requestService( LuceneWorkSerializer.class );
@@ -112,27 +119,11 @@ public final class DispatchMessageSender implements MessageSenderService, Starta
 
 		JChannel channel = channelContainer.getChannel();
 
-		UpHandler handler = channel.getUpHandler();
-		if ( handler instanceof Muxer ) {
-			Short muxId = (Short) props.get( MUX_ID );
-			if ( muxId == null ) {
-				throw log.missingJGroupsMuxId( DispatchMessageSender.MUX_ID );
-			}
-			@SuppressWarnings("unchecked")
-			Muxer<UpHandler> muxer = (Muxer<UpHandler>) handler;
-			if ( muxer.get( muxId ) != null ) {
-				throw log.jGroupsMuxIdAlreadyTaken( muxId );
-			}
-
-			ClassLoader cl = (ClassLoader) props.get( CLASSLOADER );
-			MessageListener wrapper = ( cl != null ) ? new ClassloaderMessageListener( listener, cl ) : listener;
-			MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( wrapper );
-			dispatcher = new MuxMessageDispatcher( muxId, channel, wrapper, listener, adapter );
-		}
-		else {
-			MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( listener );
-			dispatcher = new MessageDispatcher( channel, listener, listener, adapter );
-		}
+		MessageListenerToRequestHandlerAdapter requestHandler = new MessageListenerToRequestHandlerAdapter( listener );
+		dispatcher = new MessageDispatcher( channel, requestHandler );
+		dispatcher.setMembershipListener( listener );
+		//Only now that the Dispatcher is installed we can start the channel:
+		channelContainer.start();
 
 		masterNodeSelector.setLocalAddress( channel.getAddress() );
 
@@ -141,6 +132,17 @@ public final class DispatchMessageSender implements MessageSenderService, Starta
 		}
 		if ( log.isDebugEnabled() ) {
 			log.jgroupsFullConfiguration( channel.getProtocolStack().printProtocolSpecAsXML() );
+		}
+	}
+
+	/**
+	 * Verifies if there are any legacy properties which no longer apply
+	 *
+	 * @param props the configuration
+	 */
+	private void checkForOldProperties(Properties props) {
+		if ( props.get( MUX_ID ) != null ) {
+			log.muxIdPropertyIsIgnored();
 		}
 	}
 

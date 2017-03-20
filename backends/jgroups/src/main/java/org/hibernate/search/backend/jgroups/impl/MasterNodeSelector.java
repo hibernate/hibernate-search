@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.jgroups.impl;
 
-import org.hibernate.search.exception.AssertionFailure;
 import org.jgroups.Address;
-import org.jgroups.Message;
 import org.jgroups.View;
 
 
@@ -24,7 +22,7 @@ import org.jgroups.View;
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
-public class MasterNodeSelector implements NodeSelectorStrategy {
+public final class MasterNodeSelector implements NodeSelectorStrategy {
 
 	@Override
 	public boolean isIndexOwnerLocal() {
@@ -32,18 +30,13 @@ public class MasterNodeSelector implements NodeSelectorStrategy {
 	}
 
 	@Override
-	public void setLocalAddress(Address address) {
+	public void setLocalAddress(final Address address) {
 		//not needed
 	}
 
 	@Override
-	public void viewAccepted(View view) {
+	public void viewAccepted(final View view) {
 		//nothing to do
-	}
-
-	@Override
-	public Message createMessage(byte[] data) {
-		throw new AssertionFailure( "A Master node should never create new Messages" );
 	}
 
 }

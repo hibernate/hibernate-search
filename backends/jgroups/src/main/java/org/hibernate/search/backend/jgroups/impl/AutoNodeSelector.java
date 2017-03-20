@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.jgroups.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.backend.jgroups.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
-import org.jgroups.Message;
 import org.jgroups.View;
 
 
@@ -24,7 +26,9 @@ import org.jgroups.View;
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
-public class AutoNodeSelector implements NodeSelectorStrategy {
+public final class AutoNodeSelector implements NodeSelectorStrategy {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String indexName;
 	private volatile Address localAddress;
@@ -63,11 +67,7 @@ public class AutoNodeSelector implements NodeSelectorStrategy {
 			int selected = Math.abs( indexName.hashCode() % selectionRange ) + 1;
 			masterAddress = members.get( selected );
 		}
-	}
-
-	@Override
-	public Message createMessage(byte[] data) {
-		return new Message( null, localAddress, data );
+		log.acceptingNewClusterView( view, masterAddress, indexName );
 	}
 
 }

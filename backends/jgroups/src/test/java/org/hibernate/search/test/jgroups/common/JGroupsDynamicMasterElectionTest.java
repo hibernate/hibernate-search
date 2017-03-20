@@ -8,9 +8,10 @@ package org.hibernate.search.test.jgroups.common;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -69,7 +70,7 @@ public class JGroupsDynamicMasterElectionTest extends DynamicMasterSlaveSearchTe
 
 	@Test
 	public void masterElection() throws Exception {
-		TestResourceManager masterResourceManager = determineJGroupsMaster().get();
+		TestResourceManager masterResourceManager = determineJGroupsMaster();
 		List<DefaultTestResourceManager> slaveResourceManagers = determineJGroupsSlaves();
 		Assert.assertEquals( getExpectedNumberOfNodes() - 1, slaveResourceManagers.size() );
 
@@ -85,10 +86,10 @@ public class JGroupsDynamicMasterElectionTest extends DynamicMasterSlaveSearchTe
 
 		// ... check that a new master is elected
 		POLLER.pollAssertion( () -> {
-			Assert.assertTrue( "Lots of time waited and still no new master has been elected!", determineJGroupsMaster().isPresent() );
+			Assert.assertTrue( "Lots of time waited and still no new master has been elected!", wasJGroupsMasterElected() );
 		} );
 
-		masterResourceManager = determineJGroupsMaster().get();
+		masterResourceManager = determineJGroupsMaster();
 		slaveResourceManagers = determineJGroupsSlaves();
 		Assert.assertEquals( getExpectedNumberOfNodes() - 2, slaveResourceManagers.size() );
 
@@ -151,7 +152,7 @@ public class JGroupsDynamicMasterElectionTest extends DynamicMasterSlaveSearchTe
 		/*
 		 * Do *not* drop the schema upon factory closing, or the slave won't be able to use it.
 		 */
-		cfg.put( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "drop-and-create" );
+		cfg.put( org.hibernate.cfg.Environment.HBM2DDL_DATABASE_ACTION, "drop-and-create" );
 	}
 
 	@Override
@@ -173,11 +174,50 @@ public class JGroupsDynamicMasterElectionTest extends DynamicMasterSlaveSearchTe
 		}
 	}
 
-	private Optional<DefaultTestResourceManager> determineJGroupsMaster() {
+	private boolean wasJGroupsMasterElected() {
+		return wasJGroupsMasterElected( 10, 0 );
+	}
+
+	//The cluster might need to stabilize, give it some time to resolve conflicting elections:
+	private boolean wasJGroupsMasterElected(int maxAttempts, int currentAttempt) {
+		if ( currentAttempt > maxAttempts ) {
+			Assert.fail( "Max attempts reached, the cluster is still having multiple master nodes!" );
+		}
+		final long mastersCount = streamMasterNodes()
+				.count();
+		if ( mastersCount == 0 ) {
+			return false;
+		}
+		else if ( mastersCount == 1 ) {
+			return true;
+		}
+		else {
+			waitMilliseconds( 400 );
+			return wasJGroupsMasterElected( maxAttempts, ++currentAttempt );
+		}
+	}
+
+	private void waitMilliseconds(int i) {
+		try {
+			TimeUnit.MILLISECONDS.sleep( i );
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private DefaultTestResourceManager determineJGroupsMaster() {
+		wasJGroupsMasterElected();
+		List<DefaultTestResourceManager> list = streamMasterNodes()
+				.collect( Collectors.toList() );
+		Assert.assertEquals( 1, list.size() );
+		return list.get( 0 );
+	}
+
+	private Stream<DefaultTestResourceManager> streamMasterNodes() {
 		return getResourceManagers().stream()
 				.filter( this::isActive )
-				.filter( this::isJGroupsMaster )
-				.findFirst();
+				.filter( this::isJGroupsMaster );
 	}
 
 	private List<DefaultTestResourceManager> determineJGroupsSlaves() {
@@ -186,4 +226,5 @@ public class JGroupsDynamicMasterElectionTest extends DynamicMasterSlaveSearchTe
 				.filter( (manager) -> !isJGroupsMaster( manager ) )
 				.collect( Collectors.toList() );
 	}
+
 }

@@ -6,23 +6,18 @@
  */
 package org.hibernate.search.backend.jgroups.impl;
 
-import org.hibernate.search.testsupport.TestForIssue;
-import org.jgroups.Address;
-import org.jgroups.Global;
-import org.jgroups.View;
-import org.junit.Test;
-
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.hibernate.search.testsupport.TestForIssue;
+import org.jgroups.Address;
+import org.jgroups.View;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * JGroups' Auto Node Selector Test
@@ -101,26 +96,11 @@ public class AutoNodeSelectorTest {
 		}
 
 		@Override
-		public int size() {
-			return Global.INT_SIZE;
-		}
-
-		@Override
 		public int compareTo(Address o) {
 			if ( o == null || !( o instanceof TestAddress ) ) {
 				return -1;
 			}
 			return Integer.valueOf( addressId ).compareTo( ( (TestAddress) o ).addressId );
-		}
-
-		@Override
-		public void writeExternal(ObjectOutput out) throws IOException {
-			out.writeInt( addressId );
-		}
-
-		@Override
-		public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-			addressId = in.readInt();
 		}
 
 		@Override
@@ -136,6 +116,11 @@ public class AutoNodeSelectorTest {
 		@Override
 		public String toString() {
 			return "TestAddress{" + "addressId=" + addressId + '}';
+		}
+
+		@Override
+		public int serializedSize() {
+			return 4;
 		}
 	}
 

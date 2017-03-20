@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 
@@ -41,7 +42,11 @@ public class WorkQueuePerIndexSplitter {
 		String indexName = indexManager.getIndexName();
 		WorkPlan plan = queues.get( indexName );
 		if ( plan == null ) {
-			plan = new WorkPlan( indexManagerHolder.getBackendQueueProcessor( indexName ) );
+			BackendQueueProcessor backendQueueProcessor = indexManagerHolder.getBackendQueueProcessor( indexName );
+			if ( backendQueueProcessor == null ) {
+				throw new AssertionFailure( "Backend for index '" + indexName + "' not defined" );
+			}
+			plan = new WorkPlan( backendQueueProcessor );
 			queues.put( indexName, plan );
 		}
 		plan.queue.add( work );

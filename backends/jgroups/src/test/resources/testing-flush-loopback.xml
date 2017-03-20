@@ -7,14 +7,14 @@
   -->
 <config xmlns="urn:org:jgroups"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.6.xsd">
+		xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/jgroups-4.0.xsd">
 
 	<SHARED_LOOPBACK
-		bind_addr="127.0.0.1"
-		diagnostics_addr="127.0.0.1"
+		stats="false"
 		enable_diagnostics="false" />
 
 	<SHARED_LOOPBACK_PING
+		stats="false"
 		/>
 
 	<MERGE3
@@ -27,14 +27,13 @@
 			xmit_table_num_rows="50"
 			xmit_table_msgs_per_row="1024"
 			xmit_table_max_compaction_time="30000"
-			max_msg_batch_size="100" />
+			discard_delivered_msgs="true" />
 
 	<UNICAST3
 			xmit_interval="500"
 			xmit_table_num_rows="50"
 			xmit_table_msgs_per_row="1024"
 			xmit_table_max_compaction_time="30000"
-			max_msg_batch_size="100"
 			conn_expiry_timeout="0" />
 
 	<pbcast.STABLE
@@ -50,7 +49,7 @@
 	<RSVP
 		resend_interval="20"
 		timeout="10000"
-		ack_on_delivery="false"
+		ack_on_delivery="true"
 		/>
 
 </config>

@@ -38,7 +38,10 @@ import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.JChannel;
-import org.jgroups.Message;
+import org.jgroups.Message.TransientFlag;
+import org.jgroups.blocks.MessageDispatcher;
+import org.jgroups.blocks.RequestOptions;
+import org.jgroups.util.Buffer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,6 +59,7 @@ import static org.junit.Assert.assertEquals;
 public class JGroupsMasterTest extends SearchTestBase {
 
 	private static final Poller POLLER = JGroupsCommonTest.POLLER;
+	private static final long TIMEOUT = 3000; //milliseconds
 	private static final IndexedTypeIdentifier tshirtType = new PojoIndexedTypeIdentifier( TShirt.class );
 
 	private final QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
@@ -112,9 +116,14 @@ public class JGroupsMasterTest extends SearchTestBase {
 		//send message to all listeners
 		byte[] data = serviceManager.requestService( LuceneWorkSerializer.class ).toSerializedModel( queue );
 		data = MessageSerializationHelper.prependString( indexManagerName, data );
-		Message message = new Message( null, null, data );
-		channel.send( message );
+		final MessageDispatcher dispatcher = new MessageDispatcher( channel );
 
+		final RequestOptions options = RequestOptions.SYNC()
+				.exclusionList( channel.address() )
+				.setTransientFlags( TransientFlag.DONT_LOOPBACK )
+				.setTimeout( TIMEOUT ); //milliseconds
+		Buffer buffer = new Buffer( data );
+		dispatcher.castMessage( null, buffer, options );
 		serviceManager.releaseService( LuceneWorkSerializer.class );
 	}
 
