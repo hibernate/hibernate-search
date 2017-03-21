@@ -188,7 +188,8 @@
                         </Import-Package>
                         <Export-Package>
                             org.hibernate.search;version="${project.version}",
-                            org.hibernate.search.jpa;version="${project.version}"
+                            org.hibernate.search.jpa;version="${project.version}",
+                            org.hibernate.search.hcore.spi;version="${project.version}"
                         </Export-Package>
                     </instructions>
                 </configuration>

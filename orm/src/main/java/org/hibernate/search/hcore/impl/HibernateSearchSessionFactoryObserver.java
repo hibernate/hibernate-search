@@ -18,6 +18,7 @@ import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
+import org.hibernate.search.hcore.spi.BeanResolver;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.IndexControl;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
@@ -47,6 +48,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private final ConfigurationService configurationService;
 	private final JndiService namingService;
 	private final ClassLoaderService classLoaderService;
+	private final BeanResolver beanResolver;
 	private final FullTextIndexEventListener listener;
 	private final Metadata metadata;
 
@@ -59,11 +61,13 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			ConfigurationService configurationService,
 			FullTextIndexEventListener listener,
 			ClassLoaderService classLoaderService,
+			BeanResolver beanResolver,
 			JndiService namingService) {
 		this.metadata = metadata;
 		this.configurationService = configurationService;
 		this.listener = listener;
 		this.classLoaderService = classLoaderService;
+		this.beanResolver = beanResolver;
 		this.namingService = namingService;
 	}
 
@@ -75,7 +79,9 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			HibernateSessionFactoryService sessionService = new DefaultHibernateSessionFactoryService( factory );
 			if ( extendedIntegrator == null ) {
 				SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
-						.configuration( new SearchConfigurationFromHibernateCore( metadata, configurationService, classLoaderService, sessionService, namingService ) )
+						.configuration( new SearchConfigurationFromHibernateCore(
+								metadata, configurationService, classLoaderService, beanResolver, sessionService, namingService
+								) )
 						.buildSearchIntegrator();
 				extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
 			}
