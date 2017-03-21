@@ -4,14 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.integration.jtaspring;
+package org.hibernate.search.test.integration.spring.jta;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.jtaspring.dao.BoxDAO;
-import org.hibernate.search.test.integration.jtaspring.entity.Box;
-import org.hibernate.search.test.integration.jtaspring.entity.Doughnut;
-import org.hibernate.search.test.integration.jtaspring.entity.Muffin;
+import org.hibernate.search.test.integration.spring.jta.dao.BoxDAO;
+import org.hibernate.search.test.integration.spring.jta.entity.Box;
+import org.hibernate.search.test.integration.spring.jta.entity.Doughnut;
+import org.hibernate.search.test.integration.spring.jta.entity.Muffin;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
