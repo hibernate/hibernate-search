@@ -98,12 +98,19 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		Gson gson = context.getGsonProvider().getGson();
 		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
 		RestClient client = context.getClient();
+		long start = System.currentTimeMillis();
+		try {
 		return client.performRequest(
 				request.getMethod(),
 				request.getPath(),
 				request.getParameters(),
 				entity
 		);
+		}
+		finally {
+			long time = System.currentTimeMillis() - start;
+			LOG.debug( "Executed (bulk) in " + time + "ms: " + request.getMethod() + " " + request.getPath() + " " + request.getParameters() );
+		}
 	}
 
 	@Override
