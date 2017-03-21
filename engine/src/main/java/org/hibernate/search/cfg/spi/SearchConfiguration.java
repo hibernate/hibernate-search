@@ -13,6 +13,7 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -127,10 +128,18 @@ public interface SearchConfiguration {
 	boolean isMultitenancyEnabled();
 
 	/**
-	 * @return Returns a classloader service for this configuration of Search. Access to the service is via the
-	 * {@link org.hibernate.search.engine.service.spi.ServiceManager}
+	 * @return a classloader service for this configuration of Search. Access to the service is via the
+	 * {@link org.hibernate.search.engine.service.spi.ServiceManager#getClassLoaderService()}
 	 */
 	ClassLoaderService getClassLoaderService();
+
+	/**
+	 * @return a bean resolver for this configuration of Search, or {@code null} to use the default one.
+	 * Access to the service is via the {@link org.hibernate.search.engine.service.spi.ServiceManager#getBeanResolver()}
+	 */
+	default BeanResolver getBeanResolver() {
+		return null;
+	}
 
 	/**
 	 * @return {@code true} if the Hibernate Search mapping should look for JPA annotations to affect the mapping.

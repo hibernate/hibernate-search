@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.service.spi;
 
+import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 
 /**
@@ -80,5 +81,12 @@ public interface ServiceManager {
 	 * @return the {@link ClassLoaderService}
 	 */
 	ClassLoaderService getClassLoaderService();
+
+	/**
+	 * Provides direct access to the {@link BeanResolver}.
+	 * This service lookup is treated as a special case for convenience.
+	 * @return the {@link BeanResolver}
+	 */
+	BeanResolver getBeanResolver();
 
 }

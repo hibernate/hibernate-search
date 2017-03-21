@@ -34,6 +34,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
 import org.hibernate.search.hcore.impl.SearchFactoryReference;
+import org.hibernate.search.hcore.spi.BeanResolver;
 import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.junit.Test;
@@ -152,6 +153,10 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 		expect( mockSessionFactoryServiceRegistry.getService( ClassLoaderService.class ) )
 			.andReturn( mockClassLoaderService )
+			.anyTimes();
+
+		expect( mockSessionFactoryServiceRegistry.locateServiceBinding( BeanResolver.class ) )
+			.andReturn( null )
 			.anyTimes();
 
 		// returning object.class is fair enough for testing purposes

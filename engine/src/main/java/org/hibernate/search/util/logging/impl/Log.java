@@ -1027,4 +1027,6 @@ public interface Log extends BasicLogger {
 			+ " the entity class ('%1$s') or identifier ('%2$s') was missing." )
 	SearchException incompleteEntityInfo(@FormatWith(ClassFormatter.class) Class<?> clazz, Object id);
 
+	@Message(id = 339, value = "BeanResolver cannot be provided via SearchConfiguration#getProvidedServices. Use SearchConfiguration#getBeanResolver!")
+	SearchException beanResolverContainedInProvidedServicesException();
 }
