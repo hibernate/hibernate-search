@@ -51,3 +51,19 @@ index.number_of_replicas: 0
 
 # Enable Groovy scripting support for search: useful for spatial queries
 script.engine.groovy.inline.search: on
+
+# Enable slowlogs - useful when debugging
+index.search.slowlog.level: debug
+index.search.slowlog.threshold.query.warn: 5s
+index.search.slowlog.threshold.query.info: 500s
+index.search.slowlog.threshold.query.debug: 100ms
+index.search.slowlog.threshold.query.trace: 10ms
+index.search.slowlog.threshold.fetch.warn: 1s
+index.search.slowlog.threshold.fetch.info: 200ms
+index.search.slowlog.threshold.fetch.debug: 100ms
+index.search.slowlog.threshold.fetch.trace: 10ms
+index.indexing.slowlog.level: debug
+index.indexing.slowlog.threshold.index.warn: 2s
+index.indexing.slowlog.threshold.index.info: 500s
+index.indexing.slowlog.threshold.index.debug: 100ms
+index.indexing.slowlog.threshold.index.trace: 10ms
