@@ -37,11 +37,7 @@
 
     <step id="produceLuceneDoc" next="afterChunk">
         <listeners>
-            <listener ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgressSetupListener">
-                <properties>
-                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
-                </properties>
-            </listener>
+            <listener ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgressSetupListener" />
         </listeners>
         <chunk checkpoint-policy="custom">
             <reader ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader">
@@ -51,20 +47,17 @@
                     <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
-                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
                     <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}?:10000000;" />
                 </properties>
             </reader>
             <processor ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocProducer">
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
-                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
                 </properties>
             </processor>
             <writer ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter">
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
-                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
                 </properties>
             </writer>
             <checkpoint-algorithm ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.CheckpointAlgorithm">
@@ -78,7 +71,6 @@
                 <properties>
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
-                    <property name="isJavaSE" value="#{jobParameters['isJavaSE']}?:false;" />
                     <property name="maxThreads" value="#{jobParameters['maxThreads']}?:8;" />
                     <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:250;" />
                 </properties>
