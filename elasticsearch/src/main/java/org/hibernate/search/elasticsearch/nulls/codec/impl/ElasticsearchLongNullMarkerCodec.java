@@ -9,14 +9,15 @@ package org.hibernate.search.elasticsearch.nulls.codec.impl;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchNullMarkerIndexStrategy;
 
 /**
  * @author Sanne Grinovero
  */
 public class ElasticsearchLongNullMarkerCodec extends ElasticsearchNullMarkerCodec {
 
-	public ElasticsearchLongNullMarkerCodec(final NullMarker nullMarker) {
-		super( nullMarker );
+	public ElasticsearchLongNullMarkerCodec(final NullMarker nullMarker, ElasticsearchNullMarkerIndexStrategy indexStrategy) {
+		super( nullMarker, indexStrategy );
 	}
 
 	@Override

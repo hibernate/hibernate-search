@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Test indexing of {@link javax.persistence.ElementCollection} annotated arrays.
+ * Test indexing of {@link javax.persistence.ElementCollection} annotated elements.
  *
  * @author Davide D'Alto
  */
@@ -40,7 +40,7 @@ public class ArrayBridgeTest extends SearchTestBase {
 	private FullTextSession fullTextSession;
 	private ArrayBridgeTestEntity withoutNull;
 	private ArrayBridgeTestEntity withNullEntry;
-	private ArrayBridgeTestEntity withNullEmbedded;
+	private ArrayBridgeTestEntity withNullContainer;
 	private Date indexedDate;
 
 	@Override
@@ -73,14 +73,14 @@ public class ArrayBridgeTest extends SearchTestBase {
 		withNullEntry.setPrimitive( new float[] { 2.0f } );
 		withNullEntry.setDates( new Date[] { null } );
 
-		withNullEmbedded = persistEntity( fullTextSession, "Mime" );
-		withNullEmbedded.setDates( null );
-		withNullEmbedded.setNumericNullIndexed( null );
-		withNullEmbedded.setNumericNullNotIndexed( null );
-		withNullEmbedded.setPrimitive( null );
-		withNullEmbedded.setNullIndexed( null );
-		withNullEmbedded.setNullNotIndexed( null );
-		withNullEmbedded.setDates( null );
+		withNullContainer = persistEntity( fullTextSession, "Mime" );
+		withNullContainer.setDates( null );
+		withNullContainer.setNumericNullIndexed( null );
+		withNullContainer.setNumericNullNotIndexed( null );
+		withNullContainer.setPrimitive( null );
+		withNullContainer.setNullIndexed( null );
+		withNullContainer.setNullNotIndexed( null );
+		withNullContainer.setDates( null );
 
 		tx.commit();
 	}
@@ -95,9 +95,28 @@ public class ArrayBridgeTest extends SearchTestBase {
 	}
 
 	@Test
+	public void testSearchNullContainer() throws Exception {
+		List<ArrayBridgeTestEntity> results = findContainerNullResults( "nullIndexed", ArrayBridgeTestEntity.NULL_CONTAINER_TOKEN, true );
+
+		assertNotNull( "No result found for an indexed collection", results );
+		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
+		assertEquals( "Wrong result returned looking for a null in a collection", withNullContainer.getName(), results.get( 0 ).getName() );
+	}
+
+	@Test
+	public void testSearchNullNumericContainer() throws Exception {
+		List<ArrayBridgeTestEntity> results =
+				findNumericResults( "numericNullIndexed", ArrayBridgeTestEntity.NULL_CONTAINER_NUMERIC_TOKEN );
+
+		assertNotNull( "No result found for an indexed collection", results );
+		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
+		assertEquals( "Wrong result returned looking for a null collection", withNullContainer.getName(), results.get( 0 ).getName() );
+	}
+
+	@Test
 	public void testSearchNullNumericEntry() throws Exception {
 		List<ArrayBridgeTestEntity> results =
-				findResults( "numericNullIndexed", ArrayBridgeTestEntity.NULL_NUMERIC_TOKEN, true );
+				findNumericResults( "numericNullIndexed", ArrayBridgeTestEntity.NULL_NUMERIC_TOKEN );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
@@ -218,6 +237,18 @@ public class ArrayBridgeTest extends SearchTestBase {
 				"Wrong result returned from a collection of Date", withoutNull.getName(), results.get( 0 )
 						.getName()
 		);
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<ArrayBridgeTestEntity> findContainerNullResults(String fieldName, Object value, boolean checkNullToken) {
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
+				.forEntity( ArrayBridgeTestEntity.class ).get();
+		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );
+		if ( checkNullToken ) {
+			termMatchingContext.ignoreFieldBridge();
+		}
+		Query query = termMatchingContext.ignoreAnalyzer().matching( value ).createQuery();
+		return fullTextSession.createFullTextQuery( query, ArrayBridgeTestEntity.class ).list();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -957,6 +957,26 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	public void testNumericContainerFieldsTermQuery() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb.keyword()
+				.onField( "raindropPerWeekInMm" )
+				.matching( 0.231d )
+				.createQuery();
+
+		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
+
+		assertEquals(
+				"test term numeric ", 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize()
+		);
+
+		transaction.commit();
+	}
+
+	@Test
 	public void testFieldBridge() {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -1171,18 +1191,18 @@ public class DSLTest extends SearchTestBase {
 		);
 		calendar.set( 100 + 1900, 2, 12, 0, 0, 0 );
 		february = calendar.getTime();
-		fullTextSession.persist(
-				new Month(
-						"February",
-						2,
-						"Month of snowboarding",
-						"Historically, the month where we make babies while watching the whitening landscape",
-						february,
-						0.435d,
-						"feb",
-						"Month of <em>snowboarding</em>"
-				)
+		Month month = new Month(
+				"February",
+				2,
+				"Month of snowboarding",
+				"Historically, the month where we make babies while watching the whitening landscape",
+				february,
+				0.435d,
+				"feb",
+				"Month of <em>snowboarding</em>"
 		);
+		month.raindropPerWeekInMm = new Double[] { 0.231d, 0.431d, 0.231d, 0.031d };
+		fullTextSession.persist( month );
 		calendar.set( 1800, 2, 12, 0, 0, 0 );
 		Date march = calendar.getTime();
 		fullTextSession.persist(

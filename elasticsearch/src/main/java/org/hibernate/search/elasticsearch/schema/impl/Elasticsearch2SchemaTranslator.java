@@ -29,6 +29,7 @@ import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
+import org.hibernate.search.elasticsearch.util.impl.ElasticsearchJsonHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.BoostStrategy;
@@ -477,20 +478,10 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 	private JsonPrimitive convertIndexedNullTokenToJson(ElasticsearchMappingBuilder mappingBuilder,
 			DocumentFieldPath fieldPath, Object indexedNullToken) {
-		if ( indexedNullToken == null ) {
-			return null;
+		try {
+			return ElasticsearchJsonHelper.toJsonPrimitive( indexedNullToken );
 		}
-
-		if ( indexedNullToken instanceof String ) {
-			return new JsonPrimitive( (String) indexedNullToken );
-		}
-		else if ( indexedNullToken instanceof Number ) {
-			return new JsonPrimitive( (Number) indexedNullToken );
-		}
-		else if ( indexedNullToken instanceof Boolean ) {
-			return new JsonPrimitive( (Boolean) indexedNullToken );
-		}
-		else {
+		catch (IllegalArgumentException notPropagated) {
 			throw LOG.unsupportedNullTokenType( mappingBuilder.getBeanClass(), fieldPath.getAbsoluteName(),
 					indexedNullToken.getClass() );
 		}

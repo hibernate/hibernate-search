@@ -11,6 +11,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchNullMarkerIndexStrategy;
 
 /**
  * @author Sanne Grinovero
@@ -19,8 +20,8 @@ public class ElasticsearchBooleanNullMarkerCodec extends ElasticsearchNullMarker
 
 	private final BytesRef encodedToken;
 
-	public ElasticsearchBooleanNullMarkerCodec(NullMarker nullMarker) {
-		super( nullMarker );
+	public ElasticsearchBooleanNullMarkerCodec(NullMarker nullMarker, ElasticsearchNullMarkerIndexStrategy indexStrategy) {
+		super( nullMarker, indexStrategy );
 		/*
 		 * Booleans are queried as strings because Lucene Queries lack a concept of boolean term
 		 * (we do the same for non-nulls)

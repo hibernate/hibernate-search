@@ -41,4 +41,6 @@ public interface ElasticsearchService extends Service {
 
 	MissingValueStrategy getMissingValueStrategy();
 
+	MissingValueStrategy getContainerMissingValueStrategy();
+
 }

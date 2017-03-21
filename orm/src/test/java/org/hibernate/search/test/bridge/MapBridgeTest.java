@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Test indexing of {@link javax.persistence.ElementCollection} annotated maps.
+ * Test indexing of {@link javax.persistence.ElementCollection} annotated elements.
  *
  * @author Davide D'Alto
  */
@@ -40,7 +40,7 @@ public class MapBridgeTest extends SearchTestBase {
 	private FullTextSession fullTextSession;
 	private MapBridgeTestEntity withoutNull;
 	private MapBridgeTestEntity withNullEntry;
-	private MapBridgeTestEntity withNullEmbedded;
+	private MapBridgeTestEntity withNullContainer;
 	private Date indexedDate;
 
 	@Override
@@ -79,13 +79,13 @@ public class MapBridgeTest extends SearchTestBase {
 		withNullEntry.addNumericNullNotIndexed( 2, null );
 		withNullEntry.addDate( 1, null );
 
-		withNullEmbedded = persistEntity( fullTextSession, "Mime" );
-		withNullEmbedded.setDates( null );
-		withNullEmbedded.setNumericNullIndexed( null );
-		withNullEmbedded.setNumericNullNotIndexed( null );
-		withNullEmbedded.setNullIndexed( null );
-		withNullEmbedded.setNullNotIndexed( null );
-		withNullEmbedded.setDates( null );
+		withNullContainer = persistEntity( fullTextSession, "Mime" );
+		withNullContainer.setDates( null );
+		withNullContainer.setNumericNullIndexed( null );
+		withNullContainer.setNumericNullNotIndexed( null );
+		withNullContainer.setNullIndexed( null );
+		withNullContainer.setNullNotIndexed( null );
+		withNullContainer.setDates( null );
 
 		tx.commit();
 	}
@@ -100,9 +100,28 @@ public class MapBridgeTest extends SearchTestBase {
 	}
 
 	@Test
+	public void testSearchNullContainer() throws Exception {
+		List<MapBridgeTestEntity> results = findContainerNullResults( "nullIndexed", MapBridgeTestEntity.NULL_CONTAINER_TOKEN, true );
+
+		assertNotNull( "No result found for an indexed collection", results );
+		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
+		assertEquals( "Wrong result returned looking for a null in a collection", withNullContainer.getName(), results.get( 0 ).getName() );
+	}
+
+	@Test
+	public void testSearchNullNumericContainer() throws Exception {
+		List<MapBridgeTestEntity> results =
+				findNumericResults( "numericNullIndexed", MapBridgeTestEntity.NULL_CONTAINER_NUMERIC_TOKEN );
+
+		assertNotNull( "No result found for an indexed collection", results );
+		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
+		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullContainer.getName(), results.get( 0 ).getName() );
+	}
+
+	@Test
 	public void testSearchNullNumericEntry() throws Exception {
 		List<MapBridgeTestEntity> results =
-				findResults( "numericNullIndexed", MapBridgeTestEntity.NULL_NUMERIC_TOKEN, false );
+				findNumericResults( "numericNullIndexed", MapBridgeTestEntity.NULL_NUMERIC_TOKEN );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
@@ -206,6 +225,18 @@ public class MapBridgeTest extends SearchTestBase {
 		assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
 		assertEquals( "Wrong result returned from a collection of Date", withoutNull.getName(), results.get( 0 )
 				.getName() );
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<MapBridgeTestEntity> findContainerNullResults(String fieldName, Object value, boolean checkNullToken) {
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
+				.forEntity( MapBridgeTestEntity.class ).get();
+		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );
+		if ( checkNullToken ) {
+			termMatchingContext.ignoreFieldBridge();
+		}
+		Query query = termMatchingContext.ignoreAnalyzer().matching( value ).createQuery();
+		return fullTextSession.createFullTextQuery( query, MapBridgeTestEntity.class ).list();
 	}
 
 	@SuppressWarnings("unchecked")

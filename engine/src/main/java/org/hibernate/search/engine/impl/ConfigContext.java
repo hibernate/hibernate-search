@@ -98,6 +98,8 @@ public final class ConfigContext {
 
 	private final Map<IndexManagerType, MissingValueStrategy> missingValueStrategies = new HashMap<>();
 
+	private final Map<IndexManagerType, MissingValueStrategy> containerMissingValueStrategies = new HashMap<>();
+
 	private final Map<IndexManagerType, MutableAnalyzerRegistry> analyzerRegistries = new HashMap<>();
 
 	private final boolean jpaPresent;
@@ -185,6 +187,15 @@ public final class ConfigContext {
 		if ( strategy == null ) {
 			strategy = type.createMissingValueStrategy( serviceManager, searchConfiguration );
 			missingValueStrategies.put( type, strategy );
+		}
+		return strategy;
+	}
+
+	public MissingValueStrategy getContainerMissingValueStrategy(IndexManagerType type) {
+		MissingValueStrategy strategy = containerMissingValueStrategies.get( type );
+		if ( strategy == null ) {
+			strategy = type.createContainerMissingValueStrategy( serviceManager, searchConfiguration );
+			containerMissingValueStrategies.put( type, strategy );
 		}
 		return strategy;
 	}

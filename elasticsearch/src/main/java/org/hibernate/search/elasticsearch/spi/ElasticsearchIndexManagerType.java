@@ -34,4 +34,11 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType {
 			return esService.get().getMissingValueStrategy();
 		}
 	}
+
+	@Override
+	public MissingValueStrategy createContainerMissingValueStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
+		try ( ServiceReference<ElasticsearchService> esService = serviceManager.requestReference( ElasticsearchService.class ) ) {
+			return esService.get().getContainerMissingValueStrategy();
+		}
+	}
 }

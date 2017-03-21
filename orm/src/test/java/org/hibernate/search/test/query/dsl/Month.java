@@ -21,6 +21,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedContainer;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Resolution;
 
@@ -82,6 +83,10 @@ public class Month {
 
 	@Field
 	public double raindropInMm;
+
+	@Field
+	@IndexedContainer
+	public Double[] raindropPerWeekInMm;
 
 	@Field
 	public String getName() {
