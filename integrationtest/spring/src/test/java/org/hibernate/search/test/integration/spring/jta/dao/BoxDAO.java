@@ -4,32 +4,37 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.integration.jtaspring.dao;
+package org.hibernate.search.test.integration.spring.jta.dao;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.hibernate.search.test.integration.jtaspring.entity.Muffin;
+import org.hibernate.search.test.integration.spring.jta.entity.Box;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class MuffinDAO {
+public class BoxDAO {
 	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Transactional
-	public void persist(Muffin muffin) {
-		entityManager.persist( muffin );
+	public void persist(Box box) {
+		entityManager.persist( box );
 	}
 
 	@Transactional
-	public void merge(Muffin muffin) {
-		entityManager.merge( muffin );
+	public Box merge(Box box) {
+		Box result = entityManager.merge( box );
+		return result;
 	}
 
 	@Transactional
-	public void remove(Muffin muffin) {
-		entityManager.remove( muffin );
+	public void remove(Box box) {
+		entityManager.remove( box );
+	}
+
+	public EntityManager getEntityManager() {
+		return entityManager;
 	}
 }
