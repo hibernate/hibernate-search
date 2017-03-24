@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 
 
@@ -24,7 +24,7 @@ public class ForwardingElasticsearchWorkExecutionContext implements Elasticsearc
 	}
 
 	@Override
-	public RestClient getClient() {
+	public ElasticsearchClient getClient() {
 		return delegate.getClient();
 	}
 

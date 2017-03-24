@@ -6,18 +6,13 @@
  */
 package org.hibernate.search.elasticsearch.client.impl;
 
-import java.util.Properties;
-
-import org.hibernate.search.engine.service.spi.Service;
-
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 
 /**
- * Creates the Elasticsearch client.
- *
- * @author Yoann Rodiere
+ * An interface allowing to configure an {@link ElasticsearchClient}.
  */
-public interface ElasticsearchClientFactory extends Service {
+public interface ElasticsearchClientImplementor extends ElasticsearchClient {
 
-	ElasticsearchClientImplementor create(String scopeName, Properties properties);
+	void init(GsonProvider gsonProvider);
 
 }

@@ -9,7 +9,7 @@ package org.hibernate.search.elasticsearch.testutil;
 import java.io.IOException;
 
 import org.elasticsearch.client.Response;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

@@ -13,9 +13,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.BulkRequestFailedException;
@@ -51,20 +51,20 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 	private final AsyncBackendRequestProcessor asyncProcessor;
 	private final ErrorHandler errorHandler;
-	private final RestClient restClient;
+	private final ElasticsearchClient client;
 	private final GsonProvider gsonProvider;
 	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
 
 	public ElasticsearchWorkProcessor(BuildContext context,
-			RestClient restClient, GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory) {
+			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory) {
 		asyncProcessor = new AsyncBackendRequestProcessor();
 		this.errorHandler = context.getErrorHandler();
-		this.restClient = restClient;
+		this.client = client;
 		this.gsonProvider = gsonProvider;
 		this.workFactory = workFactory;
 		this.parallelWorkExecutionContext =
-				new ParallelWorkExecutionContext( restClient, gsonProvider );
+				new ParallelWorkExecutionContext( client, gsonProvider );
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 */
 	private void executeSafely(Iterable<ElasticsearchWork<?>> requests) {
 		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-				restClient, gsonProvider, workFactory, this, errorHandler );
+				client, gsonProvider, workFactory, this, errorHandler );
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
 			executeSafely( work, context );
@@ -285,7 +285,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 		private void processAsyncWork() {
 			SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
-					restClient, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler );
+					client, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler );
 			synchronized ( asyncProcessor ) {
 				while ( true ) {
 					Iterable<ElasticsearchWork<?>> works = asyncProcessor.asyncWorkQueue.drainToDetachedIterable();

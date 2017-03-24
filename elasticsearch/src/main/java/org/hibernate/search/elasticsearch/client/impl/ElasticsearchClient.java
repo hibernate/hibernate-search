@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.elasticsearch.client.impl;
 
-import java.util.Properties;
+import java.io.Closeable;
+import java.io.IOException;
 
-import org.hibernate.search.engine.service.spi.Service;
-
+import org.elasticsearch.client.Response;
 
 /**
- * Creates the Elasticsearch client.
+ * An Elasticsearch client, allowing to perform requests to a remote cluster.
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchClientFactory extends Service {
+public interface ElasticsearchClient extends Closeable {
 
-	ElasticsearchClientImplementor create(String scopeName, Properties properties);
+	Response execute(ElasticsearchRequest request) throws IOException;
 
 }

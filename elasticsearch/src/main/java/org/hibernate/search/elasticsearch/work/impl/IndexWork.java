@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.IndexWorkBuilder;
 

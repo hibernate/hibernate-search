@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;

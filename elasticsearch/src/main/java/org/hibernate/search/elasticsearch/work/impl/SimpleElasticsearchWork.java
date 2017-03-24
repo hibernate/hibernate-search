@@ -9,17 +9,14 @@ package org.hibernate.search.elasticsearch.work.impl;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Response;
-import org.elasticsearch.client.ResponseException;
-import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 /**
@@ -62,7 +59,7 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 		JsonObject parsedResponseBody;
 		try {
 			beforeExecute( executionContext, request );
-			response = performRequest( executionContext );
+			response = executionContext.getClient().execute( request );
 			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
 		}
 		catch (IOException | RuntimeException e) {
@@ -80,28 +77,6 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 		}
 
 		return generateResult( executionContext, response, parsedResponseBody );
-	}
-
-	private Response performRequest(ElasticsearchWorkExecutionContext context) throws IOException {
-		Gson gson = context.getGsonProvider().getGson();
-		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
-		RestClient client = context.getClient();
-		try {
-			return client.performRequest(
-					request.getMethod(),
-					request.getPath(),
-					request.getParameters(),
-					entity
-			);
-		}
-		catch (ResponseException e) {
-			/*
-			 * The client tries to guess what's an error and what's not, but it's too naive.
-			 * A 404 on DELETE is not always important to us, for instance.
-			 * Thus we ignore the exception and do our own checks afterwards.
-			 */
-			return e.getResponse();
-		}
 	}
 
 	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
 
 import com.google.gson.JsonObject;

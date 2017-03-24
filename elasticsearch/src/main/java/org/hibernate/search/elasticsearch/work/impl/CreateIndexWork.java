@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;

@@ -8,7 +8,7 @@ package org.hibernate.search.elasticsearch.dialect.impl;
 
 import java.util.Properties;
 
-import org.elasticsearch.client.RestClient;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.engine.service.spi.Service;
 
 
@@ -19,6 +19,6 @@ import org.hibernate.search.engine.service.spi.Service;
  */
 public interface ElasticsearchDialectFactory extends Service {
 
-	ElasticsearchDialect createDialect(RestClient client, Properties properties);
+	ElasticsearchDialect createDialect(ElasticsearchClient client, Properties properties);
 
 }

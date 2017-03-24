@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
@@ -23,7 +22,6 @@ import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -82,7 +80,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		Response response;
 		JsonObject parsedResponseBody;
 		try {
-			response = performRequest( context );
+			response = context.getClient().execute( request );
 			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
 		}
 		catch (IOException | RuntimeException e) {
@@ -92,18 +90,6 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		handleResults( context, response, parsedResponseBody );
 
 		return null;
-	}
-
-	private Response performRequest(ElasticsearchWorkExecutionContext context) throws IOException {
-		Gson gson = context.getGsonProvider().getGson();
-		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
-		RestClient client = context.getClient();
-		return client.performRequest(
-				request.getMethod(),
-				request.getPath(),
-				request.getParameters(),
-				entity
-		);
 	}
 
 	@Override

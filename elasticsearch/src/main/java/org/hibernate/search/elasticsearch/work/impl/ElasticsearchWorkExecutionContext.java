@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 
 /**
@@ -15,7 +15,7 @@ import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
  */
 public interface ElasticsearchWorkExecutionContext {
 
-	RestClient getClient();
+	ElasticsearchClient getClient();
 
 	GsonProvider getGsonProvider();
 

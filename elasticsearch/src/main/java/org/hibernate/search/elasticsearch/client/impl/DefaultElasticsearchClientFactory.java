@@ -41,7 +41,13 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 	private static final String CLIENT_PROP_PREFIX = "hibernate.search.";
 
 	@Override
-	public RestClient createClient(String scopeName, Properties properties) {
+	public ElasticsearchClientImplementor create(String scopeName, Properties properties) {
+		RestClient restClient = createClient( scopeName, properties );
+		Sniffer sniffer = createSniffer( scopeName, restClient, properties );
+		return new DefaultElasticsearchClient( restClient, sniffer );
+	}
+
+	private RestClient createClient(String scopeName, Properties properties) {
 		String propertyPrefix = propertyPrefix( scopeName );
 
 		String serverUrisString = ConfigurationParseHelper.getString(
@@ -72,8 +78,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 				.build();
 	}
 
-	@Override
-	public Sniffer createSniffer(String scopeName, RestClient client, Properties properties) {
+	private Sniffer createSniffer(String scopeName, RestClient client, Properties properties) {
 		String propertyPrefix = propertyPrefix( scopeName );
 
 		boolean discoveryEnabled = ConfigurationParseHelper.getBooleanValue(

@@ -18,8 +18,8 @@ import org.apache.http.StatusLine;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.elasticsearch.client.Response;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
-import org.hibernate.search.elasticsearch.work.impl.ElasticsearchRequest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

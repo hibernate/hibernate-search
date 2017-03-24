@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.builder.WaitForIndexStatusWorkBuilder;
 import org.hibernate.search.exception.AssertionFailure;

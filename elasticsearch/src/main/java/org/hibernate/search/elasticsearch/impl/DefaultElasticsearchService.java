@@ -9,9 +9,9 @@ package org.hibernate.search.elasticsearch.impl;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.sniff.Sniffer;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientImplementor;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -48,9 +48,7 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	 */
 	private static final String CLIENT_SCOPE_NAME = "default";
 
-	private RestClient client;
-
-	private Sniffer sniffer;
+	private ElasticsearchClient client;
 
 	private GsonProvider gsonProvider;
 
@@ -74,16 +72,20 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	public void start(Properties properties, BuildContext context) {
 		ServiceManager serviceManager = context.getServiceManager();
 
+		ElasticsearchClientImplementor clientImplementor;
 		try ( ServiceReference<ElasticsearchClientFactory> clientFactory =
 				serviceManager.requestReference( ElasticsearchClientFactory.class ) ) {
-			this.client = clientFactory.get().createClient( CLIENT_SCOPE_NAME, properties );
-			this.sniffer = clientFactory.get().createSniffer( CLIENT_SCOPE_NAME, client, properties );
+			clientImplementor = clientFactory.get().create( CLIENT_SCOPE_NAME, properties );
 		}
 
 		try ( ServiceReference<ElasticsearchDialectFactory> dialectFactory =
 				serviceManager.requestReference( ElasticsearchDialectFactory.class ) ) {
-			ElasticsearchDialect dialect = dialectFactory.get().createDialect( client, properties );
+			ElasticsearchDialect dialect = dialectFactory.get().createDialect( clientImplementor, properties );
 			this.gsonProvider = dialect.createGsonProvider();
+
+			clientImplementor.init( gsonProvider );
+			this.client = clientImplementor;
+
 			this.workFactory = dialect.createWorkFactory( gsonProvider );
 
 			this.workProcessor = new ElasticsearchWorkProcessor( context, client, gsonProvider, workFactory );
@@ -103,8 +105,7 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 	@Override
 	public void stop() {
-		try ( RestClient client = this.client;
-				Sniffer sniffer = this.sniffer;
+		try ( ElasticsearchClient client = this.client;
 				ElasticsearchWorkProcessor workProcessor = this.workProcessor; ) {
 			/*
 			 * Nothing to do: we simply take advantage of Java's auto-closing,
@@ -115,7 +116,6 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 		catch (IOException | RuntimeException e) {
 			throw new SearchException( "Failed to shut down the Elasticsearch service", e );
 		}
-		this.sniffer = null;
 		this.client = null;
 	}
 

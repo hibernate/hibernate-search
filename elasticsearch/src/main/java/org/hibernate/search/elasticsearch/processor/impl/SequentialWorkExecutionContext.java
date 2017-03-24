@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.elasticsearch.client.RestClient;
 import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
@@ -34,7 +34,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private final RestClient client;
+	private final ElasticsearchClient client;
 
 	private final GsonProvider gsonProvider;
 
@@ -52,7 +52,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 
 	private final Set<String> dirtyIndexes = new HashSet<>();
 
-	public SequentialWorkExecutionContext(RestClient client,
+	public SequentialWorkExecutionContext(ElasticsearchClient client,
 			GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory,
 			ElasticsearchWorkProcessor workProcessor,
 			ErrorHandler errorHandler) {
@@ -65,7 +65,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 	}
 
 	@Override
-	public RestClient getClient() {
+	public ElasticsearchClient getClient() {
 		return client;
 	}
 

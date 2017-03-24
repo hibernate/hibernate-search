@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.dialect.impl.es2.Elasticsearch2Dialect;
 import org.hibernate.search.elasticsearch.dialect.impl.es5.Elasticsearch5Dialect;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
@@ -30,10 +31,10 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 	private static final JsonAccessor VERSION_ACCESSOR = JsonAccessor.root().property( "version" ).property( "number" );
 
 	@Override
-	public ElasticsearchDialect createDialect(RestClient client, Properties properties) {
+	public ElasticsearchDialect createDialect(ElasticsearchClient client, Properties properties) {
 		JsonObject responseAsJsonObject;
 		try {
-			Response response = client.performRequest( "GET", "/" );
+			Response response = client.execute( ElasticsearchRequest.get().build() );
 			responseAsJsonObject = ElasticsearchClientUtils.parseJsonResponse(
 					DialectIndependentGsonProvider.INSTANCE, response );
 		}

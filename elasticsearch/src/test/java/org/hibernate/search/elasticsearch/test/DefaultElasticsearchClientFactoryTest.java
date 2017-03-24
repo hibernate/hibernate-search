@@ -10,22 +10,20 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.eclipse.jetty.http.HttpHeader;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest.Builder;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -38,12 +36,16 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * @author Yoann Rodiere
  */
 public class DefaultElasticsearchClientFactoryTest {
+
+	private static final JsonParser JSON_PARSER = new JsonParser();
 
 	private static final String CLIENT_SCOPE_NAME = "default";
 	private static final String CLIENT_PROPERTY_PREFIX = "hibernate.search.default.";
@@ -75,15 +77,15 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 		}
 	}
 
@@ -94,23 +96,15 @@ public class DefaultElasticsearchClientFactoryTest {
 
 		String payload = "{ \"foo\": \"bar\" }";
 		String errorMessage = "ErrorMessageExplainingTheError";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse().withStatus( 500 )
 						.withBody( "{ \"error\": \"" + errorMessage + "\" }" )
 				) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			ResponseException exception = null;
-			try {
-				doPost( client, "/myIndex/myType", payload );
-			}
-			catch (ResponseException e) {
-				exception = e;
-			}
-			assertThat( exception ).as( "ResponseException" ).isNotNull();
-			Response result = exception.getResponse();
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 500 );
 			assertThat( IOUtils.toString( result.getEntity().getContent() ) ).as( "response body" ).contains( errorMessage );
 		}
@@ -124,7 +118,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT, "99999" );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse()
@@ -133,7 +127,7 @@ public class DefaultElasticsearchClientFactoryTest {
 
 		thrown.expect( IOException.class );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			doPost( client, "/myIndex/myType", payload );
 		}
 	}
@@ -146,7 +140,7 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT, "1000" );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse()
@@ -155,7 +149,7 @@ public class DefaultElasticsearchClientFactoryTest {
 
 		thrown.expect( IOException.class );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			doPost( client, "/myIndex/myType", payload );
 		}
 	}
@@ -167,21 +161,21 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
-		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule2.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 		}
 	}
 
@@ -192,21 +186,21 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
-		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule2.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 503 ) ) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( 1, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 1, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 
 			wireMockRule1.resetRequests();
 			wireMockRule2.resetRequests();
@@ -217,8 +211,8 @@ public class DefaultElasticsearchClientFactoryTest {
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
-			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( 0, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 0, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 		}
 	}
 
@@ -230,25 +224,25 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
-		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule2.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withFixedDelay( 10_000 /* 10s => will time out */ ) ) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 			/*
 			 * Wiremock introduces the delay *before* registering the request to the journal,
 			 * so we should have no request in the journal if we time out.
 			 */
-			wireMockRule2.verify( 0, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 0, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 
 			wireMockRule1.resetRequests();
 			wireMockRule2.resetRequests();
@@ -258,7 +252,7 @@ public class DefaultElasticsearchClientFactoryTest {
 			 * so that we can detect if requests are sent to this node.
 			 */
 			wireMockRule2.resetMappings();
-			wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+			wireMockRule2.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 					.withRequestBody( equalToJson( payload ) )
 					.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
@@ -268,8 +262,8 @@ public class DefaultElasticsearchClientFactoryTest {
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
-			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( 0, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 0, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 		}
 	}
 
@@ -281,21 +275,21 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
-		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule2.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withFault( Fault.MALFORMED_RESPONSE_CHUNK ) ) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( 1, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 1, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 
 			wireMockRule1.resetRequests();
 			wireMockRule2.resetRequests();
@@ -306,8 +300,8 @@ public class DefaultElasticsearchClientFactoryTest {
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
-			wireMockRule1.verify( 2, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( 0, postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( 0, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 		}
 	}
 
@@ -327,15 +321,14 @@ public class DefaultElasticsearchClientFactoryTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withBody( nodesInfoResult ) ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
-		wireMockRule2.stubFor( post( urlPathEqualTo( "/myIndex/myType" ) )
+		wireMockRule2.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() );
-				Sniffer sniffer = clientFactory.createSniffer( CLIENT_SCOPE_NAME, client, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
@@ -346,8 +339,8 @@ public class DefaultElasticsearchClientFactoryTest {
 			result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType" ) ) );
+			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 		}
 	}
 
@@ -368,23 +361,23 @@ public class DefaultElasticsearchClientFactoryTest {
 		 * and only provides an authentication token if it gets a 401 status.
 		 * Thus we must stub the response for unauthenticated requests too.
 		 */
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType/_search" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType/_search" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse().withStatus( 401 )
 						.withHeader( HttpHeader.WWW_AUTHENTICATE.asString(), "Basic" ) )
 				);
 
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType/_search" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType/_search" ) )
 				.withBasicAuth( username, password )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			Response result = doPost( client, "/myIndex/myType/_search", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			wireMockRule1.verify( postRequestedFor( urlPathEqualTo( "/myIndex/myType/_search" ) ) );
+			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType/_search" ) ) );
 		}
 	}
 
@@ -396,23 +389,15 @@ public class DefaultElasticsearchClientFactoryTest {
 
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessageUnauthorized";
-		wireMockRule1.stubFor( post( urlPathEqualTo( "/myIndex/myType/_search" ) )
+		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType/_search" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse().withStatus( 401 /* Unauthorized */ )
 						.withStatusMessage( statusMessage )
 				) );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			ResponseException exception = null;
-			try {
-				doPost( client, "/myIndex/myType/_search", payload );
-			}
-			catch (ResponseException e) {
-				exception = e;
-			}
-			assertThat( exception ).as( "ResponseException" ).isNotNull();
-			Response result = exception.getResponse();
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			Response result = doPost( client, "/myIndex/myType/_search", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 401 );
 			assertThat( result.getStatusLine().getReasonPhrase() ).as( "reason phrase" ).contains( statusMessage );
 		}
@@ -431,16 +416,29 @@ public class DefaultElasticsearchClientFactoryTest {
 
 		logged.expectMessage( "HSEARCH400073", httpUri );
 
-		try ( RestClient client = clientFactory.createClient( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			// Nothing to do here
 		}
 	}
 
-	private Response doPost(RestClient client, String path, String payload) throws IOException, ResponseException {
-		return client.performRequest(
-				"POST", path, Collections.emptyMap(),
-				payload == null ? null : new StringEntity( payload, ContentType.APPLICATION_JSON )
-				);
+	private Response doPost(ElasticsearchClient client, String path, String payload) throws IOException, ResponseException {
+		return client.execute( buildRequest( ElasticsearchRequest.post(), path, payload ) );
+	}
+
+	private ElasticsearchRequest buildRequest(Builder builder, String path, String payload) {
+		for ( String pathComponent : path.split( "/" ) ) {
+			if ( !pathComponent.isEmpty() ) {
+				builder = builder.pathComponent( pathComponent );
+			}
+		}
+		if ( payload != null ) {
+			builder = builder.body( JSON_PARSER.parse( payload ).getAsJsonObject() );
+		}
+		return builder.build();
+	}
+
+	private static UrlPathPattern urlPathLike(String path) {
+		return urlPathMatching( path + "/?" );
 	}
 
 	private static ResponseDefinitionBuilder elasticsearchResponse() {
