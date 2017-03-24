@@ -6,28 +6,19 @@
  */
 package org.hibernate.search.util.logging.impl;
 
-
 /**
- * Log category to be used with {@link LoggerFactory#make(LogCategory)}.
+ * Log categories to be used with {@link LoggerFactory#make(LogCategory)}.
  *
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
-public final class LogCategory {
+public final class DefaultLogCategories {
 
-	private final String name;
-
-	public LogCategory(String name) {
-		this.name = name;
+	private DefaultLogCategories() {
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
+	/**
+	 * Category for logging executed search queries.
+	 */
+	public static final LogCategory QUERY = new LogCategory( "org.hibernate.search.fulltext_query" );
 
 }

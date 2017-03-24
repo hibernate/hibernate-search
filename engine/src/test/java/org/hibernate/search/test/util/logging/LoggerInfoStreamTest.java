@@ -19,8 +19,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
-import org.hibernate.search.util.logging.impl.LogCategory;
 import org.hibernate.search.util.logging.impl.LoggerInfoStream;
+import org.hibernate.search.util.logging.impl.LuceneLogCategories;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class LoggerInfoStreamTest {
 		indexWriter.commit();
 		indexWriter.close();
 
-		List<LoggingEvent> loggingEvents = testAppender.searchByLoggerAndMessage( LogCategory.INFOSTREAM_LOGGER_CATEGORY.getName(), "IW:" );
+		List<LoggingEvent> loggingEvents = testAppender.searchByLoggerAndMessage( LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName(), "IW:" );
 
 		assertFalse( loggingEvents.isEmpty() );
 	}

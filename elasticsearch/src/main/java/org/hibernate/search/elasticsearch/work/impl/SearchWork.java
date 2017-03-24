@@ -17,7 +17,7 @@ import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
-import org.hibernate.search.util.logging.impl.LogCategory;
+import org.hibernate.search.util.logging.impl.DefaultLogCategories;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
  */
 public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 
-	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, LogCategory.QUERY );
+	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	protected SearchWork(Builder builder) {
 		super( builder );

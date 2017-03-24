@@ -16,7 +16,7 @@ import org.apache.lucene.util.InfoStream;
  */
 public class LoggerInfoStream extends InfoStream {
 
-	private final Log logger = LoggerFactory.make( LogCategory.INFOSTREAM_LOGGER_CATEGORY );
+	private final Log logger = LoggerFactory.make( LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY );
 
 	@Override
 	public void message(String component, String message) {
