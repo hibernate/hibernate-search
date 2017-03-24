@@ -444,4 +444,10 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 					+ " Please refer to the documentation to know which versions are supported." )
 	SearchException unexpectedElasticsearchVersion(String name);
 
+	@LogMessage(level = Level.TRACE)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 82,
+			value = "Executed Elasticsearch HTTP request to path '%s' with query parameters %s in %dms"
+	)
+	void executedRequest(String path, Map<String, String> getParameters, long timeInMs);
+
 }

@@ -7,14 +7,19 @@
 package org.hibernate.search.elasticsearch.client.impl;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
+import org.hibernate.search.elasticsearch.dialect.impl.DialectIndependentGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.logging.impl.ElasticsearchLogCategories;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 
@@ -22,6 +27,8 @@ import com.google.gson.Gson;
  * @author Yoann Rodiere
  */
 public class DefaultElasticsearchClient implements ElasticsearchClientImplementor {
+
+	private static final Log requestLog = LoggerFactory.make( Log.class, ElasticsearchLogCategories.REQUEST );
 
 	private final RestClient restClient;
 
@@ -32,6 +39,7 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 	public DefaultElasticsearchClient(RestClient restClient, Sniffer sniffer) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
+		this.gsonProvider = DialectIndependentGsonProvider.INSTANCE;
 	}
 
 	@Override
@@ -43,6 +51,7 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 	public Response execute(ElasticsearchRequest request) throws IOException {
 		Gson gson = gsonProvider.getGson();
 		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
+		long start = System.nanoTime();
 		try {
 			return restClient.performRequest(
 					request.getMethod(),
@@ -58,6 +67,10 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 			 * Thus we ignore the exception and do our own checks afterwards.
 			 */
 			return e.getResponse();
+		}
+		finally {
+			long executionTime = System.nanoTime() - start;
+			requestLog.executedRequest( request.getPath(), request.getParameters(), TimeUnit.NANOSECONDS.toMillis( executionTime ) );
 		}
 	}
 

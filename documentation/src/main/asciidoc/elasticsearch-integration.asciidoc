@@ -781,6 +781,14 @@ The optimization features documented in <<search-optimize>> are only partially i
 
  * The automatic optimization is not implemented and most probably never will be.
  * The manual optimization (`searchFactory.optimize()`) is implemented.
+ 
+==== [[elasticsearch-logging]]Logging executed requests
+
+Search queries are logged to the `org.hibernate.search.fulltext_query` category at `DEBUG` level,
+as when using an embedded Lucene instance (the query format is Elasticsearch's, though).
+
+In addition, you can enable the logging of every single request sent to the Elasticsearch cluster
+by enabling `TRACE` logging for the log category `org.hibernate.search.elasticsearch.request`.
 
 === [[elasticsearch-limitations]]Limitations
 
