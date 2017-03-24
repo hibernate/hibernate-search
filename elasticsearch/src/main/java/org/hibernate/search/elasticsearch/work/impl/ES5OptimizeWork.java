@@ -15,7 +15,7 @@ import org.hibernate.search.elasticsearch.work.impl.builder.OptimizeWorkBuilder;
 import com.google.gson.JsonObject;
 
 /**
- * An optimize work for ES2, using the ForceMerge API.
+ * An optimize work for ES5, using the ForceMerge API.
  * <p>
  * The ForceMerge API replaces the removed Optimize API in ES5.
  *
