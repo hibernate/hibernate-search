@@ -464,7 +464,7 @@ public interface Log extends BasicLogger {
 			"against the Analyzer applied on this field.")
 	EmptyQueryException queryWithNoTermsAfterAnalysis(String field, String searchTerm);
 
-	@Message(id = 149, value = "Unable to determine ClassBridge for %1$s")
+	@Message(id = 149, value = "Unable to determine a ClassBridge configured on type %1$s")
 	SearchException unableToDetermineClassBridge(String className);
 
 	@Message(id = 150, value = "Unable to get input stream from blob data")

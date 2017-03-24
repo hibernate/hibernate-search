@@ -124,7 +124,7 @@ public final class BridgeFactory {
 			}
 		}
 		if ( bridge == null ) {
-			throw LOG.unableToDetermineClassBridge( ClassBridge.class.getName() );
+			throw LOG.unableToDetermineClassBridge( clazz.getName() );
 		}
 
 		populateReturnType( clazz, bridgeType, bridge );
