@@ -18,6 +18,9 @@ import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
  * This checkpoint algorithm is used to provide a checkpoint decision based on the item count N given by the user. So,
  * the job is ready to checkpoint each N items. If user does not specify the itemCount value, default value described in
  * the mass indexer will be applied.
+ * <p>
+ * Checkpoint algorithms are partition-scoped, meaning each partition has its own checkpoint counter and it is not
+ * shared with other partitions.
  *
  * @author Mincong Huang
  */

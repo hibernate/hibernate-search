@@ -30,9 +30,11 @@ import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.jboss.logging.Logger;
 
 /**
- * Item reader reads entities using scrollable results. For each reader, there's only one target entity type. The range
- * to read is defined by the partition unit. This range is always a left-closed interval.
+ * Entity reader reads entities from database. During the open of the read stream, this reader builds a scrollable
+ * result. Then, it scrolls from one entity to another at each reading. An entity reader reaches its end when there’s no
+ * more item to read. Each reader contains only one entity type.
  * <p>
+ * The reading range is restricted by the {@link PartitionBound}, which always represents as a left-closed interval.
  * For example, there 2 entity types Company and Employee. The number of rows are respectively 5 and 4500. The
  * rowsPerPartition is set to 1000. Then, there will be 6 readers and their ranges are :
  * <ul>
