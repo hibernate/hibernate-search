@@ -34,8 +34,10 @@ import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.jboss.logging.Logger;
 
 /**
- * Lucene partition mapper provides a partition plan to the Lucene production step: "produceLuceneDoc". The partition
- * plan is defined dynamically, according to the number of partitions given by the user.
+ * This partition mapper provides a dynamic partition plan for chunk processing.
+ * <p>
+ * A partition plan specifies the number of partitions, which is calculated based on the quantity of entities selected,
+ * and the value of job parameter {@code MassIndexingJobParameters.ROWS_PER_PARTITION} defined by the user.
  *
  * @author Mincong Huang
  */

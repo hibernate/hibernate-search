@@ -390,9 +390,12 @@ This feature is a work in progress.
 The integration with JSR-352, Batch Applications for the Java Platform, is in development. We do
 think we have the basics covered and we are looking for feedback.
 
-Hibernate Search provides a JSR-352 job to perform mass indexing.
-It covers not only the existing functionality of the mass indexer described above, but also benefits from
-some powerful standard features of the Java Batch Platform (JSR-352), such as failure recovery using checkpoints
+Hibernate Search provides a JSR-352 job to perform mass indexing. It covers not only the existing
+functionality of the mass indexer described above, but also benefits from some powerful standard
+features of the Java Batch Platform (JSR-352), such as failure recovery using checkpoints, chunk
+oriented processing, and parallel execution. This batch job accepts different entity type(s) as
+input, loads the relevant entities from the database, then rebuilds the full-text index from these.
+
 However, it requires a batch runtime for the execution. Please notice that we
 don't provide any batch runtime, you are free to choose one that fits you needs, e.g. the default
 batch runtime embedded in your Java EE container. We provide integration to any CDI-enabled JSR-352
