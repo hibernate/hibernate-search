@@ -31,6 +31,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
@@ -39,6 +40,7 @@ import org.hibernate.search.bridge.builtin.ShortBridge;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -46,6 +48,7 @@ import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
@@ -126,6 +129,21 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		else {
 			return bridge;
 		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2651")
+	public void testNumericDoesNotDuplicateField() throws Exception {
+		/*
+		 * Test that the store(Store.YES) call was taken into account;
+		 * it used not to be, because the call to numericField used to
+		 * create another, duplicate field, erasing all previous information.
+		 */
+		TypeMetadata metadata = getExtendedSearchIntegrator().getIndexBinding( Item.class )
+				.getDocumentBuilder().getMetadata();
+
+		assertTrue( metadata.getDocumentFieldMetadataFor( "price" ).isNumeric() );
+		assertEquals( Store.YES, metadata.getDocumentFieldMetadataFor( "price" ).getStore() );
 	}
 
 	@Test
