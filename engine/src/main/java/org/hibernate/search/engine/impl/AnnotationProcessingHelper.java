@@ -16,6 +16,7 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DynamicBoost;
+import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
@@ -162,6 +163,9 @@ public final class AnnotationProcessingHelper {
 		}
 		else if ( fieldAnn instanceof NumericField ) {
 			fieldName = ( (NumericField) fieldAnn ).forField();
+		}
+		else if ( fieldAnn instanceof Facet ) {
+			fieldName = ( (Facet) fieldAnn ).forField();
 		}
 		else {
 			return raiseAssertionOnIncorrectAnnotation( fieldAnn );
