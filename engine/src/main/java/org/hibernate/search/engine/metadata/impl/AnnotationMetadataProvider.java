@@ -1201,13 +1201,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		if ( fieldAnnotation != null ) {
 			if ( isFieldInPath( fieldAnnotation, member, pathsContext, prefix ) || !parseContext.isMaxLevelReached() ) {
-
-				Set<Facet> facetAnnotations = findMatchingFacetAnnotations( member, fieldAnnotation.name() );
 				bindFieldAnnotation(
 						prefix,
 						fieldAnnotation,
 						numericFields,
-						facetAnnotations,
 						typeMetadataBuilder,
 						propertyMetadataBuilder,
 						configContext,
@@ -1227,13 +1224,17 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		Set<Facet> matchingFacetAnnotations = new LinkedHashSet<>( 1 );
 
-		if ( facetAnnotation != null && facetAnnotation.forField().equals( fieldName ) ) {
-			matchingFacetAnnotations.add( facetAnnotation );
+		if ( facetAnnotation != null ) {
+			String forField = ReflectionHelper.getAttributeName( member, facetAnnotation.forField() );
+			if ( forField.equals( fieldName ) ) {
+				matchingFacetAnnotations.add( facetAnnotation );
+			}
 		}
 
 		if ( facetsAnnotation != null ) {
 			for ( Facet annotation : facetsAnnotation.value() ) {
-				if ( annotation != null && annotation.forField().equals( fieldName ) ) {
+				String forField = ReflectionHelper.getAttributeName( member, annotation.forField() );
+				if ( forField.equals( fieldName ) ) {
 					matchingFacetAnnotations.add( annotation );
 				}
 			}
@@ -1245,7 +1246,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			String prefix,
 			org.hibernate.search.annotations.Field fieldAnnotation,
 			NumericFieldsConfiguration numericFields,
-			Set<Facet> facetAnnotations,
 			TypeMetadata.Builder typeMetadataBuilder,
 			PropertyMetadata.Builder propertyMetadataBuilder,
 			ConfigContext configContext,
@@ -1270,6 +1270,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( fieldAnnotation.termVector() );
 
 		NumericField numericFieldAnnotation = numericFields.getNumericFieldAnnotation( fieldPath );
+
+		Set<Facet> facetAnnotations = findMatchingFacetAnnotations( member, relativeFieldName );
 
 		FieldBridge fieldBridge;
 		if ( parseContext.skipFieldBridges() ) {
@@ -1697,12 +1699,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						pathsContext,
 						prefix
 				) || !parseContext.isMaxLevelReached() ) {
-					Set<Facet> facetAnnotations = findMatchingFacetAnnotations( member, fieldAnnotation.name() );
 					bindFieldAnnotation(
 							prefix,
 							fieldAnnotation,
 							numericFields,
-							facetAnnotations,
 							typeMetadataBuilder,
 							propertyMetadataBuilder,
 							configContext,
