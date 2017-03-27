@@ -38,6 +38,8 @@ import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.DynamicBoost;
+import org.hibernate.search.annotations.Facet;
+import org.hibernate.search.annotations.Facets;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.FullTextFilterDef;
@@ -425,6 +427,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final Map<String, Object> longitude = property.getLongitude();
 			final Collection<Map<String, Object>> numericFields = property.getNumericFields();
 			final Collection<Map<String, Object>> sortableFields = property.getSortableFields();
+			final Collection<Map<String, Object>> facets = property.getFacets();
 
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
@@ -445,6 +448,15 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					sortableFieldAnnotation.setValue( entry.getKey(), entry.getValue() );
 				}
 				sortableFieldAnnotations.add( (SortableField) createAnnotation( sortableFieldAnnotation ) );
+			}
+
+			List<Facet> facetAnnotations = new ArrayList<Facet>( facets.size() );
+			for ( Map<String, Object> facet : facets ) {
+				AnnotationDescriptor sortableFieldAnnotation = new AnnotationDescriptor( Facet.class );
+				for ( Map.Entry<String, Object> entry : facet.entrySet() ) {
+					sortableFieldAnnotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				facetAnnotations.add( (Facet) createAnnotation( sortableFieldAnnotation ) );
 			}
 
 			for ( Map<String, Object> field : fields ) {
@@ -521,6 +533,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor fieldsAnnotation = new AnnotationDescriptor( Fields.class );
 			AnnotationDescriptor numericFieldsAnnotation = new AnnotationDescriptor( NumericFields.class );
 			AnnotationDescriptor sortableFieldsAnnotation = new AnnotationDescriptor( SortableFields.class );
+			AnnotationDescriptor facetsAnnotation = new AnnotationDescriptor( Facets.class );
 
 			final org.hibernate.search.annotations.Field[] fieldArray =
 					new org.hibernate.search.annotations.Field[fieldAnnotations.size()];
@@ -535,6 +548,11 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final SortableField[] sortableFieldAsArray = sortableFieldAnnotations.toArray( sortableFieldArray );
 			sortableFieldsAnnotation.setValue( "value", sortableFieldAsArray );
 			annotations.put( SortableFields.class, createAnnotation( sortableFieldsAnnotation ) );
+
+			final Facet[] facetArray = new Facet[facetAnnotations.size()];
+			final Facet[] facetAsArray = facetAnnotations.toArray( facetArray );
+			facetsAnnotation.setValue( "value", facetAsArray );
+			annotations.put( Facets.class, createAnnotation( facetsAnnotation ) );
 
 			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, createAnnotation( fieldsAnnotation ) );
