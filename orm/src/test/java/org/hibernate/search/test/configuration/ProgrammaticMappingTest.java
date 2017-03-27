@@ -44,6 +44,8 @@ import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
@@ -190,6 +192,70 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		s.delete( results.get( 0 ) );
 		s.delete( results.get( 1 ) );
 		s.delete( results.get( 2 ) );
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testFacet() throws Exception {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+
+		Item item1 = new Item();
+		item1.setId( 3 );
+		item1.setPrice( (short) 25 );
+		s.persist( item1 );
+
+		Item item2 = new Item();
+		item2.setId( 2 );
+		item2.setPrice( (short) 35 );
+		s.persist( item2 );
+
+		Item item3 = new Item();
+		item3.setId( 1 );
+		item3.setPrice( (short) 825 );
+		s.persist( item3 );
+
+		Item item4 = new Item();
+		item4.setId( 4 );
+		item4.setPrice( (short) 2089 );
+		s.persist( item4 );
+
+		tx.commit();
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity( Item.class ).get();
+		Query q = qb.all().createQuery();
+		FullTextQuery query = s.createFullTextQuery( q, Item.class );
+
+		FacetingRequest facetingRequest = qb.facet()
+				.name( "myFacet" )
+				.onField( "price_facet" )
+				.range()
+						.below( 50.0 ).excludeLimit()
+						.from( 50.0 ).to( 1000.0 ).excludeLimit()
+						.above( 1000.0 )
+				.createFacetingRequest();
+		query.getFacetManager().enableFaceting( facetingRequest );
+
+		List<Facet> results = query.list();
+
+		List<Facet> facets = query.getFacetManager().getFacets( "myFacet" );
+		assertThat( facets ).onProperty( "value" )
+				.describedAs( "Retrieved facets - values" )
+				.containsExactly( "[, 50.0)", "[50.0, 1000.0)", "[1000.0, ]" );
+		assertThat( facets ).onProperty( "count" )
+				.describedAs( "Retrieved facets - counts" )
+				.containsExactly( 2, 1, 1 );
+
+		query.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
+
+		s.delete( results.get( 0 ) );
+		s.delete( results.get( 1 ) );
+		s.delete( results.get( 2 ) );
+		s.delete( results.get( 3 ) );
 		tx.commit();
 		s.close();
 	}
