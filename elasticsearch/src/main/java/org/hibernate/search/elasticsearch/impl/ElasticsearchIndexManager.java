@@ -428,9 +428,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			workProcessor.executeSyncSafe( elasticsearchWorks );
 		}
 		else {
-			for ( ElasticsearchWork<?> work : elasticsearchWorks ) {
-				workProcessor.executeAsync( work );
-			}
+			workProcessor.executeAsync( elasticsearchWorks );
 		}
 	}
 

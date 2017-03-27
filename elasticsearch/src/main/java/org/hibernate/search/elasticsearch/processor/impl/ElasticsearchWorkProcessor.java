@@ -95,6 +95,16 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	}
 
 	/**
+	 * Executes multiple works asynchronously, passing any exception to the error handler.
+	 */
+	public void executeAsync(Iterable<ElasticsearchWork<?>> elasticsearchWorks) {
+		// TODO HSEARCH-2652 Find a way to group works so that they share the same error context
+		for ( ElasticsearchWork<?> work : elasticsearchWorks ) {
+			executeAsync( work );
+		}
+	}
+
+	/**
 	 * Blocks until the queue of requests scheduled for asynchronous processing has been fully processed.
 	 * N.B. if more work is added to the queue in the meantime, this might delay the wait.
 	 */
@@ -111,6 +121,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 				restClient, gsonProvider, workFactory, this, errorHandler );
 
 		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
+			// TODO HSEARCH-2652 Find a way to group works so that they share the same error context
 			executeSafely( work, context );
 		}
 
