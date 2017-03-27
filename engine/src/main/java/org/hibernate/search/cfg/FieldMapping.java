@@ -17,6 +17,7 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.util.StringHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -25,13 +26,49 @@ public class FieldMapping {
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
 	private final PropertyDescriptor property;
-	private final Map<String, Object> field = new HashMap<String, Object>();
+	private final Map<String, Object> field;
 
 	public FieldMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this.mapping = mapping;
 		this.entity = entity;
 		this.property = property;
+		this.field = new HashMap<String, Object>();
 		property.addField( field );
+	}
+
+	/**
+	 * @deprecated Only provided to avoid breaking the API in {@link NumericFieldMapping}, which extends this class.
+	 * Do not extend this class, just re-implement methods.
+	 */
+	@Deprecated
+	FieldMapping(String fieldName, PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
+		this.mapping = mapping;
+		this.entity = entity;
+		this.property = property;
+		Map<String, Object> existingField = getExistingField( property, fieldName );
+		if ( existingField != null ) {
+			this.field = existingField;
+		}
+		else {
+			this.field = new HashMap<String, Object>();
+			property.addField( field );
+		}
+	}
+
+	private static Map<String, Object> getExistingField(PropertyDescriptor property, String nameOfFieldToGet) {
+		if ( nameOfFieldToGet.isEmpty() ) {
+			nameOfFieldToGet = property.getName();
+		}
+		for ( Map<String, Object> field : property.getFields() ) {
+			String fieldName = (String) field.get( "name" );
+			if ( StringHelper.isEmpty( fieldName ) ) {
+				fieldName = property.getName();
+			}
+			if ( nameOfFieldToGet.equals( fieldName ) ) {
+				return field;
+			}
+		}
+		return null;
 	}
 
 	public FieldMapping name(String fieldName) {

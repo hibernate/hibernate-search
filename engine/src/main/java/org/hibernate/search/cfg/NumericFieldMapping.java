@@ -9,6 +9,7 @@ package org.hibernate.search.cfg;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * @author Gustavo Fernandes
  */
@@ -17,15 +18,19 @@ public class NumericFieldMapping extends FieldMapping {
 	private final Map<String, Object> numericField = new HashMap<String, Object>( 2 );
 
 	/**
-	 * @deprecated Use {@link #NumericFieldMapping(String, PropertyDescriptor, EntityDescriptor, SearchMapping)} instead.
+	 * @deprecated Do not use constructors, use {@code numericField} methods in other classes from the same package.
 	 */
 	@Deprecated
 	public NumericFieldMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this( property.getName(), property, entity, mapping );
 	}
 
+	/**
+	 * @deprecated Do not use constructors, use {@code numericField} methods in other classes from the same package.
+	 */
+	@Deprecated
 	public NumericFieldMapping(String fieldName, PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
-		super( property, entity, mapping );
+		super( fieldName, property, entity, mapping );
 		numericField.put( "forField", fieldName );
 		property.addNumericField( numericField );
 	}
