@@ -10,6 +10,7 @@ The following contributors have been involved in this documentation:
  * Hardy Ferentschik
  * Gustavo Fernandes
  * Sanne Grinovero
+ * Mincong Huang
  * Nabeel Ali Memon
  * Gunnar Morling
  * Yoann Rodière
