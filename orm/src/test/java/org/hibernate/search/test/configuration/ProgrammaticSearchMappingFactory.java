@@ -14,6 +14,7 @@ import org.apache.lucene.analysis.ngram.NGramFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.FacetEncodingType;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.Index;
@@ -106,7 +107,11 @@ public class ProgrammaticSearchMappingFactory {
 						.field()
 							.store( Store.YES )
 							.numericField().precisionStep( 10 )
+							.analyze( Analyze.NO )
 							.sortableField()
+							.facet()
+								.name( "price_facet" )
+								.encoding( FacetEncodingType.DOUBLE )
 						.field()
 							.name( "price_string" )
 							.store( Store.YES )
