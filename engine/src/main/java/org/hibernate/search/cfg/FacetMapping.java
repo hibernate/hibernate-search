@@ -7,29 +7,42 @@
 package org.hibernate.search.cfg;
 
 import java.lang.annotation.ElementType;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.annotations.FacetEncodingType;
+
 /**
- * Configures a sortable field. Equivalent to {@code @SortableField}.
+ * Configures a faceting field. Equivalent to {@code @Facet}.
  *
- * @author Gunnar Morling
+ * @author Yoann Rodiere
  */
-public class SortableFieldMapping {
+public class FacetMapping {
 
 	private final String fieldName;
 	private final PropertyDescriptor property;
 	private final EntityDescriptor entity;
 	private final SearchMapping mapping;
+	private final Map<String, Object> facet = new HashMap<String, Object>();
 
-	public SortableFieldMapping(String fieldName, PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
+	public FacetMapping(String fieldName, PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this.fieldName = fieldName;
 		this.property = property;
 		this.entity = entity;
 		this.mapping = mapping;
 
-		Map<String, Object> sortableField = Collections.<String, Object>singletonMap( "forField", fieldName );
-		property.addSortableField( sortableField );
+		facet.put( "forField", fieldName );
+		property.addFacet( facet );
+	}
+
+	public FacetMapping name(String fieldName) {
+		facet.put( "name", fieldName );
+		return this;
+	}
+
+	public FacetMapping encoding(FacetEncodingType encoding) {
+		facet.put( "encoding", encoding );
+		return this;
 	}
 
 	public FieldMapping field() {
@@ -38,10 +51,6 @@ public class SortableFieldMapping {
 
 	public NumericFieldMapping numericField() {
 		return new NumericFieldMapping( fieldName, property, entity, mapping );
-	}
-
-	public FacetMapping facet() {
-		return new FacetMapping( fieldName, property, entity, mapping );
 	}
 
 	public PropertyMapping property(String name, ElementType type) {

@@ -21,6 +21,7 @@ public class PropertyDescriptor {
 	private final Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
 	private final Collection<Map<String, Object>> numericFields = new ArrayList<Map<String, Object>>();
 	private final Collection<Map<String, Object>> sortableFields = new ArrayList<Map<String, Object>>();
+	private final Collection<Map<String, Object>> facets = new ArrayList<Map<String, Object>>();
 	private Map<String, Object> dateBridge = new HashMap<String, Object>();
 	private Map<String, Object> calendarBridge = new HashMap<String, Object>();
 	private Map<String,Object> indexEmbedded;
@@ -54,6 +55,10 @@ public class PropertyDescriptor {
 		sortableFields.add( sortableField );
 	}
 
+	public void addFacet(Map<String, Object> facet) {
+		facets.add( facet );
+	}
+
 	public void setDateBridge(Map<String,Object> dateBridge) {
 		this.dateBridge = dateBridge;
 	}
@@ -75,6 +80,10 @@ public class PropertyDescriptor {
 
 	public Collection<Map<String, Object>> getSortableFields() {
 		return sortableFields;
+	}
+
+	public Collection<Map<String, Object>> getFacets() {
+		return facets;
 	}
 
 	public Map<String, Object> getDocumentId() {

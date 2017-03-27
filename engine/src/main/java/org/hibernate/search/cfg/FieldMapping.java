@@ -152,6 +152,14 @@ public class FieldMapping {
 		return new SortableFieldMapping( forField, property, entity, mapping );
 	}
 
+	public FacetMapping facet() {
+		String forField = (String) field.get( "name" );
+		if ( forField == null ) {
+			forField = property.getName();
+		}
+		return new FacetMapping( forField, property, entity, mapping );
+	}
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping( name, type, entity, mapping );
 	}
