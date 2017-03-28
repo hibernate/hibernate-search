@@ -86,6 +86,7 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 		Gson gson = context.getGsonProvider().getGson();
 		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
 		RestClient client = context.getClient();
+		long start = System.currentTimeMillis();
 		try {
 			return client.performRequest(
 					request.getMethod(),
@@ -101,6 +102,10 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 			 * Thus we ignore the exception and do our own checks afterwards.
 			 */
 			return e.getResponse();
+		}
+		finally {
+			long time = System.currentTimeMillis() - start;
+			LOG.debug( "Executed (single) in " + time + "ms: " + request.getMethod() + " " + request.getPath() + " " + request.getParameters() );
 		}
 	}
 
