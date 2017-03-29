@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import org.hibernate.search.test.integration.spring.injection.i18n.InternationalizedValue;
 import org.hibernate.search.test.integration.spring.injection.model.EntityWithSpringAwareBridges;
 import org.hibernate.search.test.integration.spring.injection.model.EntityWithSpringAwareBridgesDao;
+import org.hibernate.search.test.integration.spring.injection.search.NonSpringBridge;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -99,5 +100,17 @@ public class SpringInjectionIT {
 		assertThat( search.apply( "hello" ) ).onProperty( "id" ).isEmpty();
 		assertThat( search.apply( "hallo" ) ).onProperty( "id" ).isEmpty();
 		assertThat( search.apply( "au revoir" ) ).onProperty( "id" ).containsOnly( entity2.getId() );
+	}
+
+	@Test
+	public void nonSpringFieldBridge() {
+		Function<String, List<EntityWithSpringAwareBridges>> search = dao::searchNonSpringBridge;
+
+		assertThat( search.apply( NonSpringBridge.PREFIX + InternationalizedValue.HELLO.name() ) ).onProperty( "id" ).isEmpty();
+
+		EntityWithSpringAwareBridges entity = new EntityWithSpringAwareBridges();
+		entity.setInternationalizedValue( InternationalizedValue.HELLO );
+		dao.create( entity );
+		assertThat( search.apply( NonSpringBridge.PREFIX + InternationalizedValue.HELLO.name() ) ).onProperty( "id" ).containsOnly( entity.getId() );
 	}
 }

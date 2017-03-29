@@ -72,4 +72,19 @@ public class EntityWithSpringAwareBridgesDao {
 		FullTextQuery query = ftEntityManager.createFullTextQuery( luceneQuery, EntityWithSpringAwareBridges.class );
 		return query.getResultList();
 	}
+
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<EntityWithSpringAwareBridges> searchNonSpringBridge(String terms) {
+		FullTextEntityManager ftEntityManager = Search.getFullTextEntityManager( entityManager );
+		QueryBuilder queryBuilder = ftEntityManager.getSearchFactory().buildQueryBuilder()
+				.forEntity( EntityWithSpringAwareBridges.class ).get();
+		Query luceneQuery = queryBuilder.keyword()
+				.onField( EntityWithSpringAwareBridges.NON_SPRING_BRIDGE_FIELD_NAME )
+				.ignoreFieldBridge()
+				.matching( terms )
+				.createQuery();
+		FullTextQuery query = ftEntityManager.createFullTextQuery( luceneQuery, EntityWithSpringAwareBridges.class );
+		return query.getResultList();
+	}
 }
