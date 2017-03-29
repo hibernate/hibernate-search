@@ -23,7 +23,12 @@ public class SpringBeanResolver implements BeanResolver {
 
 	@Override
 	public <T> T resolve(Class<?> reference, Class<T> expectedClass) {
-		return expectedClass.cast( beanFactory.getBean( reference ) );
+		if ( reference.isAnnotationPresent( ResolveInHibernateSearch.class ) ) {
+			return expectedClass.cast( beanFactory.getBean( reference ) );
+		}
+		else {
+			return null;
+		}
 	}
 
 }
