@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.beanresolver.impl.ReflectionBeanResolver;
+import org.hibernate.search.engine.service.beanresolver.impl.ReflectionFallbackBeanResolver;
 import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
@@ -65,9 +66,9 @@ public class StandardServiceManager implements ServiceManager {
 		this.defaultServices = defaultServices;
 		this.classloaderService = searchConfiguration.getClassLoaderService();
 		BeanResolver configuredBeanResolver = searchConfiguration.getBeanResolver();
-		BeanResolver reflectionBeanResolver = new ReflectionBeanResolver();
+		ReflectionBeanResolver reflectionBeanResolver = new ReflectionBeanResolver();
 		if ( configuredBeanResolver != null ) {
-			this.beanResolver = configuredBeanResolver;
+			this.beanResolver = new ReflectionFallbackBeanResolver( configuredBeanResolver, reflectionBeanResolver );
 		}
 		else {
 			this.beanResolver = reflectionBeanResolver;
