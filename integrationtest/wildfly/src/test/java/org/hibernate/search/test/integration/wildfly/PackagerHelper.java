@@ -66,7 +66,6 @@ public class PackagerHelper {
 	}
 
 	public static JavaArchive[] hibernateSearchTestingLibraries() {
-		String currentVersion = Version.getVersionString();
 		return Maven.resolver()
 			.resolve( "org.hibernate:hibernate-search-testing:" + getCurrentVersion() )
 			.using( new RejectDependenciesStrategy( false, exclusions ) )
