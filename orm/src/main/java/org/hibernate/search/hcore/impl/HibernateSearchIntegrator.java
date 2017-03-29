@@ -17,6 +17,7 @@ import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
+import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
 import org.hibernate.search.hcore.spi.BeanResolver;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -49,15 +50,18 @@ public class HibernateSearchIntegrator implements Integrator {
 		registerHibernateSearchEventListener( fullTextIndexEventListener, serviceRegistry );
 
 		ClassLoaderService hibernateOrmClassLoaderService = serviceRegistry.getService( ClassLoaderService.class );
+		ServiceBinding<EnvironmentSynchronizer> environmentSynchronizerBinding = serviceRegistry.locateServiceBinding( EnvironmentSynchronizer.class );
 		ServiceBinding<BeanResolver> hibernateOrmBeanResolverBinding = serviceRegistry.locateServiceBinding( BeanResolver.class );
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
 				metadata,
 				configurationService,
 				fullTextIndexEventListener,
 				hibernateOrmClassLoaderService,
+				environmentSynchronizerBinding == null ? null : serviceRegistry.getService( EnvironmentSynchronizer.class ),
 				hibernateOrmBeanResolverBinding == null ? null : serviceRegistry.getService( BeanResolver.class ),
 				namingService
 		);
+
 		sessionFactory.addObserver( observer );
 	}
 
