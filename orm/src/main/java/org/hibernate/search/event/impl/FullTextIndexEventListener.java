@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
@@ -70,7 +71,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	private boolean disabled;
 	private boolean skipDirtyChecks = true;
-	private ExtendedSearchIntegrator extendedIntegrator;
+	private volatile CompletableFuture<ExtendedSearchIntegrator> extendedIntegratorFuture;
 
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
 	// transient because it's not serializable (and state doesn't need to live longer than a flush).
@@ -170,7 +171,13 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	}
 
 	public ExtendedSearchIntegrator getExtendedSearchFactoryIntegrator() {
-		return extendedIntegrator;
+		final CompletableFuture<ExtendedSearchIntegrator> value = this.extendedIntegratorFuture;
+		if ( value != null ) {
+			return value.join();
+		}
+		else {
+			throw log.searchIntegratorNotInitialized();
+		}
 	}
 
 	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
@@ -192,11 +199,13 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	/**
 	 * Initialize method called by Hibernate Core when the SessionFactory starts.
-	 * @param extendedIntegrator the {@link ExtendedSearchIntegrator}
+	 * @param extendedIntegratorFuture a completable future that will eventually hold the {@link ExtendedSearchIntegrator}
 	 */
-	public void initialize(ExtendedSearchIntegrator extendedIntegrator) {
-		this.extendedIntegrator = extendedIntegrator;
+	public void initialize(CompletableFuture<ExtendedSearchIntegrator> extendedIntegratorFuture) {
+		this.extendedIntegratorFuture = extendedIntegratorFuture.thenApply( this::doInitialize );
+	}
 
+	private ExtendedSearchIntegrator doInitialize(ExtendedSearchIntegrator extendedIntegrator) {
 		if ( extendedIntegrator.getIndexingMode() == IndexingMode.EVENT ) {
 			disabled = extendedIntegrator.getIndexBindings().size() == 0;
 		}
@@ -210,6 +219,8 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 			skipDirtyChecks = !extendedIntegrator.isDirtyChecksEnabled();
 			log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
 		}
+
+		return extendedIntegrator;
 	}
 
 	/**
@@ -230,7 +241,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	protected void processWork(String tenantIdentifier, Object entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {
 		Work work = new Work( tenantIdentifier, entity, id, workType, identifierRollbackEnabled );
 		final EventSourceTransactionContext transactionContext = new EventSourceTransactionContext( event.getSession() );
-		extendedIntegrator.getWorker().performWork( work, transactionContext );
+		getExtendedSearchFactoryIntegrator().getWorker().performWork( work, transactionContext );
 	}
 
 	protected void processCollectionEvent(AbstractCollectionEvent event) {
@@ -307,13 +318,14 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	 * @return the {@code DocumentBuilder} for the specified object
 	 */
 	protected AbstractDocumentBuilder getDocumentBuilder(final Object instance) {
+		ExtendedSearchIntegrator integrator = getExtendedSearchFactoryIntegrator();
 		Class<?> clazz = instance.getClass();
-		EntityIndexBinding entityIndexBinding = extendedIntegrator.getIndexBinding( clazz );
+		EntityIndexBinding entityIndexBinding = integrator.getIndexBinding( clazz );
 		if ( entityIndexBinding != null ) {
 			return entityIndexBinding.getDocumentBuilder();
 		}
 		else {
-			return extendedIntegrator.getDocumentBuilderContainedEntity( clazz );
+			return integrator.getDocumentBuilderContainedEntity( clazz );
 		}
 	}
 
