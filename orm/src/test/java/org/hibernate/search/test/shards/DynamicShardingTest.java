@@ -17,8 +17,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -28,15 +33,20 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.hcore.impl.HibernateSessionFactoryService;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProviderTemplate;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,13 +85,13 @@ public class DynamicShardingTest extends SearchTestBase {
 		EntityIndexBinding entityIndexBinding = getExtendedSearchIntegrator().getIndexBindings().get( Animal.class );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 0 );
 
-		insertAnimals( elephant );
+		insert( elephant );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 1 );
 
-		insertAnimals( spider );
+		insert( spider );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 
-		insertAnimals( bear );
+		insert( bear );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 
 		assertEquals( 2, getNumberOfDocumentsInIndex( "Animal.Mammal" ) );
@@ -90,7 +100,7 @@ public class DynamicShardingTest extends SearchTestBase {
 
 	@Test
 	public void testDynamicShardsAreTargetingInQuery() throws Exception {
-		insertAnimals( elephant, spider, bear );
+		insert( elephant, spider, bear );
 
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
@@ -108,7 +118,7 @@ public class DynamicShardingTest extends SearchTestBase {
 		EntityIndexBinding entityIndexBinding = getExtendedSearchIntegrator().getIndexBindings().get( Animal.class );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 0 );
 
-		insertAnimals( elephant, spider, bear );
+		insert( elephant, spider, bear );
 
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 
@@ -117,7 +127,7 @@ public class DynamicShardingTest extends SearchTestBase {
 
 	@Test
 	public void testDeletion() throws Exception {
-		insertAnimals( elephant, spider, bear );
+		insert( elephant, spider, bear );
 
 		assertEquals( 2, getNumberOfDocumentsInIndex( "Animal.Mammal" ) );
 		assertEquals( 1, getNumberOfDocumentsInIndex( "Animal.Insect" ) );
@@ -126,6 +136,18 @@ public class DynamicShardingTest extends SearchTestBase {
 
 		assertEquals( 1, getNumberOfDocumentsInIndex( "Animal.Mammal" ) );
 		assertEquals( 1, getNumberOfDocumentsInIndex( "Animal.Insect" ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2662")
+	public void testQueryWhenEmpty() throws Exception {
+		HSQuery query = getExtendedSearchIntegrator().createHSQuery( new MatchAllDocsQuery(), Animal.class );
+		assertEquals( 0, query.queryResultSize() );
+
+		SomeOtherEntity someOtherIndexedObject = new SomeOtherEntity();
+		insert( someOtherIndexedObject );
+
+		assertEquals( 0, query.queryResultSize() );
 	}
 
 	@Override
@@ -141,24 +163,24 @@ public class DynamicShardingTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
-				Animal.class
+				Animal.class, SomeOtherEntity.class
 		};
 	}
 
-	private void insertAnimals(Animal... animals) {
+	private void insert(Object... entities) {
 		try ( Session session = openSession() ) {
 			Transaction tx = session.beginTransaction();
-			for ( Animal animal : animals ) {
-				session.persist( animal );
+			for ( Object entity : entities ) {
+				session.persist( entity );
 			}
 			tx.commit();
 		}
 	}
 
-	private void deleteAnimal(Animal animal) {
+	private void deleteAnimal(Object entity) {
 		try (Session session = openSession()) {
 			Transaction tx = session.beginTransaction();
-			session.delete( animal );
+			session.delete( entity );
 			tx.commit();
 		}
 	}
@@ -184,6 +206,19 @@ public class DynamicShardingTest extends SearchTestBase {
 				ExtendedSearchIntegrator integrator = fullTextSession.getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
 				return integrator.getIndexBindings().get( Animal.class ).getIndexManagers();
 			}
+		}
+	}
+
+	@Indexed
+	@Entity
+	private static class SomeOtherEntity {
+		@DocumentId
+		@Field(name = "idField")
+		@Id
+		@GeneratedValue
+		private Integer id;
+
+		protected SomeOtherEntity() {
 		}
 	}
 
