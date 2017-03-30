@@ -16,6 +16,10 @@ import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 
@@ -84,6 +88,51 @@ final class Helper {
 			stream.close();
 		}
 		return terms;
+	}
+
+	static boolean requiresNumericQuery(DocumentBuilderIndexedEntity documentBuilder, FieldContext fieldContext, Object ... searchedValues) {
+		String fieldName = fieldContext.getField();
+
+		FieldBridge overriddenFieldBridge = fieldContext.getFieldBridge();
+
+		/*
+		 * If using the original field bridge, rely on metadata (if any).
+		 *
+		 * It would be more logical to use metadata in any case, but we actually have
+		 * some bridges that do not abide by metadata.
+		 * For instance some bridges index string values for numeric fields when
+		 * they encounter null values (see ), and we want to allow users to
+		 * query those values. Thus ignoreFieldBridge() provides users with
+		 * a way to disable metadata inspection...
+		 */
+		if ( overriddenFieldBridge == null && !fieldContext.isIgnoreFieldBridge() ) {
+			DocumentFieldMetadata metadata = documentBuilder.getMetadata().getDocumentFieldMetadataFor( fieldName );
+			if ( metadata != null ) {
+				return metadata.isNumeric();
+			}
+
+			// We may have a field bridge, but no metadata, in particular for null embeddeds
+			FieldBridge bridge = documentBuilder.getBridge( fieldName );
+			if ( bridge != null ) {
+				return NumericFieldUtils.isNumericFieldBridge( bridge );
+			}
+		}
+
+		// If using an overridden field bridge, guess numeric-ness from this bridge.
+		if ( overriddenFieldBridge != null ) {
+			return NumericFieldUtils.isNumericFieldBridge( overriddenFieldBridge );
+		}
+
+		// If the above wasn't conclusive, guess from the given value
+		if ( searchedValues != null ) {
+			for ( Object searchedValue : searchedValues ) {
+				if ( NumericFieldUtils.requiresNumericRangeQuery( searchedValue ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 }

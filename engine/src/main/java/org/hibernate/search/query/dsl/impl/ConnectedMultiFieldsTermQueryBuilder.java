@@ -89,7 +89,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		// Handle non-null numeric values
 		if ( value != null ) {
 			applyTokenization = fieldContext.applyAnalyzer();
-			if ( NumericFieldUtils.isNumericFieldBridge( fieldBridge ) ) {
+			if ( Helper.requiresNumericQuery( documentBuilder, fieldContext, value ) ) {
 				return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
 			}
 		}
