@@ -1,5 +1,4 @@
 = Hibernate Search {hibernateSearchVersion}: Reference Guide
-Emmanuel Bernard; Hardy Ferentschik; Gustavo Fernandes; Sanne Grinovero; Nabeel Ali Memon; Gunnar Morling; Yoann Rodière; Guillaume Smet
 :doctype: book
 :revdate: {docdate}
 :sectanchors:
@@ -35,3 +34,5 @@ include::advanced-features.asciidoc[]
 include::elasticsearch-integration.asciidoc[]
 
 include::further-reading.asciidoc[]
+
+include::credits.asciidoc[]

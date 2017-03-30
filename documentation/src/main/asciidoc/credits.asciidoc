@@ -1,0 +1,16 @@
+[[credits]]
+== Credits
+
+The full list of contributors to Hibernate Search can be found in the `copyright.txt` file in the Hibernate Search sources,
+available in particular in our https://github.com/hibernate/hibernate-search/blob/master/copyright.txt[git repository].
+
+The following contributors have been involved in this documentation:
+
+ * Emmanuel Bernard
+ * Hardy Ferentschik
+ * Gustavo Fernandes
+ * Sanne Grinovero
+ * Nabeel Ali Memon
+ * Gunnar Morling
+ * Yoann Rodière
+ * Guillaume Smet
