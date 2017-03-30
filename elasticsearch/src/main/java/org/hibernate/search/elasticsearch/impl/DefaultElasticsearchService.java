@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.impl;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientImplementor;
@@ -33,6 +34,7 @@ import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
 /**
  * Provides access to the JEST client.
@@ -47,6 +49,10 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	 * we currently only have a single client for all index managers.
 	 */
 	private static final String CLIENT_SCOPE_NAME = "default";
+
+	private static final String QUERY_PROPERTIES_PREFIX = "hibernate.search.";
+
+	private ElasticsearchQueryOptions queryOptions;
 
 	private ElasticsearchClient client;
 
@@ -71,6 +77,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public void start(Properties properties, BuildContext context) {
 		ServiceManager serviceManager = context.getServiceManager();
+
+		this.queryOptions = createQueryOptions( properties );
 
 		ElasticsearchClientImplementor clientImplementor;
 		try ( ServiceReference<ElasticsearchClientFactory> clientFactory =
@@ -162,5 +170,59 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public MissingValueStrategy getMissingValueStrategy() {
 		return missingValueStrategy;
+	}
+
+	@Override
+	public ElasticsearchQueryOptions getQueryOptions() {
+		return queryOptions;
+	}
+
+	private ElasticsearchQueryOptions createQueryOptions(Properties properties) {
+		String scrollTimeout = ConfigurationParseHelper.getIntValue(
+				properties,
+				QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_TIMEOUT,
+				ElasticsearchEnvironment.Defaults.SCROLL_TIMEOUT
+				) + "s";
+		int scrollFetchSize = ConfigurationParseHelper.getIntValue(
+				properties,
+				QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_FETCH_SIZE,
+				ElasticsearchEnvironment.Defaults.SCROLL_FETCH_SIZE
+				);
+		int scrollBacktrackingWindowSize = ConfigurationParseHelper.getIntValue(
+				properties,
+				QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_BACKTRACKING_WINDOW_SIZE,
+				ElasticsearchEnvironment.Defaults.SCROLL_BACKTRACKING_WINDOW_SIZE
+				);
+
+		return new ElasticsearchQueryOptionsImpl( scrollTimeout, scrollFetchSize, scrollBacktrackingWindowSize );
+	}
+
+	private static class ElasticsearchQueryOptionsImpl implements ElasticsearchQueryOptions {
+		private final String scrollTimeout;
+		private final int scrollFetchSize;
+		private final int scrollBacktrackingWindowSize;
+
+		public ElasticsearchQueryOptionsImpl(String scrollTimeout, int scrollFetchSize, int scrollBacktrackingWindowSize) {
+			super();
+			this.scrollTimeout = scrollTimeout;
+			this.scrollFetchSize = scrollFetchSize;
+			this.scrollBacktrackingWindowSize = scrollBacktrackingWindowSize;
+		}
+
+		@Override
+		public String getScrollTimeout() {
+			return scrollTimeout;
+		}
+
+		@Override
+		public int getScrollFetchSize() {
+			return scrollFetchSize;
+		}
+
+		@Override
+		public int getScrollBacktrackingWindowSize() {
+			return scrollBacktrackingWindowSize;
+		}
+
 	}
 }
