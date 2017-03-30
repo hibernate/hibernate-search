@@ -164,7 +164,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public DocumentExtractor queryDocumentExtractor() {
-		return new ElasticsearchScrollAPIDocumentExtractor();
+		IndexSearcher searcher = getOrCreateSearcher();
+		if ( searcher != null ) {
+			return new ElasticsearchScrollAPIDocumentExtractor( searcher );
+		}
+		else {
+			return EmptyDocumentExtractor.get();
+		}
 	}
 
 	SearchResult getSearchResult() {
@@ -279,46 +285,84 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	private void execute() {
-		searcher = new IndexSearcher();
-
-		searchResult = searcher.search();
+		searcher = getOrCreateSearcher();
+		if ( searcher != null ) {
+			searchResult = searcher.search();
+		}
+		else {
+			searchResult = EmptySearchResult.get();
+		}
 		resultSize = searchResult.getTotalHitCount();
+	}
+
+	private IndexSearcher getOrCreateSearcher() {
+		if ( searcher != null ) {
+			return searcher;
+		}
+
+		Map<String, Class<?>> entityTypesByName = new HashMap<>();
+		Set<String> indexNames = new HashSet<>();
+		Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
+
+		for ( Class<?> queriedEntityType : queriedEntityTypes ) {
+			entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
+
+			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
+			IndexManager[] indexManagers = binding.getIndexManagers();
+
+			for ( IndexManager indexManager : indexManagers ) {
+				if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
+					throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
+						queriedEntityType,
+						rawSearchPayload.toString()
+					);
+				}
+
+				ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
+				indexNames.add( esIndexManager.getActualIndexName() );
+			}
+		}
+
+		if ( indexNames.isEmpty() ) {
+			/*
+			 * In this case we cannot send a request to Elasticsearch,
+			 * because by default it will query all indexes.
+			 */
+			return null;
+		}
+
+		this.searcher = new IndexSearcher( entityTypesByName, indexNames );
+		return searcher;
+	}
+
+	private Iterable<Class<?>> getQueriedEntityTypes() {
+		if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
+			return extendedIntegrator.getIndexBindings().keySet();
+		}
+		else {
+			return indexedTargetedEntities;
+		}
 	}
 
 	/**
 	 * Stores all information required to execute the query: query string, relevant indices, query parameters, ...
 	 */
 	private class IndexSearcher {
+		private final Map<String, Class<?>> entityTypesByName;
+		private final Set<String> indexNames;
+
 		private final ElasticsearchQueryOptions queryOptions;
-		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
 		private final Map<Class<?>, FieldProjection> idProjectionByEntityType = new HashMap<>();
 		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
-		private final Set<String> indexNames = new HashSet<>();
 		private final JsonObject payload;
 
-		private IndexSearcher() {
+		private IndexSearcher(Map<String, Class<?>> entityTypesByName, Set<String> indexNames) {
+			this.entityTypesByName = entityTypesByName;
+			this.indexNames = indexNames;
+
 			JsonArray typeFilters = new JsonArray();
-			Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
-
-			for ( Class<?> queriedEntityType : queriedEntityTypes ) {
-				entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
-
-				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
-				IndexManager[] indexManagers = binding.getIndexManagers();
-
-				for ( IndexManager indexManager : indexManagers ) {
-					if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
-						throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
-							queriedEntityType,
-							rawSearchPayload.toString()
-						);
-					}
-
-					ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
-					indexNames.add( esIndexManager.getActualIndexName() );
-				}
-
-				typeFilters.add( getEntityTypeFilter( queriedEntityType ) );
+			for ( String typeName : entityTypesByName.keySet() ) {
+				typeFilters.add( getEntityTypeFilter( typeName ) );
 			}
 
 			try ( ServiceReference<ElasticsearchService> elasticsearchService =
@@ -404,9 +448,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return JsonBuilder.object().add( "bool", boolBuilder.build() ).build();
 		}
 
-		private JsonObject getEntityTypeFilter(Class<?> queriedEntityType) {
+		private JsonObject getEntityTypeFilter(String name) {
 			JsonObject value = new JsonObject();
-			value.addProperty( "value", queriedEntityType.getName() );
+			value.addProperty( "value", name );
 
 			JsonObject type = new JsonObject();
 			type.add( "type", value );
@@ -426,15 +470,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			tenantFilter.add( "term", value );
 
 			return tenantFilter;
-		}
-
-		private Iterable<Class<?>> getQueriedEntityTypes() {
-			if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
-				return extendedIntegrator.getIndexBindings().keySet();
-			}
-			else {
-				return indexedTargetedEntities;
-			}
 		}
 
 		private void addProjections(JsonBuilder.Object payloadBuilder) {
@@ -1167,8 +1202,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private Integer totalResultCount;
 		private final Window<EntityInfo> results;
 
-		private ElasticsearchScrollAPIDocumentExtractor() {
-			searcher = new IndexSearcher();
+		private ElasticsearchScrollAPIDocumentExtractor(IndexSearcher searcher) {
+			this.searcher = searcher;
 			queryIndexLimit = ElasticsearchHSQueryImpl.this.maxResults == null
 					? null : ElasticsearchHSQueryImpl.this.firstResult + ElasticsearchHSQueryImpl.this.maxResults;
 			ElasticsearchQueryOptions queryOptions = searcher.getQueryOptions();
