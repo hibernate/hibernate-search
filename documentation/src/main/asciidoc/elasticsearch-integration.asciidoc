@@ -64,11 +64,47 @@ Hibernate Search connects to an Elasticsearch node but does not provide one.
 
 One option is to use the https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html[Elasticsearch Docker image] (see https://hub.docker.com/r/library/elasticsearch/[here for Elasticsearch 2]).
 
-[NOTE]
-.Elasticsearch version
---
-Hibernate Search expects an Elasticsearch cluster running version 2.x or 5.x.
+==== Elasticsearch version
 
+Hibernate Search expects an Elasticsearch cluster running version 2.x or 5.x.
+The version running on your cluster will be automatically detected on startup,
+and Hibernate Search will adapt its behavior based on the detected version.
+
+When upgrading your Elasticsearch cluster though, some
+https://www.elastic.co/guide/en/elasticsearch/reference/5.0/setup-upgrade.html[administrative tasks]
+are still required on your cluster: Hibernate Search will not take care of those.
+
+[WARNING]
+--
+Due to https://hibernate.atlassian.net/browse/HSEARCH-2605[HSEARCH-2605],
+if you use the `VALIDATE` or `MERGE` schema management strategy
+and upgrade your cluster from 2.x to 5.x,
+you will need to delete your indexes manually and <<search-batchindex,reindex your data>>.
+--
+
+The targeted version is largely transparent to Hibernate Search users,
+but there are a few differences in how Hibernate Search behaves depending
+on the Elasticsearch version that may affect you.
+The table details those differences.
+
+[cols="h,2*",options="header"]
+|===============
+||2.x|5.x
+|Configuration required for purges|<<elasticsearch-integration-server-configuration,Enable the delete-by-query plugin>>|None
+|Datatype used for text fields in Elasticsearch|`string`|`text` (if analyzed) or `keyword` (if not).
+The string datatype https://www.elastic.co/guide/en/elasticsearch/reference/5.0/string.html[has been deprecated in Elasticsearch 5.0].
+|<<field-annotation-norms,Norms>>|Not implemented|Implemented
+|Implementation of <<field-annotation-indexNullAs,`@Field.indexNullAs`>> for analyzed text fields
+ |https://www.elastic.co/guide/en/elasticsearch/reference/2.4/null-value.html[`null_value`] is added to the mapping,
+  `null` values are indexed as such.
+ |https://www.elastic.co/guide/en/elasticsearch/reference/5.0/null-value.html[`null_value`] is not available for `text` fields,
+  null values are replaced with the `indexNullAs` value explicitly when indexing.
+|===============
+
+
+
+[NOTE]
+--
 Hibernate Search internal tests run against Elasticsearch {testElasticsearchVersion} by default.
 --
 
@@ -96,11 +132,11 @@ Hibernate Search can work with an Elasticsearch server without altering its conf
 
 However some features offered by Hibernate Search require specific configuration:
 
-* if you want to be able to use the Hibernate Search <<search-batchindex-massindexer,MassIndexer>>
-with `purgeAllOnStart` enabled - which is enabled by default -, or to use `FullTextSession.purge()` or `FullTextSession.purgeAll()`,
-  install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query` plugin]
+* on Elasticsearch 2.x only (not necessary on 5.x): if you want to be able to use the Hibernate Search <<search-batchindex-massindexer,MassIndexer>>
+with `purgeAllOnStart` enabled - it is enabled by default -, or to use `FullTextSession.purge()` or `FullTextSession.purgeAll()`,
+install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query` plugin]
 * if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
-  see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
+see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
 * if you want to use paging (as opposed to <<elasticsearch-scrolling,scrolling>>) on result sets larger than 10000 elements
 (for instance access the 10001st result),
 you may increase the value of the `index.max_result_window` property (default is 10000).
