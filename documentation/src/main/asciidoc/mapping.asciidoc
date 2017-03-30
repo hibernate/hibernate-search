@@ -78,7 +78,7 @@ The following attributes of the `@Field` annotation help you control the indexin
 * `name`: describes under which name the property should be stored in the Lucene Document. The
 default value is the property name (following the JavaBeans convention)
 
-* `store`: describes whether or not the property is stored in the Lucene index. You can store the
+* [[field-annotation-store]]`store`: describes whether or not the property is stored in the Lucene index. You can store the
 value `Store.YES` (consuming more space in the index but allowing <<projections, projection>>),
 store it in a compressed way `Store.COMPRESS` (this does consume more CPU), or avoid any storage
 `Store.NO` (this is the default value). When a property is stored, you can retrieve its original
@@ -111,7 +111,7 @@ field.
 Fields used for sorting or faceting _must not_ be analyzed.
 ====
 
-* `norms`: describes whether index time boosting information should be stored (`Norms.YES`) or
+* [[field-annotation-norms]]`norms`: describes whether index time boosting information should be stored (`Norms.YES`) or
 not (`Norms.NO`). Not storing the norms can save a considerable amount of memory, but index time
 boosting will not be available in this case. The default value is `Norms.YES`.
 
@@ -140,7 +140,7 @@ The different values of this attribute are:
                     `WITH_OFFSETS` and `WITH_POSITIONS`.
 |===============
 
-* `indexNullAs`: Per default null values are ignored and not indexed. However, using `indexNullAs`
+* [[field-annotation-indexNullAs]]`indexNullAs`: Per default null values are ignored and not indexed. However, using `indexNullAs`
 you can specify a string which will be inserted as token for the null value. Per default this value
 is set to `org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL` indicating that null values
 should not be indexed. You can set this value to `DEFAULT_NULL_TOKEN` to indicate that a default null
