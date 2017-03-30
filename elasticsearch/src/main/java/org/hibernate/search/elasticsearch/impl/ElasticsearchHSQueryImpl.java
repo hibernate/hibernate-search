@@ -337,7 +337,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	private Iterable<Class<?>> getQueriedEntityTypes() {
 		if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
-			return extendedIntegrator.getIndexBindings().keySet();
+			Set<Class<?>> indexBindings = extendedIntegrator.getIndexBindings().keySet();
+			if ( indexBindings.isEmpty() ) {
+				throw LOG.queryWithNoIndexedType();
+			}
+			return indexBindings;
 		}
 		else {
 			return indexedTargetedEntities;

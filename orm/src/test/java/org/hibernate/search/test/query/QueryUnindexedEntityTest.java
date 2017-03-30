@@ -49,7 +49,7 @@ public class QueryUnindexedEntityTest extends SearchTestBase {
 			fail();
 		}
 		catch (SearchException e) {
-			assertTrue( "Wrong message", e.getMessage().startsWith( "There are no mapped entities" ) );
+			assertTrue( "Wrong message", e.getMessage().contains( "Cannot query: there aren't any mapped entity" ) );
 		}
 
 		tx.rollback();
