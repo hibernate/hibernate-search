@@ -18,6 +18,7 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata.Builder;
 import org.hibernate.search.engine.nulls.codec.impl.NotEncodingCodec;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 
@@ -212,7 +213,7 @@ public class DocumentFieldMetadata implements PartialDocumentFieldMetadata {
 		private final PartialPropertyMetadata partialSourceProperty;
 		private final DocumentFieldPath path;
 		private final Store store;
-		private final Field.Index index;
+		private Field.Index index;
 		private final Field.TermVector termVector;
 
 		// optional parameters
@@ -268,6 +269,11 @@ public class DocumentFieldMetadata implements PartialDocumentFieldMetadata {
 		@Override
 		public Index getIndex() {
 			return index;
+		}
+
+		public Builder index(Index index) {
+			this.index = index;
+			return this;
 		}
 
 		public Builder fieldBridge(FieldBridge fieldBridge) {
