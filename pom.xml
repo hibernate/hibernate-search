@@ -1574,7 +1574,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             </activation>
             <properties>
                 <testElasticsearchMavenPluginVersion>5.7</testElasticsearchMavenPluginVersion>
-                <testElasticsearchVersion>5.2.1</testElasticsearchVersion>
+                <testElasticsearchVersion>5.3.0</testElasticsearchVersion>
             </properties>
             <build>
                 <pluginManagement>
