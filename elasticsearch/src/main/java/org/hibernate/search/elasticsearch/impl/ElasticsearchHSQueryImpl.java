@@ -38,7 +38,6 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
-import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
@@ -74,7 +73,6 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.DistanceSortField;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -104,8 +102,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	 * ES default limit for (firstResult + maxResult)
 	 */
 	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
-
-	private static final String QUERY_PROPERTIES_PREFIX = "hibernate.search.";
 
 	private static final Set<String> SUPPORTED_PROJECTION_CONSTANTS = Collections.unmodifiableSet(
 			CollectionHelper.asSet(
@@ -298,6 +294,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	 * Stores all information required to execute the query: query string, relevant indices, query parameters, ...
 	 */
 	private class IndexSearcher {
+		private final ElasticsearchQueryOptions queryOptions;
 		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
 		private final Map<Class<?>, FieldProjection> idProjectionByEntityType = new HashMap<>();
 		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
@@ -327,6 +324,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 
 				typeFilters.add( getEntityTypeFilter( queriedEntityType ) );
+			}
+
+			try ( ServiceReference<ElasticsearchService> elasticsearchService =
+					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchService.class ) ) {
+				this.queryOptions = elasticsearchService.get().getQueryOptions();
 			}
 
 			// Query filters; always a type filter, possibly a tenant id filter;
@@ -680,8 +682,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							 * We still reduce the number of results in accordance to "maxResults", but that's done on our side
 							 * in the document extractor.
 							 */
-							getScrollFetchSize(),
-							getScrollTimeout()
+							getQueryOptions().getScrollFetchSize(),
+							getQueryOptions().getScrollTimeout()
 					);
 				}
 				else {
@@ -698,28 +700,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 
-		private String getScrollTimeout() {
-			return ConfigurationParseHelper.getIntValue(
-					getExtendedSearchIntegrator().getConfigurationProperties(),
-					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_TIMEOUT,
-					ElasticsearchEnvironment.Defaults.SCROLL_TIMEOUT
-					) + "s";
-		}
-
-		private int getScrollFetchSize() {
-			return ConfigurationParseHelper.getIntValue(
-					getExtendedSearchIntegrator().getConfigurationProperties(),
-					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_FETCH_SIZE,
-					ElasticsearchEnvironment.Defaults.SCROLL_FETCH_SIZE
-					);
-		}
-
-		private int getScrollBacktrackingWindowSize() {
-			return ConfigurationParseHelper.getIntValue(
-					getExtendedSearchIntegrator().getConfigurationProperties(),
-					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_BACKTRACKING_WINDOW_SIZE,
-					ElasticsearchEnvironment.Defaults.SCROLL_BACKTRACKING_WINDOW_SIZE
-					);
+		private ElasticsearchQueryOptions getQueryOptions() {
+			return queryOptions;
 		}
 
 		/**
@@ -728,8 +710,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		SearchResult scroll(String scrollId) {
 			try ( ServiceReference<ElasticsearchService> elasticsearchService =
 					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchService.class ) ) {
+				ElasticsearchQueryOptions queryOptions = getQueryOptions();
 				ElasticsearchWork<SearchResult> work = elasticsearchService.get().getWorkFactory()
-						.scroll( scrollId, getScrollTimeout() ).build();
+						.scroll( scrollId, queryOptions.getScrollTimeout() ).build();
 				return elasticsearchService.get().getWorkProcessor().executeSyncUnsafe( work );
 			}
 		}
@@ -1194,6 +1177,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			searcher = new IndexSearcher();
 			queryIndexLimit = ElasticsearchHSQueryImpl.this.maxResults == null
 					? null : ElasticsearchHSQueryImpl.this.firstResult + ElasticsearchHSQueryImpl.this.maxResults;
+			ElasticsearchQueryOptions queryOptions = searcher.getQueryOptions();
 			results = new Window<>(
 					/*
 					 * The offset is currently ignored by Elasticsearch.
@@ -1207,7 +1191,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					 * give access to the result just after the previously fetched results, and
 					 * we still need to keep enough of the previous elements to backtrack.
 					 */
-					searcher.getScrollBacktrackingWindowSize() + searcher.getScrollFetchSize()
+					queryOptions.getScrollBacktrackingWindowSize() + queryOptions.getScrollFetchSize()
 					);
 		}
 
@@ -1217,7 +1201,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				throw new IndexOutOfBoundsException( "Index must be >= 0" );
 			}
 			else if ( index < results.start() ) {
-				throw LOG.backtrackingWindowOverflow( searcher.getScrollBacktrackingWindowSize(), results.start(), index );
+				throw LOG.backtrackingWindowOverflow( searcher.getQueryOptions().getScrollBacktrackingWindowSize(), results.start(), index );
 			}
 
 			if ( totalResultCount == null ) {
