@@ -188,11 +188,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			execute();
 		}
 
-		JsonObject hit = searchResult.getJsonObject()
-				.get( "hits" )
-				.getAsJsonObject()
-				.get( "hits" )
-				.getAsJsonArray()
+		JsonObject hit = searchResult.getHits()
 				// TODO Is it right to use the document id that way? I am not quite clear about its semantics
 				.get( documentId )
 				.getAsJsonObject();
@@ -264,12 +260,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			execute();
 		}
 
-		JsonObject searchResultJsonObject = searchResult.getJsonObject();
-		JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+		JsonArray hits = searchResult.getHits();
 		List<EntityInfo> results = new ArrayList<>( hits.size() );
 
 		for ( JsonElement hit : hits ) {
-			EntityInfo entityInfo = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
+			EntityInfo entityInfo = searcher.convertQueryHit( searchResult, hit.getAsJsonObject() );
 			if ( entityInfo != null ) {
 				results.add( entityInfo );
 			}
@@ -726,7 +721,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 
-		EntityInfo convertQueryHit(JsonObject searchResult, JsonObject hit) {
+		EntityInfo convertQueryHit(SearchResult searchResult, JsonObject hit) {
 			String type = hit.get( "_type" ).getAsString();
 			Class<?> clazz = entityTypesByName.get( type );
 
@@ -801,10 +796,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							}
 							break;
 						case ElasticsearchProjectionConstants.TOOK:
-							projections[i] = searchResult.get( "took" ).getAsInt();
+							projections[i] = searchResult.getTook();
 							break;
 						case ElasticsearchProjectionConstants.TIMED_OUT:
-							projections[i] = searchResult.get( "timed_out" ).getAsBoolean();
+							projections[i] = searchResult.getTimedOut();
 							break;
 						case ElasticsearchProjectionConstants.THIS:
 							// Use EntityInfo.ENTITY_PLACEHOLDER as placeholder.
@@ -1020,11 +1015,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	@Override
 	protected void extractFacetResults() {
 		SearchResult searchResult = getSearchResult();
-		JsonElement aggregationsElement = searchResult.getJsonObject().get( "aggregations" );
-		if ( aggregationsElement == null ) {
+		JsonObject aggregations = searchResult.getAggregations();
+		if ( aggregations == null ) {
 			return;
 		}
-		JsonObject aggregations = aggregationsElement.getAsJsonObject();
 
 		Map<String, List<Facet>> results = new HashMap<>();
 		for ( FacetingRequest facetRequest : getFacetManager().getFacetRequests().values() ) {
@@ -1278,12 +1272,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		 * @return {@code true} if at least one result was fetched, {@code false} otherwise.
 		 */
 		private boolean extractWindow(SearchResult searchResult) {
-			JsonObject searchResultJsonObject = searchResult.getJsonObject();
 			boolean fetchedAtLeastOne = false;
-			scrollId = searchResultJsonObject.get( "_scroll_id" ).getAsString();
-			JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+			scrollId = searchResult.getScrollId();
+			JsonArray hits = searchResult.getHits();
 			for ( JsonElement hit : hits ) {
-				EntityInfo converted = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
+				EntityInfo converted = searcher.convertQueryHit( searchResult, hit.getAsJsonObject() );
 				if ( converted != null ) {
 					results.add( converted );
 					fetchedAtLeastOne = true;

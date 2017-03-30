@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 /**
@@ -13,8 +14,16 @@ import com.google.gson.JsonObject;
  */
 public interface SearchResult {
 
-	JsonObject getJsonObject();
+	JsonArray getHits();
 
 	int getTotalHitCount();
+
+	JsonObject getAggregations();
+
+	int getTook();
+
+	boolean getTimedOut();
+
+	String getScrollId();
 
 }
