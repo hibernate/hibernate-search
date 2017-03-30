@@ -68,7 +68,11 @@ public class Month {
 			@Field(analyze = Analyze.NO,
 					norms = Norms.NO,
 					name = "monthRomanNumber",
-					bridge = @FieldBridge(impl = RomanNumberFieldBridge.class))
+					bridge = @FieldBridge(impl = RomanNumberFieldBridge.class)),
+			@Field(analyze = Analyze.NO,
+					norms = Norms.NO,
+					name = "monthBase0",
+					bridge = @FieldBridge(impl = MonthBase0FieldBridge.class))
 	})
 	public int getMonthValue() {
 		return monthValue;

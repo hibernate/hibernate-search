@@ -739,6 +739,46 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2656")
+	public void testNumericRangeQueryWithFieldTypeOverriddenByFieldBridge() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb
+				.range()
+					.onField( "monthBase0" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.below( 1 ).excludeLimit()
+					.createQuery();
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "January", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		transaction.commit();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2656")
+	public void testNumericQueryWithFieldTypeOverriddenByFieldBridge() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb
+				.keyword()
+					.onField( "monthBase0" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.matching( 0 )
+					.createQuery();
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "January", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		transaction.commit();
+	}
+
+	@Test
 	public void testPhraseQuery() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
