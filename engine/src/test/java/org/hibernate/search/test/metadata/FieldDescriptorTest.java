@@ -159,7 +159,7 @@ public class FieldDescriptorTest {
 		assertNotNull( fieldDescriptor.getFieldBridge() );
 		assertTrue( fieldDescriptor.getFieldBridge() instanceof SpatialFieldBridge );
 
-		assertTrue( FieldSettingsDescriptor.Type.SPATIAL.equals( fieldDescriptor.getType() ) );
+		assertEquals( FieldSettingsDescriptor.Type.SPATIAL, fieldDescriptor.getType() );
 	}
 
 	@Test

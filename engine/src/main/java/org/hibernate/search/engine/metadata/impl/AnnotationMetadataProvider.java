@@ -1305,39 +1305,42 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			);
 		}
 
-		DocumentFieldMetadata.Builder fieldMetadataBuilder;
+		DocumentFieldMetadata.Builder fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
+						typeMetadataBuilder.getResultReference(),
+						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
+						fieldPath,
+						store,
+						index,
+						termVector
+				)
+				.boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
+				.fieldBridge( fieldBridge )
+				.analyzerReference( analyzerReference );
 
+		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
+			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
+			FieldMetadataBuilderImpl bridgeContributedMetadata = getBridgeContributedFieldMetadata( fieldMetadataBuilder, metadataProvidingFieldBridge );
+			for ( String sortableFieldAbsoluteName : bridgeContributedMetadata.getSortableFieldsAbsoluteNames() ) {
+				SortableFieldMetadata sortableFieldMetadata = new SortableFieldMetadata.Builder( sortableFieldAbsoluteName ).build();
+				propertyMetadataBuilder.addSortableField( sortableFieldMetadata );
+			}
+
+			for ( BridgeDefinedField field : bridgeContributedMetadata.getBridgeDefinedFields() ) {
+				fieldMetadataBuilder.addBridgeDefinedField( field );
+			}
+		}
+
+		if ( fieldBridge instanceof SpatialFieldBridge ) {
+			fieldMetadataBuilder.spatial();
+		}
 		// if we are having a numeric value make sure to mark the metadata and set the precision
 		// also numeric values don't need to be analyzed and norms are omitted (see also org.apache.lucene.document.LongField)
-		if ( isNumericField( numericFieldAnnotation, fieldBridge ) ) {
-			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
-					typeMetadataBuilder.getResultReference(),
-					propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
-					fieldPath,
-					store,
-					Field.Index.NO.equals( index ) ? index : Field.Index.NOT_ANALYZED_NO_NORMS,
-					termVector
-			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
-					.fieldBridge( fieldBridge )
-					.analyzerReference( analyzerReference )
+		else if ( isNumericField( numericFieldAnnotation, fieldBridge, fieldMetadataBuilder ) ) {
+			fieldMetadataBuilder
+					.index( Field.Index.NO.equals( index ) ? index : Field.Index.NOT_ANALYZED_NO_NORMS )
 					.numeric()
 					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) )
 					.numericEncodingType( numericEncodingType );
-		}
-		else {
-			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
-					typeMetadataBuilder.getResultReference(),
-					propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
-					fieldPath,
-					store,
-					index,
-					termVector
-			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
-					.fieldBridge( fieldBridge )
-					.analyzerReference( analyzerReference );
-			if ( fieldBridge instanceof SpatialFieldBridge ) {
-				fieldMetadataBuilder.spatial();
-			}
 		}
 
 		for ( Facet facetAnnotation : facetAnnotations ) {
@@ -1356,21 +1359,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			facetMetadataBuilder.setFacetEncoding( facetEncodingType );
 			facetMetadataBuilder.setFacetEncodingAuto( facetAnnotation.encoding().equals( FacetEncodingType.AUTO ) );
 			fieldMetadataBuilder.addFacetMetadata( facetMetadataBuilder.build() );
-		}
-
-		if ( fieldBridge instanceof MetadataProvidingFieldBridge ) {
-			MetadataProvidingFieldBridge metadataProvidingFieldBridge = (MetadataProvidingFieldBridge) fieldBridge;
-			FieldMetadataBuilderImpl bridgeContributedMetadata = getBridgeContributedFieldMetadata(
-					fieldMetadataBuilder, metadataProvidingFieldBridge );
-
-			for ( String sortableFieldAbsoluteName : bridgeContributedMetadata.getSortableFieldsAbsoluteNames() ) {
-				SortableFieldMetadata sortableFieldMetadata = new SortableFieldMetadata.Builder( sortableFieldAbsoluteName ).build();
-				propertyMetadataBuilder.addSortableField( sortableFieldMetadata );
-			}
-
-			for ( BridgeDefinedField field : bridgeContributedMetadata.getBridgeDefinedFields() ) {
-				fieldMetadataBuilder.addBridgeDefinedField( field );
-			}
 		}
 
 		final NullMarkerCodec nullTokenCodec = determineNullMarkerCodec( fieldMetadataBuilder,
@@ -1418,10 +1406,34 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return facetEncodingType;
 	}
 
-	private boolean isNumericField(NumericField numericFieldAnnotation, FieldBridge fieldBridge) {
-		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
-		// field bridge
-		return numericFieldAnnotation != null || NumericFieldUtils.isNumericContainerOrNumericFieldBridge( fieldBridge );
+	private boolean isNumericField(NumericField numericFieldAnnotation, FieldBridge fieldBridge, DocumentFieldMetadata.Builder fieldMetadataBuilder) {
+		if ( numericFieldAnnotation != null ) {
+			// @NumericField is specified explicitly
+			return true;
+		}
+		if ( NumericFieldUtils.isNumericContainerOrNumericFieldBridge( fieldBridge ) ) {
+			// An implicit numeric value is encoded via a numeric field bridge
+			return true;
+		}
+		BridgeDefinedField bridgeDefinedField = fieldMetadataBuilder.getBridgeDefinedFields().get( fieldMetadataBuilder.getAbsoluteName() );
+		if ( bridgeDefinedField != null ) {
+			// The field bridge explicitly declared the default field as numeric
+			switch ( bridgeDefinedField.getType() ) {
+				case DOUBLE:
+				case FLOAT:
+				case INTEGER:
+				case LONG:
+					return true;
+				case BOOLEAN:
+				case DATE:
+				case OBJECT:
+				case STRING:
+				default:
+					return false;
+
+			}
+		}
+		return false;
 	}
 
 	private NumericEncodingType determineNumericFieldEncoding(FieldBridge fieldBridge) {
