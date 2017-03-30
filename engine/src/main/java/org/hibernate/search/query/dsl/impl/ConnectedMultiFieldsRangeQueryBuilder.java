@@ -19,7 +19,6 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
@@ -82,36 +81,14 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		final String fieldName = fieldContext.getField();
 
 		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
-		DocumentFieldMetadata fieldMetadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( fieldName );
-		if ( fieldMetadata != null ) {
-			if ( fieldMetadata.isNumeric() ) {
-				perFieldQuery = createNumericRangeQuery( fieldName, rangeContext );
-			}
-			else {
-				perFieldQuery = createKeywordRangeQuery( fieldName, rangeContext, queryContext, conversionContext, fieldContext );
-			}
+		if ( Helper.requiresNumericQuery( documentBuilder, fieldContext, rangeContext.getFrom(), rangeContext.getTo() ) ) {
+			perFieldQuery = createNumericRangeQuery( fieldName, rangeContext );
 		}
 		else {
-			//we need to guess the proper type from the parameter types (Fallback logic required by the protobuf integration in Infinispan)
-			if ( rangeBoundaryTypeRequiredNumericQuery( rangeContext.getFrom(), rangeContext.getTo() ) ) {
-				perFieldQuery = createNumericRangeQuery( fieldName, rangeContext );
-			}
-			else {
-				perFieldQuery = createKeywordRangeQuery( fieldName, rangeContext, queryContext, conversionContext, fieldContext );
-			}
+			perFieldQuery = createKeywordRangeQuery( fieldName, rangeContext, queryContext, conversionContext, fieldContext );
 		}
 
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
-	}
-
-	private boolean rangeBoundaryTypeRequiredNumericQuery(Object from, Object to) {
-		if ( from != null ) {
-			return NumericFieldUtils.requiresNumericRangeQuery( from );
-		}
-		else if ( to != null ) {
-			return NumericFieldUtils.requiresNumericRangeQuery( to );
-		}
-		return false;
 	}
 
 	private static Query createKeywordRangeQuery(String fieldName, RangeQueryContext rangeContext, QueryBuildingContext queryContext, ConversionContext conversionContext, FieldContext fieldContext) {
