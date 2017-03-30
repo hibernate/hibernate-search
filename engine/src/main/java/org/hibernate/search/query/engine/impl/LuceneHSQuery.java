@@ -405,9 +405,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			// empty indexedTargetedEntities array means search over all indexed entities,
 			// but we have to make sure there is at least one
 			if ( indexBindings.isEmpty() ) {
-				throw new SearchException(
-						"There are no mapped entities. Don't forget to add @Indexed to at least one class."
-				);
+				throw log.queryWithNoIndexedType();
 			}
 
 			for ( EntityIndexBinding entityIndexBinding : indexBindings.values() ) {
