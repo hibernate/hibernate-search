@@ -6,22 +6,34 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.persistence.FlushModeType;
+import javax.persistence.LockModeType;
+import javax.persistence.Parameter;
+import javax.persistence.TemporalType;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
-import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.Session;
-import org.hibernate.query.ParameterMetadata;
+import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.hql.internal.QueryExecutionRequestException;
+import org.hibernate.query.ParameterMetadata;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
@@ -64,6 +76,10 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	private final HSQuery hSearchQuery;
 	private final SessionImplementor session;
 
+	private Integer firstResult;
+	private Integer maxResults;
+	//initialized at 0 since we don't expect to use hints at this stage
+	private final Map<String, Object> hints = new HashMap<String, Object>( 0 );
 
 	/**
 	 * Constructs a  <code>FullTextQueryImpl</code> instance.
@@ -84,18 +100,18 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 		this.hSearchQuery = hSearchQuery;
 		this.hSearchQuery
-				.timeoutExceptionFactory( exceptionFactory )
+				.timeoutExceptionFactory( new FullTextQueryTimeoutExceptionFactory() )
 				.tenantIdentifier( session.getTenantIdentifier() );
 	}
 
 	@Override
-	public FullTextQuery setSort(Sort sort) {
+	public FullTextQueryImpl setSort(Sort sort) {
 		hSearchQuery.sort( sort );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setFilter(Filter filter) {
+	public FullTextQueryImpl setFilter(Filter filter) {
 		hSearchQuery.filter( filter );
 		return this;
 	}
@@ -201,6 +217,22 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public List list() {
+		// Reproduce the behavior of AbstractProducedQuery.list() regarding exceptions
+		try {
+			return doHibernateSearchList();
+		}
+		catch (QueryExecutionRequestException he) {
+			throw new IllegalStateException( he );
+		}
+		catch (TypeMismatchException e) {
+			throw new IllegalArgumentException( e );
+		}
+		catch (HibernateException he) {
+			throw getExceptionConverter().convert( he );
+		}
+	}
+
+	protected List doHibernateSearchList() {
 		hSearchQuery.getTimeoutManager().start();
 		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
 		Loader loader = getLoader();
@@ -224,6 +256,15 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public int getResultSize() {
+		try {
+			return doGetResultSize();
+		}
+		catch (HibernateException he) {
+			throw getExceptionConverter().convert( he );
+		}
+	}
+
+	public int doGetResultSize() {
 		if ( getLoader().isSizeSafe() ) {
 			return hSearchQuery.queryResultSize();
 		}
@@ -233,43 +274,189 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public FullTextQuery setCriteriaQuery(Criteria criteria) {
+	public FullTextQueryImpl setCriteriaQuery(Criteria criteria) {
 		this.criteria = criteria;
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setProjection(String... fields) {
+	public FullTextQueryImpl setProjection(String... fields) {
 		hSearchQuery.projection( fields );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setSpatialParameters(Coordinates center, String fieldName) {
+	public FullTextQueryImpl setSpatialParameters(Coordinates center, String fieldName) {
 		hSearchQuery.setSpatialParameters( center, fieldName );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setSpatialParameters(double latitude, double longitude, String fieldName) {
+	public FullTextQueryImpl setSpatialParameters(double latitude, double longitude, String fieldName) {
 		setSpatialParameters( Point.fromDegrees( latitude, longitude ), fieldName );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setFirstResult(int firstResult) {
-		hSearchQuery.firstResult( firstResult );
-		return this;
-	}
-
-	@Override
 	public FullTextQuery setMaxResults(int maxResults) {
+		if ( maxResults < 0 ) {
+			throw new IllegalArgumentException(
+					"Negative ("
+							+ maxResults
+							+ ") parameter passed in to setMaxResults"
+			);
+		}
 		hSearchQuery.maxResults( maxResults );
+		this.maxResults = maxResults;
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setFetchSize(int fetchSize) {
+	public int getMaxResults() {
+		return maxResults == null || maxResults == -1
+				? Integer.MAX_VALUE
+				: maxResults;
+	}
+
+	@Override
+	public FullTextQuery setFirstResult(int firstResult) {
+		if ( firstResult < 0 ) {
+			throw new IllegalArgumentException(
+					"Negative ("
+							+ firstResult
+							+ ") parameter passed in to setFirstResult"
+			);
+		}
+		hSearchQuery.firstResult( firstResult );
+		this.firstResult = firstResult;
+		return this;
+	}
+
+	@Override
+	public int getFirstResult() {
+		return firstResult == null ? 0 : firstResult;
+	}
+
+	@Override
+	public FullTextQuery setHint(String hintName, Object value) {
+		hints.put( hintName, value );
+		if ( "javax.persistence.query.timeout".equals( hintName ) ) {
+			if ( value == null ) {
+				//nothing
+			}
+			else if ( value instanceof String ) {
+				setTimeout( Long.parseLong( (String) value ), TimeUnit.MILLISECONDS );
+			}
+			else if ( value instanceof Number ) {
+				setTimeout( ( (Number) value ).longValue(), TimeUnit.MILLISECONDS );
+			}
+		}
+		return this;
+	}
+
+	@Override
+	public Map<String, Object> getHints() {
+		return hints;
+	}
+
+	@Override // No generics, see unwrap() (same issue)
+	public FullTextQueryImpl setParameter(Parameter tParameter, Object t) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override // No generics, see unwrap() (same issue)
+	public FullTextQueryImpl setParameter(Parameter calendarParameter, Calendar calendar, TemporalType temporalType) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override // No generics, see unwrap() (same issue)
+	public FullTextQueryImpl setParameter(Parameter dateParameter, Date date, TemporalType temporalType) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public FullTextQueryImpl setParameter(String name, Object value) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public FullTextQueryImpl setParameter(String name, Date value, TemporalType temporalType) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public FullTextQueryImpl setParameter(String name, Calendar value, TemporalType temporalType) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public FullTextQueryImpl setParameter(int position, Object value) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public FullTextQueryImpl setParameter(int position, Date value, TemporalType temporalType) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Set<Parameter<?>> getParameters() {
+		return Collections.EMPTY_SET;
+	}
+
+	@Override
+	public FullTextQueryImpl setParameter(int position, Calendar value, TemporalType temporalType) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public Parameter<?> getParameter(String name) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public Parameter<?> getParameter(int position) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override // No generics, see unwrap() (same issue)
+	public Parameter getParameter(String name, Class type) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override // No generics, see unwrap() (same issue)
+	public Parameter getParameter(int position, Class type) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override // No generics, see unwrap() (same issue)
+	public boolean isBound(Parameter param) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override // No generics, see unwrap() (same issue)
+	public Object getParameterValue(Parameter param) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public Object getParameterValue(String name) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public Object getParameterValue(int position) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+	}
+
+	@Override
+	public FullTextQueryImpl setFlushMode(FlushModeType flushModeType) {
+		return (FullTextQueryImpl) super.setFlushMode( flushModeType );
+	}
+
+	@Override
+	public FullTextQueryImpl setFetchSize(int fetchSize) {
 		super.setFetchSize( fetchSize );
 		if ( fetchSize <= 0 ) {
 			throw new IllegalArgumentException( "'fetch size' parameter less than or equals to 0" );
@@ -284,7 +471,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public FullTextQuery setResultTransformer(ResultTransformer transformer) {
+	public FullTextQueryImpl setResultTransformer(ResultTransformer transformer) {
 		super.setResultTransformer( transformer );
 		this.resultTransformer = transformer;
 		return this;
@@ -302,10 +489,22 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object unwrap(Class type) {
+		//I've purposely decided not to return the underlying Hibernate FullTextQuery
+		//as I see this as an implementation detail that should not be exposed.
 		if ( type == org.apache.lucene.search.Query.class ) {
 			return hSearchQuery.getLuceneQuery();
 		}
 		throw new IllegalArgumentException( "Cannot unwrap " + type.getName() );
+	}
+
+	@Override
+	public FullTextQueryImpl setLockMode(LockModeType lockModeType) {
+		throw new UnsupportedOperationException( "lock modes not supported in fullText queries" );
+	}
+
+	@Override
+	public LockModeType getLockMode() {
+		throw new UnsupportedOperationException( "lock modes not supported in fullText queries" );
 	}
 
 	@Override
@@ -343,12 +542,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public FullTextQuery setTimeout(int timeout) {
+	public FullTextQueryImpl setTimeout(int timeout) {
 		return setTimeout( timeout, TimeUnit.SECONDS );
 	}
 
 	@Override
-	public FullTextQuery setTimeout(long timeout, TimeUnit timeUnit) {
+	public FullTextQueryImpl setTimeout(long timeout, TimeUnit timeUnit) {
 		super.setTimeout( (int) timeUnit.toSeconds( timeout ) );
 		hSearchQuery.getTimeoutManager().setTimeout( timeout, timeUnit );
 		hSearchQuery.getTimeoutManager().raiseExceptionOnTimeout();
@@ -356,7 +555,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
+	public FullTextQueryImpl limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
 		hSearchQuery.getTimeoutManager().setTimeout( timeout, timeUnit );
 		hSearchQuery.getTimeoutManager().limitFetchingOnTimeout();
 		return this;
@@ -368,7 +567,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
+	public FullTextQueryImpl initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
 		this.objectLookupMethod = lookupMethod;
 		this.databaseRetrievalMethod = retrievalMethod;
 		return this;
@@ -399,12 +598,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public FullTextQuery setEntity(int position, Object val) {
+	public FullTextQueryImpl setEntity(int position, Object val) {
 		throw new UnsupportedOperationException( "setEntity(int,Object) is not implemented in Hibernate Search queries" );
 	}
 
 	@Override
-	public FullTextQuery setEntity(String name, Object val) {
+	public FullTextQueryImpl setEntity(String name, Object val) {
 		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
 	}
 
@@ -442,11 +641,11 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		}
 	};
 
-	private static final TimeoutExceptionFactory exceptionFactory = new TimeoutExceptionFactory() {
+	private class FullTextQueryTimeoutExceptionFactory implements TimeoutExceptionFactory {
 
 		@Override
 		public RuntimeException createTimeoutException(String message, String queryDescription) {
-			return new QueryTimeoutException( message, null, queryDescription );
+			return new javax.persistence.QueryTimeoutException( message, null, FullTextQueryImpl.this );
 		}
 
 	};

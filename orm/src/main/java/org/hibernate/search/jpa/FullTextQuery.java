@@ -25,8 +25,7 @@ import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.transform.ResultTransformer;
 
 /**
- * The base interface for lucene powered searches.
- * This extends the JPA Query interface
+ * The base interface for full-text queries using the JPA API ({@link javax.persistence.Query}).
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
@@ -177,11 +176,11 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit);
 
 	/**
-	 * *Experimental* API, subject to change or removal
+	 * <b>Experimental</b> API, subject to change or removal
 	 *
-	 * When using {@link #limitExecutionTimeTo(long, java.util.concurrent.TimeUnit)} }, returns true if partial results are returned (ie if the time limit has been reached
-	 * and the result fetching process has been terminated.
-	 * @return {@code true} if partial results are returned, {@code false} otherwise
+	 * @return When using {@link #limitExecutionTimeTo(long, java.util.concurrent.TimeUnit)} }, returns {@code true}
+	 *         if partial results are returned (ie if the time limit has been reached
+	 *         and the result fetching process has been terminated.
 	 */
 	boolean hasPartialResults();
 
@@ -212,5 +211,17 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 
 	@Override
 	FullTextQuery setFlushMode(FlushModeType flushMode);
+
+	/**
+	 * Define a timeout period for a given unit of time.
+	 * Note that this is time out is on a best effort basis.
+	 * When the query goes beyond the timeout, a {@link javax.persistence.QueryTimeoutException} is raised.
+	 *
+	 * @param timeout time out period
+	 * @param timeUnit time out unit
+	 *
+	 * @return {@code this} to allow method chaining
+	 */
+	FullTextQuery setTimeout(long timeout, TimeUnit timeUnit);
 
 }
