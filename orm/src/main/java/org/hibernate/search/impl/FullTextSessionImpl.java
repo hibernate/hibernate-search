@@ -32,6 +32,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
+import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
@@ -217,6 +218,20 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		}
 		factory.initialize( properties );
 		return factory;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T unwrap(Class<T> type) {
+		if ( type.equals( FullTextEntityManager.class ) ) {
+			return (T) this;
+		}
+		else if ( type.equals( FullTextSession.class ) ) {
+			return (T) this;
+		}
+		else {
+			return super.unwrap( type );
+		}
 	}
 
 }
