@@ -106,7 +106,7 @@ However some features offered by Hibernate Search require specific configuration
 
 * if you want to be able to use the Hibernate Search <<search-batchindex-massindexer,MassIndexer>>
 with `purgeAllOnStart` enabled - which is enabled by default -, or to use `FullTextSession.purge()` or `FullTextSession.purgeAll()`,
-  install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html[`delete-by-query` plugin]
+  install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/2.2/plugins-delete-by-query.html[`delete-by-query` plugin]
 * if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
   see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
 * if you want to use paging (as opposed to <<elasticsearch-scrolling,scrolling>>) on result sets larger than 10000 elements
