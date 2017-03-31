@@ -7,6 +7,7 @@
 package org.hibernate.search.jpa;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 
 import org.hibernate.Session;
 import org.hibernate.search.exception.SearchException;
@@ -49,35 +50,12 @@ public final class Search {
 	}
 
 	private static Session getSession(EntityManager em) {
-		Object delegate = em.getDelegate();
-		if ( delegate == null ) {
+		try {
+			return em.unwrap( Session.class );
+		}
+		catch (PersistenceException e) {
 			throw new SearchException(
-					"Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)"
-			);
-		}
-		else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
-			return (Session) delegate;
-		}
-		else if ( EntityManager.class.isAssignableFrom( delegate.getClass() ) ) {
-			//Some app servers wrap the EM twice
-			delegate = ( (EntityManager) delegate ).getDelegate();
-			if ( delegate == null ) {
-				throw new SearchException(
-						"Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)"
-				);
-			}
-			else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
-				return (Session) delegate;
-			}
-			else {
-				throw new SearchException(
-						"Trying to use Hibernate Search without an Hibernate EntityManager: " + delegate.getClass()
-				);
-			}
-		}
-		else {
-			throw new SearchException(
-					"Trying to use Hibernate Search without an Hibernate EntityManager: " + delegate.getClass()
+					"Trying to use Hibernate Search with a non-Hibernate EntityManager", e
 			);
 		}
 	}
