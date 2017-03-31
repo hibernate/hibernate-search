@@ -8,7 +8,8 @@ package org.hibernate.search.jpa;
 
 import javax.persistence.EntityManager;
 
-import org.hibernate.search.jpa.impl.ImplementationFactory;
+import org.hibernate.Session;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -43,7 +44,41 @@ public final class Search {
 			return (FullTextEntityManager) em;
 		}
 		else {
-			return ImplementationFactory.createFullTextEntityManager( em );
+			return org.hibernate.search.Search.getFullTextSession( getSession( em ) );
+		}
+	}
+
+	private static Session getSession(EntityManager em) {
+		Object delegate = em.getDelegate();
+		if ( delegate == null ) {
+			throw new SearchException(
+					"Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)"
+			);
+		}
+		else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
+			return (Session) delegate;
+		}
+		else if ( EntityManager.class.isAssignableFrom( delegate.getClass() ) ) {
+			//Some app servers wrap the EM twice
+			delegate = ( (EntityManager) delegate ).getDelegate();
+			if ( delegate == null ) {
+				throw new SearchException(
+						"Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)"
+				);
+			}
+			else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
+				return (Session) delegate;
+			}
+			else {
+				throw new SearchException(
+						"Trying to use Hibernate Search without an Hibernate EntityManager: " + delegate.getClass()
+				);
+			}
+		}
+		else {
+			throw new SearchException(
+					"Trying to use Hibernate Search without an Hibernate EntityManager: " + delegate.getClass()
+			);
 		}
 	}
 
