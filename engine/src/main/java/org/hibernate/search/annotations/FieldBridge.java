@@ -12,6 +12,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.ParameterizedBridge;
+import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
+
 /**
  * Specifies a custom field bridge implementation
  *
@@ -22,8 +30,22 @@ import java.lang.annotation.Target;
 @Documented
 public @interface FieldBridge {
 
-	//default to embed @FieldBridge in @Field
+	/**
+	 * The implementation class to instantiate.
+	 * <p>
+	 * The given class must implement either {@link org.hibernate.search.bridge.FieldBridge} or
+	 * {@link StringBridge}.
+	 * <p>
+	 * Additionally, the given class may implement more advanced interfaces,
+	 * such as for instance {@link TwoWayFieldBridge}, {@link TwoWayStringBridge},
+	 * {@link MetadataProvidingFieldBridge}, {@link IgnoreAnalyzerBridge},
+	 * {@link AppliedOnTypeAwareBridge} or {@link ParameterizedBridge}.
+	 */
 	Class<?> impl() default void.class;
 
+	/**
+	 * Parameters to be passed to the bridge instance,
+	 * if it implements {@link ParameterizedBridge}.
+	 */
 	Parameter[] params() default { };
 }
