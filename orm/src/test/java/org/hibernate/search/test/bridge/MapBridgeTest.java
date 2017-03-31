@@ -102,7 +102,7 @@ public class MapBridgeTest extends SearchTestBase {
 	@Test
 	public void testSearchNullNumericEntry() throws Exception {
 		List<MapBridgeTestEntity> results =
-				findResults( "numericNullIndexed", MapBridgeTestEntity.NULL_NUMERIC_TOKEN, false );
+				findResults( "numericNullIndexed", MapBridgeTestEntity.NULL_NUMERIC_TOKEN, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
