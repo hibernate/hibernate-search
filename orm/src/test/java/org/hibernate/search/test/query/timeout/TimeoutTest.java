@@ -15,8 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.persistence.QueryTimeoutException;
+
 import org.apache.lucene.search.Query;
-import org.hibernate.QueryTimeoutException;
 import org.hibernate.Transaction;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
