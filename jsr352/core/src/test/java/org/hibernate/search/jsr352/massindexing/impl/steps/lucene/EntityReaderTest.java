@@ -18,10 +18,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
-import org.jboss.logging.Logger;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -36,7 +38,7 @@ import org.mockito.MockitoAnnotations;
  */
 public class EntityReaderTest {
 
-	private static final Logger LOGGER = Logger.getLogger( EntityReaderTest.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private static final String PERSISTENCE_UNIT_NAME = "h2";
 	private static final Company[] COMPANIES = new Company[]{
@@ -71,7 +73,7 @@ public class EntityReaderTest {
 				em.close();
 			}
 			catch (Exception e) {
-				LOGGER.error( e );
+				log.error( e );
 			}
 		}
 

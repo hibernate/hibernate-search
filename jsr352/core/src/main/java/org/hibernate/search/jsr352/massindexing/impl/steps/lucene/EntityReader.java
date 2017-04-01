@@ -23,11 +23,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
-import org.jboss.logging.Logger;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Entity reader reads entities from database. During the open of the read stream, this reader builds a scrollable
@@ -50,7 +51,7 @@ import org.jboss.logging.Logger;
  */
 public class EntityReader extends AbstractItemReader {
 
-	private static final Logger LOGGER = Logger.getLogger( EntityReader.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	@Inject
 	private JobContext jobContext;
@@ -123,12 +124,12 @@ public class EntityReader extends AbstractItemReader {
 	 * checkpoint is committed.
 	 *
 	 * @return the checkpoint info
+	 *
 	 * @throws Exception thrown for any errors.
 	 */
 	@Override
 	public Serializable checkpointInfo() throws Exception {
-		LOGGER.debug( "checkpointInfo() called. "
-				+ "Saving last read ID to batch runtime..." );
+		log.checkpointReached( entityName, checkpointId );
 		return checkpointId;
 	}
 
@@ -139,27 +140,24 @@ public class EntityReader extends AbstractItemReader {
 	 */
 	@Override
 	public void close() throws Exception {
-		LOGGER.debug( "closing everything..." );
+		log.closingReader( partitionIdStr, entityName );
 		try {
 			scroll.close();
-			LOGGER.debug( "Scrollable results closed." );
 		}
 		catch (Exception e) {
-			LOGGER.error( e );
+			log.unableToCloseScrollableResults( e );
 		}
 		try {
 			ss.close();
-			LOGGER.debug( "Stateless session closed." );
 		}
 		catch (Exception e) {
-			LOGGER.error( e );
+			log.unableToCloseStatelessSession( e );
 		}
 		try {
 			session.close();
-			LOGGER.debug( "Session closed." );
 		}
 		catch (Exception e) {
-			LOGGER.error( e );
+			log.unableToCloseSession( e );
 		}
 		// reset the chunk work count to avoid over-count in item collector
 		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
@@ -176,14 +174,13 @@ public class EntityReader extends AbstractItemReader {
 	 */
 	@Override
 	public void open(Serializable checkpointId) throws Exception {
+		log.openingReader( partitionIdStr, entityName );
 
 		final int partitionId = Integer.parseInt( partitionIdStr );
-
-		LOGGER.debugf( "[partitionId=%d] open reader for entity %s ...", (Integer) partitionId, entityName );
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 		entityType = jobData.getIndexedType( entityName );
 		PartitionBound bound = jobData.getPartitionBound( partitionId );
-		LOGGER.debug( bound );
+		log.printBound( bound );
 
 		emf = jobData.getEntityManagerFactory();
 		sessionFactory = emf.unwrap( SessionFactory.class );
@@ -269,7 +266,7 @@ public class EntityReader extends AbstractItemReader {
 	 */
 	@Override
 	public Object readItem() throws Exception {
-		LOGGER.debug( "Reading item ..." );
+		log.readingEntity();
 		Object entity = null;
 
 		if ( scroll.next() ) {
@@ -278,7 +275,7 @@ public class EntityReader extends AbstractItemReader {
 					.getIdentifier( entity );
 		}
 		else {
-			LOGGER.debug( "no more result. read ends." );
+			log.noMoreResults();
 		}
 		return entity;
 	}

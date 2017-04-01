@@ -21,8 +21,9 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * An {@link EntityManagerFactoryRegistry} that retrieves the entity manager factory
@@ -83,6 +84,8 @@ public class EntityManagerFactoriesProducer {
 @Singleton
 public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegistry {
 
+	private static final Log log = LoggerFactory.make( Log.class );
+
 	private static final String CDI_SCOPE_NAME = "cdi";
 
 	@Inject
@@ -98,15 +101,11 @@ public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegi
 				return getVetoedBeanReference( beanManager, PersistenceUnitAccessor.class ).entityManagerFactory;
 			}
 			catch (RuntimeException e) {
-				throw new SearchException( "Exception while retrieving the EntityManagerFactory using @PersistenceUnit."
-						+ " This generally happens either because the persistence wasn't configured properly"
-						+ " or because there are multiple persistence units." );
+				throw log.cannotRetrieveEntityManagerFactoryInJsr352();
 			}
 		}
 		else if ( entityManagerFactoryInstance.isAmbiguous() ) {
-			throw new SearchException( "Multiple entity manager factories have been registered in the CDI context."
-					+ " Please provide the bean name for the selected entity manager factory to the batch indexing job through"
-					+ " the 'entityManagerFactoryReference' parameter." );
+			throw log.ambiguousEntityManagerFactoryInJsr352();
 		}
 		else {
 			return entityManagerFactoryInstance.get();
@@ -126,14 +125,12 @@ public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegi
 			case CDI_SCOPE_NAME:
 				Instance<EntityManagerFactory> instance = entityManagerFactoryInstance.select( new NamedQualifier( reference ) );
 				if ( instance.isUnsatisfied() ) {
-					throw new SearchException( "No entity manager factory available in the CDI context with this bean name: '" + reference + "'."
-							+ " Make sure your entity manager factory is a named bean." );
+					throw log.noAvailableEntityManagerFactoryInCDI( reference );
 				}
 				factory = instance.get();
 				break;
 			default:
-				throw new SearchException( "Unknown entity manager factory scope: '" + scopeName + "'."
-						+ " Please use a supported scope." );
+				throw log.unknownEntityManagerFactoryScope( scopeName );
 		}
 
 		return factory;

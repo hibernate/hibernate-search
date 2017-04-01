@@ -15,8 +15,9 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
-import org.jboss.logging.Logger;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Listener for managing the step indexing progress.
@@ -25,7 +26,7 @@ import org.jboss.logging.Logger;
  */
 public class StepProgressSetupListener extends AbstractStepListener {
 
-	private static final Logger LOGGER = Logger.getLogger( StepProgressSetupListener.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	@Inject
 	private JobContext jobContext;
@@ -84,7 +85,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 				.setProjection( Projections.rowCount() )
 				.setCacheable( false )
 				.uniqueResult();
-		LOGGER.infof( "%d rows to index for entity type %s", rowCount, clazz.getName() );
+		log.rowsToIndex( clazz.getName(), rowCount );
 		return rowCount;
 	}
 }

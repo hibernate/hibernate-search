@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.jboss.logging.Logger;
-
 /**
  * Step level progress. It contains the indexing progress of the step level. In another word, it is the sum of all the
  * elementary, partition-local level progress. The progress is initialized at the first start of the indexing job and
@@ -24,7 +22,6 @@ import org.jboss.logging.Logger;
  */
 public class StepProgress implements Serializable {
 
-	private static final Logger LOGGER = Logger.getLogger( StepProgress.class );
 	private static final long serialVersionUID = 7808926033388850340L;
 
 	/**
@@ -139,7 +136,6 @@ public class StepProgress implements Serializable {
 	}
 
 	public void setRowsToIndex(String entityName, long rowsToIndex) {
-		LOGGER.infof( "{key: \"%s\", value: %d}", entityName, rowsToIndex );
 		entityProgress.put( entityName, 0L );
 		entityTotal.put( entityName, rowsToIndex );
 	}

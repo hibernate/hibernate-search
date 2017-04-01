@@ -25,13 +25,14 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerSelector;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
-import org.jboss.logging.Logger;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Batch item writer writes a list of items into Lucene documents. Here, items mean the luceneWorks, given by the
@@ -42,7 +43,7 @@ import org.jboss.logging.Logger;
 @SuppressWarnings("deprecation")
 public class LuceneDocWriter extends AbstractItemWriter {
 
-	private static final Logger LOGGER = Logger.getLogger( LuceneDocWriter.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 	private static final boolean FORCE_ASYNC = true;
 
 	@Inject
@@ -54,6 +55,10 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
 	private String entityName;
+
+	@Inject
+	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
+	private String partitionIdStr;
 
 	private EntityManagerFactory emf;
 
@@ -69,12 +74,12 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	 */
 	@Override
 	public void close() throws Exception {
-		LOGGER.debug( "close() called." );
+		log.closingDocWriter( partitionIdStr, entityName );
 		try {
 			em.close();
 		}
 		catch (Exception e) {
-			LOGGER.error( e );
+			log.unableToCloseEntityManager( e );
 		}
 	}
 
@@ -85,8 +90,7 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	 */
 	@Override
 	public void open(Serializable checkpoint) throws Exception {
-
-		LOGGER.debug( "open(Seriliazable) called" );
+		log.openingDocWriter( partitionIdStr, entityName );
 
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 

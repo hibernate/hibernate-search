@@ -15,9 +15,10 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
-import org.jboss.logging.Logger;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Enhancements after the chunk step {@code produceLuceneDoc} (lucene document production)
@@ -26,7 +27,7 @@ import org.jboss.logging.Logger;
  */
 public class AfterChunkBatchlet extends AbstractBatchlet {
 
-	private static final Logger LOGGER = Logger.getLogger( AfterChunkBatchlet.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	@Inject
 	private JobContext jobContext;
@@ -40,7 +41,7 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 	@Override
 	public String process() throws Exception {
 		if ( Boolean.parseBoolean( this.optimizeOnFinish ) ) {
-			LOGGER.info( "optimizing all entities ..." );
+			log.startOptimization();
 
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
@@ -56,7 +57,7 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 			session.close();
 		}
 		catch (Exception e) {
-			LOGGER.error( e );
+			log.unableToCloseSession( e );
 		}
 	}
 }

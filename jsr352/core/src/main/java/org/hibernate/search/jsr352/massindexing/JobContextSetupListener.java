@@ -21,14 +21,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.criterion.Criterion;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.context.jpa.impl.ActiveSessionFactoryRegistry;
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
 import org.hibernate.search.util.StringHelper;
-import org.jboss.logging.Logger;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Listener before the start of the job. It aims to setup the job context data, shared by all the steps.
@@ -43,7 +43,7 @@ import org.jboss.logging.Logger;
  */
 public class JobContextSetupListener extends AbstractJobListener {
 
-	private static final Logger LOGGER = Logger.getLogger( JobContextSetupListener.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	@Inject
 	private JobContext jobContext;
@@ -91,11 +91,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 		}
 		else {
 			if ( StringHelper.isEmpty( entityManagerFactoryReference ) ) {
-				throw new SearchException( "An 'entityManagerFactoryScope' was defined, but"
-						+ " the 'entityManagerFactoryReference' parameter is empty."
-						+ " Please also set the 'entityManagerFactoryReference' parameter to"
-						+ " select an entity manager factory, or do not set the"
-						+ " 'entityManagerFactoryScope' to try to use a default entity manager factory." );
+				throw log.entityManagerFactoryReferenceIsEmpty();
 			}
 			else {
 				return registry.get( entityManagerFactoryScope, entityManagerFactoryReference );
@@ -108,8 +104,6 @@ public class JobContextSetupListener extends AbstractJobListener {
 		EntityManager em = null;
 
 		try {
-			LOGGER.debug( "Creating entity manager ..." );
-
 			em = emf.createEntityManager();
 			List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
 			Set<Class<?>> entityTypesToIndex = Search
@@ -121,7 +115,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 					.collect( Collectors.toCollection( HashSet::new ) );
 
 			Set<Criterion> criteria = MassIndexerUtil.deserializeCriteria( serializedCustomQueryCriteria );
-			LOGGER.infof( "%d criteria found.", criteria.size() );
+			log.criteriaSize( criteria.size() );
 
 			JobContextData jobContextData = new JobContextData();
 			jobContextData.setEntityManagerFactory( emf );
@@ -134,7 +128,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 				em.close();
 			}
 			catch (Exception e) {
-				LOGGER.error( e );
+				log.unableToCloseEntityManager( e );
 			}
 		}
 	}

@@ -27,12 +27,14 @@ import javax.persistence.Persistence;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
 import org.hibernate.search.jsr352.test.util.JobFactory;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
-import org.jboss.logging.Logger;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +44,7 @@ import org.junit.Test;
  */
 public class BatchIndexingJobIT {
 
-	private static final Logger LOGGER = Logger.getLogger( BatchIndexingJobIT.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private static final String PERSISTENCE_UNIT_NAME = "h2";
 	private static final String SESSION_FACTORY_NAME = "h2-entityManagerFactory";
@@ -96,7 +98,7 @@ public class BatchIndexingJobIT {
 				em.close();
 			}
 			catch (Exception e) {
-				LOGGER.error( e );
+				log.error( e );
 			}
 		}
 	}
@@ -134,7 +136,7 @@ public class BatchIndexingJobIT {
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( executionId );
 		for ( StepExecution stepExecution : stepExecutions ) {
-			LOGGER.infof( "step %s executed.", stepExecution.getStepName() );
+			log.infof( "step %s executed.", stepExecution.getStepName() );
 			testBatchStatus( stepExecution );
 		}
 
