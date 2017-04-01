@@ -12,7 +12,8 @@ import javax.batch.api.partition.AbstractPartitionAnalyzer;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
+import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Progress aggregator aggregates the intermediary chunk progress received from each partition sent via the collectors.
@@ -22,7 +23,7 @@ import org.jboss.logging.Logger;
  */
 public class ProgressAggregator extends AbstractPartitionAnalyzer {
 
-	private static final Logger LOGGER = Logger.getLogger( ProgressAggregator.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	@Inject
 	private StepContext stepContext;
@@ -49,6 +50,6 @@ public class ProgressAggregator extends AbstractPartitionAnalyzer {
 			sb.append( System.lineSeparator() ).append( "\t" ).append( msg );
 		}
 		sb.append( System.lineSeparator() );
-		LOGGER.info( sb.toString() );
+		log.analyzeIndexProgress( sb.toString() );
 	}
 }

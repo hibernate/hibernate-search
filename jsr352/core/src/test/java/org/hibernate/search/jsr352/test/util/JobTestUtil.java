@@ -15,8 +15,8 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
-
-import org.jboss.logging.Logger;
+import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
@@ -25,7 +25,7 @@ import org.apache.lucene.search.Query;
  */
 public final class JobTestUtil {
 
-	private static final Logger LOGGER = Logger.getLogger( JobTestUtil.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private static final int THREAD_SLEEP = 1000;
 
@@ -42,7 +42,7 @@ public final class JobTestUtil {
 				&& System.currentTimeMillis() < endTime ) {
 
 			long executionId = jobExecution.getExecutionId();
-			LOGGER.infof(
+			log.infof(
 					"Job execution (id=%d) has status %s. Thread sleeps %d ms...",
 					executionId,
 					jobExecution.getBatchStatus(),

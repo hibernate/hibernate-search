@@ -58,6 +58,7 @@
             <writer ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter">
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
+                    <property name="partitionId" value="#{partitionPlan['partitionId']}" />
                 </properties>
             </writer>
             <checkpoint-algorithm ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.CheckpointAlgorithm">

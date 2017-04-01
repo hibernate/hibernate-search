@@ -27,11 +27,12 @@ import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
-import org.jboss.logging.Logger;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This partition mapper provides a dynamic partition plan for chunk processing.
@@ -43,7 +44,7 @@ import org.jboss.logging.Logger;
  */
 public class PartitionMapper implements javax.batch.api.partition.PartitionMapper {
 
-	private static final Logger LOGGER = Logger.getLogger( PartitionMapper.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private enum Type {
 		HQL, CRITERIA, FULL_ENTITY
@@ -138,7 +139,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			final int threads = Integer.valueOf( maxThreads );
 			final int partitions = partitionBounds.size();
 			final Properties[] props = new Properties[partitions];
-			LOGGER.infof( "%d partitions, %d threads.", partitions, threads );
+			log.partitionsPlan( partitions, threads );
 
 			for ( int i = 0; i < partitionBounds.size(); i++ ) {
 				props[i] = new Properties();
@@ -159,19 +160,19 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 				}
 			}
 			catch (Exception e) {
-				LOGGER.error( e );
+				log.unableToCloseScrollableResults( e );
 			}
 			try {
 				ss.close();
 			}
 			catch (Exception e) {
-				LOGGER.error( e );
+				log.unableToCloseStatelessSession( e );
 			}
 			try {
 				session.close();
 			}
 			catch (Exception e) {
-				LOGGER.error( e );
+				log.unableToCloseSession( e );
 			}
 		}
 	}

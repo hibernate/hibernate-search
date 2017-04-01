@@ -12,8 +12,6 @@ import javax.batch.api.partition.PartitionCollector;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
-
 /**
  * Progress collectors run on the partitioned step threads and there's one collector per partition. They collect the
  * partition progress and send it to the partition analyzer.
@@ -21,8 +19,6 @@ import org.jboss.logging.Logger;
  * @author Mincong Huang
  */
 public class ProgressCollector implements PartitionCollector {
-
-	private static final Logger LOGGER = Logger.getLogger( ProgressCollector.class );
 
 	@Inject
 	private StepContext stepContext;
@@ -33,7 +29,6 @@ public class ProgressCollector implements PartitionCollector {
 	 */
 	@Override
 	public Serializable collectPartitionData() throws Exception {
-		LOGGER.debug( "Collecting partition data ..." );
 		return ( (PartitionContextData) stepContext.getTransientUserData() )
 				.getPartitionProgress();
 	}

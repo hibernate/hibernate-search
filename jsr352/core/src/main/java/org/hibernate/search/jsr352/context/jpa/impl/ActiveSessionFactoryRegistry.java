@@ -16,7 +16,8 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jpa.AvailableSettings;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A registry containing all the currently active (non-closed) session factories
@@ -34,6 +35,8 @@ import org.hibernate.search.exception.SearchException;
  * @author Yoann Rodiere
  */
 public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegistry {
+
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private static final MutableSessionFactoryRegistry INSTANCE = new ActiveSessionFactoryRegistry();
 
@@ -81,15 +84,10 @@ public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegist
 	@Override
 	public synchronized EntityManagerFactory getDefault() {
 		if ( sessionFactories.isEmpty() ) {
-			throw new SearchException( "No entity manager factory has been created yet."
-					+ " Make sure that the entity manager factory has already been created and wasn't closed before"
-					+ " you launched the job." );
+			throw log.noEntityManagerFactoryCreated();
 		}
 		else if ( sessionFactories.size() > 1 ) {
-			throw new SearchException( "Multiple entity manager factories are currently active."
-					+ " Please provide the name of the selected persistence unit to the batch indexing job through"
-					+ " the 'entityManagerFactoryReference' parameter (you may also use the 'entityManagerFactoryScope'"
-					+ " parameter for more referencing options)." );
+			throw log.tooManyActiveEntityManagerFactories();
 		}
 		else {
 			return sessionFactories.iterator().next();
@@ -109,25 +107,17 @@ public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegist
 			case PERSISTENCE_UNIT_NAME_SCOPE_NAME:
 				factory = sessionFactoriesByPUName.get( reference );
 				if ( factory == null ) {
-					throw new SearchException( "No entity manager factory has been created with this persistence unit name yet: '" + reference + "'."
-							+ " Make sure you use the JPA API to create your entity manager factory (use a 'persistence.xml' file)"
-							+ " and that the entity manager factory has already been created and wasn't closed before"
-							+ " you launch the job." );
+					throw log.cannotFindEntityManagerFactoryByPUName( reference );
 				}
 				break;
 			case SESSION_FACTORY_NAME_SCOPE_NAME:
 				factory = sessionFactoriesByName.get( reference );
 				if ( factory == null ) {
-					throw new SearchException( "No entity manager factory has been created with this name yet: '" + reference + "'."
-							+ " Make sure your entity manager factory is named"
-							+ " (for instance by setting the '" + org.hibernate.cfg.AvailableSettings.SESSION_FACTORY_NAME + "' option)"
-							+ " and that the entity manager factory has already been created and wasn't closed before"
-							+ " you launch the job." );
+					throw log.cannotFindEntityManagerFactoryByName( reference );
 				}
 				break;
 			default:
-				throw new SearchException( "Unknown entity manager factory scope: '" + scopeName + "'."
-						+ " Please use a supported scope." );
+				throw log.unknownEntityManagerFactoryScope( scopeName );
 		}
 
 		return factory;

@@ -13,9 +13,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A utility class to start the Hibernate Search JSR-352 mass indexing job.
@@ -38,6 +41,8 @@ import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
  * @author Mincong Huang
  */
 public final class MassIndexingJob {
+
+	public static final Log log = LoggerFactory.make( Log.class );
 
 	public static final String NAME = "hibernate-search-mass-indexing";
 
@@ -333,7 +338,7 @@ public final class MassIndexingJob {
 					);
 				}
 				catch (IOException e) {
-					throw new SearchException( "Failed to serialize Criteria", e );
+					throw log.failedToSerializeJobParameter( Criteria.class, e );
 				}
 			}
 
