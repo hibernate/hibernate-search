@@ -56,10 +56,25 @@ public final class MassIndexingJob {
 			// Private constructor, do not use it.
 		}
 
+		/**
+		 * The entity type to index in this job execution.
+		 *
+		 * @param rootEntity the type of entity to index
+		 *
+		 * @return itself
+		 */
 		public ParametersBuilder forEntity(Class<?> rootEntity) {
 			return new ParametersBuilder( rootEntity );
 		}
 
+		/**
+		 * The entity types to index in this job execution.
+		 *
+		 * @param rootEntity the first type of entity to index, must not be null
+		 * @param rootEntities the remaining types of entity to index
+		 *
+		 * @return itself
+		 */
 		public ParametersBuilder forEntities(Class<?> rootEntity, Class<?>... rootEntities) {
 			return new ParametersBuilder( rootEntity, rootEntities );
 		}
@@ -101,19 +116,26 @@ public final class MassIndexingJob {
 			return this;
 		}
 
+		/**
+		 * The string that will identify the {@link javax.persistence.EntityManagerFactory EntityManagerFactory}. This
+		 * method is required if there's more than one persistence unit.
+		 *
+		 * @param reference the name of reference
+		 *
+		 * @return itself
+		 */
 		public ParametersBuilder entityManagerFactoryReference(String reference) {
 			this.entityManagerFactoryReference = reference;
 			return this;
 		}
 
 		/**
-		 * Whether the Hibernate queries are cacheable. This setting will be applied to
-		 * {@link org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader} . The default value is false.
-		 * Set it to true when reading a complex graph with relations.
+		 * Whether the Hibernate queries in this job should be cached. This method is optional, its default value is
+		 * false. Set it to true when reading a complex graph with relations.
 		 *
-		 * @param cacheable
+		 * @param cacheable cacheable
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder cacheable(boolean cacheable) {
 			this.cacheable = cacheable;
@@ -121,13 +143,13 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Checkpoint interval during the mass index process.
-		 * <p>
-		 * The checkpoint will be done every N items read, where N is the given item count.
+		 * The number of entities to process before triggering the next checkpoint. The value defined must be greater
+		 * than 0, and less than the value of {@link #rowsPerPartition}. This is an optional method, its default value
+		 * is {@literal 200}.
 		 *
-		 * @param checkpointInterval the number of item count before starting the next checkpoint.
+		 * @param checkpointInterval the number of entities to process before triggering the next checkpoint.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder checkpointInterval(int checkpointInterval) {
 			this.checkpointInterval = checkpointInterval;
@@ -135,11 +157,12 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * The fetch size for the result fetching.
+		 * The number of rows to retrieve for each database query. This is an optional method, its default value is
+		 * {@literal 200,000}.
 		 *
-		 * @param fetchSize
+		 * @param fetchSize the number of rows to retrieve for each database query.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder fetchSize(int fetchSize) {
 			if ( fetchSize < 1 ) {
@@ -150,12 +173,12 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * The maximum number of results will be return from the HQL / criteria. It is equivalent to keyword `LIMIT` in
-		 * SQL.
+		 * The maximum number of results will be returned from the HQL / criteria. It is equivalent to keyword
+		 * {@literal LIMIT} in SQL.
 		 *
-		 * @param customQueryLimit
+		 * @param customQueryLimit the custom query limit.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder customQueryLimit(int customQueryLimit) {
 			if ( customQueryLimit < 1 ) {
@@ -166,13 +189,13 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Specify the maximum number of threads on which to execute the partitions of this step. Note the batch runtime
-		 * cannot guarantee the request number of threads are available; it will use as many as it can up to the request
-		 * maximum. This an an optional attribute. The default is the number of partitions.
+		 * The maximum number of threads to use for processing the job. Note the batch runtime cannot guarantee the
+		 * request number of threads are available; it will use as many as it can up to the request maximum. This
+		 * method is optional, its default value is {@literal 8}.
 		 *
-		 * @param maxThreads
+		 * @param maxThreads the maximum number of threads.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder maxThreads(int maxThreads) {
 			if ( maxThreads < 1 ) {
@@ -184,12 +207,11 @@ public final class MassIndexingJob {
 
 		/**
 		 * Specify whether the mass indexer should be optimized at the beginning of the job. This operation takes place
-		 * after the purge operation and before the step of lucene document production. The default value is false.
-		 * TODO: specify what is the optimization exactly
+		 * after the purge operation and before indexing. This method is optional, its default value is false.
 		 *
-		 * @param optimizeAfterPurge
+		 * @param optimizeAfterPurge optimize after purge.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder optimizeAfterPurge(boolean optimizeAfterPurge) {
 			this.optimizeAfterPurge = optimizeAfterPurge;
@@ -198,12 +220,11 @@ public final class MassIndexingJob {
 
 		/**
 		 * Specify whether the mass indexer should be optimized at the end of the job. This operation takes place after
-		 * the step of lucene document production. The default value is false. TODO: specify what is the optimization
-		 * exactly
+		 * indexing. This method is optional, its default value is false.
 		 *
-		 * @param optimizeOnFinish
+		 * @param optimizeOnFinish optimize on finish.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder optimizeOnFinish(boolean optimizeOnFinish) {
 			this.optimizeOnFinish = optimizeOnFinish;
@@ -212,11 +233,11 @@ public final class MassIndexingJob {
 
 		/**
 		 * Specify whether the existing lucene index should be purged at the beginning of the job. This operation takes
-		 * place before the step of lucene document production. The default value is false.
+		 * place before indexing. This method is optional, its default value is false.
 		 *
-		 * @param purgeAllOnStart
+		 * @param purgeAllOnStart purge all on start.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder purgeAllOnStart(boolean purgeAllOnStart) {
 			this.purgeAllOnStart = purgeAllOnStart;
@@ -224,11 +245,13 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Add criterion to choose the set of entities to index.
+		 * Add criterion to construct a customized selection of mass-indexing under the criteria approach. You
+		 * can call this method multiple times to add multiple criteria: only entities matching every criterion
+		 * will be indexed. However, mixing this approach with the HQL restriction is not allowed.
 		 *
-		 * @param criterion
+		 * @param criterion criterion.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder restrictedBy(Criterion criterion) {
 			if ( customQueryHql != null ) {
@@ -242,11 +265,13 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Use HQL / JPQL to select to entities to index
+		 * Use HQL / JPQL to index entities of a target entity type. Your query should contain only one entity type.
+		 * Mixing this approach with the criteria restriction is not allowed. Please notice that there's no query
+		 * validation for your input.
 		 *
-		 * @param hql
+		 * @param hql HQL / JPQL.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder restrictedBy(String hql) {
 			if ( hql == null ) {
@@ -260,11 +285,12 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Define the max number of rows to process per partition.
+		 * The maximum number of rows to process per partition. The value defined must be greater than 0, and greater
+		 * than the value of {@link #checkpointInterval}. This method is optional, its default value is {@literal 250}.
 		 *
-		 * @param rowsPerPartition
+		 * @param rowsPerPartition Rows per partition.
 		 *
-		 * @return
+		 * @return itself
 		 */
 		public ParametersBuilder rowsPerPartition(int rowsPerPartition) {
 			if ( rowsPerPartition < 1 ) {
@@ -278,7 +304,7 @@ public final class MassIndexingJob {
 		/**
 		 * Build the parameters.
 		 *
-		 * @return The parameters.
+		 * @return the parameters.
 		 *
 		 * @throws SearchException if the serialization of some parameters fail.
 		 */
