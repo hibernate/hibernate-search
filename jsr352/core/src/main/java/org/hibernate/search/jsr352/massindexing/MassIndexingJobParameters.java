@@ -20,7 +20,7 @@ public final class MassIndexingJobParameters {
 
 	public static final String ENTITY_MANAGER_FACTORY_REFERENCE = "entityManagerFactoryReference";
 
-	public static final String ROOT_ENTITIES = "rootEntities";
+	public static final String ENTITY_TYPES = "entityTypes";
 
 	public static final String MAX_THREADS = "maxThreads";
 

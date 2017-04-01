@@ -423,7 +423,7 @@ long executionId = BatchRuntime
 |===
 |Parameter Name |Builder Method |Requirement |Default value |Description
 
-|`rootEntities`
+|`entityTypes`
 |`forEntity(Class<?>)`, `forEntities(Class<?>, Class<?>...)`
 |Required
 |-

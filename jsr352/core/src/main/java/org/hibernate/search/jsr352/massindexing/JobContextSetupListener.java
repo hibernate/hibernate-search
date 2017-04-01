@@ -57,8 +57,8 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String entityManagerFactoryReference;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ROOT_ENTITIES)
-	private String rootEntities;
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_TYPES)
+	private String entityTypes;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA)
@@ -111,7 +111,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 			LOGGER.debug( "Creating entity manager ..." );
 
 			em = emf.createEntityManager();
-			List<String> entityNamesToIndex = Arrays.asList( rootEntities.split( "," ) );
+			List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
 			Set<Class<?>> entityTypesToIndex = Search
 					.getFullTextEntityManager( em )
 					.getSearchFactory()

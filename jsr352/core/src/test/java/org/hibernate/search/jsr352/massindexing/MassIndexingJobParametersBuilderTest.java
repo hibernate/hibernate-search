@@ -56,8 +56,8 @@ public class MassIndexingJobParametersBuilderTest {
 		assertEquals( PURGE_ALL_ON_START, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_ALL_ON_START ) ) );
 		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) );
 
-		String rootEntities = props.getProperty( MassIndexingJobParameters.ROOT_ENTITIES );
-		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
+		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );
+		List<String> entityNames = Arrays.asList( entityTypes.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
 		assertTrue( entityNames.contains( Integer.class.getName() ) );
 		assertTrue( entityNames.contains( String.class.getName() ) );
@@ -70,8 +70,8 @@ public class MassIndexingJobParametersBuilderTest {
 				.entityManagerFactoryReference( SESSION_FACTORY_NAME )
 				.build();
 
-		String rootEntities = props.getProperty( MassIndexingJobParameters.ROOT_ENTITIES );
-		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
+		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );
+		List<String> entityNames = Arrays.asList( entityTypes.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
 		assertTrue( entityNames.contains( Integer.class.getName() ) );
 		assertTrue( entityNames.contains( String.class.getName() ) );
@@ -83,8 +83,8 @@ public class MassIndexingJobParametersBuilderTest {
 				.forEntity( Integer.class )
 				.build();
 
-		String rootEntities = props.getProperty( MassIndexingJobParameters.ROOT_ENTITIES );
-		List<String> entityNames = Arrays.asList( rootEntities.split( "," ) );
+		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );
+		List<String> entityNames = Arrays.asList( entityTypes.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
 		assertTrue( entityNames.contains( Integer.class.getName() ) );
 	}
