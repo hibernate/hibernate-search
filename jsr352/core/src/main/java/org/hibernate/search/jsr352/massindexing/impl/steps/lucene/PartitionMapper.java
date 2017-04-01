@@ -109,24 +109,24 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			session = sessionFactory.openSession();
 			ss = sessionFactory.openStatelessSession();
 
-			List<Class<?>> rootEntities = jobData.getEntityTypes();
+			List<Class<?>> entityTypes = jobData.getEntityTypes();
 			List<PartitionBound> partitionBounds = new ArrayList<>();
 			Class<?> entityType;
 
 			switch ( typeOfSelection( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
 				case HQL:
-					entityType = rootEntities.get( 0 );
+					entityType = entityTypes.get( 0 );
 					partitionBounds.add( new PartitionBound( entityType, null, null ) );
 					break;
 
 				case CRITERIA:
-					entityType = rootEntities.get( 0 );
+					entityType = entityTypes.get( 0 );
 					scroll = buildScrollableResults( ss, session, entityType, jobData.getCustomQueryCriteria() );
 					partitionBounds = buildPartitionUnitsFrom( scroll, entityType );
 					break;
 
 				case FULL_ENTITY:
-					for ( Class<?> clz : rootEntities ) {
+					for ( Class<?> clz : entityTypes ) {
 						scroll = buildScrollableResults( ss, session, clz, null );
 						partitionBounds.addAll( buildPartitionUnitsFrom( scroll, clz ) );
 					}

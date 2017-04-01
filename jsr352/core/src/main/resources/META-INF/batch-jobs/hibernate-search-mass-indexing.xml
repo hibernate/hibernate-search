@@ -20,7 +20,7 @@
             <properties>
                 <property name="entityManagerFactoryScope" value="#{jobParameters['entityManagerFactoryScope']}" />
                 <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
-                <property name="rootEntities" value="#{jobParameters['rootEntities']}" />
+                <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
                 <property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />
             </properties>
         </listener>

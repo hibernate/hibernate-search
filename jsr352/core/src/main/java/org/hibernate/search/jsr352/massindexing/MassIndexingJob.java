@@ -59,24 +59,24 @@ public final class MassIndexingJob {
 		/**
 		 * The entity type to index in this job execution.
 		 *
-		 * @param rootEntity the type of entity to index
+		 * @param entityType the type of entity to index
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder forEntity(Class<?> rootEntity) {
-			return new ParametersBuilder( rootEntity );
+		public ParametersBuilder forEntity(Class<?> entityType) {
+			return new ParametersBuilder( entityType );
 		}
 
 		/**
 		 * The entity types to index in this job execution.
 		 *
-		 * @param rootEntity the first type of entity to index, must not be null
-		 * @param rootEntities the remaining types of entity to index
+		 * @param entityType the first type of entity to index, must not be null
+		 * @param entityTypes the remaining types of entity to index
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder forEntities(Class<?> rootEntity, Class<?>... rootEntities) {
-			return new ParametersBuilder( rootEntity, rootEntities );
+		public ParametersBuilder forEntities(Class<?> entityType, Class<?>... entityTypes) {
+			return new ParametersBuilder( entityType, entityTypes );
 		}
 	}
 
@@ -86,7 +86,7 @@ public final class MassIndexingJob {
 	 */
 	public static class ParametersBuilder {
 
-		private final Set<Class<?>> rootEntities;
+		private final Set<Class<?>> entityTypes;
 		private String entityManagerFactoryScope;
 		private String entityManagerFactoryReference;
 		private Boolean cacheable;
@@ -101,13 +101,13 @@ public final class MassIndexingJob {
 		private String customQueryHql;
 		private Integer customQueryLimit;
 
-		private ParametersBuilder(Class<?> rootEntity, Class<?>... rootEntities) {
-			if ( rootEntity == null ) {
-				throw new IllegalArgumentException( "rootEntities must have at least 1 element." );
+		private ParametersBuilder(Class<?> entityType, Class<?>... entityTypes) {
+			if ( entityType == null ) {
+				throw new IllegalArgumentException( "entityTypes must have at least 1 element." );
 			}
-			this.rootEntities = new HashSet<>();
-			this.rootEntities.add( rootEntity );
-			Collections.addAll( this.rootEntities, rootEntities );
+			this.entityTypes = new HashSet<>();
+			this.entityTypes.add( entityType );
+			Collections.addAll( this.entityTypes, entityTypes );
 			customQueryCriteria = new HashSet<>();
 		}
 
@@ -322,7 +322,7 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, optimizeAfterPurge );
 			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_ON_FINISH, optimizeOnFinish );
 			addIfNotNull( jobParams, MassIndexingJobParameters.PURGE_ALL_ON_START, purgeAllOnStart );
-			addIfNotNull( jobParams, MassIndexingJobParameters.ROOT_ENTITIES, getRootEntitiesAsString() );
+			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_TYPES, getEntityTypesAsString() );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ROWS_PER_PARTITION, rowsPerPartition );
 
 			if ( !customQueryCriteria.isEmpty() ) {
@@ -340,8 +340,8 @@ public final class MassIndexingJob {
 			return jobParams;
 		}
 
-		private String getRootEntitiesAsString() {
-			return rootEntities.stream()
+		private String getEntityTypesAsString() {
+			return entityTypes.stream()
 					.map( Class::getName )
 					.collect( Collectors.joining( "," ) );
 		}
