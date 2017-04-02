@@ -33,6 +33,7 @@ import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
+import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -106,6 +107,10 @@ public class EntityReader extends AbstractItemReader {
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_LIMIT)
 	private String customQueryLimit;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
+	private String tenantId;
 
 	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
@@ -216,9 +221,9 @@ public class EntityReader extends AbstractItemReader {
 		log.printBound( bound );
 
 		emf = jobData.getEntityManagerFactory();
+		ss = PersistenceUtil.openStatelessSession( emf, tenantId );
+		session = PersistenceUtil.openSession( emf, tenantId );
 		sessionFactory = emf.unwrap( SessionFactory.class );
-		ss = sessionFactory.openStatelessSession();
-		session = sessionFactory.openSession();
 
 		PartitionContextData partitionData = null;
 		// HQL approach

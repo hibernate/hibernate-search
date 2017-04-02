@@ -18,14 +18,21 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.exception.SearchException;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Mincong Huang
  */
 public class MassIndexingJobParametersBuilderTest {
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
 	private static final String SESSION_FACTORY_NAME = "someUniqueString";
+
+	private static final String TENANT_ID = "myTenantId";
 
 	private static final boolean OPTIMIZE_AFTER_PURGE = true;
 	private static final boolean OPTIMIZE_ON_FINISH = true;
@@ -47,6 +54,7 @@ public class MassIndexingJobParametersBuilderTest {
 				.optimizeOnFinish( OPTIMIZE_ON_FINISH )
 				.rowsPerPartition( ROWS_PER_PARTITION )
 				.purgeAllOnStart( PURGE_ALL_ON_START )
+				.tenantId( TENANT_ID )
 				.build();
 
 		assertEquals( SESSION_FACTORY_NAME, props.getProperty( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE ) );
@@ -57,6 +65,7 @@ public class MassIndexingJobParametersBuilderTest {
 		assertEquals( ROWS_PER_PARTITION, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ROWS_PER_PARTITION ) ) );
 		assertEquals( PURGE_ALL_ON_START, Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_ALL_ON_START ) ) );
 		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) );
+		assertEquals( TENANT_ID, props.getProperty( MassIndexingJobParameters.TENANT_ID ) );
 
 		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );
 		List<String> entityNames = Arrays.asList( entityTypes.split( "," ) );
@@ -134,6 +143,26 @@ public class MassIndexingJobParametersBuilderTest {
 				.forEntity( String.class )
 				.restrictedBy( "from string" )
 				.restrictedBy( Restrictions.isEmpty( "dummy" ) );
+	}
+
+	@Test
+	public void testTenantId_null() throws Exception {
+		thrown.expect( NullPointerException.class );
+		thrown.expectMessage( "Your tenantId is null, please provide a valid tenant ID." );
+
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.tenantId( null );
+	}
+
+	@Test
+	public void testTenantId_empty() throws Exception {
+		thrown.expect( IllegalArgumentException.class );
+		thrown.expectMessage( "Your tenantId is empty, please provide a valid tenant ID." );
+
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.tenantId( "" );
 	}
 
 	private static class UnusedEntity {

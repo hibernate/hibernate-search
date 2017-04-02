@@ -14,14 +14,11 @@ import java.io.ObjectOutputStream;
 import java.util.Base64;
 
 import org.hibernate.search.util.StringHelper;
-import org.jboss.logging.Logger;
 
 /**
  * @author Mincong Huang
  */
 public final class SerializationUtil {
-
-	public static final Logger LOGGER = Logger.getLogger( SerializationUtil.class );
 
 	private SerializationUtil() {
 		// Private constructor, do not use it.

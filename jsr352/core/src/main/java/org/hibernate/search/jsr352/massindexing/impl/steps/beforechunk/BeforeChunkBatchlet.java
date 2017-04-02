@@ -13,13 +13,13 @@ import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -42,6 +42,10 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE)
 	private String optimizeAfterPurge;
 
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
+	private String tenantId;
+
 	private Session session;
 	private FullTextSession fts;
 
@@ -50,7 +54,7 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 		if ( Boolean.parseBoolean( this.purgeAllOnStart ) ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-			session = emf.unwrap( SessionFactory.class ).openSession();
+			session = PersistenceUtil.openSession( emf, tenantId );
 			fts = Search.getFullTextSession( session );
 			jobData.getEntityTypes().forEach( clz -> fts.purgeAll( clz ) );
 

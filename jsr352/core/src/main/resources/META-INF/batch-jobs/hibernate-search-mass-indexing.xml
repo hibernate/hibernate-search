@@ -30,13 +30,18 @@
             <properties>
                 <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:false;" />
                 <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}?:false;" />
+                <property name="tenantId" value="#{jobParameters['tenantId']}" />
             </properties>
         </batchlet>
     </step>
 
     <step id="produceLuceneDoc" next="afterChunk">
         <listeners>
-            <listener ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgressSetupListener" />
+            <listener ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgressSetupListener">
+                <properties>
+                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
+                </properties>
+            </listener>
         </listeners>
         <chunk checkpoint-policy="custom">
             <reader ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader">
@@ -46,9 +51,10 @@
 	                <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
 	                <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
 	                <property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />
-	                
+
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
+                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
@@ -58,6 +64,7 @@
             <processor ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocProducer">
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
+                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
                 </properties>
             </processor>
             <writer ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter">
@@ -75,6 +82,7 @@
         <partition>
             <mapper ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper">
                 <properties>
+                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
                     <property name="maxThreads" value="#{jobParameters['maxThreads']}?:8;" />
@@ -90,6 +98,7 @@
         <batchlet ref="org.hibernate.search.jsr352.massindexing.impl.steps.afterchunk.AfterChunkBatchlet">
             <properties>
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:false;" />
+                <property name="tenantId" value="#{jobParameters['tenantId']}" />
             </properties>
         </batchlet>
     </step>

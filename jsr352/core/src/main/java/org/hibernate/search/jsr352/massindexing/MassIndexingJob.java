@@ -106,6 +106,7 @@ public final class MassIndexingJob {
 		private Set<Criterion> customQueryCriteria;
 		private String customQueryHql;
 		private Integer customQueryLimit;
+		private String tenantId;
 
 		private ParametersBuilder(Class<?> entityType, Class<?>... entityTypes) {
 			if ( entityType == null ) {
@@ -308,6 +309,24 @@ public final class MassIndexingJob {
 		}
 
 		/**
+		 * Define the tenant ID for the job execution.
+		 *
+		 * @param tenantId Tenant ID. Null or empty value is not allowed.
+		 *
+		 * @return itself
+		 */
+		public ParametersBuilder tenantId(String tenantId) {
+			if ( tenantId == null ) {
+				throw new NullPointerException( "Your tenantId is null, please provide a valid tenant ID." );
+			}
+			if ( tenantId.isEmpty() ) {
+				throw new IllegalArgumentException( "Your tenantId is empty, please provide a valid tenant ID." );
+			}
+			this.tenantId = tenantId;
+			return this;
+		}
+
+		/**
 		 * Build the parameters.
 		 *
 		 * @return the parameters.
@@ -332,6 +351,7 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.PURGE_ALL_ON_START, purgeAllOnStart );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_TYPES, getEntityTypesAsString() );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ROWS_PER_PARTITION, rowsPerPartition );
+			addIfNotNull( jobParams, MassIndexingJobParameters.TENANT_ID, tenantId );
 
 			if ( !customQueryCriteria.isEmpty() ) {
 				try {

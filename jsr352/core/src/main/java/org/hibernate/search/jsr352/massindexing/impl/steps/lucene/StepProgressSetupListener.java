@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
+import javax.batch.api.BatchProperty;
 import javax.batch.api.listener.AbstractStepListener;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
@@ -13,10 +14,11 @@ import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -34,6 +36,10 @@ public class StepProgressSetupListener extends AbstractStepListener {
 	@Inject
 	private StepContext stepContext;
 
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
+	private String tenantId;
+
 	/**
 	 * Setup the step-level indexing progress. The {@code StepProgress} will be initialized if this is the first start,
 	 * or remain as it is if this is a restart. {@code StepProgress} is stored as the transient user data <b>for the
@@ -50,12 +56,10 @@ public class StepProgressSetupListener extends AbstractStepListener {
 			stepProgress = new StepProgress();
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-
-			SessionFactory sessionFactory = emf.unwrap( SessionFactory.class );
 			Session session = null;
 
 			try {
-				session = sessionFactory.openSession();
+				session = PersistenceUtil.openSession( emf, tenantId );
 				for ( Class<?> entityType : jobData.getEntityTypes() ) {
 					long rowCount = rowCount( entityType, session );
 					stepProgress.setRowsToIndex( entityType.getName(), rowCount );
