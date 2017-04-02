@@ -22,7 +22,6 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -32,6 +31,7 @@ import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
+import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -70,6 +70,10 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	@BatchProperty(name = MassIndexingJobParameters.ROWS_PER_PARTITION)
 	private String rowsPerPartition;
 
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
+	private String tenantId;
+
 	private EntityManagerFactory emf;
 
 	public PartitionMapper() {
@@ -100,16 +104,14 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	public PartitionPlan mapPartitions() throws Exception {
 
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
-		SessionFactory sessionFactory = null;
 		Session session = null;
 		StatelessSession ss = null;
 		ScrollableResults scroll = null;
 
 		try {
 			emf = jobData.getEntityManagerFactory();
-			sessionFactory = emf.unwrap( SessionFactory.class );
-			session = sessionFactory.openSession();
-			ss = sessionFactory.openStatelessSession();
+			session = PersistenceUtil.openSession( emf, tenantId );
+			ss = PersistenceUtil.openStatelessSession( emf, tenantId );
 
 			List<Class<?>> entityTypes = jobData.getEntityTypes();
 			List<PartitionBound> partitionBounds = new ArrayList<>();
