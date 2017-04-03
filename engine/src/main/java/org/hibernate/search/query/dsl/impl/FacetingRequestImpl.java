@@ -7,6 +7,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -23,7 +24,7 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 	private final String name;
 
 	/**
-	 * The document field name to facet on
+	 * The document facet name to facet on (@Facet.name)
 	 */
 	private final String fieldName;
 
@@ -87,7 +88,7 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 	 */
 	public abstract Class<?> getFacetValueType();
 
-	public abstract Facet createFacet(String value, int count);
+	public abstract Facet createFacet(FacetMetadata facetMetadata, String value, int count);
 
 	@Override
 	public boolean hasZeroCountsIncluded() {

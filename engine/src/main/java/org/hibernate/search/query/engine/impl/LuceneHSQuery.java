@@ -34,6 +34,7 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
+import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -53,6 +54,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.util.impl.CollectionHelper;
@@ -308,13 +310,17 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			startTime = System.nanoTime();
 		}
 
+		Collection<FacetingRequest> facetingRequests = getFacetManager().getFacetRequests().values();
+		Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata =
+				buildFacetingRequestsAndMetadata( facetingRequests, targetedEntityBindingsByName.values() );
+
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
 			queryHits = new QueryHits(
 					searcher,
 					filter,
 					sort,
 					getTimeoutManager(),
-					getFacetManager().getFacetRequests(),
+					facetingRequestsAndMetadata,
 					this.timeoutExceptionFactory,
 					spatialSearchCenter,
 					spatialFieldName
@@ -340,7 +346,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					sort,
 					n,
 					getTimeoutManager(),
-					getFacetManager().getFacetRequests(),
+					facetingRequestsAndMetadata,
 					this.timeoutExceptionFactory,
 					spatialSearchCenter,
 					spatialFieldName

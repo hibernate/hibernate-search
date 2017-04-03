@@ -18,7 +18,7 @@ public interface FacetingRequest {
 	String getFacetingName();
 
 	/**
-	 * @return the {@code Document} field name on which this faceting request is defined on
+	 * @return the name of the facet field this faceting request is defined on
 	 */
 	String getFieldName();
 

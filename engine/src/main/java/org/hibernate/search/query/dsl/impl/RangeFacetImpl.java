@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.Date;
 
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
-
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.facet.RangeFacet;
 
@@ -29,8 +27,8 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 	 */
 	private final int rangeIndex;
 
-	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index) {
-		super( facetingName, fieldName, range.getRangeString(), count );
+	RangeFacetImpl(String facetingName, String facetFieldName, String sourceFieldName, FacetRange<T> range, int count, int index) {
+		super( facetingName, facetFieldName, sourceFieldName, range.getRangeString(), count );
 		this.range = range;
 		this.rangeIndex = index;
 	}
@@ -38,11 +36,18 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 	@Override
 	public Query getFacetQuery() {
 		Object minOrMax = getNonNullMinOrMax( range );
-		if ( minOrMax instanceof Number || minOrMax instanceof Date ) {
-			return createNumericRangeQuery();
+		if ( NumericFieldUtils.requiresNumericRangeQuery( minOrMax ) ) {
+			return NumericFieldUtils.createNumericRangeQuery(
+					getSourceFieldName(),
+					range.getMin(),
+					range.getMax(),
+					range.isMinIncluded(),
+					range.isMaxIncluded()
+			);
 		}
 		else if ( minOrMax instanceof String ) {
-			return createRangeQuery(
+			return TermRangeQuery.newStringRange(
+					getSourceFieldName(),
 					(String) range.getMin(),
 					(String) range.getMax(),
 					range.isMinIncluded(),
@@ -84,66 +89,6 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 			o = range.getMax();
 		}
 		return o;
-	}
-
-	private Query createNumericRangeQuery() {
-		NumericRangeQuery query;
-		// either end of the range must have a valid value (see also HSEARCH-770)
-		Object minOrMax = getNonNullMinOrMax( range );
-		if ( minOrMax instanceof Double ) {
-			query = NumericRangeQuery.newDoubleRange(
-					getFieldName(),
-					(Double) range.getMin(),
-					(Double) range.getMax(),
-					range.isMinIncluded(),
-					range.isMaxIncluded()
-			);
-		}
-		else if ( minOrMax instanceof Float ) {
-			query = NumericRangeQuery.newFloatRange(
-					getFieldName(),
-					(Float) range.getMin(),
-					(Float) range.getMax(),
-					range.isMinIncluded(),
-					range.isMaxIncluded()
-			);
-		}
-		else if ( minOrMax instanceof Integer ) {
-			query = NumericRangeQuery.newIntRange(
-					getFieldName(),
-					(Integer) range.getMin(),
-					(Integer) range.getMax(),
-					range.isMinIncluded(),
-					range.isMaxIncluded()
-			);
-		}
-		else if ( minOrMax instanceof Long ) {
-			query = NumericRangeQuery.newLongRange(
-					getFieldName(),
-					(Long) range.getMin(),
-					(Long) range.getMax(),
-					range.isMinIncluded(),
-					range.isMaxIncluded()
-			);
-		}
-		else if ( minOrMax instanceof Date ) {
-			query = NumericRangeQuery.newLongRange(
-					getFieldName(),
-					range.getMin() == null ? null : ( (Date) range.getMin() ).getTime(),
-					range.getMax() == null ? null : ( (Date) range.getMax() ).getTime(),
-
-					range.isMinIncluded(),
-					range.isMaxIncluded()
-			);
-		}
-		else {
-			throw new AssertionFailure( "Unsupported range type" );
-		}
-		return query;
-	}
-
-	private Query createRangeQuery(String min, String max, boolean includeMin, boolean includeMax) {
-		return TermRangeQuery.newStringRange( getFieldName(), min, max, includeMin, includeMax );
 	}
 
 }
