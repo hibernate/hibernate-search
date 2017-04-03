@@ -298,20 +298,18 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		ElasticsearchService elasticsearchService = null;
-		Map<String, Class<?>> entityTypesByName = new HashMap<>();
+		Map<String, EntityIndexBinding> targetedEntityBindingsByName = buildTargetedEntityIndexBindingsByName();
 		Set<String> indexNames = new HashSet<>();
-		Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
 
-		for ( Class<?> queriedEntityType : queriedEntityTypes ) {
-			entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
+		for ( Map.Entry<String, EntityIndexBinding> entry: targetedEntityBindingsByName.entrySet() ) {
+			EntityIndexBinding binding = entry.getValue();
 
-			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
 			IndexManager[] indexManagers = binding.getIndexManagers();
 
 			for ( IndexManager indexManager : indexManagers ) {
 				if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
 					throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
-						queriedEntityType,
+						binding.getDocumentBuilder().getBeanClass(),
 						rawSearchPayload.toString()
 					);
 				}
@@ -335,21 +333,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return null;
 		}
 
-		this.searcher = new IndexSearcher( elasticsearchService, entityTypesByName, indexNames );
+		this.searcher = new IndexSearcher( elasticsearchService, targetedEntityBindingsByName, indexNames );
 		return searcher;
-	}
-
-	private Iterable<Class<?>> getQueriedEntityTypes() {
-		if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
-			Set<Class<?>> indexBindings = extendedIntegrator.getIndexBindings().keySet();
-			if ( indexBindings.isEmpty() ) {
-				throw LOG.queryWithNoIndexedType();
-			}
-			return indexBindings;
-		}
-		else {
-			return indexedTargetedEntities;
-		}
 	}
 
 	/**
@@ -357,21 +342,22 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	 */
 	private class IndexSearcher {
 		private final ElasticsearchService elasticsearchService;
-		private final Map<String, Class<?>> entityTypesByName;
+		private final Map<String, EntityIndexBinding> targetedEntityBindingsByName;
 		private final Set<String> indexNames;
 
 		private final ElasticsearchQueryOptions queryOptions;
-		private final Map<Class<?>, FieldProjection> idProjectionByEntityType = new HashMap<>();
-		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
+		private final Map<EntityIndexBinding, FieldProjection> idProjectionByEntityBinding = new HashMap<>();
+		private final Map<EntityIndexBinding, FieldProjection[]> fieldProjectionsByEntityBinding = new HashMap<>();
 		private final JsonObject payload;
 
-		private IndexSearcher(ElasticsearchService elasticsearchService, Map<String, Class<?>> entityTypesByName, Set<String> indexNames) {
+		private IndexSearcher(ElasticsearchService elasticsearchService,
+				Map<String, EntityIndexBinding> targetedEntityBindingsByName, Set<String> indexNames) {
 			this.elasticsearchService = elasticsearchService;
-			this.entityTypesByName = entityTypesByName;
+			this.targetedEntityBindingsByName = targetedEntityBindingsByName;
 			this.indexNames = indexNames;
 
 			JsonArray typeFilters = new JsonArray();
-			for ( String typeName : entityTypesByName.keySet() ) {
+			for ( String typeName : targetedEntityBindingsByName.keySet() ) {
 				typeFilters.add( getEntityTypeFilter( typeName ) );
 			}
 
@@ -402,7 +388,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 			// TODO: HSEARCH-2254 embedded fields (see https://github.com/searchbox-io/Jest/issues/304)
 			if ( sort != null ) {
-				validateSortFields( extendedIntegrator, getQueriedEntityTypes() );
+				validateSortFields( targetedEntityBindingsByName.values() );
 				payloadBuilder.add( "sort", ToElasticsearch.fromLuceneSort( sort ) );
 			}
 
@@ -483,19 +469,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			boolean includeAllSource = false;
 			JsonBuilder.Array builder = JsonBuilder.array();
 
-			Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
-
 			/*
 			 * IDs are always projected: always initialize their projections regardless of the
 			 * "projectedFields" attribute.
 			 */
-			for ( Class<?> entityType : queriedEntityTypes ) {
-				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
+			for ( EntityIndexBinding binding : targetedEntityBindingsByName.values() ) {
 				DocumentBuilderIndexedEntity documentBuilder = binding.getDocumentBuilder();
 				String idFieldName = documentBuilder.getIdFieldName();
 				TypeMetadata typeMetadata = documentBuilder.getTypeMetadata();
 				FieldProjection projection = createProjection( builder, typeMetadata, idFieldName );
-				idProjectionByEntityType.put( entityType, projection );
+				idProjectionByEntityBinding.put( binding, projection );
 			}
 
 			if ( projectedFields != null ) {
@@ -521,14 +504,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							// Ignore: no impact on source filtering
 							break;
 						default:
-							for ( Class<?> entityType : queriedEntityTypes ) {
-								EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
+							for ( EntityIndexBinding binding : targetedEntityBindingsByName.values() ) {
 								TypeMetadata typeMetadata = binding.getDocumentBuilder().getTypeMetadata();
 								FieldProjection projection = createProjection( builder, typeMetadata, projectedField );
-								FieldProjection[] projectionsForType = fieldProjectionsByEntityType.get( entityType );
+								FieldProjection[] projectionsForType = fieldProjectionsByEntityBinding.get( binding );
 								if ( projectionsForType == null ) {
 									projectionsForType = new FieldProjection[projectedFields.length];
-									fieldProjectionsByEntityType.put( entityType, projectionsForType );
+									fieldProjectionsByEntityBinding.put( binding, projectionsForType );
 								}
 								projectionsForType[i] = projection;
 							}
@@ -626,8 +608,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private void addFacetingRequest(JsonBuilder.Object facets, FacetingRequest facetingRequest) {
 			String facetFieldAbsoluteName = facetingRequest.getFieldName();
 			FacetMetadata facetMetadata = null;
-			for ( Class<?> entityType : getQueriedEntityTypes() ) {
-				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( entityType );
+			for ( EntityIndexBinding binding : targetedEntityBindingsByName.values() ) {
 				TypeMetadata typeMetadata = binding.getDocumentBuilder().getTypeMetadata();
 				facetMetadata = typeMetadata.getFacetMetadataFor( facetFieldAbsoluteName );
 				if ( facetMetadata != null ) {
@@ -756,17 +737,19 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		EntityInfo convertQueryHit(SearchResult searchResult, JsonObject hit) {
 			String type = hit.get( "_type" ).getAsString();
-			Class<?> clazz = entityTypesByName.get( type );
+			EntityIndexBinding binding = targetedEntityBindingsByName.get( type );
 
-			if ( clazz == null ) {
+			if ( binding == null ) {
 				LOG.warnf( "Found unknown type in Elasticsearch index: " + type );
 				return null;
 			}
 
-			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( clazz );
+			DocumentBuilderIndexedEntity documentBuilder = binding.getDocumentBuilder();
+			Class<?> clazz = documentBuilder.getBeanClass();
+
 			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 			conversionContext.setClass( clazz );
-			FieldProjection idProjection = idProjectionByEntityType.get( clazz );
+			FieldProjection idProjection = idProjectionByEntityBinding.get( binding );
 			Object id = idProjection.convertHit( hit, conversionContext );
 			Object[] projections = null;
 
@@ -841,13 +824,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							projections[i] = EntityInfo.ENTITY_PLACEHOLDER;
 							break;
 						default:
-							FieldProjection projection = fieldProjectionsByEntityType.get( clazz )[i];
+							FieldProjection projection = fieldProjectionsByEntityBinding.get( binding )[i];
 							projections[i] = projection.convertHit( hit, conversionContext );
 					}
 				}
 			}
 
-			return new EntityInfoImpl( clazz, binding.getDocumentBuilder().getIdPropertyName(), (Serializable) id, projections );
+			return new EntityInfoImpl( clazz, documentBuilder.getIdPropertyName(), (Serializable) id, projections );
 		}
 
 	}
