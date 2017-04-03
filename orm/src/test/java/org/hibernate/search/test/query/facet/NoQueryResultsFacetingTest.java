@@ -30,14 +30,13 @@ import static org.junit.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 public class NoQueryResultsFacetingTest extends AbstractFacetTest {
-	private final String facetFieldName = "cubicCapacity";
 	private final String facetName = "ccs";
 
 	@Test
 	public void testSimpleDiscretFacetingWithNoResultsQuery() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( facetFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.createFacetingRequest();
 		FullTextQuery query = queryHondaNoResultsWithFacet( request );
@@ -51,7 +50,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		final String descendingOrderedFacet = "desc";
 		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()
 				.name( descendingOrderedFacet )
-				.onField( facetFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.includeZeroCounts( true )
 				.createFacetingRequest();
@@ -59,7 +58,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		final String ascendingOrderedFacet = "asc";
 		FacetingRequest requestAsc = queryBuilder( Car.class ).facet()
 				.name( ascendingOrderedFacet )
-				.onField( facetFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
 				.includeZeroCounts( true )
@@ -107,7 +106,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 	public void testSimpleDiscretFacetingQuery() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( facetFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
@@ -121,7 +120,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		final String descendingOrderedFacet = "desc";
 		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()
 				.name( descendingOrderedFacet )
-				.onField( facetFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.includeZeroCounts( true )
 				.createFacetingRequest();
@@ -129,7 +128,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		final String ascendingOrderedFacet = "asc";
 		FacetingRequest requestAsc = queryBuilder( Car.class ).facet()
 				.name( ascendingOrderedFacet )
-				.onField( facetFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
 				.includeZeroCounts( true )
