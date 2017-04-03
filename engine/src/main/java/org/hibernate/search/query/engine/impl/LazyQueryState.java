@@ -8,6 +8,7 @@ package org.hibernate.search.query.engine.impl;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +23,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
@@ -45,7 +47,7 @@ public final class LazyQueryState implements Closeable {
 	private final boolean fieldSortDoTrackScores;
 	private final boolean fieldSortDoMaxScore;
 	private final ExtendedSearchIntegrator extendedIntegrator;
-	private final Set<Class<?>> targetedTypes;
+	private final Collection<EntityIndexBinding> targetedEntityBindings;
 	private final QueryFilters facetingFilters;
 
 	private Query rewrittenQuery;
@@ -55,7 +57,7 @@ public final class LazyQueryState implements Closeable {
 			IndexReader reader,
 			Similarity searcherSimilarity,
 			ExtendedSearchIntegrator extendedIntegrator,
-			Set<Class<?>> targetedTypes,
+			Collection<EntityIndexBinding> targetedEntityBindings,
 			boolean fieldSortDoTrackScores,
 			boolean fieldSortDoMaxScore) {
 		this.userQuery = userQuery;
@@ -65,7 +67,7 @@ public final class LazyQueryState implements Closeable {
 		this.searcher = new IndexSearcher( reader );
 		this.searcher.setSimilarity( searcherSimilarity );
 		this.extendedIntegrator = extendedIntegrator;
-		this.targetedTypes = targetedTypes;
+		this.targetedEntityBindings = targetedEntityBindings;
 	}
 
 	public boolean isFieldSortDoTrackScores() {
@@ -129,9 +131,9 @@ public final class LazyQueryState implements Closeable {
 		// rewrites queries to use filters
 		Set<String> stringEncodedFieldNames = new HashSet<>();
 		Set<String> numericEncodedFieldNames = new HashSet<>();
-		for ( Class<?> targetedType : targetedTypes ) {
+		for ( EntityIndexBinding binding : targetedEntityBindings ) {
 			IndexedTypeDescriptor indexedTypeDescriptor = extendedIntegrator.getIndexedTypeDescriptor(
-					targetedType
+					binding.getDocumentBuilder().getBeanClass()
 			);
 			// get the field contributions from the type (class bridges)
 			for ( FieldDescriptor fieldDescriptor : indexedTypeDescriptor.getIndexedFields() ) {

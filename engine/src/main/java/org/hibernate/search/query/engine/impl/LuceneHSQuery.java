@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -89,7 +90,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	 */
 	private Filter filter;
 
-	private transient Set<Class<?>> classesAndSubclasses;
+	private transient Map<String, EntityIndexBinding> targetedEntityBindingsByName;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
@@ -180,7 +181,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 				searcher,
 				first,
 				max,
-				classesAndSubclasses
+				targetedEntityBindingsByName
 		);
 	}
 
@@ -393,67 +394,30 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private LazyQueryState buildSearcher(ExtendedSearchIntegrator extendedIntegrator, Boolean forceScoring) {
-		Map<Class<?>, EntityIndexBinding> indexBindings = extendedIntegrator.getIndexBindings();
 		Set<IndexManager> targetedIndexes = new HashSet<>();
 		Set<String> idFieldNames = new HashSet<String>();
 		Similarity searcherSimilarity = null;
 
 		SortConfigurations.Builder sortConfigurations = new SortConfigurations.Builder();
 
+		this.targetedEntityBindingsByName = buildTargetedEntityIndexBindingsByName();
+
 		//TODO check if caching this work for the last n list of indexedTargetedEntities makes a perf boost
-		if ( indexedTargetedEntities.size() == 0 ) {
-			// empty indexedTargetedEntities array means search over all indexed entities,
-			// but we have to make sure there is at least one
-			if ( indexBindings.isEmpty() ) {
-				throw log.queryWithNoIndexedType();
+		for ( EntityIndexBinding entityIndexBinding : targetedEntityBindingsByName.values() ) {
+			DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
+			Class<?> clazz = builder.getBeanClass();
+			searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
+			if ( builder.getIdFieldName() != null ) {
+				idFieldNames.add( builder.getIdFieldName() );
+				allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 			}
 
-			for ( EntityIndexBinding entityIndexBinding : indexBindings.values() ) {
-				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
-				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
-				if ( builder.getIdFieldName() != null ) {
-					idFieldNames.add( builder.getIdFieldName() );
-					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
-				}
-
-				List<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
-				targetedIndexes.addAll( indexManagers );
-				collectSortableFields( sortConfigurations, indexManagers, builder.getTypeMetadata(),
-						Optional.empty() /* No custom metadata in this case */ );
-			}
-			classesAndSubclasses = null;
+			List<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
+			targetedIndexes.addAll( indexManagers );
+			Optional<CustomTypeMetadata> customTypeMetadata = getCustomTypeMetadata( clazz );
+			collectSortableFields( sortConfigurations, indexManagers, builder.getTypeMetadata(), customTypeMetadata );
 		}
-		else {
-			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities );
-			for ( Class<?> clazz : indexedTargetedEntities ) {
-				EntityIndexBinding indexBinder = indexBindings.get( clazz );
-				if ( indexBinder != null ) {
-					DocumentBuilderIndexedEntity builder = indexBinder.getDocumentBuilder();
-					Set<Class<?>> mappedSubclasses = builder.getMappedSubclasses();
-					involvedClasses.addAll( mappedSubclasses );
-				}
-			}
 
-			for ( Class clazz : involvedClasses ) {
-				EntityIndexBinding entityIndexBinding = indexBindings.get( clazz );
-				//TODO should we rather choose a polymorphic path and allow non mapped entities
-				if ( entityIndexBinding == null ) {
-					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
-				}
-				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
-				if ( builder.getIdFieldName() != null ) {
-					idFieldNames.add( builder.getIdFieldName() );
-					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
-				}
-
-				Optional<CustomTypeMetadata> customTypeMetadata = getCustomTypeMetadata( clazz );
-				List<IndexManager> indexManagers = getIndexManagers( entityIndexBinding );
-				targetedIndexes.addAll( indexManagers );
-				collectSortableFields( sortConfigurations, indexManagers, builder.getTypeMetadata(), customTypeMetadata );
-				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
-			}
-			this.classesAndSubclasses = involvedClasses;
-		}
 		this.idFieldNames = idFieldNames;
 
 		if ( targetedIndexes.isEmpty() ) {
@@ -465,14 +429,14 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 		//compute optimization needClassFilterClause
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
-		if ( classesAndSubclasses != null ) {
+		if ( indexedTargetedEntities.size() > 0 ) {
 			for ( IndexManager indexManager : targetedIndexes ) {
 				final Set<Class<?>> classesInIndexManager = indexManager.getContainedTypes();
 				// if an IndexManager contains only one class, we know for sure it's part of classesAndSubclasses
 				if ( classesInIndexManager.size() > 1 ) {
 					//risk of needClassFilterClause
-					for ( Class clazz : classesInIndexManager ) {
-						if ( !classesAndSubclasses.contains( clazz ) ) {
+					for ( Class<?> clazz : classesInIndexManager ) {
+						if ( !targetedEntityBindingsByName.containsKey( clazz.getName() ) ) {
 							this.needClassFilterClause = true;
 							break;
 						}
@@ -483,12 +447,9 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 				}
 			}
 		}
-		else {
-			this.classesAndSubclasses = extendedIntegrator.getIndexedTypes();
-		}
 
 		if ( this.sort != null ) {
-			validateSortFields( extendedIntegrator, this.classesAndSubclasses );
+			validateSortFields( targetedEntityBindingsByName.values() );
 		}
 
 		//set up the searcher
@@ -509,6 +470,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 		//handle the sort and projection
 		final String[] projection = this.projectedFields;
+		Collection<EntityIndexBinding> targetedEntityBindings = targetedEntityBindingsByName.values();
 		if ( Boolean.TRUE.equals( forceScoring ) ) {
 			return new LazyQueryState(
 					filteredQuery,
@@ -516,7 +478,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					compoundReader,
 					searcherSimilarity,
 					extendedIntegrator,
-					classesAndSubclasses,
+					targetedEntityBindings,
 					true,
 					true
 			);
@@ -528,7 +490,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					compoundReader,
 					searcherSimilarity,
 					extendedIntegrator,
-					classesAndSubclasses,
+					targetedEntityBindings,
 					false, false
 			);
 		}
@@ -548,7 +510,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 							compoundReader,
 							searcherSimilarity,
 							extendedIntegrator,
-							classesAndSubclasses,
+							targetedEntityBindings,
 							true,
 							false
 					);
@@ -562,7 +524,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 				compoundReader,
 				searcherSimilarity,
 				extendedIntegrator,
-				classesAndSubclasses,
+				targetedEntityBindings,
 				false,
 				false
 		);
@@ -825,8 +787,8 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			//A query filter is more practical than a manual class filtering post query (esp on scrollable resultsets)
 			//it also probably minimises the memory footprint
 			BooleanQuery.Builder classFilterBuilder = new BooleanQuery.Builder();
-			for ( Class clazz : classesAndSubclasses ) {
-				Term t = new Term( ProjectionConstants.OBJECT_CLASS, clazz.getName() );
+			for ( String typeName : targetedEntityBindingsByName.keySet() ) {
+				Term t = new Term( ProjectionConstants.OBJECT_CLASS, typeName );
 				TermQuery termQuery = new TermQuery( t );
 				classFilterBuilder.add( termQuery, BooleanClause.Occur.SHOULD );
 			}

@@ -27,7 +27,9 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
@@ -40,6 +42,7 @@ import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -63,7 +66,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	protected List<Class<?>> targetedEntities;
 	protected Set<Class<?>> indexedTargetedEntities;
-	private List<CustomTypeMetadata> customTypeMetadata;
+	private List<CustomTypeMetadata> customTypeMetadata = Collections.emptyList();
 
 	protected Sort sort;
 	protected String tenantId;
@@ -299,23 +302,23 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	 */
 	protected abstract Set<String> getSupportedProjectionConstants();
 
-	protected void validateSortFields(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities) {
+	protected void validateSortFields(Iterable<EntityIndexBinding> targetedBindings) {
 		SortField[] sortFields = sort.getSort();
 		for ( SortField sortField : sortFields ) {
-			validateSortField( extendedIntegrator, targetedEntities, sortField );
+			validateSortField( targetedBindings, sortField );
 		}
 	}
 
-	private void validateSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
+	private void validateSortField(Iterable<EntityIndexBinding> targetedBindings, SortField sortField) {
 		if ( sortField instanceof DistanceSortField ) {
-			validateDistanceSortField( extendedIntegrator, targetedEntities, sortField );
+			validateDistanceSortField( targetedBindings, sortField );
 		}
 		else if ( sortField.getType() != SortField.Type.CUSTOM ) {
 			if ( sortField.getField() == null ) {
 				validateNullSortField( sortField );
 			}
 			else {
-				validateCommonSortField( extendedIntegrator, targetedEntities, sortField );
+				validateCommonSortField( targetedBindings, sortField );
 			}
 		}
 	}
@@ -326,8 +329,8 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		}
 	}
 
-	private void validateDistanceSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
-		DocumentFieldMetadata documentFieldMetadata = findFieldMetadata( extendedIntegrator, targetedEntities, sortField.getField() );
+	private void validateDistanceSortField(Iterable<EntityIndexBinding> targetedBindings, SortField sortField) {
+		DocumentFieldMetadata documentFieldMetadata = findFieldMetadata( targetedBindings, sortField.getField() );
 		if ( documentFieldMetadata == null ) {
 			throw LOG.sortRequiresIndexedField( sortField.getClass(), sortField.getField() );
 		}
@@ -336,14 +339,14 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		}
 	}
 
-	private void validateCommonSortField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, SortField sortField) {
+	private void validateCommonSortField(Iterable<EntityIndexBinding> targetedBindings, SortField sortField) {
 		// Inspect bridge-defined fields first, to allow them to override field metadata
-		BridgeDefinedField bridgeDefinedField = findBridgeDefinedField( extendedIntegrator, targetedEntities, sortField.getField() );
+		BridgeDefinedField bridgeDefinedField = findBridgeDefinedField( targetedBindings, sortField.getField() );
 		if ( bridgeDefinedField != null ) {
 			validateSortField( sortField, bridgeDefinedField );
 		}
 		else {
-			DocumentFieldMetadata metadata = findFieldMetadata( extendedIntegrator, targetedEntities, sortField.getField() );
+			DocumentFieldMetadata metadata = findFieldMetadata( targetedBindings, sortField.getField() );
 			if ( metadata != null ) {
 				validateSortField( sortField, metadata );
 			}
@@ -379,12 +382,45 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		}
 	}
 
-	private BridgeDefinedField findBridgeDefinedField(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String fieldPath) {
+	protected final Map<String, EntityIndexBinding> buildTargetedEntityIndexBindingsByName() {
+		Map<Class<?>, EntityIndexBinding> allIndexBindings = extendedIntegrator.getIndexBindings();
+		Map<String, EntityIndexBinding> queriedIndexBindingsByName;
+
+		if ( indexedTargetedEntities.size() == 0 ) {
+			// empty indexedTargetedEntities array means search over all indexed entities,
+			// but we have to make sure there is at least one
+			if ( allIndexBindings.isEmpty() ) {
+				throw LOG.queryWithNoIndexedType();
+			}
+			queriedIndexBindingsByName = CollectionHelper.newHashMap( allIndexBindings.size() );
+			for ( Map.Entry<Class<?>, EntityIndexBinding> entry : allIndexBindings.entrySet() ) {
+				queriedIndexBindingsByName.put( entry.getKey().getName(), entry.getValue() );
+			}
+		}
+		else {
+			queriedIndexBindingsByName = CollectionHelper.newHashMap( indexedTargetedEntities.size() );
+			for ( Class<?> clazz : indexedTargetedEntities ) {
+				EntityIndexBinding entityIndexBinding = allIndexBindings.get( clazz );
+				if ( entityIndexBinding == null ) {
+					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
+				}
+				queriedIndexBindingsByName.put( clazz.getName(), entityIndexBinding );
+				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
+				Set<Class<?>> mappedSubclasses = builder.getMappedSubclasses();
+				for ( Class<?> mappedSubclass : mappedSubclasses ) {
+					queriedIndexBindingsByName.put( mappedSubclass.getName(), allIndexBindings.get( mappedSubclass ) );
+				}
+			}
+		}
+
+		return queriedIndexBindingsByName;
+	}
+
+	private BridgeDefinedField findBridgeDefinedField(Iterable<EntityIndexBinding> targetedBindings, String fieldPath) {
 		if ( fieldPath == null ) {
 			return null;
 		}
-		for ( Class<?> clazz : targetedEntities ) {
-			EntityIndexBinding indexBinding = extendedIntegrator.getIndexBinding( clazz );
+		for ( EntityIndexBinding indexBinding : targetedBindings ) {
 			TypeMetadata typeMetadata = indexBinding.getDocumentBuilder().getTypeMetadata();
 			BridgeDefinedField bridgeDefinedField = typeMetadata.getBridgeDefinedFieldMetadataFor( fieldPath );
 			if ( bridgeDefinedField != null ) {
@@ -394,12 +430,11 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 		return null;
 	}
 
-	private DocumentFieldMetadata findFieldMetadata(ExtendedSearchIntegrator extendedIntegrator, Iterable<Class<?>> targetedEntities, String fieldPath) {
+	private DocumentFieldMetadata findFieldMetadata(Iterable<EntityIndexBinding> targetedBindings, String fieldPath) {
 		if ( fieldPath == null ) {
 			return null;
 		}
-		for ( Class<?> clazz : targetedEntities ) {
-			EntityIndexBinding indexBinding = extendedIntegrator.getIndexBinding( clazz );
+		for ( EntityIndexBinding indexBinding : targetedBindings ) {
 			DocumentFieldMetadata metadata = indexBinding.getDocumentBuilder().getTypeMetadata().getDocumentFieldMetadataFor( fieldPath );
 			if ( metadata != null ) {
 				return metadata;

@@ -8,7 +8,6 @@ package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +19,8 @@ import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 
@@ -51,10 +52,10 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private boolean allowFieldSelection;
 	private boolean needId;
 	private boolean hasProjectionConstants;
-	private final Map<String, Class> targetedClasses;
+	private final Map<String, EntityIndexBinding> targetedEntityBindings;
 	private final int firstIndex;
 	private final int maxIndex;
-	private final Class singleClassIfPossible; //null when not possible
+	private final EntityIndexBinding singleEntityBindingIfPossible; //null when not possible
 	private final ConversionContext exceptionWrap = new ContextualExceptionBridgeHelper();
 
 	public DocumentExtractorImpl(QueryHits queryHits,
@@ -65,7 +66,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 								LazyQueryState searcher,
 								int firstIndex,
 								int maxIndex,
-								Set<Class<?>> classesAndSubclasses) {
+								Map<String, EntityIndexBinding> targetedEntityBindings) {
 		this.extendedIntegrator = extendedIntegrator;
 		if ( projection != null ) {
 			this.projection = projection.clone();
@@ -75,17 +76,13 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 		this.queryHits = queryHits;
 		this.allowFieldSelection = allowFieldSelection;
-		if ( classesAndSubclasses.size() == 1 ) {
-			this.singleClassIfPossible = classesAndSubclasses.iterator().next();
-			this.targetedClasses = null;
+		if ( targetedEntityBindings.size() == 1 ) {
+			this.singleEntityBindingIfPossible = targetedEntityBindings.values().iterator().next();
+			this.targetedEntityBindings = null;
 		}
 		else {
-			this.singleClassIfPossible = null;
-			this.targetedClasses = new HashMap<String, Class>( classesAndSubclasses.size() );
-			for ( Class<?> clazz : classesAndSubclasses ) {
-				//useful to reload classes from index without using reflection
-				targetedClasses.put( clazz.getName(), clazz );
-			}
+			this.singleEntityBindingIfPossible = null;
+			this.targetedEntityBindings = targetedEntityBindings;
 		}
 		this.searcher = searcher;
 		this.firstIndex = firstIndex;
@@ -141,7 +138,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				}
 			}
 		}
-		if ( singleClassIfPossible == null ) {
+		if ( singleEntityBindingIfPossible == null ) {
 			fields.add( ProjectionConstants.OBJECT_CLASS );
 		}
 		if ( needId ) {
@@ -155,29 +152,29 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		// else: this.fieldSelector = null; //We need no fields at all
 	}
 
-	private Serializable extractId(Document document, Class clazz) {
+	private Serializable extractId(DocumentBuilderIndexedEntity documentBuilder, Document document) {
 		if ( !needId ) {
 			return null;
 		}
 		else {
-			return DocumentBuilderHelper.getDocumentId( extendedIntegrator, clazz, document, exceptionWrap );
+			return DocumentBuilderHelper.getDocumentId( documentBuilder, document, exceptionWrap );
 		}
 	}
 
-	private Class extractClass(Document document) throws IOException {
+	private DocumentBuilderIndexedEntity extractDocumentBuilder(Document document) throws IOException {
 		//maybe we can avoid document extraction:
-		if ( singleClassIfPossible != null ) {
-			return singleClassIfPossible;
+		if ( singleEntityBindingIfPossible != null ) {
+			return singleEntityBindingIfPossible.getDocumentBuilder();
 		}
 		String className = document.get( ProjectionConstants.OBJECT_CLASS );
+
 		//and quite likely we can avoid the Reflect helper:
-		Class clazz = targetedClasses.get( className );
-		if ( clazz != null ) {
-			return clazz;
+		EntityIndexBinding entityBinding = targetedEntityBindings.get( className );
+		if ( entityBinding != null ) {
+			return entityBinding.getDocumentBuilder();
 		}
-		else {
-			return DocumentBuilderHelper.getDocumentClass( className, extendedIntegrator.getServiceManager() );
-		}
+
+		return DocumentBuilderHelper.getDocumentBuilder( className, extendedIntegrator );
 	}
 
 	@Override
@@ -185,13 +182,14 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		int docId = queryHits.docId( scoreDocIndex );
 		Document document = extractDocument( scoreDocIndex );
 
-		Class clazz = extractClass( document );
-		String idName = DocumentBuilderHelper.getDocumentIdName( extendedIntegrator, clazz );
-		Serializable id = extractId( document, clazz );
+		DocumentBuilderIndexedEntity documentBuilder = extractDocumentBuilder( document );
+		Class<?> clazz = documentBuilder.getBeanClass();
+		String idName = documentBuilder.getIdPropertyName();
+		Serializable id = extractId( documentBuilder, document );
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
 			projected = DocumentBuilderHelper.getDocumentFields(
-					extendedIntegrator, clazz, document, projection, exceptionWrap
+					documentBuilder, document, projection, exceptionWrap
 			);
 			if ( hasProjectionConstants ) {
 				for ( int x = 0; x < projection.length; x++ ) {

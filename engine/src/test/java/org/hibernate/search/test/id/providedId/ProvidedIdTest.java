@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.test.id.providedId;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
@@ -19,6 +21,7 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
 import org.hibernate.search.query.engine.impl.LazyQueryState;
@@ -95,7 +98,7 @@ public class ProvidedIdTest {
 				indexReader,
 				defaultSimilarity,
 				extendedIntegrator,
-				extendedIntegrator.getIndexedTypes(),
+				extendedIntegrator.getIndexBindings().values(),
 				false,
 				false
 		);
@@ -110,15 +113,15 @@ public class ProvidedIdTest {
 		);
 		Set<String> identifiers = new HashSet<String>();
 		identifiers.add( "providedId" );
-		Set<Class<?>> targetedClasses = new HashSet<Class<?>>();
-		targetedClasses.add( ProvidedIdPerson.class );
-		targetedClasses.add( ProvidedIdPersonSub.class );
+		Map<String, EntityIndexBinding> targetedEntityBindings = new HashMap<>();
+		targetedEntityBindings.put( ProvidedIdPerson.class.getName(), extendedIntegrator.getIndexBinding( ProvidedIdPerson.class ) );
+		targetedEntityBindings.put( ProvidedIdPersonSub.class.getName(), extendedIntegrator.getIndexBinding( ProvidedIdPersonSub.class ) );
 		DocumentExtractor extractor = new DocumentExtractorImpl(
 				queryHits, extendedIntegrator, new String[] { "name" },
 				identifiers, false,
 				lowLevelSearcher,
 				0, 0, //not used in this case
-				targetedClasses
+				targetedEntityBindings
 		);
 		HashSet<String> titles = new HashSet<String>( 3 );
 		for ( int id = 0; id < hits.totalHits; id++ ) {
