@@ -49,9 +49,11 @@ public class Car {
 
 	public static final String COLLATING_ANALYZER_NAME = "org_hibernate_search_test_query_facet_Car" + "_collatingAnalyzer";
 
-	// Those facet names must be different from the original field name, for testing purposes
 	public static final String CUBIC_CAPACITY_STRING = "cubicCapacity_string";
-	public static final String CUBIC_CAPACITY_NUMERIC = "cubicCapacity_numeric";
+
+	// Those facet names must be different from the source field name, for testing purposes
+	public static final String CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING = "cubicCapacity_string_facet_string";
+	public static final String CUBIC_CAPACITY_STRING_FACET_NUMERIC_ENCODING = "cubicCapacity_string_facet_numeric";
 
 	@Id
 	@GeneratedValue
@@ -73,8 +75,8 @@ public class Car {
 	private String make;
 
 	@Field(name = CUBIC_CAPACITY_STRING, analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class))
-	@Facet(name = CUBIC_CAPACITY_STRING, forField = CUBIC_CAPACITY_STRING, encoding = FacetEncodingType.STRING)
-	@Facet(name = CUBIC_CAPACITY_NUMERIC, forField = CUBIC_CAPACITY_STRING, encoding = FacetEncodingType.LONG)
+	@Facet(name = CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING, forField = CUBIC_CAPACITY_STRING, encoding = FacetEncodingType.STRING)
+	@Facet(name = CUBIC_CAPACITY_STRING_FACET_NUMERIC_ENCODING, forField = CUBIC_CAPACITY_STRING, encoding = FacetEncodingType.LONG)
 	private Integer cubicCapacity;
 
 	public Car() {

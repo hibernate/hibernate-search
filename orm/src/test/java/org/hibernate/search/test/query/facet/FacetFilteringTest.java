@@ -37,7 +37,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		Query luceneQuery = queryBuilder( Car.class ).keyword().onField( "make" ).matching( "Honda" ).createQuery();
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.includeZeroCounts( true )
 				.createFacetingRequest();
@@ -69,7 +69,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		final String ccsFacetName = "ccs";
 		FacetingRequest ccsFacetRequest = queryBuilder( Car.class ).facet()
 				.name( ccsFacetName )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.includeZeroCounts( true )
 				.createFacetingRequest();

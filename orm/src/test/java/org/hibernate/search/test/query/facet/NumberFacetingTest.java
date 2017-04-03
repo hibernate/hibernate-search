@@ -30,7 +30,7 @@ public class NumberFacetingTest extends AbstractFacetTest {
 		String facetName = "ccs";
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.createFacetingRequest();
 		FullTextQuery query = matchAll( request );
