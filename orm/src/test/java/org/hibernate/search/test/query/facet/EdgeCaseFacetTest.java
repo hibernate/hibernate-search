@@ -24,14 +24,13 @@ import static org.junit.Assert.assertEquals;
  * @author Emmanuel Bernard
  */
 public class EdgeCaseFacetTest extends AbstractFacetTest {
-	private final String indexFieldName = "cubicCapacity";
 	private final String facetName = "ccs";
 
 	@Test
 	public void testFacetingOnEmptyIndex() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( indexFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );

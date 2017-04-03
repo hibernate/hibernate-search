@@ -33,12 +33,11 @@ public class FacetFilteringTest extends AbstractFacetTest {
 
 	@Test
 	public void testDiscreteFacetDrillDown() throws Exception {
-		final String indexFieldName = "cubicCapacity";
 		final String facetName = "ccs";
 		Query luceneQuery = queryBuilder( Car.class ).keyword().onField( "make" ).matching( "Honda" ).createQuery();
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( indexFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.includeZeroCounts( true )
 				.createFacetingRequest();
@@ -68,10 +67,9 @@ public class FacetFilteringTest extends AbstractFacetTest {
 	@Test
 	public void testMultipleFacetDrillDown() throws Exception {
 		final String ccsFacetName = "ccs";
-		final String ccsFacetFieldName = "cubicCapacity";
 		FacetingRequest ccsFacetRequest = queryBuilder( Car.class ).facet()
 				.name( ccsFacetName )
-				.onField( ccsFacetFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.includeZeroCounts( true )
 				.createFacetingRequest();

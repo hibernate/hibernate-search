@@ -27,11 +27,10 @@ public class NumberFacetingTest extends AbstractFacetTest {
 
 	@Test
 	public void testSimpleFaceting() throws Exception {
-		String indexFieldName = "cubicCapacity";
 		String facetName = "ccs";
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( indexFieldName )
+				.onField( Car.CUBIC_CAPACITY_STRING )
 				.discrete()
 				.createFacetingRequest();
 		FullTextQuery query = matchAll( request );
