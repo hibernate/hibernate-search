@@ -76,9 +76,8 @@ are still required on your cluster: Hibernate Search will not take care of those
 
 [WARNING]
 --
-Due to https://hibernate.atlassian.net/browse/HSEARCH-2605[HSEARCH-2605],
-if you use the `VALIDATE` or `MERGE` schema management strategy
-and upgrade your cluster from 2.x to 5.x,
+Hibernate Search does not support the `string` datatype on Elasticsearch 5.x.
+Thus, if you upgrade your cluster from 2.x to 5.x,
 you will need to delete your indexes manually and <<search-batchindex,reindex your data>>.
 --
 
@@ -833,10 +832,6 @@ Here is a list of known limitations.
 
 Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:
 
-* The `VALIDATE` and `MERGE` strategies don't work for "legacy" mappings,
-  e.g. mappings imported from Elasticsearch 2 to Elasticsearch 5,
-  that can contain properties with the `string` datatype where Hibernate expects either `text` or `keyword`:
-  https://hibernate.atlassian.net/browse/HSEARCH-2605[HSEARCH-2605].
 * Query timeouts: https://hibernate.atlassian.net/browse/HSEARCH-2399[HSEARCH-2399]
 * MoreLikeThis queries: https://hibernate.atlassian.net/browse/HSEARCH-2395[HSEARCH-2395]
 * `@IndexedEmbedded.indexNullAs`: https://hibernate.atlassian.net/browse/HSEARCH-2389[HSEARCH-2389]
