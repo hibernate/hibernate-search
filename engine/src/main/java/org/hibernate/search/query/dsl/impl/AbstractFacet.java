@@ -18,13 +18,15 @@ import org.hibernate.search.query.facet.Facet;
  */
 public abstract class AbstractFacet implements Facet {
 	private final String facetingName;
-	private final String fieldName;
+	private final String facetFieldName;
+	private final String sourceFieldName;
 	private final String value;
 	private final int count;
 
-	public AbstractFacet(String facetingName, String fieldName, String value, int count) {
+	public AbstractFacet(String facetingName, String facetFieldName, String sourceFieldName, String value, int count) {
 		this.facetingName = facetingName;
-		this.fieldName = fieldName;
+		this.facetFieldName = facetFieldName;
+		this.sourceFieldName = sourceFieldName;
 		this.count = count;
 		this.value = value;
 	}
@@ -39,9 +41,21 @@ public abstract class AbstractFacet implements Facet {
 		return value;
 	}
 
+	/**
+	 * @deprecated Use {@link #getFacetFieldName()} instead.
+	 */
 	@Override
+	@Deprecated
 	public String getFieldName() {
-		return fieldName;
+		return getFacetFieldName();
+	}
+
+	public String getFacetFieldName() {
+		return facetFieldName;
+	}
+
+	public String getSourceFieldName() {
+		return sourceFieldName;
 	}
 
 	@Override
@@ -66,7 +80,10 @@ public abstract class AbstractFacet implements Facet {
 		if ( facetingName != null ? !facetingName.equals( that.facetingName ) : that.facetingName != null ) {
 			return false;
 		}
-		if ( fieldName != null ? !fieldName.equals( that.fieldName ) : that.fieldName != null ) {
+		if ( facetFieldName != null ? !facetFieldName.equals( that.facetFieldName ) : that.facetFieldName != null ) {
+			return false;
+		}
+		if ( sourceFieldName != null ? !sourceFieldName.equals( that.sourceFieldName ) : that.sourceFieldName != null ) {
 			return false;
 		}
 		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
@@ -79,7 +96,8 @@ public abstract class AbstractFacet implements Facet {
 	@Override
 	public int hashCode() {
 		int result = facetingName != null ? facetingName.hashCode() : 0;
-		result = 31 * result + ( fieldName != null ? fieldName.hashCode() : 0 );
+		result = 31 * result + ( facetFieldName != null ? facetFieldName.hashCode() : 0 );
+		result = 31 * result + ( sourceFieldName != null ? sourceFieldName.hashCode() : 0 );
 		result = 31 * result + ( value != null ? value.hashCode() : 0 );
 		return result;
 	}
@@ -89,7 +107,8 @@ public abstract class AbstractFacet implements Facet {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "AbstractFacet" );
 		sb.append( "{facetingName='" ).append( facetingName ).append( '\'' );
-		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
+		sb.append( ", facetFieldName='" ).append( facetFieldName ).append( '\'' );
+		sb.append( ", sourceFieldName='" ).append( sourceFieldName ).append( '\'' );
 		sb.append( ", value='" ).append( value ).append( '\'' );
 		sb.append( ", count=" ).append( count );
 		sb.append( '}' );

@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -36,6 +38,7 @@ import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.spi.CustomTypeMetadata;
@@ -495,6 +498,35 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 					String.valueOf( sortField.getType() ), String.valueOf( indexEncodingType ), sortField.getField()
 			);
 		}
+	}
+
+	protected final Map<FacetingRequest, FacetMetadata> buildFacetingRequestsAndMetadata(Collection<FacetingRequest> facetingRequests,
+			Iterable<EntityIndexBinding> targetedEntityBindings) {
+		Map<FacetingRequest, FacetMetadata> result = CollectionHelper.newHashMap( facetingRequests.size() );
+
+		for ( FacetingRequest facetingRequest : facetingRequests ) {
+			result.put( facetingRequest, findFacetMetadata( facetingRequest, targetedEntityBindings ) );
+		}
+
+		return result;
+	}
+
+	private FacetMetadata findFacetMetadata(FacetingRequest facetingRequest, Iterable<EntityIndexBinding> targetedEntityBindings) {
+		String facetFieldAbsoluteName = facetingRequest.getFieldName();
+		FacetMetadata facetMetadata = null;
+		for ( EntityIndexBinding binding : targetedEntityBindings ) {
+			TypeMetadata typeMetadata = binding.getDocumentBuilder().getTypeMetadata();
+			facetMetadata = typeMetadata.getFacetMetadataFor( facetFieldAbsoluteName );
+			if ( facetMetadata != null ) {
+				break;
+			}
+		}
+
+		if ( facetMetadata == null ) {
+			throw LOG.unknownFieldNameForFaceting( facetingRequest.getFacetingName(), facetingRequest.getFieldName() );
+		}
+
+		return facetMetadata;
 	}
 
 	// hooks to be implemented by specific sub-classes

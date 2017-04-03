@@ -10,6 +10,7 @@ package org.hibernate.search.query.dsl.impl;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.query.facet.Facet;
 
 /**
@@ -28,18 +29,18 @@ public class DiscreteFacetRequest extends FacetingRequestImpl {
 	}
 
 	@Override
-	public Facet createFacet(String value, int count) {
-		return new SimpleFacet( getFacetingName(), getFieldName(), value, count );
+	public Facet createFacet(FacetMetadata facetMetadata, String value, int count) {
+		return new SimpleFacet( getFacetingName(), getFieldName(), facetMetadata.getSourceField().getAbsoluteName(), value, count );
 	}
 
 	static class SimpleFacet extends AbstractFacet {
-		SimpleFacet(String facetingName, String fieldName, String value, int count) {
-			super( facetingName, fieldName, value, count );
+		SimpleFacet(String facetingName, String facetFieldName, String sourceFieldName, String value, int count) {
+			super( facetingName, facetFieldName, sourceFieldName, value, count );
 		}
 
 		@Override
 		public Query getFacetQuery() {
-			return new TermQuery( new Term( getFieldName(), getValue() ) );
+			return new TermQuery( new Term( getSourceFieldName(), getValue() ) );
 		}
 	}
 }

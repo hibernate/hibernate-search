@@ -47,6 +47,7 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Counter;
+import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
@@ -79,7 +80,7 @@ public class QueryHits {
 	private final LazyQueryState searcher;
 	private final Filter filter;
 	private final Sort sort;
-	private final Map<String, FacetingRequest> facetRequests;
+	private final Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata;
 	private final TimeoutManagerImpl timeoutManager;
 
 	private int totalHits;
@@ -97,7 +98,7 @@ public class QueryHits {
 			Filter filter,
 			Sort sort,
 			TimeoutManagerImpl timeoutManager,
-			Map<String, FacetingRequest> facetRequests,
+			Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata,
 			TimeoutExceptionFactory timeoutExceptionFactory,
 			Coordinates spatialSearchCenter,
 			String spatialFieldName)
@@ -108,7 +109,7 @@ public class QueryHits {
 				sort,
 				DEFAULT_TOP_DOC_RETRIEVAL_SIZE,
 				timeoutManager,
-				facetRequests,
+				facetingRequestsAndMetadata,
 				timeoutExceptionFactory,
 				spatialSearchCenter,
 				spatialFieldName
@@ -120,7 +121,7 @@ public class QueryHits {
 			Sort sort,
 			Integer n,
 			TimeoutManagerImpl timeoutManager,
-			Map<String, FacetingRequest> facetRequests,
+			Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata,
 			TimeoutExceptionFactory timeoutExceptionFactory,
 			Coordinates spatialSearchCenter,
 			String spatialFieldName)
@@ -129,7 +130,7 @@ public class QueryHits {
 		this.searcher = searcher;
 		this.filter = filter;
 		this.sort = sort;
-		this.facetRequests = facetRequests;
+		this.facetingRequestsAndMetadata = facetingRequestsAndMetadata;
 		this.timeoutExceptionFactory = timeoutExceptionFactory;
 		this.spatialSearchCenter = spatialSearchCenter;
 		this.spatialFieldName = spatialFieldName;
@@ -202,7 +203,7 @@ public class QueryHits {
 	}
 
 	public Map<String, List<Facet>> getFacets() {
-		if ( facetRequests == null || facetRequests.size() == 0 ) {
+		if ( facetingRequestsAndMetadata == null || facetingRequestsAndMetadata.size() == 0 ) {
 			return Collections.emptyMap();
 		}
 		return facetMap;
@@ -265,13 +266,15 @@ public class QueryHits {
 
 	private void updateFacets() throws IOException {
 		facetMap = new HashMap<>();
-		for ( FacetingRequest facetRequest : facetRequests.values() ) {
+		for ( Map.Entry<FacetingRequest, FacetMetadata> entry : facetingRequestsAndMetadata.entrySet() ) {
+			FacetingRequest facetRequest = entry.getKey();
+			FacetMetadata facetMetadata = entry.getValue();
 			ArrayList<Facet> facets;
 			if ( facetRequest instanceof DiscreteFacetRequest ) {
-				facets = updateStringFacets( (DiscreteFacetRequest) facetRequest );
+				facets = updateStringFacets( (DiscreteFacetRequest) facetRequest, facetMetadata );
 			}
 			else {
-				facets = updateRangeFacets( (RangeFacetRequest<?>) facetRequest );
+				facets = updateRangeFacets( (RangeFacetRequest<?>) facetRequest, facetMetadata );
 			}
 
 			// sort if necessary
@@ -289,7 +292,7 @@ public class QueryHits {
 		}
 	}
 
-	private ArrayList<Facet> updateRangeFacets(RangeFacetRequest<?> facetRequest) throws IOException {
+	private ArrayList<Facet> updateRangeFacets(RangeFacetRequest<?> facetRequest, FacetMetadata facetMetadata) throws IOException {
 		ArrayList<Facet> facets;
 		if ( ReflectionHelper.isIntegerType( facetRequest.getFacetValueType() )
 				|| Date.class.isAssignableFrom( facetRequest.getFacetValueType() ) ) {
@@ -300,7 +303,7 @@ public class QueryHits {
 					continue;
 				}
 
-				Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
+				Facet facet = facetRequest.createFacet( facetMetadata, labelAndValue.label, (int) labelAndValue.value );
 				facets.add( facet );
 			}
 		}
@@ -312,7 +315,7 @@ public class QueryHits {
 					continue;
 				}
 
-				Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
+				Facet facet = facetRequest.createFacet( facetMetadata, labelAndValue.label, (int) labelAndValue.value );
 				facets.add( facet );
 			}
 		}
@@ -390,7 +393,7 @@ public class QueryHits {
 		);
 	}
 
-	private ArrayList<Facet> updateStringFacets(DiscreteFacetRequest facetRequest) throws IOException {
+	private ArrayList<Facet> updateStringFacets(DiscreteFacetRequest facetRequest, FacetMetadata facetMetadata) throws IOException {
 		SortedSetDocValuesReaderState docValuesReaderState;
 		try {
 			docValuesReaderState = new DefaultSortedSetDocValuesReaderState( searcher.getIndexReader() );
@@ -405,7 +408,7 @@ public class QueryHits {
 
 		Set<String> termValues = Collections.emptySet();
 		if ( facetRequest.hasZeroCountsIncluded() ) {
-			termValues = findAllTermsForField( facetRequest.getFieldName(), searcher.getIndexReader() );
+			termValues = findAllTermsForField( facetMetadata.getSourceField().getAbsoluteName(), searcher.getIndexReader() );
 		}
 
 		int maxFacetCount = facetRequest.getMaxNumberOfFacets() < 0 ? DEFAULT_FACET_RETRIEVAL_SIZE : facetRequest.getMaxNumberOfFacets();
@@ -421,13 +424,13 @@ public class QueryHits {
 		ArrayList<Facet> facets = new ArrayList<>();
 		if ( facetResult != null ) {
 			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
-				Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
+				Facet facet = facetRequest.createFacet( facetMetadata, labelAndValue.label, (int) labelAndValue.value );
 				facets.add( facet );
 				termValues.remove( labelAndValue.label );
 			}
 		}
 		for ( String termValue : termValues ) {
-			Facet facet = facetRequest.createFacet( termValue, 0 );
+			Facet facet = facetRequest.createFacet( facetMetadata, termValue, 0 );
 			facets.add( 0, facet );
 		}
 		return facets;
@@ -465,7 +468,7 @@ public class QueryHits {
 	}
 
 	private Collector optionallyEnableFacetingCollector(Collector collector) {
-		if ( facetRequests == null || facetRequests.isEmpty() ) {
+		if ( facetingRequestsAndMetadata == null || facetingRequestsAndMetadata.isEmpty() ) {
 			return collector;
 		}
 		facetsCollector = new FacetsCollector();

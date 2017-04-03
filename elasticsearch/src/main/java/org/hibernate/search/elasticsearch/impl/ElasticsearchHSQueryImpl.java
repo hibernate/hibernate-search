@@ -348,6 +348,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private final ElasticsearchQueryOptions queryOptions;
 		private final Map<EntityIndexBinding, FieldProjection> idProjectionByEntityBinding = new HashMap<>();
 		private final Map<EntityIndexBinding, FieldProjection[]> fieldProjectionsByEntityBinding = new HashMap<>();
+		private final Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata;
 		private final JsonObject payload;
 
 		private IndexSearcher(ElasticsearchService elasticsearchService,
@@ -371,14 +372,20 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 			addProjections( payloadBuilder );
 
-			if ( !getFacetManager().getFacetRequests().isEmpty() ) {
+			Collection<FacetingRequest> facetingRequests = getFacetManager().getFacetRequests().values();
+			if ( !facetingRequests.isEmpty() ) {
 				JsonBuilder.Object facets = JsonBuilder.object();
 
-				for ( Entry<String, FacetingRequest> facetRequestEntry : getFacetManager().getFacetRequests().entrySet() ) {
-					addFacetingRequest( facets, facetRequestEntry.getValue() );
+				facetingRequestsAndMetadata =
+						buildFacetingRequestsAndMetadata( facetingRequests, targetedEntityBindingsByName.values() );
+				for ( Entry<FacetingRequest, FacetMetadata> facetingRequestEntry : facetingRequestsAndMetadata.entrySet() ) {
+					addFacetingRequest( facets, facetingRequestEntry.getKey(), facetingRequestEntry.getValue() );
 				}
 
 				payloadBuilder.add( "aggregations", facets );
+			}
+			else {
+				facetingRequestsAndMetadata = Collections.emptyMap();
 			}
 
 			// Initialize the sortByDistanceIndex to detect if the results are sorted by distance and the position
@@ -605,21 +612,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return new PrimitiveProjection( rootTypeMetadata, absoluteName, type );
 		}
 
-		private void addFacetingRequest(JsonBuilder.Object facets, FacetingRequest facetingRequest) {
-			String facetFieldAbsoluteName = facetingRequest.getFieldName();
-			FacetMetadata facetMetadata = null;
-			for ( EntityIndexBinding binding : targetedEntityBindingsByName.values() ) {
-				TypeMetadata typeMetadata = binding.getDocumentBuilder().getTypeMetadata();
-				facetMetadata = typeMetadata.getFacetMetadataFor( facetFieldAbsoluteName );
-				if ( facetMetadata != null ) {
-					break;
-				}
-			}
-
-			if ( facetMetadata == null ) {
-				throw LOG.unknownFieldNameForFaceting( facetingRequest.getFacetingName(), facetingRequest.getFieldName() );
-			}
-
+		private void addFacetingRequest(JsonBuilder.Object facets, FacetingRequest facetingRequest, FacetMetadata facetMetadata) {
 			String sourceFieldAbsoluteName = facetMetadata.getSourceField().getAbsoluteName();
 			String facetSubfieldName = facetMetadata.getPath().getRelativeName();
 
@@ -1037,14 +1030,16 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		Map<String, List<Facet>> results = new HashMap<>();
-		for ( FacetingRequest facetRequest : getFacetManager().getFacetRequests().values() ) {
+		for ( Map.Entry<FacetingRequest, FacetMetadata> entry : searcher.facetingRequestsAndMetadata.entrySet() ) {
+			FacetingRequest facetRequest = entry.getKey();
+			FacetMetadata facetMetadata = entry.getValue();
 			List<Facet> facets;
 			if ( facetRequest instanceof DiscreteFacetRequest ) {
-				facets = updateStringFacets( aggregations, (DiscreteFacetRequest) facetRequest );
+				facets = extractDiscreteFacets( aggregations, (DiscreteFacetRequest) facetRequest, facetMetadata );
 				// Discrete facets are sorted by Elasticsearch
 			}
 			else {
-				facets = updateRangeFacets( aggregations, (RangeFacetRequest<?>) facetRequest );
+				facets = extractRangeFacets( aggregations, (RangeFacetRequest<?>) facetRequest, facetMetadata );
 				if ( !FacetSortOrder.RANGE_DEFINITION_ORDER.equals( facetRequest.getSort() ) ) {
 					Collections.sort( facets, FacetComparators.get( facetRequest.getSort() ) );
 				}
@@ -1055,7 +1050,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		getFacetManager().setFacetResults( results );
 	}
 
-	private List<Facet> updateRangeFacets(JsonObject aggregations, RangeFacetRequest<?> facetRequest) {
+	private List<Facet> extractRangeFacets(JsonObject aggregations, RangeFacetRequest<?> facetRequest,
+			FacetMetadata facetMetadata) {
 		if ( !ReflectionHelper.isIntegerType( facetRequest.getFacetValueType() )
 				&& !Date.class.isAssignableFrom( facetRequest.getFacetValueType() )
 				&& !ReflectionHelper.isFloatingPointType( facetRequest.getFacetValueType() ) ) {
@@ -1072,12 +1068,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			if ( docCount == 0 && !facetRequest.hasZeroCountsIncluded() ) {
 				continue;
 			}
-			facets.add( facetRequest.createFacet( facetRange.getRangeString(), docCount ) );
+			facets.add( facetRequest.createFacet( facetMetadata, facetRange.getRangeString(), docCount ) );
 		}
 		return facets;
 	}
 
-	private List<Facet> updateStringFacets(JsonObject aggregations, DiscreteFacetRequest facetRequest) {
+	private List<Facet> extractDiscreteFacets(JsonObject aggregations, DiscreteFacetRequest facetRequest,
+			FacetMetadata facetMetadata) {
 		JsonElement aggregation = aggregations.get( facetRequest.getFacetingName() );
 		if ( aggregation == null ) {
 			return Collections.emptyList();
@@ -1094,6 +1091,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		ArrayList<Facet> facets = new ArrayList<>();
 		for ( JsonElement bucket : aggregation.getAsJsonObject().get( "buckets" ).getAsJsonArray() ) {
 			facets.add( facetRequest.createFacet(
+					facetMetadata,
 					bucket.getAsJsonObject().get( "key" ).getAsString(),
 					bucket.getAsJsonObject().get( "doc_count" ).getAsInt() ) );
 		}
