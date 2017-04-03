@@ -36,7 +36,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 	public void testSimpleDiscretFacetingWithNoResultsQuery() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.createFacetingRequest();
 		FullTextQuery query = queryHondaNoResultsWithFacet( request );
@@ -50,7 +50,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		final String descendingOrderedFacet = "desc";
 		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()
 				.name( descendingOrderedFacet )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.includeZeroCounts( true )
 				.createFacetingRequest();
@@ -58,7 +58,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		final String ascendingOrderedFacet = "asc";
 		FacetingRequest requestAsc = queryBuilder( Car.class ).facet()
 				.name( ascendingOrderedFacet )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
 				.includeZeroCounts( true )
@@ -106,7 +106,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 	public void testSimpleDiscretFacetingQuery() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
@@ -120,7 +120,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		final String descendingOrderedFacet = "desc";
 		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()
 				.name( descendingOrderedFacet )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.includeZeroCounts( true )
 				.createFacetingRequest();
@@ -128,7 +128,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		final String ascendingOrderedFacet = "asc";
 		FacetingRequest requestAsc = queryBuilder( Car.class ).facet()
 				.name( ascendingOrderedFacet )
-				.onField( Car.CUBIC_CAPACITY_STRING )
+				.onField( Car.CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
 				.includeZeroCounts( true )
