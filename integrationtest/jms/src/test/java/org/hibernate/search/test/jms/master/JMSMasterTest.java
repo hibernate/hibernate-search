@@ -41,7 +41,6 @@ import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.test.SearchTestBase;
@@ -161,15 +160,18 @@ public class JMSMasterTest extends SearchTestBase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		ObjectMessage message = getQueueSession().createObjectMessage();
-		final String indexName = org.hibernate.search.test.jms.master.TShirt.class.getName();
+		final String indexName = getIndexName();
 		message.setStringProperty(
 				Environment.INDEX_NAME_JMS_PROPERTY,
 				indexName );
-		IndexManager indexManager = getExtendedSearchIntegrator().getIndexManagerHolder().getIndexManager( indexName );
-		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
+		byte[] data = getExtendedSearchIntegrator().getWorkSerializer().toSerializedModel( queue );
 		message.setObject( data );
 		QueueSender sender = getQueueSession().createSender( getMessageQueue() );
 		sender.send( message );
+	}
+
+	protected String getIndexName() {
+		return org.hibernate.search.test.jms.master.TShirt.class.getName();
 	}
 
 	private Queue getMessageQueue() throws Exception {

@@ -102,7 +102,7 @@ public class JGroupsMasterTest extends SearchTestBase {
 	}
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
-		final String indexManagerName = "org.hibernate.search.test.jgroups.master.TShirt";
+		final String indexManagerName = getIndexName();
 		ServiceManager serviceManager = getExtendedSearchIntegrator().getServiceManager();
 
 		//send message to all listeners
@@ -112,6 +112,10 @@ public class JGroupsMasterTest extends SearchTestBase {
 		channel.send( message );
 
 		serviceManager.releaseService( LuceneWorkSerializer.class );
+	}
+
+	protected String getIndexName() {
+		return org.hibernate.search.test.jgroups.master.TShirt.class.getName();
 	}
 
 	/**
