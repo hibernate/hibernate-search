@@ -91,7 +91,7 @@ public class IndexManagerHolder {
 	) {
 		String indexName = getIndexName( entity, cfg );
 		Properties[] indexProperties = getIndexProperties( cfg, indexName );
-		Similarity similarity = createSimilarity( indexName, cfg, indexProperties[0], entity, buildContext );
+		Similarity similarity = createSimilarity( indexName, cfg, indexProperties[0], buildContext );
 		boolean isDynamicSharding = isShardingDynamic( indexProperties[0], buildContext );
 
 		IndexManagerType indexManagerType = getIndexManagerType( entity, cfg, buildContext );
@@ -415,7 +415,6 @@ public class IndexManagerHolder {
 	private Similarity createSimilarity(String directoryProviderName,
 			SearchConfiguration searchConfiguration,
 			Properties indexProperties,
-			XClass clazz,
 			WorkerBuildContext buildContext) {
 
 		// now we check the config
@@ -515,14 +514,6 @@ public class IndexManagerHolder {
 				);
 			}
 			else {
-				if ( !indexManager.getSimilarity().getClass().equals( similarity.getClass() ) ) {
-					throw log.getMultipleEntitiesShareIndexWithInconsistentSimilarityException(
-							mappedClass.getName(),
-							similarity.getClass().getName(),
-							indexManager.getContainedTypes().iterator().next().getName(),
-							indexManager.getSimilarity().getClass().getName()
-					);
-				}
 				indexManager.addContainedEntity( mappedClass );
 			}
 			indexManagers[index] = indexManager;
