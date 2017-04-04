@@ -28,9 +28,8 @@ public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 				.onField( "foobar" ) // foobar is not a valid field name
 				.discrete()
 				.createFacetingRequest();
-		FullTextQuery query = queryHondaWithFacet( request );
-
 		try {
+			FullTextQuery query = queryHondaWithFacet( request );
 			query.getFacetManager().getFacets( "foo" );
 			fail( "The specified field name did not exist. Faceting request should fail" );
 		}
@@ -47,11 +46,11 @@ public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 				.discrete()
 				.createFacetingRequest();
 
-		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Fruit.class );
-		query.getFacetManager().enableFaceting( request );
-		assertEquals( "Wrong number of query matches", 1, query.getResultSize() );
-
 		try {
+			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Fruit.class );
+			query.getFacetManager().enableFaceting( request );
+			assertEquals( "Wrong number of query matches", 1, query.getResultSize() );
+
 			query.getFacetManager().getFacets( "foo" );
 			fail( "The specified field name did not exist. Faceting request should fail" );
 		}
