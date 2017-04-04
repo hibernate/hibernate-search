@@ -433,8 +433,7 @@ public class SearchIntegratorBuilder {
 				optimizationBlackListedTypes.add( mappedXClass );
 			}
 
-			IndexManagerType indexManagerType = indexesFactory.getIndexManagerType(
-					mappedXClass, searchConfiguration, buildContext );
+			IndexManagerType indexManagerType = entityIndexBinding.getIndexManagerType();
 
 			// Create all DocumentBuilderIndexedEntity
 			// FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
