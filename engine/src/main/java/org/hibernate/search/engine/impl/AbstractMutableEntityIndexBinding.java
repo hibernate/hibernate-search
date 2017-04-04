@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.indexes.impl.IndexManagerGroupHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 
 /**
@@ -18,17 +19,14 @@ import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
  */
 public abstract class AbstractMutableEntityIndexBinding implements MutableEntityIndexBinding {
 
-	private final Similarity similarityInstance;
+	private final IndexManagerGroupHolder indexManagerGroupHolder;
 	private DocumentBuilderIndexedEntity documentBuilder;
-	private final IndexManagerType indexManagerType;
 	private final EntityIndexingInterceptor<?> entityIndexingInterceptor;
 
 	public AbstractMutableEntityIndexBinding(
-			Similarity similarityInstance,
-			IndexManagerType indexManagerType,
+			IndexManagerGroupHolder indexManagerGroupHolder,
 			EntityIndexingInterceptor<?> entityIndexingInterceptor) {
-		this.similarityInstance = similarityInstance;
-		this.indexManagerType = indexManagerType;
+	this.indexManagerGroupHolder = indexManagerGroupHolder;
 		this.entityIndexingInterceptor = entityIndexingInterceptor;
 	}
 
@@ -39,7 +37,7 @@ public abstract class AbstractMutableEntityIndexBinding implements MutableEntity
 
 	@Override
 	public Similarity getSimilarity() {
-		return similarityInstance;
+		return indexManagerGroupHolder.getSimilarity();
 	}
 
 	@Override
@@ -54,7 +52,7 @@ public abstract class AbstractMutableEntityIndexBinding implements MutableEntity
 
 	@Override
 	public IndexManagerType getIndexManagerType() {
-		return indexManagerType;
+		return indexManagerGroupHolder.getIndexManagerType();
 	}
 
 	@Override

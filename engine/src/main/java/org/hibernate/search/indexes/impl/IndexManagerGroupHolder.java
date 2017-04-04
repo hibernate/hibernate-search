@@ -15,10 +15,13 @@ import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
@@ -43,21 +46,23 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 
 	private final String indexNameBase;
 
-	private final Properties[] properties;
-
 	private final Similarity similarity;
+	private final IndexManagerType indexManagerType;
+	private final EntityIndexBinder entityIndexBinder;
 
 	private final ConcurrentMap<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<>();
 
 	public IndexManagerGroupHolder(IndexManagerHolder parentHolder,
 			String indexNameBase,
-			Properties[] properties,
-			Similarity similarity) {
+			Similarity similarity,
+			IndexManagerType indexManagerType,
+			EntityIndexBinder entityIndexBinder) {
 		super();
 		this.parentHolder = parentHolder;
 		this.indexNameBase = indexNameBase;
-		this.properties = properties;
 		this.similarity = similarity;
+		this.indexManagerType = indexManagerType;
+		this.entityIndexBinder = entityIndexBinder;
 	}
 
 	@Override
@@ -68,16 +73,18 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 		indexManagersRegistry.clear();
 	}
 
-	IndexManager[] preInitializeIndexManagers(Class<?> entityType, WorkerBuildContext context) {
-		IndexManager[] indexManagers;
-		int nbrOfIndexManagers = properties.length;
-		indexManagers = new IndexManager[nbrOfIndexManagers];
-		for ( int index = 0; index < nbrOfIndexManagers; index++ ) {
-			String shardIdentifier = nbrOfIndexManagers > 1 ? String.valueOf( index ) : null;
-			Properties indexProp = properties[index];
-			indexManagers[index] = getOrCreateIndexManager( shardIdentifier, indexProp, entityType, context );
-		}
-		return indexManagers;
+	public Similarity getSimilarity() {
+		return similarity;
+	}
+
+	public IndexManagerType getIndexManagerType() {
+		return indexManagerType;
+	}
+
+	MutableEntityIndexBinding bind(Class<?> entityType, EntityIndexingInterceptor<?> interceptor,
+			WorkerBuildContext buildContext) {
+		// This will create the binding, but also initialize the indexes as necessary
+		return entityIndexBinder.bind( this, entityType, interceptor, buildContext );
 	}
 
 	IndexManager getOrCreateIndexManager(String shardName, Properties indexProperties, Class<?> entityType,

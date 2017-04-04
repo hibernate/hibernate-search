@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.engine.impl;
 
-import org.apache.lucene.search.similarities.Similarity;
+import org.hibernate.search.indexes.impl.IndexManagerGroupHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
@@ -23,12 +22,11 @@ public class NonDynamicShardingEntityIndexBinding extends AbstractMutableEntityI
 	private final IndexManager[] indexManagers;
 
 	public NonDynamicShardingEntityIndexBinding(
+			IndexManagerGroupHolder indexManagerGroupHolder,
 			IndexShardingStrategy shardingStrategy,
-			Similarity similarityInstance,
-			IndexManagerType indexManagerType,
 			IndexManager[] indexManagers,
 			EntityIndexingInterceptor<?> entityIndexingInterceptor) {
-		super( similarityInstance, indexManagerType, entityIndexingInterceptor );
+		super( indexManagerGroupHolder, entityIndexingInterceptor );
 		this.shardingStrategy = shardingStrategy;
 		this.indexManagers = indexManagers;
 	}
