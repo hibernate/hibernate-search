@@ -86,7 +86,7 @@ public class ElasticsearchModuleMemberRegistrationIT {
 					.createProperty().name( "hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY )
 						.value( IndexSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP.getExternalName() ).up()
 					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
-					.createProperty().name( "hibernate.search.default.elasticsearch.required_index_status" ).value( "YELLOW" ).up()
+					.createProperty().name( "hibernate.search.default.elasticsearch.required_index_status" ).value( "yellow" ).up()
 					.createProperty().name( "hibernate.search.default.elasticsearch.refresh_after_write" ).value( "true" ).up()
 				.up().up()
 			.exportAsString();
