@@ -7,41 +7,45 @@
 package org.hibernate.search.engine.impl;
 
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.indexes.impl.DynamicShardingStrategy;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
 /**
  * @author Emmanuel Bernard
  */
-public class DynamicShardingEntityIndexBinding extends AbstractMutableEntityIndexBinding {
+@SuppressWarnings("deprecation")
+public class NonDynamicShardingEntityIndexBinding extends AbstractMutableEntityIndexBinding {
 
-	private final DynamicShardingStrategy shardingStrategy;
+	private final IndexShardingStrategy shardingStrategy;
+	private final IndexManager[] indexManagers;
 
-	public DynamicShardingEntityIndexBinding(
-			DynamicShardingStrategy shardingStrategy,
+	public NonDynamicShardingEntityIndexBinding(
+			IndexShardingStrategy shardingStrategy,
 			Similarity similarityInstance,
 			IndexManagerType indexManagerType,
+			IndexManager[] indexManagers,
 			EntityIndexingInterceptor<?> entityIndexingInterceptor) {
 		super( similarityInstance, indexManagerType, entityIndexingInterceptor );
 		this.shardingStrategy = shardingStrategy;
+		this.indexManagers = indexManagers;
 	}
 
 	@Override
-	public DynamicShardingStrategy getSelectionStrategy() {
+	public IndexShardingStrategy getSelectionStrategy() {
 		return shardingStrategy;
 	}
 
 	@Override
 	public ShardIdentifierProvider getShardIdentifierProvider() {
-		return shardingStrategy.getShardIdentifierProvider();
+		return null;
 	}
 
 	@Override
 	public IndexManager[] getIndexManagers() {
-		return shardingStrategy.getIndexManagersForAllShards();
+		return indexManagers;
 	}
 
 }

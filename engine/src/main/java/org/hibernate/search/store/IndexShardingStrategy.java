@@ -67,4 +67,5 @@ public interface IndexShardingStrategy {
 	 * @return the set of {@link IndexManager}(s) where the entities matching the filters are stored
 	 */
 	IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters);
+
 }

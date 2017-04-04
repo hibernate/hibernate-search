@@ -5,7 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-package org.hibernate.search.engine.impl;
+package org.hibernate.search.indexes.impl;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
@@ -23,20 +22,18 @@ import org.hibernate.search.store.ShardIdentifierProvider;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-class DynamicShardingStrategy implements IndexShardingStrategy {
+public class DynamicShardingStrategy implements IndexShardingStrategy {
 	private final ShardIdentifierProvider shardIdentifierProvider;
-	private final IndexManagerHolder indexManagerHolder;
-	private final String rootIndexName;
-	private final DynamicShardingEntityIndexBinding entityIndexBinding;
+	private final IndexManagerGroupHolder indexManagerGroupHolder;
+	private final Properties indexProperties;
+	private final Class<?> entityType;
 
-	DynamicShardingStrategy(ShardIdentifierProvider shardIdentifierProvider,
-			IndexManagerHolder indexManagerHolder,
-			DynamicShardingEntityIndexBinding entityIndexBinding,
-			String rootIndexName) {
+	public DynamicShardingStrategy(ShardIdentifierProvider shardIdentifierProvider,
+			IndexManagerGroupHolder indexManagerGroupHolder, Properties indexProperties, Class<?> entityType) {
 		this.shardIdentifierProvider = shardIdentifierProvider;
-		this.indexManagerHolder = indexManagerHolder;
-		this.entityIndexBinding = entityIndexBinding;
-		this.rootIndexName = rootIndexName;
+		this.indexManagerGroupHolder = indexManagerGroupHolder;
+		this.indexProperties = indexProperties;
+		this.entityType = entityType;
 	}
 
 	@Override
@@ -52,11 +49,7 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 	@Override
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		String shardIdentifier = shardIdentifierProvider.getShardIdentifier( entity, id, idInString, document );
-		return indexManagerHolder.getOrCreateIndexManager(
-				rootIndexName,
-				shardIdentifier,
-				entityIndexBinding
-		);
+		return indexManagerGroupHolder.getOrCreateIndexManager( shardIdentifier, indexProperties, entityType, null );
 	}
 
 	@Override
@@ -71,7 +64,7 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 		return getIndexManagersFromShards( shards );
 	}
 
-	ShardIdentifierProvider getShardIdentifierProvider() {
+	public ShardIdentifierProvider getShardIdentifierProvider() {
 		return shardIdentifierProvider;
 	}
 
@@ -79,10 +72,11 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 		Set<IndexManager> managers = new HashSet<IndexManager>( shardIdentifiers.size() );
 		for ( String shardIdentifier : shardIdentifiers ) {
 			managers.add(
-					indexManagerHolder.getOrCreateIndexManager(
-							rootIndexName,
+					indexManagerGroupHolder.getOrCreateIndexManager(
 							shardIdentifier,
-							entityIndexBinding
+							indexProperties,
+							entityType,
+							null
 					)
 			);
 		}
