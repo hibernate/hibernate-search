@@ -35,7 +35,7 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 	}
 
 	@Override
-	public void merge(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+	public void migrate(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
 		String indexName = indexMetadata.getName();
 		IndexSettings settings = indexMetadata.getSettings();
 
@@ -72,7 +72,7 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 			}
 		}
 		catch (SearchException e) {
-			throw LOG.schemaMergeFailed( indexName, e );
+			throw LOG.schemaUpdateFailed( indexName, e );
 		}
 	}
 

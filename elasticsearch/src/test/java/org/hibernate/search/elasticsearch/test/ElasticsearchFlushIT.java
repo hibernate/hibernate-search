@@ -40,7 +40,7 @@ public class ElasticsearchFlushIT {
 			.withProperty( "hibernate.search.default." + ElasticsearchEnvironment.REFRESH_AFTER_WRITE, "false" )
 			.withProperty(
 					"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-					IndexSchemaManagementStrategy.RECREATE_DELETE.name()
+					IndexSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP.getExternalName()
 			)
 			.withIdProvidedImplicit( true );
 

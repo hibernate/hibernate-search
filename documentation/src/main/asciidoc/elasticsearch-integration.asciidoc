@@ -177,28 +177,34 @@ Let's see the options for the `index_schema_management_strategy` property:
 [options="header"]
 |===============
 |Value|Definition
-|`NONE`|The index, its mappings and the analyzer definitions will not be created, deleted nor altered.
+|`none`|The index, its mappings and the analyzer definitions will not be created, deleted nor altered.
 Hibernate Search will **not even check** that the index already exists.
-|`VALIDATE`|The index, its mappings and analyzer definitions will be checked for conflicts with Hibernate Search's metamodel.
+|`validate`|The index, its mappings and analyzer definitions will be checked for conflicts with Hibernate Search's metamodel.
 The index, its mappings and analyzer definitions will not be created, deleted nor altered.
-|`MERGE`|The index, its mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
+|`update`|The index, its mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
 +
 Caution: if analyzer definitions have to be updated, the index will be closed automatically during the update.
-|`CREATE`|**The default**: an existing index will not be altered, a missing index will be created along with their mappings and analyzer definitions.
-|`RECREATE`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions.
+|`create`|**The default**: an existing index will not be altered, a missing index will be created along with their mappings and analyzer definitions.
+|`drop-and-create`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions.
 This will delete all content from the indexes!
-|`RECREATE_DELETE`|Similarly to `RECREATE` but will also delete the index at shutdown. Commonly used for tests.
+|`drop-and-create-and-drop`|Similar to `drop-and-create` but will also delete the index at shutdown. Commonly used for tests.
 |===============
 +
 [CAUTION]
 .Strategies in production environments
 ====
-It is strongly recommended to use either `NONE` or `VALIDATE` in a production environment. `RECREATE` and `RECREATE_DELETE` are obviously unsuitable in this context (unless you want to reindex everything upon every startup), and `MERGE` may leave your mapping half-merged in case of conflict.
+It is strongly recommended to use either `none` or `validate` in a production environment.
+`drop-and-create` and `drop-and-create-and-drop` are obviously unsuitable in this context
+(unless you want to reindex everything upon every startup),
+and `update` may leave your mapping half-updated in case of conflict.
 
-To be precise, if your mapping changed in an incompatible way, such as a field having its type changed, merging may be impossible. In this case, the `MERGE` strategy will prevent Hibernate Search from starting, but it may already have successfully merged another index, making a rollback difficult at best.
+To be precise, if your mapping changed in an incompatible way, such as a field having its type changed,
+updating the mapping may be impossible without manual intervention.
+In this case, the `update` strategy will prevent Hibernate Search from starting,
+but it may already have successfully updated the mappings for another index, making a rollback difficult at best.
 
 Also, when updating analyzer definitions, Hibernate Search will stop the affected indexes during the update.
-This means the `MERGE` strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
+This means the `update` strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
 those clients should be synchronized in such a way that while Hibernate Search is starting, no other client tries to use the index.
 
 For these reasons, migrating your mapping should be considered a part of your deployment process and be planned cautiously.
@@ -257,7 +263,7 @@ When <<elasticsearch-scrolling,scrolling>>, the maximum duration `ScrollableResu
 --
 Properties prefixed with `hibernate.search.default` can be given globally as shown above and/or be given for specific indexes:
 
-`hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE`
+`hibernate.search.someindex.elasticsearch.index_schema_management_strategy update`
 
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
 Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled`, `discovery.refresh_interval` and `discovery.scheme`.

@@ -49,7 +49,7 @@ import org.junit.rules.ExpectedException;
 @Category(SkipOnElasticsearch5.class)
 public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBase {
 
-	private static final String MERGE_FAILED_MESSAGE_ID = "HSEARCH400035";
+	private static final String UPDATE_FAILED_MESSAGE_ID = "HSEARCH400035";
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";
 	private static final String ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID = "HSEARCH400007";
 
@@ -64,7 +64,7 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 		Map<String, Object> settings = new HashMap<>();
 		settings.put(
 				"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-				IndexSchemaManagementStrategy.MERGE.name()
+				IndexSchemaManagementStrategy.UPDATE.getExternalName()
 		);
 		init( new ImmutableTestConfiguration( settings, annotatedClasses ) );
 	}
@@ -412,7 +412,7 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 
 		thrown.expect(
 				isException( SearchException.class )
-						.withMessage( MERGE_FAILED_MESSAGE_ID )
+						.withMessage( UPDATE_FAILED_MESSAGE_ID )
 				.causedBy( SearchException.class )
 						.withMessage( MAPPING_CREATION_FAILED_MESSAGE_ID )
 				.causedBy( SearchException.class )
@@ -446,7 +446,7 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 
 		thrown.expect(
 				isException( SearchException.class )
-						.withMessage( MERGE_FAILED_MESSAGE_ID )
+						.withMessage( UPDATE_FAILED_MESSAGE_ID )
 				.causedBy( SearchException.class )
 						.withMessage( MAPPING_CREATION_FAILED_MESSAGE_ID )
 				.causedBy( SearchException.class )

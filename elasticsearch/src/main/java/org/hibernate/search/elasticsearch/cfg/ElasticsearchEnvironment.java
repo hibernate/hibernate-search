@@ -191,10 +191,11 @@ public final class ElasticsearchEnvironment {
 	/**
 	 * Property for specifying the strategy for maintaining the Elasticsearch index.
 	 * <p>
-	 * The name of one of the {@link IndexSchemaManagementStrategy} constants is expected, e.g. MERGE.
+	 * The external name of one of the {@link IndexSchemaManagementStrategy} constants is expected, e.g. 'update'
+	 * (the external names can be retrieved programmatically using {@link IndexSchemaManagementStrategy#getExternalName}).
 	 * <p>
-	 * Can be given globally (e.g. {@code hibernate.search.default.elasticsearch.index_schema_management_strategy=MERGE}) or
-	 * for specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.index_schema_management_strategy=RECREATE}).
+	 * Can be given globally (e.g. {@code hibernate.search.default.elasticsearch.index_schema_management_strategy=update}) or
+	 * for specific indexes (e.g. {@code hibernate.search.someindex.elasticsearch.index_schema_management_strategy=drop-and-create}).
 	 */
 	public static final String INDEX_SCHEMA_MANAGEMENT_STRATEGY = "elasticsearch.index_schema_management_strategy";
 

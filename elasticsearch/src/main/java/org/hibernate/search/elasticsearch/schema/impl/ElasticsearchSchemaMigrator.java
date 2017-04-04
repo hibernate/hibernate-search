@@ -10,16 +10,16 @@ import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.exception.SearchException;
 
 /**
- * An object responsible for merging an existing index with provided metadata.
+ * An object responsible for updating an existing index to match provided metadata.
  *
  * @author Yoann Rodiere
  */
 public interface ElasticsearchSchemaMigrator {
 
 	/**
-	 * Merge metadata with the existing schema: for each mapping, merge the existing mapping
-	 * with the expected one, throwing {@link SearchException} if an incompatible attribute
-	 * is detected.
+	 * Update the existing schema to match the given metadata: for each mapping,
+	 * update the existing mappings and analyzer definitions to match the expected ones,
+	 * throwing {@link SearchException} if an incompatible attribute is detected.
 	 *
 	 * <p>The index is expected to already exist.
 	 *
@@ -27,6 +27,6 @@ public interface ElasticsearchSchemaMigrator {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void merge(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+	void migrate(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
 
 }

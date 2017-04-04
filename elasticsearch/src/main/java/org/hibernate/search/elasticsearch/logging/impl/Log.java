@@ -198,9 +198,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException elasticsearchMappingRetrievalForValidationFailed(@Cause Exception cause);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 35,
-			value = "Could not merge mappings in index '%1$s'"
+			value = "Could not update mappings in index '%1$s'"
 	)
-	SearchException schemaMergeFailed(String indexName, @Cause Exception cause);
+	SearchException schemaUpdateFailed(String indexName, @Cause Exception cause);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 36,
 			value = "Mapping conflict detected for field '%2$s' on entity '%1$s'."

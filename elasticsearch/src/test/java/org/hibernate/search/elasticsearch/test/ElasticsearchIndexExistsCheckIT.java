@@ -130,7 +130,7 @@ public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBas
 		Map<String, Object> settings = new HashMap<>();
 		settings.put(
 				"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-				strategy.name()
+				strategy.getExternalName()
 		);
 		settings.put(
 				"hibernate.search.default." + ElasticsearchEnvironment.INDEX_MANAGEMENT_WAIT_TIMEOUT,

@@ -67,7 +67,7 @@ public class Elasticsearch5SchemaValidationIT extends SearchInitializationTestBa
 		Map<String, Object> settings = new HashMap<>();
 		settings.put(
 				"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-				IndexSchemaManagementStrategy.VALIDATE.name()
+				IndexSchemaManagementStrategy.VALIDATE.getExternalName()
 		);
 		init( new ImmutableTestConfiguration( settings, annotatedClasses ) );
 	}

@@ -47,6 +47,7 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.IndexNameNormalizer;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -161,8 +162,13 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	}
 
 	private static IndexSchemaManagementStrategy getIndexManagementStrategy(Properties properties) {
-		String strategy = properties.getProperty( ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY );
-		return strategy != null ? IndexSchemaManagementStrategy.valueOf( strategy ) : ElasticsearchEnvironment.Defaults.INDEX_SCHEMA_MANAGEMENT_STRATEGY;
+		String propertyValue = properties.getProperty( ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY );
+		if ( StringHelper.isNotEmpty( propertyValue ) ) {
+			return IndexSchemaManagementStrategy.interpretPropertyValue( propertyValue );
+		}
+		else {
+			return ElasticsearchEnvironment.Defaults.INDEX_SCHEMA_MANAGEMENT_STRATEGY;
+		}
 	}
 
 	private static int getIndexManagementWaitTimeout(Properties properties) {
@@ -213,7 +219,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	@Override
 	public void destroy() {
-		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.RECREATE_DELETE ) {
+		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP ) {
 			elasticsearchService.getSchemaDropper().dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
 		}
 
@@ -280,22 +286,22 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 					schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
 				}
 				break;
-			case RECREATE:
-			case RECREATE_DELETE:
+			case DROP_AND_CREATE:
+			case DROP_AND_CREATE_AND_DROP:
 				ElasticsearchSchemaDropper schemaDropper = elasticsearchService.getSchemaDropper();
 				schemaDropper.dropIfExisting( actualIndexName, schemaManagementExecutionOptions );
 				schemaCreator.createIndex( indexMetadata, schemaManagementExecutionOptions );
 				schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
 				createdIndex = true;
 				break;
-			case MERGE:
+			case UPDATE:
 				createdIndex = schemaCreator.createIndexIfAbsent( indexMetadata, schemaManagementExecutionOptions );
 				if ( createdIndex ) {
 					schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
 				}
 				else {
 					ElasticsearchSchemaMigrator schemaMigrator = elasticsearchService.getSchemaMigrator();
-					schemaMigrator.merge( indexMetadata, schemaManagementExecutionOptions );
+					schemaMigrator.migrate( indexMetadata, schemaManagementExecutionOptions );
 				}
 				break;
 			case VALIDATE:
@@ -336,13 +342,13 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 					schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
 				}
 				break;
-			case RECREATE:
-			case RECREATE_DELETE:
+			case DROP_AND_CREATE:
+			case DROP_AND_CREATE_AND_DROP:
 				schemaCreator.createMappings( indexMetadata, schemaManagementExecutionOptions );
 				break;
-			case MERGE:
+			case UPDATE:
 				ElasticsearchSchemaMigrator schemaMigrator = elasticsearchService.getSchemaMigrator();
-				schemaMigrator.merge( indexMetadata, schemaManagementExecutionOptions );
+				schemaMigrator.migrate( indexMetadata, schemaManagementExecutionOptions );
 				break;
 			case VALIDATE:
 				ElasticsearchSchemaValidator schemaValidator = elasticsearchService.getSchemaValidator();

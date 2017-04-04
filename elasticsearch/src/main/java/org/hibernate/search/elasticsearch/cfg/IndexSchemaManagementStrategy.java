@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.elasticsearch.cfg;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Strategy for creating/deleting the indexes in Elasticsearch upon session factory initialization and shut-down.
  *
@@ -18,7 +22,7 @@ public enum IndexSchemaManagementStrategy {
 	 * <p>Hibernate Search will not even check that the index actually exists.
 	 * <p>The index schema (mapping and analyzer definitions) is not managed by Hibernate Search and is not checked.
 	 */
-	NONE,
+	NONE("none"),
 
 	/**
 	 * Upon session factory initialization, existing index mappings will be checked
@@ -27,20 +31,20 @@ public enum IndexSchemaManagementStrategy {
 	 * or if an analyzer definition is missing or differs in any way.
 	 * <p>This strategy will not bring any change to the mappings or analyzer definitions, nor create or delete any index.
 	 */
-	VALIDATE,
+	VALIDATE("validate"),
 
 	/**
-	 * Upon session factory initialization, index mappings and analyzer definitions will be merged with existing ones,
-	 * causing an exception if a mapping to be merged is not compatible with the existing one.
+	 * Upon session factory initialization, index mappings and analyzer definitions will be updated to match expected ones,
+	 * causing an exception if a mapping to be updated is not compatible with the expected one.
 	 * <p>Missing indexes will be created along with their mappings and analyzer definitions.
 	 * Missing mappings and analyzer definitions on existing indexes will be created.
 	 */
-	MERGE,
+	UPDATE("update"),
 
 	/**
 	 * Existing indexes will not be altered, missing indexes will be created along with their mappings and analyzer definitions.
 	 */
-	CREATE,
+	CREATE("create"),
 
 	/**
 	 * Indexes - and all their contents - will be deleted and newly created (along with their mappings and analyzer definitions)
@@ -49,11 +53,42 @@ public enum IndexSchemaManagementStrategy {
 	 * <p>Note that whenever a search factory is altered after initialization (i.e. new entities are mapped),
 	 * the index will <strong>not</strong> be deleted again: new mappings will simply be added to the index.
 	 */
-	RECREATE,
+	DROP_AND_CREATE("drop-and-create"),
 
 	/**
-	 * The same as {@link #RECREATE}, but indexes - and all their contents - will be deleted upon session factory
+	 * The same as {@link #DROP_AND_CREATE}, but indexes - and all their contents - will be deleted upon session factory
 	 * shut-down as well.
 	 */
-	RECREATE_DELETE;
+	DROP_AND_CREATE_AND_DROP("drop-and-create-and-drop");
+
+	private static final Map<String, IndexSchemaManagementStrategy> VALUES_BY_EXTERNAL_NAME;
+	static {
+		Map<String, IndexSchemaManagementStrategy> tmpMap = new HashMap<>();
+		for ( IndexSchemaManagementStrategy strategy : values() ) {
+			tmpMap.put( strategy.externalName, strategy );
+		}
+		VALUES_BY_EXTERNAL_NAME = Collections.unmodifiableMap( tmpMap );
+	}
+
+	public static IndexSchemaManagementStrategy interpretPropertyValue(String propertyValue) {
+		IndexSchemaManagementStrategy strategy = VALUES_BY_EXTERNAL_NAME.get( propertyValue );
+		if ( strategy == null ) {
+				throw new IllegalArgumentException( "Unrecognized property value for an index schema management strategy: '" + propertyValue
+						+ "'. Please use one of " + VALUES_BY_EXTERNAL_NAME.keySet() );
+		}
+		return strategy;
+	}
+
+	private final String externalName;
+
+	private IndexSchemaManagementStrategy(String propertyValue) {
+		this.externalName = propertyValue;
+	}
+
+	/**
+	 * @return the name to use in configuration files.
+	 */
+	public String getExternalName() {
+		return externalName;
+	}
 }

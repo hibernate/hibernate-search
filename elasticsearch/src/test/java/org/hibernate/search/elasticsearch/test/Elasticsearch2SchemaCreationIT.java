@@ -84,7 +84,7 @@ public class Elasticsearch2SchemaCreationIT extends SearchInitializationTestBase
 		Map<String, Object> settings = new HashMap<>();
 		settings.put(
 				"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-				strategy.name()
+				strategy.getExternalName()
 		);
 		init( new ImmutableTestConfiguration( settings, annotatedClasses ) );
 	}
