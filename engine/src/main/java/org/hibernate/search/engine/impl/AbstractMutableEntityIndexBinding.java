@@ -10,35 +10,26 @@ import java.util.Set;
 
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.store.IndexShardingStrategy;
-import org.hibernate.search.store.ShardIdentifierProvider;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBinding {
+public abstract class AbstractMutableEntityIndexBinding implements MutableEntityIndexBinding {
 
-	private final IndexShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
 	private DocumentBuilderIndexedEntity documentBuilder;
 	private final IndexManagerType indexManagerType;
-	private final IndexManager[] indexManagers;
-	private final EntityIndexingInterceptor entityIndexingInterceptor;
+	private final EntityIndexingInterceptor<?> entityIndexingInterceptor;
 
-	public DefaultMutableEntityIndexBinding(
-			IndexShardingStrategy shardingStrategy,
+	public AbstractMutableEntityIndexBinding(
 			Similarity similarityInstance,
 			IndexManagerType indexManagerType,
-			IndexManager[] providers,
-			EntityIndexingInterceptor entityIndexingInterceptor) {
-				this.shardingStrategy = shardingStrategy;
-				this.similarityInstance = similarityInstance;
-				this.indexManagerType = indexManagerType;
-				this.indexManagers = providers;
-				this.entityIndexingInterceptor = entityIndexingInterceptor;
+			EntityIndexingInterceptor<?> entityIndexingInterceptor) {
+		this.similarityInstance = similarityInstance;
+		this.indexManagerType = indexManagerType;
+		this.entityIndexingInterceptor = entityIndexingInterceptor;
 	}
 
 	@Override
@@ -49,16 +40,6 @@ public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBindi
 	@Override
 	public Similarity getSimilarity() {
 		return similarityInstance;
-	}
-
-	@Override
-	public IndexShardingStrategy getSelectionStrategy() {
-		return shardingStrategy;
-	}
-
-	@Override
-	public ShardIdentifierProvider getShardIdentifierProvider() {
-		return null;
 	}
 
 	@Override
@@ -77,12 +58,7 @@ public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBindi
 	}
 
 	@Override
-	public IndexManager[] getIndexManagers() {
-		return indexManagers;
-	}
-
-	@Override
-	public EntityIndexingInterceptor getEntityIndexingInterceptor() {
+	public EntityIndexingInterceptor<?> getEntityIndexingInterceptor() {
 		return entityIndexingInterceptor;
 	}
 
