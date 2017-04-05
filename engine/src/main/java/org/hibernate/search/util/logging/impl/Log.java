@@ -294,10 +294,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d initialized")
 	void serializationProtocol(int major, int minor);
 
-	@LogMessage(level = ERROR)
-	@Message(id = 80, value = "Received a remote message about an unknown index '%1$s': discarding message!")
-	void messageReceivedForUndefinedIndex(String indexName);
-
 	@LogMessage(level = WARN)
 	@Message(id = 81,
 			value = "The index '%1$s' is using a non-recommended combination of backend and directoryProvider implementations")

@@ -16,6 +16,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.backend.spi.BatchBackend;
+import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
@@ -400,6 +401,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	@Override
 	public HSQuery createLuceneBasedHSQuery() {
 		return delegate.createLuceneBasedHSQuery();
+	}
+
+	@Override
+	public OperationDispatcher getRemoteOperationDispatcher() {
+		return delegate.getRemoteOperationDispatcher();
 	}
 
 }
