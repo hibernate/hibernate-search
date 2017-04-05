@@ -12,10 +12,11 @@ import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.logging.impl.Log;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
 import org.jgroups.Message;
@@ -34,12 +35,12 @@ public class JGroupsMasterMessageListener implements Receiver {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private final BuildContext context;
+	private final SearchIntegrator integrator;
 	private final NodeSelectorService selector;
 	private final LuceneWorkSerializer luceneWorkSerializer;
 
 	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorService masterNodeSelector, LuceneWorkSerializer luceneWorkSerializer) {
-		this.context = context;
+		this.integrator = context.getUninitializedSearchIntegrator();
 		this.selector = masterNodeSelector;
 		this.luceneWorkSerializer = luceneWorkSerializer;
 	}
@@ -55,14 +56,8 @@ public class JGroupsMasterMessageListener implements Receiver {
 			//nodeSelector can be null if we receive the message during shutdown
 			if ( nodeSelector != null && nodeSelector.isIndexOwnerLocal() ) {
 				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( offset, bufferLength, rawBuffer );
-				final BackendQueueProcessor backendQueueProcessor = context.getAllIndexesManager().getBackendQueueProcessor( indexName );
-				if ( backendQueueProcessor != null ) {
-					final List<LuceneWork> queue = luceneWorkSerializer.toLuceneWorks( serializedQueue );
-					applyLuceneWorkLocally( queue, backendQueueProcessor, message );
-				}
-				else {
-					log.messageReceivedForUndefinedIndex( indexName );
-				}
+				List<LuceneWork> queue = luceneWorkSerializer.toLuceneWorks( serializedQueue );
+				applyLuceneWorkLocally( queue, message );
 			}
 			else {
 				//TODO forward to new owner or log error
@@ -76,7 +71,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 		}
 	}
 
-	private void applyLuceneWorkLocally(List<LuceneWork> queue, BackendQueueProcessor backendQueueProcessor, Message message) {
+	private void applyLuceneWorkLocally(List<LuceneWork> queue, Message message) {
 		if ( queue != null && !queue.isEmpty() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debugf(
@@ -85,7 +80,8 @@ public class JGroupsMasterMessageListener implements Receiver {
 						message.getSrc()
 				);
 			}
-			backendQueueProcessor.applyWork( queue, null );
+			OperationDispatcher operationDispatcher = integrator.getRemoteOperationDispatcher();
+			operationDispatcher.dispatch( queue, null );
 		}
 		else {
 			log.receivedEmptyLuceneWorksInMessage();
