@@ -8,9 +8,6 @@ package org.hibernate.search.test.jms.master;
 
 import static org.junit.Assert.assertEquals;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +32,6 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
-import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -47,6 +43,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.concurrency.Poller;
@@ -86,8 +83,7 @@ public class JMSMasterTest extends SearchTestBase {
 
 	@Test
 	public void testMessageSending() throws Exception {
-
-		TShirt shirt = createObjectWithSQL();
+		TShirt shirt = createObject();
 		List<LuceneWork> queue = createDocumentAndWorkQueue( shirt );
 
 		registerMessageListener();
@@ -111,7 +107,7 @@ public class JMSMasterTest extends SearchTestBase {
 		assertEquals( 0, listByQuery( "logo:jboss" ).size() );
 
 		{
-			shirt = createObjectWithSQL();
+			shirt = createObject();
 			queue = createDocumentAndWorkQueue( shirt );
 
 			registerMessageListener();
@@ -217,7 +213,7 @@ public class JMSMasterTest extends SearchTestBase {
 				ProjectionConstants.OBJECT_CLASS, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED
 		);
 		doc.add( field );
-		field = new Field( "id", "1", Field.Store.YES, Field.Index.ANALYZED );
+		field = new Field( "id", String.valueOf( shirt.getId() ), Field.Store.YES, Field.Index.ANALYZED );
 		doc.add( field );
 		field = new Field( "logo", shirt.getLogo(), Field.Store.NO, Field.Index.ANALYZED );
 		doc.add( field );
@@ -232,26 +228,19 @@ public class JMSMasterTest extends SearchTestBase {
 	}
 
 	/**
-	 * Create a test object without triggering indexing. Use SQL directly.
+	 * Create a test object without triggering indexing,
+	 * because Hibernate Search listeners are disabled.
 	 *
 	 * @return a <code>TShirt</code> test object.
-	 *
-	 * @throws SQLException in case the insert fails.
 	 */
-	private TShirt createObjectWithSQL() throws SQLException {
+	private TShirt createObject() {
 		Session s = openSession();
 		s.getTransaction().begin();
-		s.doWork( new Work() {
-			@Override
-			public void execute(Connection connection) throws SQLException {
-				final Statement statement = connection.createStatement();
-				statement.executeUpdate(
-						"insert into TShirt_Master(id, logo, size_, length_) values( 1, 'JBoss balls', 'large', 23.2)"
-				);
-				statement.close();
-			}
-		} );
-		TShirt ts = s.get( TShirt.class, 1 );
+		TShirt ts = new TShirt();
+		ts.setLogo( "JBoss balls" );
+		ts.setSize( "large" );
+		ts.setLength( 23.2d );
+		s.persist( ts );
 		s.getTransaction().commit();
 		s.close();
 		return ts;
@@ -290,6 +279,9 @@ public class JMSMasterTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
+		// See createObject()
+		cfg.put( Environment.INDEXING_STRATEGY, IndexingMode.MANUAL.toExternalRepresentation() );
+
 		// explicitly set the backend even though local is default.
 		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "local" );
 	}
