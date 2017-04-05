@@ -15,7 +15,6 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -31,13 +30,11 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private static final Log log = LoggerFactory.make();
 
 	private final int batchSize;
-	private final Map<Class<?>, EntityIndexBinding> entityIndexBindings;
-	private final TransactionalOperationExecutorSelector executorSelector;
+	private final TransactionalOperationDispatcher operationDispatcher;
 
 	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexBinding> entityIndexBindings, Properties properties, IndexManagerHolder indexManagerHolder) {
-		this.entityIndexBindings = entityIndexBindings;
 		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
-		this.executorSelector = new TransactionalOperationExecutorSelector( indexManagerHolder );
+		this.operationDispatcher = new TransactionalOperationDispatcher( indexManagerHolder, entityIndexBindings );
 	}
 
 	@Override
@@ -72,15 +69,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			sb.append( "]" );
 			log.trace( sb.toString() );
 		}
-		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter();
-		for ( LuceneWork work : sealedQueue ) {
-			final Class<?> entityType = work.getEntityClass();
-			EntityIndexBinding entityIndexBinding = entityIndexBindings.get( entityType );
-			IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-			TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( executorSelector, null );
-			executor.performOperation( work, shardingStrategy, context );
-		}
-		context.commitOperations( null );
+		operationDispatcher.dispatch( sealedQueue, null );
 	}
 
 	@Override
