@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.spi.BatchBackend;
+import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -230,4 +231,13 @@ public interface SearchIntegrator extends AutoCloseable {
 	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
 
 	LuceneWorkSerializer getWorkSerializer();
+
+	/**
+	 * @return An operation dispatcher allowing to insert works retrieved from
+	 * remote sources (e.g. JMS or JGroups slaves).
+	 *
+	 * @hsearch.experimental Operation dispatchers are under active development.
+	 * You should be prepared for incompatible changes in future releases.
+	 */
+	OperationDispatcher getRemoteOperationDispatcher();
 }

@@ -14,8 +14,8 @@ import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -57,21 +57,23 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		final ObjectMessage objectMessage = (ObjectMessage) message;
 		final String indexName;
 		final List<LuceneWork> queue;
-		final IndexManager indexManager;
 		SearchIntegrator integrator = getSearchIntegrator();
 		try {
 			indexName = extractIndexName( objectMessage );
 			if ( log.isDebugEnabled() ) {
 				logMessageDetails( objectMessage, indexName );
 			}
-			indexManager = integrator.getIndexManager( indexName );
-			if ( indexManager == null ) {
-				log.messageReceivedForUndefinedIndex( indexName );
-				return;
-			}
 
-			queue = getSearchIntegrator().getWorkSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
-			indexManager.performOperations( queue, null );
+			queue = integrator.getWorkSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
+
+			/*
+			 * We have to use a dispatcher here in order to make sure
+			 * the sharding strategies lazily initialize new indexes as necessary
+			 * and update their shard list.
+			 * Thus the index name is rather useless in this case.
+			 */
+			OperationDispatcher dispatcher = integrator.getRemoteOperationDispatcher();
+			dispatcher.dispatch( queue, null );
 		}
 		catch (JMSException e) {
 			log.unableToRetrieveObjectFromMessage( message.getClass(), e );
