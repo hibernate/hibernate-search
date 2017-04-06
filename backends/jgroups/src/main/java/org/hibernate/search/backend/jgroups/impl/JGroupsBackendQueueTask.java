@@ -28,16 +28,16 @@ public class JGroupsBackendQueueTask {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private final JGroupsBackendQueueProcessor factory;
+	private final MessageSenderService messageSender;
 	private final String indexName;
 	private final NodeSelectorStrategy masterNodeSelector;
 	private final LuceneWorkSerializer luceneWorkSerializer;
 	private final boolean blockForACK; //true by default if this backend is synchronous
 	private final long messageTimeout;
 
-	public JGroupsBackendQueueTask(JGroupsBackendQueueProcessor factory, IndexManager indexManager,
+	public JGroupsBackendQueueTask(MessageSenderService messageSender, IndexManager indexManager,
 			NodeSelectorService masterNodeSelector, LuceneWorkSerializer luceneWorkSerializer, boolean blockForACK, long messageTimeout) {
-		this.factory = factory;
+		this.messageSender = messageSender;
 		this.blockForACK = blockForACK;
 		this.messageTimeout = messageTimeout;
 		this.indexName = indexManager.getIndexName();
@@ -76,9 +76,9 @@ public class JGroupsBackendQueueTask {
 
 		try {
 			Message message = masterNodeSelector.createMessage( data );
-			factory.getMessageSenderService().send( message, blockForACK, messageTimeout );
+			messageSender.send( message, blockForACK, messageTimeout );
 			if ( trace ) {
-				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );
+				log.tracef( "Lucene works have been sent from slave %s to master node.", messageSender.getAddress() );
 			}
 		}
 		catch (Exception e) {

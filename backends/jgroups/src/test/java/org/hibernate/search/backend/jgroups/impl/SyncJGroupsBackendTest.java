@@ -49,8 +49,8 @@ public class SyncJGroupsBackendTest {
 		.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
 		.withProperty( "hibernate.search.dvds.jgroups.messages_timeout", String.valueOf( JGROUPS_MESSAGES_TIMEOUT ) )
 		.withProperty( "hibernate.search.books.worker.execution", "async" )
-		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
-		.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
+		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackend.BLOCK_WAITING_ACK, "true" )
+		.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackend.BLOCK_WAITING_ACK, "false" )
 		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
 
 	@Rule
