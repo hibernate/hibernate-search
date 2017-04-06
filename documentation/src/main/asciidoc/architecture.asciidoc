@@ -69,7 +69,8 @@ Hibernate Search offers the ability to let the batched work being processed by d
 Several back ends are provided out of the box and you have the option to plugin your own. It is
 important to understand that in this context back end encompasses more than just the configuration
 option `hibernate.search.default.worker.backend`. This property just specifies a implementation of
-the BackendQueueProcessor interface which is a part of a back end configuration. In most cases,
+the `BackendQueueProcessor` interface (or the `Backend` interface, see <<table-backend-configuration, the configuration options>>)
+which is a part of a back end configuration. In most cases,
 however, additional configuration settings are needed to successfully configure a specific backend
 setup, like for example the JMS back end.
 

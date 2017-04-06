@@ -28,8 +28,13 @@ public interface BackendQueueProcessor {
 	 * @param props all configuration properties
 	 * @param context context giving access to required meta data
 	 * @param indexManager the index it is related to.
+	 *
+	 * @deprecated Use a {@link Backend} implementation and implement your initialization logic
+	 * in {@link Backend#createQueueProcessor(IndexManager, WorkerBuildContext)} instead.
 	 */
-	void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager);
+	default void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+		// Does nothing by default
+	}
 
 	/**
 	 * Used to shutdown and eventually release resources.

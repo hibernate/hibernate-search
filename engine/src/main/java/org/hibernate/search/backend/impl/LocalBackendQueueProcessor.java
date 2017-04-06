@@ -16,7 +16,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
- * A {@link BackendQueueProcessor} which applies given index changes locally to the corresponding {@link IndexManager}.
+ * A queue processor for the {@link LocalBackend}.
  *
  * @author Gunnar Morling
  */
@@ -24,6 +24,26 @@ public class LocalBackendQueueProcessor implements BackendQueueProcessor {
 
 	private IndexManager indexManager;
 
+	/**
+	 * @deprecated Provided so that passing the LocalBackendQueueProcessor class
+	 * as the value of the "backend" configuration option still works, but normally
+	 * the "local" string should be used instead, in which case the other constructor
+	 * is used.
+	 */
+	@Deprecated
+	public LocalBackendQueueProcessor() {
+	}
+
+	public LocalBackendQueueProcessor(IndexManager indexManager) {
+		this.indexManager = indexManager;
+	}
+
+	/**
+	 * @deprecated Provided so that passing the LocalBackendQueueProcessor class
+	 * as the value of the "backend" configuration option still works, but normally
+	 * the "local" string should be used instead, in which case this method is not used.
+	 */
+	@Deprecated
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.indexManager = indexManager;

@@ -27,6 +27,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -70,6 +71,7 @@ public class IndexManagerHolder {
 	private final ConcurrentMap<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 	private final ConcurrentMap<String, BackendQueueProcessor> backendQueueProcessorRegistry = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, IndexManagerGroupHolder> groupHolderRegistry = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, IndexManagerGroupHolder> groupHolderByIndexManagerNameRegistry = new ConcurrentHashMap<>();
 
 	private ExtendedSearchIntegrator integrator;
 
@@ -163,6 +165,10 @@ public class IndexManagerHolder {
 		return integrator;
 	}
 
+	void register(String indexName, IndexManagerGroupHolder groupHolder) {
+		groupHolderByIndexManagerNameRegistry.put( indexName, groupHolder );
+	}
+
 	void register(String indexName, IndexManager indexManager, BackendQueueProcessor backendQueueProcessor) {
 		indexManagersRegistry.put( indexName, indexManager );
 		backendQueueProcessorRegistry.put( indexName, backendQueueProcessor );
@@ -181,6 +187,7 @@ public class IndexManagerHolder {
 			groupHolder.close();
 		}
 		groupHolderRegistry.clear();
+		groupHolderByIndexManagerNameRegistry.clear();
 		indexManagersRegistry.clear();
 		indexManagerImplementationsRegistry.clear();
 	}
@@ -203,6 +210,15 @@ public class IndexManagerHolder {
 		}
 
 		return backendQueueProcessorRegistry.get( indexName );
+	}
+
+	public IndexManagerGroupHolder getGroupHolderByIndexManager(IndexManager indexManager) {
+		String indexName = indexManager.getIndexName();
+		IndexManagerGroupHolder groupHolder = groupHolderByIndexManagerNameRegistry.get( indexName );
+		if ( groupHolder == null ) {
+			throw new AssertionFailure( "An index manager was not properly registered in the IndexManagerHolder: " + indexName );
+		}
+		return groupHolder;
 	}
 
 	private Class<? extends EntityIndexingInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {

@@ -39,7 +39,26 @@ class DynamicShardingEntityIndexBinder implements EntityIndexBinder {
 		);
 		DynamicShardingStrategy shardingStrategy = new DynamicShardingStrategy( shardIdentifierProvider, holder, properties, entityType );
 
+		/*
+		 * Ensure the backend is created even if there are no indexes yet:
+		 * this allows master/slave backends to set up message consumers
+		 * on the master node in case a slave initiates the creation
+		 * of an index, for instance.
+		 */
+		preInitializeBackend( holder, buildContext );
+
 		return new DynamicShardingEntityIndexBinding( holder, shardingStrategy, interceptor );
+	}
+
+	@Override
+	public String createBackendIdentifier(String backendName, String indexName) {
+		/*
+		 * There will be only one backend instance shared among all shards.
+		 *
+		 * We only integrate the backend name in the ID, in order to
+		 * handle the case where the backend delegates to another implementation.
+		 */
+		return backendName;
 	}
 
 	private ShardIdentifierProvider createShardIdentifierProvider(WorkerBuildContext buildContext, Properties indexProperty) {
@@ -52,6 +71,16 @@ class DynamicShardingEntityIndexBinder implements EntityIndexBinder {
 		shardIdentifierProvider.initialize( properties, buildContext );
 
 		return shardIdentifierProvider;
+	}
+
+	private void preInitializeBackend(IndexManagerGroupHolder holder, WorkerBuildContext buildContext) {
+		/*
+		 * We only rely on the index manager name for debugging purposes:
+		 * see createBackendIdentifier, the index manager name is not used in the backend identifier.
+		 *
+		 * Thus we can safely assume that the index manager name is the index name base.
+		 */
+		holder.getOrCreateBackend( holder.getIndexNameBase(), properties, buildContext );
 	}
 
 }
