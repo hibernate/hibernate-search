@@ -11,7 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.backend.impl.InternalBackendFactory;
+import org.hibernate.search.backend.spi.Backend;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
@@ -51,6 +52,7 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 	private final EntityIndexBinder entityIndexBinder;
 
 	private final ConcurrentMap<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Backend> backendRegistry = new ConcurrentHashMap<>();
 
 	public IndexManagerGroupHolder(IndexManagerHolder parentHolder,
 			String indexNameBase,
@@ -67,10 +69,19 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 
 	@Override
 	public synchronized void close() {
+		for ( Backend backend : backendRegistry.values() ) {
+			backend.close();
+		}
+		backendRegistry.clear();
+
 		for ( IndexManager indexManager : indexManagersRegistry.values() ) {
 			indexManager.destroy();
 		}
 		indexManagersRegistry.clear();
+	}
+
+	public String getIndexNameBase() {
+		return indexNameBase;
 	}
 
 	public Similarity getSimilarity() {
@@ -85,6 +96,36 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 			WorkerBuildContext buildContext) {
 		// This will create the binding, but also initialize the indexes as necessary
 		return entityIndexBinder.bind( this, entityType, interceptor, buildContext );
+	}
+
+	public Backend getOrCreateBackend(String indexManagerName, Properties properties, WorkerBuildContext buildContext) {
+		String backendName = properties.getProperty( Environment.WORKER_BACKEND );
+		return getOrCreateBackend( backendName, indexManagerName, properties, buildContext );
+	}
+
+	public Backend getOrCreateBackend(String backendName, String indexManagerName, Properties properties, WorkerBuildContext buildContext) {
+		if ( backendName == null ) {
+			/*
+			 * The name may be null (meaning "use the default"), but this is annoying here
+			 * because we use it as a key in a may that doesn't accept null keys.
+			 * Since an empty string also means "use the default", we'll use that instead.
+			 */
+			backendName = "";
+		}
+		String backendIdentifier = entityIndexBinder.createBackendIdentifier( backendName, indexManagerName );
+		Backend backend = backendRegistry.get( backendIdentifier );
+		if ( backend != null ) {
+			return backend;
+		}
+		synchronized (this) {
+			backend = backendRegistry.get( backendIdentifier );
+			if ( backend != null ) {
+				return backend;
+			}
+			backend = InternalBackendFactory.createBackend( backendName, indexManagerName, properties, buildContext );
+			backendRegistry.put( backendIdentifier, backend );
+			return backend;
+		}
 	}
 
 	IndexManager getOrCreateIndexManager(String shardName, Properties indexProperties, Class<?> entityType,
@@ -157,7 +198,19 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 
 		indexManagersRegistry.put( indexName, manager );
 
-		BackendQueueProcessor backendQueueProcessor = BackendFactory.createBackend( manager, workerBuildContext, indexProperties );
+		/*
+		 * During backend creation, it may be needed to create another backend,
+		 * for instance if a backend wants to delegate to another implementation.
+		 * But during backend creation, we don't have a reference to this instance,
+		 * so we cannot call getOrCreateBackend().
+		 * To work around this (and to avoid breaking the BackendFactory API),
+		 * we provide IndexManagerHolder.getGroupHolderByIndexManager(),
+		 * but this requires to first register the groupHolder against the index name.
+		 */
+		parentHolder.register( indexName, this );
+
+		Backend backend = getOrCreateBackend( indexName, indexProperties, workerBuildContext );
+		BackendQueueProcessor backendQueueProcessor = backend.createQueueProcessor( manager, workerBuildContext );
 		parentHolder.register( indexName, manager, backendQueueProcessor );
 
 		manager.addContainedEntity( entityType );

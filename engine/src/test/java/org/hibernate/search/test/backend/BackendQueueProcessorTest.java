@@ -8,9 +8,10 @@ package org.hibernate.search.test.backend;
 
 import java.util.Properties;
 
-import org.easymock.classextension.EasyMock;
-import org.hibernate.search.backend.impl.LocalBackendQueueProcessor;
-import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
+import org.easymock.EasyMock;
+import org.hibernate.search.backend.impl.LocalBackend;
+import org.hibernate.search.backend.impl.blackhole.BlackHoleBackend;
+import org.hibernate.search.backend.spi.Backend;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -23,16 +24,17 @@ public class BackendQueueProcessorTest {
 
 	@Test
 	public void testCheckingForNullWork() {
-		checkBackendBehaviour( new LocalBackendQueueProcessor() );
-		checkBackendBehaviour( new BlackHoleBackendQueueProcessor() );
+		checkBackendBehaviour( LocalBackend.INSTANCE );
+		checkBackendBehaviour( BlackHoleBackend.INSTANCE );
 	}
 
-	private void checkBackendBehaviour(BackendQueueProcessor backend) {
+	private void checkBackendBehaviour(Backend backend) {
 		try {
 			WorkerBuildContext context = EasyMock.createNiceMock( WorkerBuildContext.class );
 			IndexManager indexManager = EasyMock.createNiceMock( IndexManager.class );
-			backend.initialize( new Properties(), context, indexManager );
-			backend.applyWork( null, null );
+			backend.initialize( new Properties(), context );
+			BackendQueueProcessor processor = backend.createQueueProcessor( indexManager, context );
+			processor.applyWork( null, null );
 		}
 		catch (IllegalArgumentException e) {
 			// this is ok, we just want to avoid other exceptions or NPEs

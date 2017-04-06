@@ -21,4 +21,19 @@ interface EntityIndexBinder {
 	MutableEntityIndexBinding bind(IndexManagerGroupHolder holder, Class<?> entityType,
 			EntityIndexingInterceptor<?> interceptor, WorkerBuildContext buildContext);
 
+	/**
+	 * Controls how backends are identified.
+	 * <p>
+	 * This is primarily used to allow the dynamic sharding binder
+	 * to only have one backend instance per backend name, shared among
+	 * all shards, whereas the non-dynamic sharding binder will want
+	 * one backend instance per shard (so as to allow multiple shards
+	 * to have different types of backends, or differently configured backends).
+	 *
+	 * @param backendName The name of the backend, defining to implementation to use
+	 * @param indexName The name of the index
+	 * @return The backend identifier
+	 */
+	String createBackendIdentifier(String backendName, String indexName);
+
 }

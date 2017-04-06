@@ -26,6 +26,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 @SuppressWarnings("deprecation")
 class NonDynamicShardingEntityIndexBinder implements EntityIndexBinder {
 	private static final Log log = LoggerFactory.make();
+	private static final String INDEX_BACKEND_NAME_SEPARATOR = "#";
 
 	private final Class<? extends IndexShardingStrategy> shardingStrategyClass;
 	private final Properties[] properties;
@@ -50,6 +51,17 @@ class NonDynamicShardingEntityIndexBinder implements EntityIndexBinder {
 		shardingStrategy.initialize( maskedProperties, indexManagers );
 
 		return new NonDynamicShardingEntityIndexBinding( holder, shardingStrategy, indexManagers, interceptor );
+	}
+
+	@Override
+	public String createBackendIdentifier(String backendName, String indexName) {
+		/*
+		 * Each shard will have its own backend instances,
+		 * because each shard has a separate set of properties.
+		 * We also integrate the backend name in the ID, in order to
+		 * handle the case where a backend delegates to another implementation.
+		 */
+		return indexName + INDEX_BACKEND_NAME_SEPARATOR + backendName;
 	}
 
 	private IndexManager[] preInitializeIndexManagersAndBackends(IndexManagerGroupHolder holder,

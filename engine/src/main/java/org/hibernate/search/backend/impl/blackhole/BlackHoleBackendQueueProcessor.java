@@ -18,11 +18,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * This backend does not do anything: the Documents are not
- * sent to any index but are discarded.
- * Useful to identify the bottleneck in indexing performance problems,
- * fully disabling the backend system but still building the Documents
- * needed to update an index (loading data from DB).
+ * A queue processor for the {@link BlackHoleBackend}.
  *
  * @author Sanne Grinovero
  */
