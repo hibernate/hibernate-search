@@ -13,7 +13,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
-import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.jgroups.impl.JGroupsBackend;
 import org.hibernate.search.backend.jgroups.impl.MessageListenerToRequestHandlerAdapter;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
@@ -128,8 +128,8 @@ public class JGroupsSlaveTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.put( "hibernate.search.default." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" );
-		cfg.put( "hibernate.search.default." + JGroupsBackendQueueProcessor.MESSAGE_TIMEOUT_MS, "100" );
+		cfg.put( "hibernate.search.default." + JGroupsBackend.BLOCK_WAITING_ACK, "false" );
+		cfg.put( "hibernate.search.default." + JGroupsBackend.MESSAGE_TIMEOUT_MS, "100" );
 		cfg.put( DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
 		cfg.put( DispatchMessageSender.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}
