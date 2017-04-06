@@ -50,18 +50,10 @@ public class JGroupsMasterMessageListener implements Receiver {
 		final int offset = message.getOffset();
 		final int bufferLength = message.getLength();
 		final byte[] rawBuffer = message.getRawBuffer();
-		final String indexName = MessageSerializationHelper.extractIndexName( offset, rawBuffer );
-		final NodeSelectorStrategy nodeSelector = selector.getMasterNodeSelector( indexName );
 		try {
-			//nodeSelector can be null if we receive the message during shutdown
-			if ( nodeSelector != null && nodeSelector.isIndexOwnerLocal() ) {
-				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( offset, bufferLength, rawBuffer );
-				List<LuceneWork> queue = luceneWorkSerializer.toLuceneWorks( serializedQueue );
-				applyLuceneWorkLocally( queue, message );
-			}
-			else {
-				//TODO forward to new owner or log error
-			}
+			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( offset, bufferLength, rawBuffer );
+			List<LuceneWork> queue = luceneWorkSerializer.toLuceneWorks( serializedQueue );
+			applyLuceneWorkLocally( queue, message );
 		}
 		catch (ClassCastException e) {
 			log.illegalObjectRetrievedFromMessage( e );
