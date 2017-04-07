@@ -19,6 +19,7 @@ import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -82,6 +83,13 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		try {
 			response = context.getClient().execute( request );
 			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
+
+			handleResults( context, response, parsedResponseBody );
+
+			return null;
+		}
+		catch (SearchException e) {
+			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
 		}
 		catch (IOException | RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed(
@@ -89,10 +97,6 @@ public class BulkWork implements ElasticsearchWork<Void> {
 					ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
 					e );
 		}
-
-		handleResults( context, response, parsedResponseBody );
-
-		return null;
 	}
 
 	@Override
