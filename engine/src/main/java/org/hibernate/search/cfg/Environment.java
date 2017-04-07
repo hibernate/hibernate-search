@@ -284,7 +284,7 @@ public final class Environment {
 	 * disallowed and and uncovered sort is detected, an exception will be raised, otherwise only a warning will be
 	 * logged.
 	 * <p>
-	 * Allowed values are "true" and "false". Defaults to "true".
+	 * Allowed values are "true" and "false". Defaults to "false".
 	 *
 	 * @see org.hibernate.search.annotations.SortableField
 	 */

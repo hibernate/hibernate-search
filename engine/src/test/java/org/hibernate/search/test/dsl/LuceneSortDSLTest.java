@@ -28,6 +28,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -49,7 +50,8 @@ import org.junit.experimental.categories.Category;
 @Category(SkipOnElasticsearch.class) // Elasticsearch doesn't support non-metadata-providing field bridges
 public class LuceneSortDSLTest {
 	@Rule
-	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedEntry.class );
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( IndexedEntry.class )
+			.withProperty( Environment.INDEX_UNINVERTING_ALLOWED, "true" );
 
 	@Before
 	public void prepareTestData() {
