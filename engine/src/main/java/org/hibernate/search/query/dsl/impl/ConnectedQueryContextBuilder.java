@@ -41,6 +41,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 	public final class HSearchEntityContext implements EntityContext {
 		private final Class<?> indexBoundType;
+		private final ScopedAnalyzerReference originalAnalyzerReference;
 		private final ScopedAnalyzerReference.CopyBuilder queryAnalyzerReferenceBuilder;
 		private final AnalyzerRegistry analyzerRegistry;
 
@@ -60,6 +61,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 				}
 			}
 
+			originalAnalyzerReference = factory.getAnalyzerReference( indexBoundType );
 			queryAnalyzerReferenceBuilder = factory.getAnalyzerReference( indexBoundType ).startCopy();
 			IndexManagerType indexManagerType = factory.getIndexBinding( indexBoundType ).getIndexManagerType();
 			analyzerRegistry = factory.getAnalyzerRegistry( indexManagerType );
@@ -95,7 +97,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 		@Override
 		public QueryBuilder get() {
-			return new ConnectedQueryBuilder( new QueryBuildingContext( factory, queryAnalyzerReferenceBuilder.build(), indexBoundType ) );
+			return new ConnectedQueryBuilder( new QueryBuildingContext( factory, originalAnalyzerReference, queryAnalyzerReferenceBuilder.build(), indexBoundType ) );
 		}
 	}
 }

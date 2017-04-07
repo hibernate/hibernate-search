@@ -656,6 +656,16 @@ By default Elasticsearch interprets the date/time strings lacking the time zone 
 The simplest way to avoid issues is to always explicitly provide time zones IDs or offsets when building native Elasticsearch queries. This may be achieved either by directly adding the time zone ID or offset in date strings, or by using the `time_zone` parameter (range queries only). See Elasticsearch documentation for more information.
 ====
 
+[CAUTION]
+.Simple query string queries and analyzers
+====
+The simple query string DSL is supported by the Elasticsearch integration.
+
+In the general case, your query will automatically use the analyzers defined in the schema but be aware that, in the advanced case when you want to override the analyzer used, Elasticsearch only support overriding the analyzer globally.
+
+Thus, when overriding the analyzer, it must be consistent across all the queried fields.
+====
+
 ==== [[elasticsearch-query-spatial]] Spatial queries
 
 The Elasticsearch integration supports spatial queries by using either the DSL or native Elasticsearch queries.

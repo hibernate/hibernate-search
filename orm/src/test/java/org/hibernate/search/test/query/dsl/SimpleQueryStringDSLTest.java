@@ -22,6 +22,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,6 +42,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@SuppressWarnings({ "unchecked" })
 	public void testSimpleQueryString() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -57,7 +59,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
 			List<Coffee> results = fullTextQuery.getResultList();
 
-			compareResultsAndExpected( Arrays.asList( "Dulsão do Brasil", "Kazaar", "Livanto" ), results );
+			compareCoffeeResultsAndExpected( Arrays.asList( "Dulsão do Brasil", "Kazaar", "Livanto" ), results );
 
 			query = qb.simpleQueryString()
 					.onFields( "name", "summary", "description" )
@@ -68,7 +70,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
 			results = fullTextQuery.getResultList();
 
-			compareResultsAndExpected( Arrays.asList( "Bukeela ka Ethiopia", "Linizio Lungo", "Volluto" ), results );
+			compareCoffeeResultsAndExpected( Arrays.asList( "Bukeela ka Ethiopia", "Linizio Lungo", "Volluto" ), results );
 
 			query = qb.simpleQueryString()
 					.onFields( "name", "summary", "description" )
@@ -79,7 +81,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
 			results = fullTextQuery.getResultList();
 
-			compareResultsAndExpected( Arrays.asList( "Ristretto" ), results );
+			compareCoffeeResultsAndExpected( Arrays.asList( "Ristretto" ), results );
 
 			query = qb.simpleQueryString()
 					.onFields( "name", "summary", "description" )
@@ -89,7 +91,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
 			results = fullTextQuery.getResultList();
 
-			compareResultsAndExpected( Arrays.asList( "Caramelito", "Dulsão do Brasil", "Roma", "Volluto" ), results );
+			compareCoffeeResultsAndExpected( Arrays.asList( "Caramelito", "Dulsão do Brasil", "Roma", "Volluto" ), results );
 		}
 		finally {
 			transaction.commit();
@@ -97,6 +99,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@SuppressWarnings({ "unchecked" })
 	public void testBoost() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -115,7 +118,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			fullTextQuery.setSort( new Sort( SortField.FIELD_SCORE ) );
 			List<Coffee> results = fullTextQuery.getResultList();
 
-			compareResultsAndExpected( Arrays.asList( "Rosabaya de Colombia", "Decaffeinato", "Ristretto" ), results );
+			compareCoffeeResultsAndExpected( Arrays.asList( "Rosabaya de Colombia", "Decaffeinato", "Ristretto" ), results );
 
 			query = qb.simpleQueryString()
 					.onFields( "name", "summary" )
@@ -127,7 +130,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			fullTextQuery.setSort( new Sort( SortField.FIELD_SCORE ) );
 			results = fullTextQuery.getResultList();
 
-			compareResultsAndExpected( Arrays.asList( "Ristretto", "Rosabaya de Colombia", "Decaffeinato" ), results );
+			compareCoffeeResultsAndExpected( Arrays.asList( "Ristretto", "Rosabaya de Colombia", "Decaffeinato" ), results );
 		}
 		finally {
 			transaction.commit();
@@ -135,6 +138,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@SuppressWarnings({ "unchecked" })
 	public void testFuzzy() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -152,22 +156,82 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
 			List<Coffee> results = fullTextQuery.getResultList();
 
-			compareResultsAndExpected( Arrays.asList( "Decaffeinato", "Ristretto", "Rosabaya de Colombia", "Volluto" ), results );
+			compareCoffeeResultsAndExpected( Arrays.asList( "Decaffeinato", "Ristretto", "Rosabaya de Colombia", "Volluto" ), results );
 		}
 		finally {
 			transaction.commit();
 		}
 	}
 
-	private void compareResultsAndExpected(List<String> expected, List<Coffee> results) {
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2678")
+	@SuppressWarnings({ "unchecked" })
+	public void testAnalyzer() {
+		Transaction transaction = fullTextSession.beginTransaction();
+
+		try {
+			QueryBuilder qb = getBookQueryBuilder();
+
+			Query query = qb.simpleQueryString()
+					.onFields( "title", "author" )
+					.useAndAsDefaultOperator()
+					.matching( "Molière" )
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
+			fullTextQuery.setSort( new Sort( new SortField( "title", SortField.Type.STRING ) ) );
+			List<Book> results = fullTextQuery.getResultList();
+
+			compareBookResultsAndExpected( Arrays.asList( "Le Grand Molière illustré", "Tartuffe" ), results );
+
+			query = qb.simpleQueryString()
+					.onFields( "title", "author" )
+					.useAndAsDefaultOperator()
+					.matching( "deplacait" )
+					.createQuery();
+
+			fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
+			fullTextQuery.setSort( new Sort( new SortField( "title", SortField.Type.STRING ) ) );
+			results = fullTextQuery.getResultList();
+
+			compareBookResultsAndExpected( Arrays.asList( "Le chat qui déplaçait des montagnes" ), results );
+
+			qb = fullTextSession.getSearchFactory()
+					.buildQueryBuilder()
+					.forEntity( Book.class )
+					.overridesForField( "author", "titleAnalyzer" )
+					.get();
+			query = qb.simpleQueryString()
+					.onFields( "title", "author" )
+					.useAndAsDefaultOperator()
+					.matching( "Molière" )
+					.createQuery();
+
+			fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
+			fullTextQuery.setSort( new Sort( new SortField( "title", SortField.Type.STRING ) ) );
+			results = fullTextQuery.getResultList();
+
+			compareBookResultsAndExpected( Arrays.asList( "Dom Garcie de Navarre", "Le Grand Molière illustré" ), results );
+		}
+		finally {
+			transaction.commit();
+		}
+	}
+
+	private void compareCoffeeResultsAndExpected(List<String> expected, List<Coffee> results) {
 		assertThat( results ).onProperty( "name" ).isEqualTo( expected );
+	}
+
+	private void compareBookResultsAndExpected(List<String> expected, List<Book> results) {
+		assertThat( results ).onProperty( "title" ).isEqualTo( expected );
 	}
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Coffee.class,
-				CoffeeBrand.class
+				CoffeeBrand.class,
+				Book.class
 		};
 	}
 
@@ -175,6 +239,13 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 		return fullTextSession.getSearchFactory()
 				.buildQueryBuilder()
 				.forEntity( Coffee.class )
+				.get();
+	}
+
+	private QueryBuilder getBookQueryBuilder() {
+		return fullTextSession.getSearchFactory()
+				.buildQueryBuilder()
+				.forEntity( Book.class )
 				.get();
 	}
 
@@ -345,6 +416,12 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 				6,
 				brandMonkey
 		);
+
+		fullTextSession.persist( new Book( 1L, "Le chat qui regardait les étoiles", "Lilian Jackson Braun" ) );
+		fullTextSession.persist( new Book( 2L, "Le chat qui déplaçait des montagnes", "Lilian Jackson Braun" ) );
+		fullTextSession.persist( new Book( 3L, "Le Grand Molière illustré", "Caroline Guillot" ) );
+		fullTextSession.persist( new Book( 4L, "Tartuffe", "Molière" ) );
+		fullTextSession.persist( new Book( 5L, "Dom Garcie de Navarre", "moliere" ) ); // Molière all lowercase and without an accent
 
 		tx.commit();
 		fullTextSession.clear();

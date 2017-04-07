@@ -21,11 +21,14 @@ import org.hibernate.search.exception.AssertionFailure;
 public class QueryBuildingContext {
 	private final ExtendedSearchIntegrator factory;
 	private final DocumentBuilderIndexedEntity documentBuilder;
+	private final ScopedAnalyzerReference originalAnalyzerReference;
 	private final ScopedAnalyzerReference queryAnalyzerReference;
 	private final Class<?> entityType;
 
-	public QueryBuildingContext(ExtendedSearchIntegrator factory, ScopedAnalyzerReference queryAnalyzerReference, Class<?> entityType) {
+	public QueryBuildingContext(ExtendedSearchIntegrator factory, ScopedAnalyzerReference originalAnalyzerReference,
+			ScopedAnalyzerReference queryAnalyzerReference, Class<?> entityType) {
 		this.factory = factory;
+		this.originalAnalyzerReference = originalAnalyzerReference;
 		this.queryAnalyzerReference = queryAnalyzerReference;
 		this.entityType = entityType;
 
@@ -42,6 +45,10 @@ public class QueryBuildingContext {
 
 	public DocumentBuilderIndexedEntity getDocumentBuilder() {
 		return documentBuilder;
+	}
+
+	public ScopedAnalyzerReference getOriginalAnalyzerReference() {
+		return originalAnalyzerReference;
 	}
 
 	public ScopedAnalyzerReference getQueryAnalyzerReference() {
