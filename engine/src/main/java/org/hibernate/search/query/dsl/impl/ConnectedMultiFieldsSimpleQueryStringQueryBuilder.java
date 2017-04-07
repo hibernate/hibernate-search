@@ -54,10 +54,11 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 		Query query;
 
 		if ( queryContext.getQueryAnalyzerReference().is( RemoteAnalyzerReference.class ) ) {
-			// we use the analyzers defined in the schema as it is not possible to define per field schema here
 			RemoteSimpleQueryStringQuery.Builder builder = new RemoteSimpleQueryStringQuery.Builder()
 					.query( simpleQueryString )
-					.useAndAsDefaultOperator( useAndAsDefaultOperator );
+					.useAndAsDefaultOperator( useAndAsDefaultOperator )
+					.originalRemoteAnalyzerReference( queryContext.getOriginalAnalyzerReference().unwrap( RemoteAnalyzerReference.class ) )
+					.queryRemoteAnalyzerReference( queryContext.getQueryAnalyzerReference().unwrap( RemoteAnalyzerReference.class ) );
 
 			fieldsContexts.forEach( fieldsContext -> {
 				fieldsContext.forEach( fieldContext -> {

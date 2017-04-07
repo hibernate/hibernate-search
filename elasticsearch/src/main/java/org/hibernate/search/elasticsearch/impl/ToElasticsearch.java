@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.elasticsearch.impl;
 
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -432,7 +435,9 @@ public class ToElasticsearch {
 				.addProperty( "query", query.getQuery() )
 				.addProperty( "default_operator", query.isMatchAll() ? "and" : "or" );
 
-		// we always have at least one field defined
+		Set<String> analyzers = new HashSet<>();
+		String overridingRemoteAnalyzerName = null;
+
 		JsonArray fieldArray = new JsonArray();
 		for ( Field field : query.getFields() ) {
 			StringBuilder sb = new StringBuilder( field.getName() );
@@ -440,8 +445,31 @@ public class ToElasticsearch {
 				sb.append( BOOST_OPERATOR ).append( field.getBoost() );
 			}
 			fieldArray.add( sb.toString() );
+
+			String originalRemoteAnalyzerName = query.getOriginalRemoteAnalyzerReference().getAnalyzer().getName( field.getName() );
+			String queryRemoteAnalyzerName = query.getQueryRemoteAnalyzerReference().getAnalyzer().getName( field.getName() );
+			analyzers.add( queryRemoteAnalyzerName );
+			if ( !queryRemoteAnalyzerName.equals( originalRemoteAnalyzerName ) ) {
+				if ( overridingRemoteAnalyzerName == null ) {
+					overridingRemoteAnalyzerName = queryRemoteAnalyzerName;
+				}
+				else if ( !overridingRemoteAnalyzerName.equals( queryRemoteAnalyzerName ) ) {
+					throw LOG.unableToOverrideQueryAnalyzerWithMoreThanOneAnalyzersForSimpleQueryStringQueries(
+							Arrays.asList( overridingRemoteAnalyzerName, queryRemoteAnalyzerName ) );
+				}
+			}
 		}
+		// we always have at least one field defined
 		queryBuilder.add( "fields", fieldArray );
+
+		if ( overridingRemoteAnalyzerName != null ) {
+			if ( analyzers.size() == 1 ) {
+				queryBuilder.addProperty( "analyzer", overridingRemoteAnalyzerName );
+			}
+			else {
+				throw LOG.unableToOverrideQueryAnalyzerWithMoreThanOneAnalyzersForSimpleQueryStringQueries( analyzers );
+			}
+		}
 
 		JsonObject simpleQueryStringQuery = JsonBuilder.object()
 				.add( "simple_query_string",
