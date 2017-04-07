@@ -303,6 +303,7 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${test.elasticsearch.host.provided}</skip>
                                     <artifactItems>
                                         <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
                                         <artifactItem>
@@ -385,6 +386,7 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${test.elasticsearch.host.provided}</skip>
                                     <artifactItems>
                                         <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
                                         <artifactItem>

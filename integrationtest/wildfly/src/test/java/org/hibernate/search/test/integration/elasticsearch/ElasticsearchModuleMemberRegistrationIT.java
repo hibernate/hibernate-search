@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -24,6 +25,7 @@ import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
+import org.hibernate.search.testsupport.setup.TestDefaults;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -47,6 +49,10 @@ import org.junit.runner.RunWith;
 public class ElasticsearchModuleMemberRegistrationIT {
 
 	private static final String EXPECTED_SEARCH_VERSION_RESOURCE = "expectedHibernateSearchVersion";
+	private static final String ES_PROPERTY_PREFIX = "hibernate.search.default.";
+	private static final String ES_HOST_PROPERTY = ES_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI;
+	private static final String ES_USERNAME_PROPERTY = ES_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_USERNAME;
+	private static final String ES_PASSWORD_PROPERTY = ES_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_PASSWORD;
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
@@ -71,6 +77,7 @@ public class ElasticsearchModuleMemberRegistrationIT {
 	}
 
 	private static Asset persistenceXml() {
+		Properties testDefaults = TestDefaults.getProperties();
 		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
 			.version( "2.0" )
 			.createPersistenceUnit()
@@ -88,6 +95,9 @@ public class ElasticsearchModuleMemberRegistrationIT {
 					.createProperty().name( "jboss.as.jpa.providerModule" ).value( getHibernateORMModuleName() ).up()
 					.createProperty().name( "hibernate.search.default.elasticsearch.required_index_status" ).value( "yellow" ).up()
 					.createProperty().name( "hibernate.search.default.elasticsearch.refresh_after_write" ).value( "true" ).up()
+					.createProperty().name( ES_HOST_PROPERTY ).value( testDefaults.getProperty( ES_HOST_PROPERTY ) ).up()
+					.createProperty().name( ES_USERNAME_PROPERTY ).value( testDefaults.getProperty( ES_USERNAME_PROPERTY ) ).up()
+					.createProperty().name( ES_PASSWORD_PROPERTY ).value( testDefaults.getProperty( ES_PASSWORD_PROPERTY ) ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );

@@ -53,8 +53,7 @@ public class ElasticsearchIndexExistsCheckIT extends SearchInitializationTestBas
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient()
-			.requiredIndexStatus( ElasticsearchIndexStatus.YELLOW );
+	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
 	private IndexSchemaManagementStrategy strategy;
 

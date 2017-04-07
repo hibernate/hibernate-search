@@ -65,6 +65,7 @@ installation directory. Then read the documentation available in *docs/reference
 
 #### Build options (profiles and properties)
 
+##### Documentation
 The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
 output is enabled; to also generate the PDF output use:
 
@@ -74,7 +75,10 @@ To build the distribution bundle run:
 
     > mvn clean install -Pdocumentation-pdf,dist -s settings-example.xml
 
-The Elasticsearch module tests against one single version of Elasticsearch at a time.
+##### Elasticsearch
+
+The Elasticsearch module tests against one single version of Elasticsearch at a time,
+launching an Elasticsearch server automatically on port 9200.
 You may redefine the version to use by specifying the right profile and using the
 `test.elasticsearch.host.version` property:
 
@@ -88,6 +92,22 @@ The following profiles are available:
 
 A list of available versions for `test.elasticsearch.host.version` can be found on
 [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.elasticsearch%22%20AND%20a%3A%22elasticsearch%22).
+
+Alternatively, you can prevent the build from launching an Elasticsearch server automatically
+and run Elasticsearch-related tests against your own server using the
+`test.elasticsearch.host.provided` and `test.elasticsearch.host.url` properties:
+
+    > mvn clean install -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=http://localhost:9200
+
+If you want to run tests against an older Elasticsearch version  (2.x for instance),
+you will still have to select a profile among those listed above, and disable the default profile:
+
+    > mvn clean install -P!elasticsearch-5.0,elasticsearch-2.2 -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=http://localhost:9200
+
+You may also use authentication:
+
+    > mvn clean install -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=https://localhost:9200 -Dtest.elasticsearch.host.username=ironman -Dtest.elasticsearch.host.password=j@rV1s
+
 
 ### Contributing
 
