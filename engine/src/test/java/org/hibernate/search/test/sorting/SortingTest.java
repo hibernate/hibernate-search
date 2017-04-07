@@ -30,6 +30,7 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
@@ -415,7 +416,8 @@ public class SortingTest {
 
 		@SortableFields({
 				@org.hibernate.search.annotations.SortableField(forField = "ageForStringSorting"),
-				@org.hibernate.search.annotations.SortableField(forField = "ageForIntSorting")
+				@org.hibernate.search.annotations.SortableField(forField = "ageForIntSorting"),
+				@org.hibernate.search.annotations.SortableField(forField = "ageForNullChecks")
 		})
 		@Fields({
 			@Field(name = "ageForStringSorting", store = Store.YES, analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class) ),
@@ -443,6 +445,7 @@ public class SortingTest {
 		final List<Friend> friends;
 
 		@Field
+		@SortableField
 		@IndexedEmbedded//TODO improve error message when this is missing
 		Integer[] array;
 
