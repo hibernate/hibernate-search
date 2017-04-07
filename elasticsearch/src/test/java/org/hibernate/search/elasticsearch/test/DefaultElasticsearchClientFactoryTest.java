@@ -50,12 +50,6 @@ public class DefaultElasticsearchClientFactoryTest {
 	private static final String CLIENT_SCOPE_NAME = "default";
 	private static final String CLIENT_PROPERTY_PREFIX = "hibernate.search.default.";
 
-	private static final int PORT_1 = 9201;
-	private static final String URI_1 = "http://localhost:" + PORT_1;
-
-	private static final int PORT_2 = 9202;
-	private static final String URI_2 = "http://localhost:" + PORT_2;
-
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
@@ -63,10 +57,10 @@ public class DefaultElasticsearchClientFactoryTest {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Rule
-	public WireMockRule wireMockRule1 = new WireMockRule( PORT_1 );
+	public WireMockRule wireMockRule1 = new WireMockRule( 0 /* Automatic port selection */ );
 
 	@Rule
-	public WireMockRule wireMockRule2 = new WireMockRule( PORT_2 );
+	public WireMockRule wireMockRule2 = new WireMockRule( 0 /* Automatic port selection */ );
 
 	private DefaultElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
 
@@ -74,7 +68,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-2274")
 	public void simple() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 );
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
@@ -92,7 +86,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@Test
 	public void error() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 );
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
 		String errorMessage = "ErrorMessageExplainingTheError";
@@ -113,7 +107,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@Test
 	public void timeout_read() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT, "99999" );
 
@@ -135,7 +129,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@Test
 	public void timeout_request() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "99999" )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_REQUEST_TIMEOUT, "1000" );
 
@@ -158,7 +152,8 @@ public class DefaultElasticsearchClientFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-2235")
 	public void multipleHosts() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 );
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI,
+						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
@@ -183,7 +178,8 @@ public class DefaultElasticsearchClientFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_serverError() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 );
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI,
+						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
@@ -220,7 +216,8 @@ public class DefaultElasticsearchClientFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_timeout() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI,
+						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
 
 		String payload = "{ \"foo\": \"bar\" }";
@@ -271,7 +268,8 @@ public class DefaultElasticsearchClientFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_fault() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 + " " + URI_2 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI,
+						httpUrlFor( wireMockRule1 ) + " " + httpUrlFor( wireMockRule2 ) )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_READ_TIMEOUT, "1000" /* 1s */ );
 
 		String payload = "{ \"foo\": \"bar\" }";
@@ -309,11 +307,11 @@ public class DefaultElasticsearchClientFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-2449")
 	public void discovery() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.DISCOVERY_ENABLED, "true" )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.DISCOVERY_REFRESH_INTERVAL, "1" );
 
-		String nodesInfoResult = dummyNodeInfoResponse( PORT_1, PORT_2 );
+		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.port(), wireMockRule2.port() );
 
 		wireMockRule1.stubFor( get( WireMock.urlMatching( "/_nodes.*" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withBody( nodesInfoResult ) ) );
@@ -350,7 +348,7 @@ public class DefaultElasticsearchClientFactoryTest {
 		String username = "ironman";
 		String password = "j@rV1s";
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_USERNAME, username )
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_PASSWORD, password );
 
@@ -385,7 +383,7 @@ public class DefaultElasticsearchClientFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	public void authentication_error() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, URI_1 );
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessageUnauthorized";
@@ -435,6 +433,10 @@ public class DefaultElasticsearchClientFactoryTest {
 			builder = builder.body( JSON_PARSER.parse( payload ).getAsJsonObject() );
 		}
 		return builder.build();
+	}
+
+	private static String httpUrlFor(WireMockRule rule) {
+		return "http://localhost:" + rule.port();
 	}
 
 	private static UrlPathPattern urlPathLike(String path) {
