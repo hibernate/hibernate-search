@@ -1500,6 +1500,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             <properties>
                 <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>2.0.0</test.elasticsearch.host.version>
+                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
                 <pluginManagement>
@@ -1508,6 +1509,9 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                            </configuration>
                             <dependencies>
                                 <dependency>
                                     <groupId>org.elasticsearch</groupId>
@@ -1534,6 +1538,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             <properties>
                 <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>2.4.4</test.elasticsearch.host.version>
+                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
                 <pluginManagement>
@@ -1542,6 +1547,9 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${test.elasticsearch.mavenPlugin.version}</version>
+                            <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
+                            </configuration>
                             <dependencies>
                                 <dependency>
                                     <groupId>org.elasticsearch</groupId>
@@ -1574,6 +1582,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             <properties>
                 <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>5.3.0</test.elasticsearch.host.version>
+                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
                 <pluginManagement>
@@ -1583,6 +1592,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <configuration>
+                                <skip>${test.elasticsearch.host.provided}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                             </configuration>

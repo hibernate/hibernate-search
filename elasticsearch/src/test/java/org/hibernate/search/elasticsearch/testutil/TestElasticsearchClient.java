@@ -12,10 +12,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
@@ -28,6 +32,7 @@ import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.testsupport.setup.TestDefaults;
 import org.hibernate.search.util.impl.SearchThreadFactory;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.rules.ExternalResource;
@@ -52,13 +57,6 @@ public class TestElasticsearchClient extends ExternalResource {
 	private final List<String> createdIndicesNames = Lists.newArrayList();
 
 	private final List<String> createdTemplatesNames = Lists.newArrayList();
-
-	private ElasticsearchIndexStatus requiredIndexStatus = ElasticsearchEnvironment.Defaults.REQUIRED_INDEX_STATUS;
-
-	public TestElasticsearchClient requiredIndexStatus(ElasticsearchIndexStatus requiredIndexStatus) {
-		this.requiredIndexStatus = requiredIndexStatus;
-		return this;
-	}
 
 	public IndexClient index(Class<?> rootClass) {
 		return new IndexClient( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( rootClass.getName() ) );
@@ -256,7 +254,11 @@ public class TestElasticsearchClient extends ExternalResource {
 	private void waitForRequiredIndexStatus(final String indexName) throws IOException {
 		performRequest( ElasticsearchRequest.get()
 				.pathComponent( "_cluster" ).pathComponent( "health" ).pathComponent( indexName )
-				.param( "wait_for_status", requiredIndexStatus.getElasticsearchString() )
+				/*
+				 * We only wait for YELLOW: it's perfectly fine, and some tests actually expect
+				 * the indexes to never reach a green status
+				 */
+				.param( "wait_for_status", ElasticsearchIndexStatus.YELLOW.getElasticsearchString() )
 				.param( "timeout", ElasticsearchEnvironment.Defaults.INDEX_MANAGEMENT_WAIT_TIMEOUT + "ms" )
 				.build() );
 	}
@@ -365,6 +367,10 @@ public class TestElasticsearchClient extends ExternalResource {
 	protected void before() throws Throwable {
 		gson = DialectIndependentGsonProvider.INSTANCE.getGson();
 
+		Properties properties = TestDefaults.getProperties();
+		String username = properties.getProperty( "hibernate.search.default." + ElasticsearchEnvironment.SERVER_USERNAME );
+		String password = properties.getProperty( "hibernate.search.default." + ElasticsearchEnvironment.SERVER_PASSWORD );
+
 		this.client = RestClient.builder( HttpHost.create( ElasticsearchEnvironment.Defaults.SERVER_URI ) )
 				/*
 				 * Note: this timeout is not only used on retries,
@@ -373,6 +379,15 @@ public class TestElasticsearchClient extends ExternalResource {
 				 */
 				.setMaxRetryTimeoutMillis( ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT )
 				.setHttpClientConfigCallback( (builder) -> {
+					if ( username != null ) {
+						BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+						credentialsProvider.setCredentials(
+								new AuthScope( AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME ),
+								new UsernamePasswordCredentials( username, password )
+								);
+
+						builder = builder.setDefaultCredentialsProvider( credentialsProvider );
+					}
 					return builder
 							.setMaxConnTotal( ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION )
 							.setMaxConnPerRoute( ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE )
