@@ -77,14 +77,17 @@ public class BulkWork implements ElasticsearchWork<Void> {
 
 		GsonProvider gsonProvider = context.getGsonProvider();
 
-		Response response;
-		JsonObject parsedResponseBody;
+		Response response = null;
+		JsonObject parsedResponseBody = null;
 		try {
 			response = context.getClient().execute( request );
 			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
 		}
 		catch (IOException | RuntimeException e) {
-			throw LOG.elasticsearchRequestFailed( ElasticsearchClientUtils.formatRequest( gsonProvider, request ), null, e );
+			throw LOG.elasticsearchRequestFailed(
+					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
+					ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
+					e );
 		}
 
 		handleResults( context, response, parsedResponseBody );
