@@ -54,9 +54,9 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 
 	@Override
 	public final R execute(ElasticsearchWorkExecutionContext executionContext) {
-		Response response;
 		GsonProvider gsonProvider = executionContext.getGsonProvider();
-		JsonObject parsedResponseBody;
+		Response response = null;
+		JsonObject parsedResponseBody = null;
 		try {
 			beforeExecute( executionContext, request );
 			response = executionContext.getClient().execute( request );
@@ -65,7 +65,8 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 		catch (IOException | RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed(
 					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					null, e );
+					ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
+					e );
 		}
 
 		resultAssessor.checkSuccess( executionContext, request, response, parsedResponseBody );

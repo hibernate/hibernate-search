@@ -96,6 +96,9 @@ public class ElasticsearchClientUtils {
 	}
 
 	public static String formatResponse(GsonProvider gsonProvider, Response response, JsonObject parsedResponse) {
+		if ( response == null ) {
+			return null;
+		}
 		StringBuilder sb = new StringBuilder();
 		StatusLine statusLine = response.getStatusLine();
 		sb.append( "Status: " ).append( statusLine.getStatusCode() ).append( " " ).append( statusLine.getReasonPhrase() ).append( "\n" );
