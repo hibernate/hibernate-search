@@ -15,6 +15,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -57,10 +58,19 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 		GsonProvider gsonProvider = executionContext.getGsonProvider();
 		Response response = null;
 		JsonObject parsedResponseBody = null;
+		R result;
+
 		try {
 			beforeExecute( executionContext, request );
 			response = executionContext.getClient().execute( request );
 			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
+
+			resultAssessor.checkSuccess( executionContext, request, response, parsedResponseBody );
+
+			result = generateResult( executionContext, response, parsedResponseBody );
+		}
+		catch (SearchException e) {
+			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
 		}
 		catch (IOException | RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed(
@@ -69,15 +79,13 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 					e );
 		}
 
-		resultAssessor.checkSuccess( executionContext, request, response, parsedResponseBody );
-
-		afterSuccess( executionContext );
-
 		if ( markIndexDirty ) {
 			executionContext.setIndexDirty( dirtiedIndexName );
 		}
 
-		return generateResult( executionContext, response, parsedResponseBody );
+		afterSuccess( executionContext );
+
+		return result;
 	}
 
 	protected void beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
