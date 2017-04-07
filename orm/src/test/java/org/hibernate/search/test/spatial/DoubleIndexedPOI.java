@@ -13,6 +13,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
@@ -33,6 +34,8 @@ import javax.persistence.Id;
 @Spatial
 public class DoubleIndexedPOI {
 	@Id
+	@Field(name = "idSort")
+	@SortableField(forField = "idSort")
 	Integer id;
 
 	@Field(store = Store.YES)

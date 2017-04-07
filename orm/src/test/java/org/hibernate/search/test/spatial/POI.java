@@ -15,6 +15,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
@@ -28,6 +29,8 @@ import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 @Indexed
 public class POI {
 	@Id
+	@Field(name = "idSort")
+	@SortableField(forField = "idSort")
 	Integer id;
 
 	@Field(store = Store.YES)

@@ -132,6 +132,8 @@ public class ClassBridgeTest extends SearchTestBase {
 
 		hibQuery.setProjection( FullTextQuery.THIS, "equiptype", "branchnetwork" );
 
+		hibQuery.setSort( queryBuilder.sort().byField( "idSort" ).createSort() );
+
 		ScrollableResults projections = hibQuery.scroll();
 		assertNotNull( projections );
 

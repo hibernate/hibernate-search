@@ -257,7 +257,7 @@ public class SortDSLTest {
 
 		Sort sort = builder().sort()
 				.byField( "uniqueIntegerField" )
-						.onMissingValue().use( 1 )
+						.onMissingValue().use( 2 )
 				.createSort();
 		assertThat(
 				query( query, sort ),

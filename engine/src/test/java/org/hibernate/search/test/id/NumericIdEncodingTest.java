@@ -15,12 +15,15 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
@@ -52,8 +55,11 @@ public class NumericIdEncodingTest {
 	}
 
 	private void expectedProjections(NumericRangeQuery<Long> numericRangeQuery, String... expectedProjections) {
-		HSQuery hsQuery = factoryHolder.getSearchFactory().createHSQuery( numericRangeQuery, Staff.class )
-				.projection( "name" );
+		SearchIntegrator searchFactory = factoryHolder.getSearchFactory();
+		QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity( Staff.class ).get();
+		HSQuery hsQuery = searchFactory.createHSQuery( numericRangeQuery, Staff.class )
+				.projection( "name" )
+				.sort( queryBuilder.sort().byField( "idSort" ).createSort() );
 		List<EntityInfo> result = hsQuery.queryEntityInfos();
 		assertEquals( expectedProjections.length, result.size() );
 		assertEquals( expectedProjections.length, hsQuery.queryResultSize() );
@@ -75,8 +81,14 @@ public class NumericIdEncodingTest {
 	@Indexed
 	public class Staff {
 
-		@DocumentId @NumericField final Long id;
-		@Field(store = Store.YES) final String name;
+		@DocumentId
+		@NumericField(forField = "id")
+		@Field(name = "idSort")
+		@SortableField(forField = "idSort")
+		final Long id;
+
+		@Field(store = Store.YES)
+		final String name;
 
 		Staff(long id, String name) {
 			this.id = id;

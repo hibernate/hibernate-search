@@ -147,6 +147,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude ).andLongitude( centerLongitude ).createSort() );
 		List results = hibQuery.list();
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
@@ -548,6 +549,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude ).andLongitude( centerLongitude ).createSort() );
 		List results = hibQuery.list();
 		Assert.assertEquals( 2, results.size() );
 		Object[] firstResult = (Object[]) results.get( 0 );
@@ -562,6 +564,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 		hibQuery = fullTextSession.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, Spatial.COORDINATES_DEFAULT_FIELD );
+		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude ).andLongitude( centerLongitude ).createSort() );
 		results = hibQuery.list();
 		Assert.assertEquals( 2, results.size() );
 		firstResult = (Object[]) results.get( 0 );
