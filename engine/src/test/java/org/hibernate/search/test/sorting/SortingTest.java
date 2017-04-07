@@ -78,17 +78,21 @@ public class SortingTest {
 				new Person( 3, 5, "Five" )
 			);
 
-		// Non sorted, expect results in indexing order:
 		Query query = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get().all().createQuery();
-		assertSortedResults( query, null, 0, 1, 2, 3 );
 
 		// Sorting Age as string:
 		Sort sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING ) );
 		assertSortedResults( query, sortAsString, 1, 0, 3, 2 );
+		// Also check reverse, to ensure this wasn't just luck
+		sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING, true ) );
+		assertSortedResults( query, sortAsString, 2, 3, 0, 1 );
 
 		// Sorting Age as Int (numeric):
 		Sort sortAsInt = new Sort( new SortField( "ageForIntSorting", SortField.Type.INT ) );
 		assertSortedResults( query, sortAsInt, 0, 3, 2, 1 );
+		// Also check reverse, to ensure this wasn't just luck
+		sortAsInt = new Sort( new SortField( "ageForIntSorting", SortField.Type.INT, true ) );
+		assertSortedResults( query, sortAsInt, 1, 2, 3, 0 );
 	}
 
 	@Test

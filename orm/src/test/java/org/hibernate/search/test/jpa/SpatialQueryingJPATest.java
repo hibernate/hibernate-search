@@ -48,7 +48,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 	}
 
 	@Test
-	public void testDistanceProjectionWithoutSort() throws Exception {
+	public void testDistanceProjectionWithoutDistanceSort() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
 		POI poi3 = new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
@@ -82,6 +82,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+				hibQuery.setSort( builder.sort().byField( "idSort" ).createSort() );
 				List results = hibQuery.getResultList();
 				Assert.assertEquals( 6, results.size() );
 				Object[] firstResult = (Object[]) results.get( 0 );
@@ -102,7 +103,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2324")
-	public void testDistanceProjectionWithoutSortMissingCoordinates() throws Exception {
+	public void testDistanceProjectionWithoutDistanceSortMissingCoordinates() throws Exception {
 		POI poi1 = new POI( 1, "Distance to 24,32 : unknown (incomplete coordinates)", null, 32d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : unknown (incomplete coordinates)", 24d, null, "" );
 		POI poi3 = new POI( 3, "Distance to 23,32 : unknown (incomplete coordinates)", null, null, "" );
@@ -126,12 +127,14 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+				hibQuery.setSort( builder.sort().byField( "idSort" ).createSort() );
 				List results = hibQuery.getResultList();
 				Assert.assertEquals( "Missing coordinates should never appear in spatial query results", 0, results.size() );
 
 				hibQuery = em.createFullTextQuery( builder.all().createQuery(), POI.class );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+				hibQuery.setSort( builder.sort().byField( "idSort" ).createSort() );
 				results = hibQuery.getResultList();
 				Assert.assertEquals( 3, results.size() );
 				Object[] firstResult = (Object[]) results.get( 0 );
@@ -447,6 +450,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+				hibQuery.setSort( builder.sort().byField( "idSort" ).createSort() );
 				List results = hibQuery.getResultList();
 				Object[] firstResult = (Object[]) results.get( 0 );
 				Object[] secondResult = (Object[]) results.get( 1 );
@@ -468,6 +472,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				hibQuery = em.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, Spatial.COORDINATES_DEFAULT_FIELD );
+				hibQuery.setSort( builder.sort().byField( "idSort" ).createSort() );
 				results = hibQuery.getResultList();
 				firstResult = (Object[]) results.get( 0 );
 				secondResult = (Object[]) results.get( 1 );
