@@ -76,9 +76,9 @@ To build the distribution bundle run:
 
 The Elasticsearch module tests against one single version of Elasticsearch at a time.
 You may redefine the version to use by specifying the right profile and using the
-`testElasticsearchVersion` property:
+`test.elasticsearch.host.version` property:
 
-    > mvn clean install -Pelasticsearch-2.0 -DtestElasticsearchVersion=2.1.0
+    > mvn clean install -Pelasticsearch-2.0 -Dtest.elasticsearch.host.version=2.1.0
 
 The following profiles are available:
 
@@ -86,7 +86,7 @@ The following profiles are available:
  * `elasticsearch-2.2` for 2.2.x and later 2.x
  * `elasticsearch-5.0` for 5.x (the default)
 
-A list of available versions for `testElasticsearchVersion` can be found on
+A list of available versions for `test.elasticsearch.host.version` can be found on
 [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.elasticsearch%22%20AND%20a%3A%22elasticsearch%22).
 
 ### Contributing

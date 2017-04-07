@@ -265,7 +265,7 @@
             <!-- Activation rules are not inherited from the profile definition in the parent, so we must copy them here -->
             <activation>
                 <property>
-                    <name>!testElasticsearchVersion</name>
+                    <name>!test.elasticsearch.host.version</name>
                 </property>
             </activation>
             <build>
