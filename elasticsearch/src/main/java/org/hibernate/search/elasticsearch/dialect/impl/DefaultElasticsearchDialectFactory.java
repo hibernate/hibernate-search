@@ -14,9 +14,11 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.dialect.impl.es2.Elasticsearch2Dialect;
 import org.hibernate.search.elasticsearch.dialect.impl.es5.Elasticsearch5Dialect;
+import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -32,17 +34,13 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 
 	@Override
 	public ElasticsearchDialect createDialect(ElasticsearchClient client, Properties properties) {
-		JsonObject responseAsJsonObject;
+		String version;
 		try {
-			Response response = client.execute( ElasticsearchRequest.get().build() );
-			responseAsJsonObject = ElasticsearchClientUtils.parseJsonResponse(
-					DialectIndependentGsonProvider.INSTANCE, response );
+			version = getVersion( client );
 		}
-		catch (IOException | RuntimeException e) {
+		catch (RuntimeException e) {
 			throw log.failedToDetectElasticsearchVersion( e );
 		}
-
-		String version = VERSION_ACCESSOR.get( responseAsJsonObject ).getAsString();
 
 		if ( version.startsWith( "2." ) ) {
 			return new Elasticsearch2Dialect();
@@ -52,6 +50,35 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 		}
 		else {
 			throw log.unexpectedElasticsearchVersion( version );
+		}
+	}
+
+	private String getVersion(ElasticsearchClient client) {
+		ElasticsearchRequest request = ElasticsearchRequest.get().build();
+		GsonProvider gsonProvider = DialectIndependentGsonProvider.INSTANCE;
+		Response response = null;
+		JsonObject responseAsJsonObject = null;
+		try {
+			response = client.execute( request );
+			responseAsJsonObject = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
+
+			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusLine().getStatusCode() ) ) {
+				throw log.elasticsearchRequestFailed(
+						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
+						ElasticsearchClientUtils.formatResponse( gsonProvider, response, responseAsJsonObject ),
+						null );
+			}
+
+			return VERSION_ACCESSOR.get( responseAsJsonObject ).getAsString();
+		}
+		catch (SearchException e) {
+			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
+		}
+		catch (IOException | RuntimeException e) {
+			throw log.elasticsearchRequestFailed(
+					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
+					ElasticsearchClientUtils.formatResponse( gsonProvider, response, responseAsJsonObject ),
+					e );
 		}
 	}
 }
