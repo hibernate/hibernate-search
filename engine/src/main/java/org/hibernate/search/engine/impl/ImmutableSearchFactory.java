@@ -190,7 +190,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		);
 
 		this.indexUninvertingAllowed = ConfigurationParseHelper.getBooleanValue(
-				configurationProperties, Environment.INDEX_UNINVERTING_ALLOWED, true
+				configurationProperties, Environment.INDEX_UNINVERTING_ALLOWED, false
 		);
 	}
 

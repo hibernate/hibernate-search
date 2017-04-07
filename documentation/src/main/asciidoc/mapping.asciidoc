@@ -369,23 +369,24 @@ may be altered in future revisions, e.g. by adding further methods, thus breakin
 
 [[flagging-uncovered-sorts]]
 ====== Flagging uncovered sorts
-By default Hibernate Search will transparently create an uninverting index reader when running a query with sorts not
-covered by the sortable fields configured as described above. While this allows to execute the query, relying on index
-uninverting negatively impacts performance.
+By default Hibernate Search will raise an exception when running a query with sorts not
+covered by the sortable fields configured as described above.
 
-You thus can optionally advice Hibernate Search to raise an exception when detecting uncovered sorts. To do so, specify
-the following option:
+You thus can optionally advice Hibernate Search to transparently create an uninverting index reader when detecting uncovered sorts.
+Note that while this allows to execute the query, relying on index uninverting negatively impacts performance.
 
-.Disabling automatic index uninverting for uncovered sorts
+To do so, specify the following option:
+
+.Enabling automatic index uninverting for uncovered sorts
 ====
 [source]
 ----
-hibernate.search.index_uninverting_allowed = false
+hibernate.search.index_uninverting_allowed = true
 ----
 ====
 
-You e.g. may set this to `false` during testing to identify the sortable fields required for your queries and set it to
-`true` in production environments to fall back to index uninverting for uncovered sorts accidentally left over.
+For instance you may leave this to the default (`false`) during testing to identify the sortable fields required for your queries
+and set it to `true` in production environments to fall back to index uninverting for uncovered sorts accidentally left over.
 
 [[id-annotation]]
 ===== @Id

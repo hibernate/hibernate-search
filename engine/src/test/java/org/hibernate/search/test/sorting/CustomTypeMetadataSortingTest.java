@@ -26,6 +26,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
@@ -52,7 +53,8 @@ public class CustomTypeMetadataSortingTest {
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Rule
-	public final SearchFactoryHolder factoryHolder = new SearchFactoryHolder( PropertySet.class, ExtendedPropertySet.class, Person.class );
+	public final SearchFactoryHolder factoryHolder = new SearchFactoryHolder( PropertySet.class, ExtendedPropertySet.class, Person.class )
+			.withProperty( Environment.INDEX_UNINVERTING_ALLOWED, "true" );
 
 	@Test
 	public void undeclaredSortableField_defaultMetadata() {
