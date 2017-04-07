@@ -1491,15 +1491,15 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
              To run tests against a different version of Elasticsearch, use the appropriate profile
              and provide the Elasticsearch version:
              
-                 mvn clean test -Pelasticsearch-2.0 -DtestElasticsearchVersion=2.1.0
+                 mvn clean test -Pelasticsearch-2.0 -Dtest.elasticsearch.version=2.1.0
           -->
         
         <!-- Elasticsearch [2.0,2.2) test environment -->
         <profile>
             <id>elasticsearch-2.0</id>
             <properties>
-                <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
-                <testElasticsearchVersion>2.0.0</testElasticsearchVersion>
+                <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>2.0.0</test.elasticsearch.host.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -1507,12 +1507,12 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${testElasticsearchMavenPluginVersion}</version>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <dependencies>
                                 <dependency>
                                     <groupId>org.elasticsearch</groupId>
                                     <artifactId>elasticsearch</artifactId>
-                                    <version>${testElasticsearchVersion}</version>
+                                    <version>${test.elasticsearch.host.version}</version>
                                 </dependency>
                                 
                                 <!-- The next is used to get ES log output into the Maven console -->
@@ -1532,8 +1532,8 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
         <profile>
             <id>elasticsearch-2.2</id>
             <properties>
-                <testElasticsearchMavenPluginVersion>2.2</testElasticsearchMavenPluginVersion>
-                <testElasticsearchVersion>2.4.4</testElasticsearchVersion>
+                <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>2.4.4</test.elasticsearch.host.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -1541,12 +1541,12 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${testElasticsearchMavenPluginVersion}</version>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <dependencies>
                                 <dependency>
                                     <groupId>org.elasticsearch</groupId>
                                     <artifactId>elasticsearch</artifactId>
-                                    <version>${testElasticsearchVersion}</version>
+                                    <version>${test.elasticsearch.host.version}</version>
                                 </dependency>
                                 
                                 <!-- The next is used to get ES log output into the Maven console -->
@@ -1568,12 +1568,12 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
             <activation>
                 <!-- Activate by default, i.e. if testElasticsearchVersion has not been defined explicitly -->
                 <property>
-                    <name>!testElasticsearchVersion</name>
+                    <name>!test.elasticsearch.mavenPlugin.version</name>
                 </property>
             </activation>
             <properties>
-                <testElasticsearchMavenPluginVersion>5.7</testElasticsearchMavenPluginVersion>
-                <testElasticsearchVersion>5.3.0</testElasticsearchVersion>
+                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.host.version>5.3.0</test.elasticsearch.host.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -1581,9 +1581,9 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${testElasticsearchMavenPluginVersion}</version>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <configuration>
-                                <version>${testElasticsearchVersion}</version>
+                                <version>${test.elasticsearch.host.version}</version>
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                             </configuration>
                             <dependencies>

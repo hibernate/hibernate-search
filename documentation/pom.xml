@@ -172,7 +172,7 @@
                         <hibernateShortVersion>${hibernate-orm.module.slot}</hibernateShortVersion>
                         <luceneVersion>${luceneVersion}</luceneVersion>
                         <infinispanVersion>${infinispanVersion}</infinispanVersion>
-                        <testElasticsearchVersion>${testElasticsearchVersion}</testElasticsearchVersion>
+                        <testElasticsearchVersion>${test.elasticsearch.host.version}</testElasticsearchVersion>
                     </attributes>
                 </configuration>
             </plugin>
