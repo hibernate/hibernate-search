@@ -187,6 +187,7 @@
                             org.apache.lucene.uninverting;version="${luceneOsgiRangeVersion}",
                             org.apache.lucene.util;version="${luceneOsgiRangeVersion}",
                             org.apache.lucene.util.automaton;version="${luceneOsgiRangeVersion}",
+                            org.apache.lucene.queryparser.simple;version="${luceneOsgiRangeVersion}",
                             org.jboss.logging.*;version="${jbossLoggingOsgiRangeVersion}",
                             org.apache.tika.*;version="[${tikaVersion}, 1.5)";resolution:=optional,
                             javax.transaction.*;version="0";resolution:=optional
