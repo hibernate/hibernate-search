@@ -66,7 +66,7 @@ public class ElasticsearchSimpleQueryStringDSLIT extends SearchTestBase {
 					.get();
 			Query query = qb.simpleQueryString()
 					.onFields( "title", "author" )
-					.useAndAsDefaultOperator()
+					.withAndAsDefaultOperator()
 					.matching( "Molière" )
 					.createQuery();
 

@@ -34,6 +34,6 @@ public interface SimpleQueryStringMatchingContext extends SimpleQueryStringDefin
 	/**
 	 * Define the default operator as AND.
 	 */
-	SimpleQueryStringDefinitionTermination useAndAsDefaultOperator();
+	SimpleQueryStringDefinitionTermination withAndAsDefaultOperator();
 
 }

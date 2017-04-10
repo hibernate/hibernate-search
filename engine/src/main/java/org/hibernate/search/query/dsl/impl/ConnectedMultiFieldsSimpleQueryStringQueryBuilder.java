@@ -30,11 +30,11 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 	private final List<FieldsContext> fieldsContexts;
 	private final QueryBuildingContext queryContext;
 
-	private final boolean useAndAsDefaultOperator;
+	private final boolean withAndAsDefaultOperator;
 
 	public ConnectedMultiFieldsSimpleQueryStringQueryBuilder(String simpleQueryString,
 			List<FieldsContext> fieldsContexts,
-			boolean useAndAsDefaultOperator,
+			boolean withAndAsDefaultOperator,
 			QueryCustomizer queryCustomizer,
 			QueryBuildingContext queryContext) {
 		this.simpleQueryString = simpleQueryString;
@@ -42,7 +42,7 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 		this.queryCustomizer = queryCustomizer;
 		this.fieldsContexts = fieldsContexts;
 
-		this.useAndAsDefaultOperator = useAndAsDefaultOperator;
+		this.withAndAsDefaultOperator = withAndAsDefaultOperator;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 		if ( queryContext.getQueryAnalyzerReference().is( RemoteAnalyzerReference.class ) ) {
 			RemoteSimpleQueryStringQuery.Builder builder = new RemoteSimpleQueryStringQuery.Builder()
 					.query( simpleQueryString )
-					.useAndAsDefaultOperator( useAndAsDefaultOperator )
+					.withAndAsDefaultOperator( withAndAsDefaultOperator )
 					.originalRemoteAnalyzerReference( queryContext.getOriginalAnalyzerReference().unwrap( RemoteAnalyzerReference.class ) )
 					.queryRemoteAnalyzerReference( queryContext.getQueryAnalyzerReference().unwrap( RemoteAnalyzerReference.class ) );
 
@@ -71,7 +71,7 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 		else {
 			ConnectedSimpleQueryParser queryParser = new ConnectedSimpleQueryParser(
 					queryContext.getQueryAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer(), fieldsContexts );
-			queryParser.setDefaultOperator( useAndAsDefaultOperator ? Occur.MUST : Occur.SHOULD );
+			queryParser.setDefaultOperator( withAndAsDefaultOperator ? Occur.MUST : Occur.SHOULD );
 
 			query = queryParser.parse( simpleQueryString );
 
