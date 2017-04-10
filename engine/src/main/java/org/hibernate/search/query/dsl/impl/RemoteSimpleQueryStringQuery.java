@@ -26,20 +26,20 @@ public class RemoteSimpleQueryStringQuery extends Query {
 
 	private final List<Field> fields;
 
-	private final boolean useAndAsDefaultOperator;
+	private final boolean withAndAsDefaultOperator;
 
 	private final RemoteAnalyzerReference originalRemoteAnalyzerReference;
 
 	private final RemoteAnalyzerReference queryRemoteAnalyzerReference;
 
-	private RemoteSimpleQueryStringQuery(String query, List<Field> fields, boolean useAndAsDefaultOperator,
+	private RemoteSimpleQueryStringQuery(String query, List<Field> fields, boolean withAndAsDefaultOperator,
 			RemoteAnalyzerReference originalRemoteAnalyzerReference, RemoteAnalyzerReference queryRemoteAnalyzerReference) {
 		if ( fields.size() == 0 ) {
 			throw new AssertionFailure( "At least one field should be defined for a " + RemoteSimpleQueryStringQuery.class.getSimpleName() );
 		}
 		this.query = query;
 		this.fields = Collections.unmodifiableList( fields );
-		this.useAndAsDefaultOperator = useAndAsDefaultOperator;
+		this.withAndAsDefaultOperator = withAndAsDefaultOperator;
 		this.originalRemoteAnalyzerReference = originalRemoteAnalyzerReference;
 		this.queryRemoteAnalyzerReference = queryRemoteAnalyzerReference;
 	}
@@ -49,7 +49,7 @@ public class RemoteSimpleQueryStringQuery extends Query {
 
 		private List<Field> fields = new ArrayList<Field>();
 
-		private boolean useAndAsDefaultOperator;
+		private boolean withAndAsDefaultOperator;
 
 		private RemoteAnalyzerReference originalRemoteAnalyzerReference;
 
@@ -65,8 +65,8 @@ public class RemoteSimpleQueryStringQuery extends Query {
 			return this;
 		}
 
-		public Builder useAndAsDefaultOperator(boolean useAndAsDefaultOperator) {
-			this.useAndAsDefaultOperator = useAndAsDefaultOperator;
+		public Builder withAndAsDefaultOperator(boolean withAndAsDefaultOperator) {
+			this.withAndAsDefaultOperator = withAndAsDefaultOperator;
 			return this;
 		}
 
@@ -81,7 +81,7 @@ public class RemoteSimpleQueryStringQuery extends Query {
 		}
 
 		public RemoteSimpleQueryStringQuery build() {
-			return new RemoteSimpleQueryStringQuery( query, fields, useAndAsDefaultOperator, originalRemoteAnalyzerReference, queryRemoteAnalyzerReference );
+			return new RemoteSimpleQueryStringQuery( query, fields, withAndAsDefaultOperator, originalRemoteAnalyzerReference, queryRemoteAnalyzerReference );
 		}
 	}
 
@@ -123,7 +123,7 @@ public class RemoteSimpleQueryStringQuery extends Query {
 	}
 
 	public boolean isMatchAll() {
-		return useAndAsDefaultOperator;
+		return withAndAsDefaultOperator;
 	}
 
 	public RemoteAnalyzerReference getOriginalRemoteAnalyzerReference() {
@@ -140,7 +140,7 @@ public class RemoteSimpleQueryStringQuery extends Query {
 		sb.append( getClass().getSimpleName() ).append( "<" );
 		sb.append( "query:" ).append( query ).append( ", " );
 		sb.append( "fields:" ).append( fields ).append( ", " );
-		sb.append( "useAndAsDefaultOperator:" ).append( useAndAsDefaultOperator ).append( ", " );
+		sb.append( "withAndAsDefaultOperator:" ).append( withAndAsDefaultOperator ).append( ", " );
 		sb.append( "originalRemoteAnalyzerReference:" ).append( originalRemoteAnalyzerReference ).append( ", " );
 		sb.append( "queryRemoteAnalyzerReference:" ).append( queryRemoteAnalyzerReference );
 		sb.append( ">" );

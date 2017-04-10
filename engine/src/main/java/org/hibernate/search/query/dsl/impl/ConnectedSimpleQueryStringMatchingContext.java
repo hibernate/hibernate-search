@@ -25,7 +25,7 @@ public class ConnectedSimpleQueryStringMatchingContext implements SimpleQueryStr
 	private final List<FieldsContext> fieldsContexts = new ArrayList<FieldsContext>();
 	private FieldsContext currentFieldsContext;
 
-	private boolean useAndAsDefaultOperator = false;
+	private boolean withAndAsDefaultOperator = false;
 
 	public ConnectedSimpleQueryStringMatchingContext(String field, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
@@ -61,12 +61,12 @@ public class ConnectedSimpleQueryStringMatchingContext implements SimpleQueryStr
 
 	@Override
 	public SimpleQueryStringTermination matching(String simpleQueryString) {
-		return new ConnectedMultiFieldsSimpleQueryStringQueryBuilder( simpleQueryString, fieldsContexts, useAndAsDefaultOperator, queryCustomizer, queryContext );
+		return new ConnectedMultiFieldsSimpleQueryStringQueryBuilder( simpleQueryString, fieldsContexts, withAndAsDefaultOperator, queryCustomizer, queryContext );
 	}
 
 	@Override
-	public SimpleQueryStringDefinitionTermination useAndAsDefaultOperator() {
-		useAndAsDefaultOperator = true;
+	public SimpleQueryStringDefinitionTermination withAndAsDefaultOperator() {
+		withAndAsDefaultOperator = true;
 		return this;
 	}
 

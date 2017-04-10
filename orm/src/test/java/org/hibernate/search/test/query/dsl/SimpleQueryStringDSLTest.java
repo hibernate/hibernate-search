@@ -52,7 +52,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 
 			Query query = qb.simpleQueryString()
 					.onFields( "name", "summary", "description" )
-					.useAndAsDefaultOperator()
+					.withAndAsDefaultOperator()
 					.matching( "balanced arabica" )
 					.createQuery();
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
@@ -63,7 +63,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 
 			query = qb.simpleQueryString()
 					.onFields( "name", "summary", "description" )
-					.useAndAsDefaultOperator()
+					.withAndAsDefaultOperator()
 					.matching( "-balanced arabica" )
 					.createQuery();
 			fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
@@ -74,7 +74,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 
 			query = qb.simpleQueryString()
 					.onFields( "name", "summary", "description" )
-					.useAndAsDefaultOperator()
+					.withAndAsDefaultOperator()
 					.matching( "powerful \"fruity note\"" )
 					.createQuery();
 			fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
@@ -110,7 +110,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			Query query = qb.simpleQueryString()
 				.onFields( "name", "summary" ).boostedTo( 5f )
 				.andField( "description" )
-				.useAndAsDefaultOperator()
+				.withAndAsDefaultOperator()
 				.matching( "fruity arabicas" )
 				.createQuery();
 
@@ -123,7 +123,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 			query = qb.simpleQueryString()
 					.onFields( "name", "summary" )
 					.andField( "description" ).boostedTo( 10f )
-					.useAndAsDefaultOperator()
+					.withAndAsDefaultOperator()
 					.matching( "fruity arabicas" )
 					.createQuery();
 			fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
@@ -148,7 +148,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 
 			Query query = qb.simpleQueryString()
 				.onFields( "name", "summary", "description" )
-				.useAndAsDefaultOperator()
+				.withAndAsDefaultOperator()
 				.matching( "fruity arabica~2" )
 				.createQuery();
 
@@ -174,7 +174,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 
 			Query query = qb.simpleQueryString()
 					.onFields( "title", "author" )
-					.useAndAsDefaultOperator()
+					.withAndAsDefaultOperator()
 					.matching( "Molière" )
 					.createQuery();
 
@@ -186,7 +186,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 
 			query = qb.simpleQueryString()
 					.onFields( "title", "author" )
-					.useAndAsDefaultOperator()
+					.withAndAsDefaultOperator()
 					.matching( "deplacait" )
 					.createQuery();
 
@@ -203,7 +203,7 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 					.get();
 			query = qb.simpleQueryString()
 					.onFields( "title", "author" )
-					.useAndAsDefaultOperator()
+					.withAndAsDefaultOperator()
 					.matching( "Molière" )
 					.createQuery();
 

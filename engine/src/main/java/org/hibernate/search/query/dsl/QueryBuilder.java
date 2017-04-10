@@ -44,9 +44,9 @@ public interface QueryBuilder {
 	PhraseContext phrase();
 
 	/**
-	 * Build a plain text query.
+	 * Build a query from a simple query string.
 	 *
-	 * @return a {@code SimpleQueryStringContext} instance for building the plain text query
+	 * @return a {@code SimpleQueryStringContext} instance for building a query from a simple query string
 	 */
 	SimpleQueryStringContext simpleQueryString();
 

@@ -306,7 +306,7 @@ Query luceneQuery = mythQB
 ====
 
 By default, a simple query string query uses the OR operator if the operator is not explicitly defined.
-If you prefer using the AND operator as default, you can add the `useAndAsDefaultOperator` flag.
+If you prefer using the AND operator as default, you can add the `withAndAsDefaultOperator` flag.
 The following query returns results containing storm AND tree.
 
 ====
@@ -315,7 +315,7 @@ The following query returns results containing storm AND tree.
 Query luceneQuery = mythQB
     .simpleQueryString()
     .onField("history")
-    .useAndAsDefaultOperator()
+    .withAndAsDefaultOperator()
     .matching("storm tree")
     .createQuery();
 ----
@@ -333,7 +333,7 @@ Query luceneQuery = mythQB
         .boostedTo(5f)
     .andFields("history", "description")
         .boostedTo(2f)
-    .useAndAsDefaultOperator()
+    .withAndAsDefaultOperator()
     .matching("storm tree")
     .createQuery();
 ----
