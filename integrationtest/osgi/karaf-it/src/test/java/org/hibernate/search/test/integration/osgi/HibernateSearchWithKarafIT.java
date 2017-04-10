@@ -6,7 +6,19 @@
  */
 package org.hibernate.search.test.integration.osgi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
@@ -20,6 +32,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
@@ -37,17 +50,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.wiring.BundleRevision;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 /**
  * A basic integration test that executes Hibernate Search in Apache Karaf using
@@ -235,6 +237,27 @@ public class HibernateSearchWithKarafIT {
 		progressMonitor = new AssertingMassIndexerProgressMonitor( 1 );
 		fullTextSession.createIndexer( Muppet.class ).progressMonitor( progressMonitor ).startAndWait();
 		progressMonitor.assertExpectedProgressMade();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSimpleQueryStringDSL() throws Exception {
+		SessionFactory sessionFactory = (SessionFactory) bundleContext.getService( serviceReference );
+		FullTextSession fullTextSession = Search.getFullTextSession( sessionFactory.openSession() );
+
+		persistElmo( fullTextSession );
+
+		QueryBuilder qb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder()
+				.forEntity( Muppet.class )
+				.get();
+
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( qb.simpleQueryString().onField( "name" ).matching( "Elmo" ).createQuery(), Muppet.class );
+		List<Muppet> results = fullTextQuery.getResultList();
+
+		assertEquals( "Elmo should be there", 1, results.size() );
+		Muppet muppet = results.get( 0 );
+		assertEquals( "Index muppet is not Elmo", "Elmo", muppet.getName() );
 	}
 
 	private boolean isFragmentBundle(Bundle bundle) {

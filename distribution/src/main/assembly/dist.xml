@@ -40,6 +40,7 @@
             <includes>
                 <!-- hibernate-search-engine -->
                 <include>org.apache.lucene:lucene-core</include>
+                <include>org.apache.lucene:lucene-queryparser</include>
                 <include>org.hibernate.common:hibernate-commons-annotations</include>
                 <include>org.jboss.logging:jboss-logging</include>
 
