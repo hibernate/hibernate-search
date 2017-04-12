@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
  *<p>Adapt the classname filter as needed to run a single test or an entire test package.
  *
  * <p>Running such tests from the IDE will require having an Elasticsearch
- * node running. You can easily start one by running 'mvn elasticsearch:run'
+ * node running. You can easily start one by running 'mvn elasticsearch:runforked'
  * from the elasticsearch module in this project.
  *
  * @author Gunnar Morling

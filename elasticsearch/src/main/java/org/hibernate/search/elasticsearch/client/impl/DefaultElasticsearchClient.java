@@ -61,6 +61,7 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 			);
 		}
 		catch (ResponseException e) {
+			requestLog.debug( "ES client issued a ResponseException - not necessarily a problem", e );
 			/*
 			 * The client tries to guess what's an error and what's not, but it's too naive.
 			 * A 404 on DELETE is not always important to us, for instance.
