@@ -147,6 +147,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 
 	private RequestConfig.Builder customizeRequestConfig(String propertyPrefix, Properties properties, RequestConfig.Builder builder) {
 		return builder
+				.setConnectionRequestTimeout( 0 ) //Disable lease handling for the connection pool! See also HSEARCH-2681
 				.setSocketTimeout( ConfigurationParseHelper.getIntValue(
 						properties,
 						propertyPrefix + ElasticsearchEnvironment.SERVER_READ_TIMEOUT,
