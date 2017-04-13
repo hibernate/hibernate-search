@@ -661,7 +661,7 @@ The simplest way to avoid issues is to always explicitly provide time zones IDs 
 ====
 The simple query string DSL is supported by the Elasticsearch integration.
 
-In the general case, your query will automatically use the analyzers defined in the schema but be aware that, in the advanced case when you want to override the analyzer used, Elasticsearch only support overriding the analyzer globally.
+In the general case, your query will automatically use the analyzers defined in the schema but be aware that, in the advanced case when you want to override the analyzer used, Elasticsearch only supports overriding the analyzer globally.
 
 Thus, when overriding the analyzer, it must be consistent across all the queried fields.
 ====
