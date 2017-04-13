@@ -19,6 +19,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.test.jgroups.master.TShirt;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,8 +31,7 @@ import org.junit.Test;
 public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 	public static final String TESTING_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
-	public static final long NETWORK_WAIT_MILLISECONDS = 100;
-	public static final int MAX_WAITS = 100;
+	public static final Poller POLLER = Poller.milliseconds( 10_000, 100 );
 
 	/**
 	 * Name of the JGroups channel used in test
@@ -69,25 +69,16 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 			// since this is an async backend, we expect to see
 			// the values in the index *eventually*.
-			boolean failed = true;
-			for ( int i = 0; i < MAX_WAITS; i++ ) {
-				Thread.sleep( NETWORK_WAIT_MILLISECONDS );
-
+			POLLER.pollAssertion( () -> {
 				masterSession.getTransaction().begin();
 				Query luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
 				org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
 				List result = query.list();
 				masterSession.getTransaction().commit();
 
-				if ( result.size() == 2 ) { //the condition we're waiting for
-					failed = false;
-					break; //enough time wasted
-				}
-			}
-
-			if ( failed ) {
-				Assert.fail( "Lots of time waited and still the two documents are not indexed yet!" );
-			}
+				Assert.assertEquals( "Lots of time waited and still the two documents are not indexed yet!",
+						2, result.size() );
+			} );
 		}
 
 		try ( Session slaveSession = getSlaveSession() ) {
@@ -96,25 +87,14 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 			ts.setLogo( "Peter pan" );
 			tx.commit();
 
-			boolean failed = true;
-			for ( int i = 0; i < MAX_WAITS; i++ ) {
-				//need to sleep for the message consumption
-				Thread.sleep( NETWORK_WAIT_MILLISECONDS );
-
+			POLLER.pollAssertion( () -> {
 				Query luceneQuery = parser.parse( "logo:Peter pan" );
 				masterSession.getTransaction().begin();
 				org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
 				List result = query.list();
 				masterSession.getTransaction().commit();
-				if ( result.size() == 1 ) { //the condition we're waiting for
-					failed = false;
-					break; //enough time wasted
-				}
-			}
-
-			if ( failed ) {
-				Assert.fail( "Waited for long and still Peter Pan didn't fly in!" );
-			}
+				Assert.assertEquals( "Waited for long and still Peter Pan didn't fly in!", 1, result.size() );
+			} );
 		}
 
 		try ( Session slaveSession = getSlaveSession() ) {
@@ -123,25 +103,14 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 			slaveSession.delete( slaveSession.get( TShirt.class, ts2.getId() ) );
 			tx.commit();
 
-			boolean failed = true;
-			for ( int i = 0; i < MAX_WAITS; i++ ) {
-				//need to sleep for the message consumption
-				Thread.sleep( NETWORK_WAIT_MILLISECONDS );
-
+			POLLER.pollAssertion( () -> {
 				Query luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
 				masterSession.getTransaction().begin();
 				org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
 				List result = query.list();
 				masterSession.getTransaction().commit();
-				if ( result.size() == 0 ) { //the condition we're waiting for
-					failed = false;
-					break; //enough time wasted
-				}
-			}
-
-			if ( failed ) {
-				Assert.fail( "Waited for long and elements where still not deleted!" );
-			}
+				Assert.assertEquals( "Waited for long and elements where still not deleted!", 0, result.size() );
+			} );
 		}
 	}
 
