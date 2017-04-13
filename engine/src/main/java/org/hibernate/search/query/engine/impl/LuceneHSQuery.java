@@ -405,9 +405,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			// empty indexedTargetedEntities array means search over all indexed entities,
 			// but we have to make sure there is at least one
 			if ( indexBindings.isEmpty() ) {
-				throw new SearchException(
-						"There are no mapped entities. Don't forget to add @Indexed to at least one class."
-				);
+				throw log.queryWithNoIndexedType();
 			}
 
 			for ( EntityIndexBinding entityIndexBinding : indexBindings.values() ) {
@@ -457,6 +455,13 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			this.classesAndSubclasses = involvedClasses;
 		}
 		this.idFieldNames = idFieldNames;
+
+		if ( targetedIndexes.isEmpty() ) {
+			/*
+			 * May happen when searching on indexes with dynamic sharding that haven't any shard yet.
+			 */
+			return null;
+		}
 
 		//compute optimization needClassFilterClause
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize

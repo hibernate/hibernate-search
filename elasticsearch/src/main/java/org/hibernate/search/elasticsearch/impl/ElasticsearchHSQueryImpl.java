@@ -38,7 +38,6 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
-import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
@@ -54,9 +53,9 @@ import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
@@ -74,7 +73,6 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.DistanceSortField;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -104,8 +102,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	 * ES default limit for (firstResult + maxResult)
 	 */
 	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
-
-	private static final String QUERY_PROPERTIES_PREFIX = "hibernate.search.";
 
 	private static final Set<String> SUPPORTED_PROJECTION_CONSTANTS = Collections.unmodifiableSet(
 			CollectionHelper.asSet(
@@ -168,7 +164,13 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 	@Override
 	public DocumentExtractor queryDocumentExtractor() {
-		return new ElasticsearchScrollAPIDocumentExtractor();
+		IndexSearcher searcher = getOrCreateSearcher();
+		if ( searcher != null ) {
+			return new ElasticsearchScrollAPIDocumentExtractor( searcher );
+		}
+		else {
+			return EmptyDocumentExtractor.get();
+		}
 	}
 
 	SearchResult getSearchResult() {
@@ -192,37 +194,30 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			execute();
 		}
 
-		JsonObject hit = searchResult.getJsonObject()
-				.get( "hits" )
-				.getAsJsonObject()
-				.get( "hits" )
-				.getAsJsonArray()
+		JsonObject hit = searchResult.getHits()
 				// TODO Is it right to use the document id that way? I am not quite clear about its semantics
 				.get( documentId )
 				.getAsJsonObject();
 
-		try ( ServiceReference<ElasticsearchService> elasticsearchService =
-						getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchService.class ) ) {
-			/*
-			 * Do not add every property of the original payload: some properties, such as "_source", do not have the same syntax
-			 * and are not necessary to the explanation.
-			 */
-			JsonObject explainPayload = JsonBuilder.object()
-					.add( "query", searcher.payload.get( "query" ) )
-					.build();
+		/*
+		 * Do not add every property of the original payload: some properties, such as "_source", do not have the same syntax
+		 * and are not necessary to the explanation.
+		 */
+		JsonObject explainPayload = JsonBuilder.object()
+				.add( "query", searcher.payload.get( "query" ) )
+				.build();
 
-			ElasticsearchWork<ExplainResult> work = elasticsearchService.get().getWorkFactory().explain(
-					hit.get( "_index" ).getAsString(),
-					hit.get( "_type" ).getAsString(),
-					hit.get( "_id" ).getAsString(),
-					explainPayload )
-					.build();
+		ElasticsearchWork<ExplainResult> work = searcher.elasticsearchService.getWorkFactory().explain(
+				hit.get( "_index" ).getAsString(),
+				hit.get( "_type" ).getAsString(),
+				hit.get( "_id" ).getAsString(),
+				explainPayload )
+				.build();
 
-			ExplainResult result = elasticsearchService.get().getWorkProcessor().executeSyncUnsafe( work );
-			JsonObject explanation = result.getJsonObject().get( "explanation" ).getAsJsonObject();
+		ExplainResult result = searcher.elasticsearchService.getWorkProcessor().executeSyncUnsafe( work );
+		JsonObject explanation = result.getJsonObject().get( "explanation" ).getAsJsonObject();
 
-			return convertExplanation( explanation );
-		}
+		return convertExplanation( explanation );
 	}
 
 	private Explanation convertExplanation(JsonObject explanation) {
@@ -268,12 +263,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			execute();
 		}
 
-		JsonObject searchResultJsonObject = searchResult.getJsonObject();
-		JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+		JsonArray hits = searchResult.getHits();
 		List<EntityInfo> results = new ArrayList<>( hits.size() );
 
 		for ( JsonElement hit : hits ) {
-			EntityInfo entityInfo = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
+			EntityInfo entityInfo = searcher.convertQueryHit( searchResult, hit.getAsJsonObject() );
 			if ( entityInfo != null ) {
 				results.add( entityInfo );
 			}
@@ -288,46 +282,100 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	private void execute() {
-		searcher = new IndexSearcher();
-
-		searchResult = searcher.search();
+		IndexSearcher searcher = getOrCreateSearcher();
+		if ( searcher != null ) {
+			searchResult = searcher.search();
+		}
+		else {
+			searchResult = EmptySearchResult.get();
+		}
 		resultSize = searchResult.getTotalHitCount();
+	}
+
+	private IndexSearcher getOrCreateSearcher() {
+		if ( searcher != null ) {
+			return searcher;
+		}
+
+		ElasticsearchService elasticsearchService = null;
+		Map<String, Class<?>> entityTypesByName = new HashMap<>();
+		Set<String> indexNames = new HashSet<>();
+		Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
+
+		for ( Class<?> queriedEntityType : queriedEntityTypes ) {
+			entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
+
+			EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
+			IndexManager[] indexManagers = binding.getIndexManagers();
+
+			for ( IndexManager indexManager : indexManagers ) {
+				if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
+					throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
+						queriedEntityType,
+						rawSearchPayload.toString()
+					);
+				}
+
+				ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
+				indexNames.add( esIndexManager.getActualIndexName() );
+				if ( elasticsearchService == null ) {
+					elasticsearchService = esIndexManager.getElasticsearchService();
+				}
+				else if ( elasticsearchService != esIndexManager.getElasticsearchService() ) {
+					throw new AssertionFailure( "Found two index managers refering to two different ElasticsearchService instances" );
+				}
+			}
+		}
+
+		if ( indexNames.isEmpty() ) {
+			/*
+			 * In this case we cannot send a request to Elasticsearch,
+			 * because by default it will query all indexes.
+			 */
+			return null;
+		}
+
+		this.searcher = new IndexSearcher( elasticsearchService, entityTypesByName, indexNames );
+		return searcher;
+	}
+
+	private Iterable<Class<?>> getQueriedEntityTypes() {
+		if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
+			Set<Class<?>> indexBindings = extendedIntegrator.getIndexBindings().keySet();
+			if ( indexBindings.isEmpty() ) {
+				throw LOG.queryWithNoIndexedType();
+			}
+			return indexBindings;
+		}
+		else {
+			return indexedTargetedEntities;
+		}
 	}
 
 	/**
 	 * Stores all information required to execute the query: query string, relevant indices, query parameters, ...
 	 */
 	private class IndexSearcher {
-		private final Map<String, Class<?>> entityTypesByName = new HashMap<>();
+		private final ElasticsearchService elasticsearchService;
+		private final Map<String, Class<?>> entityTypesByName;
+		private final Set<String> indexNames;
+
+		private final ElasticsearchQueryOptions queryOptions;
 		private final Map<Class<?>, FieldProjection> idProjectionByEntityType = new HashMap<>();
 		private final Map<Class<?>, FieldProjection[]> fieldProjectionsByEntityType = new HashMap<>();
-		private final Set<String> indexNames = new HashSet<>();
 		private final JsonObject payload;
 
-		private IndexSearcher() {
+		private IndexSearcher(ElasticsearchService elasticsearchService, Map<String, Class<?>> entityTypesByName, Set<String> indexNames) {
+			this.elasticsearchService = elasticsearchService;
+			this.entityTypesByName = entityTypesByName;
+			this.indexNames = indexNames;
+
 			JsonArray typeFilters = new JsonArray();
-			Iterable<Class<?>> queriedEntityTypes = getQueriedEntityTypes();
-
-			for ( Class<?> queriedEntityType : queriedEntityTypes ) {
-				entityTypesByName.put( queriedEntityType.getName(), queriedEntityType );
-
-				EntityIndexBinding binding = extendedIntegrator.getIndexBinding( queriedEntityType );
-				IndexManager[] indexManagers = binding.getIndexManagers();
-
-				for ( IndexManager indexManager : indexManagers ) {
-					if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
-						throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
-							queriedEntityType,
-							rawSearchPayload.toString()
-						);
-					}
-
-					ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
-					indexNames.add( esIndexManager.getActualIndexName() );
-				}
-
-				typeFilters.add( getEntityTypeFilter( queriedEntityType ) );
+			for ( String typeName : entityTypesByName.keySet() ) {
+				typeFilters.add( getEntityTypeFilter( typeName ) );
 			}
+
+			this.queryOptions = elasticsearchService.getQueryOptions();
 
 			// Query filters; always a type filter, possibly a tenant id filter;
 			JsonObject filteredQuery = getFilteredQuery( rawSearchPayload.get( "query" ), typeFilters );
@@ -407,9 +455,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			return JsonBuilder.object().add( "bool", boolBuilder.build() ).build();
 		}
 
-		private JsonObject getEntityTypeFilter(Class<?> queriedEntityType) {
+		private JsonObject getEntityTypeFilter(String name) {
 			JsonObject value = new JsonObject();
-			value.addProperty( "value", queriedEntityType.getName() );
+			value.addProperty( "value", name );
 
 			JsonObject type = new JsonObject();
 			type.add( "type", value );
@@ -429,15 +477,6 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			tenantFilter.add( "term", value );
 
 			return tenantFilter;
-		}
-
-		private Iterable<Class<?>> getQueriedEntityTypes() {
-			if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
-				return extendedIntegrator.getIndexBindings().keySet();
-			}
-			else {
-				return indexedTargetedEntities;
-			}
 		}
 
 		private void addProjections(JsonBuilder.Object payloadBuilder) {
@@ -661,89 +700,61 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		}
 
 		private SearchResult search(boolean enableScrolling) {
-			try ( ServiceReference<ElasticsearchService> elasticsearchService =
-					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchService.class ) ) {
-				SearchWorkBuilder builder = elasticsearchService.get().getWorkFactory()
-						.search( payload ).indexes( indexNames );
+			SearchWorkBuilder builder = elasticsearchService.getWorkFactory()
+					.search( payload ).indexes( indexNames );
 
-				if ( enableScrolling ) {
-					/*
-					 * Note: "firstResult" is currently being ignored by Elasticsearch when scrolling.
-					 * See https://github.com/elastic/elasticsearch/issues/9373
-					 * To work this around, we don't use the "from" parameter here, and the document
-					 * extractor will skip the results by scrolling until it gets the right index.
-					 */
-					builder.scrolling(
-							/*
-							 * The "size" parameter has a slightly different meaning when scrolling: it defines the window
-							 * size for the first search *and* for the next calls to the scroll API.
-							 * We still reduce the number of results in accordance to "maxResults", but that's done on our side
-							 * in the document extractor.
-							 */
-							getScrollFetchSize(),
-							getScrollTimeout()
-					);
-				}
-				else {
-					builder.paging(
-							firstResult,
-							// If the user has given a 'size' value, take it as is, let ES itself complain if it's too high; if no value is
-							// given, I take as much as possible, as by default only 10 rows would be returned
-							maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult
-					);
-				}
-
-				ElasticsearchWork<SearchResult> work = builder.build();
-				return elasticsearchService.get().getWorkProcessor().executeSyncUnsafe( work );
+			if ( enableScrolling ) {
+				/*
+				 * Note: "firstResult" is currently being ignored by Elasticsearch when scrolling.
+				 * See https://github.com/elastic/elasticsearch/issues/9373
+				 * To work this around, we don't use the "from" parameter here, and the document
+				 * extractor will skip the results by scrolling until it gets the right index.
+				 */
+				builder.scrolling(
+						/*
+						 * The "size" parameter has a slightly different meaning when scrolling: it defines the window
+						 * size for the first search *and* for the next calls to the scroll API.
+						 * We still reduce the number of results in accordance to "maxResults", but that's done on our side
+						 * in the document extractor.
+						 */
+						getQueryOptions().getScrollFetchSize(),
+						getQueryOptions().getScrollTimeout()
+				);
 			}
+			else {
+				builder.paging(
+						firstResult,
+						// If the user has given a 'size' value, take it as is, let ES itself complain if it's too high; if no value is
+						// given, I take as much as possible, as by default only 10 rows would be returned
+						maxResults != null ? maxResults : MAX_RESULT_WINDOW_SIZE - firstResult
+				);
+			}
+
+			ElasticsearchWork<SearchResult> work = builder.build();
+			return elasticsearchService.getWorkProcessor().executeSyncUnsafe( work );
 		}
 
-		private String getScrollTimeout() {
-			return ConfigurationParseHelper.getIntValue(
-					getExtendedSearchIntegrator().getConfigurationProperties(),
-					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_TIMEOUT,
-					ElasticsearchEnvironment.Defaults.SCROLL_TIMEOUT
-					) + "s";
-		}
-
-		private int getScrollFetchSize() {
-			return ConfigurationParseHelper.getIntValue(
-					getExtendedSearchIntegrator().getConfigurationProperties(),
-					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_FETCH_SIZE,
-					ElasticsearchEnvironment.Defaults.SCROLL_FETCH_SIZE
-					);
-		}
-
-		private int getScrollBacktrackingWindowSize() {
-			return ConfigurationParseHelper.getIntValue(
-					getExtendedSearchIntegrator().getConfigurationProperties(),
-					QUERY_PROPERTIES_PREFIX + ElasticsearchEnvironment.SCROLL_BACKTRACKING_WINDOW_SIZE,
-					ElasticsearchEnvironment.Defaults.SCROLL_BACKTRACKING_WINDOW_SIZE
-					);
+		private ElasticsearchQueryOptions getQueryOptions() {
+			return queryOptions;
 		}
 
 		/**
 		 * Scroll through search results, using a previously obtained scrollId.
 		 */
 		SearchResult scroll(String scrollId) {
-			try ( ServiceReference<ElasticsearchService> elasticsearchService =
-					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchService.class ) ) {
-				ElasticsearchWork<SearchResult> work = elasticsearchService.get().getWorkFactory()
-						.scroll( scrollId, getScrollTimeout() ).build();
-				return elasticsearchService.get().getWorkProcessor().executeSyncUnsafe( work );
-			}
+			ElasticsearchQueryOptions queryOptions = getQueryOptions();
+			ElasticsearchWork<SearchResult> work = elasticsearchService.getWorkFactory()
+					.scroll( scrollId, queryOptions.getScrollTimeout() ).build();
+			return elasticsearchService.getWorkProcessor().executeSyncUnsafe( work );
 		}
 
 		void clearScroll(String scrollId) {
-			try ( ServiceReference<ElasticsearchService> elasticsearchService =
-					getExtendedSearchIntegrator().getServiceManager().requestReference( ElasticsearchService.class ) ) {
-				ElasticsearchWork<?> work = elasticsearchService.get().getWorkFactory()
-						.clearScroll( scrollId ).build();
-				elasticsearchService.get().getWorkProcessor().executeSyncUnsafe( work );
-			}
+			ElasticsearchWork<?> work = elasticsearchService.getWorkFactory()
+					.clearScroll( scrollId ).build();
+			elasticsearchService.getWorkProcessor().executeSyncUnsafe( work );
 		}
 
-		EntityInfo convertQueryHit(JsonObject searchResult, JsonObject hit) {
+		EntityInfo convertQueryHit(SearchResult searchResult, JsonObject hit) {
 			String type = hit.get( "_type" ).getAsString();
 			Class<?> clazz = entityTypesByName.get( type );
 
@@ -818,10 +829,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							}
 							break;
 						case ElasticsearchProjectionConstants.TOOK:
-							projections[i] = searchResult.get( "took" ).getAsInt();
+							projections[i] = searchResult.getTook();
 							break;
 						case ElasticsearchProjectionConstants.TIMED_OUT:
-							projections[i] = searchResult.get( "timed_out" ).getAsBoolean();
+							projections[i] = searchResult.getTimedOut();
 							break;
 						case ElasticsearchProjectionConstants.THIS:
 							// Use EntityInfo.ENTITY_PLACEHOLDER as placeholder.
@@ -1037,11 +1048,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	@Override
 	protected void extractFacetResults() {
 		SearchResult searchResult = getSearchResult();
-		JsonElement aggregationsElement = searchResult.getJsonObject().get( "aggregations" );
-		if ( aggregationsElement == null ) {
+		JsonObject aggregations = searchResult.getAggregations();
+		if ( aggregations == null ) {
 			return;
 		}
-		JsonObject aggregations = aggregationsElement.getAsJsonObject();
 
 		Map<String, List<Facet>> results = new HashMap<>();
 		for ( FacetingRequest facetRequest : getFacetManager().getFacetRequests().values() ) {
@@ -1190,10 +1200,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private Integer totalResultCount;
 		private final Window<EntityInfo> results;
 
-		private ElasticsearchScrollAPIDocumentExtractor() {
-			searcher = new IndexSearcher();
+		private ElasticsearchScrollAPIDocumentExtractor(IndexSearcher searcher) {
+			this.searcher = searcher;
 			queryIndexLimit = ElasticsearchHSQueryImpl.this.maxResults == null
 					? null : ElasticsearchHSQueryImpl.this.firstResult + ElasticsearchHSQueryImpl.this.maxResults;
+			ElasticsearchQueryOptions queryOptions = searcher.getQueryOptions();
 			results = new Window<>(
 					/*
 					 * The offset is currently ignored by Elasticsearch.
@@ -1207,7 +1218,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 					 * give access to the result just after the previously fetched results, and
 					 * we still need to keep enough of the previous elements to backtrack.
 					 */
-					searcher.getScrollBacktrackingWindowSize() + searcher.getScrollFetchSize()
+					queryOptions.getScrollBacktrackingWindowSize() + queryOptions.getScrollFetchSize()
 					);
 		}
 
@@ -1217,7 +1228,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				throw new IndexOutOfBoundsException( "Index must be >= 0" );
 			}
 			else if ( index < results.start() ) {
-				throw LOG.backtrackingWindowOverflow( searcher.getScrollBacktrackingWindowSize(), results.start(), index );
+				throw LOG.backtrackingWindowOverflow( searcher.getQueryOptions().getScrollBacktrackingWindowSize(), results.start(), index );
 			}
 
 			if ( totalResultCount == null ) {
@@ -1294,12 +1305,11 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		 * @return {@code true} if at least one result was fetched, {@code false} otherwise.
 		 */
 		private boolean extractWindow(SearchResult searchResult) {
-			JsonObject searchResultJsonObject = searchResult.getJsonObject();
 			boolean fetchedAtLeastOne = false;
-			scrollId = searchResultJsonObject.get( "_scroll_id" ).getAsString();
-			JsonArray hits = searchResultJsonObject.get( "hits" ).getAsJsonObject().get( "hits" ).getAsJsonArray();
+			scrollId = searchResult.getScrollId();
+			JsonArray hits = searchResult.getHits();
 			for ( JsonElement hit : hits ) {
-				EntityInfo converted = searcher.convertQueryHit( searchResultJsonObject, hit.getAsJsonObject() );
+				EntityInfo converted = searcher.convertQueryHit( searchResult, hit.getAsJsonObject() );
 				if ( converted != null ) {
 					results.add( converted );
 					fetchedAtLeastOne = true;

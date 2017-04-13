@@ -148,6 +148,13 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		this.workProcessor = elasticsearchService.getWorkProcessor();
 	}
 
+	/**
+	 * @return the ElasticsearchService used by this index manager.
+	 */
+	public ElasticsearchService getElasticsearchService() {
+		return elasticsearchService;
+	}
+
 	private static String getOverriddenIndexName(String indexName, Properties properties) {
 		String name = properties.getProperty( Environment.INDEX_NAME_PROP_NAME );
 		return name != null ? name : indexName;

@@ -20,6 +20,8 @@ import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
 import org.hibernate.search.util.logging.impl.DefaultLogCategories;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -114,7 +116,17 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 
 	static class SearchResultImpl implements SearchResult {
 
+		private static final JsonAccessor HITS_HITS_ACCESSOR = JsonAccessor.root().property( "hits" ).property( "hits" );
+
 		private static final JsonAccessor COUNT_ACCESSOR = JsonAccessor.root().property( "hits" ).property( "total" );
+
+		private static final JsonAccessor AGGREGATIONS_ACCESSOR = JsonAccessor.root().property( "aggregations" );
+
+		private static final JsonAccessor TOOK_ACCESSOR = JsonAccessor.root().property( "took" );
+
+		private static final JsonAccessor TIMED_OUT_ACCESSOR = JsonAccessor.root().property( "timed_out" );
+
+		private static final JsonAccessor SCROLL_ID_ACCESSOR = JsonAccessor.root().property( "_scroll_id" );
 
 		private final JsonObject jsonObject;
 
@@ -124,13 +136,35 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 		}
 
 		@Override
-		public JsonObject getJsonObject() {
-			return jsonObject;
+		public JsonArray getHits() {
+			return HITS_HITS_ACCESSOR.get( jsonObject ).getAsJsonArray();
 		}
 
 		@Override
 		public int getTotalHitCount() {
 			return COUNT_ACCESSOR.get( jsonObject ).getAsInt();
+		}
+
+		@Override
+		public JsonObject getAggregations() {
+			JsonElement element = AGGREGATIONS_ACCESSOR.get( jsonObject );
+			return element == null ? null : element.getAsJsonObject();
+		}
+
+		@Override
+		public int getTook() {
+			return TOOK_ACCESSOR.get( jsonObject ).getAsInt();
+		}
+
+		@Override
+		public boolean getTimedOut() {
+			return TIMED_OUT_ACCESSOR.get( jsonObject ).getAsBoolean();
+		}
+
+		@Override
+		public String getScrollId() {
+			JsonElement element = SCROLL_ID_ACCESSOR.get( jsonObject );
+			return element == null ? null : element.getAsString();
 		}
 
 	}

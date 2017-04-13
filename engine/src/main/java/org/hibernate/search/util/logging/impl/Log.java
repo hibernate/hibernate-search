@@ -1019,4 +1019,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 332, value = "None of the specified entity types ('%s') or any of their subclasses are configured." )
 	IllegalArgumentException targetedEntityTypesNotConfigured(String targetedEntities);
+
+	@Message(id = 333, value = "Cannot query: there aren't any mapped entity. Don't forget to add @Indexed to at least one class." )
+	SearchException queryWithNoIndexedType();
 }
