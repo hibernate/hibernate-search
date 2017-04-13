@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.cfg;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -65,13 +66,14 @@ public enum IndexSchemaManagementStrategy {
 	static {
 		Map<String, IndexSchemaManagementStrategy> tmpMap = new HashMap<>();
 		for ( IndexSchemaManagementStrategy strategy : values() ) {
-			tmpMap.put( strategy.externalName, strategy );
+			tmpMap.put( strategy.externalName.toLowerCase( Locale.ROOT ), strategy );
 		}
 		VALUES_BY_EXTERNAL_NAME = Collections.unmodifiableMap( tmpMap );
 	}
 
 	public static IndexSchemaManagementStrategy interpretPropertyValue(String propertyValue) {
-		IndexSchemaManagementStrategy strategy = VALUES_BY_EXTERNAL_NAME.get( propertyValue );
+		final String normalizedName = propertyValue.trim().toLowerCase( Locale.ROOT );
+		IndexSchemaManagementStrategy strategy = VALUES_BY_EXTERNAL_NAME.get( normalizedName );
 		if ( strategy == null ) {
 				throw new IllegalArgumentException( "Unrecognized property value for an index schema management strategy: '" + propertyValue
 						+ "'. Please use one of " + VALUES_BY_EXTERNAL_NAME.keySet() );
