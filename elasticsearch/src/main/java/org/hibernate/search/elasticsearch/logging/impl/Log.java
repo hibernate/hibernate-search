@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.logging.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -449,5 +450,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "Executed Elasticsearch HTTP request to path '%s' with query parameters %s in %dms"
 	)
 	void executedRequest(String path, Map<String, String> getParameters, long timeInMs);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 83,
+			value = "For simple query string queries, Elasticsearch does not support overriding fields with more than one different analyzers: %1$s.")
+	SearchException unableToOverrideQueryAnalyzerWithMoreThanOneAnalyzersForSimpleQueryStringQueries(Collection<String> analyzers);
 
 }

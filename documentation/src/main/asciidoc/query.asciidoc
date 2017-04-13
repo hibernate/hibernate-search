@@ -279,7 +279,7 @@ term, you can use the andField() method for that.
 Query luceneQuery = mythQB.keyword()
     .onField("history")
     .andField("name")
-      .boostedTo(5)
+        .boostedTo(5f)
     .andField("description")
     .matching("storm")
     .createQuery();
@@ -288,6 +288,74 @@ Query luceneQuery = mythQB.keyword()
 
 In the previous example, only field name is boosted to 5.
 
+
+===== Simple query string queries
+
+Simple query string queries use the Lucene SimpleQueryParser. The query text is parsed and it exposes more
+search features to the end user such as boolean operators and phrase queries.
+
+====
+[source, JAVA]
+----
+Query luceneQuery = mythQB
+    .simpleQueryString()
+    .onField("history")
+    .matching("(storm OR hurricane) AND \"falling branches\"")
+    .createQuery();
+----
+====
+
+By default, a simple query string query uses the OR operator if the operator is not explicitly defined.
+If you prefer using the AND operator as default, you can add the `withAndAsDefaultOperator` flag.
+The following query returns results containing storm AND tree.
+
+====
+[source, JAVA]
+----
+Query luceneQuery = mythQB
+    .simpleQueryString()
+    .onField("history")
+    .withAndAsDefaultOperator()
+    .matching("storm tree")
+    .createQuery();
+----
+====
+
+It is also possible to search on several fields at the same time, meaning you can search for the presence
+of keywords in e.g. "name", "history" and "description", potentially with different boosts.
+
+====
+[source, JAVA]
+----
+Query luceneQuery = mythQB
+    .simpleQueryString()
+    .onField("name")
+        .boostedTo(5f)
+    .andFields("history", "description")
+        .boostedTo(2f)
+    .withAndAsDefaultOperator()
+    .matching("storm tree")
+    .createQuery();
+----
+====
+
+The above query returns results containing "storm" and "tree" either in "name", "history" or "description".
+
+The syntax supported by the SimpleQueryParser includes the following operators: boolean (AND, OR, NOT),
+prefix, phrase, precedence, fuzzy and near operator for phrase queries.
+
+The query below will also return results containing "storms" or "sturm".
+
+====
+[source, JAVA]
+----
+Query luceneQuery = mythQB
+    .simpleQueryString()
+    .onFields("name", "history", "description")
+    .matching("storm~2")
+    .createQuery();
+----
+====
 
 ===== Fuzzy queries
 

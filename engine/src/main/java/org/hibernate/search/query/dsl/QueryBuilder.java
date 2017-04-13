@@ -44,6 +44,13 @@ public interface QueryBuilder {
 	PhraseContext phrase();
 
 	/**
+	 * Build a query from a simple query string.
+	 *
+	 * @return a {@code SimpleQueryStringContext} instance for building a query from a simple query string
+	 */
+	SimpleQueryStringContext simpleQueryString();
+
+	/**
 	 * Start for building a boolean query.
 	 *
 	 * @return a {@code BooleanJunction} instance for building the boolean query

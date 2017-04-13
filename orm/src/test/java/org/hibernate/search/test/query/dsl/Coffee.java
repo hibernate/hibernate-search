@@ -13,9 +13,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 
@@ -26,6 +28,8 @@ import org.hibernate.search.annotations.TermVector;
 @Indexed
 public class Coffee {
 
+	public static final String NAME_SORT = "name_sort";
+
 	@Id
 	@GeneratedValue
 	public Integer getId() { return id; }
@@ -35,6 +39,8 @@ public class Coffee {
 	private Integer id;
 
 	@Field(termVector = TermVector.NO, store = Store.YES)
+	@Field(name = NAME_SORT, analyze = Analyze.NO)
+	@SortableField(forField = NAME_SORT)
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
 	private String name;

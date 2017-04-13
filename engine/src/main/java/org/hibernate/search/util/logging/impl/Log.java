@@ -1019,4 +1019,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 332, value = "None of the specified entity types ('%s') or any of their subclasses are configured." )
 	IllegalArgumentException targetedEntityTypesNotConfigured(String targetedEntities);
+
+	@Message(id = 333, value = "The simple query parser does not support empty queries.")
+	EmptyQueryException simpleQueryParserDoesNotSupportEmptyQueries();
+
+	@Message(id = 334, value = "Unable to build a Lucene query from the query string '%1$s'.")
+	EmptyQueryException unableToBuildLuceneQueryFromQueryString(String query);
 }

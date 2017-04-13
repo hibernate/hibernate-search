@@ -12,6 +12,7 @@ import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.FacetContext;
 import org.hibernate.search.query.dsl.MoreLikeThisContext;
 import org.hibernate.search.query.dsl.PhraseContext;
+import org.hibernate.search.query.dsl.SimpleQueryStringContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.RangeContext;
 import org.hibernate.search.query.dsl.SpatialContext;
@@ -44,6 +45,11 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 	@Override
 	public PhraseContext phrase() {
 		return new ConnectedPhraseContext( context );
+	}
+
+	@Override
+	public SimpleQueryStringContext simpleQueryString() {
+		return new ConnectedSimpleQueryStringContext( context );
 	}
 
 	//fixme Have to use raw types but would be nice to not have to
