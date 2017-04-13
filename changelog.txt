@@ -1,6 +1,54 @@
 Hibernate Search Changelog
 ==========================
 
+5.8.0.Beta1 (13-04-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2681 Lease request timeouts on the Elasticsearch async client lead to cascading failures
+    * HSEARCH-2664 Broken links in doc: delete-by-query plugin
+    * HSEARCH-2662 Querying an empty, dynamically sharded index won't work (Lucene + Elasticsearch)
+    * HSEARCH-2656 Range queries on fields with a custom MetadataProvidingFieldBridge may not detect numeric-ness correctly
+    * HSEARCH-2651 Calls to numericField in the programmatic API create duplicate fields
+    * HSEARCH-2631 Iterating on results of query on single class with criteria generates wrong statistics
+    * HSEARCH-2630 Queries on multiple classes returning a single result generates wrong statistics
+    * HSEARCH-2602 The documentation recommends using the deprecated byField(String, SortField.Type) method in the sort DSL
+    * HSEARCH-2541 FullTextQuery with single result does not populate fields or ID in entity results
+    * HSEARCH-2353 Add support for norms with Elasticsearch 5
+    * HSEARCH-2277 Some resources may not be cleaned on bootstrap failure
+    * HSEARCH-1862 Allow configuration of facets via programmatic configuration API
+
+** Improvement
+    * HSEARCH-2661 Avoid the recurring calls to serviceManager.requestReference in ElasticsearchHSQueryImpl
+    * HSEARCH-2648 Add debug/trace logs showing execution time of Elasticsearch requests
+    * HSEARCH-2646 Mark the private JBoss Modules as private.api
+    * HSEARCH-2645 Separate the JBoss Module for the Elasticsearch client
+    * HSEARCH-2644 Mention what needs to be done to switch Elasticsearch version in docs
+    * HSEARCH-2600 Update javadoc configuration
+    * HSEARCH-2565 Boolean QueryBuilder clauses should accept a 'null' clause
+    * HSEARCH-2521 Clarify if error HSEARCH000278 could be caused by the entity not being a managed entity
+    * HSEARCH-2361 Make sure Elasticsearch related configuration properties are parsed and validated at boot time
+    * HSEARCH-2009 Document supported types for @FieldBridge#impl()
+    * HSEARCH-2001 By default enable a "strict mode" validation for sorting
+
+** New Feature
+    * HSEARCH-2678 Add a simple query string entry point to the DSL
+    * HSEARCH-2469 Ability to fail over to the next host when a request to an Elasticsearch host fails
+
+** Task
+    * HSEARCH-2686 No longer require the ByteBuddy dependency to run OSGi tests
+    * HSEARCH-2685 Update to Hibernate ORM 5.2.9.Final
+    * HSEARCH-2669 Remove mentions of HSEARCH-2605 in the Elasticsearch documentation
+    * HSEARCH-2660 Make index schema management strategy options more consistent with JPA
+    * HSEARCH-2654 Upgrade Elasticsearch RestClient + Sniffer to 5.3
+    * HSEARCH-2653 Rework credits section in the documentation
+    * HSEARCH-2635 Some clarifications in the Elasticsearch related documentation
+    * HSEARCH-2628 JNDI support should reuse the JNDIService from Hibernate ORM
+    * HSEARCH-2607 Improve OSGi test diagnostics when running tests on misconfigured networks
+    * HSEARCH-2581 Add the ability to support multiple incompatible Elasticsearch versions (dialects?)
+    * HSEARCH-2434 Add support for Elasticsearch 5
+    * HSEARCH-2382 Merge the JPA and Hibernate native components like ORM did
+
 5.7.0.Final (21-02-2017)
 -------------------------
 
