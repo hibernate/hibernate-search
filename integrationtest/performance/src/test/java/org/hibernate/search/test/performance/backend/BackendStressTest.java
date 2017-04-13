@@ -10,12 +10,13 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.test.backend.lucene.Condition;
 import org.hibernate.search.test.backend.lucene.Quote;
 import org.hibernate.search.test.backend.lucene.StopTimer;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.impl.Executors;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hibernate.search.test.backend.lucene.Conditions.assertConditionMet;
 
 /**
  * Stress test for backend writing. Supports async and sync modes, different directory providers and also
@@ -102,6 +102,8 @@ public class BackendStressTest {
 	 * to have a value different than 1 for other directories.
 	 */
 	private static final int CLUSTER_NODES = (provider == Provider.INFINISPAN) ? 4 : 1;
+
+	private static final Poller POLLER = Poller.milliseconds( 50_000, 20 );
 
 	@Parameterized.Parameters
 	public static List<Object[]> data() {
@@ -176,7 +178,8 @@ public class BackendStressTest {
 
 		waitForAll( futures );
 
-		assertConditionMet( new MinimumSizeCondition( searchIntegrator ) );
+		int expectedIndexSize = workLog.calculateIndexSize();
+		POLLER.pollAssertion( () -> assertDocumentIndexed( searchIntegrator, expectedIndexSize ) );
 
 		timer.stop();
 
@@ -189,26 +192,13 @@ public class BackendStressTest {
 		}
 	}
 
-	/**
-	 * Condition that uses the workLog to calculate the expected final number of documents in the index
-	 */
-	class MinimumSizeCondition implements Condition {
-		final int expectedSize;
-		private final SearchIntegrator integrator;
-
-		MinimumSizeCondition(SearchIntegrator integrator) {
-			this.integrator = integrator;
-			expectedSize = workLog.calculateIndexSize();
-		}
-		@Override
-		public boolean evaluate() {
-			int size = integrator
-					.createHSQuery( new MatchAllDocsQuery(), Quote.class )
-					.queryResultSize();
-			System.out.println( "Index size=" + size + ", expected=" + expectedSize );
-			return size >= expectedSize;
-
-		}
+	private void assertDocumentIndexed(SearchIntegrator integrator, int expectedIndexSize) {
+		int size = integrator
+				.createHSQuery( new MatchAllDocsQuery(), Quote.class )
+				.queryResultSize();
+		String logMessage = "Index size=" + size + ", expected=" + expectedIndexSize;
+		System.out.println( logMessage );
+		Assert.assertTrue( logMessage, size >= expectedIndexSize );
 	}
 
 	class Task implements Runnable {
