@@ -12,14 +12,15 @@ import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.CountingErrorHandler;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -28,7 +29,6 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import static org.hibernate.search.test.backend.lucene.Conditions.assertConditionMet;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -41,6 +41,8 @@ import static org.junit.Assert.assertTrue;
 public class ScheduledCommitPolicyTest {
 
 	private static final int NUMBER_ENTITIES = 1000;
+
+	private static final Poller POLLER = Poller.milliseconds( 50_000, 20 );
 
 	private int globalIdCounter = 0;
 
@@ -62,7 +64,7 @@ public class ScheduledCommitPolicyTest {
 		ScheduledCommitPolicy scheduledCommitPolicy = (ScheduledCommitPolicy) commitPolicy;
 		ScheduledThreadPoolExecutor scheduledExecutor = (ScheduledThreadPoolExecutor) scheduledCommitPolicy.getScheduledExecutorService();
 
-		assertConditionMet( new TaskExecutedCondition( scheduledExecutor, 1 ) );
+		POLLER.pollAssertion( () -> assertTaskExecuted( scheduledExecutor, 1 ) );
 	}
 
 	@Test
@@ -73,12 +75,7 @@ public class ScheduledCommitPolicyTest {
 	public void testErrorHandlingDuringCommit() throws Exception {
 		writeData( sfAsyncExclusiveIndex, 2 );
 		final CountingErrorHandler errorHandler = (CountingErrorHandler) sfAsyncExclusiveIndex.getSearchFactory().getErrorHandler();
-		assertConditionMet( new Condition() {
-			@Override
-			public boolean evaluate() {
-				return errorHandler.getCountFor( IOException.class ) >= 2;
-			}
-		} );
+		POLLER.pollAssertion( () -> Assert.assertTrue( errorHandler.getCountFor( IOException.class ) >= 2 ) );
 	}
 
 	@Test
@@ -89,62 +86,32 @@ public class ScheduledCommitPolicyTest {
 	public void testErrorHandlingOnBackgroundThread() throws Exception {
 		writeData( sfAsyncExclusiveIndex, 2 );
 		final CountingErrorHandler errorHandler = (CountingErrorHandler) sfAsyncExclusiveIndex.getSearchFactory().getErrorHandler();
-		assertConditionMet( new Condition() {
-			@Override
-			public boolean evaluate() {
-				// It's going to commit once each millisecond, and produce a failure each time.
-				// So "4" is just a random number higher than 0, but high enough to
-				// verify that the scheduled task is not being killed at the first failure,
-				// and will keep trying.
-				return errorHandler.getCountFor( NullPointerException.class ) >= 4;
-			}
-		} );
+		// It's going to commit once each millisecond, and produce a failure each time.
+		// So "4" is just a random number higher than 0, but high enough to
+		// verify that the scheduled task is not being killed at the first failure,
+		// and will keep trying.
+		POLLER.pollAssertion( () -> Assert.assertTrue( errorHandler.getCountFor( NullPointerException.class ) >= 4 ) );
 	}
 
 	@Test
 	public void testDocVisibility() throws Exception {
 		writeData( sfAsyncExclusiveIndex, NUMBER_ENTITIES );
-		assertConditionMet( new IndexingFinishedCondition( sfAsyncExclusiveIndex, NUMBER_ENTITIES ) );
+		POLLER.pollAssertion( () -> assertIndexingFinished( sfAsyncExclusiveIndex, NUMBER_ENTITIES ) );
 
 		writeData( sfAsyncExclusiveIndex, 10 );
-		assertConditionMet( new IndexingFinishedCondition( sfAsyncExclusiveIndex, NUMBER_ENTITIES + 10 ) );
+		POLLER.pollAssertion( () -> assertIndexingFinished( sfAsyncExclusiveIndex, NUMBER_ENTITIES + 10 ) );
 
 		writeData( sfAsyncExclusiveIndex, 1 );
-		assertConditionMet( new IndexingFinishedCondition( sfAsyncExclusiveIndex, NUMBER_ENTITIES + 10 + 1 ) );
+		POLLER.pollAssertion( () -> assertIndexingFinished( sfAsyncExclusiveIndex, NUMBER_ENTITIES + 10 + 1 ) );
 	}
 
-	private class IndexingFinishedCondition implements Condition {
-		private final int expectedDocsCount;
-		private final ExtendedSearchIntegrator searchFactory;
-		private IndexingFinishedCondition(SearchFactoryHolder searchFactoryHolder, int expectedDocsCount) {
-			this.searchFactory = searchFactoryHolder.getSearchFactory();
-			this.expectedDocsCount = expectedDocsCount;
-		}
-
-		private HSQuery matchAllQuery() {
-			return searchFactory
-					.createHSQuery( new MatchAllDocsQuery(), Quote.class );
-		}
-
-		@Override
-		public boolean evaluate() {
-			return expectedDocsCount == matchAllQuery().queryResultSize();
-		}
+	private void assertIndexingFinished(SearchFactoryHolder searchFactoryHolder, int expectedDocsCount) {
+		HSQuery query = searchFactoryHolder.getSearchFactory().createHSQuery( new MatchAllDocsQuery(), Quote.class );
+		Assert.assertEquals( expectedDocsCount, query.queryResultSize() );
 	}
 
-	private class TaskExecutedCondition implements Condition {
-
-		private final ScheduledThreadPoolExecutor executor;
-		private final int taskCount;
-
-		private TaskExecutedCondition(ScheduledThreadPoolExecutor executor, int taskCount) {
-			this.executor = executor;
-			this.taskCount = taskCount;
-		}
-		@Override
-		public boolean evaluate() {
-			return executor.getCompletedTaskCount() >= taskCount;
-		}
+	private void assertTaskExecuted(ScheduledThreadPoolExecutor executor, int taskCount) {
+		Assert.assertTrue( executor.getCompletedTaskCount() >= taskCount );
 	}
 
 	private void writeData(SearchFactoryHolder sfHolder, int numberEntities) {
