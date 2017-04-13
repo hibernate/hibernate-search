@@ -6,15 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.client.impl;
 
-import java.net.URI;
 import java.util.Properties;
 
-import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.nio.conn.NoopIOSessionStrategy;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
@@ -55,14 +54,9 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 				propertyPrefix + ElasticsearchEnvironment.SERVER_URI,
 				ElasticsearchEnvironment.Defaults.SERVER_URI
 		);
+		ServerUris hosts = ServerUris.fromString( serverUrisString );
 
-		String[] serverUris = serverUrisString.trim().split( "\\s" );
-		HttpHost[] hosts = new HttpHost[serverUris.length];
-		for ( int i = 0 ; i < serverUris.length ; ++i ) {
-			hosts[i] = HttpHost.create( serverUris[i] );
-		}
-
-		return RestClient.builder( hosts )
+		return RestClient.builder( hosts.asHostsArray() )
 				/*
 				 * Note: this timeout is not only used on retries,
 				 * but also when executing requests synchronously.
@@ -74,7 +68,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 						ElasticsearchEnvironment.Defaults.SERVER_REQUEST_TIMEOUT
 				) )
 				.setRequestConfigCallback( (b) -> customizeRequestConfig( propertyPrefix, properties, b ) )
-				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( propertyPrefix, properties, serverUris, b ) )
+				.setHttpClientConfigCallback( (b) -> customizeHttpClientConfig( propertyPrefix, properties, hosts, b ) )
 				.build();
 	}
 
@@ -104,7 +98,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 	}
 
 	private HttpAsyncClientBuilder customizeHttpClientConfig(String propertyPrefix,
-			Properties properties, String[] serverUris, HttpAsyncClientBuilder builder) {
+			Properties properties, ServerUris hosts, HttpAsyncClientBuilder builder) {
 		builder = builder
 				.setMaxConnTotal( ConfigurationParseHelper.getIntValue(
 						properties,
@@ -117,6 +111,11 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 						ElasticsearchEnvironment.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE
 				) )
 				.setThreadFactory( new SearchThreadFactory( "Elasticsearch transport thread" ) );
+		if ( hosts.isAnyRequiringSSL() == false ) {
+			// In this case disable the SSL capability as it might have an impact on
+			// bootstrap time, for example consuming entropy for no reason
+			builder.setSSLStrategy( NoopIOSessionStrategy.INSTANCE );
+		}
 
 		String username = ConfigurationParseHelper.getString(
 				properties,
@@ -130,7 +129,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 					null
 			);
 			if ( password != null ) {
-				warnPasswordsOverHttp( serverUris );
+				hosts.warnPasswordsOverHttp();
 			}
 
 			BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -166,13 +165,4 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 				.toString();
 	}
 
-	private boolean warnPasswordsOverHttp(String[] serverUris) {
-		for ( String serverUriAsString : serverUris ) {
-			URI uri = URI.create( serverUriAsString );
-			if ( HTTP_SCHEME.equals( uri.getScheme() ) ) {
-				log.usingPasswordOverHttp( serverUriAsString );
-			}
-		}
-		return false;
-	}
 }
