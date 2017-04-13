@@ -17,6 +17,7 @@ import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.jgroups.impl.MessageListenerToRequestHandlerAdapter;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
@@ -33,6 +34,8 @@ import org.junit.Test;
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class JGroupsSlaveTest extends SearchTestBase {
+
+	private static final Poller POLLER = JGroupsCommonTest.POLLER;
 
 	private Channel channel;
 
@@ -59,17 +62,10 @@ public class JGroupsSlaveTest extends SearchTestBase {
 			s.persist( ts2 );
 			tx.commit();
 
-			boolean failed = true;
-			for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
-				Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
-				if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 2 ) { //the condition we're waiting for
-					failed = false;
-					break; //enough time wasted
-				}
-			}
-			if ( failed ) {
-				Assert.fail( "Message not received after waiting for long!" );
-			}
+			POLLER.pollAssertion( () -> {
+				Assert.assertTrue( "Message not received after waiting for long!",
+						JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 2 );
+			} );
 		}
 
 		JGroupsReceiver.reset();
@@ -80,17 +76,10 @@ public class JGroupsSlaveTest extends SearchTestBase {
 			ts.setLogo( "Peter pan" );
 			tx.commit();
 
-			boolean failed = true;
-			for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
-				Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
-				if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 ) { //the condition we're waiting for
-					failed = false;
-					break; //enough time wasted
-				}
-			}
-			if ( failed ) {
-				Assert.fail( "Message not received after waiting for long!" );
-			}
+			POLLER.pollAssertion( () -> {
+				Assert.assertTrue( "Message not received after waiting for long!",
+						JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 );
+			} );
 		}
 
 		JGroupsReceiver.reset();
@@ -100,17 +89,10 @@ public class JGroupsSlaveTest extends SearchTestBase {
 			s.delete( s.get( TShirt.class, ts.getId() ) );
 			tx.commit();
 
-			boolean failed = true;
-			for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
-				Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
-				if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 ) { //the condition we're waiting for
-					failed = false;
-					break; //enough time wasted
-				}
-			}
-			if ( failed ) {
-				Assert.fail( "Message not received after waiting for long!" );
-			}
+			POLLER.pollAssertion( () -> {
+				Assert.assertTrue( "Message not received after waiting for long!",
+						JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 );
+			} );
 		}
 	}
 

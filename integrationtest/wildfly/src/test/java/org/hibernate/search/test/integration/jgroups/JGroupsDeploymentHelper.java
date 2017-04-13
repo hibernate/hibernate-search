@@ -15,6 +15,7 @@ import org.hibernate.search.test.integration.jms.MasterSlaveTestTemplate;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -50,6 +51,7 @@ public class JGroupsDeploymentHelper {
 		WebArchive webArchive = ShrinkWrap
 				.create( WebArchive.class, name + ".war" )
 				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, MasterSlaveTestTemplate.class )
+				.addClass( Poller.class )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsResource( "testing-flush-loopback.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure-excludejavassist.xml", "jboss-deployment-structure.xml" )

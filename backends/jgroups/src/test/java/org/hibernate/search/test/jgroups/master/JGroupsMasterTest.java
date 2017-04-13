@@ -31,6 +31,7 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
@@ -50,6 +51,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class JGroupsMasterTest extends SearchTestBase {
 
+	private static final Poller POLLER = JGroupsCommonTest.POLLER;
+
 	private final QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 
 	/**
@@ -68,17 +71,10 @@ public class JGroupsMasterTest extends SearchTestBase {
 		List<LuceneWork> queue = createDocumentAndWorkQueue( shirt );
 		sendMessage( queue );
 
-		boolean failed = true;
-		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
-			Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
-			if ( countByQuery( "logo:jboss" ) == 1 ) { //the condition we're waiting for
-				failed = false;
-				break; //enough time wasted
-			}
-		}
-		if ( failed ) {
-			Assert.fail( "Message not received after waiting for long!" );
-		}
+		POLLER.pollAssertion( () -> {
+			Assert.assertEquals( "Message not received after waiting for long!",
+					1, countByQuery( "logo:jboss" ) );
+		} );
 	}
 
 	private int countByQuery(String luceneQueryString) throws ParseException {
