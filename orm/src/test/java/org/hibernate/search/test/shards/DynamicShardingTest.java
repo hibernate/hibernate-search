@@ -147,7 +147,8 @@ public class DynamicShardingTest extends SearchTestBase {
 		SomeOtherEntity someOtherIndexedObject = new SomeOtherEntity();
 		insert( someOtherIndexedObject );
 
-		assertEquals( 0, query.queryResultSize() );
+		HSQuery queryAgain = getExtendedSearchIntegrator().createHSQuery( new MatchAllDocsQuery(), Animal.class );
+		assertEquals( 0, queryAgain.queryResultSize() );
 	}
 
 	@Override
