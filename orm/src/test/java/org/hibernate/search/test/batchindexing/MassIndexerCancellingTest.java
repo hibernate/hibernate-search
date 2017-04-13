@@ -20,6 +20,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.testing.TestForIssue;
@@ -62,22 +63,14 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 		Assert.assertTrue( monitor.getThreadNumber() == threadsToLoadObjects );
 
 		// verify index is now containing 2 docs
-		verifyIndexIntegrityEventually( 2 );
+		Poller.milliseconds( 10_000, 10 ).pollAssertion( () -> {
+				Assert.assertEquals( "Expected index size still not reached after 10 seconds!",
+						2, getIndexSize() );
+		} );
 
 		// check all indexing thread are interrupted
 		Assert.assertTrue( monitor.massIndexerThreadsAreInterruptedOrDied() );
 
-	}
-
-	private void verifyIndexIntegrityEventually(int expectedIndexSize) throws InterruptedException {
-		int attempt = 0;
-		while ( ! verifyIndexIntegrity( expectedIndexSize ) ) {
-			Thread.sleep( 10 );
-			attempt++;
-			if ( attempt == 1000 ) {
-				Assert.fail( "Expected index size still not reached after 10 seconds!" );
-			}
-		}
 	}
 
 	class InnerIndexerProgressMonitor extends SimpleIndexingProgressMonitor {
@@ -130,7 +123,7 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 
 	}
 
-	private boolean verifyIndexIntegrity(int expectedDocs) {
+	private int getIndexSize() {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction transaction = fullTextSession.beginTransaction();
@@ -140,7 +133,8 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 			int resultSize = fullTextQuery.getResultSize();
 
 			transaction.commit();
-			return expectedDocs == resultSize;
+
+			return resultSize;
 		}
 		finally {
 			fullTextSession.close();
