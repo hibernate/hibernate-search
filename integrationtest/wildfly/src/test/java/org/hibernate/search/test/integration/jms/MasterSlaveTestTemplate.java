@@ -16,6 +16,7 @@ import javax.inject.Inject;
 
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.InSequence;
 import org.junit.Test;
@@ -36,14 +37,16 @@ public abstract class MasterSlaveTestTemplate {
 	/**
 	 * Idle loop to wait for results to be transmitted
 	 */
-	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION = 50;
+	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION_MS = 50;
 
 	/**
 	 * Multiplier on top of REFRESH_PERIOD_IN_SEC we can wait before considering the test failed.
 	 */
 	private static final int MAX_PERIOD_RETRIES = 5;
 
-	private static final int MAX_SEARCH_ATTEMPTS = ( MAX_PERIOD_RETRIES * REFRESH_PERIOD_IN_SEC * 1000 / SLEEP_TIME_FOR_SYNCHRONIZATION );
+	private static final int MAX_SYNCHRONIZATION_TIME_MS = MAX_PERIOD_RETRIES * REFRESH_PERIOD_IN_SEC * 1000;
+
+	private static final Poller POLLER = Poller.milliseconds( MAX_SYNCHRONIZATION_TIME_MS, SLEEP_TIME_FOR_SYNCHRONIZATION_MS );
 
 	@Inject
 	RegistrationController memberRegistration;
@@ -102,48 +105,33 @@ public abstract class MasterSlaveTestTemplate {
 	@InSequence(4)
 	@OperateOnDeployment("slave-1")
 	public void searchNewMembersAfterSynchronizationOnSlave1() throws Exception {
-		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
-		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
-		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Davide D'Alto", "Davide" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Peter O'Tall", "Peter" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Richard Mayhew", "Richard" ) );
 	}
 
 	@Test
 	@InSequence(5)
 	@OperateOnDeployment("slave-2")
 	public void searchNewMembersAfterSynchronizationOnSlave2() throws Exception {
-		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
-		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
-		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Davide D'Alto", "Davide" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Peter O'Tall", "Peter" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Richard Mayhew", "Richard" ) );
 	}
 
 	@Test
 	@InSequence(6)
 	@OperateOnDeployment("master")
 	public void searchNewMembersAfterSynchronizationOnMaster() throws Exception {
-		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
-		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
-		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Davide D'Alto", "Davide" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Peter O'Tall", "Peter" ) );
+		POLLER.pollAssertion( () -> assertSearchResult( "Richard Mayhew", "Richard" ) );
 	}
 
-	private void assertSearchResult(String expectedResult, List<RegisteredMember> results) {
+	private void assertSearchResult(String expectedResult, String searchString) {
+		List<RegisteredMember> results = memberRegistration.search( searchString );
 		assertEquals( "Unexpected number of results from search", 1, results.size() );
 		assertEquals( "Unexpected result from search", expectedResult, results.get( 0 ).getName() );
-	}
-
-	private void waitForIndexSynchronization() throws InterruptedException {
-		Thread.sleep( SLEEP_TIME_FOR_SYNCHRONIZATION );
-	}
-
-	private List<RegisteredMember> search(String name) throws InterruptedException {
-		List<RegisteredMember> results = memberRegistration.search( name );
-
-		int attempts = 0;
-		while ( results.size() == 0 && attempts < MAX_SEARCH_ATTEMPTS ) {
-			attempts++;
-			waitForIndexSynchronization();
-			results = memberRegistration.search( name );
-		}
-		return results;
 	}
 
 }

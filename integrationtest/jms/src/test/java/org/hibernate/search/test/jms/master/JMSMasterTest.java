@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.jms.master;
 
+import static org.junit.Assert.assertEquals;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -23,15 +25,18 @@ import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.naming.Context;
 import javax.naming.NamingException;
+import javax.persistence.criteria.CriteriaDelete;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -44,11 +49,10 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests that the Master node in a JMS cluster can properly process messages placed onto the queue.
@@ -69,6 +73,10 @@ public class JMSMasterTest extends SearchTestBase {
 	 */
 	private static final String CONNECTION_FACTORY_NAME = "java:/ConnectionFactory";
 
+	public static final Poller POLLER = Poller.milliseconds( 10_000, 100 );
+
+	private final QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
+
 	/**
 	 * ActiveMQ message broker.
 	 */
@@ -83,27 +91,24 @@ public class JMSMasterTest extends SearchTestBase {
 		List<LuceneWork> queue = createDocumentAndWorkQueue( shirt );
 
 		registerMessageListener();
+
+		assertEquals( 0, listByQuery( "logo:jboss" ).size() );
+
 		sendMessage( queue );
 
 		// need to sleep to give JMS processing and indexing time
-		Thread.sleep( 1000 );
+		POLLER.pollAssertion( () -> assertEquals( 1, listByQuery( "logo:jboss" ).size() ) );
 
-		{
-			FullTextSession ftSess = Search.getFullTextSession( openSession() );
-			ftSess.getTransaction().begin();
-			QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
-			Query luceneQuery = parser.parse( "logo:jboss" );
-			org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
-			List result = query.list();
-			assertEquals( 1, result.size() );
-			ftSess.delete( result.get( 0 ) );
-			ftSess.purgeAll( TShirt.class );
-			ftSess.getTransaction().commit();
+		FullTextSession ftSession = Search.getFullTextSession( openSession() );
+		ftSession.getTransaction().begin();
+		CriteriaDelete<TShirt> delete = ftSession.getCriteriaBuilder().createCriteriaDelete( TShirt.class );
+		delete.from( TShirt.class );
+		ftSession.createQuery( delete ).executeUpdate();
+		ftSession.purgeAll( TShirt.class );
+		ftSession.getTransaction().commit();
+		ftSession.close();
 
-			Thread.sleep( 1000 );
-
-			ftSess.close();
-		}
+		assertEquals( 0, listByQuery( "logo:jboss" ).size() );
 
 		{
 			shirt = createObjectWithSQL();
@@ -112,22 +117,7 @@ public class JMSMasterTest extends SearchTestBase {
 			registerMessageListener();
 			sendMessage( queue );
 
-			// need to sleep to give JMS processing and indexing time
-			Thread.sleep( 1000 );
-
-			{
-				FullTextSession ftSess = Search.getFullTextSession( openSession() );
-				ftSess.getTransaction().begin();
-				QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
-				Query luceneQuery = parser.parse( "logo:jboss" );
-				{
-					org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
-					List result = query.list();
-					assertEquals( 1, result.size() );
-				}
-				ftSess.getTransaction().commit();
-				ftSess.close();
-			}
+			POLLER.pollAssertion( () -> assertEquals( 1, listByQuery( "logo:jboss" ).size() ) );
 
 			{
 				DeleteByQueryLuceneWork work = new DeleteByQueryLuceneWork( TShirt.class, new SingularTermDeletionQuery( "logo", "jboss" ) );
@@ -137,15 +127,34 @@ public class JMSMasterTest extends SearchTestBase {
 				this.sendMessage( l );
 			}
 
-			Thread.sleep( 1000 );
-
-			{
+			POLLER.pollAssertion( () -> {
 				HSQuery hsQuery = this.getExtendedSearchIntegrator().createHSQuery(
 						this.getExtendedSearchIntegrator().buildQueryBuilder().forEntity( TShirt.class ).get().all().createQuery(),
 						TShirt.class
 						);
 				assertEquals( 0, hsQuery.queryResultSize() );
+			} );
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<TShirt> listByQuery(String luceneQueryString) throws ParseException {
+		FullTextSession ftSess = Search.getFullTextSession( openSession() );
+		try {
+			ftSess.getTransaction().begin();
+			try {
+				Query luceneQuery = parser.parse( luceneQueryString );
+				FullTextQuery query = ftSess.createFullTextQuery( luceneQuery );
+				@SuppressWarnings({ "rawtypes" })
+				List result = query.list();
+				return result;
 			}
+			finally {
+				ftSess.getTransaction().commit();
+			}
+		}
+		finally {
+			ftSess.close();
 		}
 	}
 
