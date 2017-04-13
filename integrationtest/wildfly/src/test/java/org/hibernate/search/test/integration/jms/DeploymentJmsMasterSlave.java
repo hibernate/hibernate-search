@@ -17,6 +17,7 @@ import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.hibernate.search.test.integration.jms.transaction.TransactionalJmsMasterSlave;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
@@ -64,6 +65,7 @@ public final class DeploymentJmsMasterSlave {
 						MasterSlaveTestTemplate.class,
 						TransactionalJmsMasterSlave.class
 				)
+				.addClass( Poller.class )
 				.addAsResource( new StringAsset( "deploymentName=" + name ), CONFIGURATION_PROPERTIES_RESOURCENAME )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure-excludejavassist.xml", "jboss-deployment-structure.xml" )

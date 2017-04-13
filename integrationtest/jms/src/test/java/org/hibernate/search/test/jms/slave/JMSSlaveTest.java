@@ -27,6 +27,7 @@ import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jms.master.JMSMasterTest;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.After;
 import org.junit.Before;
@@ -51,6 +52,8 @@ public class JMSSlaveTest extends SearchTestBase {
 	 * Name of the connection factory as found in JNDI (see jndi.properties).
 	 */
 	private static final String CONNECTION_FACTORY_NAME = "java:/ConnectionFactory";
+
+	private static final Poller POLLER = Poller.milliseconds( 1_000, 200 );
 
 	/**
 	 * ActiveMQ message broker.
@@ -83,10 +86,10 @@ public class JMSSlaveTest extends SearchTestBase {
 		}
 
 		//need to sleep for the message consumption
-		Thread.sleep( 500 );
-
-		assertEquals( 1, SearchQueueChecker.queues );
-		assertEquals( 2, SearchQueueChecker.works );
+		POLLER.pollAssertion( () -> {
+			assertEquals( 1, SearchQueueChecker.queues );
+			assertEquals( 2, SearchQueueChecker.works );
+		} );
 
 		SearchQueueChecker.reset();
 		try ( Session s = openSession() ) {
@@ -97,10 +100,10 @@ public class JMSSlaveTest extends SearchTestBase {
 		}
 
 		//need to sleep for the message consumption
-		Thread.sleep( 500 );
-
-		assertEquals( 1, SearchQueueChecker.queues );
-		assertEquals( 1, SearchQueueChecker.works );
+		POLLER.pollAssertion( () -> {
+			assertEquals( 1, SearchQueueChecker.queues );
+			assertEquals( 1, SearchQueueChecker.works );
+		} );
 
 		SearchQueueChecker.reset();
 
@@ -112,10 +115,10 @@ public class JMSSlaveTest extends SearchTestBase {
 		}
 
 		//Need to sleep for the message consumption
-		Thread.sleep( 500 );
-
-		assertEquals( 1, SearchQueueChecker.queues );
-		assertEquals( 2, SearchQueueChecker.works );
+		POLLER.pollAssertion( () -> {
+			assertEquals( 1, SearchQueueChecker.queues );
+			assertEquals( 2, SearchQueueChecker.works );
+		} );
 
 		SearchQueueChecker.reset();
 		try ( Session s = openSession() ) {
@@ -128,10 +131,10 @@ public class JMSSlaveTest extends SearchTestBase {
 		}
 
 		// Need to sleep for the message consumption
-		Thread.sleep( 500 );
-
-		assertEquals( 1, SearchQueueChecker.queues );
-		assertEquals( 1, SearchQueueChecker.works );
+		POLLER.pollAssertion( () -> {
+			assertEquals( 1, SearchQueueChecker.queues );
+			assertEquals( 1, SearchQueueChecker.works );
+		} );
 	}
 
 	@Override
