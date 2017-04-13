@@ -175,7 +175,7 @@
         <jgroupsVersion>3.6.12.Final</jgroupsVersion>
 
         <!-- ORM and transitive deps; Make sure to match ORM's set of versions when updating -->
-        <hibernateVersion>5.2.9.Final</hibernateVersion>
+        <hibernateVersion>5.2.10.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>5.0.1.Final</hibernateCommonsAnnotationVersion>
         <jandexVersion>2.0.3.Final</jandexVersion>
         <classMateVersion>1.3.0</classMateVersion>
@@ -563,7 +563,7 @@
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
-                      <artifactId>geronimo-jta_1.1_spec</artifactId>
+                        <artifactId>geronimo-jta_1.1_spec</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
