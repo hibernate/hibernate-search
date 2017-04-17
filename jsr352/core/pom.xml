@@ -8,7 +8,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search-jsr352-parent</artifactId>
@@ -16,7 +16,7 @@
     </parent>
 
     <artifactId>hibernate-search-jsr352-core</artifactId>
-    
+
     <name>Hibernate Search JSR-352</name>
     <description>Core of the Hibernate Search JSR-352 integration</description>
 
@@ -40,8 +40,23 @@
 
         <!-- test -->
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -69,7 +84,7 @@
             <artifactId>byteman-bmunit</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
             <artifactId>com.ibm.jbatch-runtime</artifactId>
@@ -79,7 +94,7 @@
         <!--
             JBatch requires a database in order to work, and it seems it uses SQL that won't work with H2.
             Anyway, it uses an embedded Derby instance by default, so we just put the Derby driver in the classpath
-            so it won't complain. 
+            so it won't complain.
          -->
         <dependency>
             <groupId>org.apache.derby</groupId>

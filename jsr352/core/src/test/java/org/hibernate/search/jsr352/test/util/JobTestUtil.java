@@ -10,11 +10,12 @@ import java.util.List;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -55,15 +56,27 @@ public final class JobTestUtil {
 	}
 
 	public static <T> List<T> findIndexedResults(EntityManagerFactory emf, Class<T> clazz, String key, String value) {
-		EntityManager em = emf.createEntityManager();
-		FullTextEntityManager ftem = Search.getFullTextEntityManager( em );
-		Query luceneQuery = ftem.getSearchFactory().buildQueryBuilder()
+		SessionFactory sessionFactory = emf.unwrap( SessionFactory.class );
+		try (Session session = sessionFactory.openSession()) {
+			return find( session, clazz, key, value );
+		}
+	}
+
+	public static <T> List<T> findIndexedResultsInTenant(EntityManagerFactory emf, Class<T> clazz, String key, String value, String tenantId) {
+		SessionFactory sessionFactory = emf.unwrap( SessionFactory.class );
+		try (Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession()) {
+			return find( session, clazz, key, value );
+		}
+	}
+
+	private static <T> List<T> find(Session session, Class<T> clazz, String key, String value) {
+		FullTextSession fts = Search.getFullTextSession( session );
+		Query luceneQuery = fts.getSearchFactory().buildQueryBuilder()
 				.forEntity( clazz ).get()
 				.keyword().onField( key ).matching( value )
 				.createQuery();
 		@SuppressWarnings("unchecked")
-		List<T> result = ftem.createFullTextQuery( luceneQuery ).getResultList();
-		em.close();
+		List<T> result = fts.createFullTextQuery( luceneQuery ).getResultList();
 		return result;
 	}
 
