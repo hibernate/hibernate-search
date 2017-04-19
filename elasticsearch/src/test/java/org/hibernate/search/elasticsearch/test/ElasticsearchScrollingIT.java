@@ -74,12 +74,13 @@ public class ElasticsearchScrollingIT {
 		generateData( 0, DEFAULT_MAX_RESULT_WINDOW + 10 );
 
 		Query query = builder().all().createQuery();
-		DocumentExtractor extractor = getQuery( query )
-				.queryDocumentExtractor();
-		for ( int i = 0; i < DEFAULT_MAX_RESULT_WINDOW + 10; ++i ) {
-			EntityInfo info = extractor.extract(i);
-			assertNotNull( info );
-			assertEquals( i, info.getId() );
+		try ( DocumentExtractor extractor = getQuery( query )
+				.queryDocumentExtractor() ) {
+			for ( int i = 0; i < DEFAULT_MAX_RESULT_WINDOW + 10; ++i ) {
+				EntityInfo info = extractor.extract(i);
+				assertNotNull( info );
+				assertEquals( i, info.getId() );
+			}
 		}
 	}
 
@@ -88,16 +89,16 @@ public class ElasticsearchScrollingIT {
 		generateData( 0, 1000 );
 
 		Query query = builder().all().createQuery();
-		DocumentExtractor extractor = getQuery( query )
-				.queryDocumentExtractor();
+		try ( DocumentExtractor extractor = getQuery( query )
+				.queryDocumentExtractor() ) {
+			EntityInfo info = extractor.extract( 1 );
+			assertNotNull( info );
+			assertEquals( 1, info.getId() );
 
-		EntityInfo info = extractor.extract( 1 );
-		assertNotNull( info );
-		assertEquals( 1, info.getId() );
-
-		info = extractor.extract( 500 );
-		assertNotNull( info );
-		assertEquals( 500, info.getId() );
+			info = extractor.extract( 500 );
+			assertNotNull( info );
+			assertEquals( 500, info.getId() );
+		}
 	}
 
 	@Test
@@ -105,17 +106,17 @@ public class ElasticsearchScrollingIT {
 		generateData( 0, 1001 );
 
 		Query query = builder().all().createQuery();
-		DocumentExtractor extractor = getQuery( query )
-				.queryDocumentExtractor();
+		try ( DocumentExtractor extractor = getQuery( query )
+				.queryDocumentExtractor() ) {
+			EntityInfo info = extractor.extract( 1000 );
+			assertNotNull( info );
+			assertEquals( 1000, info.getId() );
 
-		EntityInfo info = extractor.extract( 1000 );
-		assertNotNull( info );
-		assertEquals( 1000, info.getId() );
-
-		// Backtrack exactly 1000 positions
-		info = extractor.extract( 0 );
-		assertNotNull( info );
-		assertEquals( 0, info.getId() );
+			// Backtrack exactly 1000 positions
+			info = extractor.extract( 0 );
+			assertNotNull( info );
+			assertEquals( 0, info.getId() );
+		}
 	}
 
 	private QueryBuilder builder() {
