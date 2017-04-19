@@ -20,8 +20,10 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
+import org.hibernate.search.backend.impl.TransactionalOperationDispatcher;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.backend.spi.BatchBackend;
+import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
@@ -129,6 +131,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final DatabaseRetrievalMethod defaultDatabaseRetrievalMethod;
 	private final boolean enlistWorkerInTransaction;
 	private final boolean indexUninvertingAllowed;
+	private final OperationDispatcher remoteOperationDispatcher;
 	private volatile LuceneWorkSerializer workSerializer;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
@@ -192,6 +195,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.indexUninvertingAllowed = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.INDEX_UNINVERTING_ALLOWED, false
 		);
+
+		this.remoteOperationDispatcher = new TransactionalOperationDispatcher( this );
 	}
 
 	private ObjectLookupMethod determineDefaultObjectLookupMethod() {
@@ -686,6 +691,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public HSQuery createLuceneBasedHSQuery() {
 		return new LuceneHSQuery( this );
+	}
+
+	@Override
+	public OperationDispatcher getRemoteOperationDispatcher() {
+		return remoteOperationDispatcher;
 	}
 
 }

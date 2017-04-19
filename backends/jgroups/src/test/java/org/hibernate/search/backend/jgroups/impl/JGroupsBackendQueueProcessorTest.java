@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.jgroups.impl;
 
+import org.easymock.EasyMock;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.junit.Test;
 
@@ -17,7 +18,8 @@ public class JGroupsBackendQueueProcessorTest {
 	@Test
 	public void testCheckingForNullWork() {
 		try {
-			BackendQueueProcessor backend = new JGroupsBackendQueueProcessor( new SlaveNodeSelector() );
+			JGroupsBackendQueueTask queueTask = EasyMock.createNiceMock( JGroupsBackendQueueTask.class );
+			BackendQueueProcessor backend = new JGroupsBackendQueueProcessor( new SlaveNodeSelector(), queueTask, null );
 			backend.applyWork( null, null );
 		}
 		catch (IllegalArgumentException e2) {

@@ -524,7 +524,17 @@ configured differently for each index.
 
 `blackhole`: Mainly a test/developer setting which ignores all indexing work
 
-You can also specify the fully qualified name of a class implementing BackendQueueProcessor. This way you can implement your own communication layer. The implementation is responsible for returning a Runnable instance which on execution will process the index work.
+You can also specify the fully qualified name of a class implementing `BackendQueueProcessor`.
+This way you can implement your own communication layer: the queue processors will receive all index works
+to be sent to index managers.
+
+Please note that instances of `BackendQueueProcessor` will only be created as soon as index managers are created,
+and those may be created lazily
+(for instance when the indexes are using <<advanced-features-dynamic-sharding,dynamic sharding>>).
+If you want to initialize some resources eagerly,
+you can instead specify the fully qualified name of a class implementing `Backend`.
+This class which will be instantiated and initialized on startup,
+and will then be asked to produce `BackendQueueProcessor` instances as needed.
 
 |===============
 

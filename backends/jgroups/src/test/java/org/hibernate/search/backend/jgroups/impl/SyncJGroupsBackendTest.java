@@ -13,6 +13,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
+import org.hibernate.search.backend.jgroups.impl.JGroupsReceivingMockBackend.JGroupsReceivingMockBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
@@ -48,8 +49,8 @@ public class SyncJGroupsBackendTest {
 		.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
 		.withProperty( "hibernate.search.dvds.jgroups.messages_timeout", String.valueOf( JGROUPS_MESSAGES_TIMEOUT ) )
 		.withProperty( "hibernate.search.books.worker.execution", "async" )
-		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
-		.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
+		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackend.BLOCK_WAITING_ACK, "true" )
+		.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackend.BLOCK_WAITING_ACK, "false" )
 		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
 
 	@Rule
@@ -69,7 +70,7 @@ public class SyncJGroupsBackendTest {
 		JGroupsBackendQueueProcessor starsBackend = extractJGroupsBackend( "stars" );
 		Assert.assertFalse( "stars index was configured with an asyncronous JGroups backend", starsBackend.blocksForACK() );
 
-		JGroupsReceivingMockBackend dvdBackendMock = extractMockBackend( "dvds" );
+		JGroupsReceivingMockBackendQueueProcessor dvdBackendMock = extractMockBackend( "dvds" );
 
 		dvdBackendMock.resetThreadTrap();
 		boolean timeoutTriggered = false;
@@ -95,7 +96,7 @@ public class SyncJGroupsBackendTest {
 		Assert.assertTrue( "The backend didn't receive any message: something wrong with the test setup of network configuration", dvdBackendMock.wasSomethingReceived() );
 		Assert.assertTrue( timeoutTriggered );
 
-		JGroupsReceivingMockBackend booksBackendMock = extractMockBackend( "books" );
+		JGroupsReceivingMockBackendQueueProcessor booksBackendMock = extractMockBackend( "books" );
 		booksBackendMock.resetThreadTrap();
 		//Books are async so they should not timeout
 		storeBook( 1, "Hibernate Search in Action" );
@@ -123,8 +124,8 @@ public class SyncJGroupsBackendTest {
 	@Test
 	public void alternativeBackendConfiguration() {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( masterNode, "dvds" );
-		JGroupsBackendQueueProcessor jgroupsProcessor = (JGroupsBackendQueueProcessor) backendQueueProcessor;
-		BackendQueueProcessor delegatedBackend = jgroupsProcessor.getDelegatedBackend();
+		JGroupsReceivingMockBackendQueueProcessor jgroupsProcessor = (JGroupsReceivingMockBackendQueueProcessor) backendQueueProcessor;
+		BackendQueueProcessor delegatedBackend = jgroupsProcessor.getDelegate().getDelegatedBackend();
 		Assert.assertTrue( "dvds backend was configured with a delegate to blackhole but it's not using it", delegatedBackend instanceof BlackHoleBackendQueueProcessor );
 	}
 
@@ -136,10 +137,10 @@ public class SyncJGroupsBackendTest {
 		Assert.assertEquals( "message timeout configuration property not applied", JGROUPS_MESSAGES_TIMEOUT, messageTimeout );
 	}
 
-	private JGroupsReceivingMockBackend extractMockBackend(String indexName) {
+	private JGroupsReceivingMockBackendQueueProcessor extractMockBackend(String indexName) {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( masterNode, indexName );
-		Assert.assertTrue( "Backend not using the configured Mock!", backendQueueProcessor instanceof JGroupsReceivingMockBackend );
-		return (JGroupsReceivingMockBackend) backendQueueProcessor;
+		Assert.assertTrue( "Backend not using the configured Mock!", backendQueueProcessor instanceof JGroupsReceivingMockBackendQueueProcessor );
+		return (JGroupsReceivingMockBackendQueueProcessor) backendQueueProcessor;
 	}
 
 	private JGroupsBackendQueueProcessor extractJGroupsBackend(String indexName) {

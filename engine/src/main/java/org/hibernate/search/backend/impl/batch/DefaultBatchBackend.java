@@ -14,17 +14,14 @@ import java.util.Set;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
-import org.hibernate.search.backend.impl.StreamingOperationExecutor;
-import org.hibernate.search.backend.impl.StreamingOperationExecutorSelector;
-import org.hibernate.search.backend.impl.TransactionalOperationExecutor;
-import org.hibernate.search.backend.impl.TransactionalOperationExecutorSelector;
-import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
+import org.hibernate.search.backend.impl.StreamingOperationDispatcher;
+import org.hibernate.search.backend.impl.TransactionalOperationDispatcher;
 import org.hibernate.search.backend.spi.BatchBackend;
+import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * This is not meant to be used as a regular
@@ -38,15 +35,19 @@ public class DefaultBatchBackend implements BatchBackend {
 
 	private final ExtendedSearchIntegrator integrator;
 	private final MassIndexerProgressMonitor progressMonitor;
+	private final OperationDispatcher streamingDispatcher;
+	private final OperationDispatcher transactionalDispatcher;
 
 	public DefaultBatchBackend(ExtendedSearchIntegrator integrator, MassIndexerProgressMonitor progressMonitor) {
 		this.integrator = integrator;
 		this.progressMonitor = progressMonitor;
+		this.streamingDispatcher = new StreamingOperationDispatcher( integrator, true /* forceAsync */ );
+		this.transactionalDispatcher = new TransactionalOperationDispatcher( integrator );
 	}
 
 	@Override
 	public void enqueueAsyncWork(LuceneWork work) throws InterruptedException {
-		sendWorkToShards( work, true );
+		streamingDispatcher.dispatch( work, progressMonitor );
 	}
 
 	@Override
@@ -61,23 +62,8 @@ public class DefaultBatchBackend implements BatchBackend {
 
 	@Override
 	public void doWorkInSync(LuceneWork work) {
-		sendWorkToShards( work, false );
-	}
-
-	private void sendWorkToShards(LuceneWork work, boolean forceAsync) {
-		final Class<?> entityType = work.getEntityClass();
-		EntityIndexBinding entityIndexBinding = integrator.getIndexBinding( entityType );
-		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-		if ( forceAsync ) {
-			StreamingOperationExecutor executor = work.acceptIndexWorkVisitor( StreamingOperationExecutorSelector.INSTANCE, null );
-			executor.performStreamOperation( work, shardingStrategy, progressMonitor, forceAsync );
-		}
-		else {
-			WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
-			TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( new TransactionalOperationExecutorSelector( integrator.getIndexManagerHolder() ), null );
-			executor.performOperation( work, shardingStrategy, workContext );
-			workContext.commitOperations( progressMonitor ); //FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
-		}
+		//FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
+		transactionalDispatcher.dispatch( work, progressMonitor );
 	}
 
 	@Override

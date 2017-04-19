@@ -28,6 +28,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.testsupport.TestConstants;
@@ -64,11 +65,10 @@ public class JGroupsMasterTest extends SearchTestBase {
 
 	@Test
 	public void testMessageSending() throws Exception {
+		TShirt shirt = createObject();
+		List<LuceneWork> queue = createDocumentAndWorkQueue( shirt );
 
 		assertEquals( 0, countByQuery( "logo:jboss" ) );
-
-		TShirt shirt = createObjectWithSQL();
-		List<LuceneWork> queue = createDocumentAndWorkQueue( shirt );
 		sendMessage( queue );
 
 		POLLER.pollAssertion( () -> {
@@ -102,7 +102,7 @@ public class JGroupsMasterTest extends SearchTestBase {
 	}
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
-		final String indexManagerName = "org.hibernate.search.test.jgroups.master.TShirt";
+		final String indexManagerName = getIndexName();
 		ServiceManager serviceManager = getExtendedSearchIntegrator().getServiceManager();
 
 		//send message to all listeners
@@ -112,6 +112,10 @@ public class JGroupsMasterTest extends SearchTestBase {
 		channel.send( message );
 
 		serviceManager.releaseService( LuceneWorkSerializer.class );
+	}
+
+	protected String getIndexName() {
+		return org.hibernate.search.test.jgroups.master.TShirt.class.getName();
 	}
 
 	/**
@@ -127,7 +131,7 @@ public class JGroupsMasterTest extends SearchTestBase {
 				ProjectionConstants.OBJECT_CLASS, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED
 		);
 		doc.add( field );
-		field = new Field( "id", "1", Field.Store.YES, Field.Index.NOT_ANALYZED );
+		field = new Field( "id", String.valueOf( shirt.getId() ), Field.Store.YES, Field.Index.NOT_ANALYZED );
 		doc.add( field );
 		field = new Field( "logo", shirt.getLogo(), Field.Store.NO, Field.Index.ANALYZED );
 		doc.add( field );
@@ -142,11 +146,12 @@ public class JGroupsMasterTest extends SearchTestBase {
 	}
 
 	/**
-	 * Create a test object and delete if from index.
+	 * Create a test object without triggering indexing,
+	 * because Hibernate Search listeners are disabled.
 	 *
 	 * @return a <code>TShirt</code> test object.
 	 */
-	private TShirt createObjectWithSQL() {
+	private TShirt createObject() {
 		Session s = openSession();
 		s.getTransaction().begin();
 		TShirt ts = new TShirt();
@@ -155,10 +160,6 @@ public class JGroupsMasterTest extends SearchTestBase {
 		ts.setLength( 23.2d );
 		s.persist( ts );
 		s.getTransaction().commit();
-		FullTextSession fullTextSession = Search.getFullTextSession( s );
-		fullTextSession.beginTransaction();
-		fullTextSession.purge( TShirt.class, 1 );
-		fullTextSession.getTransaction().commit();
 		s.close();
 		return ts;
 	}
@@ -179,6 +180,9 @@ public class JGroupsMasterTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
+		// See createObject()
+		cfg.put( Environment.INDEXING_STRATEGY, IndexingMode.MANUAL.toExternalRepresentation() );
+
 		// JGroups configuration for master node
 		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
 		cfg.put( DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
