@@ -32,6 +32,7 @@ public interface BackendQueueProcessor {
 	 * @deprecated Use a {@link Backend} implementation and implement your initialization logic
 	 * in {@link Backend#createQueueProcessor(IndexManager, WorkerBuildContext)} instead.
 	 */
+	@Deprecated
 	default void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		// Does nothing by default
 	}
