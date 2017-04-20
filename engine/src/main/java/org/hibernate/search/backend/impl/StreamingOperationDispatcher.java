@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -26,21 +24,12 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Yoann Rodiere
  */
 public class StreamingOperationDispatcher implements OperationDispatcher {
-	private final Function<Class<?>, EntityIndexBinding> bindingLookup;
+
 	private final boolean forceAsync;
+	private final SearchIntegrator integrator;
 
 	public StreamingOperationDispatcher(SearchIntegrator integrator, boolean forceAsync) {
-		this( integrator::getIndexBinding, forceAsync );
-	}
-
-	public StreamingOperationDispatcher(Map<Class<?>, EntityIndexBinding> bindings,
-			boolean forceAsync) {
-		this( bindings::get, forceAsync );
-	}
-
-	private StreamingOperationDispatcher(Function<Class<?>, EntityIndexBinding> bindingLookup,
-			boolean forceAsync) {
-		this.bindingLookup = bindingLookup;
+		this.integrator = integrator;
 		this.forceAsync = forceAsync;
 	}
 
@@ -58,7 +47,7 @@ public class StreamingOperationDispatcher implements OperationDispatcher {
 
 	private void executeWork(LuceneWork work, IndexingMonitor progressMonitor) {
 		final Class<?> entityType = work.getEntityClass();
-		EntityIndexBinding entityIndexBinding = bindingLookup.apply( entityType );
+		EntityIndexBinding entityIndexBinding = integrator.getIndexBinding( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		StreamingOperationExecutor executor =
 				work.acceptIndexWorkVisitor( StreamingOperationExecutorSelector.INSTANCE, null );
