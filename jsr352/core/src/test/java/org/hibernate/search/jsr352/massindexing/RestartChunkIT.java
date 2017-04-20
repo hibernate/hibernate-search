@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchStatus;
@@ -109,14 +110,15 @@ public class RestartChunkIT {
 		assertEquals( 0, people.size() );
 
 		// start the job
+		Properties parameters = MassIndexingJob.parameters()
+				.forEntities( Company.class, Person.class )
+				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
+				// must be smaller than ITEMS_BEFORE_SIMULATED_FAILURE to trigger the restart
+				.checkpointInterval( 10 )
+				.build();
 		long execId1 = jobOperator.start(
 				MassIndexingJob.NAME,
-				MassIndexingJob.parameters()
-						.forEntities( Company.class, Person.class )
-						.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
-						// must be smaller than ITEMS_BEFORE_SIMULATED_FAILURE to trigger the restart
-						.checkpointInterval( 10 )
-						.build()
+				parameters
 		);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
@@ -128,7 +130,11 @@ public class RestartChunkIT {
 		}
 
 		// restart the job
-		long execId2 = jobOperator.restart( execId1, null );
+		/*
+		 * From the specs (v1.0, 10.8.1):
+		 * Job parameter values are not remembered from one execution to the next.
+		 */
+		long execId2 = jobOperator.restart( execId1, parameters );
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
 		for ( StepExecution stepExec : jobOperator.getStepExecutions( execId2 ) ) {

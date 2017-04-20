@@ -70,56 +70,21 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- The JBeret artifacts declare all the dependencies as provided, so we have to redeclare them ourselves... -->
-        <!-- JBeret minimal application dependencies -->
-        <!-- https://jberet.gitbooks.io/jberet-user-guide/content/set_up_jberet/#minimal-application-dependencies -->
         <dependency>
-            <groupId>org.jboss.spec.javax.transaction</groupId>
-            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+            <groupId>com.ibm.jbatch</groupId>
+            <artifactId>com.ibm.jbatch-runtime</artifactId>
+            <version>1.0</version>
             <scope>test</scope>
         </dependency>
+        <!--
+            JBatch requires a database in order to work, and it seems it uses SQL that won't work with H2.
+            Anyway, it uses an embedded Derby instance by default, so we just put the Derby driver in the classpath
+            so it won't complain. 
+         -->
         <dependency>
-            <groupId>org.jberet</groupId>
-            <artifactId>jberet-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.marshalling</groupId>
-            <artifactId>jboss-marshalling</artifactId>
-            <version>1.4.11.Final</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.weld</groupId>
-            <artifactId>weld-core</artifactId>
-            <version>2.3.4.Final</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.security</groupId>
-            <artifactId>wildfly-security-manager</artifactId>
-            <version>1.1.2.Final</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <!-- The JBeret artifacts declare all the dependencies as provided, so we have to redeclare them ourselves... -->
-        <!-- Additional dependencies for Java SE batch applications -->
-        <!-- https://jberet.gitbooks.io/jberet-user-guide/content/set_up_jberet/#additional-dependencies-for-java-se-batch-applications -->
-        <dependency>
-            <groupId>org.jberet</groupId>
-            <artifactId>jberet-se</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.weld.se</groupId>
-            <artifactId>weld-se</artifactId>
-            <version>2.3.4.Final</version>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.13.1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

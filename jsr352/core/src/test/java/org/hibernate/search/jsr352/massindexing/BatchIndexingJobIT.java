@@ -18,7 +18,6 @@ import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.Metric;
-import javax.batch.runtime.Metric.MetricType;
 import javax.batch.runtime.StepExecution;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -28,6 +27,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgress;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
@@ -50,12 +50,6 @@ public class BatchIndexingJobIT {
 	private static final String SESSION_FACTORY_NAME = "h2-entityManagerFactory";
 
 	private static final int JOB_TIMEOUT_MS = 10_000;
-
-	// example dataset
-	private static final long DB_COMP_ROWS = 3;
-	private static final long DB_PERS_ROWS = 3;
-	private static final long DB_WHOS_ROWS = 3;
-	private static final long DB_TOTAL_ROWS = DB_COMP_ROWS + DB_PERS_ROWS + DB_WHOS_ROWS;
 
 	private JobOperator jobOperator;
 	private EntityManagerFactory emf;
@@ -268,17 +262,19 @@ public class BatchIndexingJobIT {
 
 	private void testBatchStatus(StepExecution stepExecution) {
 		BatchStatus batchStatus = stepExecution.getBatchStatus();
+		assertEquals( BatchStatus.COMPLETED, batchStatus );
 		switch ( stepExecution.getStepName() ) {
 			case "produceLuceneDoc":
-				for ( Metric m : stepExecution.getMetrics() ) {
-					if ( m.getType().equals( MetricType.READ_COUNT ) ) {
-						assertEquals( DB_TOTAL_ROWS, m.getValue() );
-					}
-					else if ( m.getType().equals( MetricType.WRITE_COUNT ) ) {
-						assertEquals( DB_TOTAL_ROWS, m.getValue() );
-					}
-				}
-				assertEquals( BatchStatus.COMPLETED, batchStatus );
+				/*
+				 * We cannot check the metrics, which in JBatch are set to 0
+				 * for partitioned steps (the metrics are handled separately for
+				 * each partition).
+				 * Thus we check our own object.
+				 */
+				StepProgress progress = (StepProgress) stepExecution.getPersistentUserData();
+				assertEquals( 1.0, progress.getProgress( Company.class.getName() ), 0.01 );
+				assertEquals( 1.0, progress.getProgress( Person.class.getName() ), 0.01 );
+				assertEquals( 1.0, progress.getProgress( WhoAmI.class.getName() ), 0.01 );
 				break;
 
 			default:
