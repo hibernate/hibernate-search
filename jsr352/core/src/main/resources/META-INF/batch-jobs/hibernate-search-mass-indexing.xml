@@ -9,14 +9,7 @@
     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
 
     <listeners>
-        <!--
-            The following batch artifact is designed to be overridden when using dependency injection.
-            To do so, the overriding bean must extends JobContextSetupListener and its name
-            in the dependency injection context must be the fully-qualified class name of
-            JobContextSetupListener.
-            This allows this batch job definition to work even when there is no support for DI.
-         -->
-        <listener ref="org.hibernate.search.jsr352.massindexing.JobContextSetupListener">
+        <listener ref="org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener">
             <properties>
                 <property name="entityManagerFactoryScope" value="#{jobParameters['entityManagerFactoryScope']}" />
                 <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
