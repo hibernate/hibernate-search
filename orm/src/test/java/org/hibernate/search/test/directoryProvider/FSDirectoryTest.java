@@ -164,13 +164,8 @@ public class FSDirectoryTest extends SearchTestBase {
 				IndexSearcher searcher = new IndexSearcher( indexReader );
 				// deleting before search, but after IndexSearcher creation:
 				// ( fails when deleting -concurrently- to IndexSearcher initialization! )
-				try {
-					FileHelper.delete( getBaseIndexDir() );
-				}
-				catch (IOException ioe) {
-					// If you try deleting an in-use index on Windows, you'll get an AccessDenied
-					// So ignore that for the purposes of this test.
-				}
+				// Use the "tryDelete" form to ignore exceptions on Windows:
+				FileHelper.tryDelete( getBaseIndexDir() );
 				TermQuery query = new TermQuery( new Term( "title", "action" ) );
 				TopDocs hits = searcher.search( query, 1000 );
 				assertEquals( 1, hits.totalHits );
