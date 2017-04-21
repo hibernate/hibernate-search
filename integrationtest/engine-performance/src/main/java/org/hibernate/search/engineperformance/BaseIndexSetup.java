@@ -44,7 +44,7 @@ class BaseIndexSetup {
 	}
 
 	protected void cleanup() throws IOException {
-		FileHelper.delete( createdTempDirectory );
+		FileHelper.tryDelete( createdTempDirectory );
 	}
 
 }
