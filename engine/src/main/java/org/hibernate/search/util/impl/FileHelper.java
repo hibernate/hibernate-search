@@ -124,7 +124,7 @@ public class FileHelper {
 		}
 		else {
 			if ( destination.exists() && destination.isDirectory() ) {
-				delete( destination );
+				tryDelete( destination.toPath() );
 			}
 			if ( destination.exists() ) {
 				long sts = source.lastModified() / FAT_PRECISION;
@@ -183,13 +183,29 @@ public class FileHelper {
 	}
 
 	/**
-	 * Attempts to delete a file. If the file is a directory delete recursively all content.
+	 * Deletes a file. If the file is a directory delete recursively all content.
 	 *
 	 * @param path the file or directory to be deleted
 	 *
-	 * @throws IOException if it wasn't possible to delete all content which is a common problem on Windows systems.
+	 * @throws IOException if it wasn't possible to delete all content.
 	 */
 	public static void delete(Path path) throws IOException {
+		deleteRecursive( path, false );
+	}
+
+	/**
+	 * Attempts to delete a file. If the file is a directory delete recursively all content.
+	 * Any IOException preventing a file to be deleted will be swallowed.
+	 *
+	 * @param path the file or directory to be deleted
+	 *
+	 * @throws IOException on unexpected io errors
+	 */
+	public static void tryDelete(Path path) throws IOException {
+		deleteRecursive( path, true );
+	}
+
+	private static void deleteRecursive(Path path, final boolean ignoreExceptions) throws IOException {
 		if ( path == null ) {
 			throw new IllegalArgumentException();
 		}
@@ -201,15 +217,38 @@ public class FileHelper {
 		Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				Files.delete( file );
+				delete( file, ignoreExceptions );
 				return FileVisitResult.CONTINUE;
 			}
 
 			@Override
 			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-				Files.delete( dir );
+				delete( dir, ignoreExceptions );
 				return FileVisitResult.CONTINUE;
 			}
 		});
 	}
+
+	private static void delete(Path file, boolean ignoreExceptions) throws IOException {
+		if ( ignoreExceptions ) {
+			safeDelete( file );
+		}
+		else {
+			deleteOrFail( file );
+		}
+	}
+
+	private static void safeDelete(Path file) {
+		try {
+			Files.delete( file );
+		}
+		catch (IOException e) {
+			log.fileDeleteFailureIgnored( e );
+		}
+	}
+
+	private static void deleteOrFail(Path file) throws IOException {
+		Files.delete( file );
+	}
+
 }

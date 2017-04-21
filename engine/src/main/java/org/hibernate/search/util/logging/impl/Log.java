@@ -942,4 +942,8 @@ public interface Log extends BasicLogger {
 			+ " (synonyms) should not be used on sortable fields. Only the first token will be indexed.")
 	void multipleTermsInAnalyzedSortableField(String fieldName);
 
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 336, value = "A file could not be deleted: likely lock contention. Not a problem for index replications as it will be attempted again in the future.")
+	void fileDeleteFailureIgnored(@Cause IOException e);
+
 }
