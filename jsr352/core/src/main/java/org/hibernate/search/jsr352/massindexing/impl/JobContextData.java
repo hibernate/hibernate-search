@@ -16,7 +16,10 @@ import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 
 /**
@@ -58,6 +61,10 @@ public class JobContextData {
 
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
+	}
+
+	public ExtendedSearchIntegrator getSearchIntegrator() {
+		return ContextHelper.getSearchIntegratorBySF( entityManagerFactory.unwrap( SessionFactory.class ) );
 	}
 
 	public void setEntityTypes(Collection<Class<?>> entityTypes) {

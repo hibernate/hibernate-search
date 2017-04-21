@@ -15,7 +15,6 @@ import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
@@ -23,7 +22,6 @@ import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
@@ -77,10 +75,10 @@ public class LuceneDocProducer implements ItemProcessor {
 		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
 		Class<?> entityType = jobContextData.getIndexedType( entityName );
 		entityTypeIdentifier = new PojoIndexedTypeIdentifier( entityType );
-		emf = jobContextData.getEntityManagerFactory();
-		searchIntegrator = ContextHelper.getSearchIntegratorBySF( emf.unwrap( SessionFactory.class ) );
+		searchIntegrator = jobContextData.getSearchIntegrator();
 		entityIndexBinding = searchIntegrator.getIndexBindings().get( entityTypeIdentifier );
 		docBuilder = entityIndexBinding.getDocumentBuilder();
+		emf = jobContextData.getEntityManagerFactory();
 	}
 
 	/**
