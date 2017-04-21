@@ -33,6 +33,7 @@ import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
+import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -110,9 +111,16 @@ public class EntityReader extends AbstractItemReader {
 	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
 	private String partitionIdStr;
 
+	@Inject
+	@BatchProperty(name = MassIndexingPartitionProperties.LOWER_BOUND)
+	private String serializedLowerBound;
+
+	@Inject
+	@BatchProperty(name = MassIndexingPartitionProperties.UPPER_BOUND)
+	private String serializedUpperBound;
+
 	private EntityManagerFactory emf;
 
-	private Class<?> entityType;
 	private Serializable checkpointId;
 	private Session session;
 	private StatelessSession ss;
@@ -124,26 +132,23 @@ public class EntityReader extends AbstractItemReader {
 
 	/**
 	 * Constructor for unit test TODO should it be done in this way?
-	 *
-	 * @param cacheable
-	 * @param entityName
-	 * @param fetchSize
-	 * @param hql
-	 * @param maxResults
-	 * @param partitionIdStr
 	 */
 	EntityReader(String cacheable,
 			String entityName,
 			String fetchSize,
 			String hql,
 			String maxResults,
-			String partitionIdStr) {
+			String partitionIdStr,
+			String serializedLowerBound,
+			String serializedUpperBound) {
 		this.cacheable = cacheable;
 		this.entityName = entityName;
 		this.fetchSize = fetchSize;
 		this.customQueryHql = hql;
 		this.customQueryLimit = maxResults;
 		this.partitionIdStr = partitionIdStr;
+		this.serializedLowerBound = serializedLowerBound;
+		this.serializedUpperBound = serializedUpperBound;
 	}
 
 	/**
@@ -207,8 +212,7 @@ public class EntityReader extends AbstractItemReader {
 
 		JobContextData jobData = getJobContextData();
 
-		entityType = jobData.getIndexedType( entityName );
-		PartitionBound bound = jobData.getPartitionBound( partitionId );
+		PartitionBound bound = getPartitionBound( jobData );
 		log.printBound( bound );
 
 		emf = jobData.getEntityManagerFactory();
@@ -255,6 +259,13 @@ public class EntityReader extends AbstractItemReader {
 				entityTypes, serializedCustomQueryCriteria );
 	}
 
+	private PartitionBound getPartitionBound(JobContextData jobContextData) throws IOException, ClassNotFoundException {
+		Class<?> entityType = jobContextData.getIndexedType( entityName );
+		Object lowerBound = SerializationUtil.deserialize( serializedLowerBound );
+		Object upperBound = SerializationUtil.deserialize( serializedUpperBound );
+		return new PartitionBound( entityType, lowerBound, upperBound );
+	}
+
 	private ScrollableResults buildScrollUsingHQL(StatelessSession ss, String HQL) {
 		return ss.createQuery( HQL )
 				.setReadOnly( true )
@@ -266,6 +277,7 @@ public class EntityReader extends AbstractItemReader {
 
 	private ScrollableResults buildScrollUsingCriteria(StatelessSession ss,
 			PartitionBound unit, Object checkpointId, JobContextData jobData) {
+		Class<?> entityType = unit.getEntityType();
 		String idName = sessionFactory.getClassMetadata( entityType )
 				.getIdentifierPropertyName();
 

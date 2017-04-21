@@ -20,7 +20,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
-import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 
 /**
  * Container for data shared across the entire batch job.
@@ -38,11 +37,6 @@ public class JobContextData {
 	 * used too. So this map facilitates this kind of lookup.
 	 */
 	private Map<String, Class<?>> entityTypeMap;
-
-	/**
-	 * The list of partition boundaries, one element per partition
-	 */
-	private List<PartitionBound> partitionBounds;
 
 	private Set<Criterion> customQueryCriteria;
 
@@ -90,14 +84,6 @@ public class JobContextData {
 		return customQueryCriteria;
 	}
 
-	public void setPartitionBounds(List<PartitionBound> partitionBounds) {
-		this.partitionBounds = partitionBounds;
-	}
-
-	public PartitionBound getPartitionBound(int partitionId) {
-		return partitionBounds.get( partitionId );
-	}
-
 	public void setCustomQueryCriteria(Set<Criterion> criteria) {
 		this.customQueryCriteria = criteria;
 	}
@@ -108,7 +94,6 @@ public class JobContextData {
 				.append( "JobContextData [" )
 				.append( "entityManagerFactory=" ).append( entityManagerFactory )
 				.append( ", entityTypeMap=" ).append( entityTypeMap )
-				.append( ", partitionBounds=" ).append( partitionBounds )
 				.append( ", customQueryCriteria=" ).append( customQueryCriteria )
 				.append( "]" )
 				.toString();
