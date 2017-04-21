@@ -14,8 +14,6 @@ import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
@@ -24,12 +22,10 @@ import org.hibernate.search.backend.impl.StreamingOperationExecutorSelector;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerSelector;
-import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -60,28 +56,8 @@ public class LuceneDocWriter extends AbstractItemWriter {
 	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
 	private String partitionIdStr;
 
-	private EntityManagerFactory emf;
-
-	private EntityManager em;
 
 	private IndexManagerSelector indexManagerSelector;
-
-	/**
-	 * The close method marks the end of use of the ItemWriter. This method is called when the job stops for any reason.
-	 * In case of job interruption, the job might need to be restarted. That's why the step context data is persisted.
-	 *
-	 * @throws Exception is thrown for any errors.
-	 */
-	@Override
-	public void close() throws Exception {
-		log.closingDocWriter( partitionIdStr, entityName );
-		try {
-			em.close();
-		}
-		catch (Exception e) {
-			log.unableToCloseEntityManager( e );
-		}
-	}
 
 	/**
 	 * The open method prepares the writer to write items.
@@ -94,15 +70,9 @@ public class LuceneDocWriter extends AbstractItemWriter {
 
 		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 
-		emf = jobData.getEntityManagerFactory();
-		em = emf.createEntityManager();
-
 		Class<?> entityType = jobData.getIndexedType( entityName );
 		IndexedTypeIdentifier typeIdentifier = new PojoIndexedTypeIdentifier( entityType );
-		EntityIndexBinding entityIndexBinding = Search
-				.getFullTextEntityManager( em )
-				.getSearchFactory()
-				.unwrap( SearchIntegrator.class )
+		EntityIndexBinding entityIndexBinding = jobData.getSearchIntegrator()
 				.getIndexBinding( typeIdentifier );
 		indexManagerSelector = entityIndexBinding.getIndexManagerSelector();
 	}
