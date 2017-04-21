@@ -37,15 +37,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
 /**
- * This integration test (IT) aims to test the restartability of the job execution mass-indexer under Java EE
- * environment, with step partitioning (parallelism). We need to prove that the job restart from the checkpoint where it
- * was stopped, but not from the very beginning.
+ * Test the behavior when there are multiple entity manager factories (persistence units),
+ * but those are correctly registered as CDI beans.
  *
  * @author Mincong Huang
  */
 @RunWith(Arquillian.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class MultipleEntityManagerFactoryBeansIT {
+public class MultipleEntityManagerFactoriesRegisteredAsBeansIT {
 
 	private static final String ENTITY_MANAGER_FACTORY_BEAN_NAME = MultipleEntityManagerFactoriesProducer.H2_ENTITY_MANAGER_FACTORY_BEAN_NAME;
 
@@ -61,7 +60,7 @@ public class MultipleEntityManagerFactoryBeansIT {
 	@Deployment
 	public static WebArchive createDeployment() {
 		WebArchive war = ShrinkWrap
-				.create( WebArchive.class, MultipleEntityManagerFactoryBeansIT.class.getSimpleName() + ".war" )
+				.create( WebArchive.class, MultipleEntityManagerFactoriesRegisteredAsBeansIT.class.getSimpleName() + ".war" )
 				.addAsResource( "jsr352/persistence_multiple.xml", "META-INF/persistence.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure-jsr352.xml", "/jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
