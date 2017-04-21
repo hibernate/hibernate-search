@@ -687,16 +687,17 @@ will stay open during the whole mass indexing process.
 
 ===== [[jsr-352-emf-cdi]] CDI environment
 
-You can use CDI to retrieve the `EntityManagerFactory`. Unless you use an already packaged
-`hibernate-search-jsr352` module for your application container, this will require you to add the
-`hibernate-search-jsr352-cdi` jar to your classpath.
+If your JSR-352 runtime uses CDI as a dependency injection mechanism,
+you can use CDI to retrieve the `EntityManagerFactory`.
+Unless you use an already packaged `hibernate-search-jsr352` module for your application container,
+this will require you to add the `hibernate-search-jsr352-cdi` jar to your classpath.
 
 If you use only one persistence unit, the mass indexer will be able to access your database
 automatically without any special configuration.
 
 If you want to use multiple persistence units, you will have to register the `EntityManagerFactories`
 as beans in the CDI context.
-Note that entity manager factories may not be considered as beans by default, in which case
+Note that entity manager factories will probably not be considered as beans by default, in which case
 you will have to register them yourself. You may use an application-scoped bean to do so:
 
 ====
@@ -742,22 +743,25 @@ an entity manager factory by its persistence unit name when using the mass index
 You can use different dependency injection mechanisms to retrieve the `EntityManagerFactory`,
 under the following conditions:
 
- 1. The JSR-352 runtime must use this dependency injection mechanism
- 2. You must register a bean in the dependency injection context
- that will implement the `EntityManagerFactory` retrieval.
-
-Your bean must:
-
- 1. extend `org.hibernate.search.jsr352.massindexing.JobContextSetupListener`;
- 2. override `getEntityManagerFactoryRegistry()` to return a registry of your own that will perform the actual retrieval;
- 3. and be registered in the dependency injection context as a named bean with this exact name:
- `org.hibernate.search.jsr352.massindexing.JobContextSetupListener`.
+1. The JSR-352 runtime must use this dependency injection mechanism.
+For instance Spring Batch uses Spring DI, JBeret (in WildFly) uses CDI, ...
+2. You must make sure that your dependency injection mechanism will register
+all injection-annotated classes (`@Singleton`, `@Named`, ...) from the
+`hibernate-search-jsr352-core` module in the dependency injection context.
+For instance this can be achieved in Spring DI using the `@ComponentScan` annotation.
+2. You must register a single bean in the dependency injection context
+that will implement the `EntityManagerFactoryRegistry` interface.
 
 ===== Plain Java environment (no dependency injection at all)
 
-If you use only one persistence unit, the mass indexer will be able to access your database
-automatically without any special configuration: you only have to make sure to create the
-`EntityManagerFactory` (or `SessionFactory`) in your application before launching the mass indexer.
+The following will work only if your JSR-352 runtime does not support dependency injection at all,
+i.e. it ignores `@Inject` annotations in batch artifacts.
+This is the case for JBatch in Java SE mode, for instance.
+
+If you use only one persistence unit,
+the mass indexer will be able to access your database automatically without any special configuration:
+you only have to make sure to create the `EntityManagerFactory` (or `SessionFactory`)
+in your application before launching the mass indexer.
 
 If you want to use multiple persistence units, you will have to add two parameters when launching the
 mass indexer:

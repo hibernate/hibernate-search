@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.jsr352.massindexing;
+package org.hibernate.search.jsr352.massindexing.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,6 +17,8 @@ import javax.batch.api.BatchProperty;
 import javax.batch.api.listener.AbstractJobListener;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -25,22 +27,24 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.context.jpa.impl.ActiveSessionFactoryRegistry;
 import org.hibernate.search.jsr352.logging.impl.Log;
-import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Listener before the start of the job. It aims to setup the job context data, shared by all the steps.
- * <p>
- * This is the default implementation, meant to be overridden (mainly its
- * {@link #getEntityManagerFactoryRegistry()} method) when one needs to retrieve the entity manager
- * factories differently.
- * This default implementation uses an {@link ActiveSessionFactoryRegistry}, which has
- * some limitations (see its javadoc).
  *
  * @author Mincong Huang
  */
+/*
+ * Hack to make sure that, when using dependency injection,
+ * this bean is resolved using DI and is properly injected.
+ * Otherwise it would just be instantiated using its default
+ * constructor and would not be injected.
+ */
+@Named(value = "org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener")
+@Singleton
 public class JobContextSetupListener extends AbstractJobListener {
 
 	private static final Log log = LoggerFactory.make( Log.class );
@@ -64,22 +68,17 @@ public class JobContextSetupListener extends AbstractJobListener {
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA)
 	private String serializedCustomQueryCriteria;
 
+	@Inject
+	private EntityManagerFactoryRegistry emfRegistry;
+
 	@Override
 	public void beforeJob() throws Exception {
 		setUpContext();
 	}
 
-	/**
-	 * Method to be overridden to retrieve the entity manager factory by different means (CDI, Spring DI, ...).
-	 *
-	 * @return The entity manager factory registry used to convert the entity manager factory reference to an actual instance.
-	 */
-	protected EntityManagerFactoryRegistry getEntityManagerFactoryRegistry() {
-		return ActiveSessionFactoryRegistry.getInstance();
-	}
-
 	private EntityManagerFactory getEntityManagerFactory() {
-		EntityManagerFactoryRegistry registry = getEntityManagerFactoryRegistry();
+		EntityManagerFactoryRegistry registry =
+				emfRegistry != null ? emfRegistry : ActiveSessionFactoryRegistry.getInstance();
 
 		if ( StringHelper.isEmpty( entityManagerFactoryScope ) ) {
 			if ( StringHelper.isEmpty( entityManagerFactoryReference ) ) {
