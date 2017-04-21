@@ -19,4 +19,8 @@ public final class MassIndexingPartitionProperties {
 	public static final String ENTITY_NAME = "entityName";
 
 	public static final String PARTITION_ID = "partitionId";
+
+	public static final String LOWER_BOUND = "lowerBound";
+
+	public static final String UPPER_BOUND = "upperBound";
 }

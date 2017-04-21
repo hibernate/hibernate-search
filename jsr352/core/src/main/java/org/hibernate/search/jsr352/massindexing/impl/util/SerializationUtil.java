@@ -12,46 +12,39 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.Set;
 
-import org.hibernate.criterion.Criterion;
 import org.hibernate.search.util.StringHelper;
 import org.jboss.logging.Logger;
 
 /**
  * @author Mincong Huang
  */
-public final class MassIndexerUtil {
+public final class SerializationUtil {
 
-	public static final Logger LOGGER = Logger.getLogger( MassIndexerUtil.class );
+	public static final Logger LOGGER = Logger.getLogger( SerializationUtil.class );
 
-	private MassIndexerUtil() {
+	private SerializationUtil() {
 		// Private constructor, do not use it.
 	}
 
-	public static String serializeCriteria(Set<Criterion> criteria)
-			throws IOException {
+	public static String serialize(Object object) throws IOException {
 		try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				ObjectOutputStream oos = new ObjectOutputStream( baos ) ) {
-			oos.writeObject( criteria );
+			oos.writeObject( object );
 			oos.flush();
 			byte bytes[] = baos.toByteArray();
 			return Base64.getEncoder().encodeToString( bytes );
 		}
 	}
 
-	public static Set<Criterion> deserializeCriteria(String serialized)
-			throws IOException, ClassNotFoundException {
+	public static Object deserialize(String serialized) throws IOException, ClassNotFoundException {
 		if ( StringHelper.isEmpty( serialized ) ) {
-			return Collections.emptySet();
+			return null;
 		}
 		byte bytes[] = Base64.getDecoder().decode( serialized );
 		try ( ByteArrayInputStream bais = new ByteArrayInputStream( bytes );
 				ObjectInputStream ois = new ObjectInputStream( bais ) ) {
-			@SuppressWarnings("unchecked")
-			Set<Criterion> criteria = (Set<Criterion>) ois.readObject();
-			return criteria;
+			return ois.readObject();
 		}
 	}
 }

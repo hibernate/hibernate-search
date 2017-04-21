@@ -17,7 +17,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.logging.impl.Log;
-import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
+import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -334,7 +334,7 @@ public final class MassIndexingJob {
 				try {
 					jobParams.put(
 							MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA,
-							MassIndexerUtil.serializeCriteria( customQueryCriteria )
+							SerializationUtil.serialize( customQueryCriteria )
 					);
 				}
 				catch (IOException e) {
