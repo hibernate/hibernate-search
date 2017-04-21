@@ -6,31 +6,16 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import javax.batch.api.BatchProperty;
 import javax.batch.api.listener.AbstractJobListener;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.criterion.Criterion;
-import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
-import org.hibernate.search.jsr352.context.jpa.impl.ActiveSessionFactoryRegistry;
-import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
-import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexerUtil;
-import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
 
 /**
  * Listener before the start of the job. It aims to setup the job context data, shared by all the steps.
@@ -46,8 +31,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 @Named(value = "org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener")
 @Singleton
 public class JobContextSetupListener extends AbstractJobListener {
-
-	private static final Log log = LoggerFactory.make( Log.class );
 
 	@Inject
 	private JobContext jobContext;
@@ -73,63 +56,9 @@ public class JobContextSetupListener extends AbstractJobListener {
 
 	@Override
 	public void beforeJob() throws Exception {
-		setUpContext();
-	}
-
-	private EntityManagerFactory getEntityManagerFactory() {
-		EntityManagerFactoryRegistry registry =
-				emfRegistry != null ? emfRegistry : ActiveSessionFactoryRegistry.getInstance();
-
-		if ( StringHelper.isEmpty( entityManagerFactoryScope ) ) {
-			if ( StringHelper.isEmpty( entityManagerFactoryReference ) ) {
-				return registry.getDefault();
-			}
-			else {
-				return registry.get( entityManagerFactoryReference );
-			}
-		}
-		else {
-			if ( StringHelper.isEmpty( entityManagerFactoryReference ) ) {
-				throw log.entityManagerFactoryReferenceIsEmpty();
-			}
-			else {
-				return registry.get( entityManagerFactoryScope, entityManagerFactoryReference );
-			}
-		}
-	}
-
-	private void setUpContext() throws ClassNotFoundException, IOException {
-		EntityManagerFactory emf = getEntityManagerFactory();
-		EntityManager em = null;
-
-		try {
-			em = emf.createEntityManager();
-			List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
-			Set<Class<?>> entityTypesToIndex = Search
-					.getFullTextEntityManager( em )
-					.getSearchFactory()
-					.getIndexedTypes()
-					.stream()
-					.filter( clz -> entityNamesToIndex.contains( clz.getName() ) )
-					.collect( Collectors.toCollection( HashSet::new ) );
-
-			Set<Criterion> criteria = MassIndexerUtil.deserializeCriteria( serializedCustomQueryCriteria );
-			log.criteriaSize( criteria.size() );
-
-			JobContextData jobContextData = new JobContextData();
-			jobContextData.setEntityManagerFactory( emf );
-			jobContextData.setCustomQueryCriteria( criteria );
-			jobContextData.setEntityTypes( entityTypesToIndex );
-			jobContext.setTransientUserData( jobContextData );
-		}
-		finally {
-			try {
-				em.close();
-			}
-			catch (Exception e) {
-				log.unableToCloseEntityManager( e );
-			}
-		}
+		JobContextUtil.getOrCreateData( jobContext,
+				emfRegistry, entityManagerFactoryScope, entityManagerFactoryReference,
+				entityTypes, serializedCustomQueryCriteria );
 	}
 
 }
