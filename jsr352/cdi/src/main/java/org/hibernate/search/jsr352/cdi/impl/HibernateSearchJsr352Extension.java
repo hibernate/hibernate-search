@@ -14,6 +14,7 @@ import javax.enterprise.inject.spi.Extension;
 
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener;
+import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader;
 
 
 /**
@@ -42,6 +43,7 @@ public class HibernateSearchJsr352Extension implements Extension {
 
 	public void afterTypeDiscovery(@Observes AfterTypeDiscovery event, BeanManager beanManager) {
 		registerType( event, beanManager, JobContextSetupListener.class );
+		registerType( event, beanManager, EntityReader.class );
 	}
 
 	private void registerType(AfterTypeDiscovery event, BeanManager beanManager, Class<?> clazz) {

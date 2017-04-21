@@ -1,0 +1,132 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.jsr352.massindexing.impl.util;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.batch.runtime.context.JobContext;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import org.hibernate.criterion.Criterion;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.jpa.Search;
+import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.context.jpa.impl.ActiveSessionFactoryRegistry;
+import org.hibernate.search.jsr352.logging.impl.Log;
+import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
+import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+/**
+ * Utility allowing to set up and retrieve the job context data, shared by all the steps.
+ * <p>
+ * When no {@link EntityManagerFactoryRegistry} is provided,
+ * this utility uses an {@link ActiveSessionFactoryRegistry},
+ * which has some limitations (see its javadoc).
+ *
+ * @author Mincong Huang
+ * @author Yoann Rodiere
+ */
+public final class JobContextUtil {
+
+	private static final Log log = LoggerFactory.make( Log.class );
+
+	private JobContextUtil() {
+		// Private constructor, do not use it.
+	}
+
+	public static JobContextData getOrCreateData(JobContext jobContext,
+			EntityManagerFactoryRegistry emfRegistry,
+			String entityManagerFactoryScope, String entityManagerFactoryReference,
+			String entityTypes, String serializedCustomQueryCriteria) throws ClassNotFoundException, IOException {
+		JobContextData data = (JobContextData) jobContext.getTransientUserData();
+		if ( data == null ) {
+			EntityManagerFactory emf = getEntityManagerFactory( emfRegistry, entityManagerFactoryScope, entityManagerFactoryReference );
+			data = createData( emf, entityTypes, serializedCustomQueryCriteria );
+			jobContext.setTransientUserData( data );
+		}
+		return data;
+	}
+
+	public static JobContextData getExistingData(JobContext jobContext) {
+		JobContextData data = (JobContextData) jobContext.getTransientUserData();
+		if ( data == null ) {
+			throw new AssertionFailure( "The job context data was unexpectedly missing;"
+					+ " there probably is something wrong with how Hibernate Search set up the job context data." );
+		}
+		return data;
+	}
+
+	private static EntityManagerFactory getEntityManagerFactory(EntityManagerFactoryRegistry emfRegistry,
+			String entityManagerFactoryScope, String entityManagerFactoryReference) {
+		EntityManagerFactoryRegistry registry =
+				emfRegistry != null ? emfRegistry : ActiveSessionFactoryRegistry.getInstance();
+
+		if ( StringHelper.isEmpty( entityManagerFactoryScope ) ) {
+			if ( StringHelper.isEmpty( entityManagerFactoryReference ) ) {
+				return registry.getDefault();
+			}
+			else {
+				return registry.get( entityManagerFactoryReference );
+			}
+		}
+		else {
+			if ( StringHelper.isEmpty( entityManagerFactoryReference ) ) {
+				throw log.entityManagerFactoryReferenceIsEmpty();
+			}
+			else {
+				return registry.get( entityManagerFactoryScope, entityManagerFactoryReference );
+			}
+		}
+	}
+
+	private static JobContextData createData(EntityManagerFactory emf, String entityTypes, String serializedCustomQueryCriteria)
+			throws ClassNotFoundException, IOException {
+		EntityManager em = null;
+
+		try {
+			em = emf.createEntityManager();
+			List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
+			IndexedTypeSet typeIds = Search
+					.getFullTextEntityManager( em )
+					.getSearchFactory()
+					.unwrap( ExtendedSearchIntegrator.class )
+					.getIndexedTypeIdentifiers();
+			Set<Class<?>> entityTypesToIndex = new HashSet<>();
+			for ( IndexedTypeIdentifier typeId : typeIds ) {
+				if ( entityNamesToIndex.contains( typeId.getName() ) ) {
+					entityTypesToIndex.add( typeId.getPojoType() );
+				}
+			}
+
+			Set<Criterion> criteria = MassIndexerUtil.deserializeCriteria( serializedCustomQueryCriteria );
+			log.criteriaSize( criteria.size() );
+
+			JobContextData jobContextData = new JobContextData();
+			jobContextData.setEntityManagerFactory( emf );
+			jobContextData.setCustomQueryCriteria( criteria );
+			jobContextData.setEntityTypes( entityTypesToIndex );
+			return jobContextData;
+		}
+		finally {
+			try {
+				em.close();
+			}
+			catch (Exception e) {
+				log.unableToCloseEntityManager( e );
+			}
+		}
+	}
+
+}

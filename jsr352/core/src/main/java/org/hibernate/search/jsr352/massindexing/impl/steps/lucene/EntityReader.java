@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.jsr352.massindexing.impl.steps.lucene;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.batch.api.BatchProperty;
@@ -13,6 +14,8 @@ import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Criteria;
@@ -23,9 +26,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
+import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties;
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -49,12 +54,34 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Mincong Huang
  */
+// Same hack as in JobContextSetupListener.
+@Named(value = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader")
+@Singleton
 public class EntityReader extends AbstractItemReader {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
 	@Inject
 	private JobContext jobContext;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE)
+	private String entityManagerFactoryScope;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE)
+	private String entityManagerFactoryReference;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_TYPES)
+	private String entityTypes;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA)
+	private String serializedCustomQueryCriteria;
+
+	@Inject
+	private EntityManagerFactoryRegistry emfRegistry;
 
 	@Inject
 	private StepContext stepContext;
@@ -177,7 +204,9 @@ public class EntityReader extends AbstractItemReader {
 		log.openingReader( partitionIdStr, entityName );
 
 		final int partitionId = Integer.parseInt( partitionIdStr );
-		JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
+
+		JobContextData jobData = getJobContextData();
+
 		entityType = jobData.getIndexedType( entityName );
 		PartitionBound bound = jobData.getPartitionBound( partitionId );
 		log.printBound( bound );
@@ -210,6 +239,20 @@ public class EntityReader extends AbstractItemReader {
 		}
 
 		stepContext.setTransientUserData( partitionData );
+	}
+
+	/*
+	 * The spec states that a new job context is created for each partition,
+	 * meaning that the entity reader may not be able to re-use the job context
+	 * data set up in the JobContextSetupListener (actually we can, but only with JBeret).
+	 * Thus we take care to re-create the data if necessary.
+	 *
+	 * See https://github.com/WASdev/standards.jsr352.jbatch/issues/50
+	 */
+	private JobContextData getJobContextData() throws ClassNotFoundException, IOException {
+		return JobContextUtil.getOrCreateData( jobContext,
+				emfRegistry, entityManagerFactoryScope, entityManagerFactoryReference,
+				entityTypes, serializedCustomQueryCriteria );
 	}
 
 	private ScrollableResults buildScrollUsingHQL(StatelessSession ss, String HQL) {
