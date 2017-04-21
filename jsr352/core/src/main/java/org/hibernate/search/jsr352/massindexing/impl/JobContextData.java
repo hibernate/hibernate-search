@@ -40,11 +40,6 @@ public class JobContextData {
 	private Map<String, Class<?>> entityTypeMap;
 
 	/**
-	 * The total number of entities to index over all the entity types.
-	 */
-	private long totalEntityToIndex;
-
-	/**
 	 * The list of partition boundaries, one element per partition
 	 */
 	private List<PartitionBound> partitionBounds;
@@ -91,25 +86,8 @@ public class JobContextData {
 		return entityType;
 	}
 
-	public long getTotalEntityToIndex() {
-		return totalEntityToIndex;
-	}
-
 	public Set<Criterion> getCustomQueryCriteria() {
 		return customQueryCriteria;
-	}
-
-	public void setTotalEntityToIndex(long totalEntityToIndex) {
-		this.totalEntityToIndex = totalEntityToIndex;
-	}
-
-	/**
-	 * Increment to total entity number to index
-	 *
-	 * @param increment the entity number to index for one entity type
-	 */
-	public void incrementTotalEntity(long increment) {
-		totalEntityToIndex += increment;
 	}
 
 	public void setPartitionBounds(List<PartitionBound> partitionBounds) {
@@ -130,7 +108,6 @@ public class JobContextData {
 				.append( "JobContextData [" )
 				.append( "entityManagerFactory=" ).append( entityManagerFactory )
 				.append( ", entityTypeMap=" ).append( entityTypeMap )
-				.append( ", totalEntityToIndex=" ).append( totalEntityToIndex )
 				.append( ", partitionBounds=" ).append( partitionBounds )
 				.append( ", customQueryCriteria=" ).append( customQueryCriteria )
 				.append( "]" )
