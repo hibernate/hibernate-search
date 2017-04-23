@@ -208,4 +208,20 @@ public interface Log extends BaseHibernateSearchLogger {
 			value = "Failed to serialize job parameter of type %1$s")
 	SearchException failedToSerializeJobParameter(@FormatWith(ClassFormatter.class) Class<?> type, @Cause Throwable e);
 
+	@Message(id = JSR_352_MESSAGES_START_ID + 29,
+			value = "Unable to parse value '%1$s' for job parameter '%2$s'."
+	)
+	SearchException unableToParseJobParameter(String parameterName, Object parameterValue, @Cause Exception e);
+
+	@Message(id = JSR_352_MESSAGES_START_ID + 30,
+			value = "The value of parameter 'checkpointInterval' (value=%1$d) should be less than"
+					+ " the value of parameter 'rowsPerPartition' (value=%2$d)."
+	)
+	SearchException illegalCheckpointInterval(int checkpointInterval, int rowsPerPartition);
+
+	@Message(id = JSR_352_MESSAGES_START_ID + 31,
+			value = "The value of parameter '%1$s' (value=%2$d) should be greater than 0."
+	)
+	SearchException negativeValueOrZero(String parameterName, Number parameterValue);
+
 }

@@ -9,6 +9,12 @@
     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
 
     <listeners>
+        <listener ref="org.hibernate.search.jsr352.massindexing.JobParameterValidationListener">
+            <properties>
+                <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}?:200;" />
+                <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:250;" />
+            </properties>
+        </listener>
         <listener ref="org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener">
             <properties>
                 <property name="entityManagerFactoryScope" value="#{jobParameters['entityManagerFactoryScope']}" />

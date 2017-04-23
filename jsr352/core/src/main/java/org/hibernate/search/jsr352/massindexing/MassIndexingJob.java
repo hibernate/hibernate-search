@@ -18,6 +18,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
+import org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -314,6 +315,8 @@ public final class MassIndexingJob {
 		 * @throws SearchException if the serialization of some parameters fail.
 		 */
 		public Properties build() {
+			ValidationUtil.validateCheckpointInterval( checkpointInterval, rowsPerPartition );
+
 			Properties jobParams = new Properties();
 
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE, entityManagerFactoryScope );
