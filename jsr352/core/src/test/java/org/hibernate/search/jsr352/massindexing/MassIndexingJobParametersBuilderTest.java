@@ -16,6 +16,8 @@ import java.util.Properties;
 
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.search.exception.SearchException;
+
 import org.junit.Test;
 
 /**
@@ -104,6 +106,24 @@ public class MassIndexingJobParametersBuilderTest {
 		MassIndexingJob.parameters().forEntity( String.class ).restrictedBy( (Criterion) null );
 	}
 
+	@Test(expected = SearchException.class)
+	public void testCheckpointInterval_greaterThanRowsPerPartitions() {
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.checkpointInterval( 5 )
+				.rowsPerPartition( 4 )
+				.build();
+	}
+
+	@Test(expected = SearchException.class)
+	public void testCheckpointInterval_equalToRowsPerPartitions() {
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.checkpointInterval( 4 )
+				.rowsPerPartition( 4 )
+				.build();
+	}
+
 	/**
 	 * A batch indexing job cannot have 2 types of restrictions in the same time. Either JPQL / HQL or Criteria approach
 	 * is used. Using both will leads to illegal argument exception.
@@ -115,4 +135,10 @@ public class MassIndexingJobParametersBuilderTest {
 				.restrictedBy( "from string" )
 				.restrictedBy( Restrictions.isEmpty( "dummy" ) );
 	}
+
+	private static class UnusedEntity {
+		private UnusedEntity() {
+		}
+	}
+
 }
