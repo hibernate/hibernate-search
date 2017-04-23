@@ -9,6 +9,7 @@ package org.hibernate.search.spatial.impl;
 import static org.hibernate.search.spatial.impl.CoordinateHelper.coordinate;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReader;
@@ -164,6 +165,35 @@ public final class DistanceFilter extends Filter {
 		else {
 			return SpatialHelper.formatLongitude( coordinatesField );
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = 31 * super.hashCode() + previousFilter.hashCode();
+		hashCode = 31 * hashCode + center.hashCode();
+		hashCode = 31 * hashCode + Double.hashCode( radius );
+		hashCode = 31 * hashCode + Objects.hashCode( coordinatesField );
+		hashCode = 31 * hashCode + Objects.hashCode( latitudeField );
+		hashCode = 31 * hashCode + Objects.hashCode( longitudeField );
+		return hashCode;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj instanceof DistanceFilter ) {
+			DistanceFilter other = (DistanceFilter) obj;
+			return Float.floatToIntBits( getBoost() ) == Float.floatToIntBits( other.getBoost() )
+				&& previousFilter.equals( other.previousFilter )
+				&& center.equals( other.center )
+				&& radius == other.radius
+				&& Objects.equals( coordinatesField, other.coordinatesField )
+				&& Objects.equals( latitudeField, other.latitudeField )
+				&& Objects.equals( longitudeField, other.longitudeField );
+		}
+		return false;
 	}
 
 	@Override

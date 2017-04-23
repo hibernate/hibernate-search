@@ -93,6 +93,26 @@ public final class SpatialHashFilter extends Filter {
 	}
 
 	@Override
+	public int hashCode() {
+		int hashCode = 31 * super.hashCode() + spatialHashCellsIds.hashCode();
+		hashCode = 31 * hashCode + fieldName.hashCode();
+		return hashCode;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj instanceof SpatialHashFilter ) {
+			SpatialHashFilter other = (SpatialHashFilter) obj;
+			return spatialHashCellsIds.equals( other.spatialHashCellsIds )
+				&& fieldName.equals( other.fieldName );
+		}
+		return false;
+	}
+
+	@Override
 	public String toString(String field) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "SpatialHashFilter" );
