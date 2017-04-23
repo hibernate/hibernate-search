@@ -78,6 +78,24 @@ public class ChainedFilter extends Filter {
 	}
 
 	@Override
+	public int hashCode() {
+		return 31 * super.hashCode() + chainedFilters.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj instanceof ChainedFilter ) {
+			ChainedFilter other = (ChainedFilter) obj;
+			return Float.floatToIntBits( getBoost() ) == Float.floatToIntBits( other.getBoost() )
+				&& chainedFilters.equals( other.chainedFilters );
+		}
+		return false;
+	}
+
+	@Override
 	public String toString(String field) {
 		final StringBuilder sb = new StringBuilder();
 		boolean first = true;
