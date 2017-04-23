@@ -204,6 +204,24 @@ public final class Point implements Coordinates {
 	}
 
 	@Override
+	public int hashCode() {
+		return 31 * Double.hashCode( latitude ) + Double.hashCode( longitude );
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj instanceof Point ) {
+			Point other = (Point) obj;
+			return latitude == other.latitude
+				&& longitude == other.longitude;
+		}
+		return false;
+	}
+
+	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "Point" );

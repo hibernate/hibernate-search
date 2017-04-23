@@ -17,7 +17,9 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.NumericRangeFilter;
+import org.apache.lucene.search.QueryCachingPolicy;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
@@ -42,6 +44,7 @@ import static org.junit.Assert.fail;
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class FilterTest extends SearchTestBase {
+	private QueryCachingPolicy cachingPolicy;
 	private BooleanQuery query;
 	private FullTextSession fullTextSession;
 
@@ -356,6 +359,8 @@ public class FilterTest extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
+		cachingPolicy = IndexSearcher.getDefaultQueryCachingPolicy();
+		IndexSearcher.setDefaultQueryCachingPolicy( QueryCachingPolicy.ALWAYS_CACHE );
 		createData();
 		query = createQuery();
 		fullTextSession = Search.getFullTextSession( openSession() );
@@ -367,6 +372,7 @@ public class FilterTest extends SearchTestBase {
 	public void tearDown() throws Exception {
 		fullTextSession.getTransaction().commit();
 		fullTextSession.close();
+		IndexSearcher.setDefaultQueryCachingPolicy( cachingPolicy );
 		super.tearDown();
 	}
 
