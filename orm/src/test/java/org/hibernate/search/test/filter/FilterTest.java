@@ -370,9 +370,16 @@ public class FilterTest extends SearchTestBase {
 	@Override
 	@After
 	public void tearDown() throws Exception {
-		fullTextSession.getTransaction().commit();
-		fullTextSession.close();
-		IndexSearcher.setDefaultQueryCachingPolicy( cachingPolicy );
+		try {
+			fullTextSession.getTransaction().commit();
+			fullTextSession.close();
+		}
+		finally {
+			// Reset the caching policy to its original state
+			if ( cachingPolicy != null ) {
+				IndexSearcher.setDefaultQueryCachingPolicy( cachingPolicy );
+			}
+		}
 		super.tearDown();
 	}
 
