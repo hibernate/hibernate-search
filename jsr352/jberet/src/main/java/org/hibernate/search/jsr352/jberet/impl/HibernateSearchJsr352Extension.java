@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.jsr352.cdi.impl;
+package org.hibernate.search.jsr352.jberet.impl;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterTypeDiscovery;
@@ -32,7 +32,7 @@ import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader;
  * Besides exposing private types unnecessarily,
  * this is annoying because it puts default {@link EntityManagerFactoryRegistry} implementations into the CDI context,
  * leading to conflicts when injecting such types
- * (since this module, hibernate-search-jsr352-cdi, also provides an implementation).
+ * (since this module, hibernate-search-jsr352-jberet, also provides an implementation).
  * <br>See <a href="https://issues.jboss.org/browse/WFLY-8656">WFLY-8656</a>.
  * </ul>
  * Thus we use explicit type registration as a workaround.
