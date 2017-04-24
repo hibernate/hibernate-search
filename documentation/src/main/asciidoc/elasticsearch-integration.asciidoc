@@ -677,7 +677,7 @@ you need to enable the Groovy plugin by adding the following snippet to your Ela
 
 .Enabling Groovy support in your elasticsearch.yml
 ----
-script.engine.groovy.inline.search: on
+script.engine.groovy.inline.search: true
 ----
 
 ==== [[elasticsearch-scrolling]] Paging and scrolling

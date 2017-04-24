@@ -67,4 +67,4 @@ node.max_local_storage_nodes: 1
 #
 # Enable Groovy scripting support for search: useful for spatial queries
 #
-script.engine.groovy.inline.search: on
+script.engine.groovy.inline.search: true
