@@ -30,7 +30,7 @@
 
     <modules>
         <module>core</module>
-        <module>cdi</module>
+        <module>jberet</module>
     </modules>
 
     <issueManagement>

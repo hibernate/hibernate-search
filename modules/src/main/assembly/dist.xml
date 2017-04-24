@@ -246,7 +246,7 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-jsr352-core</include>
-                <include>org.hibernate:hibernate-search-jsr352-cdi</include>
+                <include>org.hibernate:hibernate-search-jsr352-jberet</include>
             </includes>
         </dependencySet>
 
