@@ -21,6 +21,7 @@ import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -121,14 +122,14 @@ public class SearchFactoryHolder extends ExternalResource {
 		return this;
 	}
 
-	public DirectoryBasedIndexManager extractIndexManager(Class indexedType) {
+	public IndexManager extractIndexManager(Class indexedType) {
 		EntityIndexBinding indexBindingForEntity = getSearchFactory().getIndexBinding( indexedType );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
+		IndexManager indexManager = (IndexManager) indexBindingForEntity.getIndexManagers()[0];
 		return indexManager;
 	}
 
 	public AbstractWorkspaceImpl extractWorkspace(Class indexedType) {
-		DirectoryBasedIndexManager indexManager = extractIndexManager( indexedType );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) extractIndexManager( indexedType );
 		WorkspaceHolder backend = indexManager.getWorkspaceHolder();
 		return backend.getIndexResources().getWorkspace();
 	}
