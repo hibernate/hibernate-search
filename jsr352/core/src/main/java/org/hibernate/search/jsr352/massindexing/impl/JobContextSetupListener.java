@@ -11,9 +11,9 @@ import javax.batch.api.listener.AbstractJobListener;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.inject.scope.HibernateSearchJobScoped;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
 
@@ -29,7 +29,7 @@ import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
  * constructor and would not be injected.
  */
 @Named(value = "org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener")
-@Singleton
+@HibernateSearchJobScoped
 public class JobContextSetupListener extends AbstractJobListener {
 
 	@Inject

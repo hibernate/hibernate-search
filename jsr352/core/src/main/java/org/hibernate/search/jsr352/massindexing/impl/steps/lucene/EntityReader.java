@@ -15,7 +15,6 @@ import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Criteria;
@@ -27,6 +26,7 @@ import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
@@ -57,7 +57,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 // Same hack as in JobContextSetupListener.
 @Named(value = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader")
-@Singleton
+@HibernateSearchPartitionScoped
 public class EntityReader extends AbstractItemReader {
 
 	private static final Log log = LoggerFactory.make( Log.class );
