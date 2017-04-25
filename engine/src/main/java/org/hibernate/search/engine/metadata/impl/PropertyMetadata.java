@@ -17,7 +17,6 @@ import java.util.Set;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
-import org.hibernate.search.util.impl.ReflectionHelper;
 
 /**
  * Encapsulating the metadata for a single indexed property (field or getter).
@@ -125,9 +124,6 @@ public class PropertyMetadata implements PartialPropertyMetadata {
 
 		public Builder(BackReference<TypeMetadata> declaringType, XProperty propertyAccessor, Class<?> propertyClass) {
 			this.declaringType = declaringType;
-			if ( propertyAccessor != null ) {
-				ReflectionHelper.setAccessible( propertyAccessor );
-			}
 			this.propertyAccessor = propertyAccessor;
 			this.propertyClass = propertyClass;
 			this.fieldMetadataSet = new LinkedHashSet<>();
