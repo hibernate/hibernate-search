@@ -743,11 +743,15 @@ an entity manager factory by its persistence unit name when using the mass index
 If you want to use a different JSR-352 implementation that happens to allow dependency injection,
 you can use `hibernate-search-jsr352-core` under the following conditions:
 
-1. You must make sure that the dependency injection mechanism will register
-all injection-annotated classes (`@Singleton`, `@Named`, ...) from the
+1. You must map the following two scope annotations
+to the relevant scope in the dependency injection mechanism:
+ * `org.hibernate.search.jsr352.inject.scope.HibernateSearchJobScoped`
+ * `org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped`
+2. You must make sure that the dependency injection mechanism will register
+all injection-annotated classes (`@Named`, ...) from the
 `hibernate-search-jsr352-core` module in the dependency injection context.
 For instance this can be achieved in Spring DI using the `@ComponentScan` annotation.
-2. You must register a single bean in the dependency injection context
+3. You must register a single bean in the dependency injection context
 that will implement the `EntityManagerFactoryRegistry` interface.
 
 ===== Plain Java environment (no dependency injection at all)

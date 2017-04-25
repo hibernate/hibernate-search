@@ -6,15 +6,26 @@
  */
 package org.hibernate.search.jsr352.jberet.impl;
 
+import java.lang.annotation.Annotation;
+
+import javax.enterprise.context.ContextNotActiveException;
+import javax.enterprise.context.spi.Context;
+import javax.enterprise.context.spi.Contextual;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AfterTypeDiscovery;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
+import org.hibernate.search.jsr352.inject.scope.HibernateSearchJobScoped;
+import org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener;
 import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader;
+import org.jberet.cdi.JobScoped;
+import org.jberet.cdi.PartitionScoped;
 
 
 /**
@@ -34,8 +45,11 @@ import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader;
  * leading to conflicts when injecting such types
  * (since this module, hibernate-search-jsr352-jberet, also provides an implementation).
  * <br>See <a href="https://issues.jboss.org/browse/WFLY-8656">WFLY-8656</a>.
+ * <li>Even if we could solve the above, JBeret requires specific scope annotations to be set on the
+ * beans so that they are correctly scoped. Since the core isn't dependent on JBeret, we must specify these
+ * scopes manually when registering the beans.
  * </ul>
- * Thus we use explicit type registration as a workaround.
+ * Thus we use explicit type and scope registration as a workaround.
  *
  * @author Yoann Rodiere
  */
@@ -46,9 +60,65 @@ public class HibernateSearchJsr352Extension implements Extension {
 		registerType( event, beanManager, EntityReader.class );
 	}
 
+	public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
+		addScopeAlias( event, beanManager, HibernateSearchJobScoped.class, JobScoped.class );
+		addScopeAlias( event, beanManager, HibernateSearchPartitionScoped.class, PartitionScoped.class );
+	}
+
 	private void registerType(AfterTypeDiscovery event, BeanManager beanManager, Class<?> clazz) {
 		AnnotatedType<?> annotatedType = beanManager.createAnnotatedType( clazz );
 		event.addAnnotatedType( annotatedType, clazz.getName() );
+	}
+
+	private void addScopeAlias(AfterBeanDiscovery event, BeanManager beanManager,
+			Class<? extends Annotation> alias, Class<? extends Annotation> target) {
+		event.addContext( new AliasedContext( alias, beanManager, target ) );
+	}
+
+	private static class AliasedContext implements Context {
+
+		private final Class<? extends Annotation> scopeType;
+		private final BeanManager targetBeanManager;
+		private final Class<? extends Annotation> targetScopeType;
+
+		public AliasedContext(Class<? extends Annotation> scopeType,
+				BeanManager targetBeanManager, Class<? extends Annotation> targetScopeType) {
+			super();
+			this.scopeType = scopeType;
+			this.targetBeanManager = targetBeanManager;
+			this.targetScopeType = targetScopeType;
+		}
+
+		private Context delegate() {
+			return targetBeanManager.getContext( targetScopeType );
+		}
+
+		@Override
+		public Class<? extends Annotation> getScope() {
+			return scopeType;
+		}
+
+		@Override
+		public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext) {
+			return delegate().get( contextual, creationalContext );
+		}
+
+		@Override
+		public <T> T get(Contextual<T> contextual) {
+			return delegate().get( contextual );
+		}
+
+		@Override
+		public boolean isActive() {
+			try {
+				delegate();
+				return true;
+			}
+			catch (ContextNotActiveException e) {
+				return false;
+			}
+		}
+
 	}
 
 }
