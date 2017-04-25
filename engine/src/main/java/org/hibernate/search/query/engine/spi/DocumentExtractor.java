@@ -31,7 +31,7 @@ public interface DocumentExtractor extends Closeable {
 	 *
 	 * @param index The requested result index.
 	 * @return The entity information for the requested result.
-	 * @throws IOException
+	 * @throws IOException if an error occurs while extracting the results.
 	 */
 	EntityInfo extract(int index) throws IOException;
 

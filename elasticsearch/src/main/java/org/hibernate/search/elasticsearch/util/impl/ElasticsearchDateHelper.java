@@ -51,6 +51,7 @@ public final class ElasticsearchDateHelper {
 	/**
 	 * Limit a calendar resolution.
 	 *
+	 * @param calendar The calendar whose resolution is to be limited
 	 * @param resolution The desired resolution of the date to be returned
 	 * @return the calendar with all values more precise than {@code resolution} set to 0 or 1
 	 *

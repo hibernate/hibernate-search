@@ -82,7 +82,7 @@ public interface QueryBuilder {
 	 *
 	 * It uses an approach similar to Lucene's {@code MoreLikeThis}
 	 *
-	 * @return the entry point for building more a more like this queryt
+	 * @return the entry point for building a more like this query
 	 */
 	MoreLikeThisContext moreLikeThis();
 
@@ -90,6 +90,8 @@ public interface QueryBuilder {
 	 * Build a sort that can be applied to a query execution.
 	 * When multiple sort definitions are expressed,
 	 * they are processed in decreasing priority.
+	 *
+	 * @return the entry point for building a sort
 	 */
 	SortContext sort();
 

@@ -16,22 +16,22 @@ import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
 public interface ExecutionOptions {
 
 	/**
-	 * Status the index needs to be at least in, otherwise we'll fail starting up.
+	 * @return the status the index needs to be at least in, otherwise we'll fail starting up.
 	 */
 	ElasticsearchIndexStatus getRequiredIndexStatus();
 
 	/**
-	 * Elasticsearch dynamic behaviour.
+	 * @return the default Elasticsearch dynamic mapping behaviour.
 	 */
 	DynamicType getDynamicMapping();
 
 	/**
-	 * Time to wait for the {@link #getRequiredIndexStatus() required index status}, in milliseconds.
+	 * @return the time to wait for the {@link #getRequiredIndexStatus() required index status}, in milliseconds.
 	 */
 	int getIndexManagementTimeoutInMs();
 
 	/**
-	 * Whether multitenancy is enabled ({@code true}) or not ({@code false}).
+	 * @return whether multitenancy is enabled ({@code true}) or not ({@code false}).
 	 */
 	boolean isMultitenancyEnabled();
 

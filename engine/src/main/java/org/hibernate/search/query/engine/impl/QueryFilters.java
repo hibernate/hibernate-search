@@ -36,16 +36,16 @@ public final class QueryFilters {
 	/**
 	 * Will wrap the passed Query into a BooleanQuery to apply all filters as boolean clauses.
 	 * Returns the unmodified (same instance) of the input if there are no filters to be applied.
-	 * @param filteredQuery
-	 * @return
+	 * @param queryToFilter The query to be filtered.
+	 * @return The filtered query.
 	 */
-	public Query filterOrPassthrough(Query filteredQuery) {
+	public Query filterOrPassthrough(Query queryToFilter) {
 		if ( isEmpty() ) {
-			return filteredQuery;
+			return queryToFilter;
 		}
 		else {
 			BooleanQuery.Builder boolQueryBuilder = new BooleanQuery.Builder();
-			boolQueryBuilder.add( filteredQuery, Occur.MUST );
+			boolQueryBuilder.add( queryToFilter, Occur.MUST );
 			for ( Query bc : filterQueries ) {
 				boolQueryBuilder.add( bc, BooleanClause.Occur.FILTER );
 			}

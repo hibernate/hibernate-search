@@ -59,7 +59,9 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 		}
 
 		/**
-		 * Returns all those sort fields from the given {@link Sort} that cannot be satisfied by the existing sortable
+		 * @param entityType the targeted entity type
+		 * @param sort the sort to be examined
+		 * @return all those sort fields from the given {@link Sort} that cannot be satisfied by the existing sortable
 		 * fields (doc value fields) declared for the given indexed type.
 		 */
 		public List<String> getUncoveredSorts(Class<?> entityType, Sort sort) {

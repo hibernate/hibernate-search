@@ -91,7 +91,7 @@ public class FacetRange<T> {
 	}
 
 	/**
-	 * Returns a string suitable to use as an identifier.
+	 * @return a string suitable to use as an identifier.
 	 */
 	public String getIdentifier() {
 		StringBuilder builder = new StringBuilder();

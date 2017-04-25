@@ -261,14 +261,14 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		propertyMapping.addField( facetFieldName, fieldMapping );
 	}
 
-	/**
+	/*
 	 * Adds the main indexing-related options to the given facet sub-field: "index", "doc_values", "analyzer", ...
 	 */
 	protected void addSubfieldIndexOptions(PropertyMapping fieldMapping, FacetMetadata facetMetadata) {
 		fieldMapping.setIndex( IndexType.NOT_ANALYZED );
 	}
 
-	/**
+	/*
 	 * Adds the main indexing-related options to the given property: "index", "doc_values", "analyzer", ...
 	 */
 	protected void addIndexOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder,

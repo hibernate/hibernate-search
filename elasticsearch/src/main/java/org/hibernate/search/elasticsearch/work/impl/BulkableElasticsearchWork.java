@@ -18,8 +18,8 @@ public interface BulkableElasticsearchWork<T> extends ElasticsearchWork<T> {
 	JsonObject getBulkableActionBody();
 
 	/**
-	 * @param context
-	 * @param resultItem
+	 * @param context The execution context
+	 * @param resultItem The part of the JSON result relevant to this work
 	 * @return {@code true} if the result is considered a success, {@code false} otherwise.
 	 */
 	boolean handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject resultItem);

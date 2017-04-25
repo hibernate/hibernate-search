@@ -286,9 +286,9 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 
 	}
 
-	/**
+	/*
 	 * Validate that two values are equal, using a given default value when null is encountered on either value.
-	 * <p>Useful to take into account the fact that Elasticsearch has default values for attributes.
+	 * Useful to take into account the fact that Elasticsearch has default values for attributes.
 	 */
 	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			T expectedValue, T actualValue, T defaultValueForNulls) {
@@ -302,8 +302,8 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	/**
-	 * Variation of {@link #validateEqualWithDefault(ValidationErrorCollector, String, Object, Object, Object)} for floats.
+	/*
+	 * Variation of validateEqualWithDefault() for floats.
 	 */
 	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Float expectedValue, Float actualValue, float delta, Float defaultValueForNulls) {
@@ -335,8 +335,8 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	/**
-	 * Variation of {@link #validateEqualWithDefault(ValidationErrorCollector, String, Object, Object, Object)} for doubles.
+	/*
+	 * Variation of validateEqualWithDefault() for doubles.
 	 */
 	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Double expectedValue, Double actualValue, double delta, Double defaultValueForNulls) {
@@ -366,12 +366,10 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	/**
+	/*
 	 * Special validation for an Elasticsearch format:
-	 * <ul>
-	 * <li>Checks that the first element (the format used for output format in ES) is equal
-	 * <li>Checks all expected formats are present in the actual value
-	 * </ul>
+	 * - Checks that the first element (the format used for output format in ES) is equal
+	 * - Checks all expected formats are present in the actual value
 	 */
 	protected <T> void validateFormatWithDefault(ValidationErrorCollector errorCollector,
 			String attributeName, List<String> expectedValue, List<String> actualValue, List<String> defaultValueForNulls) {
@@ -456,9 +454,9 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		void validate(ValidationErrorCollector errorCollector, T expected, T actual);
 	}
 
-	/**
+	/*
 	 * Validate all elements in a map.
-	 * <p>
+	 *
 	 * Unexpected elements are ignored, we only validate expected elements.
 	 */
 	protected <T> void validateAll(

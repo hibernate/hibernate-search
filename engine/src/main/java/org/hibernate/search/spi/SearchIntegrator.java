@@ -78,9 +78,11 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * <p>Calling {@link HSQuery#targetedEntities(java.util.List)} on the resulting query
 	 * is not necessary, unless you later decide to target a subset of {@code entities}.
 	 *
+	 * @param fullTextQuery the full-text engine query
+	 * @param entityTypes the targeted entity types
 	 * @return an Hibernate Search query object
 	 */
-	HSQuery createHSQuery(Query luceneQuery, Class<?>... entityTypes);
+	HSQuery createHSQuery(Query fullTextQuery, Class<?>... entityTypes);
 
 	/**
 	 * Return an Hibernate Search query object.
@@ -91,9 +93,11 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * <p>Calling {@link HSQuery#targetedTypes(java.util.List)} on the resulting query
 	 * is not necessary, unless you later decide to target a subset of {@code entities}.
 	 *
+	 * @param fullTextQuery the full-text engine query
+	 * @param types the targeted entity types
 	 * @return an Hibernate Search query object
 	 */
-	HSQuery createHSQuery(Query luceneQuery, CustomTypeMetadata... types);
+	HSQuery createHSQuery(Query fullTextQuery, CustomTypeMetadata... types);
 
 	/**
 	 * @return true if the SearchIntegrator was stopped

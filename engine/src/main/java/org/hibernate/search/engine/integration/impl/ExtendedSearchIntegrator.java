@@ -139,7 +139,7 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	ObjectLookupMethod getDefaultObjectLookupMethod();
 
 	/**
-	 * Whether index uninverting should be done when running queries with sorts not covered by the configured sortable
+	 * @return whether index uninverting should be done when running queries with sorts not covered by the configured sortable
 	 * fields. If not allowed, an exception will be raised in this situation.
 	 */
 	boolean isIndexUninvertingAllowed();

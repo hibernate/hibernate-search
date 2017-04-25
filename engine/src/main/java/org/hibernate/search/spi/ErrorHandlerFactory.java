@@ -37,7 +37,7 @@ public final class ErrorHandlerFactory {
 	}
 
 	/**
-	 * @param searchConfiguration
+	 * @param searchConfiguration The configuration that may specify an ErrorHandler
 	 * @return ErrorHandler specified in the {@link SearchConfiguration} or the default one in case not specified.
 	 */
 	public static ErrorHandler createErrorHandler(SearchConfiguration searchConfiguration) {

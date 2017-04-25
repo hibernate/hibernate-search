@@ -281,7 +281,6 @@ public final class ElasticsearchEnvironment {
 	 * in the index schema.
 	 * <p>
 	 * Possible values are:
-	 * <p>
 	 * <ul>
 	 * <li>{@code true}: Add new fields dynamically</li>
 	 * <li>{@code false}: Ignore new fields</li>
