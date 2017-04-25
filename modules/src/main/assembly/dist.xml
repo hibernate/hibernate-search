@@ -17,67 +17,67 @@
     <files>
         <file>
             <source>${module.xml.basedir}/lucene/module.xml</source>
-            <outputDirectory>/org/apache/lucene/${lucene.module.slot}</outputDirectory>
+            <outputDirectory>org/apache/lucene/${lucene.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/lucene_internal/module.xml</source>
-            <outputDirectory>/org/apache/lucene/internal/${lucene.module.slot}</outputDirectory>
+            <outputDirectory>org/apache/lucene/internal/${lucene.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/engine/module.xml</source>
-            <outputDirectory>/org/hibernate/search/engine/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/engine/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${aliases.xml.basedir}/search/engine/module.xml</source>
-            <outputDirectory>/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/orm/module.xml</source>
-            <outputDirectory>/org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${aliases.xml.basedir}/search/orm/module.xml</source>
-            <outputDirectory>/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/backend-jms/module.xml</source>
-            <outputDirectory>/org/hibernate/search/backend-jms/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/backend-jms/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/serialization-avro/module.xml</source>
-            <outputDirectory>/org/hibernate/search/serialization-avro/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/serialization-avro/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/backend-jgroups/module.xml</source>
-            <outputDirectory>/org/hibernate/search/backend-jgroups/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/backend-jgroups/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/elasticsearch/module.xml</source>
-            <outputDirectory>/org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/elasticsearch/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/es-client/module.xml</source>
-            <outputDirectory>/org/hibernate/search/elasticsearch-client/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/elasticsearch-client/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/es-sniffer/module.xml</source>
-            <outputDirectory>/org/hibernate/search/elasticsearch-sniffer/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/elasticsearch-sniffer/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/gson/module.xml</source>
-            <outputDirectory>/org/hibernate/search/elasticsearch-gson/${hibernate.search.version}</outputDirectory>
+            <outputDirectory>org/hibernate/search/elasticsearch-gson/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
