@@ -52,4 +52,4 @@ script:
     2.2) BUILD_OPTIONS+=' -P!elasticsearch-5.0,elasticsearch-2.2' ;;
     5.0) ;;
     esac
-  - ./mvnw -s settings-example.xml -Pdocs,dist $BUILD_OPTIONS clean install
+  - ./mvnw -s settings-example.xml -Pdist $BUILD_OPTIONS clean install
