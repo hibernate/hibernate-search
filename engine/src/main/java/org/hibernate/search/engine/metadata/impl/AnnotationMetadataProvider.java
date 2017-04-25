@@ -230,6 +230,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
+		// Make sure we'll be able to access values
+		ReflectionHelper.setAccessible( member );
+
 		final String relativeFieldName = getIdAttributeName( member, idAnnotation );
 		final DocumentFieldPath fieldPath = new DocumentFieldPath( prefix, relativeFieldName );
 		if ( isRoot ) {
@@ -1065,6 +1068,15 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		PropertyMetadata property = propertyMetadataBuilder.build();
 		if ( !property.getFieldMetadataSet().isEmpty() ) {
+			/*
+			 * Make sure we'll be able to access values.
+			 * This should only be called when we're absolutely sure we'll have to access values,
+			 * because this call may fail (in JDK 9 in particular),
+			 * which would make the whole bootstrapping process fail.
+			 * See HSEARCH-2697 (fixed).
+			 */
+			ReflectionHelper.setAccessible( member );
+
 			typeMetadataBuilder.addProperty( property );
 		}
 	}
@@ -2064,4 +2076,5 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		return false;
 	}
+
 }
