@@ -33,6 +33,14 @@
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- We need an empty JAR, otherwise the build will fail -->
+                    <skipIfEmpty>false</skipIfEmpty>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

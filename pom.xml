@@ -814,6 +814,7 @@
                             <Implementation-URL>http://search.hibernate.org</Implementation-URL>
                         </manifestEntries>
                     </archive>
+                    <skipIfEmpty>true</skipIfEmpty>
                 </configuration>
                 <executions>
                     <execution>
