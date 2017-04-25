@@ -22,7 +22,7 @@ public interface ElasticsearchSchemaTranslator {
 	/**
 	 * Translates index metadata, throwing an exception if translation fails.
 	 *
-	 * @param indexName
+	 * @param indexName The name of the index
 	 * @param descriptors The entity bindings
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.

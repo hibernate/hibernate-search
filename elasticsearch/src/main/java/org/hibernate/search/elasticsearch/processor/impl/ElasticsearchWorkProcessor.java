@@ -75,6 +75,9 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 	/**
 	 * Executes a work synchronously, potentially throwing exceptions (the error handler isn't used).
+	 *
+	 * @param work The work to be executed.
+	 * @return The result of the given work.
 	 */
 	public <T> T executeSyncUnsafe(ElasticsearchWork<T> work) {
 		return work.execute( parallelWorkExecutionContext );
@@ -82,16 +85,20 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 	/**
 	 * Executes works synchronously, passing any thrown exception to the error handler.
+	 *
+	 * @param works The works to be executed.
 	 */
-	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> requests) {
-		executeSafely( requests );
+	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> works) {
+		executeSafely( works );
 	}
 
 	/**
 	 * Executes a work asynchronously, passing any exception to the error handler.
+	 *
+	 * @param work The work to be executed.
 	 */
-	public void executeAsync(ElasticsearchWork<?> request) {
-		asyncProcessor.submitRequest( request );
+	public void executeAsync(ElasticsearchWork<?> work) {
+		asyncProcessor.submitRequest( work );
 	}
 
 	/**

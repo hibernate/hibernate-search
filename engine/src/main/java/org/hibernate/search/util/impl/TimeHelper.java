@@ -32,6 +32,10 @@ public final class TimeHelper {
 	 * <p>Tested against TCKDTFParsedInstant in
 	 * http://hg.openjdk.java.net/jdk9/dev/jdk/rev/f371bdfb7875
 	 * with both JDK8b101 and JDK9 (early access - build 137).
+	 *
+	 * @param value The value to be parsed
+	 * @param formatter The formatter to use when parsing
+	 * @return The parsed {@link ZonedDateTime}
 	 */
 	public static ZonedDateTime parseZoneDateTime(String value, DateTimeFormatter formatter) {
 		TemporalAccessor temporal = formatter.parse( value );

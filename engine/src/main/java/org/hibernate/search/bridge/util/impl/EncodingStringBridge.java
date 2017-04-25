@@ -28,6 +28,9 @@ public abstract class EncodingStringBridge<T> implements EncodingBridge, StringB
 	/**
 	 * Parse the 'indexNullAs' string to an indexable value.
 	 * <p>The required format does not have to be the same as the encoded format.
+	 *
+	 * @param indexNullAs The string to parse.
+	 * @return The encoded value for the given string.
 	 * @throws IllegalArgumentException If the given string does not match the required format.
 	 */
 	protected abstract T parseIndexNullAs(String indexNullAs) throws IllegalArgumentException;

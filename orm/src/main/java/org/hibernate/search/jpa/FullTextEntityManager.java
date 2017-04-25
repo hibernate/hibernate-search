@@ -37,6 +37,14 @@ public interface FullTextEntityManager extends EntityManager {
 
 	/**
 	 * Creates a fulltext query from the given query descriptor.
+	 *
+	 * @param descriptor The query descriptor
+	 * @param entities List of classes for type filtering. The query result will only return entities of
+	 * the specified types and their respective subtype. If no class is specified no type filtering will take place.
+	 *
+	 * @return A <code>FullTextQuery</code> using the given query descriptor.
+	 *
+	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
 	FullTextQuery createFullTextQuery(QueryDescriptor descriptor, Class<?>... entities);
 

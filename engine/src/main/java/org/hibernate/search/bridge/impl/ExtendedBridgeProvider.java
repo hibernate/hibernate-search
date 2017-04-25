@@ -11,6 +11,7 @@ import java.lang.reflect.AnnotatedElement;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.bridge.spi.BridgeProvider.BridgeProviderContext;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**
@@ -24,6 +25,9 @@ public abstract class ExtendedBridgeProvider implements BridgeProvider {
 	/**
 	 * Same as {@link org.hibernate.search.bridge.spi.BridgeProvider#provideFieldBridge(org.hibernate.search.bridge.spi.BridgeProvider.BridgeProviderContext)}
 	 * but accepts an extended context.
+	 * @param bridgeContext the {@link ExtendedBridgeProviderContext}
+	 * @return a {@link org.hibernate.search.bridge.FieldBridge} instance if the provider can
+	 * build a bridge for the calling context. {@code null} otherwise.
 	 */
 	public abstract FieldBridge provideFieldBridge(ExtendedBridgeProviderContext bridgeContext);
 
@@ -39,12 +43,13 @@ public abstract class ExtendedBridgeProvider implements BridgeProvider {
 	public interface ExtendedBridgeProviderContext extends BridgeProviderContext {
 
 		/**
-		 * Offers access to the annotations hosted on the member seeking a bridge.
+		 * @return The {@link AnnotatedElement} for the member seeking a bridge,
+		 * offering access to its annotations.
 		 */
 		AnnotatedElement getAnnotatedElement();
 
 		/**
-		 * Return the member name for log and exception report purposes.
+		 * @return the member name for log and exception report purposes.
 		 */
 		String getMemberName();
 
@@ -54,7 +59,7 @@ public abstract class ExtendedBridgeProvider implements BridgeProvider {
 		boolean isId();
 
 		/**
-		 * Whether the field in question is marked as numeric field by means of the {code NumericField} annotation or
+		 * @return whether the field in question is marked as numeric field by means of the {code NumericField} annotation or
 		 * not.
 		 */
 		boolean isExplicitlyMarkedAsNumeric();

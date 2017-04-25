@@ -299,7 +299,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	}
 
 	/**
-	 * Returns the names of the projection constants supported by a specific implementation in addition to projecting
+	 * @return the names of the projection constants supported by a specific implementation in addition to projecting
 	 * actual field values. If a given projection name begins with {@link #HSEARCH_PROJECTION_FIELD_PREFIX} and is not
 	 * part of the set of constants returned by an implementation, an exception will be raised.
 	 */

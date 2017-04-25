@@ -32,6 +32,8 @@ public final class MultiWriteDrainableLinkedList<T> {
 
 	/**
 	 * Adds a new entry to this list.
+	 *
+	 * @param element The element to add.
 	 */
 	public void add(T element) {
 		final Node<T> newnode = new Node<T>( element );

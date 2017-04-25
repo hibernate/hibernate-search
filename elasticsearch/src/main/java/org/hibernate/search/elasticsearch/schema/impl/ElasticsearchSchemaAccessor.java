@@ -44,6 +44,9 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	/**
+	 * @param indexName The name of the index
+	 * @param settings The settings for the newly created index
+	 * @param executionOptions The execution options
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
 	public boolean createIndexIfAbsent(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {

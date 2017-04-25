@@ -52,28 +52,28 @@ public interface ElasticsearchAnalysisDefinitionRegistry {
 	void register(String name, CharFilterDefinition definition);
 
 	/**
-	 * @param name
+	 * @param name An analyzer name
 	 * @return The analyzer definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */
 	AnalyzerDefinition getAnalyzerDefinition(String name);
 
 	/**
-	 * @param name
+	 * @param name A tokenizer name
 	 * @return The tokenizer definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */
 	TokenizerDefinition getTokenizerDefinition(String name);
 
 	/**
-	 * @param name
+	 * @param name A token filter name
 	 * @return The token filter definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */
 	TokenFilterDefinition getTokenFilterDefinition(String name);
 
 	/**
-	 * @param name
+	 * @param name A char filter name
 	 * @return The char filter definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */

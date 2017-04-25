@@ -55,6 +55,8 @@ public final class ScheduledCommitPolicy extends AbstractCommitPolicy {
 
 	/**
 	 * Exposed as public method for tests only
+	 *
+	 * @return The executor used by this policy, newly created if necessary.
 	 */
 	public synchronized ScheduledExecutorService getScheduledExecutorService() {
 		if ( scheduledExecutorService == null ) {

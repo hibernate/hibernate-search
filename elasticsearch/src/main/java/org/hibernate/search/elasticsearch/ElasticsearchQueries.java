@@ -50,6 +50,9 @@ public class ElasticsearchQueries {
 	 * <p>
 	 * See the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html">
 	 * official documentation</a> for the complete payload syntax.
+	 *
+	 * @param payload The JSON payload as a String
+	 * @return A query descriptor that can be used to create a query.
 	 */
 	public static QueryDescriptor fromJson(String payload) {
 		JsonObject payloadAsJsonObject;
@@ -81,6 +84,9 @@ public class ElasticsearchQueries {
 	 * <p>
 	 * See the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">
 	 * official documentation</a> for the query syntax.
+	 *
+	 * @param queryStringQuery A query string conforming to the "query string" syntax.
+	 * @return A query descriptor that can be used to create a query.
 	 */
 	public static QueryDescriptor fromQueryString(String queryStringQuery) {
 		// Payload looks like so:

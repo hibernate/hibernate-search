@@ -81,6 +81,7 @@ public class PropertyMetadata implements PartialPropertyMetadata {
 	}
 
 	/**
+	 * @return A newly created list containing this property's field metadata.
 	 * @deprecated use getFieldMetadataSet() instead
 	 */
 	@Deprecated
