@@ -47,7 +47,7 @@
                 <!-- hibernate-search-orm -->
                 <include>org.hibernate:hibernate-core</include>
                 <include>dom4j:dom4j</include>
-                <include>javassist:javassist</include>
+                <include>org.javassist:javassist</include>
             </includes>
             <excludes>
                 <exclude>org.jboss:jandex</exclude>
