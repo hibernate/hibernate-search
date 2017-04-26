@@ -19,6 +19,7 @@
 
     <name>Hibernate Search Distribution</name>
     <description>Builds the distribution bundles</description>
+    <packaging>pom</packaging>
 
     <properties>
         <!-- Skip artifact deployment -->
