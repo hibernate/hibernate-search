@@ -39,11 +39,6 @@
             <artifactId>hibernate-search-orm</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-testing</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <!-- test -->
         <dependency>
