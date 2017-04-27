@@ -113,6 +113,11 @@ public interface Statistics {
 	 * @return a map of all indexed entities and their document count. The map key is the fqc of the entity and
 	 *         the map value is the document count.
 	 */
+	/*
+	 * Implementation note: this method is not prefixed with "get" so as
+	 * not to be considered as a JMX attribute,
+	 * which will in particular prevent clients from calling it without explicit action.
+	 */
 	Map<String, Integer> indexedEntitiesCount();
 
 	/**
@@ -129,6 +134,11 @@ public interface Statistics {
 	 * @return a map of all index names and the size of the corresponding index, in bytes.
 	 *         The map key is the index name (which may differ from the entity name, depending
 	 *         on configuration settings).
+	 */
+	/*
+	 * Implementation note: this method is not prefixed with "get" so as
+	 * not to be considered as a JMX attribute,
+	 * which will in particular prevent clients from calling it without explicit action.
 	 */
 	Map<String, Long> indexSizes();
 }
