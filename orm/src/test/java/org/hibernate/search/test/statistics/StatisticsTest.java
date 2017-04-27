@@ -38,13 +38,31 @@ import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 
 /**
  * @author Yoann Rodiere
  */
 @Category(ElasticsearchSupportInProgress.class) // HSEARCH-2421 Support statistics with Elasticsearch
+@RunWith( Parameterized.class )
 public class StatisticsTest extends SearchTestBase {
+
+	@Parameters(name = "Directory provider {0}")
+	public static Object[] data() {
+		return new Object[] {
+			"ram",
+			"filesystem" // Mainly to test getIndexSize()
+		};
+	}
+
+	private final String directoryProviderName;
+
+	public StatisticsTest(String directoryProviderName) {
+		this.directoryProviderName = directoryProviderName;
+	}
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
@@ -54,6 +72,7 @@ public class StatisticsTest extends SearchTestBase {
 	@Override
 	public void configure(java.util.Map<String,Object> settings) {
 		settings.put( Environment.GENERATE_STATS, Boolean.TRUE.toString() );
+		settings.put( "hibernate.search.default.directory_provider", directoryProviderName );
 	}
 
 	@After
@@ -250,6 +269,59 @@ public class StatisticsTest extends SearchTestBase {
 		}
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2014")
+	public void indexSize() {
+		long currentSizeForA = getStatistics().getIndexSize( A.INDEX_NAME );
+		long currentSizeForB = getStatistics().getIndexSize( B.INDEX_NAME );
+		// Don't assume anything about the size of an empty index; it may not be 0
+
+		Map<String, Long> indexSizes = getStatistics().indexSizes();
+		assertEquals( 2, indexSizes.size() );
+		assertEquals( (Long) currentSizeForA, indexSizes.get( A.INDEX_NAME ) );
+		assertEquals( (Long) currentSizeForB, indexSizes.get( B.INDEX_NAME ) );
+
+		try (Session s = openSession()) {
+			A entity = new A();
+			entity.id = 1L;
+			Transaction tx = s.beginTransaction();
+			s.persist( entity );
+			tx.commit();
+		}
+
+		long previousSizeForA = currentSizeForA;
+		long previousSizeForB = currentSizeForB;
+		currentSizeForA = getStatistics().getIndexSize( A.INDEX_NAME );
+		currentSizeForB = getStatistics().getIndexSize( B.INDEX_NAME );
+		assertTrue( currentSizeForA > previousSizeForA );
+		assertEquals( previousSizeForB, currentSizeForB );
+
+		indexSizes = getStatistics().indexSizes();
+		assertEquals( 2, indexSizes.size() );
+		assertEquals( (Long) currentSizeForA, indexSizes.get( A.INDEX_NAME ) );
+		assertEquals( (Long) currentSizeForB, indexSizes.get( B.INDEX_NAME ) );
+
+		try (Session s = openSession()) {
+			A entity = new A();
+			entity.id = 2L;
+			Transaction tx = s.beginTransaction();
+			s.persist( entity );
+			tx.commit();
+		}
+
+		previousSizeForA = currentSizeForA;
+		previousSizeForB = currentSizeForB;
+		currentSizeForA = getStatistics().getIndexSize( A.INDEX_NAME );
+		currentSizeForB = getStatistics().getIndexSize( B.INDEX_NAME );
+		assertTrue( currentSizeForA > previousSizeForA );
+		assertEquals( previousSizeForB, currentSizeForB );
+
+		indexSizes = getStatistics().indexSizes();
+		assertEquals( 2, indexSizes.size() );
+		assertEquals( (Long) currentSizeForA, indexSizes.get( A.INDEX_NAME ) );
+		assertEquals( (Long) currentSizeForB, indexSizes.get( B.INDEX_NAME ) );
+	}
+
 	private Statistics getStatistics() {
 		return getSearchFactory().getStatistics();
 	}
@@ -261,6 +333,8 @@ public class StatisticsTest extends SearchTestBase {
 	@Entity
 	@Indexed
 	private static class A {
+		public static final String INDEX_NAME = A.class.getName();
+
 		@Id
 		private Long id;
 
@@ -269,8 +343,10 @@ public class StatisticsTest extends SearchTestBase {
 	}
 
 	@Entity
-	@Indexed
+	@Indexed(index = B.INDEX_NAME)
 	private static class B {
+		public static final String INDEX_NAME = "B";
+
 		@Id
 		private Long id;
 

@@ -207,6 +207,16 @@ public final class JMXRegistrar {
 		public Map<String, Integer> indexedEntitiesCount() {
 			return delegate.indexedEntitiesCount();
 		}
+
+		@Override
+		public long getIndexSize(String indexName) {
+			return delegate.getIndexSize( indexName );
+		}
+
+		@Override
+		public Map<String, Long> indexSizes() {
+			return delegate.indexSizes();
+		}
 	}
 
 	/**

@@ -114,4 +114,21 @@ public interface Statistics {
 	 *         the map value is the document count.
 	 */
 	Map<String, Integer> indexedEntitiesCount();
+
+	/**
+	 * Returns the size of the index with the given name, in bytes.
+	 *
+	 * @param indexName the index name (which may differ from the entity name,
+	 *         depending on configuration settings)
+	 * @return the size of the given index, in bytes
+	 * @throws java.lang.IllegalArgumentException in case the index name is not valid
+	 */
+	long getIndexSize(String indexName);
+
+	/**
+	 * @return a map of all index names and the size of the corresponding index, in bytes.
+	 *         The map key is the index name (which may differ from the entity name, depending
+	 *         on configuration settings).
+	 */
+	Map<String, Long> indexSizes();
 }

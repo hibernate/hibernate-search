@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.stat.impl;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -24,9 +26,11 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-
+import org.apache.lucene.store.Directory;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
@@ -246,6 +250,49 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );
 		}
 		return clazz;
+	}
+
+	@Override
+	public long getIndexSize(String indexName) {
+		IndexManager indexManager = extendedIntegrator.getIndexManager( indexName );
+		if ( indexManager == null ) {
+			throw new IllegalArgumentException( "'" + indexName + "' is not a known index" );
+		}
+		return getIndexSize( indexManager );
+	}
+
+	@Override
+	public Map<String, Long> indexSizes() {
+		return extendedIntegrator.getIndexManagerHolder().getIndexManagers().stream()
+				.collect( Collectors.toMap( IndexManager::getIndexName, this::getIndexSize ) );
+	}
+
+	private long getIndexSize(IndexManager indexManager) {
+		if ( !( indexManager instanceof DirectoryBasedIndexManager ) ) {
+			throw new IllegalArgumentException( "Index '" + indexManager.getIndexName()
+					+ "' is not a Lucene index" );
+		}
+
+		DirectoryBasedIndexManager directoryBasedIndexManager = (DirectoryBasedIndexManager) indexManager;
+		Directory directory = directoryBasedIndexManager.getDirectoryProvider().getDirectory();
+
+		long totalSize = 0l;
+		try {
+			for ( String fileName : directory.listAll() ) {
+				try {
+					totalSize += directory.fileLength( fileName );
+				}
+				catch (FileNotFoundException ignored) {
+					// Ignore: the file was probably removed since the call to listAll
+				}
+			}
+		}
+		catch (IOException e) {
+			throw new SearchException( "Unexpected exception while computing size of index '"
+					+ indexManager.getIndexName() + "'", e );
+		}
+
+		return totalSize;
 	}
 }
 
