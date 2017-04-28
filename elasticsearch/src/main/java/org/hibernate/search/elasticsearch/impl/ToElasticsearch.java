@@ -691,7 +691,6 @@ public class ToElasticsearch {
 	public static JsonObject fromLuceneFilter(Filter luceneFilter) {
 		if ( luceneFilter instanceof QueryWrapperFilter ) {
 			Query query = ( (QueryWrapperFilter) luceneFilter ).getQuery();
-			query.setBoost( luceneFilter.getBoost() * query.getBoost() );
 			return fromLuceneQuery( query );
 		}
 		else if ( luceneFilter instanceof DistanceFilter ) {
