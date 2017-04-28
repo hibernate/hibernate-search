@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * <p>
  * Factory methods currently are used to instantiate the following classes:
  * <ul>
- * <li>{@link org.apache.lucene.search.Filter}; The factory class is to be given via {@link FullTextFilterDef#impl()}</li>
+ * <li>{@link org.apache.lucene.search.Query}; The factory class is to be given via {@link FullTextFilterDef#impl()}</li>
  * <li>{@link org.hibernate.search.cfg.SearchMapping}; The factory class is to be registered with the bootstrapping
  * configuration using the {@link org.hibernate.search.cfg.Environment#MODEL_MAPPING} key</li>
  * </ul>
