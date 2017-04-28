@@ -32,18 +32,18 @@ public @interface FullTextFilterDef {
 	String name();
 
 	/**
-	 * The implementation of this filter definition. May be
+	 * The implementation of this filter definition. May be:
 	 * <ul>
-	 * <li>a class implementing {@link org.apache.lucene.search.Filter} or</li>
+	 * <li>a class implementing {@link org.apache.lucene.search.Query} or</li>
 	 * <li>a filter factory class, defining a method annotated with {@link Factory} which has no parameters and returns
-	 * a {@code Filter} instance.</li>
+	 * a {@code Query} instance.</li>
 	 * </ul>
 	 * The given class must define a no-args constructor and a JavaBeans setter method for each parameter to be passed
 	 * via {@link org.hibernate.search.filter.FullTextFilter#setParameter(String, Object)}.
 	 * <p>
 	 * The Lucene filter created by this filter definition must be thread-safe.
 	 *
-	 * @return A class implementing {@code Filter} or a filter factory class
+	 * @return A class implementing {@code Query} or a factory class
 	 */
 	Class<?> impl();
 
