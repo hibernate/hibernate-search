@@ -8,6 +8,8 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.builder.GetIndexSettingsWorkBuilder;
@@ -18,7 +20,7 @@ import com.google.gson.JsonObject;
 
 public class GetIndexSettingsWork extends SimpleElasticsearchWork<IndexSettings> {
 
-	private final String indexName;
+	private final URLEncodedString indexName;
 
 	protected GetIndexSettingsWork(Builder builder) {
 		super( builder );
@@ -28,7 +30,7 @@ public class GetIndexSettingsWork extends SimpleElasticsearchWork<IndexSettings>
 	@Override
 	protected IndexSettings generateResult(ElasticsearchWorkExecutionContext context,
 			Response response, JsonObject parsedResponseBody) {
-		JsonElement index = parsedResponseBody.get( indexName );
+		JsonElement index = parsedResponseBody.get( indexName.original );
 		if ( index == null || !index.isJsonObject() ) {
 			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + parsedResponseBody );
 		}
@@ -52,9 +54,9 @@ public class GetIndexSettingsWork extends SimpleElasticsearchWork<IndexSettings>
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements GetIndexSettingsWorkBuilder {
-		private final String indexName;
+		private final URLEncodedString indexName;
 
-		public Builder(String indexName) {
+		public Builder(URLEncodedString indexName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 		}
@@ -64,7 +66,7 @@ public class GetIndexSettingsWork extends SimpleElasticsearchWork<IndexSettings>
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
 					.pathComponent( indexName )
-					.pathComponent( "_settings" );
+					.pathComponent( Paths._SETTINGS );
 			return builder.build();
 		}
 

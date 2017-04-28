@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.processor.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.exception.AssertionFailure;
@@ -45,7 +46,7 @@ class ParallelWorkExecutionContext implements ElasticsearchWorkExecutionContext 
 	}
 
 	@Override
-	public void setIndexDirty(String indexName) {
+	public void setIndexDirty(URLEncodedString indexName) {
 		throw new AssertionFailure( "Unexpected dirty index with a default context."
 				+ " Works that may alter index content should be executed"
 				+ " through the BackendRequestProcessor, using an appropriate context." );

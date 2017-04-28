@@ -21,6 +21,7 @@ import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchBridgeDefinedField;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchAsNullNullMarkerCodec;
@@ -64,7 +65,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	@Override
-	public IndexMetadata translate(String indexName, Collection<EntityIndexBinding> descriptors, ExecutionOptions executionOptions) {
+	public IndexMetadata translate(URLEncodedString indexName, Collection<EntityIndexBinding> descriptors, ExecutionOptions executionOptions) {
 		IndexMetadata indexMetadata = new IndexMetadata();
 
 		indexMetadata.setName( indexName );

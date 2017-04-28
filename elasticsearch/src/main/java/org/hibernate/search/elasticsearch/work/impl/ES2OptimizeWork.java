@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.OptimizeWorkBuilder;
 
 import com.google.gson.JsonObject;
@@ -38,14 +40,14 @@ public class ES2OptimizeWork extends SimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements OptimizeWorkBuilder {
-		private List<String> indexNames = new ArrayList<>();
+		private final Set<URLEncodedString> indexNames = new HashSet<>();
 
 		public Builder() {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 		}
 
 		@Override
-		public Builder index(String indexName) {
+		public Builder index(URLEncodedString indexName) {
 			this.indexNames.add( indexName );
 			return this;
 		}
@@ -59,7 +61,7 @@ public class ES2OptimizeWork extends SimpleElasticsearchWork<Void> {
 				builder.multiValuedPathComponent( indexNames );
 			}
 
-			builder.pathComponent( "_optimize" );
+			builder.pathComponent( Paths._OPTIMIZE );
 
 			return builder.build();
 		}

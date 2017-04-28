@@ -6,17 +6,11 @@
  */
 package org.hibernate.search.elasticsearch.client.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.util.StringHelper;
 
 import com.google.gson.JsonObject;
 
@@ -87,19 +81,24 @@ public final class ElasticsearchRequest {
 			this.method = method;
 		}
 
-		public Builder pathComponent(String pathComponent) {
-			try {
-				String encodedPathComponent = URLEncoder.encode( pathComponent, StandardCharsets.UTF_8.name() );
-				pathBuilder.append( encodedPathComponent ).append( PATH_SEPARATOR );
-			}
-			catch (UnsupportedEncodingException e) {
-				throw new AssertionFailure( "Unexpected error retrieving the UTF-8 charset", e );
-			}
+		public Builder pathComponent(URLEncodedString pathComponent) {
+			pathBuilder.append( pathComponent.encoded ).append( PATH_SEPARATOR );
 			return this;
 		}
 
-		public Builder multiValuedPathComponent(Iterable<String> indexNames) {
-			return pathComponent( StringHelper.join( indexNames, "," ) );
+		public Builder multiValuedPathComponent(Iterable<URLEncodedString> indexNames) {
+			boolean first = true;
+			for ( URLEncodedString name : indexNames ) {
+				if ( !first ) {
+					pathBuilder.append( ',' );
+				}
+				else {
+					first = false;
+				}
+				pathBuilder.append( name.encoded );
+			}
+			pathBuilder.append( PATH_SEPARATOR );
+			return this;
 		}
 
 		public Builder param(String name, String value) {

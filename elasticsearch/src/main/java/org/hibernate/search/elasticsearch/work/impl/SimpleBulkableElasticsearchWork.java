@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.List;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.exception.AssertionFailure;
 
 import com.google.gson.JsonObject;
@@ -69,7 +70,7 @@ public abstract class SimpleBulkableElasticsearchWork<R>
 	protected abstract static class Builder<B>
 			extends SimpleElasticsearchWork.Builder<B> {
 
-		public Builder(String dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
+		public Builder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
 			super( dirtiedIndexName, resultAssessor );
 		}
 

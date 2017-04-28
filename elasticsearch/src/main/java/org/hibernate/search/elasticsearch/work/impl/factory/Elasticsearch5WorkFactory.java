@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl.factory;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.work.impl.ES5DeleteByQueryWork;
 import org.hibernate.search.elasticsearch.work.impl.ES5FlushWork;
@@ -36,7 +37,7 @@ public class Elasticsearch5WorkFactory extends Elasticsearch2WorkFactory {
 	}
 
 	@Override
-	public DeleteByQueryWorkBuilder deleteByQuery(String indexName, JsonObject payload) {
+	public DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
 		return new ES5DeleteByQueryWork.Builder( indexName, payload );
 	}
 

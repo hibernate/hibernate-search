@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
@@ -50,16 +52,16 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 				.getIndexBinding( entityType )
 				.getIndexManagers();
 
-		List<String> indexNames = new ArrayList<>( indexManagers.length );
+		List<URLEncodedString> indexNames = new ArrayList<>( indexManagers.length );
 
 		for ( IndexManager indexManager : indexManagers ) {
-			indexNames.add( ( (ElasticsearchIndexManager)indexManager ).getActualIndexName() );
+			indexNames.add( URLEncodedString.fromString( ( (ElasticsearchIndexManager)indexManager ).getActualIndexName() ) );
 		}
 
 		try ( ServiceReference<ElasticsearchService> esService =
 				serviceManager.requestReference( ElasticsearchService.class ) ) {
 			CountWork work = new CountWork.Builder( indexNames )
-					.type( entityType.getName() )
+					.type( URLEncodedString.fromString( entityType.getName() ) )
 					.build();
 			return esService.get().getWorkProcessor().executeSyncUnsafe( work );
 		}
@@ -112,20 +114,20 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 		private static class Builder extends SimpleElasticsearchWork.Builder<Builder> {
 
-			private final List<String> indexNames = new ArrayList<>();
-			private final List<String> typeNames = new ArrayList<>();
+			private final List<URLEncodedString> indexNames = new ArrayList<>();
+			private final List<URLEncodedString> typeNames = new ArrayList<>();
 			private JsonObject query;
 
-			public Builder(String indexName) {
+			public Builder(URLEncodedString indexName) {
 				this( Collections.singletonList( indexName ) );
 			}
 
-			public Builder(Collection<String> indexNames) {
+			public Builder(Collection<URLEncodedString> indexNames) {
 				super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 				this.indexNames.addAll( indexNames );
 			}
 
-			public Builder type(String type) {
+			public Builder type(URLEncodedString type) {
 				this.typeNames.add( type );
 				return this;
 			}
@@ -145,7 +147,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 					builder.multiValuedPathComponent( typeNames );
 				}
 
-				builder.pathComponent( "_count" );
+				builder.pathComponent( Paths._COUNT );
 
 				if ( query != null ) {
 					builder.body( query );

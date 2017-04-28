@@ -26,6 +26,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaCreator;
@@ -78,7 +79,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	 * The index name for the Elasticsearch module, i.e. the
 	 * actual name of the underlying Elasticsearch index.
 	 */
-	private String actualIndexName;
+	private URLEncodedString actualIndexName;
 
 	private boolean refreshAfterWrite;
 	private boolean sync;
@@ -421,7 +422,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 
 	@Override
 	public String getActualIndexName() {
-		return actualIndexName;
+		return actualIndexName.original;
 	}
 
 	public boolean needsRefreshAfterWrite() {

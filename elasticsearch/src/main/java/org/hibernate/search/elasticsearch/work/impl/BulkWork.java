@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 import org.elasticsearch.client.Response;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
@@ -180,7 +182,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		}
 
 		@Override
-		public void setIndexDirty(String indexName) {
+		public void setIndexDirty(URLEncodedString indexName) {
 			// Don't delegate
 		}
 	}
@@ -202,7 +204,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( "_bulk" )
+					.pathComponent( Paths._BULK )
 					.param( "refresh", refreshInBulkAPICall );
 
 			for ( BulkableElasticsearchWork<?> work : bulkableWorks ) {

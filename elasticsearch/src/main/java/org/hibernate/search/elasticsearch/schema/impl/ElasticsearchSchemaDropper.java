@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -22,7 +23,7 @@ public interface ElasticsearchSchemaDropper {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void drop(String indexName, ExecutionOptions executionOptions);
+	void drop(URLEncodedString indexName, ExecutionOptions executionOptions);
 
 	/**
 	 * Drops an index, throwing an exception if dropping fails.
@@ -33,6 +34,6 @@ public interface ElasticsearchSchemaDropper {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void dropIfExisting(String indexName, ExecutionOptions executionOptions);
+	void dropIfExisting(URLEncodedString indexName, ExecutionOptions executionOptions);
 
 }

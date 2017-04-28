@@ -8,6 +8,8 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.ExplainWorkBuilder;
 
 import com.google.gson.JsonObject;
@@ -30,12 +32,12 @@ public class ExplainWork extends SimpleElasticsearchWork<ExplainResult> {
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements ExplainWorkBuilder {
-		private final String indexName;
-		private final String typeName;
-		private final String id;
+		private final URLEncodedString indexName;
+		private final URLEncodedString typeName;
+		private final URLEncodedString id;
 		private final JsonObject payload;
 
-		public Builder(String indexName, String typeName, String id, JsonObject payload) {
+		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
@@ -50,7 +52,7 @@ public class ExplainWork extends SimpleElasticsearchWork<ExplainResult> {
 					.pathComponent( indexName )
 					.pathComponent( typeName )
 					.pathComponent( id )
-					.pathComponent( "_explain" )
+					.pathComponent( Paths._EXPLAIN )
 					.body( payload );
 			return builder.build();
 		}

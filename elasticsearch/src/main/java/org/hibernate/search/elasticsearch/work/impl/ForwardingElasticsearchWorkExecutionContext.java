@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 
 
@@ -34,7 +35,7 @@ public class ForwardingElasticsearchWorkExecutionContext implements Elasticsearc
 	}
 
 	@Override
-	public void setIndexDirty(String indexName) {
+	public void setIndexDirty(URLEncodedString indexName) {
 		delegate.setIndexDirty( indexName );
 	}
 

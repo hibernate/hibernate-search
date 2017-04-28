@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.work.impl.builder;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 
 /**
@@ -13,6 +14,6 @@ import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
  */
 public interface OptimizeWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>>, TranslatedLuceneWorkBuilder<OptimizeWorkBuilder> {
 
-	OptimizeWorkBuilder index(String indexName);
+	OptimizeWorkBuilder index(URLEncodedString indexName);
 
 }

@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
@@ -50,7 +51,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 	 */
 	private final Map<IndexingMonitor, BufferedIndexingMonitor> bufferedIndexMonitors = new HashMap<>();
 
-	private final Set<String> dirtyIndexes = new HashSet<>();
+	private final Set<URLEncodedString> dirtyIndexes = new HashSet<>();
 
 	public SequentialWorkExecutionContext(ElasticsearchClient client,
 			GsonProvider gsonProvider, ElasticsearchWorkFactory workFactory,
@@ -75,7 +76,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 	}
 
 	@Override
-	public void setIndexDirty(String indexName) {
+	public void setIndexDirty(URLEncodedString indexName) {
 		dirtyIndexes.add( indexName );
 	}
 
@@ -109,7 +110,7 @@ class SequentialWorkExecutionContext implements ElasticsearchWorkExecutionContex
 		}
 
 		RefreshWorkBuilder builder = workFactory.refresh();
-		for ( String index : dirtyIndexes ) {
+		for ( URLEncodedString index : dirtyIndexes ) {
 			builder.index( index );
 		}
 		ElasticsearchWork<?> work = builder.build();

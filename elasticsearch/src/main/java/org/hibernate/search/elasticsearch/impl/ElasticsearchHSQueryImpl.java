@@ -38,6 +38,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.filter.ElasticsearchFilter;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
@@ -208,9 +209,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				.build();
 
 		ElasticsearchWork<ExplainResult> work = searcher.elasticsearchService.getWorkFactory().explain(
-				hit.get( "_index" ).getAsString(),
-				hit.get( "_type" ).getAsString(),
-				hit.get( "_id" ).getAsString(),
+				URLEncodedString.fromJSon( hit.get( "_index" ) ),
+				URLEncodedString.fromJSon( hit.get( "_type" ) ),
+				URLEncodedString.fromJSon( hit.get( "_id" ) ),
 				explainPayload )
 				.build();
 
@@ -299,7 +300,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 		ElasticsearchService elasticsearchService = null;
 		Map<String, EntityIndexBinding> targetedEntityBindingsByName = buildTargetedEntityIndexBindingsByName();
-		Set<String> indexNames = new HashSet<>();
+		Set<URLEncodedString> indexNames = new HashSet<>();
 
 		for ( Map.Entry<String, EntityIndexBinding> entry: targetedEntityBindingsByName.entrySet() ) {
 			EntityIndexBinding binding = entry.getValue();
@@ -315,7 +316,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 
 				ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
-				indexNames.add( esIndexManager.getActualIndexName() );
+				indexNames.add( URLEncodedString.fromString( esIndexManager.getActualIndexName() ) );
 				if ( elasticsearchService == null ) {
 					elasticsearchService = esIndexManager.getElasticsearchService();
 				}
@@ -343,7 +344,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	private class IndexSearcher {
 		private final ElasticsearchService elasticsearchService;
 		private final Map<String, EntityIndexBinding> targetedEntityBindingsByName;
-		private final Set<String> indexNames;
+		private final Set<URLEncodedString> indexNames;
 
 		private final ElasticsearchQueryOptions queryOptions;
 		private final Map<EntityIndexBinding, FieldProjection> idProjectionByEntityBinding = new HashMap<>();
@@ -352,7 +353,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		private final JsonObject payload;
 
 		private IndexSearcher(ElasticsearchService elasticsearchService,
-				Map<String, EntityIndexBinding> targetedEntityBindingsByName, Set<String> indexNames) {
+				Map<String, EntityIndexBinding> targetedEntityBindingsByName, Set<URLEncodedString> indexNames) {
 			this.elasticsearchService = elasticsearchService;
 			this.targetedEntityBindingsByName = targetedEntityBindingsByName;
 			this.indexNames = indexNames;

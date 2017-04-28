@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.schema.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
@@ -36,7 +37,7 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 
 	@Override
 	public void migrate(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
-		String indexName = indexMetadata.getName();
+		URLEncodedString indexName = indexMetadata.getName();
 		IndexSettings settings = indexMetadata.getSettings();
 
 		try {
@@ -64,7 +65,7 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 			}
 
 			for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
-				String mappingName = entry.getKey();
+				URLEncodedString mappingName = URLEncodedString.fromString( entry.getKey() );
 				TypeMapping mapping = entry.getValue();
 
 				// Elasticsearch itself takes care of the actual merging
@@ -75,6 +76,5 @@ public class DefaultElasticsearchSchemaMigrator implements ElasticsearchSchemaMi
 			throw LOG.schemaUpdateFailed( indexName, e );
 		}
 	}
-
 
 }

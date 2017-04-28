@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteByQueryWorkBuilder;
 
 import com.google.gson.JsonObject;
@@ -34,18 +36,18 @@ public class ES5DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements DeleteByQueryWorkBuilder {
-		private final String indexName;
+		private final URLEncodedString indexName;
 		private final JsonObject payload;
-		private List<String> typeNames = new ArrayList<>();
+		private final Set<URLEncodedString> typeNames = new HashSet<>();
 
-		public Builder(String indexName, JsonObject payload) {
+		public Builder(URLEncodedString indexName, JsonObject payload) {
 			super( indexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.payload = payload;
 		}
 
 		@Override
-		public Builder type(String typeName) {
+		public Builder type(URLEncodedString typeName) {
 			typeNames.add( typeName );
 			return this;
 		}
@@ -60,7 +62,7 @@ public class ES5DeleteByQueryWork extends SimpleElasticsearchWork<Void> {
 				builder.multiValuedPathComponent( typeNames );
 			}
 
-			builder.pathComponent( "_delete_by_query" )
+			builder.pathComponent( Paths._DELETE_BY_QUERY )
 					.body( payload );
 
 			return builder.build();

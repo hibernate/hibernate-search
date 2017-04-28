@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import java.util.Map;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
@@ -38,7 +39,7 @@ public class ElasticsearchSchemaAccessor {
 		this.workProcessor = workProcessor;
 	}
 
-	public void createIndex(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {
+	public void createIndex(URLEncodedString indexName, IndexSettings settings, ExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.createIndex( indexName ).settings( settings ).build();
 		workProcessor.executeSyncUnsafe( work );
 	}
@@ -49,7 +50,7 @@ public class ElasticsearchSchemaAccessor {
 	 * @param executionOptions The execution options
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
-	public boolean createIndexIfAbsent(String indexName, IndexSettings settings, ExecutionOptions executionOptions) {
+	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings, ExecutionOptions executionOptions) {
 		ElasticsearchWork<CreateIndexResult> work = workFactory.createIndex( indexName )
 				.settings( settings )
 				.ignoreExisting()
@@ -58,12 +59,12 @@ public class ElasticsearchSchemaAccessor {
 		return CreateIndexResult.CREATED.equals( result );
 	}
 
-	public boolean indexExists(String indexName) {
+	public boolean indexExists(URLEncodedString indexName) {
 		ElasticsearchWork<Boolean> work = workFactory.indexExists( indexName ).build();
 		return workProcessor.executeSyncUnsafe( work );
 	}
 
-	public IndexMetadata getCurrentIndexMetadata(String indexName) {
+	public IndexMetadata getCurrentIndexMetadata(URLEncodedString indexName) {
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setName( indexName );
 
@@ -88,7 +89,7 @@ public class ElasticsearchSchemaAccessor {
 		return indexMetadata;
 	}
 
-	public void updateSettings(String indexName, IndexSettings settings) {
+	public void updateSettings(URLEncodedString indexName, IndexSettings settings) {
 		ElasticsearchWork<?> work = workFactory.putIndexSettings( indexName, settings ).build();
 
 		try {
@@ -99,7 +100,7 @@ public class ElasticsearchSchemaAccessor {
 		}
 	}
 
-	public void putMapping(String indexName, String mappingName, TypeMapping mapping) {
+	public void putMapping(URLEncodedString indexName, URLEncodedString mappingName, TypeMapping mapping) {
 		ElasticsearchWork<?> work = workFactory.putIndexTypeMapping( indexName, mappingName, mapping ).build();
 
 		try {
@@ -110,7 +111,7 @@ public class ElasticsearchSchemaAccessor {
 		}
 	}
 
-	public void waitForIndexStatus(final String indexName, ExecutionOptions executionOptions) {
+	public void waitForIndexStatus(final URLEncodedString indexName, ExecutionOptions executionOptions) {
 		ElasticsearchIndexStatus requiredIndexStatus = executionOptions.getRequiredIndexStatus();
 		String timeoutAndUnit = executionOptions.getIndexManagementTimeoutInMs() + "ms";
 
@@ -121,18 +122,18 @@ public class ElasticsearchSchemaAccessor {
 		workProcessor.executeSyncUnsafe( work );
 	}
 
-	public void dropIndex(String indexName, ExecutionOptions executionOptions) {
+	public void dropIndex(URLEncodedString indexName, ExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).build();
 		workProcessor.executeSyncUnsafe( work );
 	}
 
-	public void closeIndex(String indexName) {
+	public void closeIndex(URLEncodedString indexName) {
 		ElasticsearchWork<?> work = workFactory.closeIndex( indexName ).build();
 		workProcessor.executeSyncUnsafe( work );
 		LOG.closedIndex( indexName );
 	}
 
-	public void openIndex(String indexName) {
+	public void openIndex(URLEncodedString indexName) {
 		try {
 			ElasticsearchWork<?> work = workFactory.openIndex( indexName ).build();
 			workProcessor.executeSyncUnsafe( work );

@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 
 /**
@@ -19,7 +20,7 @@ public interface ElasticsearchWorkExecutionContext {
 
 	GsonProvider getGsonProvider();
 
-	void setIndexDirty(String indexName);
+	void setIndexDirty(URLEncodedString indexName);
 
 	IndexingMonitor getBufferedIndexingMonitor(IndexingMonitor indexingMonitor);
 

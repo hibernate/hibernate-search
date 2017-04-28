@@ -8,6 +8,8 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.builder.PutIndexSettingsWorkBuilder;
@@ -32,12 +34,12 @@ public class PutIndexSettingsWork extends SimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements PutIndexSettingsWorkBuilder {
-		private final String indexName;
+		private final URLEncodedString indexName;
 		private final JsonObject payload;
 
 		public Builder(
 				GsonProvider gsonProvider,
-				String indexName, IndexSettings settings) {
+				URLEncodedString indexName, IndexSettings settings) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			/*
@@ -53,7 +55,7 @@ public class PutIndexSettingsWork extends SimpleElasticsearchWork<Void> {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.put()
 					.pathComponent( indexName )
-					.pathComponent( "_settings" )
+					.pathComponent( Paths._SETTINGS )
 					.body( payload );
 			return builder.build();
 		}

@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.schema.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
@@ -31,7 +32,7 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 
 	@Override
 	public void createIndex(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
-		String indexName = indexMetadata.getName();
+		URLEncodedString indexName = indexMetadata.getName();
 
 		schemaAccessor.createIndex( indexName, indexMetadata.getSettings(), executionOptions );
 
@@ -40,7 +41,7 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 
 	@Override
 	public boolean createIndexIfAbsent(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
-		String indexName = indexMetadata.getName();
+		URLEncodedString indexName = indexMetadata.getName();
 
 		boolean created = false;
 
@@ -54,7 +55,7 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 	}
 
 	@Override
-	public void checkIndexExists(String indexName, ExecutionOptions executionOptions) {
+	public void checkIndexExists(URLEncodedString indexName, ExecutionOptions executionOptions) {
 		if ( schemaAccessor.indexExists( indexName ) ) {
 			schemaAccessor.waitForIndexStatus( indexName, executionOptions );
 		}
@@ -65,12 +66,11 @@ public class DefaultElasticsearchSchemaCreator implements ElasticsearchSchemaCre
 
 	@Override
 	public void createMappings(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
-		String indexName = indexMetadata.getName();
+		URLEncodedString indexName = indexMetadata.getName();
 
 		for ( Map.Entry<String, TypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
-			String mappingName = entry.getKey();
+			URLEncodedString mappingName = URLEncodedString.fromString( entry.getKey() );
 			TypeMapping mapping = entry.getValue();
-
 			schemaAccessor.putMapping( indexName, mappingName, mapping );
 		}
 	}
