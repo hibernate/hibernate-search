@@ -44,7 +44,7 @@ import org.junit.Test;
  *
  * @author Guillaume Smet
  */
-public class ToElasticsearchDSLIT extends SearchTestBase {
+public class ToElasticsearchIT extends SearchTestBase {
 
 	@Before
 	public void setupTestData() {
@@ -63,7 +63,7 @@ public class ToElasticsearchDSLIT extends SearchTestBase {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testDSLPhraseQueryWithoutAnalyzer() {
+	public void testPhraseQueryWithoutAnalyzer() {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
 
