@@ -36,7 +36,7 @@ public class ElasticsearchIndexNameConflictIT extends SearchInitializationTestBa
 		thrown.expectMessage( "HSEARCH000326" );
 		thrown.expectMessage( "MYFIRSTENTITY" );
 		thrown.expectMessage( "myfirstentity" );
-		thrown.expectMessage( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( "myfirstentity" ) );
+		thrown.expectMessage( ElasticsearchIndexNameNormalizer.getElasticsearchIndexName( "myfirstentity" ).original );
 
 		init( MyFirstEntityUpperCase.class, MyfirstEntityLowerCase.class );
 	}

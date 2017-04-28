@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl.builder;
 
 import java.util.Collection;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.elasticsearch.work.impl.SearchResult;
 
@@ -16,7 +17,7 @@ import org.hibernate.search.elasticsearch.work.impl.SearchResult;
  */
 public interface SearchWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<SearchResult>> {
 
-	SearchWorkBuilder indexes(Collection<String> indexNames);
+	SearchWorkBuilder indexes(Collection<URLEncodedString> indexNames);
 
 	SearchWorkBuilder paging(int firstResult, int size);
 

@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.IndexExistsWorkBuilder;
 
@@ -34,9 +35,9 @@ public class IndexExistsWork extends SimpleElasticsearchWork<Boolean> {
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements IndexExistsWorkBuilder {
-		private final String indexName;
+		private final URLEncodedString indexName;
 
-		public Builder(String indexName) {
+		public Builder(URLEncodedString indexName) {
 			super( null, RESULT_ASSESSOR );
 			this.indexName = indexName;
 		}

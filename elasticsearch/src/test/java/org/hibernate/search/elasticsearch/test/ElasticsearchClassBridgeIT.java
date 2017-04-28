@@ -18,6 +18,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
@@ -146,7 +147,7 @@ public class ElasticsearchClassBridgeIT extends SearchTestBase {
 		// Add an additional field to the ES mapping, unknown to Hibernate Search
 		elasticsearchClient.index( "golfplayer" ).type( GolfPlayer.class )
 				.putMapping( "{'properties': {'fieldNotInMapping': {'type':'integer'}}}" )
-				.index( "9999", "{'id':9999,'fieldNotInMapping':42}" );
+				.index( URLEncodedString.fromString( "9999" ), "{'id':9999,'fieldNotInMapping':42}" );
 
 		Session s = openSession();
 		FullTextSession session = Search.getFullTextSession( s );

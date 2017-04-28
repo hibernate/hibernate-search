@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.DropIndexWorkBuilder;
 
 import com.google.gson.JsonObject;
@@ -29,9 +30,9 @@ public class DropIndexWork extends SimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements DropIndexWorkBuilder {
-		private final String indexName;
+		private final URLEncodedString indexName;
 
-		public Builder(String indexName) {
+		public Builder(URLEncodedString indexName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 		}

@@ -8,6 +8,8 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.work.impl.builder.PutIndexMappingWorkBuilder;
@@ -32,13 +34,13 @@ public class PutIndexTypeMappingWork extends SimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements PutIndexMappingWorkBuilder {
-		private final String indexName;
-		private final String typeName;
+		private final URLEncodedString indexName;
+		private final URLEncodedString typeName;
 		private final JsonObject payload;
 
 		public Builder(
 				GsonProvider gsonProvider,
-				String indexName, String typeName, TypeMapping typeMapping) {
+				URLEncodedString indexName, URLEncodedString typeName, TypeMapping typeMapping) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
@@ -56,7 +58,7 @@ public class PutIndexTypeMappingWork extends SimpleElasticsearchWork<Void> {
 					ElasticsearchRequest.put()
 					.pathComponent( indexName )
 					.pathComponent( typeName )
-					.pathComponent( "_mapping" )
+					.pathComponent( Paths._MAPPING )
 					.body( payload );
 			return builder.build();
 		}

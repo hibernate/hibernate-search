@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.ScrollWorkBuilder;
 
@@ -43,8 +44,8 @@ public class ScrollWork extends SimpleElasticsearchWork<SearchResult> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( "_search" )
-					.pathComponent( "scroll" )
+					.pathComponent( Paths._SEARCH )
+					.pathComponent( Paths.SCROLL )
 					.body(JsonBuilder.object()
 							.addProperty( "scroll_id", scrollId )
 							.addProperty( "scroll", scrollTimeout )

@@ -24,6 +24,7 @@ import org.hibernate.search.elasticsearch.client.impl.DefaultElasticsearchClient
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest.Builder;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -426,7 +427,8 @@ public class DefaultElasticsearchClientFactoryTest {
 	private ElasticsearchRequest buildRequest(Builder builder, String path, String payload) {
 		for ( String pathComponent : path.split( "/" ) ) {
 			if ( !pathComponent.isEmpty() ) {
-				builder = builder.pathComponent( pathComponent );
+				URLEncodedString fromString = URLEncodedString.fromString( pathComponent );
+				builder = builder.pathComponent( fromString );
 			}
 		}
 		if ( payload != null ) {

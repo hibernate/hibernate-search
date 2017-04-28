@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -22,12 +23,12 @@ public class DefaultElasticsearchSchemaDropper implements ElasticsearchSchemaDro
 	}
 
 	@Override
-	public void drop(String indexName, ExecutionOptions executionOptions) {
+	public void drop(URLEncodedString indexName, ExecutionOptions executionOptions) {
 		schemaAccessor.dropIndex( indexName, executionOptions );
 	}
 
 	@Override
-	public void dropIfExisting(String indexName, ExecutionOptions executionOptions) {
+	public void dropIfExisting(URLEncodedString indexName, ExecutionOptions executionOptions) {
 		// Not actually needed, but do it to avoid cluttering the ES log
 		if ( ! schemaAccessor.indexExists( indexName ) ) {
 			return;

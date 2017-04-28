@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.work.impl.factory;
 import java.util.List;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
@@ -71,17 +72,17 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public IndexWorkBuilder index(String indexName, String typeName, String id, JsonObject document) {
+	public IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject document) {
 		return new IndexWork.Builder( indexName, typeName, id, document );
 	}
 
 	@Override
-	public DeleteWorkBuilder delete(String indexName, String typeName, String id) {
+	public DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id) {
 		return new DeleteWork.Builder( indexName, typeName, id );
 	}
 
 	@Override
-	public DeleteByQueryWorkBuilder deleteByQuery(String indexName, JsonObject payload) {
+	public DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
 		return new ES2DeleteByQueryWork.Builder( indexName, payload );
 	}
 
@@ -111,7 +112,7 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ExplainWorkBuilder explain(String indexName, String typeName, String id, JsonObject payload) {
+	public ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload) {
 		return new ExplainWork.Builder( indexName, typeName, id, payload );
 	}
 
@@ -126,52 +127,52 @@ public class Elasticsearch2WorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public CreateIndexWorkBuilder createIndex(String indexName) {
+	public CreateIndexWorkBuilder createIndex(URLEncodedString indexName) {
 		return new CreateIndexWork.Builder( gsonProvider, indexName );
 	}
 
 	@Override
-	public DropIndexWorkBuilder dropIndex(String indexName) {
+	public DropIndexWorkBuilder dropIndex(URLEncodedString indexName) {
 		return new DropIndexWork.Builder( indexName );
 	}
 
 	@Override
-	public OpenIndexWorkBuilder openIndex(String indexName) {
+	public OpenIndexWorkBuilder openIndex(URLEncodedString indexName) {
 		return new OpenIndexWork.Builder( indexName );
 	}
 
 	@Override
-	public CloseIndexWorkBuilder closeIndex(String indexName) {
+	public CloseIndexWorkBuilder closeIndex(URLEncodedString indexName) {
 		return new CloseIndexWork.Builder( indexName );
 	}
 
 	@Override
-	public IndexExistsWorkBuilder indexExists(String indexName) {
+	public IndexExistsWorkBuilder indexExists(URLEncodedString indexName) {
 		return new IndexExistsWork.Builder( indexName );
 	}
 
 	@Override
-	public GetIndexSettingsWorkBuilder getIndexSettings(String indexName) {
+	public GetIndexSettingsWorkBuilder getIndexSettings(URLEncodedString indexName) {
 		return new GetIndexSettingsWork.Builder( indexName );
 	}
 
 	@Override
-	public PutIndexSettingsWorkBuilder putIndexSettings(String indexName, IndexSettings settings) {
+	public PutIndexSettingsWorkBuilder putIndexSettings(URLEncodedString indexName, IndexSettings settings) {
 		return new PutIndexSettingsWork.Builder( gsonProvider, indexName, settings );
 	}
 
 	@Override
-	public GetIndexTypeMappingsWorkBuilder getIndexTypeMappings(String indexName) {
+	public GetIndexTypeMappingsWorkBuilder getIndexTypeMappings(URLEncodedString indexName) {
 		return new GetIndexTypeMappingsWork.Builder( indexName );
 	}
 
 	@Override
-	public PutIndexMappingWorkBuilder putIndexTypeMapping(String indexName, String typeName, TypeMapping mapping) {
+	public PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName, TypeMapping mapping) {
 		return new PutIndexTypeMappingWork.Builder( gsonProvider, indexName, typeName, mapping );
 	}
 
 	@Override
-	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(String indexName, ElasticsearchIndexStatus requiredStatus, String timeout) {
+	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, ElasticsearchIndexStatus requiredStatus, String timeout) {
 		return new WaitForIndexStatusWork.Builder( indexName, requiredStatus, timeout );
 	}
 }

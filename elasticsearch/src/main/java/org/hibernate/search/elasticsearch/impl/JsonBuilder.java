@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.impl;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
 
 import com.google.gson.JsonArray;
@@ -123,6 +124,9 @@ public class JsonBuilder {
 			if ( value instanceof String || value == null ) {
 				jsonObject.addProperty( property, (String) value );
 			}
+			if ( value instanceof URLEncodedString ) {
+				addProperty( property, (URLEncodedString) value );
+			}
 			else if ( value instanceof Number ) {
 				jsonObject.addProperty( property, (Number) value );
 			}
@@ -158,6 +162,11 @@ public class JsonBuilder {
 
 		public JsonBuilder.Object addProperty(String property, String value) {
 			jsonObject.addProperty( property, value );
+			return this;
+		}
+
+		public JsonBuilder.Object addProperty(String property, URLEncodedString value) {
+			jsonObject.addProperty( property, value.original );
 			return this;
 		}
 

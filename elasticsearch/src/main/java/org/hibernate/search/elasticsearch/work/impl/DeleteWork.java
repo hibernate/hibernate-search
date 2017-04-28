@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.DeleteWorkBuilder;
 
@@ -33,11 +34,11 @@ public class DeleteWork extends SimpleBulkableElasticsearchWork<Void> {
 	public static class Builder
 			extends SimpleBulkableElasticsearchWork.Builder<Builder>
 			implements DeleteWorkBuilder {
-		private final String indexName;
-		private final String typeName;
-		private final String id;
+		private final URLEncodedString indexName;
+		private final URLEncodedString typeName;
+		private final URLEncodedString id;
 
-		public Builder(String indexName, String typeName, String id) {
+		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id) {
 			super( indexName, SUCCESS_ASSESSOR );
 			this.indexName = indexName;
 			this.typeName = typeName;

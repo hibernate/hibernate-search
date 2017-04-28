@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import org.elasticsearch.client.Response;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
@@ -30,7 +31,7 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 
 	protected final ElasticsearchRequest request;
 	private final LuceneWork luceneWork;
-	protected final String dirtiedIndexName;
+	protected final URLEncodedString dirtiedIndexName;
 	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
 	protected final boolean markIndexDirty;
 
@@ -116,13 +117,13 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 
 	@SuppressWarnings("unchecked") // By contract, subclasses must implement B
 	protected abstract static class Builder<B> {
-		protected final String dirtiedIndexName;
+		protected final URLEncodedString dirtiedIndexName;
 		protected ElasticsearchRequestSuccessAssessor resultAssessor;
 
 		protected LuceneWork luceneWork;
 		protected boolean markIndexDirty;
 
-		public Builder(String dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
+		public Builder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
 			this.dirtiedIndexName = dirtiedIndexName;
 			this.resultAssessor = resultAssessor;
 		}

@@ -126,7 +126,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 20,
 			value = "Could not create mapping for entity type %1$s"
 	)
-	SearchException elasticsearchMappingCreationFailed(String entityType, @Cause Exception cause);
+	SearchException elasticsearchMappingCreationFailed(Object entityType, @Cause Exception cause);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 21,
 			value = "Unexpected field type for field '%2$s': %1$s"
@@ -201,7 +201,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 35,
 			value = "Could not update mappings in index '%1$s'"
 	)
-	SearchException schemaUpdateFailed(String indexName, @Cause Exception cause);
+	SearchException schemaUpdateFailed(Object indexName, @Cause Exception cause);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 36,
 			value = "Mapping conflict detected for field '%2$s' on entity '%1$s'."
@@ -281,7 +281,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 50,
 			value = "The index '%1$s' does not exist in the Elasticsearch cluster." )
-	SearchException indexMissing(String indexName);
+	SearchException indexMissing(Object indexName);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 51,
 			value = "The given payload contains unsupported attributes: %1$s. Only 'query' is supported." )
@@ -368,7 +368,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 67,
 			value = "Could not update settings for index '%1$s'"
 	)
-	SearchException elasticsearchSettingsUpdateFailed(String indexName, @Cause Exception e);
+	SearchException elasticsearchSettingsUpdateFailed(Object indexName, @Cause Exception e);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 68,
 			value = "Could not retrieve the index settings from Elasticsearch for validation"
@@ -379,19 +379,19 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 69,
 			value = "Closed Elasticsearch index '%1$s' automatically."
 	)
-	void closedIndex(String indexName);
+	void closedIndex(Object indexName);
 
 	@LogMessage(level = Level.INFO)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 70,
 			value = "Opened Elasticsearch index '%1$s' automatically."
 	)
-	void openedIndex(String indexName);
+	void openedIndex(Object indexName);
 
 	@LogMessage(level = Level.ERROR)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 71,
 			value = "Failed to open Elasticsearch index '%1$s' ; see the stack trace below."
 	)
-	void failedToOpenIndex(String indexName);
+	void failedToOpenIndex(Object indexName);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 72,
 			value = "DeleteByQuery request to Elasticsearch failed with 404 result code."

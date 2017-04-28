@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.work.impl.factory;
 import java.util.List;
 
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 import org.hibernate.search.elasticsearch.work.impl.BulkableElasticsearchWork;
@@ -41,11 +42,11 @@ import com.google.gson.JsonObject;
  */
 public interface ElasticsearchWorkFactory {
 
-	IndexWorkBuilder index(String indexName, String typeName, String id, JsonObject document);
+	IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject document);
 
-	DeleteWorkBuilder delete(String indexName, String typeName, String id);
+	DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id);
 
-	DeleteByQueryWorkBuilder deleteByQuery(String indexName, JsonObject payload);
+	DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload);
 
 	FlushWorkBuilder flush();
 
@@ -57,30 +58,30 @@ public interface ElasticsearchWorkFactory {
 
 	SearchWorkBuilder search(JsonObject payload);
 
-	ExplainWorkBuilder explain(String indexName, String typeName, String id, JsonObject payload);
+	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload);
 
 	ScrollWorkBuilder scroll(String scrollId, String scrollTimeout);
 
 	ClearScrollWorkBuilder clearScroll(String scrollId);
 
-	CreateIndexWorkBuilder createIndex(String indexName);
+	CreateIndexWorkBuilder createIndex(URLEncodedString indexName);
 
-	DropIndexWorkBuilder dropIndex(String indexName);
+	DropIndexWorkBuilder dropIndex(URLEncodedString indexName);
 
-	OpenIndexWorkBuilder openIndex(String indexName);
+	OpenIndexWorkBuilder openIndex(URLEncodedString indexName);
 
-	CloseIndexWorkBuilder closeIndex(String indexName);
+	CloseIndexWorkBuilder closeIndex(URLEncodedString indexName);
 
-	IndexExistsWorkBuilder indexExists(String indexName);
+	IndexExistsWorkBuilder indexExists(URLEncodedString indexName);
 
-	GetIndexSettingsWorkBuilder getIndexSettings(String indexName);
+	GetIndexSettingsWorkBuilder getIndexSettings(URLEncodedString indexName);
 
-	PutIndexSettingsWorkBuilder putIndexSettings(String indexName, IndexSettings settings);
+	PutIndexSettingsWorkBuilder putIndexSettings(URLEncodedString indexName, IndexSettings settings);
 
-	GetIndexTypeMappingsWorkBuilder getIndexTypeMappings(String indexName);
+	GetIndexTypeMappingsWorkBuilder getIndexTypeMappings(URLEncodedString indexName);
 
-	PutIndexMappingWorkBuilder putIndexTypeMapping(String indexName, String typeName, TypeMapping mapping);
+	PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName, TypeMapping mapping);
 
-	WaitForIndexStatusWorkBuilder waitForIndexStatusWork(String indexName, ElasticsearchIndexStatus requiredStatus, String timeout);
+	WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, ElasticsearchIndexStatus requiredStatus, String timeout);
 
 }

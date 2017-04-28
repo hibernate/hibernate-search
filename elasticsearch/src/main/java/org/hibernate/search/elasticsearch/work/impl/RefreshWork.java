@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 
 import com.google.gson.JsonObject;
@@ -32,14 +34,14 @@ public class RefreshWork extends SimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements RefreshWorkBuilder {
-		private List<String> indexNames = new ArrayList<>();
+		private List<URLEncodedString> indexNames = new ArrayList<>();
 
 		public Builder() {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 		}
 
 		@Override
-		public Builder index(String indexName) {
+		public Builder index(URLEncodedString indexName) {
 			indexNames.add( indexName );
 			return this;
 		}
@@ -53,7 +55,7 @@ public class RefreshWork extends SimpleElasticsearchWork<Void> {
 				builder.multiValuedPathComponent( indexNames );
 			}
 
-			builder.pathComponent( "_refresh" );
+			builder.pathComponent( Paths._REFRESH );
 
 			return builder.build();
 		}

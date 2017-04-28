@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -56,7 +58,8 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements SearchWorkBuilder {
 		private final JsonObject payload;
-		private final List<String> indexes = new ArrayList<>();
+		private final Set<URLEncodedString> indexes = new HashSet<>();
+
 		private Integer from;
 		private Integer size;
 		private Integer scrollSize;
@@ -68,7 +71,7 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 		}
 
 		@Override
-		public Builder indexes(Collection<String> indexNames) {
+		public Builder indexes(Collection<URLEncodedString> indexNames) {
 			indexes.addAll( indexNames );
 			return this;
 		}
@@ -92,7 +95,7 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
 					.multiValuedPathComponent( indexes )
-					.pathComponent( "_search" )
+					.pathComponent( Paths._SEARCH )
 					.body( payload );
 
 			if ( from != null && size != null ) {

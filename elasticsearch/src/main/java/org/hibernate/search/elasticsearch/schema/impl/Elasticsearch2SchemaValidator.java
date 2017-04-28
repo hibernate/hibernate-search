@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.json.AnalysisJsonElementEquivalence;
 import org.hibernate.search.elasticsearch.schema.impl.json.AnalysisParameterEquivalenceRegistry;
@@ -123,11 +124,11 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 
 	@Override
 	public void validate(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
-		String indexName = expectedIndexMetadata.getName();
+		URLEncodedString indexName = expectedIndexMetadata.getName();
 		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
 
 		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
-		errorCollector.push( ValidationContextType.INDEX, indexName );
+		errorCollector.push( ValidationContextType.INDEX, indexName.original );
 		try {
 			validate( errorCollector, expectedIndexMetadata, actualIndexMetadata );
 		}
@@ -154,11 +155,11 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 
 	@Override
 	public boolean isSettingsValid(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
-		String indexName = expectedIndexMetadata.getName();
+		URLEncodedString indexName = expectedIndexMetadata.getName();
 		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
 
 		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
-		errorCollector.push( ValidationContextType.INDEX, indexName );
+		errorCollector.push( ValidationContextType.INDEX, indexName.original );
 		try {
 			validateIndexSettings( errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings() );
 		}

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.exception.SearchException;
 
@@ -42,7 +43,7 @@ public interface ElasticsearchSchemaCreator {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If the index doesn't exist, or if an error occurs.
 	 */
-	void checkIndexExists(String indexname, ExecutionOptions executionOptions);
+	void checkIndexExists(URLEncodedString indexname, ExecutionOptions executionOptions);
 
 	/**
 	 * Create mappings on a supposedly existing index.

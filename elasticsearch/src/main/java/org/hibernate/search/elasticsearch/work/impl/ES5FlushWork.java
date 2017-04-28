@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.Paths;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.FlushWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
@@ -49,8 +51,7 @@ public class ES5FlushWork extends SimpleElasticsearchWork<Void> {
 			extends SimpleElasticsearchWork.Builder<Builder>
 			implements FlushWorkBuilder {
 		private final RefreshWorkBuilder refreshWorkBuilder;
-
-		private List<String> indexNames = new ArrayList<>();
+		private final Set<URLEncodedString> indexNames = new HashSet<>();
 
 		public Builder(ElasticsearchWorkFactory workFactory) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -58,7 +59,7 @@ public class ES5FlushWork extends SimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public Builder index(String indexName) {
+		public Builder index(URLEncodedString indexName) {
 			this.indexNames.add( indexName );
 			this.refreshWorkBuilder.index( indexName );
 			return this;
@@ -73,7 +74,7 @@ public class ES5FlushWork extends SimpleElasticsearchWork<Void> {
 				builder.multiValuedPathComponent( indexNames );
 			}
 
-			builder.pathComponent( "_flush" );
+			builder.pathComponent( Paths._FLUSH );
 
 			return builder.build();
 		}

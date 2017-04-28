@@ -26,6 +26,7 @@ import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.gson.impl.JsonElementType;
 import org.hibernate.search.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
@@ -63,12 +64,12 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private final String indexName;
+	private final URLEncodedString indexName;
 	private final boolean refreshAfterWrite;
 	private final ExtendedSearchIntegrator searchIntegrator;
 	private final ElasticsearchWorkFactory workFactory;
 
-	public ElasticsearchIndexWorkVisitor(String indexName, boolean refreshAfterWrite,
+	public ElasticsearchIndexWorkVisitor(URLEncodedString indexName, boolean refreshAfterWrite,
 			ExtendedSearchIntegrator searchIntegrator, ElasticsearchWorkFactory workFactory) {
 		this.indexName = indexName;
 		this.refreshAfterWrite = refreshAfterWrite;
@@ -87,7 +88,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 	@Override
 	public ElasticsearchWork<?> visitDeleteWork(DeleteLuceneWork work, IndexingMonitor monitor) {
-		return workFactory.delete( indexName, work.getEntityClass().getName(), getDocumentId( work ) )
+		return workFactory.delete( indexName, entityName( work ), getDocumentId( work ) )
 				.luceneWork( work )
 				.markIndexDirty( refreshAfterWrite )
 				.build();
@@ -113,7 +114,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 
 		Set<Class<?>> typesToDelete = searchIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { work.getEntityClass() } );
 		for ( Class<?> typeToDelete : typesToDelete ) {
-			builder.type( typeToDelete.getName() );
+			builder.type( URLEncodedString.fromString( typeToDelete.getName() ) );
 		}
 
 		return builder.build();
@@ -142,7 +143,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 				searchIntegrator.getIndexBinding( work.getEntityClass() ).getDocumentBuilder(),
 				work.getDeletionQuery()
 		);
-		String typeName = work.getEntityClass().getName();
+		URLEncodedString typeName = URLEncodedString.fromString( work.getEntityClass().getName() );
 
 		JsonObject payload = createDeleteByQueryPayload( convertedQuery, work.getTenantId() );
 
@@ -177,10 +178,9 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 	}
 
 
-	private IndexWorkBuilder indexDocument(String id, Document document, Class<?> entityType) {
+	private IndexWorkBuilder indexDocument(URLEncodedString id, Document document, Class<?> entityType) {
 		JsonObject source = convertDocumentToJson( document, entityType );
-		String typeName = entityType.getName();
-
+		URLEncodedString typeName = URLEncodedString.fromString( entityType.getName() );
 		return workFactory.index( indexName, typeName, id, source );
 	}
 
@@ -355,11 +355,16 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 		}
 	}
 
-	private String getDocumentId(LuceneWork work) {
-		return work.getTenantId() == null ? work.getIdInString() : work.getTenantId() + "_" + work.getIdInString();
+	private URLEncodedString getDocumentId(LuceneWork work) {
+		return URLEncodedString.fromString( work.getTenantId() == null ? work.getIdInString() : work.getTenantId() + "_" + work.getIdInString() );
 	}
 
 	private boolean isDocValueField(IndexableField field) {
 		return field.fieldType().docValuesType() != DocValuesType.NONE;
 	}
+
+	private static URLEncodedString entityName(LuceneWork work) {
+		return URLEncodedString.fromString( work.getEntityClass().getName() );
+	}
+
 }
