@@ -16,7 +16,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
-import org.apache.lucene.search.CachingWrapperQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredQuery;
@@ -39,7 +38,7 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.filter.impl.CachingWrapperFilter;
+import org.hibernate.search.filter.impl.CachingWrapperQuery;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
@@ -245,6 +244,10 @@ public class ToElasticsearch {
 		}
 		else if ( query instanceof CachingWrapperQuery ) {
 			JsonObject result = fromLuceneQuery( ( (CachingWrapperQuery) query ).getQuery() );
+			return wrapBoostIfNecessary( result, query.getBoost() );
+		}
+		else if ( query instanceof org.apache.lucene.search.CachingWrapperQuery ) {
+			JsonObject result = fromLuceneQuery( ( (org.apache.lucene.search.CachingWrapperQuery) query ).getQuery() );
 			return wrapBoostIfNecessary( result, query.getBoost() );
 		}
 
@@ -717,13 +720,10 @@ public class ToElasticsearch {
 		else if ( luceneFilter instanceof SpatialHashFilter ) {
 			return convertSpatialHashFilter( (SpatialHashFilter) luceneFilter );
 		}
-		else if ( luceneFilter instanceof CachingWrapperFilter ) {
-			return fromLuceneFilter( ( (CachingWrapperFilter) luceneFilter ).getCachedFilter() );
-		}
 		else if ( luceneFilter instanceof org.apache.lucene.search.CachingWrapperFilter ) {
 			return fromLuceneFilter( ( (org.apache.lucene.search.CachingWrapperFilter) luceneFilter ).getFilter() );
 		}
-		throw LOG.cannotTransformLuceneFilterIntoEsQuery( luceneFilter );
+		throw LOG.cannotTransformLuceneQueryIntoEsQuery( luceneFilter );
 	}
 
 	/**
