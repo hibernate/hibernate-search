@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.elasticsearch.client.Response;
@@ -19,6 +20,7 @@ import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
@@ -104,8 +106,15 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 
 	@Override
 	public boolean isSuccess(ElasticsearchWorkExecutionContext context, JsonObject resultItem) {
+		if ( resultItem == null ) {
+			return false;
+		}
 		// Result items have the following format: { "actionName" : { "status" : 201, ... } }
-		JsonObject content = resultItem.entrySet().iterator().next().getValue().getAsJsonObject();
+		Entry<String, JsonElement> firstEntry = resultItem.entrySet().iterator().next();
+		if ( firstEntry == null ) {
+			return false;
+		}
+		JsonObject content = firstEntry.getValue().getAsJsonObject();
 		int statusCode = BULK_ITEM_STATUS_CODE.get( content ).getAsInt();
 		return ElasticsearchClientUtils.isSuccessCode( statusCode )
 			|| ignoredErrorStatuses.contains( statusCode )
