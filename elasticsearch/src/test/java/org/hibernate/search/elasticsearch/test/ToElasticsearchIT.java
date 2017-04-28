@@ -18,7 +18,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
+import org.apache.lucene.search.CachingWrapperQuery;
 import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -72,6 +77,74 @@ public class ToElasticsearchIT extends SearchTestBase {
 
 			String queryString = fullTextQuery.getQueryString();
 			assertJsonEquals( "{'query':{'prefix':{'message':{'value':'import'}}}}", queryString );
+
+			List<Letter> letters = fullTextQuery.list();
+
+			assertThat( letters ).hasSize( 1 );
+			assertThat( letters ).onProperty( "message" ).containsExactly( "Important letter" );
+		}
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testBoostQuery() {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+
+			TermQuery termQuery = new TermQuery( new Term( "message", "import" ) );
+			termQuery.setBoost( 3.0f );
+			BoostQuery testedQuery = new BoostQuery( termQuery, 2.0f );
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
+					testedQuery, Letter.class );
+
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'bool':{'must':{'term':{'message':{'value':'import','boost':3.0}}},'boost':2.0}}}", queryString );
+
+			List<Letter> letters = fullTextQuery.list();
+
+			assertThat( letters ).hasSize( 1 );
+			assertThat( letters ).onProperty( "message" ).containsExactly( "Important letter" );
+		}
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testCachingWrapperQueryWithBoost() {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+
+			TermQuery termQuery = new TermQuery( new Term( "message", "import" ) );
+			termQuery.setBoost( 3.0f );
+			CachingWrapperQuery testedQuery = new CachingWrapperQuery( termQuery );
+			testedQuery.setBoost( 2.0f );
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
+					testedQuery, Letter.class );
+
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'bool':{'must':{'term':{'message':{'value':'import','boost':3.0}}},'boost':2.0}}}", queryString );
+
+			List<Letter> letters = fullTextQuery.list();
+
+			assertThat( letters ).hasSize( 1 );
+			assertThat( letters ).onProperty( "message" ).containsExactly( "Important letter" );
+		}
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testBooleanQueryWithBoost() {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+
+			TermQuery termQuery = new TermQuery( new Term( "message", "import" ) );
+			termQuery.setBoost( 3.0f );
+			BooleanQuery testedQuery = new BooleanQuery.Builder().add( termQuery, Occur.SHOULD ).build();
+			testedQuery.setBoost( 2.0f );
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
+					testedQuery, Letter.class );
+
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'bool':{'should':{'term':{'message':{'value':'import','boost':3.0}}},'boost':2.0}}}", queryString );
 
 			List<Letter> letters = fullTextQuery.list();
 

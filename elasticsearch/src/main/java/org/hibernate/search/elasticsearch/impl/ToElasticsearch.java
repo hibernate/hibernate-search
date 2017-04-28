@@ -268,7 +268,7 @@ public class ToElasticsearch {
 			}
 		}
 
-		JsonObject clauses = new JsonObject();
+		JsonBuilder.Object clauses = JsonBuilder.object();
 
 		if ( musts.size() > 1 ) {
 			clauses.add( "must", musts );
@@ -298,8 +298,10 @@ public class ToElasticsearch {
 			clauses.add( "filter", filters.iterator().next() );
 		}
 
+		clauses.append( boostAppender( booleanQuery ) );
+
 		JsonObject bool = new JsonObject();
-		bool.add( "bool", clauses );
+		bool.add( "bool", clauses.build() );
 		return bool;
 	}
 
