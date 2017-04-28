@@ -29,7 +29,6 @@ import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
@@ -1141,8 +1140,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 	}
 
 	private JsonObject toJsonFilter(Object candidateFilter) {
-		if ( candidateFilter instanceof Filter ) {
-			return ToElasticsearch.fromLuceneFilter( (Filter) candidateFilter );
+		if ( candidateFilter instanceof Query ) {
+			// This also handles the case where the query extends Filter
+			return ToElasticsearch.fromLuceneQuery( (Query) candidateFilter );
 		}
 		else if ( candidateFilter instanceof ElasticsearchFilter ) {
 			return JSON_PARSER.parse( ( (ElasticsearchFilter) candidateFilter ).getJsonFilter() ).getAsJsonObject();
