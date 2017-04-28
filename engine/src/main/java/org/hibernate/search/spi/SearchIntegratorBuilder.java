@@ -62,7 +62,7 @@ import org.hibernate.search.engine.spi.SearchMappingHelper;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.filter.impl.CachingWrapperFilter;
+import org.hibernate.search.filter.impl.CachingWrapperQuery;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -258,7 +258,7 @@ public class SearchIntegratorBuilder {
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg ) );
 		factoryState.setCacheBitResultsSize(
 				ConfigurationParseHelper.getIntValue(
-						cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
+						cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperQuery.DEFAULT_SIZE
 				)
 		);
 	}

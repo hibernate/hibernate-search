@@ -18,7 +18,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.similarities.Similarity;
@@ -78,12 +77,8 @@ public final class LazyQueryState implements Closeable {
 		return fieldSortDoMaxScore;
 	}
 
-	public Explanation explain(int documentId) throws IOException {
-		return searcher.explain( rewrittenQuery(), documentId );
-	}
-
-	public Explanation explain(Query filteredQuery, int documentId) throws IOException {
-		return searcher.explain( filteredQuery, documentId );
+	public Explanation explain(QueryFilters filters, int documentId) throws IOException {
+		return searcher.explain( filters.filterOrPassthrough( rewrittenQuery() ), documentId );
 	}
 
 	public Document doc(final int docId) throws IOException {
@@ -99,10 +94,10 @@ public final class LazyQueryState implements Closeable {
 		return searcher.getIndexReader().maxDoc();
 	}
 
-	public void search(final Filter filter, final Collector collector) throws IOException {
+	public void search(final QueryFilters filters, final Collector collector) throws IOException {
 		validateQuery();
 		QUERY_LOG.executingLuceneQuery( userQuery );
-		searcher.search( rewrittenQuery(), filter, collector );
+		searcher.search( filters.filterOrPassthrough( rewrittenQuery() ), collector );
 	}
 
 	public IndexReader getIndexReader() {

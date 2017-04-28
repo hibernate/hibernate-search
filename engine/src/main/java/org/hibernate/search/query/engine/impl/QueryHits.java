@@ -35,7 +35,6 @@ import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -78,7 +77,7 @@ public class QueryHits {
 
 
 	private final LazyQueryState searcher;
-	private final Filter filter;
+	private final QueryFilters filters;
 	private final Sort sort;
 	private final Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata;
 	private final TimeoutManagerImpl timeoutManager;
@@ -95,7 +94,7 @@ public class QueryHits {
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 
 	public QueryHits(LazyQueryState searcher,
-			Filter filter,
+			QueryFilters filters,
 			Sort sort,
 			TimeoutManagerImpl timeoutManager,
 			Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata,
@@ -105,7 +104,7 @@ public class QueryHits {
 			throws IOException {
 		this(
 				searcher,
-				filter,
+				filters,
 				sort,
 				DEFAULT_TOP_DOC_RETRIEVAL_SIZE,
 				timeoutManager,
@@ -117,7 +116,7 @@ public class QueryHits {
 	}
 
 	public QueryHits(LazyQueryState searcher,
-			Filter filter,
+			QueryFilters filters,
 			Sort sort,
 			Integer n,
 			TimeoutManagerImpl timeoutManager,
@@ -128,7 +127,7 @@ public class QueryHits {
 			throws IOException {
 		this.timeoutManager = timeoutManager;
 		this.searcher = searcher;
-		this.filter = filter;
+		this.filters = filters;
 		this.sort = sort;
 		this.facetingRequestsAndMetadata = facetingRequestsAndMetadata;
 		this.timeoutExceptionFactory = timeoutExceptionFactory;
@@ -189,7 +188,7 @@ public class QueryHits {
 	}
 
 	public Explanation explain(int index) throws IOException {
-		final Explanation explanation = searcher.explain( docId( index ) );
+		final Explanation explanation = searcher.explain( filters, docId( index ) );
 		timeoutManager.isTimedOut();
 		return explanation;
 	}
@@ -239,7 +238,7 @@ public class QueryHits {
 		boolean timeoutNow = isImmediateTimeout();
 		if ( !timeoutNow ) {
 			try {
-				searcher.search( filter, collector );
+				searcher.search( filters, collector );
 			}
 			catch (TimeLimitingCollector.TimeExceededException e) {
 				//we have reached the time limit and stopped before the end

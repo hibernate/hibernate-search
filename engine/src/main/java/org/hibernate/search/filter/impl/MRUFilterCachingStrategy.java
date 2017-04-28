@@ -8,7 +8,7 @@ package org.hibernate.search.filter.impl;
 
 import java.util.Properties;
 
-import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.FilterKey;
@@ -40,12 +40,12 @@ public class MRUFilterCachingStrategy implements FilterCachingStrategy {
 	}
 
 	@Override
-	public Filter getCachedFilter(FilterKey key) {
-		return (Filter) cache.get( key );
+	public Query getCachedFilter(FilterKey key) {
+		return (Query) cache.get( key );
 	}
 
 	@Override
-	public void addCachedFilter(FilterKey key, Filter filter) {
+	public void addCachedFilter(FilterKey key, Query filter) {
 		cache.put( key, filter );
 	}
 }
