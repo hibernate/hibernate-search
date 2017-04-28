@@ -26,7 +26,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.similarities.Similarity;
@@ -45,8 +44,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.StandardFilterKey;
-import org.hibernate.search.filter.impl.CachingWrapperFilter;
-import org.hibernate.search.filter.impl.ChainedFilter;
+import org.hibernate.search.filter.impl.CachingWrapperQuery;
 import org.hibernate.search.filter.impl.DefaultFilterKey;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
@@ -86,11 +84,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	private Query luceneQuery;
 
 	private boolean allowFieldSelectionInProjection = true;
-
-	/**
-	 * Combined chained filter to be applied to the query.
-	 */
-	private Filter filter;
 
 	private transient Map<String, EntityIndexBinding> targetedEntityBindingsByName;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
@@ -250,9 +243,8 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			);
 		}
 		try {
-			org.apache.lucene.search.Query filteredQuery = filterQueryByTenantId( filterQueryByClasses( luceneQuery ) );
-			buildFilters();
-			explanation = searcher.explain( filteredQuery, documentId );
+			QueryFilters filters = createFilters();
+			explanation = searcher.explain( filters, documentId );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to query Lucene index and build explanation", e );
@@ -301,7 +293,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	 * @throws IOException in case there is an error executing the lucene search.
 	 */
 	private QueryHits getQueryHits(LazyQueryState searcher, Integer n) throws IOException {
-		buildFilters();
+		QueryFilters filters = createFilters();
 		QueryHits queryHits;
 
 		boolean stats = extendedIntegrator.getStatistics().isStatisticsEnabled();
@@ -317,7 +309,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
 			queryHits = new QueryHits(
 					searcher,
-					filter,
+					filters,
 					sort,
 					getTimeoutManager(),
 					facetingRequestsAndMetadata,
@@ -329,7 +321,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		else if ( 0 == n ) {
 			queryHits = new QueryHits(
 					searcher,
-					filter,
+					filters,
 					null,
 					0,
 					getTimeoutManager(),
@@ -342,7 +334,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		else {
 			queryHits = new QueryHits(
 					searcher,
-					filter,
+					filters,
 					sort,
 					n,
 					getTimeoutManager(),
@@ -624,38 +616,37 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		return fullTextFilters;
 	}
 
-	private void buildFilters() {
-		ChainedFilter chainedFilter = new ChainedFilter();
+	private QueryFilters createFilters() {
+		List<Query> filterQueries = new ArrayList<>();
 		if ( !filterDefinitions.isEmpty() ) {
 			for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
-				Filter filter = buildLuceneFilter( fullTextFilter );
+				Query filter = buildLuceneFilter( fullTextFilter );
 				if ( filter != null ) {
-					chainedFilter.addFilter( filter );
+					filterQueries.add( filter );
 				}
 			}
 		}
 
 		if ( userFilter != null ) {
-			chainedFilter.addFilter( userFilter );
+			filterQueries.add( userFilter );
 		}
 
-		if ( chainedFilter.isEmpty() ) {
-			filter = null;
+		if ( filterQueries.isEmpty() ) {
+			return QueryFilters.EMPTY_FILTERSET;
 		}
 		else {
-			filter = chainedFilter;
+			return new QueryFilters( filterQueries );
 		}
 	}
 
 	/**
 	 * Builds a Lucene filter using the given <code>FullTextFilter</code>.
 	 *
-	 * @param fullTextFilter the Hibernate specific <code>FullTextFilter</code> used to create the
-	 * Lucene <code>Filter</code>.
-	 *
-	 * @return the Lucene filter mapped to the filter definition
+	 * @param fullTextFilter the Hibernate Search specific <code>FullTextFilter</code>,
+	 * referencing the filter to use and providing parameters
+	 * @return the filter, as a Lucene <code>Query</code>.
 	 */
-	private Filter buildLuceneFilter(FullTextFilterImpl fullTextFilter) {
+	private Query buildLuceneFilter(FullTextFilterImpl fullTextFilter) {
 
 		/*
 		 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
@@ -670,14 +661,15 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 		if ( !cacheInstance( def.getCacheMode() ) ) {
 			Object filterOrFactory = createFilterInstance( fullTextFilter, def );
-			return createFilter( def, filterOrFactory );
+			return createFilterQuery( def, filterOrFactory );
 		}
 		else {
 			return createOrGetLuceneFilterFromCache( fullTextFilter, def );
 		}
 	}
 
-	private Filter createOrGetLuceneFilterFromCache(FullTextFilterImpl fullTextFilter, FilterDef def) {
+	@SuppressWarnings("deprecation")
+	private Query createOrGetLuceneFilterFromCache(FullTextFilterImpl fullTextFilter, FilterDef def) {
 		// Avoiding the filter/factory instantiation, unless needed for key determination or actual filter creation
 		boolean hasCustomKey = def.getKeyMethod() != null;
 		Object filterOrFactory = hasCustomKey ? createFilterInstance( fullTextFilter, def ) : null;
@@ -685,21 +677,21 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		FilterKey key = createFilterKey( def, filterOrFactory, fullTextFilter );
 
 		// try to get the filter out of the cache
-		Filter filter = extendedIntegrator.getFilterCachingStrategy().getCachedFilter( key );
+		Query filterQuery = extendedIntegrator.getFilterCachingStrategy().getCachedFilter( key );
 
-		if ( filter == null ) {
-			filter = createFilter( def, hasCustomKey ? filterOrFactory : createFilterInstance( fullTextFilter, def ) );
-			extendedIntegrator.getFilterCachingStrategy().addCachedFilter( key, filter );
+		if ( filterQuery == null ) {
+			filterQuery = createFilterQuery( def, hasCustomKey ? filterOrFactory : createFilterInstance( fullTextFilter, def ) );
+			extendedIntegrator.getFilterCachingStrategy().addCachedFilter( key, filterQuery );
 		}
 
-		return filter;
+		return filterQuery;
 	}
 
-	private Filter createFilter(FilterDef def, Object filterOrFactory) {
-		Filter filter;
+	private Query createFilterQuery(FilterDef def, Object filterOrFactory) {
+		Query filterQuery;
 		if ( def.getFactoryMethod() != null ) {
 			try {
-				filter = (Filter) def.getFactoryMethod().invoke( filterOrFactory );
+				filterQuery = (Query) def.getFactoryMethod().invoke( filterOrFactory );
 			}
 			catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SearchException(
@@ -709,44 +701,43 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			}
 			catch (ClassCastException e) {
 				throw new SearchException(
-						"Factory method does not return a org.apache.lucene.search.Filter class: "
+						"Factory method does not return a org.apache.lucene.search.Query class: "
 								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
 				);
 			}
 		}
 		else {
 			try {
-				filter = (Filter) filterOrFactory;
+				filterQuery = (Query) filterOrFactory;
 			}
 			catch (ClassCastException e) {
 				throw new SearchException(
-						"Filter implementation does not implement the Filter interface: "
+						"Filter implementation does not extend the Query class: "
 								+ def.getImpl().getName() + ". "
 								+ ( def.getFactoryMethod() != null ? def.getFactoryMethod().getName() : "" ), e
 				);
 			}
 		}
 
-		filter = addCachingWrapperFilter( filter, def );
-		return filter;
+		return addCachingWrapper( filterQuery, def );
 	}
 
 	/**
-	 * Decides whether to wrap the given filter around a <code>CachingWrapperFilter<code>.
+	 * Decides whether to wrap the given filter around a <code>CachingWrapperQuery<code>.
 	 *
-	 * @param filter the filter which maybe gets wrapped.
+	 * @param filterQuery the filter query which maybe gets wrapped.
 	 * @param def The filter definition used to decide whether wrapping should occur or not.
 	 *
-	 * @return The original filter or wrapped filter depending on the information extracted from
+	 * @return The original filter query or wrapped filter query depending on the information extracted from
 	 *         <code>def</code>.
 	 */
-	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
+	private Query addCachingWrapper(Query filterQuery, FilterDef def) {
 		if ( cacheResults( def.getCacheMode() ) ) {
-			int cachingWrapperFilterSize = extendedIntegrator.getFilterCacheBitResultsSize();
-			filter = new CachingWrapperFilter( filter, cachingWrapperFilterSize );
+			int cacheSize = extendedIntegrator.getFilterCacheBitResultsSize();
+			filterQuery = new CachingWrapperQuery( filterQuery, cacheSize );
 		}
 
-		return filter;
+		return filterQuery;
 	}
 
 	private FilterKey createFilterKey(FilterDef def, Object filterOrFactory, FullTextFilterImpl fullTextFilter) {

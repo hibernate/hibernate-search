@@ -9,6 +9,8 @@ package org.hibernate.search.filter;
 import java.util.Properties;
 
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
 
 /**
  * Defines the caching filter strategy
@@ -30,13 +32,42 @@ public interface FilterCachingStrategy {
 	 * @param key the filter key
 	 * @return the cached filter or null if not cached
 	 */
-	Filter getCachedFilter(FilterKey key);
+	Query getCachedFilter(FilterKey key);
 
 	/**
 	 * Propose a candidate filter for caching
 	 *
 	 * @param key the filter key
 	 * @param filter the filter to cache
+	 *
+	 * @deprecated This method is not used by Hibernate Search anymore
+	 * and will be removed in a future version. Please implement
+	 * {@link #addCachedFilter(FilterKey, Query)} instead.
 	 */
-	void addCachedFilter(FilterKey key, Filter filter);
+	@Deprecated
+	default void addCachedFilter(FilterKey key, Filter filter) {
+		/*
+		 * No-op by default: we only leave this method for backward
+		 * compatibility with implementations created before we introduced
+		 * addCachedFilter(FilterKey, Query), but we don't want new implementations
+		 * to bother with implementing it.
+		 */
+	}
+
+	/**
+	 * Propose a candidate filter for caching.
+	 *
+	 * @param key the filter key
+	 * @param filter the filter to cache
+	 */
+	@SuppressWarnings("deprecation")
+	default void addCachedFilter(FilterKey key, Query filter) {
+		/*
+		 * Default implementation for backward compatibility with implementations
+		 * created before we introduced this method.
+		 * This default implementation should be removed when we remove
+		 * addCachedFilter(FilterKey, Filter).
+		 */
+		addCachedFilter( key, new QueryWrapperFilter( filter ) );
+	}
 }
