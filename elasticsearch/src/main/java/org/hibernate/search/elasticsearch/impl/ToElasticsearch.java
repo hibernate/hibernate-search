@@ -15,6 +15,8 @@ import java.util.Set;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
+import org.apache.lucene.search.CachingWrapperQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredQuery;
@@ -232,6 +234,14 @@ public class ToElasticsearch {
 		}
 		else if ( query instanceof PhraseQuery ) {
 			return convertPhraseQuery( (PhraseQuery) query );
+		}
+		else if ( query instanceof BoostQuery ) {
+			JsonObject result = fromLuceneQuery( ( (BoostQuery) query ).getQuery() );
+			return wrapBoostIfNecessary( result, query.getBoost() );
+		}
+		else if ( query instanceof CachingWrapperQuery ) {
+			JsonObject result = fromLuceneQuery( ( (CachingWrapperQuery) query ).getQuery() );
+			return wrapBoostIfNecessary( result, query.getBoost() );
 		}
 
 		throw LOG.cannotTransformLuceneQueryIntoEsQuery( query );
@@ -528,6 +538,20 @@ public class ToElasticsearch {
 				).build();
 
 		return constantScoreQuery;
+	}
+
+	private static JsonObject wrapBoostIfNecessary(JsonObject convertedQuery, float boost) {
+		if ( boost != DEFAULT_BOOST ) { // We actually want to use float equality here
+			return JsonBuilder.object()
+					.add( "bool",
+							JsonBuilder.object()
+									.add( "must", convertedQuery )
+									.addProperty( "boost", boost )
+					).build();
+		}
+		else {
+			return convertedQuery;
+		}
 	}
 
 	private static JsonObject convertFilteredQuery(FilteredQuery query) {
