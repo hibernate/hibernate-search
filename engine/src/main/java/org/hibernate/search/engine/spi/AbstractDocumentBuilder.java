@@ -28,6 +28,8 @@ import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -53,16 +55,17 @@ public abstract class AbstractDocumentBuilder {
 
 	protected EntityState entityState;
 
+
 	/**
 	 * Constructor.
-	 *
 	 * @param xClass The class for which to build a document builder
 	 * @param typeMetadata metadata for the specified class
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList keeps track of types on which we need to disable collection events optimizations
 	 * @param instanceInitializer a {@link org.hibernate.search.spi.InstanceInitializer} object.
 	 */
-	public AbstractDocumentBuilder(XClass xClass,
+	public AbstractDocumentBuilder(
+			XClass xClass,
 			TypeMetadata typeMetadata,
 			ReflectionManager reflectionManager,
 			Set<XClass> optimizationBlackList,
@@ -82,7 +85,7 @@ public abstract class AbstractDocumentBuilder {
 
 	public abstract void addWorkToQueue(
 			String tenantIdentifier,
-			Class<?> entityClass,
+			IndexedTypeIdentifier typeIdentifier,
 			Object entity, Serializable id,
 			boolean delete,
 			boolean add,
@@ -109,14 +112,26 @@ public abstract class AbstractDocumentBuilder {
 		return isRoot;
 	}
 
+	/**
+	 * @deprecated use {@link #getTypeMetadata()}
+	 */
+	@Deprecated
 	public Class<?> getBeanClass() {
 		return beanClass;
 	}
 
+	/**
+	 * @deprecated use {@link #getTypeMetadata()}
+	 */
+	@Deprecated
 	public XClass getBeanXClass() {
 		return beanXClass;
 	}
 
+	/**
+	 * @deprecated use {@link #getTypeMetadata()}
+	 */
+	@Deprecated
 	public TypeMetadata getMetadata() {
 		return typeMetadata;
 	}
@@ -133,7 +148,8 @@ public abstract class AbstractDocumentBuilder {
 		return mappedSubclasses;
 	}
 
-	public void postInitialize(Set<Class<?>> indexedClasses) {
+	public void postInitialize(IndexedTypeSet indexedClassesSet) {
+		Set<Class<?>> indexedClasses = indexedClassesSet.toPojosSet();
 		//we initialize only once because we no longer have a reference to the reflectionManager
 		//in theory
 		Class<?> plainClass = beanClass;

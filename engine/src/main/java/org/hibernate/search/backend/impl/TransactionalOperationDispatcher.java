@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -18,7 +17,9 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -29,7 +30,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Yoann Rodiere
  */
 public class TransactionalOperationDispatcher implements OperationDispatcher {
-	private final Function<Class<?>, EntityIndexBinding> bindingLookup;
+	private final Function<IndexedTypeIdentifier, EntityIndexBinding> bindingLookup;
 	private final IndexManagerHolder indexManagerHolder;
 	private final Predicate<IndexManager> indexManagerFilter;
 
@@ -43,12 +44,12 @@ public class TransactionalOperationDispatcher implements OperationDispatcher {
 	}
 
 	public TransactionalOperationDispatcher(IndexManagerHolder indexManagerHolder,
-			Map<Class<?>, EntityIndexBinding> bindings) {
+			IndexedTypeMap<EntityIndexBinding> bindings) {
 		this( indexManagerHolder, bindings::get, indexManager -> true );
 	}
 
 	private TransactionalOperationDispatcher(IndexManagerHolder indexManagerHolder,
-			Function<Class<?>, EntityIndexBinding> bindingLookup,
+			Function<IndexedTypeIdentifier, EntityIndexBinding> bindingLookup,
 			Predicate<IndexManager> indexManagerFilter) {
 		this.indexManagerHolder = indexManagerHolder;
 		this.bindingLookup = bindingLookup;
@@ -72,7 +73,7 @@ public class TransactionalOperationDispatcher implements OperationDispatcher {
 	}
 
 	private void appendWork(WorkQueuePerIndexSplitter context, LuceneWork work) {
-		final Class<?> entityType = work.getEntityClass();
+		final IndexedTypeIdentifier entityType = work.getEntityType();
 		EntityIndexBinding entityIndexBinding = bindingLookup.apply( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( TransactionalOperationExecutorSelector.INSTANCE, null );

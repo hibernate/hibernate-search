@@ -32,6 +32,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
@@ -85,7 +86,7 @@ public class IndexManagerHolder {
 	// (for both fieldCaches and cached filters)
 	public synchronized MutableEntityIndexBinding buildEntityIndexBinding(
 			XClass entity,
-			Class<?> mappedClass,
+			IndexedTypeIdentifier mappedClassId,
 			SearchConfiguration cfg,
 			WorkerBuildContext buildContext
 	) {
@@ -95,7 +96,7 @@ public class IndexManagerHolder {
 
 		EntityIndexingInterceptor<?> interceptor = createEntityIndexingInterceptor( entity );
 
-		return groupHolder.bind( mappedClass, interceptor, buildContext );
+		return groupHolder.bind( mappedClassId, interceptor, buildContext );
 	}
 
 	private synchronized IndexManagerGroupHolder getOrCreateGroupHolder(

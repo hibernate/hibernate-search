@@ -10,30 +10,29 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * @author Emmanuel Bernard
  */
 public class AddLuceneWork extends LuceneWork {
 
-	private static final long serialVersionUID = -2450349312813297371L;
-
 	private final Map<String, String> fieldToAnalyzerMap;
 
-	public AddLuceneWork(Serializable id, String idInString, Class<?> entity, Document document) {
-		this( null, id, idInString, entity, document, null );
+	public AddLuceneWork(Serializable id, String idInString, IndexedTypeIdentifier entityType, Document document) {
+		this( null, id, idInString, entityType, document, null );
 	}
 
-	public AddLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document) {
-		this( tenantId, id, idInString, entity, document, null );
+	public AddLuceneWork(String tenantId, Serializable id, String idInString, IndexedTypeIdentifier entityType, Document document) {
+		this( tenantId, id, idInString, entityType, document, null );
 	}
 
-	public AddLuceneWork(Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
-		this( null, id, idInString, entity, document, fieldToAnalyzerMap );
+	public AddLuceneWork(Serializable id, String idInString, IndexedTypeIdentifier entityType, Document document, Map<String, String> fieldToAnalyzerMap) {
+		this( null, id, idInString, entityType, document, fieldToAnalyzerMap );
 	}
 
-	public AddLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
-		super( tenantId, id, idInString, entity, document );
+	public AddLuceneWork(String tenantId, Serializable id, String idInString, IndexedTypeIdentifier entityType, Document document, Map<String, String> fieldToAnalyzerMap) {
+		super( tenantId, id, idInString, entityType, document );
 		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
 	}
 
@@ -50,7 +49,7 @@ public class AddLuceneWork extends LuceneWork {
 	@Override
 	public String toString() {
 		String tenant = getTenantId() == null ? "" : " [" + getTenantId() + "] ";
-		return "AddLuceneWork" + tenant + ": " + this.getEntityClass().getName() + "#" + this.getIdInString();
+		return "AddLuceneWork" + tenant + ": " + this.getEntityType().getName() + "#" + this.getIdInString();
 	}
 
 }

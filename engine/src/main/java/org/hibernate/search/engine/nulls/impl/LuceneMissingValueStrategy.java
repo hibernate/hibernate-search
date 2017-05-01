@@ -14,6 +14,7 @@ import org.hibernate.search.engine.nulls.codec.impl.LuceneIntegerNullMarkerCodec
 import org.hibernate.search.engine.nulls.codec.impl.LuceneLongNullMarkerCodec;
 import org.hibernate.search.engine.nulls.codec.impl.LuceneStringNullMarkerCodec;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class LuceneMissingValueStrategy implements MissingValueStrategy {
 	}
 
 	@Override
-	public NullMarkerCodec createNullMarkerCodec(Class<?> entityType,
+	public NullMarkerCodec createNullMarkerCodec(IndexedTypeIdentifier entityType,
 			PartialDocumentFieldMetadata fieldMetadata, NullMarker nullMarker) {
 		Object nullEncoded = nullMarker.nullEncoded();
 		if ( nullEncoded instanceof String ) {
@@ -50,7 +51,7 @@ public class LuceneMissingValueStrategy implements MissingValueStrategy {
 			return new LuceneDoubleNullMarkerCodec( nullMarker );
 		}
 		else {
-			throw LOG.unsupportedNullTokenType( entityType, fieldMetadata.getPath().getAbsoluteName(),
+			throw LOG.unsupportedNullTokenType( entityType.getName(), fieldMetadata.getPath().getAbsoluteName(),
 					nullEncoded.getClass() );
 		}
 	}

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.nesting.impl;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+
 /**
  * Always returns the no-op context.
  *
@@ -16,7 +18,8 @@ public class DefaultNestingContextFactory implements NestingContextFactory {
 	public static final NestingContextFactory INSTANCE = new DefaultNestingContextFactory();
 
 	@Override
-	public NestingContext createNestingContext(Class<?> indexedEntityType) {
+	public NestingContext createNestingContext(IndexedTypeIdentifier indexedEntityType) {
 		return NoOpNestingContext.INSTANCE;
 	}
+
 }

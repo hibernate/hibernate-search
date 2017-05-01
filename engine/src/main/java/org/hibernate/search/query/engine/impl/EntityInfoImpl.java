@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -24,9 +25,9 @@ public class EntityInfoImpl implements EntityInfo {
 	private static final Log log = LoggerFactory.make();
 
 	/**
-	 * The entity class.
+	 * The entity type.
 	 */
-	private final Class<?> clazz;
+	private final IndexedTypeIdentifier type;
 
 	/**
 	 * The document id.
@@ -50,23 +51,29 @@ public class EntityInfoImpl implements EntityInfo {
 	 */
 	private Object entityInstance;
 
-	public EntityInfoImpl(Class clazz, String idName, Serializable id, Object[] projection) {
-		this.clazz = clazz;
+	public EntityInfoImpl(IndexedTypeIdentifier type, String idName, Serializable id, Object[] projection) {
+		this.type = type;
 		this.idName = idName;
 		this.id = id;
 		this.projection = projection;
 	}
 
 	@Override
+	public IndexedTypeIdentifier getType() {
+		return type;
+	}
+
+	@Override
+	@Deprecated
 	public Class<?> getClazz() {
-		if ( clazz == null ) {
+		if ( type == null ) {
 			/*
 			 * Only throw an exception here, not in the constructor,
 			 * because in some cases we don't need the class at all (e.g. projections).
 			 */
-			throw log.incompleteEntityInfo( clazz, id );
+			throw log.incompleteEntityInfo( null, id );
 		}
-		return clazz;
+		return type.getPojoType();
 	}
 
 	@Override
@@ -76,7 +83,7 @@ public class EntityInfoImpl implements EntityInfo {
 			 * Only throw an exception here, not in the constructor,
 			 * because in some cases we don't need the identifier at all (e.g. projections).
 			 */
-			throw log.incompleteEntityInfo( clazz, id );
+			throw log.incompleteEntityInfo( type, id );
 		}
 		return id;
 	}
@@ -111,7 +118,8 @@ public class EntityInfoImpl implements EntityInfo {
 		return "EntityInfoImpl{" +
 				"idName='" + idName + '\'' +
 				", id=" + id +
-				", clazz=" + clazz +
+				", clazz=" + type +
 				'}';
 	}
+
 }

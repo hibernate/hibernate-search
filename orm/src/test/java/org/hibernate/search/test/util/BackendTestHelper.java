@@ -22,6 +22,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.test.TestResourceManager;
 
 /**
@@ -55,7 +56,7 @@ public abstract class BackendTestHelper {
 	/**
 	 * Returns the number of indexed documents for the given type.
 	 */
-	public abstract int getNumberOfDocumentsInIndex(Class<?> entityType);
+	public abstract int getNumberOfDocumentsInIndex(IndexedTypeIdentifier entityType);
 
 	/**
 	 * Returns the number of indexed documents for the given index.
@@ -76,7 +77,7 @@ public abstract class BackendTestHelper {
 			this.resourceManager = resourceManager;
 		}
 
-		public Directory getDirectory(Class<?> entityType) {
+		public Directory getDirectory(IndexedTypeIdentifier entityType) {
 			ExtendedSearchIntegrator integrator = resourceManager.getExtendedSearchIntegrator();
 			IndexManager[] indexManagers = integrator.getIndexBinding( entityType ).getIndexManagers();
 			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
@@ -84,7 +85,7 @@ public abstract class BackendTestHelper {
 		}
 
 		@Override
-		public int getNumberOfDocumentsInIndex(Class<?> entityType) {
+		public int getNumberOfDocumentsInIndex(IndexedTypeIdentifier entityType) {
 			try ( IndexReader reader = DirectoryReader.open( getDirectory( entityType ) ) ) {
 				return reader.numDocs();
 			}

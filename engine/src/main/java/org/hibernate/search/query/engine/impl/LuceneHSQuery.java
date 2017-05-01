@@ -53,6 +53,8 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.spi.CustomTypeMetadata;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -285,7 +287,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		for ( IndexManager indexManager : indexManagers ) {
 			if ( !( indexManager instanceof DirectoryBasedIndexManager ) ) {
 				throw log.cannotRunLuceneQueryTargetingEntityIndexedWithNonLuceneIndexManager(
-						binding.getDocumentBuilder().getBeanClass(),
+						binding.getDocumentBuilder().getTypeIdentifier(),
 						luceneQuery.toString()
 				);
 			}
@@ -438,11 +440,11 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
 		if ( indexedTargetedEntities.size() > 0 ) {
 			for ( IndexManager indexManager : targetedIndexes ) {
-				final Set<Class<?>> classesInIndexManager = indexManager.getContainedTypes();
+				final IndexedTypeSet classesInIndexManager = indexManager.getContainedTypes();
 				// if an IndexManager contains only one class, we know for sure it's part of classesAndSubclasses
 				if ( classesInIndexManager.size() > 1 ) {
 					//risk of needClassFilterClause
-					for ( Class<?> clazz : classesInIndexManager ) {
+					for ( IndexedTypeIdentifier clazz : classesInIndexManager ) {
 						if ( !targetedEntityBindingsByName.containsKey( clazz.getName() ) ) {
 							this.needClassFilterClause = true;
 							break;

@@ -8,7 +8,6 @@ package org.hibernate.search.indexes.spi;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
@@ -16,6 +15,8 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -92,7 +93,7 @@ public interface IndexManager {
 	/**
 	 * @return the set of classes being indexed in this manager
 	 */
-	Set<Class<?>> getContainedTypes();
+	IndexedTypeSet getContainedTypes();
 
 	/**
 	 * @return the {@code Similarity} applied to this index. Note, only a single {@code Similarity} can be applied to
@@ -116,9 +117,9 @@ public interface IndexManager {
 	void setSearchFactory(ExtendedSearchIntegrator boundSearchIntegrator);
 
 	/**
-	 * @param entity Adds the specified entity type to this index manager, making it responsible for manging this type.
+	 * @param entityType Adds the specified entity type to this index manager, making it responsible for manging this type.
 	 */
-	void addContainedEntity(Class<?> entity);
+	void addContainedEntity(IndexedTypeIdentifier entityType);
 
 	/**
 	 * To optimize the underlying index. Some implementations might ignore the request, if it doesn't apply to them.

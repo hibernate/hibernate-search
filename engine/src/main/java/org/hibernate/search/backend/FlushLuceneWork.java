@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Used to flush and commit asynchronous and other pending operations on the Indexes.
@@ -22,10 +23,10 @@ public class FlushLuceneWork extends LuceneWork {
 	 * Flushes all index operations for a specific entity.
 	 *
 	 * @param tenantId the tenant identifier. It might be null
-	 * @param entity the entity type for which to flush the index
+	 * @param typeIdentifier the entity type for which to flush the index
 	 */
-	public FlushLuceneWork(String tenantId, Class<?> entity) {
-		super( tenantId, null, null, entity );
+	public FlushLuceneWork(String tenantId, IndexedTypeIdentifier typeIdentifier) {
+		super( tenantId, null, null, typeIdentifier );
 	}
 
 	/**
@@ -42,12 +43,12 @@ public class FlushLuceneWork extends LuceneWork {
 
 	@Override
 	public String toString() {
-		Class entityClass = this.getEntityClass();
+		IndexedTypeIdentifier entityClass = this.getEntityType();
 		if ( entityClass == null ) {
 			return "FlushLuceneWork: global";
 		}
 		else {
-			return "FlushLuceneWork: " + this.getEntityClass().getName();
+			return "FlushLuceneWork: " + entityClass.getName();
 		}
 	}
 }

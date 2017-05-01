@@ -19,6 +19,7 @@ import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTransla
 import org.hibernate.search.engine.metadata.impl.PartialDocumentFieldMetadata;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 public final class ElasticsearchMissingValueStrategy implements MissingValueStrategy {
@@ -32,7 +33,7 @@ public final class ElasticsearchMissingValueStrategy implements MissingValueStra
 	}
 
 	@Override
-	public NullMarkerCodec createNullMarkerCodec(Class<?> entityType,
+	public NullMarkerCodec createNullMarkerCodec(IndexedTypeIdentifier entityType,
 			PartialDocumentFieldMetadata fieldMetadata, NullMarker nullMarker) {
 		Object nullEncoded = nullMarker.nullEncoded();
 		if ( nullEncoded instanceof String ) {
@@ -64,8 +65,10 @@ public final class ElasticsearchMissingValueStrategy implements MissingValueStra
 			return new ElasticsearchBooleanNullMarkerCodec( nullMarker );
 		}
 		else {
-			throw LOG.unsupportedNullTokenType( entityType, fieldMetadata.getPath().getRelativeName(),
+			throw LOG.unsupportedNullTokenType( entityType.getName(), fieldMetadata.getPath().getRelativeName(),
 					nullEncoded.getClass() );
 		}
 	}
+
 }
+

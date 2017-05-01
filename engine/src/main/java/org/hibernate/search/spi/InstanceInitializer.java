@@ -22,6 +22,12 @@ import org.hibernate.search.backend.spi.Work;
  */
 public interface InstanceInitializer {
 
+	/**
+	 * @deprecated Use {@link #getIndexedTypeIdFromWork(Work)}
+	 * @param work
+	 * @return
+	 */
+	@Deprecated
 	Class<?> getClassFromWork(Work work);
 
 	/**
@@ -57,5 +63,11 @@ public interface InstanceInitializer {
 	 * @return the initialized array, to be used on lazily-loading arrays
 	 */
 	Object[] initializeArray(Object[] value);
+
+	/**
+	 * @param work
+	 * @return the identification of the user type being indexed
+	 */
+	IndexedTypeIdentifier getIndexedTypeIdFromWork(Work work);
 
 }

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.query.engine.impl;
 
-import static java.util.stream.Collectors.toList;
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 import java.io.Serializable;
@@ -16,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
@@ -45,7 +45,11 @@ import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.spi.CustomTypeMetadata;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.IndexedTypeMap;
+import org.hibernate.search.spi.impl.IndexedTypesSets;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.CollectionHelper;
@@ -72,8 +76,8 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	protected transient TimeoutExceptionFactory timeoutExceptionFactory;
 	protected transient TimeoutManagerImpl timeoutManager;
 
-	protected List<Class<?>> targetedEntities;
-	protected Set<Class<?>> indexedTargetedEntities;
+	protected IndexedTypeSet targetedEntities;
+	protected IndexedTypeSet indexedTargetedEntities;
 	private List<CustomTypeMetadata> customTypeMetadata = Collections.emptyList();
 
 	protected Sort sort;
@@ -121,19 +125,18 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	}
 
 	@Override
-	public final HSQuery targetedEntities(List<Class<?>> classes) {
-		setTargetedEntities( classes == null ? new ArrayList<>( 0 ) : new ArrayList<Class<?>>( classes ) );
+	public final HSQuery targetedEntities(IndexedTypeSet types) {
+		setTargetedEntities( types == null ? IndexedTypesSets.empty() : types );
 		this.customTypeMetadata = Collections.emptyList();
 		return this;
 	}
 
-	private void setTargetedEntities(List<Class<?>> classes) {
+	private void setTargetedEntities(IndexedTypeSet queryTarget) {
 		clearCachedResults();
-		this.targetedEntities = classes;
-		final Class<?>[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
-		this.indexedTargetedEntities = extendedIntegrator.getIndexedTypesPolymorphic( classesAsArray );
+		this.targetedEntities = queryTarget;
+		this.indexedTargetedEntities = extendedIntegrator.getIndexedTypesPolymorphic( queryTarget );
 		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
-			Set<Class<?>> configuredTargetEntities = extendedIntegrator.getConfiguredTypesPolymorphic( classesAsArray );
+			IndexedTypeSet configuredTargetEntities = extendedIntegrator.getConfiguredTypesPolymorphic( queryTarget );
 			if ( configuredTargetEntities.isEmpty() ) {
 				throw LOG.targetedEntityTypesNotConfigured( StringHelper.join( targetedEntities, "," ) );
 			}
@@ -149,9 +152,10 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 			return targetedEntities( null );
 		}
 
-		List<Class<?>> entityTypes = types.stream()
-				.map( CustomTypeMetadata::getEntityType ).collect( toList() );
-		setTargetedEntities( entityTypes );
+		IndexedTypeSet typesSet = types.stream()
+				.map( CustomTypeMetadata::getEntityType )
+				.collect( IndexedTypesSets.streamCollector() );
+		setTargetedEntities( typesSet );
 		this.customTypeMetadata = new ArrayList<>( types );
 
 		return this;
@@ -159,7 +163,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 
 	protected final Optional<CustomTypeMetadata> getCustomTypeMetadata(Class<?> clazz) {
 		return customTypeMetadata.stream()
-				.filter( metadata -> metadata.getEntityType().isAssignableFrom( clazz ) )
+				.filter( metadata -> metadata.getEntityType().getPojoType().isAssignableFrom( clazz ) )
 				.findFirst();
 	}
 
@@ -268,7 +272,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	 * List of targeted entities as described by the user
 	 */
 	@Override
-	public List<Class<?>> getTargetedEntities() {
+	public IndexedTypeSet getTargetedEntities() {
 		return targetedEntities;
 	}
 
@@ -276,7 +280,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	 * Set of indexed entities corresponding to the class hierarchy of the targeted entities
 	 */
 	@Override
-	public Set<Class<?>> getIndexedTargetedEntities() {
+	public IndexedTypeSet getIndexedTargetedEntities() {
 		return indexedTargetedEntities;
 	}
 
@@ -392,7 +396,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	}
 
 	protected final Map<String, EntityIndexBinding> buildTargetedEntityIndexBindingsByName() {
-		Map<Class<?>, EntityIndexBinding> allIndexBindings = extendedIntegrator.getIndexBindings();
+		IndexedTypeMap<EntityIndexBinding> allIndexBindings = extendedIntegrator.getIndexBindings();
 		Map<String, EntityIndexBinding> queriedIndexBindingsByName;
 
 		if ( indexedTargetedEntities.size() == 0 ) {
@@ -402,18 +406,18 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 				throw LOG.queryWithNoIndexedType();
 			}
 			queriedIndexBindingsByName = CollectionHelper.newHashMap( allIndexBindings.size() );
-			for ( Map.Entry<Class<?>, EntityIndexBinding> entry : allIndexBindings.entrySet() ) {
+			for ( Entry<IndexedTypeIdentifier, EntityIndexBinding> entry : allIndexBindings.entrySet() ) {
 				queriedIndexBindingsByName.put( entry.getKey().getName(), entry.getValue() );
 			}
 		}
 		else {
 			queriedIndexBindingsByName = CollectionHelper.newHashMap( indexedTargetedEntities.size() );
-			for ( Class<?> clazz : indexedTargetedEntities ) {
-				EntityIndexBinding entityIndexBinding = allIndexBindings.get( clazz );
+			for ( IndexedTypeIdentifier type : indexedTargetedEntities ) {
+				EntityIndexBinding entityIndexBinding = allIndexBindings.get( type );
 				if ( entityIndexBinding == null ) {
-					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
+					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + type );
 				}
-				queriedIndexBindingsByName.put( clazz.getName(), entityIndexBinding );
+				queriedIndexBindingsByName.put( type.getName(), entityIndexBinding );
 				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
 				Set<Class<?>> mappedSubclasses = builder.getMappedSubclasses();
 				for ( Class<?> mappedSubclass : mappedSubclasses ) {

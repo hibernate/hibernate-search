@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -19,6 +20,7 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * A loader which loads objects of multiple types.
@@ -55,10 +57,10 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		// root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.size() == 0 ) {
 			//support all classes
-			for ( Map.Entry<Class<?>, EntityIndexBinding> entry : extendedIntegrator.getIndexBindings().entrySet() ) {
+			for ( Entry<IndexedTypeIdentifier, EntityIndexBinding> entry : extendedIntegrator.getIndexBindings().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().getDocumentBuilder().isRoot() ) {
-					safeEntityTypes.add( entry.getKey() );
+					safeEntityTypes.add( entry.getKey().getPojoType() );
 				}
 			}
 		}

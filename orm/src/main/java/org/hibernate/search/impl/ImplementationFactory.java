@@ -8,7 +8,7 @@ package org.hibernate.search.impl;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -35,7 +35,7 @@ public final class ImplementationFactory {
 		}
 	}
 
-	public static SearchFactory createSearchFactory(SearchIntegrator searchIntegrator) {
+	public static SearchFactory createSearchFactory(ExtendedSearchIntegrator searchIntegrator) {
 		return new SearchFactoryImpl( searchIntegrator );
 	}
 

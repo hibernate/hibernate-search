@@ -8,6 +8,9 @@ package org.hibernate.search.backend.spi;
 
 import java.io.Serializable;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
+
 /**
  * A unit of work. Only make sense inside the same session since it uses the scope principle.
  *
@@ -16,56 +19,77 @@ import java.io.Serializable;
  */
 public class Work {
 	private final Object entity;
-	private final Class<?> entityClass;
+	private final IndexedTypeIdentifier entityTypeId;
 	private final Serializable id;
 	private final WorkType type;
 	private final boolean identifierWasRolledBack;
 	private final String tenantIdentifier;
 
 	public Work(Object entity, Serializable id, WorkType type) {
-		this( null, entity, null, id, type, false );
+		this( null, entity, (IndexedTypeIdentifier) null, id, type, false );
 	}
 
 	public Work(Object entity, Serializable id, WorkType type, boolean identifierRollbackEnabled) {
-		this( null, entity, null, id, type, identifierRollbackEnabled );
+		this( null, entity, (IndexedTypeIdentifier) null, id, type, identifierRollbackEnabled );
 	}
 
+	@Deprecated
 	public Work(Class<?> entityType, Serializable id, WorkType type) {
 		this( null, null, entityType, id, type, false );
 	}
 
+	public Work(IndexedTypeIdentifier entityType, Serializable id, WorkType type) {
+		this( null, null, entityType, id, type, false );
+	}
+
 	public Work(Object entity, WorkType type) {
-		this( null, entity, null, null, type, false );
+		this( null, entity, (IndexedTypeIdentifier) null, null, type, false );
 	}
 
 	public Work(String tenantId, Object entity, Serializable id, WorkType type) {
-		this( tenantId, entity, null, id, type, false );
+		this( tenantId, entity, (IndexedTypeIdentifier) null, id, type, false );
 	}
 
 	public Work(String tenantId, Object entity, Serializable id, WorkType type, boolean identifierRollbackEnabled) {
-		this( tenantId, entity, null, id, type, identifierRollbackEnabled );
+		this( tenantId, entity, (IndexedTypeIdentifier) null, id, type, identifierRollbackEnabled );
 	}
 
+	@Deprecated
 	public Work(String tenantId, Class<?> entityType, Serializable id, WorkType type) {
 		this( tenantId, null, entityType, id, type, false );
 	}
 
-	public Work(String tenantId, Object entity, WorkType type) {
-		this( tenantId, entity, null, null, type, false );
+	public Work(String tenantId, IndexedTypeIdentifier entityType, Serializable id, WorkType type) {
+		this( tenantId, null, entityType, id, type, false );
 	}
 
-	private Work(String tenantId, Object entity, Class<?> entityClass, Serializable id,
-			WorkType type, boolean identifierWasRolledBack) {
+	public Work(String tenantId, Object entity, WorkType type) {
+		this( tenantId, entity, (IndexedTypeIdentifier) null, null, type, false );
+	}
+
+	@Deprecated
+	private Work(String tenantId, Object entity, Class<?> entityClass, Serializable id, WorkType type, boolean identifierWasRolledBack) {
+		this( tenantId, entity,
+				entityClass == null ? null : new PojoIndexedTypeIdentifier( entityClass ),
+						id, type, identifierWasRolledBack );
+	}
+
+	private Work(String tenantId, Object entity, IndexedTypeIdentifier entityTypeId, Serializable id, WorkType type, boolean identifierWasRolledBack) {
 		this.entity = entity;
-		this.entityClass = entityClass;
+		this.entityTypeId = entityTypeId;
 		this.id = id;
 		this.type = type;
 		this.identifierWasRolledBack = identifierWasRolledBack;
 		this.tenantIdentifier = tenantId;
 	}
 
+	@Deprecated
 	public Class<?> getEntityClass() {
-		return entityClass;
+		return entityTypeId != null ? entityTypeId.getPojoType() : null;
+	}
+
+	public IndexedTypeIdentifier getTypeIdentifier() {
+		return entityTypeId;
 	}
 
 	public String getTenantIdentifier() {
@@ -91,7 +115,7 @@ public class Work {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "Work{" );
-		sb.append( "entityClass=" ).append( entityClass );
+		sb.append( "entityTypeId=" ).append( entityTypeId );
 		sb.append( ", tenantId=" ).append( tenantIdentifier );
 		sb.append( ", id=" ).append( id );
 		sb.append( ", type=" ).append( type );

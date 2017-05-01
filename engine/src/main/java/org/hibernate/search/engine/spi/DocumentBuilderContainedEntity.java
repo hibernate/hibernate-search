@@ -15,6 +15,7 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
@@ -53,7 +54,7 @@ public class DocumentBuilderContainedEntity extends AbstractDocumentBuilder {
 	@Override
 	public void addWorkToQueue(
 			String tenantId,
-			Class<?> entityClass,
+			IndexedTypeIdentifier typeIdentifier,
 			Object entity,
 			Serializable id,
 			boolean delete,

@@ -7,9 +7,7 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -48,7 +46,10 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.IndexNameNormalizer;
 import org.hibernate.search.indexes.spi.ReaderProvider;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.impl.IndexedTypesSets;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -89,11 +90,11 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	private Similarity similarity;
 
 	private ExtendedSearchIntegrator searchIntegrator;
-	private final Set<Class<?>> containedEntityTypes = new HashSet<>();
+	private IndexedTypeSet containedEntityTypes = IndexedTypesSets.empty();
 
 	private boolean indexInitialized = false;
 	private boolean indexCreatedByHibernateSearch = false;
-	private final Set<Class<?>> initializedContainedEntityTypes = new HashSet<>();
+	private IndexedTypeSet initializedContainedEntityTypes = IndexedTypesSets.empty();
 
 	private ServiceManager serviceManager;
 
@@ -251,18 +252,17 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 			 */
 			indexCreatedByHibernateSearch = initializeIndex( containedEntityTypes );
 			indexInitialized = true;
-			initializedContainedEntityTypes.addAll( containedEntityTypes );
+			initializedContainedEntityTypes = IndexedTypesSets.composite( initializedContainedEntityTypes, containedEntityTypes );
 		}
 		else {
-			Set<Class<?>> notYetInitializedContainedEntityTypes = new HashSet<>( containedEntityTypes );
-			notYetInitializedContainedEntityTypes.removeAll( initializedContainedEntityTypes );
+			IndexedTypeSet notYetInitializedContainedEntityTypes = IndexedTypesSets.subtraction( containedEntityTypes, initializedContainedEntityTypes );
 
 			if ( notYetInitializedContainedEntityTypes.isEmpty() ) {
 				return; // Nothing to do
 			}
 
 			reinitializeIndex( notYetInitializedContainedEntityTypes );
-			initializedContainedEntityTypes.addAll( notYetInitializedContainedEntityTypes );
+			initializedContainedEntityTypes = IndexedTypesSets.composite( initializedContainedEntityTypes, notYetInitializedContainedEntityTypes );
 		}
 	}
 
@@ -273,7 +273,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	 * (if it's part of the schema management strategy).
 	 * @return {@code true} if the index had to be created, {@code false} otherwise.
 	 */
-	private boolean initializeIndex(Set<Class<?>> entityTypesToInitialize) {
+	private boolean initializeIndex(IndexedTypeSet entityTypesToInitialize) {
 		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
 			return false;
 		}
@@ -332,7 +332,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	 * @param entityTypesToInitialize The entity types whose mapping will be added to the index
 	 * (if it's part of the schema management strategy).
 	 */
-	private void reinitializeIndex(Set<Class<?>> entityTypesToInitialize) {
+	private void reinitializeIndex(IndexedTypeSet entityTypesToInitialize) {
 		if ( schemaManagementStrategy == IndexSchemaManagementStrategy.NONE ) {
 			return;
 		}
@@ -363,9 +363,9 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 		}
 	}
 
-	private IndexMetadata createIndexMetadata(Collection<Class<?>> classes) {
+	private IndexMetadata createIndexMetadata(IndexedTypeSet entityTypes) {
 		List<EntityIndexBinding> descriptors = new ArrayList<>();
-		for ( Class<?> entityType : classes ) {
+		for ( IndexedTypeIdentifier entityType : entityTypes ) {
 			EntityIndexBinding descriptor = searchIntegrator.getIndexBinding( entityType );
 			descriptors.add( descriptor );
 		}
@@ -375,8 +375,8 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	}
 
 	@Override
-	public void addContainedEntity(Class<?> entity) {
-		containedEntityTypes.add( entity );
+	public void addContainedEntity(IndexedTypeIdentifier entity) {
+		containedEntityTypes = IndexedTypesSets.composite( containedEntityTypes, entity );
 	}
 
 	// Getters
@@ -392,7 +392,7 @@ public class ElasticsearchIndexManager implements IndexManager, IndexNameNormali
 	}
 
 	@Override
-	public Set<Class<?>> getContainedTypes() {
+	public IndexedTypeSet getContainedTypes() {
 		return containedEntityTypes;
 	}
 

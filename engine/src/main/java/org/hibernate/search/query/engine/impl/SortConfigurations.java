@@ -8,17 +8,19 @@ package org.hibernate.search.query.engine.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.engine.metadata.impl.SortableFieldMetadata;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
+import org.hibernate.search.spi.impl.IndexedTypesSets;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
 /**
  * Provides information about the sortable fields configured for given entities.
@@ -35,7 +37,7 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 	private final List<SortConfiguration> configurations;
 
 	private SortConfigurations(List<SortConfiguration> configurations) {
-		this.configurations = Collections.unmodifiableList( configurations );
+		this.configurations = configurations;
 	}
 
 	@Override
@@ -51,9 +53,9 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 	public static class SortConfiguration {
 
 		private final String indexName;
-		private final Map<Class<?>, List<SortableFieldMetadata>> sortableFieldsByType;
+		private final Map<IndexedTypeIdentifier,List<SortableFieldMetadata>> sortableFieldsByType;
 
-		public SortConfiguration(String indexName, Map<Class<?>, List<SortableFieldMetadata>> sortableFieldsByType) {
+		public SortConfiguration(String indexName, Map<IndexedTypeIdentifier,List<SortableFieldMetadata>> sortableFieldsByType) {
 			this.indexName = indexName;
 			this.sortableFieldsByType = sortableFieldsByType;
 		}
@@ -64,7 +66,7 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 		 * @return all those sort fields from the given {@link Sort} that cannot be satisfied by the existing sortable
 		 * fields (doc value fields) declared for the given indexed type.
 		 */
-		public List<String> getUncoveredSorts(Class<?> entityType, Sort sort) {
+		public List<String> getUncoveredSorts(IndexedTypeIdentifier entityType, Sort sort) {
 			List<String> uncoveredSorts = new ArrayList<>();
 
 			for ( SortField sortField : sort.getSort() ) {
@@ -89,8 +91,8 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 			return uncoveredSorts;
 		}
 
-		public Set<Class<?>> getEntityTypes() {
-			return sortableFieldsByType.keySet();
+		public IndexedTypeSet getEntityTypes() {
+			return sortableFieldsByType.keySet().stream().collect( IndexedTypesSets.streamCollector() );
 		}
 
 		public String getIndexName() {
@@ -110,27 +112,30 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 	 */
 	public static class Builder {
 
-		private final Map<String, Map<Class<?>, List<SortableFieldMetadata>>> builtConfigurations = new HashMap<>();
-		private Map<Class<?>, List<SortableFieldMetadata>> currentIndexBucket;
+		private final Map<String, Map<IndexedTypeIdentifier,List<SortableFieldMetadata>>> builtConfigurations = new HashMap<>();
+		private Map<IndexedTypeIdentifier,List<SortableFieldMetadata>> currentIndexBucket;
 		private List<SortableFieldMetadata> currentEntityTypeBucket;
 
 		public Builder setIndex(String indexName) {
 			currentIndexBucket = builtConfigurations.get( indexName );
-
 			if ( currentIndexBucket == null ) {
 				currentIndexBucket = new HashMap<>();
 				builtConfigurations.put( indexName, currentIndexBucket );
 			}
-
 			return this;
 		}
 
-		public Builder setEntityType(Class<?> entityType) {
-			currentEntityTypeBucket = currentIndexBucket.get( entityType );
+		@Deprecated
+		public Builder setEntityType(Class<?> pojotype) {
+			return setEntityType( new PojoIndexedTypeIdentifier( pojotype ) );
+		}
+
+		public Builder setEntityType(IndexedTypeIdentifier indexedTypeIdentifier) {
+			currentEntityTypeBucket = currentIndexBucket.get( indexedTypeIdentifier );
 
 			if ( currentEntityTypeBucket == null ) {
 				currentEntityTypeBucket = new ArrayList<>();
-				currentIndexBucket.put( entityType, currentEntityTypeBucket );
+				currentIndexBucket.put( indexedTypeIdentifier, currentEntityTypeBucket );
 			}
 
 			return this;
@@ -147,13 +152,14 @@ public class SortConfigurations implements Iterable<SortConfigurations.SortConfi
 		}
 
 		public SortConfigurations build() {
-			List<SortConfiguration> configurations = new ArrayList<>();
+			ArrayList<SortConfiguration> configurations = new ArrayList<>( builtConfigurations.size() );
 
-			for ( Entry<String, Map<Class<?>, List<SortableFieldMetadata>>> configuration : builtConfigurations.entrySet() ) {
+			for ( Entry<String, Map<IndexedTypeIdentifier,List<SortableFieldMetadata>>> configuration : builtConfigurations.entrySet() ) {
 				configurations.add( new SortConfiguration( configuration.getKey(), configuration.getValue() ) );
 			}
 
 			return new SortConfigurations( configurations );
 		}
 	}
+
 }

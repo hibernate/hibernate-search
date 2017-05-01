@@ -28,6 +28,7 @@ import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldPath;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -133,13 +134,13 @@ public final class AnnotationProcessingHelper {
 	}
 
 	public static AnalyzerReference getAnalyzerReference(
-			Class<?> entityType, DocumentFieldPath fieldPath,
+			IndexedTypeIdentifier indexedTypeIdentifier, DocumentFieldPath fieldPath,
 			org.hibernate.search.annotations.Analyzer analyzerAnn,
 			Normalizer normalizerAnn, ConfigContext configContext, IndexManagerType indexManagerType) {
 		AnalyzerReference analyzerReference = getAnalyzerReference( analyzerAnn, configContext, indexManagerType );
 		AnalyzerReference normalizerReference = getNormalizerReference( normalizerAnn, configContext, indexManagerType );
 		if ( analyzerReference != null && normalizerReference != null ) {
-			throw log.cannotReferenceAnalyzerAndNormalizer( entityType, fieldPath.getRelativeName() );
+			throw log.cannotReferenceAnalyzerAndNormalizer( indexedTypeIdentifier, fieldPath.getRelativeName() );
 		}
 		return analyzerReference != null ? analyzerReference : normalizerReference;
 	}

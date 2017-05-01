@@ -42,7 +42,9 @@ import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexingMode;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.concurrency.Poller;
@@ -58,6 +60,8 @@ import org.junit.Test;
  * @author Sanne Grinovero
  */
 public class JMSMasterTest extends SearchTestBase {
+
+	private static final IndexedTypeIdentifier tshirtType = new PojoIndexedTypeIdentifier( TShirt.class );
 
 	/**
 	 * Name of the test queue as found in JNDI (see jndi.properties).
@@ -115,7 +119,7 @@ public class JMSMasterTest extends SearchTestBase {
 			POLLER.pollAssertion( () -> assertEquals( 1, listByQuery( "logo:jboss" ).size() ) );
 
 			{
-				DeleteByQueryLuceneWork work = new DeleteByQueryLuceneWork( TShirt.class, new SingularTermDeletionQuery( "logo", "jboss" ) );
+				DeleteByQueryLuceneWork work = new DeleteByQueryLuceneWork( tshirtType, new SingularTermDeletionQuery( "logo", "jboss" ) );
 				List<LuceneWork> l = new ArrayList<>();
 				l.add( work );
 				this.registerMessageListener();
@@ -222,7 +226,7 @@ public class JMSMasterTest extends SearchTestBase {
 		DoubleField numField = new DoubleField( "length", shirt.getLength(), Field.Store.NO );
 		doc.add( numField );
 		LuceneWork luceneWork = new AddLuceneWork(
-				shirt.getId(), String.valueOf( shirt.getId() ), shirt.getClass(), doc
+				shirt.getId(), String.valueOf( shirt.getId() ), tshirtType, doc
 		);
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( luceneWork );

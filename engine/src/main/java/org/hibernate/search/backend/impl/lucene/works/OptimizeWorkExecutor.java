@@ -11,6 +11,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -35,7 +36,7 @@ class OptimizeWorkExecutor implements LuceneWorkExecutor {
 
 	@Override
 	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
-		final Class<?> entityType = work.getEntityClass();
+		final IndexedTypeIdentifier entityType = work.getEntityType();
 		log.tracef( "optimize Lucene index: %s", entityType );
 		workspace.performOptimization( delegate.getIndexWriter() );
 	}

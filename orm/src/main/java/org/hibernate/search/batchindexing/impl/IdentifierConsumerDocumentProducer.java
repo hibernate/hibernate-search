@@ -8,7 +8,6 @@ package org.hibernate.search.batchindexing.impl;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import javax.transaction.TransactionManager;
@@ -40,6 +39,8 @@ import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -59,9 +60,9 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	private final ProducerConsumerQueue<List<Serializable>> source;
 	private final SessionFactory sessionFactory;
 	private final CacheMode cacheMode;
-	private final Class<?> type;
+	private final IndexedTypeIdentifier type;
 	private final MassIndexerProgressMonitor monitor;
-	private final Map<Class<?>, EntityIndexBinding> entityIndexBindings;
+	private final IndexedTypeMap<EntityIndexBinding> entityIndexBindings;
 	private final String idName;
 	private final ErrorHandler errorHandler;
 	private final BatchBackend backend;
@@ -79,7 +80,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CountDownLatch producerEndSignal,
-			CacheMode cacheMode, Class<?> type,
+			CacheMode cacheMode, IndexedTypeIdentifier indexedType,
 			ExtendedSearchIntegrator searchFactory,
 			String idName, BatchBackend backend, ErrorHandler errorHandler,
 			Integer transactionTimeout,
@@ -88,7 +89,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		this.monitor = monitor;
 		this.sessionFactory = sessionFactory;
 		this.cacheMode = cacheMode;
-		this.type = type;
+		this.type = indexedType;
 		this.idName = idName;
 		this.backend = backend;
 		this.errorHandler = errorHandler;
@@ -271,7 +272,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		String idInString = null;
 		try {
 			idInString = conversionContext
-					.setClass( clazz )
+					.setConvertedTypeId( docBuilder.getTypeIdentifier() )
 					.twoWayConversionContext( idBridge )
 					.objectToString( id );
 		}
@@ -284,7 +285,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		//that we hit the database several times during work construction.
 		AddLuceneWork addWork = docBuilder.createAddWork(
 				tenantId,
-				clazz,
+				docBuilder.getTypeIdentifier(),
 				entity,
 				id,
 				idInString,

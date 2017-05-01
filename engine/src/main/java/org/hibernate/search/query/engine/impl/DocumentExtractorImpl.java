@@ -23,6 +23,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 
 /**
@@ -183,7 +184,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		Document document = extractDocument( scoreDocIndex );
 
 		DocumentBuilderIndexedEntity documentBuilder = extractDocumentBuilder( document );
-		Class<?> clazz = documentBuilder.getBeanClass();
+		IndexedTypeIdentifier type = documentBuilder.getTypeIdentifier();
 		String idName = documentBuilder.getIdPropertyName();
 		Serializable id = extractId( documentBuilder, document );
 		Object[] projected = null;
@@ -209,7 +210,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 						projected[x] = queryHits.explain( scoreDocIndex );
 					}
 					else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
-						projected[x] = clazz;
+						projected[x] = type.getPojoType();
 					}
 					else if ( ProjectionConstants.SPATIAL_DISTANCE.equals( projection[x] ) ) {
 						projected[x] = queryHits.spatialDistance( scoreDocIndex );
@@ -225,7 +226,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				}
 			}
 		}
-		return new EntityInfoImpl( clazz, idName, id, projected );
+		return new EntityInfoImpl( type, idName, id, projected );
 	}
 
 	@Override

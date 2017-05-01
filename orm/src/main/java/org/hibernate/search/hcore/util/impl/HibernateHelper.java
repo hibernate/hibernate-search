@@ -10,6 +10,8 @@ package org.hibernate.search.hcore.util.impl;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
 /**
  * @author Emmanuel Bernard
@@ -38,10 +40,17 @@ public final class HibernateHelper {
 		return Hibernate.isInitialized( entity );
 	}
 
+	@Deprecated
 	public static Class<?> getClassFromWork(Work work) {
 		return work.getEntityClass() != null ?
 				work.getEntityClass() :
 				getClass( work.getEntity() );
+	}
+
+	public static IndexedTypeIdentifier getIndexedTypeIdFromWork(Work work) {
+		return work.getTypeIdentifier() != null ?
+				work.getTypeIdentifier() :
+				new PojoIndexedTypeIdentifier( getClass( work.getEntity() ) );
 	}
 
 	public static Object unproxy(Object value) {
@@ -50,4 +59,5 @@ public final class HibernateHelper {
 		}
 		return value;
 	}
+
 }

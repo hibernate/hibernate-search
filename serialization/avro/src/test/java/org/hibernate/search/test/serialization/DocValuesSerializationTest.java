@@ -21,6 +21,8 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.util.SerializationTestHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -35,6 +37,8 @@ import org.junit.Test;
  */
 @TestForIssue(jiraKey = "HSEARCH-1795")
 public class DocValuesSerializationTest {
+
+	private static final IndexedTypeIdentifier remoteTypeId = new PojoIndexedTypeIdentifier( RemoteEntity.class );
 
 	@Rule
 	public SearchFactoryHolder searchFactoryHolder = new SearchFactoryHolder( RemoteEntity.class );
@@ -124,7 +128,7 @@ public class DocValuesSerializationTest {
 
 	private List<LuceneWork> buildLuceneWorks(Document document) {
 		List<LuceneWork> works = new ArrayList<>();
-		works.add( new AddLuceneWork( 123, "123", RemoteEntity.class, document ) );
+		works.add( new AddLuceneWork( 123, "123", remoteTypeId, document ) );
 		return works;
 	}
 }

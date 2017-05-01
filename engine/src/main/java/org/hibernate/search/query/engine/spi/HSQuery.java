@@ -7,7 +7,6 @@
 package org.hibernate.search.query.engine.spi;
 
 import java.util.List;
-import java.util.Set;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
@@ -20,6 +19,7 @@ import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.MustJunction;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.CustomTypeMetadata;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
 
 /**
@@ -72,10 +72,10 @@ public interface HSQuery extends ProjectionConstants {
 	 * {@link SearchIntegrator#createHSQuery(Query, Class...)}, unless you want to change the targeted
 	 * entities.
 	 *
-	 * @param classes the list of classes (indexes) targeted by this query
+	 * @param types the list of classes (indexes) targeted by this query
 	 * @return {@code this} to allow for method chaining
 	 */
-	HSQuery targetedEntities(List<Class<?>> classes);
+	HSQuery targetedEntities(IndexedTypeSet types);
 
 	/**
 	 * Defines the targeted types, which may carry custom metadata which should override the supporting entity type's metadata.
@@ -159,12 +159,12 @@ public interface HSQuery extends ProjectionConstants {
 	/**
 	 * @return the targeted entity types
 	 */
-	List<Class<?>> getTargetedEntities();
+	IndexedTypeSet getTargetedEntities();
 
 	/**
 	 * @return a set of indexed entities corresponding to the class hierarchy of the targeted entities
 	 */
-	Set<Class<?>> getIndexedTargetedEntities();
+	IndexedTypeSet getIndexedTargetedEntities();
 
 	/**
 	 * @return the projected field names

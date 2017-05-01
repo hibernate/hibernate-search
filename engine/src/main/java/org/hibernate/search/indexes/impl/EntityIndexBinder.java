@@ -8,6 +8,7 @@ package org.hibernate.search.indexes.impl;
 
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -18,8 +19,7 @@ import org.hibernate.search.spi.WorkerBuildContext;
  */
 interface EntityIndexBinder {
 
-	MutableEntityIndexBinding bind(IndexManagerGroupHolder holder, Class<?> entityType,
-			EntityIndexingInterceptor<?> interceptor, WorkerBuildContext buildContext);
+	MutableEntityIndexBinding bind(IndexManagerGroupHolder holder, IndexedTypeIdentifier entityType, EntityIndexingInterceptor<?> interceptor, WorkerBuildContext buildContext);
 
 	/**
 	 * Controls how backends are identified.

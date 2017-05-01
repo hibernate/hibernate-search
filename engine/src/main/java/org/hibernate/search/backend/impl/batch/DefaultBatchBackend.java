@@ -8,8 +8,6 @@ package org.hibernate.search.backend.impl.batch;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -22,6 +20,9 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
+import org.hibernate.search.spi.IndexedTypeMap;
 
 /**
  * This is not meant to be used as a regular
@@ -52,7 +53,7 @@ public class DefaultBatchBackend implements BatchBackend {
 
 	@Override
 	public void awaitAsyncProcessingCompletion() {
-		Map<Class<?>, EntityIndexBinding> indexBindings = integrator.getIndexBindings();
+		IndexedTypeMap<EntityIndexBinding> indexBindings = integrator.getIndexBindings();
 		for ( EntityIndexBinding indexBinding : indexBindings.values() ) {
 			for ( IndexManager indexManager : indexBinding.getIndexManagers() ) {
 				indexManager.awaitAsyncProcessingCompletion();
@@ -67,7 +68,7 @@ public class DefaultBatchBackend implements BatchBackend {
 	}
 
 	@Override
-	public void flush(Set<Class<?>> entityTypes) {
+	public void flush(IndexedTypeSet entityTypes) {
 		Collection<IndexManager> uniqueIndexManagers = uniqueIndexManagerForTypes( entityTypes );
 		for ( IndexManager indexManager : uniqueIndexManagers ) {
 			indexManager.performStreamOperation( FlushLuceneWork.INSTANCE, progressMonitor, false );
@@ -75,16 +76,16 @@ public class DefaultBatchBackend implements BatchBackend {
 	}
 
 	@Override
-	public void optimize(Set<Class<?>> entityTypes) {
+	public void optimize(IndexedTypeSet entityTypes) {
 		Collection<IndexManager> uniqueIndexManagers = uniqueIndexManagerForTypes( entityTypes );
 		for ( IndexManager indexManager : uniqueIndexManagers ) {
 			indexManager.performStreamOperation( OptimizeLuceneWork.INSTANCE, progressMonitor, false );
 		}
 	}
 
-	private Collection<IndexManager> uniqueIndexManagerForTypes(Collection<Class<?>> entityTypes) {
+	private Collection<IndexManager> uniqueIndexManagerForTypes(IndexedTypeSet entityTypes) {
 		HashMap<String,IndexManager> uniqueBackends = new HashMap<String, IndexManager>( entityTypes.size() );
-		for ( Class<?> type : entityTypes ) {
+		for ( IndexedTypeIdentifier type : entityTypes ) {
 			EntityIndexBinding indexBindingForEntity = integrator.getIndexBinding( type );
 			if ( indexBindingForEntity != null ) {
 				IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();

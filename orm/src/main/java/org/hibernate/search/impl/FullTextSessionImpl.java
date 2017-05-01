@@ -7,9 +7,7 @@
 package org.hibernate.search.impl;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Properties;
-import java.util.Set;
 
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -36,6 +34,9 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
+import org.hibernate.search.spi.impl.IndexedTypesSets;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -79,7 +80,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	@Override
 	public FullTextQuery createFullTextQuery(QueryDescriptor queryDescriptor, Class<?>... entities) {
 		HSQuery hsQuery = queryDescriptor.createHSQuery( getSearchIntegrator() )
-				.targetedEntities( Arrays.asList( entities ) );
+				.targetedEntities( IndexedTypesSets.fromClasses( entities ) );
 		return createFullTextQuery( hsQuery );
 	}
 
@@ -107,29 +108,26 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		if ( entityType == null ) {
 			return;
 		}
-
-		Set<Class<?>> targetedClasses = getSearchIntegrator().getIndexedTypesPolymorphic(
-				new Class[] {
-						entityType
-				}
-		);
+		final ExtendedSearchIntegrator searchIntegrator = getSearchIntegrator();
+		final IndexedTypeIdentifier typeIdentifier = searchIntegrator.getIndexBindings().keyFromPojoType( entityType );
+		final IndexedTypeSet targetedClasses = getSearchIntegrator().getIndexedTypesPolymorphic(typeIdentifier.asTypeSet());
 		if ( targetedClasses.isEmpty() ) {
 			String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
 			throw new IllegalArgumentException( msg );
 		}
 
-		for ( Class<?> clazz : targetedClasses ) {
+		for ( IndexedTypeIdentifier type : targetedClasses ) {
 			if ( id == null ) {
-				createAndPerformWork( clazz, null, WorkType.PURGE_ALL );
+				createAndPerformWork( type, null, WorkType.PURGE_ALL );
 			}
 			else {
-				createAndPerformWork( clazz, id, WorkType.PURGE );
+				createAndPerformWork( type, id, WorkType.PURGE );
 			}
 		}
 	}
 
-	private void createAndPerformWork(Class<?> clazz, Serializable id, WorkType workType) {
-		Work work = new Work( delegate.getTenantIdentifier(), clazz, id, workType );
+	private void createAndPerformWork(IndexedTypeIdentifier type, Serializable id, WorkType workType) {
+		Work work = new Work( delegate.getTenantIdentifier(), type, id, workType );
 		getSearchIntegrator().getWorker().performWork( work, transactionContext );
 	}
 

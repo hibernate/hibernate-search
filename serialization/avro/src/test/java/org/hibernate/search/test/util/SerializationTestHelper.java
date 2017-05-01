@@ -128,7 +128,7 @@ public final class SerializationTestHelper {
 	}
 
 	private static void assertAdd(AddLuceneWork work, AddLuceneWork copy) {
-		assertThat( copy.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( work.getEntityClass() );
+		assertThat( copy.getEntityType() ).as( "Add.getEntityClass is not copied" ).isEqualTo( work.getEntityType() );
 		assertThat( copy.getId() ).as( "Add.getId is not copied" ).isEqualTo( work.getId() );
 		assertThat( copy.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( work.getIdInString() );
 		assertThat( copy.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
@@ -137,7 +137,7 @@ public final class SerializationTestHelper {
 	}
 
 	private static void assertUpdate(UpdateLuceneWork work, UpdateLuceneWork copy) {
-		assertThat( copy.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( work.getEntityClass() );
+		assertThat( copy.getEntityType() ).as( "Add.getEntityClass is not copied" ).isEqualTo( work.getEntityType() );
 		assertThat( copy.getId() ).as( "Add.getId is not copied" ).isEqualTo( work.getId() );
 		assertThat( copy.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( work.getIdInString() );
 		assertThat( copy.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
@@ -146,7 +146,7 @@ public final class SerializationTestHelper {
 	}
 
 	private static void assertDeleteByQuery(DeleteByQueryLuceneWork work, DeleteByQueryLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as( "DeleteByQuery.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
+		assertThat( work.getEntityType() ).as( "DeleteByQuery.getEntityClass is not copied" ).isEqualTo( copy.getEntityType() );
 		assertThat( work.getDeletionQuery() ).as( "DeleteByQuery.getDeletionQuery is not copied" ).isEqualTo( copy.getDeletionQuery() );
 	}
 
@@ -273,8 +273,8 @@ public final class SerializationTestHelper {
 	}
 
 	private static void assertDelete(DeleteLuceneWork work, DeleteLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as( "Delete.getEntityClass is not copied" )
-				.isEqualTo( copy.getEntityClass() );
+		assertThat( work.getEntityType() ).as( "Delete.getEntityClass is not copied" )
+				.isEqualTo( copy.getEntityType() );
 		assertThat( work.getId() ).as( "Delete.getId is not copied" ).isEqualTo( copy.getId() );
 		assertThat( (Object) work.getDocument() ).as( "Delete.getDocument is not the same" )
 				.isEqualTo( copy.getDocument() );
@@ -285,13 +285,13 @@ public final class SerializationTestHelper {
 	}
 
 	private static void assertPurgeAll(PurgeAllLuceneWork work, PurgeAllLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as( "PurgeAllLuceneWork.getEntityClass is not copied" )
-				.isEqualTo( copy.getEntityClass() );
+		assertThat( work.getEntityType() ).as( "PurgeAllLuceneWork.getEntityClass is not copied" )
+				.isEqualTo( copy.getEntityType() );
 	}
 
 	private static void assertFlush(FlushLuceneWork work, FlushLuceneWork copy) {
-		assertThat( copy.getEntityClass() ).as( "FlushLuceneWork.getEntityClass is not copied" )
-				.isEqualTo( work.getEntityClass() );
+		assertThat( copy.getEntityType() ).as( "FlushLuceneWork.getEntityClass is not copied" )
+				.isEqualTo( work.getEntityType() );
 	}
 
 	public static class SerializableStringReader extends Reader implements Serializable {

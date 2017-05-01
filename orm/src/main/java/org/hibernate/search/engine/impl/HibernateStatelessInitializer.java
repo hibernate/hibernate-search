@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
 
@@ -61,6 +62,11 @@ public class HibernateStatelessInitializer implements InstanceInitializer {
 	@Override
 	public Class<?> getClassFromWork(Work work) {
 		return HibernateHelper.getClassFromWork( work );
+	}
+
+	@Override
+	public IndexedTypeIdentifier getIndexedTypeIdFromWork(Work work) {
+		return HibernateHelper.getIndexedTypeIdFromWork( work );
 	}
 
 }

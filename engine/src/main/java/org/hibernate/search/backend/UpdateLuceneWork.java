@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Carries a Lucene update operation from the engine to the backend
@@ -20,24 +21,22 @@ import org.apache.lucene.document.Document;
  */
 public class UpdateLuceneWork extends LuceneWork {
 
-	private static final long serialVersionUID = -5267394465359187688L;
-
 	private final Map<String, String> fieldToAnalyzerMap;
 
-	public UpdateLuceneWork(Serializable id, String idInString, Class<?> entity, Document document) {
-		this( null, id, idInString, entity, document, null );
+	public UpdateLuceneWork(Serializable id, String idInString, IndexedTypeIdentifier entityType, Document document) {
+		this( null, id, idInString, entityType, document, null );
 	}
 
-	public UpdateLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document) {
-		this( tenantId, id, idInString, entity, document, null );
+	public UpdateLuceneWork(String tenantId, Serializable id, String idInString, IndexedTypeIdentifier entityType, Document document) {
+		this( tenantId, id, idInString, entityType, document, null );
 	}
 
-	public UpdateLuceneWork(Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
-		this( null, id, idInString, entity, document );
+	public UpdateLuceneWork(Serializable id, String idInString, IndexedTypeIdentifier entityType, Document document, Map<String, String> fieldToAnalyzerMap) {
+		this( null, id, idInString, entityType, document );
 	}
 
-	public UpdateLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
-		super( tenantId, id, idInString, entity, document );
+	public UpdateLuceneWork(String tenantId, Serializable id, String idInString, IndexedTypeIdentifier entityType, Document document, Map<String, String> fieldToAnalyzerMap) {
+		super( tenantId, id, idInString, entityType, document );
 		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
 	}
 
@@ -54,7 +53,7 @@ public class UpdateLuceneWork extends LuceneWork {
 	@Override
 	public String toString() {
 		String tenant = getTenantId() == null ? "" : " [" + getTenantId() + "] ";
-		return "UpdateLuceneWork" + tenant + ": " + this.getEntityClass().getName() + "#" + this.getIdInString();
+		return "UpdateLuceneWork" + tenant + ": " + this.getEntityType().getName() + "#" + this.getIdInString();
 	}
 
 }

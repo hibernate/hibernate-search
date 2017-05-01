@@ -92,7 +92,7 @@ public class SearchIndexerTest {
 		}
 
 		public Set<Class<?>> getRootEntities() {
-			return this.rootEntities;
+			return this.rootEntities.toPojosSet();
 		}
 
 	}

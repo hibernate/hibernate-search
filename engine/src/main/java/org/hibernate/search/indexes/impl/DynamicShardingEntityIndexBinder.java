@@ -11,6 +11,7 @@ import java.util.Properties;
 import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
@@ -31,7 +32,7 @@ class DynamicShardingEntityIndexBinder implements EntityIndexBinder {
 	}
 
 	@Override
-	public MutableEntityIndexBinding bind(IndexManagerGroupHolder holder, Class<?> entityType,
+	public MutableEntityIndexBinding bind(IndexManagerGroupHolder holder, IndexedTypeIdentifier entityType,
 			EntityIndexingInterceptor<?> interceptor, WorkerBuildContext buildContext) {
 		Properties maskedProperties = new MaskedProperty( properties, IndexManagerHolder.SHARDING_STRATEGY );
 		ShardIdentifierProvider shardIdentifierProvider = createShardIdentifierProvider(

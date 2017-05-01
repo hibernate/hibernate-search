@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Represent a unit of work to be applied against the Lucene index.
@@ -27,20 +28,20 @@ import org.apache.lucene.document.Document;
 public abstract class LuceneWork {
 
 	private final Document document;
-	private final Class<?> entityClass;
+	private final IndexedTypeIdentifier entityType;
 	private final String tenantId;
 	private final Serializable id;
 	private final String idInString;
 
-	public LuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity) {
-		this( tenantId, id, idInString, entity, null );
+	public LuceneWork(String tenantId, Serializable id, String idInString, IndexedTypeIdentifier typeIdentifier) {
+		this( tenantId, id, idInString, typeIdentifier, null );
 	}
 
-	public LuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document) {
+	public LuceneWork(String tenantId, Serializable id, String idInString, IndexedTypeIdentifier typeIdentifier, Document document) {
 		this.tenantId = tenantId;
 		this.id = id;
 		this.idInString = idInString;
-		this.entityClass = entity;
+		this.entityType = typeIdentifier;
 		this.document = document;
 	}
 
@@ -48,8 +49,17 @@ public abstract class LuceneWork {
 		return document;
 	}
 
+	/**
+	 * @deprecated use {@link #getEntityType()}: this method will be removed!
+	 * @return the Class identifying the entity type
+	 */
+	@Deprecated
 	public Class<?> getEntityClass() {
-		return entityClass;
+		return entityType.getPojoType();
+	}
+
+	public IndexedTypeIdentifier getEntityType() {
+		return entityType;
 	}
 
 	public Serializable getId() {

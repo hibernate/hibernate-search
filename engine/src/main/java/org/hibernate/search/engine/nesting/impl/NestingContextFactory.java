@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.nesting.impl;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+
 /**
  * Factory for creating {@link NestingContext}s.
  *
@@ -13,5 +15,6 @@ package org.hibernate.search.engine.nesting.impl;
  */
 public interface NestingContextFactory {
 
-	NestingContext createNestingContext(Class<?> indexedEntityType);
+	NestingContext createNestingContext(IndexedTypeIdentifier indexedEntityType);
+
 }

@@ -33,6 +33,8 @@ import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.util.SerializationTestHelper;
 import org.hibernate.search.test.util.SerializationTestHelper.SerializableStringReader;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -49,6 +51,8 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author Hardy Ferentschik
  */
 public class SerializationTest {
+
+	private static final IndexedTypeIdentifier remoteTypeId = new PojoIndexedTypeIdentifier( RemoteEntity.class );
 
 	@Rule
 	public SearchFactoryHolder searchFactoryHolder = new SearchFactoryHolder( RemoteEntity.class );
@@ -96,29 +100,30 @@ public class SerializationTest {
 		List<LuceneWork> works = new ArrayList<LuceneWork>();
 		works.add( OptimizeLuceneWork.INSTANCE );
 		works.add( OptimizeLuceneWork.INSTANCE );
-		works.add( new OptimizeLuceneWork( RemoteEntity.class ) ); //class won't be send over
-		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
-		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
-		works.add( new DeleteByQueryLuceneWork( RemoteEntity.class, new SingularTermDeletionQuery( "key", "value" ) ) );
-		works.add( new DeleteLuceneWork( 123l, "123", RemoteEntity.class ) );
-		works.add( new DeleteLuceneWork( "Sissi", "Sissi", RemoteEntity.class ) );
+		IndexedTypeIdentifier remoteTypeId = new PojoIndexedTypeIdentifier( RemoteEntity.class );
+		works.add( new OptimizeLuceneWork( remoteTypeId ) ); //won't be send over
+		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
+		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
+		works.add( new DeleteByQueryLuceneWork( remoteTypeId, new SingularTermDeletionQuery( "key", "value" ) ) );
+		works.add( new DeleteLuceneWork( 123l, "123", remoteTypeId ) );
+		works.add( new DeleteLuceneWork( "Sissi", "Sissi", remoteTypeId ) );
 		works.add(
 				new DeleteLuceneWork(
 						new URL( "http://emmanuelbernard.com" ),
 						"http://emmanuelbernard.com",
-						RemoteEntity.class
+						remoteTypeId
 				)
 		);
 
 		Document doc = buildDocumentWithNumericFields();
 		Map<String, String> analyzers = new HashMap<String, String>();
 		analyzers.put( "godo", "ngram" );
-		works.add( new AddLuceneWork( 123, "123", RemoteEntity.class, doc, analyzers ) );
+		works.add( new AddLuceneWork( 123, "123", remoteTypeId, doc, analyzers ) );
 
 		doc = buildDocumentWithMultipleMixedTypeFields();
-		works.add( new UpdateLuceneWork( 1234, "1234", RemoteEntity.class, doc ) );
+		works.add( new UpdateLuceneWork( 1234, "1234", remoteTypeId, doc ) );
 
-		works.add( new AddLuceneWork( 125, "125", RemoteEntity.class, new Document() ) );
+		works.add( new AddLuceneWork( 125, "125", remoteTypeId, new Document() ) );
 		return works;
 	}
 

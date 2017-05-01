@@ -22,6 +22,8 @@ import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.junit.Assert;
@@ -47,6 +49,8 @@ import org.junit.Test;
  */
 @TestForIssue(jiraKey = "HSEARCH-1637")
 public class SerializationInstanceNotReusedTest {
+
+	private static final IndexedTypeIdentifier testTypeId = new PojoIndexedTypeIdentifier( Book.class );
 
 	private final CountingSerializationProvider countingServiceInstance = new CountingSerializationProvider();
 
@@ -93,8 +97,8 @@ public class SerializationInstanceNotReusedTest {
 	private List<LuceneWork> makeSomeWork() {
 		List<LuceneWork> list = new LinkedList<>();
 		//just some random data:
-		list.add( new AddLuceneWork( Integer.valueOf( 5 ), "id:5", Book.class, new Document() ) );
-		list.add( new AddLuceneWork( Integer.valueOf( 6 ), "id:6", Book.class, new Document() ) );
+		list.add( new AddLuceneWork( Integer.valueOf( 5 ), "id:5", testTypeId, new Document() ) );
+		list.add( new AddLuceneWork( Integer.valueOf( 6 ), "id:6", testTypeId, new Document() ) );
 		return list;
 	}
 

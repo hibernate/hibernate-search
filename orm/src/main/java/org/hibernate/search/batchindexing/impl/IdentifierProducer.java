@@ -22,6 +22,7 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final ProducerConsumerQueue<List<Serializable>> destination;
 	private final SessionFactory sessionFactory;
 	private final int batchSize;
-	private final Class<?> indexedType;
+	private final IndexedTypeIdentifier indexedType;
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
@@ -66,7 +67,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
-			Class<?> indexedType, MassIndexerProgressMonitor monitor,
+			IndexedTypeIdentifier indexedType, MassIndexerProgressMonitor monitor,
 			long objectsLimit, ErrorHandler errorHandler, int idFetchSize, String tenantId) {
 				this.destination = fromIdentifierListToEntities;
 				this.sessionFactory = sessionFactory;

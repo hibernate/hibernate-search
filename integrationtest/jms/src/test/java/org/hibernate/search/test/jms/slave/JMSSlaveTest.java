@@ -22,6 +22,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.backend.jms.impl.JmsBackendQueueProcessor;
 import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
@@ -42,6 +44,8 @@ import static org.junit.Assert.assertEquals;
  * @author Hardy Ferentschik
  */
 public class JMSSlaveTest extends SearchTestBase {
+
+	private static final IndexedTypeIdentifier TSHIRT_TYPE = new PojoIndexedTypeIdentifier( TShirt.class );
 
 	/**
 	 * Name of the test queue as found in JNDI  (see jndi.properties).
@@ -125,7 +129,7 @@ public class JMSSlaveTest extends SearchTestBase {
 			Transaction tx = s.beginTransaction();
 			TransactionContextForTest tc = new TransactionContextForTest();
 			ExtendedSearchIntegrator integrator = this.getExtendedSearchIntegrator();
-			integrator.getWorker().performWork( new DeleteByQueryWork( TShirt.class, new SingularTermDeletionQuery( "id", String.valueOf( ts.getId() ) ) ), tc );
+			integrator.getWorker().performWork( new DeleteByQueryWork( TSHIRT_TYPE, new SingularTermDeletionQuery( "id", String.valueOf( ts.getId() ) ) ), tc );
 			tc.end();
 			tx.commit();
 		}

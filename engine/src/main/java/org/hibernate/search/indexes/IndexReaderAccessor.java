@@ -7,6 +7,7 @@
 package org.hibernate.search.indexes;
 
 import org.apache.lucene.index.IndexReader;
+import org.hibernate.search.spi.IndexedTypeSet;
 
 /**
  * The {@code IndexReaderAccessor} exposes {@link org.apache.lucene.index.IndexReader}s directly, making it possible to query the Lucene
@@ -45,6 +46,15 @@ public interface IndexReaderAccessor {
 	 * @throws java.lang.IllegalArgumentException if one of the specified classes is not indexed
 	 */
 	IndexReader open(Class<?>... entities);
+
+	/**
+	 * This method is intended for integrators which use alternative entity mappings over annotated
+	 * Class objects.
+	 * @param types the entity types for which to return a (multi)reader
+	 * @return an IndexReader containing at least all listed entities
+	 * @throws java.lang.IllegalArgumentException if one of the specified classes is not indexed
+	 */
+	IndexReader open(IndexedTypeSet types);
 
 	/**
 	 * Opens an IndexReader on all named indexes.

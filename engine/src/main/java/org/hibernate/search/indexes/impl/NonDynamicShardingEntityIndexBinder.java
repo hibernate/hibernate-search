@@ -12,6 +12,7 @@ import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.impl.NonDynamicShardingEntityIndexBinding;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
@@ -37,7 +38,7 @@ class NonDynamicShardingEntityIndexBinder implements EntityIndexBinder {
 	}
 
 	@Override
-	public MutableEntityIndexBinding bind(IndexManagerGroupHolder holder, Class<?> entityType,
+	public MutableEntityIndexBinding bind(IndexManagerGroupHolder holder, IndexedTypeIdentifier entityType,
 			EntityIndexingInterceptor<?> interceptor, WorkerBuildContext buildContext) {
 		IndexShardingStrategy shardingStrategy = ClassLoaderHelper.instanceFromClass(
 				IndexShardingStrategy.class,
@@ -65,7 +66,7 @@ class NonDynamicShardingEntityIndexBinder implements EntityIndexBinder {
 	}
 
 	private IndexManager[] preInitializeIndexManagersAndBackends(IndexManagerGroupHolder holder,
-			Class<?> entityType, WorkerBuildContext context) {
+			IndexedTypeIdentifier entityType, WorkerBuildContext context) {
 		IndexManager[] indexManagers;
 		int nbrOfIndexManagers = properties.length;
 		if ( nbrOfIndexManagers == 0 ) {

@@ -29,6 +29,7 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
 import org.hibernate.search.spi.impl.TypeHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
@@ -42,8 +43,8 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
  */
 public class MutableSearchFactoryState implements SearchFactoryState {
 
-	private Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities;
-	private Map<Class<?>, EntityIndexBinding> indexBindingsPerEntity;
+	private IndexedTypeMap<DocumentBuilderContainedEntity> documentBuildersContainedEntities;
+	private IndexedTypeMap<EntityIndexBinding> indexBindingsPerEntity;
 	private IndexingMode indexingMode;
 	private Worker worker;
 	private BackendQueueProcessor backendQueueProcessor;
@@ -112,12 +113,12 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	@Override
-	public Map<Class<?>, DocumentBuilderContainedEntity> getDocumentBuildersContainedEntities() {
+	public IndexedTypeMap<DocumentBuilderContainedEntity> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
 	}
 
 	@Override
-	public Map<Class<?>, EntityIndexBinding> getIndexBindings() {
+	public IndexedTypeMap<EntityIndexBinding> getIndexBindings() {
 		return indexBindingsPerEntity;
 	}
 
@@ -170,11 +171,11 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return indexedTypeHierarchy;
 	}
 
-	public void setDocumentBuildersContainedEntities(Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities) {
+	public void setDocumentBuildersContainedEntities(IndexedTypeMap<DocumentBuilderContainedEntity> documentBuildersContainedEntities) {
 		this.documentBuildersContainedEntities = documentBuildersContainedEntities;
 	}
 
-	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities) {
+	public void setDocumentBuildersIndexedEntities(IndexedTypeMap<EntityIndexBinding> documentBuildersIndexedEntities) {
 		this.indexBindingsPerEntity = documentBuildersIndexedEntities;
 	}
 

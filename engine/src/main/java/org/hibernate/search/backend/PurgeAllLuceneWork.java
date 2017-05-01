@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * A unit of work used to purge an entire index.
@@ -14,14 +15,12 @@ package org.hibernate.search.backend;
  */
 public class PurgeAllLuceneWork extends LuceneWork {
 
-	private static final long serialVersionUID = 8124091288284011715L;
-
-	public PurgeAllLuceneWork(Class<?> entity) {
-		this( null, entity );
+	public PurgeAllLuceneWork(IndexedTypeIdentifier type) {
+		this( null, type );
 	}
 
-	public PurgeAllLuceneWork(String tenantId, Class<?> entity) {
-		super( tenantId, null, null, entity, null );
+	public PurgeAllLuceneWork(String tenantId, IndexedTypeIdentifier type) {
+		super( tenantId, null, null, type, null );
 	}
 
 	@Override
@@ -32,7 +31,7 @@ public class PurgeAllLuceneWork extends LuceneWork {
 	@Override
 	public String toString() {
 		String tenant = getTenantId() == null ? "" : " [" + getTenantId() + "] ";
-		return "PurgeAllLuceneWork" + tenant + ": " + this.getEntityClass().getName();
+		return "PurgeAllLuceneWork" + tenant + ": " + this.getEntityType().getName();
 	}
 
 }

@@ -12,6 +12,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Keep the query builder contextual information
@@ -23,18 +24,18 @@ public class QueryBuildingContext {
 	private final DocumentBuilderIndexedEntity documentBuilder;
 	private final ScopedAnalyzerReference originalAnalyzerReference;
 	private final ScopedAnalyzerReference queryAnalyzerReference;
-	private final Class<?> entityType;
+	private final IndexedTypeIdentifier entityType;
 
 	public QueryBuildingContext(ExtendedSearchIntegrator factory, ScopedAnalyzerReference originalAnalyzerReference,
-			ScopedAnalyzerReference queryAnalyzerReference, Class<?> entityType) {
+			ScopedAnalyzerReference queryAnalyzerReference, IndexedTypeIdentifier indexBoundType) {
 		this.factory = factory;
 		this.originalAnalyzerReference = originalAnalyzerReference;
 		this.queryAnalyzerReference = queryAnalyzerReference;
-		this.entityType = entityType;
+		this.entityType = indexBoundType;
 
-		EntityIndexBinding indexBinding = factory.getIndexBinding( entityType );
+		EntityIndexBinding indexBinding = factory.getIndexBinding( indexBoundType );
 		if ( indexBinding == null ) {
-			throw new AssertionFailure( "Class is not indexed: " + entityType );
+			throw new AssertionFailure( "Class is not indexed: " + indexBoundType );
 		}
 		documentBuilder = indexBinding.getDocumentBuilder();
 	}
@@ -55,7 +56,7 @@ public class QueryBuildingContext {
 		return queryAnalyzerReference;
 	}
 
-	public Class<?> getEntityType() {
+	public IndexedTypeIdentifier getEntityType() {
 		return entityType;
 	}
 }

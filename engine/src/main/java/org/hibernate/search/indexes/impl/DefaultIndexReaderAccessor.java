@@ -15,6 +15,8 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -45,17 +47,31 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 			throw log.needAtLeastOneIndexedEntityType();
 		}
 
-		HashMap<String, IndexManager> indexManagers = new HashMap<String, IndexManager>();
+		HashMap<String, IndexManager> indexManagers = new HashMap<>();
 		for ( Class<?> type : entities ) {
-			EntityIndexBinding entityIndexBinding = searchFactory.getSafeIndexBindingForEntity( type );
-			IndexManager[] indexManagersForAllShards = entityIndexBinding.getSelectionStrategy()
-					.getIndexManagersForAllShards();
-			for ( IndexManager im : indexManagersForAllShards ) {
-				indexManagers.put( im.getIndexName(), im );
-			}
+			collectAllIndexManagersInto( searchFactory.getSafeIndexBindingForEntity( type ), indexManagers );
 		}
-		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()] );
-		return MultiReaderFactory.openReader( uniqueIndexManagers );
+		return MultiReaderFactory.openReader( indexManagers );
+	}
+
+	@Override
+	public IndexReader open(IndexedTypeSet types) {
+		if ( types.isEmpty() ) {
+			throw log.needAtLeastOneIndexedEntityType();
+		}
+
+		HashMap<String, IndexManager> indexManagers = new HashMap<>();
+		for ( IndexedTypeIdentifier type : types ) {
+			collectAllIndexManagersInto( searchFactory.getSafeIndexBindingForEntity( type ), indexManagers );
+		}
+		return MultiReaderFactory.openReader( indexManagers );
+	}
+
+	private static void collectAllIndexManagersInto(EntityIndexBinding bindings, HashMap<String, IndexManager> indexManagers) {
+		IndexManager[] indexManagersForAllShards = bindings.getSelectionStrategy().getIndexManagersForAllShards();
+		for ( IndexManager im : indexManagersForAllShards ) {
+			indexManagers.put( im.getIndexName(), im );
+		}
 	}
 
 	@Override

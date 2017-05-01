@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.impl;
 
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchEntityHelper;
@@ -16,7 +15,8 @@ import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.query.engine.impl.LuceneQueryTranslator;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.search.spi.IndexedTypeSet;
+import org.hibernate.search.spi.impl.IndexedTypesSets;
 
 import com.google.gson.JsonObject;
 
@@ -47,17 +47,18 @@ public class ElasticsearchLuceneQueryTranslator implements LuceneQueryTranslator
 	}
 
 	@Override
-	public boolean conversionRequired(Class<?>... entities) {
-		Set<Class<?>> queriedEntityTypes = getQueriedEntityTypes( entities );
+	public boolean conversionRequired(IndexedTypeSet entities) {
+		IndexedTypeSet queriedEntityTypes = getQueriedEntityTypes( entities );
 		return ElasticsearchEntityHelper.isAnyMappedToElasticsearch( extendedIntegrator, queriedEntityTypes );
 	}
 
-	private Set<Class<?>> getQueriedEntityTypes(Class<?>... indexedTargetedEntities) {
-		if ( indexedTargetedEntities == null || indexedTargetedEntities.length == 0 ) {
+	private IndexedTypeSet getQueriedEntityTypes(IndexedTypeSet indexedTargetedEntities) {
+		if ( indexedTargetedEntities == null || indexedTargetedEntities.isEmpty() ) {
 			return extendedIntegrator.getIndexBindings().keySet();
 		}
 		else {
-			return CollectionHelper.asSet( indexedTargetedEntities );
+			return IndexedTypesSets.fromIdentifiers( indexedTargetedEntities );
 		}
 	}
+
 }

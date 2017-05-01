@@ -8,6 +8,7 @@ package org.hibernate.search.backend.spi;
 
 import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 
 /**
@@ -22,12 +23,12 @@ public class DeleteByQueryLuceneWork extends LuceneWork {
 
 	private final DeletionQuery deletionQuery;
 
-	public DeleteByQueryLuceneWork(Class<?> entity, DeletionQuery deletionQuery) {
-		this( null, entity, deletionQuery );
+	public DeleteByQueryLuceneWork(IndexedTypeIdentifier typeIdentifier, DeletionQuery deletionQuery) {
+		this( null, typeIdentifier, deletionQuery );
 	}
 
-	public DeleteByQueryLuceneWork(String tenantId, Class<?> entity, DeletionQuery deletionQuery) {
-		super( tenantId, null, null, entity );
+	public DeleteByQueryLuceneWork(String tenantId, IndexedTypeIdentifier typeIdentifier, DeletionQuery deletionQuery) {
+		super( tenantId, null, null, typeIdentifier );
 		this.deletionQuery = deletionQuery;
 	}
 
@@ -42,7 +43,7 @@ public class DeleteByQueryLuceneWork extends LuceneWork {
 
 	@Override
 	public String toString() {
-		return "DeleteByQueryLuceneWork: " + this.getEntityClass().getName() + ": " + this.deletionQuery.toString();
+		return "DeleteByQueryLuceneWork: " + this.getEntityType().getName() + ": " + this.deletionQuery.toString();
 	}
 
 }

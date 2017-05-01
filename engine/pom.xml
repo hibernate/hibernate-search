@@ -231,6 +231,7 @@
                             org.hibernate.search.spatial;version="${project.version}",
                             org.hibernate.search.spatial.impl;version="${project.version}",
                             org.hibernate.search.spi;version="${project.version}",
+                            org.hibernate.search.spi.impl;version="${project.version}",
                             org.hibernate.search.stat;version="${project.version}",
                             org.hibernate.search.stat.spi;version="${project.version}",
                             org.hibernate.search.store;version="${project.version}",

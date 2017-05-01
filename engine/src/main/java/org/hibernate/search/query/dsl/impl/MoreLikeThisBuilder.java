@@ -98,12 +98,12 @@ public class MoreLikeThisBuilder<T> {
 
 	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity documentBuilder, ExtendedSearchIntegrator searchIntegrator ) {
 		this.documentBuilder = documentBuilder;
-		Similarity configuredSimilarity = searchIntegrator.getIndexBindings().get( documentBuilder.getBeanClass() ).getSimilarity();
+		Similarity configuredSimilarity = searchIntegrator.getIndexBindings().get( documentBuilder.getTypeIdentifier() ).getSimilarity();
 		if ( configuredSimilarity instanceof TFIDFSimilarity ) {
 			this.similarity = (TFIDFSimilarity) configuredSimilarity;
 		}
 		else {
-			throw log.requireTFIDFSimilarity( documentBuilder.getBeanClass() );
+			throw log.requireTFIDFSimilarity( documentBuilder.getTypeIdentifier() );
 		}
 	}
 
@@ -134,7 +134,7 @@ public class MoreLikeThisBuilder<T> {
 			return maybeExcludeComparedEntity( createQuery( retrieveTerms() ) );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnIndexOfEntity( e, documentBuilder.getBeanClass() );
+			throw log.ioExceptionOnIndexOfEntity( e, documentBuilder.getTypeIdentifier() );
 		}
 	}
 
@@ -163,7 +163,7 @@ public class MoreLikeThisBuilder<T> {
 			return null;
 		}
 		findById = new TermQuery( new Term( documentBuilder.getIdFieldName(), id ) );
-		HSQuery query = queryContext.getExtendedSearchIntegrator().createHSQuery( findById, queryContext.getEntityType() );
+		HSQuery query = queryContext.getExtendedSearchIntegrator().createHSQuery( findById, queryContext.getEntityType().getPojoType() );
 		List<EntityInfo> entityInfos = query
 				.maxResults( 1 )
 				.projection( HSQuery.DOCUMENT_ID )
@@ -230,7 +230,7 @@ public class MoreLikeThisBuilder<T> {
 			if ( fieldBridge instanceof NumericFieldBridge ) {
 				// we probably can do something here
 				//TODO how to build the query where we don't have the value?
-				throw log.numericFieldCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getBeanClass() );
+				throw log.numericFieldCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getTypeIdentifier() );
 			}
 			DocumentFieldMetadata fieldMetadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor(
 					fieldContext.getField()
@@ -244,11 +244,11 @@ public class MoreLikeThisBuilder<T> {
 			boolean hasTermVector = fieldMetadata.getTermVector() != Field.TermVector.NO;
 			boolean isStored = fieldMetadata.getStore() != Store.NO;
 			if ( ! ( hasTermVector || isStored ) ) {
-				throw log.fieldNotStoredNorTermVectorCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getBeanClass() );
+				throw log.fieldNotStoredNorTermVectorCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getTypeIdentifier() );
 			}
 			boolean isIdOrEmbeddedId = fieldMetadata.isId() || fieldMetadata.isIdInEmbedded();
 			if ( isIdOrEmbeddedId ) {
-				throw log.fieldIdCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getBeanClass() );
+				throw log.fieldIdCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getTypeIdentifier() );
 			}
 		}
 

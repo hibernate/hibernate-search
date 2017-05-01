@@ -9,7 +9,6 @@ package org.hibernate.search.test.metadata;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
@@ -21,6 +20,8 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.indexes.spi.ReaderProvider;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -69,7 +70,7 @@ class DummyIndexManager implements IndexManager {
 	}
 
 	@Override
-	public Set<Class<?>> getContainedTypes() {
+	public IndexedTypeSet getContainedTypes() {
 		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
 	}
 
@@ -89,7 +90,7 @@ class DummyIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void addContainedEntity(Class<?> entity) {
+	public void addContainedEntity(IndexedTypeIdentifier entity) {
 		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
 	}
 

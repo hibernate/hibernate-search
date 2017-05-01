@@ -7,9 +7,8 @@
 package org.hibernate.search.backend.spi;
 
 
-import java.util.Set;
-
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.spi.IndexedTypeSet;
 
 /**
  * Implementations of this interface are not drop-in replacements for the standard BackendQueueProcessor,
@@ -51,7 +50,7 @@ public interface BatchBackend {
 	 *
 	 * @param indexedRootTypes a {@link java.util.Set} object.
 	 */
-	void flush(Set<Class<?>> indexedRootTypes);
+	void flush(IndexedTypeSet indexedRootTypes);
 
 	/**
 	 * Triggers optimization of all indexes containing at least one instance of the
@@ -59,6 +58,6 @@ public interface BatchBackend {
 	 *
 	 * @param targetedClasses Used to specify which indexes need optimization.
 	 */
-	void optimize(Set<Class<?>> targetedClasses);
+	void optimize(IndexedTypeSet targetedClasses);
 
 }

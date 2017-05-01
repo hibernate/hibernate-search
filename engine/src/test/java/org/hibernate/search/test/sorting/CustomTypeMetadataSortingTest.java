@@ -30,6 +30,8 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.CustomTypeMetadata;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -251,8 +253,8 @@ public class CustomTypeMetadataSortingTest {
 		}
 
 		@Override
-		public Class<?> getEntityType() {
-			return PropertySet.class;
+		public IndexedTypeIdentifier getEntityType() {
+			return new PojoIndexedTypeIdentifier( PropertySet.class );
 		}
 
 		@Override
@@ -264,8 +266,8 @@ public class CustomTypeMetadataSortingTest {
 	private static class PersonMetadata implements CustomTypeMetadata {
 
 		@Override
-		public Class<?> getEntityType() {
-			return Person.class;
+		public IndexedTypeIdentifier getEntityType() {
+			return new PojoIndexedTypeIdentifier( Person.class );
 		}
 
 		@Override

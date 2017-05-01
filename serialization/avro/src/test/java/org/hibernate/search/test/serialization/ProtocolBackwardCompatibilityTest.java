@@ -46,6 +46,8 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.serialization.avro.impl.KnownProtocols;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.util.SerializationTestHelper;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
@@ -61,7 +63,9 @@ import org.junit.Test;
  * @author Hardy Ferentschik
  */
 public class ProtocolBackwardCompatibilityTest {
+
 	private static final String RESOURCE_BASE_NAME = "persistent-work-avro-";
+	private static final IndexedTypeIdentifier remoteTypeId = new PojoIndexedTypeIdentifier( RemoteEntity.class );
 
 	@Rule
 	public SearchFactoryHolder searchFactoryHolder = new SearchFactoryHolder( RemoteEntity.class );
@@ -128,16 +132,16 @@ public class ProtocolBackwardCompatibilityTest {
 		List<LuceneWork> works = new ArrayList<>();
 		works.add( OptimizeLuceneWork.INSTANCE );
 		works.add( OptimizeLuceneWork.INSTANCE );
-		works.add( new OptimizeLuceneWork( RemoteEntity.class ) ); //class won't be send over
-		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
-		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
-		works.add( new DeleteLuceneWork( 123l, "123", RemoteEntity.class ) );
-		works.add( new DeleteLuceneWork( "Sissi", "Sissi", RemoteEntity.class ) );
+		works.add( new OptimizeLuceneWork( remoteTypeId ) ); //class won't be send over
+		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
+		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
+		works.add( new DeleteLuceneWork( 123l, "123", remoteTypeId ) );
+		works.add( new DeleteLuceneWork( "Sissi", "Sissi", remoteTypeId ) );
 		works.add(
 				new DeleteLuceneWork(
 						new URL( "http://emmanuelbernard.com" ),
 						"http://emmanuelbernard.com",
-						RemoteEntity.class
+						remoteTypeId
 				)
 		);
 
@@ -153,7 +157,8 @@ public class ProtocolBackwardCompatibilityTest {
 
 		Map<String, String> analyzers = new HashMap<>();
 		analyzers.put( "godo", "ngram" );
-		works.add( new AddLuceneWork( 123, "123", RemoteEntity.class, doc, analyzers ) );
+
+		works.add( new AddLuceneWork( 123, "123", remoteTypeId, doc, analyzers ) );
 
 		doc = new Document();
 		Field field = new Field(
@@ -194,8 +199,8 @@ public class ProtocolBackwardCompatibilityTest {
 		field.setBoost( 3f );
 		doc.add( field );
 
-		works.add( new UpdateLuceneWork( 1234, "1234", RemoteEntity.class, doc ) );
-		works.add( new AddLuceneWork( 125, "125", RemoteEntity.class, new Document() ) );
+		works.add( new UpdateLuceneWork( 1234, "1234", remoteTypeId, doc ) );
+		works.add( new AddLuceneWork( 125, "125", remoteTypeId, new Document() ) );
 		return works;
 	}
 
@@ -212,7 +217,7 @@ public class ProtocolBackwardCompatibilityTest {
 		document.add( new BinaryDocValuesField( "foo", new BytesRef( "world" ) ) );
 		document.add( new SortedSetDocValuesField( "foo", new BytesRef( "hello" ) ) );
 		document.add( new SortedDocValuesField( "foo", new BytesRef( "world" ) ) );
-		works.add( new AddLuceneWork( 123, "123", RemoteEntity.class, document ) );
+		works.add( new AddLuceneWork( 123, "123", remoteTypeId, document ) );
 		return works;
 	}
 

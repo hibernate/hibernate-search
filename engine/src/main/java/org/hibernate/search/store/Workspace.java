@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.store;
 
-import java.util.Set;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 
 /**
  * @deprecated This interface will be moved and should be considered non-public API [HSEARCH-1915]
@@ -22,7 +22,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 @Deprecated
 public interface Workspace {
 
-	DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entity);
+	DocumentBuilderIndexedEntity getDocumentBuilder(IndexedTypeIdentifier type);
 
 	Analyzer getAnalyzer(String name);
 
@@ -38,7 +38,7 @@ public interface Workspace {
 	 * @param writer the IndexWriter to use for optimization
 	 * @see org.hibernate.search.backend.OptimizeLuceneWork
 	 * @see org.hibernate.search.spi.SearchIntegrator#optimize()
-	 * @see org.hibernate.search.spi.SearchIntegrator#optimize(Class)
+	 * @see org.hibernate.search.spi.SearchIntegrator#optimize(IndexedTypeIdentifier)
 	 */
 	void performOptimization(IndexWriter writer);
 
@@ -53,7 +53,7 @@ public interface Workspace {
 	 * @return The set of entity types being indexed
 	 * in the underlying IndexManager backing this Workspace.
 	 */
-	Set<Class<?>> getEntitiesInIndexManager();
+	IndexedTypeSet getEntitiesInIndexManager();
 
 	/**
 	 * Invoked after all changes of a transaction are applied.

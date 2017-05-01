@@ -18,7 +18,9 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.batchindexing.spi.MassIndexerWithTenant;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.impl.IndexedTypesSets;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -38,7 +40,7 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final SessionFactoryImplementor sessionFactory;
 
-	protected Set<Class<?>> rootEntities = new HashSet<Class<?>>();
+	protected final IndexedTypeSet rootEntities;
 
 	// default settings defined here:
 	private int typesToIndexInParallel = 1;
@@ -74,20 +76,16 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	 *
 	 * @return a new set of entities
 	 */
-	private static Set<Class<?>> toRootEntities(ExtendedSearchIntegrator extendedIntegrator, Class<?>... selection) {
+	private static IndexedTypeSet toRootEntities(ExtendedSearchIntegrator extendedIntegrator, Class<?>... selection) {
 		Set<Class<?>> entities = new HashSet<Class<?>>();
 		//first build the "entities" set containing all indexed subtypes of "selection".
 		for ( Class<?> entityType : selection ) {
-			Set<Class<?>> targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic(
-					new Class[] {
-							entityType
-					}
-			);
+			IndexedTypeSet targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic( IndexedTypesSets.fromClass( entityType ) );
 			if ( targetedClasses.isEmpty() ) {
 				String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
 				throw new IllegalArgumentException( msg );
 			}
-			entities.addAll( targetedClasses );
+			entities.addAll( targetedClasses.toPojosSet() );
 		}
 		Set<Class<?>> cleaned = new HashSet<Class<?>>();
 		Set<Class<?>> toRemove = new HashSet<Class<?>>();
@@ -109,7 +107,7 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 		}
 		cleaned.removeAll( toRemove );
 		log.debugf( "Targets for indexing job: %s", cleaned );
-		return cleaned;
+		return IndexedTypesSets.fromClasses( cleaned.toArray( new Class[cleaned.size()] ) );
 	}
 
 	@Override

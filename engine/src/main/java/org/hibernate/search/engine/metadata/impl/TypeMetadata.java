@@ -30,6 +30,7 @@ import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -46,7 +47,7 @@ public class TypeMetadata {
 	/**
 	 * The type for this metadata
 	 */
-	private final Class<?> indexedType;
+	private final IndexedTypeIdentifier type;
 
 	/**
 	 * The class boost for this type (class level @Boost)
@@ -162,7 +163,7 @@ public class TypeMetadata {
 	private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata;
 
 	protected TypeMetadata(Builder builder) {
-		this.indexedType = builder.indexedType;
+		this.type = builder.indexedType;
 		this.boost = builder.boost;
 		this.scopedAnalyzerReference = builder.scopedAnalyzerReferenceBuilder == null ? null
 				: builder.scopedAnalyzerReferenceBuilder.build();
@@ -187,8 +188,8 @@ public class TypeMetadata {
 		this.classBridgeSortableFieldMetadata = Collections.unmodifiableSet( builder.classBridgeSortableFieldMetadata );
 	}
 
-	public Class<?> getType() {
-		return indexedType;
+	public IndexedTypeIdentifier getType() {
+		return type;
 	}
 
 	public Set<PropertyMetadata> getAllPropertyMetadata() {
@@ -486,7 +487,7 @@ public class TypeMetadata {
 
 	public static class Builder {
 		protected final BackReference<TypeMetadata> resultReference = new BackReference<>();
-		private final Class<?> indexedType;
+		private final IndexedTypeIdentifier indexedType;
 		private final ScopedAnalyzerReference.Builder scopedAnalyzerReferenceBuilder;
 		private final MutableAnalyzerRegistry analyzerRegistry;
 
@@ -505,7 +506,7 @@ public class TypeMetadata {
 		private XProperty jpaProperty;
 		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new LinkedHashSet<>();
 
-		public Builder(Class<?> indexedType, ConfigContext configContext, ParseContext parseContext) {
+		public Builder(IndexedTypeIdentifier indexedType, ConfigContext configContext, ParseContext parseContext) {
 			this.indexedType = indexedType;
 			if ( parseContext.skipAnalyzers() ) {
 				this.analyzerRegistry = null;
@@ -518,7 +519,7 @@ public class TypeMetadata {
 			}
 		}
 
-		public Builder(Class<?> indexedType, Builder containerTypeBuilder) {
+		public Builder(IndexedTypeIdentifier indexedType, Builder containerTypeBuilder) {
 			this.indexedType = indexedType;
 			this.analyzerRegistry = containerTypeBuilder.analyzerRegistry;
 			this.scopedAnalyzerReferenceBuilder = containerTypeBuilder.scopedAnalyzerReferenceBuilder;
@@ -639,7 +640,7 @@ public class TypeMetadata {
 			return stateInspectionOptimizationsEnabled;
 		}
 
-		public Class<?> getIndexedType() {
+		public IndexedTypeIdentifier getIndexedType() {
 			return indexedType;
 		}
 

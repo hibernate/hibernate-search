@@ -16,6 +16,8 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
 /**
  * @author Hardy Ferentschik
@@ -29,8 +31,16 @@ public final class DescriptorTestHelper {
 		//not allowed
 	}
 
+	/**
+	 * @deprecated use {@link #getTypeDescriptor(AnnotationMetadataProvider, IndexedTypeIdentifier)}
+	 */
+	@Deprecated
 	public static IndexedTypeDescriptor getTypeDescriptor(AnnotationMetadataProvider metadataProvider, Class<?> clazz) {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( clazz, LuceneEmbeddedIndexManagerType.INSTANCE );
+		return getTypeDescriptor( metadataProvider, new PojoIndexedTypeIdentifier( clazz ) );
+	}
+
+	public static IndexedTypeDescriptor getTypeDescriptor(AnnotationMetadataProvider metadataProvider, IndexedTypeIdentifier type) {
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( type, LuceneEmbeddedIndexManagerType.INSTANCE );
 		return new IndexedTypeDescriptorImpl(
 				typeMetadata,
 				getDummyUnShardedIndexManager()

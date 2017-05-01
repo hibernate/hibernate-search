@@ -17,6 +17,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -42,7 +43,7 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 
 	@Override
 	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
-		final Class<?> entityType = work.getEntityClass();
+		final IndexedTypeIdentifier entityType = work.getEntityType();
 		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
 		ScopedAnalyzerReference analyzerReference = documentBuilder.getAnalyzerReference();

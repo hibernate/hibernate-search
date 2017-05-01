@@ -25,6 +25,7 @@ import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.engine.nesting.impl.NoOpNestingContext;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.impl.CollectionHelper;
 
 public class ElasticsearchNestingContextFactoryProvider implements NestingContextFactoryProvider, Startable {
@@ -51,7 +52,7 @@ public class ElasticsearchNestingContextFactoryProvider implements NestingContex
 		}
 
 		@Override
-		public NestingContext createNestingContext(Class<?> indexedEntityType) {
+		public NestingContext createNestingContext(IndexedTypeIdentifier indexedEntityType) {
 			ContextCreationStrategy strategy = strategies.get( indexedEntityType.getName() );
 
 			if ( strategy == null ) {

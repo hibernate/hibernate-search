@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engineperformance;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
@@ -19,6 +18,7 @@ import org.hibernate.search.engineperformance.model.BookEntity;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.impl.IndexedTypesSets;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -59,7 +59,7 @@ public class JMHBenchmarks {
 		int maxResults = eh.getMaxResults();
 
 		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, BookEntity.class );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( BookEntity.class ) );
+		hsQuery.targetedEntities( IndexedTypesSets.fromClass( BookEntity.class ) );
 		hsQuery.sort( new Sort( new SortField( "rating", SortField.Type.FLOAT, true ) ) );
 		hsQuery.maxResults( maxResults );
 		int queryResultSize = hsQuery.queryResultSize();
@@ -94,7 +94,7 @@ public class JMHBenchmarks {
 		int maxResults = eh.getMaxResults();
 
 		HSQuery hsQuery = searchIntegrator.createHSQuery( luceneQuery, BookEntity.class );
-		hsQuery.targetedEntities( Arrays.<Class<?>>asList( BookEntity.class ) );
+		hsQuery.targetedEntities( IndexedTypesSets.fromClass( BookEntity.class ) );
 		hsQuery.maxResults( maxResults );
 		int queryResultSize = hsQuery.queryResultSize();
 		List<EntityInfo> queryEntityInfos = hsQuery.queryEntityInfos();

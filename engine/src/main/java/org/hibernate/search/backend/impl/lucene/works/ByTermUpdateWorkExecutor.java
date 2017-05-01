@@ -16,6 +16,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -51,7 +52,7 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
 		final Serializable id = work.getId();
 		final String tenantId = work.getTenantId();
-		final Class<?> managedType = work.getEntityClass();
+		final IndexedTypeIdentifier managedType = work.getEntityType();
 		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( managedType );
 		try {
 			if ( DeleteWorkExecutor.isIdNumeric( builder ) ) {

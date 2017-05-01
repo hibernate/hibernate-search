@@ -68,7 +68,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 		Query query;
 		final ExtendedSearchIntegrator searchIntegrator = queryContext.getExtendedSearchIntegrator();
 		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
-		IndexReader indexReader = searchIntegrator.getIndexReaderAccessor().open( queryContext.getEntityType() );
+		IndexReader indexReader = searchIntegrator.getIndexReaderAccessor().open( queryContext.getEntityType().asTypeSet() );
 		// retrieving the docId and building the more like this query form the term vectors must be using the same index reader
 		try {
 			String[] fieldNames = getAllCompatibleFieldNames( documentBuilder );
@@ -106,7 +106,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 			}
 		}
 		if ( fieldNames.size() == 0 ) {
-			throw log.noFieldCompatibleForMoreLikeThis( documentBuilder.getBeanClass() );
+			throw log.noFieldCompatibleForMoreLikeThis( documentBuilder.getTypeIdentifier() );
 		}
 		return fieldNames.toArray( new String[fieldNames.size()] );
 	}

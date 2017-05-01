@@ -6,13 +6,12 @@
  */
 package org.hibernate.search.elasticsearch.util.impl;
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.hibernate.search.elasticsearch.spi.ElasticsearchIndexManagerType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 
 /**
  * @author Yoann Rodiere
@@ -23,19 +22,18 @@ public final class ElasticsearchEntityHelper {
 		// private constructor
 	}
 
-	public static boolean isMappedToElasticsearch(ExtendedSearchIntegrator integrator, Class<?> entityType) {
-		Set<Class<?>> entityTypesWithSubTypes = integrator.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
+	public static boolean isMappedToElasticsearch(ExtendedSearchIntegrator integrator, IndexedTypeIdentifier entityType) {
+		IndexedTypeSet entityTypesWithSubTypes = integrator.getIndexedTypesPolymorphic( entityType.asTypeSet() );
 		return hasElasticsearchIndexManager( integrator, entityTypesWithSubTypes );
 	}
 
-	public static boolean isAnyMappedToElasticsearch(ExtendedSearchIntegrator integrator, Collection<Class<?>> entityTypes) {
-		Set<Class<?>> entityTypesWithSubTypes = integrator.getIndexedTypesPolymorphic(
-				entityTypes.toArray( new Class<?>[entityTypes.size()] ) );
+	public static boolean isAnyMappedToElasticsearch(ExtendedSearchIntegrator integrator, IndexedTypeSet entityTypes) {
+		IndexedTypeSet entityTypesWithSubTypes = integrator.getIndexedTypesPolymorphic( entityTypes );
 		return hasElasticsearchIndexManager( integrator, entityTypesWithSubTypes );
 	}
 
-	private static boolean hasElasticsearchIndexManager(ExtendedSearchIntegrator integrator, Collection<Class<?>> entityTypes) {
-		for ( Class<?> entityType : entityTypes ) {
+	private static boolean hasElasticsearchIndexManager(ExtendedSearchIntegrator integrator, IndexedTypeSet entityTypes) {
+		for ( IndexedTypeIdentifier entityType : entityTypes ) {
 			EntityIndexBinding binding = integrator.getIndexBinding( entityType );
 			if ( binding == null ) {
 				continue;

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * A unit of work triggering an optimize operation.
@@ -21,10 +22,10 @@ public class OptimizeLuceneWork extends LuceneWork {
 
 	/**
 	 * Optimizes the index(es) of a specific entity
-	 * @param entity the entity type
+	 * @param entityType the entity type
 	 */
-	public OptimizeLuceneWork(Class<?> entity) {
-		super( null, null, null, entity );
+	public OptimizeLuceneWork(IndexedTypeIdentifier entityType) {
+		super( null, null, null, entityType );
 	}
 
 	/**
@@ -41,12 +42,12 @@ public class OptimizeLuceneWork extends LuceneWork {
 
 	@Override
 	public String toString() {
-		Class entityClass = this.getEntityClass();
+		IndexedTypeIdentifier entityClass = this.getEntityType();
 		if ( entityClass == null ) {
 			return "OptimizeLuceneWork: global";
 		}
 		else {
-			return "OptimizeLuceneWork: " + this.getEntityClass().getName();
+			return "OptimizeLuceneWork: " + entityClass.getName();
 		}
 	}
 

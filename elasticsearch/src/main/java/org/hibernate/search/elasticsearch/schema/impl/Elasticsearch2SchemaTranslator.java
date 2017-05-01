@@ -503,7 +503,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			return new JsonPrimitive( (Boolean) indexedNullToken );
 		}
 		else {
-			throw LOG.unsupportedNullTokenType( mappingBuilder.getBeanClass(), fieldPath.getAbsoluteName(),
+			throw LOG.unsupportedNullTokenType( mappingBuilder.getBeanClass().getName(), fieldPath.getAbsoluteName(),
 					indexedNullToken.getClass() );
 		}
 	}

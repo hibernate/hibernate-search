@@ -21,6 +21,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
@@ -47,7 +48,7 @@ class DeleteWorkExecutor implements LuceneWorkExecutor {
 
 	@Override
 	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
-		final Class<?> entityType = work.getEntityClass();
+		final IndexedTypeIdentifier entityType = work.getEntityType();
 		final Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by query.", entityType, id );
 		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( entityType );

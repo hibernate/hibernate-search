@@ -9,6 +9,7 @@ package org.hibernate.search.bridge.spi;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 
 /**
@@ -48,11 +49,21 @@ public interface ConversionContext {
 
 	/**
 	 * In case the next conversion fails, the error message will point to this type.
+	 * @deprecated Use {@link #setConvertedTypeId(IndexedTypeIdentifier)}
 	 *
 	 * @param beanClass the class type which is going to be converted
 	 * @return this for method chaining.
 	 */
+	@Deprecated
 	ConversionContext setClass(Class<?> beanClass);
+
+	/**
+	 * In case the next conversion fails, the error message will point to this type.
+	 *
+	 * @param type the type which is going to be converted
+	 * @return this for method chaining.
+	 */
+	ConversionContext setConvertedTypeId(IndexedTypeIdentifier type);
 
 	/**
 	 * In case the next conversion fails, the error message will point to the

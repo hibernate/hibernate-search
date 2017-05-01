@@ -84,7 +84,8 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 
 		@Override
 		public void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion( work.getEntityClass(), work.getId(), work.getIdInString() );
+			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
+					work.getEntityType().getPojoType(), work.getId(), work.getIdInString() );
 			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}
@@ -98,7 +99,7 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition(
-					work.getEntityClass(),
+					work.getEntityType().getPojoType(),
 					work.getId(),
 					work.getIdInString(),
 					work.getDocument()
@@ -114,7 +115,7 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityClass(),
+					work.getEntityType().getPojoType(),
 					work.getId(),
 					work.getIdInString()
 			);
@@ -144,7 +145,7 @@ public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityClass(),
+					work.getEntityType().getPojoType(),
 					work.getId(),
 					work.getIdInString()
 			);

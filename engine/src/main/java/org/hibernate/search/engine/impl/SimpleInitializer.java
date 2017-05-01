@@ -10,7 +10,9 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 
 /**
  * Simple pass-through implementation of {@code InstanceInitializer}.
@@ -30,11 +32,19 @@ public final class SimpleInitializer implements InstanceInitializer {
 		return entity;
 	}
 
+	@Deprecated
 	@Override
 	public Class<?> getClassFromWork(Work work) {
 		return work.getEntityClass() != null ?
 				work.getEntityClass() :
 				getClass( work.getEntity() );
+	}
+
+	@Override
+	public IndexedTypeIdentifier getIndexedTypeIdFromWork(Work work) {
+		return work.getTypeIdentifier() != null ?
+				work.getTypeIdentifier() :
+				new PojoIndexedTypeIdentifier( getClass( work.getEntity() ) );
 	}
 
 	@Override

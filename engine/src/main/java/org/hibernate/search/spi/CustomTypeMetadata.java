@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public interface CustomTypeMetadata {
 
-	Class<?> getEntityType();
+	IndexedTypeIdentifier getEntityType();
 
 	Set<String> getSortableFields();
 

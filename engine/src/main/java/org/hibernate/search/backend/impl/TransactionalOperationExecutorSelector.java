@@ -88,7 +88,7 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
 				WorkQueuePerIndexSplitter context) {
 			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition(
-					work.getEntityClass(),
+					work.getEntityType().getPojoType(),
 					work.getId(),
 					work.getIdInString(),
 					work.getDocument()
@@ -104,7 +104,7 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
 				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityClass(),
+					work.getEntityType().getPojoType(),
 					work.getId(),
 					work.getIdInString()
 			);
@@ -121,7 +121,7 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
 				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityClass(),
+					work.getEntityType().getPojoType(),
 					work.getId(),
 					work.getIdInString()
 			);
@@ -168,7 +168,7 @@ public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
 				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityClass(),
+					work.getEntityType().getPojoType(),
 					work.getId(),
 					work.getIdInString()
 			);

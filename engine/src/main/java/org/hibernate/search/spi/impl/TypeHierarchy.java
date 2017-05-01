@@ -7,13 +7,13 @@
 
 package org.hibernate.search.spi.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -24,10 +24,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class TypeHierarchy {
 	private static final Log log = LoggerFactory.make();
 
-	private Map<Class<?>, Set<Class<?>>> classToConfiguredClass;
+	private Map<Class<?>, Set<IndexedTypeIdentifier>> classToConfiguredClass;
 
 	public TypeHierarchy() {
-		classToConfiguredClass = new HashMap<Class<?>, Set<Class<?>>>();
+		classToConfiguredClass = new HashMap<Class<?>, Set<IndexedTypeIdentifier>>();
 	}
 
 	public void addConfiguredClass(Class<?> configuredClass) {
@@ -43,21 +43,22 @@ public class TypeHierarchy {
 	}
 
 	private void addClass(Class<?> superclass, Class<?> indexedClass) {
-		Set<Class<?>> classesSet = classToConfiguredClass.get( superclass );
+		Set<IndexedTypeIdentifier> classesSet = classToConfiguredClass.get( superclass );
 		if ( classesSet == null ) {
-			classesSet = new HashSet<Class<?>>();
+			classesSet = new HashSet<IndexedTypeIdentifier>();
 			classToConfiguredClass.put( superclass, classesSet );
 		}
-		classesSet.add( indexedClass );
+		classesSet.add( new PojoIndexedTypeIdentifier( indexedClass ) );
 	}
 
-	public Set<Class<?>> getConfiguredClasses(Class<?>[] classes) {
-		if ( classes == null ) {
-			return Collections.<Class<?>>emptySet();
+	public IndexedTypeSet getConfiguredClasses(IndexedTypeSet types) {
+		if ( types == null ) {
+			return IndexedTypesSets.empty();
 		}
-		Set<Class<?>> indexedClasses = new HashSet<Class<?>>();
-		for ( Class<?> clazz : classes ) {
-			Set<Class<?>> set = classToConfiguredClass.get( clazz );
+		Set<IndexedTypeIdentifier> indexedClasses = new HashSet<IndexedTypeIdentifier>();
+		for ( IndexedTypeIdentifier type : types ) {
+			Class<?> clazz = type.getPojoType();
+			Set<IndexedTypeIdentifier> set = classToConfiguredClass.get( clazz );
 			if ( set != null ) {
 				// at this point we don't have to care about including indexed subclasses of a indexed class
 				// MultiClassesQueryLoader will take care of this later and optimise the queries
@@ -65,8 +66,8 @@ public class TypeHierarchy {
 			}
 		}
 		if ( log.isTraceEnabled() ) {
-			log.tracef( "Targeted indexed classes for %s: %s", Arrays.toString( classes ), indexedClasses );
+			log.tracef( "Targeted indexed classes for %s: %s", types, indexedClasses );
 		}
-		return indexedClasses;
+		return IndexedTypesSets.fromIdentifiers( indexedClasses );
 	}
 }

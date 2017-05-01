@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -31,6 +30,8 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -75,15 +76,13 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 
 			@SuppressWarnings("unchecked")
 			List<Object> queryResultList = criteria.list();
-			InstanceInitializer instanceInitializer = objectInitializationContext.getExtendedSearchIntegrator()
-					.getInstanceInitializer();
+			final ExtendedSearchIntegrator integrator = objectInitializationContext.getExtendedSearchIntegrator();
+			final InstanceInitializer instanceInitializer = integrator.getInstanceInitializer();
 			for ( Object o : queryResultList ) {
 				Class<?> loadedType = instanceInitializer.getClass( o );
 				Object unproxiedObject = instanceInitializer.unproxy( o );
-				DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder(
-						loadedType,
-						objectInitializationContext.getExtendedSearchIntegrator()
-						);
+				IndexedTypeIdentifier type = integrator.getIndexBindings().keyFromPojoType( loadedType );
+				DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder( type, integrator );
 				if ( documentBuilder == null ) {
 					// the query result can contain entities which are not indexed. This can for example happen if
 					// the targeted entity type is a superclass with indexed and un-indexed sub classes
@@ -171,7 +170,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 	 */
 	private Criterion getIdListCriterion(List<EntityInfo> entityInfos, ObjectInitializationContext objectInitializationContext) {
 		DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder(
-				entityInfos.iterator().next().getClazz(),
+				entityInfos.iterator().next().getType(),
 				objectInitializationContext.getExtendedSearchIntegrator()
 		);
 		String idName = documentBuilder.getIdPropertyName();
@@ -221,9 +220,9 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 		}
 	}
 
-	private Class<?> getRootEntityType(SessionFactoryImplementor sessionFactory, Class<?> entityType) {
-		String entityName = sessionFactory.getClassMetadata( entityType ).getEntityName();
-		String rootEntityName = sessionFactory.getEntityPersister( entityName ).getRootEntityName();
+	private Class<?> getRootEntityType(SessionFactoryImplementor sessionFactory, IndexedTypeIdentifier indexedTypeIdentifier) {
+		String entityName = sessionFactory.getClassMetadata( indexedTypeIdentifier.getPojoType() ).getEntityName();
+		String rootEntityName = sessionFactory.getMetamodel().entityPersister( entityName ).getRootEntityName();
 
 		return sessionFactory.getEntityPersister( rootEntityName ).getMappedClass();
 	}
@@ -231,20 +230,20 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 	private void addToIdSpace(Map<Class<?>, EntityInfoIdSpace> idSpaces, EntityInfo entityInfo, IdUniquenessResolver resolver, SessionFactoryImplementor sessionFactory) {
 		// add to existing id space if possible
 		for ( Entry<Class<?>, EntityInfoIdSpace> idSpace : idSpaces.entrySet() ) {
-			if ( resolver.areIdsUniqueForClasses( entityInfo.getClazz(), idSpace.getKey() ) ) {
+			if ( resolver.areIdsUniqueForClasses( entityInfo.getType().getPojoType(), idSpace.getKey() ) ) {
 				idSpace.getValue().add( entityInfo );
 				return;
 			}
 		}
 
 		// otherwise create a new id space, using the root entity as key
-		Class<?> rootType = getRootEntityType( sessionFactory, entityInfo.getClazz() );
+		Class<?> rootType = getRootEntityType( sessionFactory, entityInfo.getType() );
 		EntityInfoIdSpace idSpace = new EntityInfoIdSpace( rootType, entityInfo );
-		idSpaces.put( getRootEntityType( sessionFactory, entityInfo.getClazz() ), idSpace );
+		idSpaces.put( getRootEntityType( sessionFactory, entityInfo.getType() ), idSpace );
 	}
 
-	private DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entityType, ExtendedSearchIntegrator extendedIntegrator) {
-		Set<Class<?>> indexedEntities = extendedIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
+	private DocumentBuilderIndexedEntity getDocumentBuilder(IndexedTypeIdentifier entityType, ExtendedSearchIntegrator extendedIntegrator) {
+		IndexedTypeSet indexedEntities = extendedIntegrator.getIndexedTypesPolymorphic( entityType.asTypeSet() );
 		if ( indexedEntities.size() > 0 ) {
 			return extendedIntegrator.getIndexBinding(
 					indexedEntities.iterator().next()

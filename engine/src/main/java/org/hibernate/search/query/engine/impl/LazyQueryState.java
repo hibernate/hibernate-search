@@ -8,7 +8,6 @@ package org.hibernate.search.query.engine.impl;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +45,7 @@ public final class LazyQueryState implements Closeable {
 	private final boolean fieldSortDoTrackScores;
 	private final boolean fieldSortDoMaxScore;
 	private final ExtendedSearchIntegrator extendedIntegrator;
-	private final Collection<EntityIndexBinding> targetedEntityBindings;
+	private final Iterable<EntityIndexBinding> targetedEntityBindings;
 	private final QueryFilters facetingFilters;
 
 	private Query rewrittenQuery;
@@ -56,7 +55,7 @@ public final class LazyQueryState implements Closeable {
 			IndexReader reader,
 			Similarity searcherSimilarity,
 			ExtendedSearchIntegrator extendedIntegrator,
-			Collection<EntityIndexBinding> targetedEntityBindings,
+			Iterable<EntityIndexBinding> targetedEntityBindings,
 			boolean fieldSortDoTrackScores,
 			boolean fieldSortDoMaxScore) {
 		this.userQuery = userQuery;

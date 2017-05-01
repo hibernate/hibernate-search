@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.engine.impl;
 
-import java.util.Set;
-
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.indexes.impl.IndexManagerGroupHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 
@@ -46,7 +45,7 @@ public abstract class AbstractMutableEntityIndexBinding implements MutableEntity
 	}
 
 	@Override
-	public void postInitialize(Set<Class<?>> indexedClasses) {
+	public void postInitialize(IndexedTypeSet indexedClasses) {
 		documentBuilder.postInitialize( indexedClasses );
 	}
 

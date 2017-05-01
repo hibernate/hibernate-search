@@ -23,6 +23,7 @@ import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.IndexManagerType;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
@@ -92,7 +93,7 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 		return indexManagerType;
 	}
 
-	MutableEntityIndexBinding bind(Class<?> entityType, EntityIndexingInterceptor<?> interceptor,
+	MutableEntityIndexBinding bind(IndexedTypeIdentifier entityType, EntityIndexingInterceptor<?> interceptor,
 			WorkerBuildContext buildContext) {
 		// This will create the binding, but also initialize the indexes as necessary
 		return entityIndexBinder.bind( this, entityType, interceptor, buildContext );
@@ -128,7 +129,7 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 		}
 	}
 
-	IndexManager getOrCreateIndexManager(String shardName, Properties indexProperties, Class<?> entityType,
+	IndexManager getOrCreateIndexManager(String shardName, Properties indexProperties, IndexedTypeIdentifier entityType,
 			WorkerBuildContext context) {
 		String indexName = indexNameBase;
 		if ( shardName != null ) {
@@ -156,7 +157,7 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 		return indexManager;
 	}
 
-	private synchronized IndexManager doCreateIndexManager(String indexName, Class<?> entityType,
+	private synchronized IndexManager doCreateIndexManager(String indexName, IndexedTypeIdentifier entityType,
 			Properties indexProperties, WorkerBuildContext workerBuildContext) {
 		ExtendedSearchIntegrator activeIntegrator = null;
 

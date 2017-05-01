@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.spi;
 
 import org.hibernate.search.backend.impl.DeleteByQuerySupport;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Delete via a serializable query
@@ -23,7 +24,7 @@ public class DeleteByQueryWork extends Work {
 
 	private final DeletionQuery deleteByQuery;
 
-	public DeleteByQueryWork(Class<?> entityType, DeletionQuery deletionQuery) {
+	public DeleteByQueryWork(IndexedTypeIdentifier entityType, DeletionQuery deletionQuery) {
 		this( null, entityType, deletionQuery );
 	}
 
@@ -31,11 +32,11 @@ public class DeleteByQueryWork extends Work {
 	 * Creates a DeleteByWork
 	 *
 	 * @param tenantId the tenant identifier
-	 * @param entityType the class to operate on
+	 * @param entityType the type to operate on
 	 * @param deletionQuery the query to delete by
 	 * @throws IllegalArgumentException if a unsupported SerializableQuery is passed
 	 */
-	public DeleteByQueryWork(String tenantId, Class<?> entityType, DeletionQuery deletionQuery) {
+	public DeleteByQueryWork(String tenantId, IndexedTypeIdentifier entityType, DeletionQuery deletionQuery) {
 		super( tenantId, entityType, null, WorkType.DELETE_BY_QUERY );
 		if ( entityType == null ) {
 			throw new IllegalArgumentException( "entityType must not be null" );

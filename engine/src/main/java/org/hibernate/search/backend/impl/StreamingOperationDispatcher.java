@@ -13,6 +13,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -46,7 +47,7 @@ public class StreamingOperationDispatcher implements OperationDispatcher {
 	}
 
 	private void executeWork(LuceneWork work, IndexingMonitor progressMonitor) {
-		final Class<?> entityType = work.getEntityClass();
+		final IndexedTypeIdentifier entityType = work.getEntityType();
 		EntityIndexBinding entityIndexBinding = integrator.getIndexBinding( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		StreamingOperationExecutor executor =

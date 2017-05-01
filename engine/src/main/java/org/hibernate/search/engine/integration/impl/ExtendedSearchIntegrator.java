@@ -8,13 +8,11 @@ package org.hibernate.search.engine.integration.impl;
 
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -22,8 +20,10 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
 /**
@@ -35,15 +35,10 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  */
 public interface ExtendedSearchIntegrator extends SearchIntegrator {
 
-	/**
-	 * Returns a map of all known entity index binding (indexed entities) keyed against the indexed type
-	 *
-	 * @return a map of all known entity index binding (indexed entities) keyed against the indexed type. The empty
-	 * map is returned if there are no indexed types.
-	 */
-	Map<Class<?>, EntityIndexBinding> getIndexBindings();
-
+	@Deprecated
 	DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(Class<?> entityType);
+
+	DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(IndexedTypeIdentifier entityType);
 
 	FilterCachingStrategy getFilterCachingStrategy();
 
@@ -60,7 +55,10 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * @param classes an array of types
 	 * @return the set of configured subtypes
 	 */
-	Set<Class<?>> getConfiguredTypesPolymorphic(Class<?>[] classes);
+	@Deprecated
+	IndexedTypeSet getConfiguredTypesPolymorphic(Class<?>[] classes);
+
+	IndexedTypeSet getConfiguredTypesPolymorphic(IndexedTypeSet types);
 
 	/**
 	 * Given a set of target entities, return the set of configured subtypes that are indexed.
@@ -77,7 +75,10 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * @param classes an array of types
 	 * @return the set of configured subtypes that are indexed
 	 */
-	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
+	@Deprecated
+	IndexedTypeSet getIndexedTypesPolymorphic(Class<?>[] classes);
+
+	IndexedTypeSet getIndexedTypesPolymorphic(IndexedTypeSet queryTarget);
 
 	/**
 	 * @return {@code true} if JMX is enabled
@@ -163,15 +164,21 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	SearchIntegration getIntegration(IndexManagerType indexManagerType);
 
 	/**
-	 * Retrieve the scoped analyzer reference for a given class.
+	 * Retrieve the scoped analyzer reference for a given indexed type.
 	 *
-	 * @param clazz The class for which to retrieve the analyzer.
+	 * @param type The type for which to retrieve the analyzer.
 	 *
 	 * @return The scoped analyzer for the specified class.
 	 *
-	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
-	 * class is not an indexed entity.
+	 * @throws java.lang.IllegalArgumentException in case {@code type == null} or the specified
+	 * type is not an indexed entity.
 	 */
+	ScopedAnalyzerReference getAnalyzerReference(IndexedTypeIdentifier type);
+
+	/**
+	 * @deprecated use {@link #getAnalyzerReference(IndexedTypeIdentifier)}
+	 */
+	@Deprecated
 	ScopedAnalyzerReference getAnalyzerReference(Class<?> clazz);
 
 	/**
@@ -181,4 +188,5 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * @return an Hibernate Search query object
 	 */
 	HSQuery createLuceneBasedHSQuery();
+
 }

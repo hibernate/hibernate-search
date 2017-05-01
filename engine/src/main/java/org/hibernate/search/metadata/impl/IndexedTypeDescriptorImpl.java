@@ -21,6 +21,7 @@ import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.PropertyDescriptor;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -28,9 +29,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
+
 	private static final Log log = LoggerFactory.make();
 
-	private final Class<?> indexedType;
+	private final IndexedTypeIdentifier indexedType;
 	private final float classBoost;
 	@Deprecated
 	private final BoostStrategy boostStrategy;
@@ -81,7 +83,7 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 
 	@Override
 	public Class<?> getType() {
-		return indexedType;
+		return indexedType.getPojoType();
 	}
 
 	@Override
@@ -223,6 +225,12 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 		}
 		return fieldDescriptorMap;
 	}
+
+	@Override
+	public IndexedTypeIdentifier getIndexedType() {
+		return this.indexedType;
+	}
+
 }
 
 

@@ -7,6 +7,7 @@
 package org.hibernate.search.reader.impl;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Sort;
@@ -26,6 +27,11 @@ public final class MultiReaderFactory {
 
 	private MultiReaderFactory() {
 		//not allowed
+	}
+
+	public static IndexReader openReader(Map<String, IndexManager> indexManagers) {
+		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()] );
+		return openReader( uniqueIndexManagers );
 	}
 
 	public static IndexReader openReader(IndexManager... indexManagers) {

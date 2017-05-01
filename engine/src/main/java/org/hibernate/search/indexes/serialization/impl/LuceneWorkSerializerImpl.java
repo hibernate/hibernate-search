@@ -94,27 +94,27 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer, Startable
 					serializer.addOptimizeAll();
 				}
 				else if ( work instanceof PurgeAllLuceneWork ) {
-					serializer.addPurgeAll( work.getEntityClass().getName() );
+					serializer.addPurgeAll( work.getEntityType().getName() );
 				}
 				else if ( work instanceof FlushLuceneWork ) {
 					serializer.addFlush();
 				}
 				else if ( work instanceof DeleteLuceneWork ) {
 					processId( work, serializer );
-					serializer.addDelete( work.getEntityClass().getName() );
+					serializer.addDelete( work.getEntityType().getName() );
 				}
 				else if ( work instanceof DeleteByQueryLuceneWork ) {
-					serializer.addDeleteByQuery( work.getEntityClass().getName(), ( (DeleteByQueryLuceneWork) work ).getDeletionQuery() );
+					serializer.addDeleteByQuery( work.getEntityType().getName(), ( (DeleteByQueryLuceneWork) work ).getDeletionQuery() );
 				}
 				else if ( work instanceof AddLuceneWork ) {
 					serializeDocument( work.getDocument(), serializer );
 					processId( work, serializer );
-					serializer.addAdd( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
+					serializer.addAdd( work.getEntityType().getName(), work.getFieldToAnalyzerMap() );
 				}
 				else if ( work instanceof UpdateLuceneWork ) {
 					serializeDocument( work.getDocument(), serializer );
 					processId( work, serializer );
-					serializer.addUpdate( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
+					serializer.addUpdate( work.getEntityType().getName(), work.getFieldToAnalyzerMap() );
 				}
 			}
 			return serializer.serialize();

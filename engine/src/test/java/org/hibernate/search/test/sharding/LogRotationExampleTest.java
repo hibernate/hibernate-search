@@ -30,6 +30,7 @@ import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -131,7 +132,7 @@ public class LogRotationExampleTest {
 		log.timestamp = timestamp;
 
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-		Work work = new Work( LogMessage.class, log.timestamp, WorkType.DELETE );
+		Work work = new Work( new PojoIndexedTypeIdentifier( LogMessage.class ), log.timestamp, WorkType.DELETE );
 		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();

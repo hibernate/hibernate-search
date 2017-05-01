@@ -37,9 +37,7 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 		final int numberOfObjectsToInitialize = entityInfos.size();
 
 		if ( numberOfObjectsToInitialize == 0 ) {
-			if ( log.isTraceEnabled() ) {
-				log.tracef( "No object to initialize" );
-			}
+			log.tracef( "No object to initialize" );
 			return;
 		}
 
@@ -59,7 +57,7 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 					remainingEntityInfos.add( entityInfo );
 				}
 				else {
-					EntityInfoLoadKey key = new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() );
+					EntityInfoLoadKey key = new EntityInfoLoadKey( entityInfo.getType().getPojoType(), entityInfo.getId() );
 					idToObjectMap.put( key, o );
 				}
 			}

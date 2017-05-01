@@ -27,6 +27,7 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.stat.Statistics;
 
 /**
@@ -35,9 +36,10 @@ import org.hibernate.search.stat.Statistics;
  * @author Emmanuel Bernard
  */
 public interface SearchFactoryState {
-	Map<Class<?>, DocumentBuilderContainedEntity> getDocumentBuildersContainedEntities();
 
-	Map<Class<?>, EntityIndexBinding> getIndexBindings();
+	IndexedTypeMap<DocumentBuilderContainedEntity> getDocumentBuildersContainedEntities();
+
+	IndexedTypeMap<EntityIndexBinding> getIndexBindings();
 
 	IndexingMode getIndexingMode();
 

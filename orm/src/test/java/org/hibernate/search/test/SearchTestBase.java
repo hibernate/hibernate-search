@@ -16,6 +16,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
@@ -106,7 +108,17 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 		return Collections.emptySet();
 	}
 
+	/**
+	 * Use {@link #getNumberOfDocumentsInIndex(IndexedTypeIdentifier)}
+	 * @param entityType
+	 * @return
+	 */
+	@Deprecated
 	protected int getNumberOfDocumentsInIndex(Class<?> entityType) {
+		return getNumberOfDocumentsInIndex( new PojoIndexedTypeIdentifier( entityType ) );
+	}
+
+	protected int getNumberOfDocumentsInIndex(IndexedTypeIdentifier entityType) {
 		return getBackendTestHelper().getNumberOfDocumentsInIndex( entityType );
 	}
 

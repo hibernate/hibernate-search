@@ -8,19 +8,19 @@ package org.hibernate.search.backend;
 
 import java.io.Serializable;
 
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+
 /**
  * @author Emmanuel Bernard
  */
 public class DeleteLuceneWork extends LuceneWork {
 
-	private static final long serialVersionUID = -854604138119230246L;
-
-	public DeleteLuceneWork(Serializable id, String idInString, Class<?> entity) {
-		this( null, id, idInString, entity );
+	public DeleteLuceneWork(Serializable id, String idInString, IndexedTypeIdentifier typeIdentifier) {
+		this( null, id, idInString, typeIdentifier );
 	}
 
-	public DeleteLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity) {
-		super( tenantId, id, idInString, entity );
+	public DeleteLuceneWork(String tenantId, Serializable id, String idInString, IndexedTypeIdentifier typeIdentifier) {
+		super( tenantId, id, idInString, typeIdentifier );
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class DeleteLuceneWork extends LuceneWork {
 	@Override
 	public String toString() {
 		String tenant = getTenantId() == null ? "" : " [" + getTenantId() + "] ";
-		return "DeleteLuceneWork" + tenant + ": " + this.getEntityClass().getName() + "#" + this.getIdInString();
+		return "DeleteLuceneWork" + tenant + ": " + this.getEntityType().getName() + "#" + this.getIdInString();
 	}
 
 }

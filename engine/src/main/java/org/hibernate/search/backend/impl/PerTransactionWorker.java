@@ -23,6 +23,7 @@ import org.hibernate.search.util.impl.Maps;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.TransactionContext;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -54,7 +55,7 @@ public class PerTransactionWorker implements Worker {
 
 	@Override
 	public void performWork(Work work, TransactionContext transactionContext) {
-		final Class<?> entityType = instanceInitializer.getClassFromWork( work );
+		final IndexedTypeIdentifier entityType = instanceInitializer.getIndexedTypeIdFromWork( work );
 		EntityIndexBinding indexBindingForEntity = factory.getIndexBinding( entityType );
 		if ( indexBindingForEntity == null
 				&& factory.getDocumentBuilderContainedEntity( entityType ) == null ) {
@@ -135,23 +136,23 @@ public class PerTransactionWorker implements Worker {
 				throw new AssertionFailure( "Unknown work type: " + work.getType() );
 		}
 		Work result = work;
-		Class<?> entityClass = work.getEntityClass();
+		IndexedTypeIdentifier entityType = work.getTypeIdentifier();
 		switch ( operation ) {
 			case APPLY_DEFAULT:
 				break;
 			case SKIP:
 				result = null;
-				log.forceSkipIndexOperationViaInterception( entityClass, work.getType() );
+				log.forceSkipIndexOperationViaInterception( entityType, work.getType() );
 				break;
 			case UPDATE:
 				result = new Work( work.getTenantIdentifier(), work.getEntity(), work.getId(), WorkType.UPDATE );
-				log.forceUpdateOnIndexOperationViaInterception( entityClass, work.getType() );
+				log.forceUpdateOnIndexOperationViaInterception( entityType, work.getType() );
 				break;
 			case REMOVE:
 				//This works because other Work constructors are never used from WorkType ADD, UPDATE, REMOVE, COLLECTION
 				//TODO should we force isIdentifierRollback to false if the operation is not a delete?
 				result = new Work( work.getTenantIdentifier(), work.getEntity(), work.getId(), WorkType.DELETE, work.isIdentifierWasRolledBack() );
-				log.forceRemoveOnIndexOperationViaInterception( entityClass, work.getType() );
+				log.forceRemoveOnIndexOperationViaInterception( entityType, work.getType() );
 				break;
 			default:
 				throw new AssertionFailure( "Unknown action type: " + operation );

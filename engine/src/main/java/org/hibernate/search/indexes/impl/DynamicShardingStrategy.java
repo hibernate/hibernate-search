@@ -15,6 +15,7 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
@@ -26,10 +27,10 @@ public class DynamicShardingStrategy implements IndexShardingStrategy {
 	private final ShardIdentifierProvider shardIdentifierProvider;
 	private final IndexManagerGroupHolder indexManagerGroupHolder;
 	private final Properties indexProperties;
-	private final Class<?> entityType;
+	private final IndexedTypeIdentifier entityType;
 
 	public DynamicShardingStrategy(ShardIdentifierProvider shardIdentifierProvider,
-			IndexManagerGroupHolder indexManagerGroupHolder, Properties indexProperties, Class<?> entityType) {
+			IndexManagerGroupHolder indexManagerGroupHolder, Properties indexProperties, IndexedTypeIdentifier entityType) {
 		this.shardIdentifierProvider = shardIdentifierProvider;
 		this.indexManagerGroupHolder = indexManagerGroupHolder;
 		this.indexProperties = indexProperties;

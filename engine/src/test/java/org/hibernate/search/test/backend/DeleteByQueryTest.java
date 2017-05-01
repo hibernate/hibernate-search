@@ -28,6 +28,8 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
@@ -37,6 +39,9 @@ import org.junit.Test;
  * @author Martin Braun
  */
 public class DeleteByQueryTest {
+
+	private static final IndexedTypeIdentifier BOOK_TYPE = new PojoIndexedTypeIdentifier( Book.class );
+	private static final IndexedTypeIdentifier MOVIE_TYPE = new PojoIndexedTypeIdentifier( Movie.class );
 
 	@Rule
 	public SearchFactoryHolder factoryHolder = new SearchFactoryHolder( Book.class, Movie.class );
@@ -95,14 +100,14 @@ public class DeleteByQueryTest {
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "url", "lordoftherings" ) ), tc );
+			worker.performWork( new DeleteByQueryWork( BOOK_TYPE, new SingularTermDeletionQuery( "url", "lordoftherings" ) ), tc );
 			tc.end();
 		}
 		this.assertCount( Book.class, 1, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "url", "thehobbit" ) ), tc );
+			worker.performWork( new DeleteByQueryWork( BOOK_TYPE, new SingularTermDeletionQuery( "url", "thehobbit" ) ), tc );
 			tc.end();
 		}
 		this.assertCount( Book.class, 0, integrator );
@@ -125,14 +130,14 @@ public class DeleteByQueryTest {
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "id", String.valueOf( 5 ) ) ), tc );
+			worker.performWork( new DeleteByQueryWork( BOOK_TYPE, new SingularTermDeletionQuery( "id", String.valueOf( 5 ) ) ), tc );
 			tc.end();
 		}
 		this.assertCount( Book.class, 1, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "id", String.valueOf( 6 ) ) ), tc );
+			worker.performWork( new DeleteByQueryWork( BOOK_TYPE, new SingularTermDeletionQuery( "id", String.valueOf( 6 ) ) ), tc );
 			tc.end();
 		}
 		this.assertCount( Book.class, 0, integrator );
@@ -155,14 +160,14 @@ public class DeleteByQueryTest {
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Movie.class, new SingularTermDeletionQuery( "id", 3 ) ), tc );
+			worker.performWork( new DeleteByQueryWork( MOVIE_TYPE, new SingularTermDeletionQuery( "id", 3 ) ), tc );
 			tc.end();
 		}
 		this.assertCount( Movie.class, 1, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Movie.class, new SingularTermDeletionQuery( "id", 4 ) ), tc );
+			worker.performWork( new DeleteByQueryWork( MOVIE_TYPE, new SingularTermDeletionQuery( "id", 4 ) ), tc );
 			tc.end();
 		}
 		this.assertCount( Movie.class, 0, integrator );
@@ -201,14 +206,14 @@ public class DeleteByQueryTest {
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Book.class, query ), tc );
+			worker.performWork( new DeleteByQueryWork( BOOK_TYPE, query ), tc );
 			tc.end();
 		}
 		this.assertCount( entityType, expectedCount, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new Work( Book.class, null, WorkType.PURGE_ALL ), tc );
+			worker.performWork( new Work( BOOK_TYPE, null, WorkType.PURGE_ALL ), tc );
 			tc.end();
 		}
 		this.assertCount( entityType, 0, integrator );

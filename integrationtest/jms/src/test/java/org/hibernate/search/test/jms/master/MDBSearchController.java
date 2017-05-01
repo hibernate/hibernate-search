@@ -14,7 +14,7 @@ import org.hibernate.search.spi.SearchIntegrator;
  */
 public class MDBSearchController extends AbstractJMSHibernateSearchController {
 
-	final SearchIntegrator integrator;
+	private final SearchIntegrator integrator;
 
 	MDBSearchController(SearchIntegrator integrator) {
 		this.integrator = integrator;

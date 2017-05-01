@@ -26,6 +26,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.query.engine.impl.SortConfigurations;
 import org.hibernate.search.query.engine.impl.SortConfigurations.SortConfiguration;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -134,7 +135,7 @@ public class ManagedMultiReader extends MultiReader {
 			boolean foundEntityWithAllRequiredSorts = false;
 			boolean foundEntityWithMissingSorts = false;
 
-			for ( Class<?> entityType : sortConfiguration.getEntityTypes() ) {
+			for ( IndexedTypeIdentifier entityType : sortConfiguration.getEntityTypes() ) {
 				List<String> uncoveredSorts = sortConfiguration.getUncoveredSorts( entityType, sort );
 
 				if ( !uncoveredSorts.isEmpty() ) {

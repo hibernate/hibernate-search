@@ -17,6 +17,7 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
 
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -26,10 +27,8 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -46,16 +45,10 @@ public final class DocumentBuilderHelper {
 	}
 
 	public static DocumentBuilderIndexedEntity getDocumentBuilder(String className, ExtendedSearchIntegrator searchIntegrator) {
-		Class<?> clazz;
-		try {
-			clazz = ClassLoaderHelper.classForName( className, searchIntegrator.getServiceManager() );
-		}
-		catch (ClassLoadingException e) {
-			throw new SearchException( "Unable to load indexed class: " + className, e );
-		}
-		EntityIndexBinding entityIndexBinding = searchIntegrator.getIndexBinding( clazz );
+		IndexedTypeIdentifier keyFromName = searchIntegrator.getIndexBindings().keyFromName( className );
+		EntityIndexBinding entityIndexBinding = searchIntegrator.getIndexBinding( keyFromName );
 		if ( entityIndexBinding == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz );
+			throw new SearchException( "No Lucene configuration set up for: " + keyFromName.getName() );
 		}
 		return entityIndexBinding.getDocumentBuilder();
 	}
@@ -65,7 +58,7 @@ public final class DocumentBuilderHelper {
 		final String fieldName = builderIndexedEntity.getIdFieldName();
 		try {
 			return (Serializable) conversionContext
-					.setClass( builderIndexedEntity.getBeanClass() )
+					.setConvertedTypeId( builderIndexedEntity.getTypeIdentifier() )
 					.pushIdentifierProperty()
 					.twoWayConversionContext( fieldBridge )
 					.get( fieldName, document );
@@ -79,7 +72,7 @@ public final class DocumentBuilderHelper {
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
 		Arrays.fill( result, NOT_SET );
-		conversionContext.setClass( builderIndexedEntity.getBeanClass() );
+		conversionContext.setConvertedTypeId( builderIndexedEntity.getTypeIdentifier() );
 		if ( builderIndexedEntity.getIdFieldName() != null ) {
 			final String fieldName = builderIndexedEntity.getIdFieldName();
 			int matchingPosition = getFieldPosition( fields, fieldName );

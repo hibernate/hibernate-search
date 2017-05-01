@@ -26,7 +26,9 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Assert;
@@ -45,12 +47,14 @@ import org.junit.experimental.categories.Category;
 @Category(SkipOnElasticsearch.class) // This test is Lucene-specific. The equivalent for Elasticsearch is ElasticsearchIndexWorkProcessorErrorHandlingTest
 public class LuceneErrorHandlingTest extends SearchTestBase {
 
-	static final AtomicInteger WORK_COUNTER = new AtomicInteger();
+	private static final IndexedTypeIdentifier testTypeId = new PojoIndexedTypeIdentifier( Foo.class );
+
+	private static final AtomicInteger WORK_COUNTER = new AtomicInteger();
 
 	@Test
 	public void testErrorHandling() {
 		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
-		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( Foo.class );
+		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( testTypeId );
 		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
 
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
@@ -94,7 +98,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 	@Test
 	public void testNoEntityErrorHandling() {
 		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
-		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( Foo.class );
+		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( testTypeId );
 		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
 
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
@@ -148,7 +152,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 	static class HarmlessWork extends DeleteLuceneWork {
 
 		public HarmlessWork(String workIdentifier) {
-			super( workIdentifier, workIdentifier, Foo.class );
+			super( workIdentifier, workIdentifier, testTypeId );
 		}
 
 		@Override
@@ -189,7 +193,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 	static class FailingWork extends DeleteLuceneWork {
 
 		public FailingWork(String workIdentifier) {
-			super( workIdentifier, workIdentifier, Foo.class );
+			super( workIdentifier, workIdentifier, testTypeId );
 		}
 
 		@Override

@@ -10,8 +10,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -24,14 +24,14 @@ class NumericFieldsConfiguration {
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private final Class<?> indexedType;
-	private final XProperty member;
+	private final IndexedTypeIdentifier indexedType;
+	private final String propertyName;
 	private final Map<String, NumericField> fieldsMarkedAsNumeric;
 	private final Set<String> fieldsOfProperty = new LinkedHashSet<>();
 
-	NumericFieldsConfiguration(Class<?> indexedType, XProperty member, Map<String, NumericField> fieldsMarkedAsNumeric) {
-		this.indexedType = indexedType;
-		this.member = member;
+	NumericFieldsConfiguration(IndexedTypeIdentifier indexedTypeIdentifier, String propertyName, Map<String, NumericField> fieldsMarkedAsNumeric) {
+		this.indexedType = indexedTypeIdentifier;
+		this.propertyName = propertyName;
 		this.fieldsMarkedAsNumeric = fieldsMarkedAsNumeric;
 	}
 
@@ -69,7 +69,7 @@ class NumericFieldsConfiguration {
 				continue;
 			}
 
-			throw LOG.numericFieldAnnotationWithoutMatchingField( indexedType, member.getName() );
+			throw LOG.numericFieldAnnotationWithoutMatchingField( indexedType, propertyName );
 		}
 	}
 

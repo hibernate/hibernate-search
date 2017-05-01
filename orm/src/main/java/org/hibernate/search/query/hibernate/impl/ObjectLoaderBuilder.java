@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Criteria;
@@ -22,6 +21,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -30,7 +30,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class ObjectLoaderBuilder {
 	private Criteria criteria;
-	private List<Class<?>> targetedEntities;
+	private IndexedTypeSet targetedEntities;
 	private SessionImplementor session;
 	private ExtendedSearchIntegrator extendedIntegrator;
 	private Set<Class<?>> indexedTargetedEntities;
@@ -44,7 +44,7 @@ public class ObjectLoaderBuilder {
 		return this;
 	}
 
-	public ObjectLoaderBuilder targetedEntities(List<Class<?>> targetedEntities) {
+	public ObjectLoaderBuilder targetedEntities(IndexedTypeSet targetedEntities) {
 		this.targetedEntities = targetedEntities;
 		return this;
 	}
@@ -81,7 +81,7 @@ public class ObjectLoaderBuilder {
 	private Loader getSingleEntityLoader() {
 		final QueryLoader queryLoader = new QueryLoader();
 		queryLoader.init( (Session) session, extendedIntegrator, getObjectInitializer(), timeoutManager );
-		queryLoader.setEntityType( targetedEntities.iterator().next() );
+		queryLoader.setEntityType( targetedEntities.iterator().next().getPojoType() );
 		return queryLoader;
 	}
 
@@ -89,7 +89,7 @@ public class ObjectLoaderBuilder {
 		if ( targetedEntities.size() > 1 ) {
 			throw new SearchException( "Cannot mix criteria and multiple entity types" );
 		}
-		Class entityType = targetedEntities.size() == 0 ? null : targetedEntities.iterator().next();
+		Class entityType = targetedEntities.size() == 0 ? null : targetedEntities.iterator().next().getPojoType();
 		if ( criteria instanceof CriteriaImpl ) {
 			String targetEntity = ( (CriteriaImpl) criteria ).getEntityOrClassName();
 			if ( entityType == null ) {

@@ -10,9 +10,11 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.stat.Statistics;
 
@@ -25,9 +27,9 @@ import org.hibernate.search.stat.Statistics;
  */
 final class SearchFactoryImpl implements SearchFactory {
 
-	private final SearchIntegrator searchIntegrator;
+	private final ExtendedSearchIntegrator searchIntegrator;
 
-	public SearchFactoryImpl(SearchIntegrator searchIntegrator) {
+	public SearchFactoryImpl(ExtendedSearchIntegrator searchIntegrator) {
 		this.searchIntegrator = searchIntegrator;
 	}
 
@@ -37,8 +39,9 @@ final class SearchFactoryImpl implements SearchFactory {
 	}
 
 	@Override
-	public void optimize(Class<?> entityType) {
-		searchIntegrator.optimize( entityType );
+	public void optimize(Class<?> clazz) {
+		IndexedTypeIdentifier typeId = searchIntegrator.getIndexBindings().keyFromPojoType( clazz );
+		searchIntegrator.optimize( typeId );
 	}
 
 	@Override
@@ -48,7 +51,8 @@ final class SearchFactoryImpl implements SearchFactory {
 
 	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
-		return searchIntegrator.getAnalyzer( clazz );
+		IndexedTypeIdentifier typeId = searchIntegrator.getIndexBindings().keyFromPojoType( clazz );
+		return searchIntegrator.getAnalyzer( typeId );
 	}
 
 	@Override

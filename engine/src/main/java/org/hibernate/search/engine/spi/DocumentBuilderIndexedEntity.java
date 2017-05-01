@@ -73,6 +73,7 @@ import org.hibernate.search.engine.nesting.impl.NestingContextFactory;
 import org.hibernate.search.engine.nesting.impl.NestingContextFactoryProvider;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.InternalAnalyzerUtils;
@@ -148,9 +149,10 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 	private NestingContextFactory nestingContextFactory;
 
+	private final IndexedTypeIdentifier mappedClassId;
+
 	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
-	 *
 	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>
 	 * @param typeMetadata all the metadata for the entity type
 	 * @param context Handle to default configuration settings
@@ -161,6 +163,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	public DocumentBuilderIndexedEntity(XClass clazz, TypeMetadata typeMetadata, ConfigContext context,
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {
 		super( clazz, typeMetadata, reflectionManager, optimizationBlackList, instanceInitializer );
+		this.mappedClassId = typeMetadata.getType();
 
 		ProvidedId providedIdAnnotation = findProvidedId( clazz, reflectionManager );
 		if ( providedIdAnnotation != null || context.isProvidedIdImplicit() ) {
@@ -208,6 +211,13 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return idPropertyMetadata.getPropertyAccessor();
 	}
 
+	/**
+	 * @return which indexed type is being mapped by this DocumentBuilder
+	 */
+	public IndexedTypeIdentifier getTypeIdentifier() {
+		return this.mappedClassId;
+	}
+
 	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {
 		ProvidedId id = null;
 		XClass currentClass = clazz;
@@ -219,17 +229,17 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	@Override
-	public void addWorkToQueue(String tenantId, Class<?> entityClass, Object entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
+	public void addWorkToQueue(String tenantId, IndexedTypeIdentifier typeIdentifier, Object entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
 		DocumentFieldMetadata idFieldMetadata = idPropertyMetadata.getFieldMetadata( idFieldName );
 		String idInString = objectToString( getIdBridge(), idFieldMetadata.getAbsoluteName(), id, contextualBridge );
 		if ( delete && !add ) {
-			queue.add( new DeleteLuceneWork( tenantId, id, idInString, entityClass ) );
+			queue.add( new DeleteLuceneWork( tenantId, id, idInString, typeIdentifier ) );
 		}
 		else if ( add && !delete ) {
 			queue.add(
 					createAddWork(
 							tenantId,
-							entityClass,
+							typeIdentifier,
 							entity,
 							id,
 							idInString,
@@ -242,7 +252,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			queue.add(
 					createUpdateWork(
 							tenantId,
-							entityClass,
+							typeIdentifier,
 							entity,
 							id,
 							idInString,
@@ -258,7 +268,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		String stringValue;
 		try {
 			stringValue = conversionContext
-					.setClass( getBeanClass() )
+					.setConvertedTypeId( getTypeMetadata().getType() )
 					.twoWayConversionContext( bridge )
 					.objectToString( value );
 		}
@@ -273,7 +283,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		String stringValue;
 		try {
 			stringValue = conversionContext
-					.setClass( getBeanClass() )
+					.setConvertedTypeId( getTypeMetadata().getType() )
 					.stringConversionContext( bridge )
 					.objectToString( value );
 		}
@@ -283,28 +293,28 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return stringValue;
 	}
 
-	public AddLuceneWork createAddWork(String tenantId, Class<?> entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext conversionContext) {
+	public AddLuceneWork createAddWork(String tenantId, IndexedTypeIdentifier entityType, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext conversionContext) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( tenantId, entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext, null );
 		final AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
-			addWork = new AddLuceneWork( tenantId, id, idInString, entityClass, doc );
+			addWork = new AddLuceneWork( tenantId, id, idInString, entityType, doc );
 		}
 		else {
-			addWork = new AddLuceneWork( tenantId, id, idInString, entityClass, doc, fieldToAnalyzerMap );
+			addWork = new AddLuceneWork( tenantId, id, idInString, entityType, doc, fieldToAnalyzerMap );
 		}
 		return addWork;
 	}
 
-	public UpdateLuceneWork createUpdateWork(String tenantId, Class entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
+	public UpdateLuceneWork createUpdateWork(String tenantId, IndexedTypeIdentifier entityType, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( tenantId, entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge, null );
 		final UpdateLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
-			addWork = new UpdateLuceneWork( tenantId, id, idInString, entityClass, doc );
+			addWork = new UpdateLuceneWork( tenantId, id, idInString, entityType, doc );
 		}
 		else {
-			addWork = new UpdateLuceneWork( tenantId, id, idInString, entityClass, doc, fieldToAnalyzerMap );
+			addWork = new UpdateLuceneWork( tenantId, id, idInString, entityType, doc, fieldToAnalyzerMap );
 		}
 		return addWork;
 	}
@@ -369,7 +379,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
 			LuceneOptions luceneOptions = new LuceneOptionsImpl( idFieldMetaData, idFieldMetaData.getBoost(), documentLevelBoost );
 			final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( getIdBridge() );
-			conversionContext.setClass( entityType );
+			conversionContext.setConvertedTypeId( getTypeMetadata().getType() );
 
 			if ( idPropertyName != null ) {
 				conversionContext.pushProperty( idPropertyName );
@@ -1160,4 +1170,5 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	public boolean isIdMatchingJpaId() {
 		return ( !idProvided && getTypeMetadata().isJpaIdUsedAsDocumentId() );
 	}
+
 }

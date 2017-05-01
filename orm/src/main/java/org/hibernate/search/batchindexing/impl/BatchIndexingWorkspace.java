@@ -21,6 +21,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -40,7 +41,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private final ProducerConsumerQueue<List<Serializable>> primaryKeyStream;
 
 	private final int documentBuilderThreads;
-	private final Class<?> indexedType;
+	private final IndexedTypeIdentifier indexedType;
 	private final String idNameOfIndexedType;
 
 	// status control
@@ -67,7 +68,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	public BatchIndexingWorkspace(ExtendedSearchIntegrator extendedIntegrator,
 								SessionFactoryImplementor sessionFactory,
-								Class<?> entityType,
+								IndexedTypeIdentifier type,
 								int objectLoadingThreads,
 								CacheMode cacheMode,
 								int objectLoadingBatchSize,
@@ -79,11 +80,11 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 								Integer transactionTimeout,
 								String tenantId) {
 		super( extendedIntegrator );
-		this.indexedType = entityType;
+		this.indexedType = type;
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
-		this.idNameOfIndexedType = extendedIntegrator.getIndexBinding( entityType )
+		this.idNameOfIndexedType = extendedIntegrator.getIndexBinding( type )
 				.getDocumentBuilder()
 				.getIdPropertyName();
 		this.sessionFactory = sessionFactory;

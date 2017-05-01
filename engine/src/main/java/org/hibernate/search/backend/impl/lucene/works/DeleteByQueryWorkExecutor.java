@@ -21,6 +21,7 @@ import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -45,7 +46,7 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
 		DeleteByQueryLuceneWork deleteWork = (DeleteByQueryLuceneWork) work;
 
-		final Class<?> entityType = work.getEntityClass();
+		final IndexedTypeIdentifier entityType = work.getEntityType();
 		final DeletionQuery query = deleteWork.getDeletionQuery();
 
 		if ( log.isTraceEnabled() ) {

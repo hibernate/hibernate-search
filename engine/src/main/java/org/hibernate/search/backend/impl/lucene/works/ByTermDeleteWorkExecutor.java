@@ -15,6 +15,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.IndexWriterDelegate;
@@ -42,7 +43,7 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 
 	@Override
 	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
-		final Class<?> managedType = work.getEntityClass();
+		final IndexedTypeIdentifier managedType = work.getEntityType();
 		final String tenantId = work.getTenantId();
 		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( managedType );
 		Serializable id = work.getId();

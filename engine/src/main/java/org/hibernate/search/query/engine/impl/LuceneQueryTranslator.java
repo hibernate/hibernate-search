@@ -9,6 +9,7 @@ package org.hibernate.search.query.engine.impl;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
+import org.hibernate.search.spi.IndexedTypeSet;
 
 /**
  * Implementations translate Lucene queries into other backend-specific representations.
@@ -21,5 +22,5 @@ public interface LuceneQueryTranslator extends Service {
 
 	QueryDescriptor convertLuceneQuery(Query query);
 
-	boolean conversionRequired(Class<?>... entities);
+	boolean conversionRequired(IndexedTypeSet entities);
 }

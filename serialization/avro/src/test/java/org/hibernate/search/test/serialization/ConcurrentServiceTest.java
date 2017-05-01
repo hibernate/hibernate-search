@@ -17,6 +17,8 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
@@ -113,12 +115,13 @@ public class ConcurrentServiceTest {
 		List<LuceneWork> works = new ArrayList<>();
 		works.add( OptimizeLuceneWork.INSTANCE );
 		works.add( OptimizeLuceneWork.INSTANCE );
-		works.add( new OptimizeLuceneWork( RemoteEntity.class ) ); //class won't be send over
-		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
-		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
-		works.add( new DeleteLuceneWork( 123l, "123", RemoteEntity.class ) );
-		works.add( new DeleteLuceneWork( "Foo", "Bar", RemoteEntity.class ) );
-		works.add( new AddLuceneWork( 125, "125", RemoteEntity.class, new Document() ) );
+		IndexedTypeIdentifier type = new PojoIndexedTypeIdentifier( RemoteEntity.class );
+		works.add( new OptimizeLuceneWork( type ) ); //won't be send over
+		works.add( new PurgeAllLuceneWork( type ) );
+		works.add( new PurgeAllLuceneWork( type ) );
+		works.add( new DeleteLuceneWork( 123l, "123", type ) );
+		works.add( new DeleteLuceneWork( "Foo", "Bar", type ) );
+		works.add( new AddLuceneWork( 125, "125", type, new Document() ) );
 		return works;
 	}
 

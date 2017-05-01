@@ -16,6 +16,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.search.Search;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchInitializationTestBase;
@@ -101,6 +102,7 @@ public class RamDirectoryTest extends SearchInitializationTestBase {
 	}
 
 	private int getDocumentNbr() throws Exception {
-		return getBackendTestHelper().getNumberOfDocumentsInIndex( Document.class );
+		return getBackendTestHelper().getNumberOfDocumentsInIndex( new PojoIndexedTypeIdentifier( Document.class ) );
 	}
+
 }

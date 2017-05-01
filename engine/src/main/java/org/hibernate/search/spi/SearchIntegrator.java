@@ -35,18 +35,38 @@ import org.hibernate.search.stat.Statistics;
  * its clients.
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public interface SearchIntegrator extends AutoCloseable {
 
 	/**
+	 * Returns a map of all known entity index binding (indexed entities) keyed against the indexed type
+	 *
+	 * @return a map of all known entity index binding (indexed entities) keyed against the indexed type. The empty
+	 * map is returned if there are no indexed types.
+	 */
+	IndexedTypeMap<EntityIndexBinding> getIndexBindings();
+
+	/**
 	 * Returns the entity to index binding for the given type.
+	 *
+	 * @deprecated Use {@link #getIndexBinding(IndexedTypeIdentifier)} instead.
 	 *
 	 * @param entityType the type for which to retrieve the binding
 	 *
 	 * @return the entity to index binding for the given type. {@code null} is returned for types which are unindexed or
 	 *         unknown.
 	 */
+	@Deprecated
 	EntityIndexBinding getIndexBinding(Class<?> entityType);
+
+	/**
+	 * Returns the entity to index binding for the given type.
+	 * @param entityType the type for which to retrieve the binding
+	 * @return the entity to index binding for the given type. {@code null} is returned for types which are unindexed or
+	 *         unknown.
+	 */
+	EntityIndexBinding getIndexBinding(IndexedTypeIdentifier entityType);
 
 	/**
 	 * Add the following classes to the SearchIntegrator. If these classes are new to the SearchIntegrator this
@@ -61,7 +81,7 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * The returned object uses fluent APIs to define additional query settings.
 	 * <p>Be aware that some backends may not implement {@link HSQuery#luceneQuery(Query)},
 	 * in which case the query provided here cannot be overridden.
-	 * <p>Calling {@link HSQuery#targetedEntities(java.util.List)} on the resulting query
+	 * <p>Calling {@link HSQuery#targetedEntities(IndexedTypeSet)} on the resulting query
 	 * is not necessary, unless you later decide to target a subset of {@code entities}.
 	 *
 	 * @param fullTextQuery the full-text engine query
@@ -112,10 +132,19 @@ public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Optimize the index holding {@code entityType}
+	 * @deprecated Use {@link #optimize(IndexedTypeIdentifier)}
 	 *
 	 * @param entityType the entity type (index) to optimize
 	 */
+	@Deprecated
 	void optimize(Class entityType);
+
+	/**
+	 * Optimize the index holding {@code entityType}
+	 *
+	 * @param entityType the entity type (index) to optimize
+	 */
+	void optimize(IndexedTypeIdentifier entityType);
 
 	/**
 	 * Retrieve an analyzer instance by its definition name
@@ -131,6 +160,8 @@ public interface SearchIntegrator extends AutoCloseable {
 	/**
 	 * Retrieves the scoped analyzer for a given class.
 	 *
+	 * @deprecated Use {@link #getAnalyzer(IndexedTypeIdentifier)}
+	 *
 	 * @param clazz The class for which to retrieve the analyzer.
 	 *
 	 * @return The scoped analyzer for the specified class.
@@ -138,7 +169,20 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
 	 * class is not an indexed entity.
 	 */
+	@Deprecated
 	Analyzer getAnalyzer(Class<?> clazz);
+
+	/**
+	 * Retrieves the scoped analyzer for a given indexed type.
+	 *
+	 * @param typeId The indexed type identifier for which to retrieve the analyzer.
+	 *
+	 * @return The scoped analyzer for the specified class.
+	 *
+	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
+	 * class is not an indexed entity.
+	 */
+	Analyzer getAnalyzer(IndexedTypeIdentifier typeId);
 
 	/**
 	 * @return return a query builder providing a fluent API to create Lucene queries
@@ -162,6 +206,8 @@ public interface SearchIntegrator extends AutoCloseable {
 	/**
 	 * Returns a descriptor for the specified entity type describing its indexed state.
 	 *
+	 * @deprecated Use {@link #getIndexedTypeDescriptor(IndexedTypeIdentifier)}
+	 *
 	 * @param entityType the entity for which to retrieve the descriptor
 	 *
 	 * @return a non {@code null} {@code IndexedEntityDescriptor}. This method can also be called for non indexed types.
@@ -169,14 +215,37 @@ public interface SearchIntegrator extends AutoCloseable {
 	 *
 	 * @throws IllegalArgumentException in case {@code entityType} is {@code null}
 	 */
+	@Deprecated
 	IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType);
+
+	/**
+	 * Returns a descriptor for the specified entity type describing its indexed state.
+	 *
+	 * @param typeId the identification of the indexed entity for which to retrieve the descriptor
+	 *
+	 * @return a non {@code null} {@code IndexedEntityDescriptor}. This method can also be called for non indexed types.
+	 *         To determine whether the entity is actually indexed {@link org.hibernate.search.metadata.IndexedTypeDescriptor#isIndexed()} can be used.
+	 *
+	 * @throws IllegalArgumentException in case {@code entityType} is {@code null}
+	 */
+	IndexedTypeDescriptor getIndexedTypeDescriptor(IndexedTypeIdentifier typeId);
 
 	/**
 	 * Returns the set of currently indexed types.
 	 *
+	 * @deprecated Use {@link #getIndexedTypeIdentifiers()}
+	 *
 	 * @return the set of currently indexed types. If no types are indexed the empty set is returned.
 	 */
+	@Deprecated
 	Set<Class<?>> getIndexedTypes();
+
+	/**
+	 * Returns the set of currently indexed types.
+	 *
+	 * @return the set of currently indexed types. This might be empty.
+	 */
+	IndexedTypeSet getIndexedTypeIdentifiers();
 
 	/**
 	 * Unwraps some internal Hibernate Search types.
@@ -235,4 +304,5 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * You should be prepared for incompatible changes in future releases.
 	 */
 	OperationDispatcher createRemoteOperationDispatcher(Predicate<IndexManager> indexManagerFilter);
+
 }

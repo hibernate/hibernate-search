@@ -84,7 +84,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	/**
 	 * Constructs a  <code>FullTextQueryImpl</code> instance.
 	 *
-	 * @param hSearchQuery The query, with the {@link HSQuery#targetedEntities(List) targeted entities} already set if necessary.
+	 * @param hSearchQuery The query, with the {@link HSQuery#targetedEntities(org.hibernate.search.spi.IndexedTypesSet) targeted entities} already set if necessary.
 	 * @param session Access to the Hibernate session.
 	 * @param parameterMetadata Additional query metadata.
 	 */
@@ -164,7 +164,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		ObjectLoaderBuilder loaderBuilder = new ObjectLoaderBuilder()
 				.criteria( criteria )
 				.targetedEntities( hSearchQuery.getTargetedEntities() )
-				.indexedTargetedEntities( hSearchQuery.getIndexedTargetedEntities() )
+				.indexedTargetedEntities( hSearchQuery.getIndexedTargetedEntities().toPojosSet() )
 				.session( session )
 				.searchFactory( hSearchQuery.getExtendedSearchIntegrator() )
 				.timeoutManager( hSearchQuery.getTimeoutManager() )

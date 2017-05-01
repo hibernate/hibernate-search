@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.Collections;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -20,6 +18,8 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -60,8 +60,8 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entity) {
-		return indexManager.getIndexBinding( entity ).getDocumentBuilder();
+	public DocumentBuilderIndexedEntity getDocumentBuilder(IndexedTypeIdentifier type) {
+		return indexManager.getIndexBinding( type ).getDocumentBuilder();
 	}
 
 	@Override
@@ -85,11 +85,11 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public Set<Class<?>> getEntitiesInIndexManager() {
+	public IndexedTypeSet getEntitiesInIndexManager() {
 		// Do not cache it as an IndexManager receiving a new type should return an updated list
 		// and will trigger a LuceneBackendResources rebuild and by side effect
 		// a new LuceneWorkVisitor which will need the new list
-		return Collections.unmodifiableSet( indexManager.getContainedTypes() );
+		return indexManager.getContainedTypes();
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 		}
 		// Optimize only if we have all the metadata
 		if ( indexMetadataIsComplete ) {
-			Set<Class<?>> entitiesInvolved = getEntitiesInIndexManager();
+			IndexedTypeSet entitiesInvolved = getEntitiesInIndexManager();
 			// a single entity is always safe
 			if ( entitiesInvolved.size() == 1 ) {
 				return true;
@@ -148,16 +148,16 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 				// because we don't know for sure all the fields involved as FiedBridges can do a lot of things
 				// behind our back
 				// Once we have some new metadata, we can revisit
-				for ( Class<?> firstEntity : entitiesInvolved ) {
+				for ( IndexedTypeIdentifier firstEntity : entitiesInvolved ) {
 					boolean firstEntityIsUsingJPAId =
 							indexManager.getIndexBinding( firstEntity )
 									.getDocumentBuilder()
 									.getTypeMetadata()
 									.isJpaIdUsedAsDocumentId();
 					boolean followingEntities = false;
-					for ( Class<?> secondEntity : entitiesInvolved ) {
+					for ( IndexedTypeIdentifier secondEntity : entitiesInvolved ) {
 						// Skip all entities already processed and the same entity
-						if ( firstEntity == secondEntity ) {
+						if ( firstEntity.equals( secondEntity ) ) {
 							followingEntities = true;
 						}
 						else if ( followingEntities ) {
@@ -171,7 +171,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 							// the boolean evaluation in important: only call areIdsUniqueForClasses if absolutely necessary
 							boolean uniqueIdEqualityMeansEntityEquality =
 									firstEntityIsUsingJPAId && secondEntityIsUsingJPAId &&
-									idUniquenessResolver.areIdsUniqueForClasses( firstEntity, secondEntity );
+									idUniquenessResolver.areIdsUniqueForClasses( firstEntity.getPojoType(), secondEntity.getPojoType() );
 							if ( !uniqueIdEqualityMeansEntityEquality ) {
 								return false;
 							}

@@ -18,6 +18,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.jmx.IndexControlMBean;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Implementation of the {@code IndexControlMBean} JMX attributes and operations.
@@ -88,8 +89,8 @@ public class IndexControl implements IndexControlMBean {
 
 	@Override
 	public void optimize(String entity) {
-		Class<?> clazz = getEntityClass( entity );
-		extendedIntegrator.optimize( clazz );
+		IndexedTypeIdentifier typeIdentifier = extendedIntegrator.getIndexBindings().keyFromName( entity );
+		extendedIntegrator.optimize( typeIdentifier );
 	}
 
 	@Override

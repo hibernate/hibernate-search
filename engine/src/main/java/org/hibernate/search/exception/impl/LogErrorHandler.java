@@ -11,6 +11,7 @@ import java.util.List;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -53,7 +54,7 @@ public class LogErrorHandler implements ErrorHandler {
 	}
 
 	public static final void appendFailureMessage(StringBuilder message, LuceneWork workThatFailed) {
-		Class<?> entityClass = workThatFailed.getEntityClass();
+		IndexedTypeIdentifier entityClass = workThatFailed.getEntityType();
 		String entityClassName = entityClass == null ? null : entityClass.getName();
 		message.append( "\tEntity " )
 			.append( entityClassName )

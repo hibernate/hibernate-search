@@ -20,6 +20,7 @@ import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.After;
@@ -87,7 +88,7 @@ public class DeleteByQueryIT extends SearchTestBase {
 		ExtendedSearchIntegrator integrator = session.getSearchFactory()
 				.unwrap( ExtendedSearchIntegrator.class );
 
-		DeleteByQueryWork queryWork = new DeleteByQueryWork( HockeyPlayer.class, new SingularTermDeletionQuery( "active", "false" ) );
+		DeleteByQueryWork queryWork = new DeleteByQueryWork( new PojoIndexedTypeIdentifier( HockeyPlayer.class ), new SingularTermDeletionQuery( "active", "false" ) );
 
 		TransactionContext tc = new TransactionContextForTest();
 

@@ -15,6 +15,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -40,7 +41,7 @@ class FacetBuildingContext<T> {
 		);
 
 	private final ExtendedSearchIntegrator factory;
-	private final Class<?> entityType;
+	private final IndexedTypeIdentifier entityType;
 
 	private String name;
 	private String fieldName;
@@ -54,9 +55,9 @@ class FacetBuildingContext<T> {
 	private boolean includeRangeEnd = true;
 	private int maxFacetCount = -1;
 
-	public FacetBuildingContext(ExtendedSearchIntegrator factory, Class<?> entityType) {
+	public FacetBuildingContext(ExtendedSearchIntegrator factory, IndexedTypeIdentifier indexedTypeIdentifier) {
 		this.factory = factory;
-		this.entityType = entityType;
+		this.entityType = indexedTypeIdentifier;
 	}
 
 	void setName(String name) {

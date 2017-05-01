@@ -17,6 +17,8 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.util.StringHelper;
 
 /**
@@ -32,7 +34,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	private static final String IDENTIFIER = "identifier";
 
 	// Mutable state:
-	private Class<?> clazz;
+	private IndexedTypeIdentifier type;
 	private StringBridge stringBridge;
 	private FieldBridge oneWayBridge;
 	private TwoWayFieldBridge twoWayBridge;
@@ -44,8 +46,14 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	private final StringConversionContextImpl stringAdapter = new StringConversionContextImpl();
 
 	@Override
+	@Deprecated
 	public ConversionContext setClass(Class<?> clazz) {
-		this.clazz = clazz;
+		return setConvertedTypeId( new PojoIndexedTypeIdentifier( clazz ) );
+	}
+
+	@Override
+	public ConversionContext setConvertedTypeId(IndexedTypeIdentifier type) {
+		this.type = type;
 		return this;
 	}
 
@@ -72,8 +80,8 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 
 	protected BridgeException buildBridgeException(Exception e, String method, String fieldName, Object bridge) {
 		StringBuilder errorMessage = new StringBuilder( "Exception while calling bridge#" ).append( method );
-		if ( clazz != null ) {
-			errorMessage.append( "\n\tentity class: " ).append( clazz.getName() );
+		if ( type != null ) {
+			errorMessage.append( "\n\tentity class: " ).append( type.getName() );
 		}
 		if ( propertyPath.size() > 0 ) {
 			errorMessage.append( "\n\tentity property path: " );
@@ -184,4 +192,5 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			}
 		}
 	}
+
 }

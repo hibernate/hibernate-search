@@ -28,7 +28,9 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexingMode;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.testsupport.TestConstants;
@@ -53,6 +55,7 @@ import static org.junit.Assert.assertEquals;
 public class JGroupsMasterTest extends SearchTestBase {
 
 	private static final Poller POLLER = JGroupsCommonTest.POLLER;
+	private static final IndexedTypeIdentifier tshirtType = new PojoIndexedTypeIdentifier( TShirt.class );
 
 	private final QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
 
@@ -115,7 +118,7 @@ public class JGroupsMasterTest extends SearchTestBase {
 	}
 
 	protected String getIndexName() {
-		return org.hibernate.search.test.jgroups.master.TShirt.class.getName();
+		return tshirtType.getName();
 	}
 
 	/**
@@ -138,7 +141,7 @@ public class JGroupsMasterTest extends SearchTestBase {
 		DoubleField numField = new DoubleField( "length", shirt.getLength(), Field.Store.NO );
 		doc.add( numField );
 		LuceneWork luceneWork = new AddLuceneWork(
-				shirt.getId(), String.valueOf( shirt.getId() ), shirt.getClass(), doc
+				shirt.getId(), String.valueOf( shirt.getId() ), tshirtType, doc
 		);
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( luceneWork );

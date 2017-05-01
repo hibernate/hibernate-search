@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -15,6 +14,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -32,9 +32,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private final int batchSize;
 	private final TransactionalOperationDispatcher operationDispatcher;
 
-	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexBinding> entityIndexBindings, Properties properties, IndexManagerHolder indexManagerHolder) {
+	public BatchedQueueingProcessor(IndexedTypeMap<EntityIndexBinding> documentBuildersIndexedEntities, Properties properties, IndexManagerHolder indexManagerHolder) {
 		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
-		this.operationDispatcher = new TransactionalOperationDispatcher( indexManagerHolder, entityIndexBindings );
+		this.operationDispatcher = new TransactionalOperationDispatcher( indexManagerHolder, documentBuildersIndexedEntities );
 	}
 
 	@Override

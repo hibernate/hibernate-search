@@ -26,6 +26,7 @@ import org.hibernate.search.elasticsearch.work.impl.SimpleElasticsearchWork;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.test.TestResourceManager;
 import org.hibernate.search.test.util.BackendTestHelper;
 
@@ -45,7 +46,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 	}
 
 	@Override
-	public int getNumberOfDocumentsInIndex(Class<?> entityType) {
+	public int getNumberOfDocumentsInIndex(IndexedTypeIdentifier entityType) {
 		ServiceManager serviceManager = resourceManager.getExtendedSearchIntegrator().getServiceManager();
 
 		IndexManager[] indexManagers = resourceManager.getExtendedSearchIntegrator()

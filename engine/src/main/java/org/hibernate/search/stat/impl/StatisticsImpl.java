@@ -32,6 +32,7 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
@@ -214,7 +215,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	@Override
 	public Set<String> getIndexedClassNames() {
 		Set<String> indexedClasses = new HashSet<String>();
-		for ( Class clazz : extendedIntegrator.getIndexBindings().keySet() ) {
+		for ( IndexedTypeIdentifier clazz : extendedIntegrator.getIndexBindings().keySet() ) {
 			indexedClasses.add( clazz.getName() );
 		}
 		return indexedClasses;

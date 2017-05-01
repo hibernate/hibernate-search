@@ -7,8 +7,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -16,6 +14,9 @@ import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
+import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -36,28 +37,29 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 	@Override
 	public EntityContext forEntity(Class<?> entityType) {
-		return new HSearchEntityContext( entityType, factory );
+		IndexedTypeIdentifier realtype = new PojoIndexedTypeIdentifier( entityType );
+		return new HSearchEntityContext( realtype, factory );
 	}
 
 	public final class HSearchEntityContext implements EntityContext {
-		private final Class<?> indexBoundType;
+		private final IndexedTypeIdentifier indexBoundType;
 		private final ScopedAnalyzerReference originalAnalyzerReference;
 		private final ScopedAnalyzerReference.CopyBuilder queryAnalyzerReferenceBuilder;
 		private final AnalyzerRegistry analyzerRegistry;
 
-		public HSearchEntityContext(Class<?> entityType, ExtendedSearchIntegrator factory) {
+		public HSearchEntityContext(IndexedTypeIdentifier entityType, ExtendedSearchIntegrator factory) {
 			// get a type for meta-data retrieval; if the given type itself is not indexed, one indexed sub-type will
 			// be used; note that this allows to e.g. query for fields not present on the given type but on one of its
 			// sub-types, but we accept this for now
 			indexBoundType = getIndexBoundType( entityType, factory );
 
 			if ( indexBoundType == null ) {
-				Set<Class<?>> configuredSubTypes = factory.getConfiguredTypesPolymorphic( new Class<?>[] { entityType } );
+				IndexedTypeSet configuredSubTypes = factory.getConfiguredTypesPolymorphic( entityType.asTypeSet() );
 				if ( configuredSubTypes.isEmpty() ) {
-					throw log.cantQueryUnconfiguredType( entityType.getCanonicalName() );
+					throw log.cantQueryUnconfiguredType( entityType.getName() );
 				}
 				else {
-					throw log.cantQueryUnindexedType( entityType.getCanonicalName() );
+					throw log.cantQueryUnindexedType( entityType.getName() );
 				}
 			}
 
@@ -75,12 +77,12 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 		 * @return the given type itself if it is indexed, otherwise the first found indexed sub-type or {@code null} if
 		 * neither the given type nor any of its sub-types are indexed
 		 */
-		private Class<?> getIndexBoundType(Class<?> entityType, ExtendedSearchIntegrator factory) {
+		private IndexedTypeIdentifier getIndexBoundType(IndexedTypeIdentifier entityType, ExtendedSearchIntegrator factory) {
 			if ( factory.getIndexBinding( entityType ) != null ) {
 				return entityType;
 			}
 
-			Set<Class<?>> indexedSubTypes = factory.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
+			IndexedTypeSet indexedSubTypes = factory.getIndexedTypesPolymorphic( entityType.asTypeSet() );
 
 			if ( !indexedSubTypes.isEmpty() ) {
 				return indexedSubTypes.iterator().next();

@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.indexes.spi;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -26,7 +24,10 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.impl.IndexedTypesSets;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.Log;
@@ -50,7 +51,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private WorkspaceHolder workspaceHolder;
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters indexingParameters;
-	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
+	private IndexedTypeSet containedEntityTypes = IndexedTypesSets.empty();
 	private LuceneWorkSerializer serializer;
 	private ExtendedSearchIntegrator boundSearchIntegrator = null;
 	private DirectoryBasedReaderProvider readers = null;
@@ -90,7 +91,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public Set<Class<?>> getContainedTypes() {
+	public IndexedTypeSet getContainedTypes() {
 		return containedEntityTypes;
 	}
 
@@ -135,8 +136,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void addContainedEntity(Class<?> entity) {
-		if ( containedEntityTypes.add( entity ) ) {
+	public void addContainedEntity(IndexedTypeIdentifier entity) {
+		final IndexedTypeSet oldSet = containedEntityTypes;
+		final IndexedTypeSet newSet = IndexedTypesSets.composite( oldSet, entity );
+		if ( ! oldSet.equals( newSet ) ) {
+			this.containedEntityTypes = newSet;
 			triggerWorkspaceReconfiguration();
 		}
 	}
@@ -175,8 +179,14 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	//Not exposed on the IndexManager interface
+	@Deprecated
 	public EntityIndexBinding getIndexBinding(Class<?> entityType) {
 		return boundSearchIntegrator.getIndexBinding( entityType );
+	}
+
+	//Not exposed on the IndexManager interface
+	public EntityIndexBinding getIndexBinding(IndexedTypeIdentifier type) {
+		return boundSearchIntegrator.getIndexBinding( type );
 	}
 
 	//Not exposed on the IndexManager interface

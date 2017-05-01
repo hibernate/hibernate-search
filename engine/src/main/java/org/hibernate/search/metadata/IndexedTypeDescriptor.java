@@ -9,6 +9,7 @@ package org.hibernate.search.metadata;
 import java.util.Set;
 
 import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Top level descriptor of the metadata API. Giving access to the indexing information for a single type.
@@ -18,9 +19,16 @@ import org.hibernate.search.engine.BoostStrategy;
 public interface IndexedTypeDescriptor extends FieldContributor {
 
 	/**
+	 * @deprecated Use {@link #getIndexedType()} instead. This method will be removed.
 	 * @return the type for which this descriptor provides meta information
 	 */
+	@Deprecated
 	Class<?> getType();
+
+	/**
+	 * @return the type for which this descriptor provides meta information
+	 */
+	IndexedTypeIdentifier getIndexedType();
 
 	/**
 	 * @return {@code true} if the type for this descriptor is indexed, {@code false} otherwise

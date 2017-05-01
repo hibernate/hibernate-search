@@ -73,6 +73,7 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.DistanceSortField;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -740,10 +741,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 
 			DocumentBuilderIndexedEntity documentBuilder = binding.getDocumentBuilder();
-			Class<?> clazz = documentBuilder.getBeanClass();
+			IndexedTypeIdentifier typeId = documentBuilder.getTypeIdentifier();
 
 			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
-			conversionContext.setClass( clazz );
+			conversionContext.setConvertedTypeId( typeId );
 			FieldProjection idProjection = idProjectionByEntityBinding.get( binding );
 			Object id = idProjection.convertHit( hit, conversionContext );
 			Object[] projections = null;
@@ -764,7 +765,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 							projections[i] = id;
 							break;
 						case ElasticsearchProjectionConstants.OBJECT_CLASS:
-							projections[i] = clazz;
+							projections[i] = typeId.getPojoType();
 							break;
 						case ElasticsearchProjectionConstants.SCORE:
 							projections[i] = hit.getAsJsonObject().get( "_score" ).getAsFloat();
@@ -825,7 +826,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				}
 			}
 
-			return new EntityInfoImpl( clazz, documentBuilder.getIdPropertyName(), (Serializable) id, projections );
+			return new EntityInfoImpl( typeId, documentBuilder.getIdPropertyName(), (Serializable) id, projections );
 		}
 
 	}
