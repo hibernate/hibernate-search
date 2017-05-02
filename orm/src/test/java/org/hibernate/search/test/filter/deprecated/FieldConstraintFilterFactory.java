@@ -4,10 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.filter;
+package org.hibernate.search.test.filter.deprecated;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
@@ -15,29 +17,33 @@ import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
 
 /**
- * Apply a security filter to the results
+ * Creates a filter for a given field.
  *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public class SecurityFilterFactory {
-	private String login;
+public class FieldConstraintFilterFactory {
+	private String field;
+	private String value;
 
-	/**
-	 * injected parameter
-	 */
-	public void setLogin(String login) {
-		this.login = login;
+	@Factory
+	public Filter buildFilter() {
+		Query q = new TermQuery( new Term( field, value ) );
+		return new QueryWrapperFilter( q );
+	}
+
+	public void setField(String field) {
+		this.field = field;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	@Key
 	public FilterKey getKey() {
 		StandardFilterKey key = new StandardFilterKey();
-		key.addParameter( login );
+		key.addParameter( field );
+		key.addParameter( value );
 		return key;
-	}
-
-	@Factory
-	public Query getFilter() {
-		return new TermQuery( new Term( "teacher", login ) );
 	}
 }

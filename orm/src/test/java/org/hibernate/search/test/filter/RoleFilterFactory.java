@@ -7,9 +7,7 @@
 package org.hibernate.search.test.filter;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
@@ -39,8 +37,7 @@ public class RoleFilterFactory {
 	}
 
 	@Factory
-	public Filter getFilter() {
-		Query query = new TermQuery( new Term( "role", role.name() ) );
-		return new QueryWrapperFilter( query );
+	public Query getFilter() {
+		return new TermQuery( new Term( "role", role.name() ) );
 	}
 }

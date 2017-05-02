@@ -9,15 +9,29 @@ package org.hibernate.search.test.filter;
 import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.Factory;
+import org.hibernate.search.exception.SearchException;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-public class ExcludeAllFilterFactory {
+public class InstanceBasedExcludeAllFilterFactory {
+
+	private static volatile int creationCount = 0;
 
 	@Factory
-	public Query getFilter() {
+	public Query create() {
+		creationCount++;
 		return new MatchNoDocsQuery();
 	}
 
+	public static void reset() {
+		creationCount = 0;
+	}
+
+	public static void assertInstancesCreated(int count) {
+		if ( creationCount != count ) {
+			throw new SearchException( "test failed, " + creationCount + " instances were created, expected " + count );
+		}
+	}
 }

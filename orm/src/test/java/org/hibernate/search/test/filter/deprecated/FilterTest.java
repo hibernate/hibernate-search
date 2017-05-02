@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.filter;
+package org.hibernate.search.test.filter.deprecated;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -32,8 +32,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.filter.Employee.Role;
-import org.hibernate.search.test.filter.FieldConstraintFilterFactoryWithoutKeyMethod.BuildFilterInvocation;
+import org.hibernate.search.test.filter.deprecated.Employee.Role;
+import org.hibernate.search.test.filter.deprecated.FieldConstraintFilterFactoryWithoutKeyMethod.BuildFilterInvocation;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
@@ -79,6 +79,7 @@ public class FilterTest extends SearchTestBase {
 	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2405 Support caching for filters with Elasticsearch
 	// Moreover the Elasticsearch backend does not support custom Lucene filters.
 	public void testCache() {
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 ); // SearchFactory tests filter construction once
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		assertEquals( "No filter should happen", 3, ftQuery.getResultSize() );
 
@@ -102,14 +103,14 @@ public class FilterTest extends SearchTestBase {
 
 		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cacheinstancetest" );
-		InstanceBasedExcludeAllFilterFactory.assertInstancesCreated( 0 );
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 );
 		assertEquals( "Should filter out all", 0, ftQuery.getResultSize() );
-		InstanceBasedExcludeAllFilterFactory.assertInstancesCreated( 1 );
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 );
 
 		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cacheinstancetest" );
 		ftQuery.getResultSize();
-		InstanceBasedExcludeAllFilterFactory.assertInstancesCreated( 1 );
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 );
 	}
 
 	@Test
@@ -257,7 +258,7 @@ public class FilterTest extends SearchTestBase {
 
 		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
-		ftQuery.enableFullTextFilter( "emptyWithDeprecatedFilterType" );
+		ftQuery.enableFullTextFilter( "empty" );
 		assertEquals( "two filters, one is empty, should not match anything", 0, ftQuery.getResultSize() );
 	}
 
@@ -415,7 +416,7 @@ public class FilterTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( "hibernate.search.filter.cache_docidresults.size", "10" );
-		InstanceBasedExcludeAllFilterFactory.reset();
+		InstanceBasedExcludeAllFilter.reset();
 	}
 
 	private BooleanQuery createQuery() {
