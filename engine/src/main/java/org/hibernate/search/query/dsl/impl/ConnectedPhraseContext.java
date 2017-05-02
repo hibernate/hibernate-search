@@ -7,8 +7,8 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Filter;
 
+import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.PhraseContext;
 import org.hibernate.search.query.dsl.PhraseMatchingContext;
 
@@ -51,7 +51,7 @@ class ConnectedPhraseContext implements PhraseContext {
 	}
 
 	@Override
-	public PhraseContext filteredBy(Filter filter) {
+	public PhraseContext filteredBy(Query filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}

@@ -7,7 +7,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.SimpleQueryStringContext;
 import org.hibernate.search.query.dsl.SimpleQueryStringMatchingContext;
 
@@ -49,7 +49,7 @@ class ConnectedSimpleQueryStringContext implements SimpleQueryStringContext {
 	}
 
 	@Override
-	public ConnectedSimpleQueryStringContext filteredBy(Filter filter) {
+	public ConnectedSimpleQueryStringContext filteredBy(Query filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}

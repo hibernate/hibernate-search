@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery.Builder;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
@@ -99,7 +98,7 @@ class BooleanQueryBuilder implements MustJunction {
 	}
 
 	@Override
-	public MustJunction filteredBy(Filter filter) {
+	public MustJunction filteredBy(Query filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}

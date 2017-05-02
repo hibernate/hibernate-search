@@ -8,6 +8,7 @@
 package org.hibernate.search.query.dsl;
 
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Query;
 
 /**
  * Operations common to all types of queries
@@ -36,11 +37,11 @@ public interface QueryCustomization<T> {
 	T withConstantScore();
 
 	/**
-	 * Filter the query results with the Filter instance
-	 * @param filter the filter to use
+	 * Filter the query results with the given Query instance
+	 * @param filter the Query to use as a filter
 	 * @return an instance of T for method chaining
 	 */
-	T filteredBy(Filter filter);
+	T filteredBy(Query filter);
 
 	//TODO filter(String) + parameters
 }
