@@ -1466,7 +1466,7 @@ You can use one or more `@FullTextFilterDef` on any:
 This implies that filter definitions are global and their names must be unique.
 A `SearchException` is thrown in case two different `@FullTextFilterDef` annotations
 with the same name are defined. Each named filter has to
-specify its actual filter implementation.
+specify a way to retrieve the actual filter implementation.
 
 .Defining and implementing a Filter
 ====
@@ -1474,55 +1474,47 @@ specify its actual filter implementation.
 ----
 @Entity
 @Indexed
-@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class),
+@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilterFactory.class)
 @FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class)
 public class Driver { ... }
 ----
 
 [source, JAVA]
 ----
-public class BestDriversFilter extends QueryWrapperFilter {
-
-	public BestDriversFilter() {
-		super( new TermQuery( new Term( "score", "5" ) ) );
-	}
-
-}
-----
-====
-
-`BestDriversFilter` is an example of a simple Lucene filter which reduces the result set to drivers
-whose score is 5. In this example we use `org.apache.lucene.search.QueryWrapperFilter`, which extends
-`org.apache.lucene.search.Filter`, as it's a convenient way to wrap a Lucene Query.
-
-Make sure the Filter has a public constructor which does not require any parameter.
-
-If your Filter creation requires additional steps or if the filter you want to use does not have a
-no-arg constructor, you can use the factory pattern:
-
-.Creating a filter using the factory pattern
-====
-[source, JAVA]
-----
-@Entity
-@Indexed
-@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilterFactory.class)
-public class Driver { ... }
-
 public class BestDriversFilterFactory {
 
-    @Factory
-    public Filter getFilter() {
-        //some additional steps to cache the filter results per IndexReader
-        Filter bestDriversFilter = new BestDriversFilter();
-        return new CachingWrapperFilter(bestDriversFilter);
+    @org.hibernate.search.annotations.Factory
+    public Query create() {
+        return new TermQuery( new Term( "score", "5" ) );
     }
+
 }
 ----
 ====
 
-Hibernate Search will look for a `@Factory` annotated method and use it to build the filter
-instance. The factory must have a no-arg constructor.
+`BestDriversFilterFactory` is an example of a simple Lucene filter which reduces the result set to drivers
+whose score is 5.
+In this example we use the factory pattern: the class assigned to `@FullTextFilterDef.impl` is a factory class,
+and the actual filter will be returned by a `@Factory` annotated, no-argument method on this class.
+Make sure the factory has a public constructor which does not require any parameter.
+
+Alternatively, you can assign to `@FullTextFilterDef.impl` the exact type of your filter,
+i.e. a class extending `org.apache.lucene.search.Query`.
+The class will still have to provide a public, no-argument constructor.
+
+[CAUTION]
+====
+In previous versions of Hibernate Search, filters had to extend the `org.apache.lucene.search.Filter` type
+instead of `org.apache.lucene.search.Query`.
+
+This is still supported, but the `Filter` type has been deprecated
+and will be removed in a future version of Lucene.
+
+Thus, it is advisable to convert your existing filters and filter factories
+so as not to rely on the `org.apache.lucene.search.Filter` type anymore, and to use simple queries instead.
+There should be a `Query` equivalent for every `Filter` subtype: `TermQuery` replaces `TermFilter`,
+`BooleanQuery` replaces `BooleanFilter`, etc.
+====
 
 Named filters come in handy where parameters have to be passed to the filter. For example a security
 filter might want to know which security level you want to apply:
@@ -1554,9 +1546,8 @@ public class SecurityFilterFactory {
     }
 
     @Factory
-    public Filter getFilter() {
-        Query query = new TermQuery( new Term( "level", level.toString() ) );
-        return new CachingWrapperFilter( new QueryWrapperFilter(query) );
+    public Query getFilter() {
+        return new TermQuery( new Term( "level", level.toString() ) );
     }
 }
 ----
@@ -1573,19 +1564,19 @@ caching, you can implement your own FilterCachingStrategy. The classname is defi
 `$$hibernate.search.filter.cache_strategy$$`.
 
 This filter caching mechanism should not be confused with caching the actual filter results. In
-Lucene it is common practice to wrap filters using the IndexReader around a `CachingWrapperFilter`.
-The wrapper will cache the DocIdSet returned from the `getDocIdSet(IndexReader reader)` method to
-avoid expensive re-computation. It is important to mention that the computed `DocIdSet` is only
+Lucene it is common practice to wrap filters using the IndexReader around a `CachingWrapperQuery`.
+The wrapper will cache the set of matching documents to
+avoid expensive re-computation. It is important to mention that the computed set of matching documents is only
 cachable for the same IndexReader instance, because the reader effectively represents the state of
 the index at the moment it was opened. The document list cannot change within an opened
 `IndexReader`. A different/new `IndexReader` instance, however, works potentially on a different set
-of Documents (either from a different index or simply because the index has changed), hence the
-cached DocIdSet has to be recomputed.
+of documents (either from a different index or simply because the index has changed), hence the
+filter result has to be recomputed.
 
 Hibernate Search also helps with this aspect of caching. Per default the `cache` flag of
 `@FullTextFilterDef` is set to `$$FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS$$` which will
 automatically cache the filter instance as well as wrap the specified filter around a Hibernate
-specific implementation of `CachingWrapperFilter`. In contrast to Lucene's version of this class
+specific implementation of `CachingWrapperQuery`. In contrast to Lucene's version of this class
 `SoftReferences` are used together with a hard reference count (see discussion about filter cache).
 The hard reference count can be adjusted using `hibernate.search.filter.cache_docidresults.size`
 (defaults to 5). The wrapping behavior can be controlled using the `@FullTextFilterDef.cache`
@@ -1599,15 +1590,14 @@ parameter. There are three different values for this parameter:
               This setting might be useful for rapidly changing data sets or
               heavily memory constrained environments.
 |FilterCacheModeType.INSTANCE_ONLY|The filter instance is cached and reused across
-              concurrent Filter.getDocIdSet() calls.
-              DocIdSet results are not cached. This
+              concurrent filter calls.
+              Filter results are not cached. This
               setting is useful when a filter uses its own specific caching
               mechanism or the filter results change dynamically due to
-              application specific events making
-              DocIdSet caching in both cases
+              application specific events making filter results caching in both cases
               unnecessary.
 |FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS|Both the filter instance and the
-              DocIdSet results are cached. This is the
+              filter results are cached. This is the
               default value.
 
 |===============
@@ -1618,7 +1608,7 @@ Last but not least - why should filters be cached? There are two areas where fil
 * the system does not update the targeted entity index often (in other words, the IndexReader is
 reused a lot)
 
-* the Filter's DocIdSet is expensive to compute (compared to the time spent to execute the query)
+* the filter's result is expensive to compute (compared to the time spent to execute the query)
 
 [[query-filter-shard]]
 ==== Using filters in a sharded environment
