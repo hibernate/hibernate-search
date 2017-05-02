@@ -420,7 +420,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 			// user filter
 			if ( userFilter != null ) {
-				filters.add( ToElasticsearch.fromLuceneFilter( userFilter ) );
+				filters.add( ToElasticsearch.fromLuceneQuery( userFilter ) );
 			}
 
 			if ( !filterDefinitions.isEmpty() ) {
