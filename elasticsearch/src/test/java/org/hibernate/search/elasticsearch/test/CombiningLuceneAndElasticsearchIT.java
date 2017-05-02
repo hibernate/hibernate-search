@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.MatchNoDocsQuery;
+import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -105,7 +105,7 @@ public class CombiningLuceneAndElasticsearchIT extends SearchTestBase {
 		Transaction tx = s.beginTransaction();
 
 		try {
-			session.createFullTextQuery( new MatchNoDocsQuery(), ResearchPaper.class ).list();
+			session.createFullTextQuery( new NotTranslatableQuery(), ResearchPaper.class ).list();
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (SearchException se) {
@@ -151,5 +151,14 @@ public class CombiningLuceneAndElasticsearchIT extends SearchTestBase {
 		// default is ES
 		settings.put( "hibernate.search.comic_book.indexmanager", "directory-based" );
 		settings.put( "hibernate.search.comic_book.directory_provider", "ram" );
+	}
+
+	private static class NotTranslatableQuery extends Query {
+
+		@Override
+		public String toString(String field) {
+			return getClass().getName();
+		}
+
 	}
 }

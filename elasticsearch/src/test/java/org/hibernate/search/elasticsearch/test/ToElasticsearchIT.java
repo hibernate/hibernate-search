@@ -22,6 +22,7 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.CachingWrapperQuery;
+import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
@@ -150,6 +151,25 @@ public class ToElasticsearchIT extends SearchTestBase {
 
 			assertThat( letters ).hasSize( 1 );
 			assertThat( letters ).onProperty( "message" ).containsExactly( "Important letter" );
+		}
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testMatchNoDocsQuery() {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+
+			MatchNoDocsQuery testedQuery = new MatchNoDocsQuery();
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
+					testedQuery, Letter.class );
+
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'type':{'value': '__HSearch_Workaround_MatchNoDocsQuery'}}}", queryString );
+
+			List<Letter> letters = fullTextQuery.list();
+
+			assertThat( letters ).isEmpty();
 		}
 	}
 

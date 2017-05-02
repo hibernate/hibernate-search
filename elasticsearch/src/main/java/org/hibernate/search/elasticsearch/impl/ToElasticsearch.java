@@ -22,6 +22,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.PrefixQuery;
@@ -193,6 +194,9 @@ public class ToElasticsearch {
 		if ( query instanceof MatchAllDocsQuery ) {
 			return convertMatchAllDocsQuery( (MatchAllDocsQuery) query );
 		}
+		else if ( query instanceof MatchNoDocsQuery ) {
+			return convertMatchNoDocsQuery( (MatchNoDocsQuery) query );
+		}
 		else if ( query instanceof TermQuery ) {
 			return convertTermQuery( (TermQuery) query );
 		}
@@ -253,6 +257,20 @@ public class ToElasticsearch {
 
 	private static JsonObject convertMatchAllDocsQuery(MatchAllDocsQuery matchAllDocsQuery) {
 		return JsonBuilder.object().add( "match_all", new JsonObject() ).build();
+	}
+
+	private static JsonObject convertMatchNoDocsQuery(MatchNoDocsQuery matchNoDocsQuery) {
+		/*
+		 * Elasticsearch 2.x does not provide a match_none query, so we work it around
+		 * by targeting a type that doesn't exist.
+		 * We use a type query, because Elasticsearch 5.x has optimizations that convert
+		 * type queries to MatchNoDocsQueries automatically when an unknown type is
+		 * requested.
+		 */
+		return JsonBuilder.object()
+				.add( "type", JsonBuilder.object()
+						.addProperty( "value", "__HSearch_Workaround_MatchNoDocsQuery" )
+				).build();
 	}
 
 	private static JsonObject convertBooleanQuery(BooleanQuery booleanQuery) {
