@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Filter;
-
+import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.SpatialContext;
 import org.hibernate.search.query.dsl.SpatialMatchingContext;
 import org.hibernate.search.query.dsl.Unit;
@@ -49,7 +48,7 @@ public class ConnectedSpatialContext implements SpatialContext {
 	}
 
 	@Override
-	public SpatialContext filteredBy(Filter filter) {
+	public SpatialContext filteredBy(Query filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}
