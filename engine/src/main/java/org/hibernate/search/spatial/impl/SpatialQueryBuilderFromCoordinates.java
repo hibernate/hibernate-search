@@ -6,102 +6,82 @@
  */
 package org.hibernate.search.spatial.impl;
 
+import java.util.List;
+
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.FilteredQuery;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
-
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 
-import java.util.List;
-
 /**
- * The SpatialQueryBuilder holds builder methods for Hash, Distance and Spatial (Hash+Distance) filters
- * and queries
+ * The SpatialQueryBuilder holds builder methods for Hash, Distance and Spatial (Hash+Distance) queries
  *
  * @author Nicolas Helleringer
  */
 public abstract class SpatialQueryBuilderFromCoordinates {
 
 	/**
-	 * Returns a Lucene filter which rely on Hibernate Search Spatial
-	 * spatial hash indexation to filter document at radius
-	 *
-	 * @param center center of the search discus
-	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing Coordinates
-	 * @return Lucene filter to be used in a Query
-	 * @see org.apache.lucene.search.Query
-	 * @see org.hibernate.search.spatial.Coordinates
-	 * @see org.apache.lucene.search.Filter
-	 */
-	public static Filter buildSpatialHashFilter(Coordinates center, double radius, String fieldName) {
-		int bestSpatialHashLevel = SpatialHelper.findBestSpatialHashLevelForSearchRange( 2.0d * radius );
-		if ( bestSpatialHashLevel > SpatialFieldBridgeByHash.DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL ) {
-			bestSpatialHashLevel = SpatialFieldBridgeByHash.DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL;
-		}
-		List<String> spatialHashCellsIds = SpatialHelper.getSpatialHashCellsIds( center, radius, bestSpatialHashLevel );
-		return new SpatialHashFilter( spatialHashCellsIds, SpatialHelper.formatFieldName( bestSpatialHashLevel, fieldName ) );
-	}
-
-	/**
-	 * Returns a Lucene filter to fine filter document by distance
-	 *
-	 * @param center center of the search discus
-	 * @param radius distance max to center in km
-	 * @param coordinatesField name of the Lucene Field implementing Coordinates
-	 * @return Lucene filter to be used in a Query
-	 * @param previousFilter	preceding filter in filter chain
-	 * Warning if passed null DistanceFilter constructor use a
-	 * filter wrapped match all query (time/resource consuming !)
-	 * @see org.apache.lucene.search.Query
-	 * @see org.hibernate.search.spatial.Coordinates
-	 * @see DistanceFilter
-	 * @see Filter
-	 */
-	public static Filter buildDistanceFilter(Filter previousFilter, Coordinates center, double radius, String coordinatesField) {
-		return new DistanceFilter( previousFilter, center, radius, coordinatesField );
-	}
-
-	/**
-	 * Returns a Lucene filter to fine filter document by distance
-	 *
-	 * @param center center of the search discus
-	 * @param radius distance max to center in km
-	 * @param latitudeField name of the Lucene Field hosting latitude
-	 * @param longitudeField name of the Lucene Field hosting longitude
-	 * @return Lucene filter to be used in a Query
-	 * @param previousFilter	preceding filter in filter chain
-	 * Warning if passed null DistanceFilter constructor use a
-	 * filter wrapped match all query (time/ressource consuming !)
-	 * @see org.apache.lucene.search.Query
-	 * @see org.hibernate.search.spatial.Coordinates
-	 * @see DistanceFilter
-	 * @see Filter
-	 */
-	public static Filter buildDistanceFilter(Filter previousFilter, Coordinates center, double radius, String latitudeField, String longitudeField) {
-		return new DistanceFilter( previousFilter, center, radius, latitudeField, longitudeField );
-	}
-
-	/**
-	 * Returns a Lucene Query which rely on Hibernate Search Spatial
-	 * spatial hash indexation to filter document at radius by wrapping a
-	 * SpatialHashFilter
+	 * Returns a Lucene query to match documents by distance to a center,
+	 * relying only on spatial hashes.
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 * @return Lucene Query to be used in a search
+	 *
 	 * @see org.apache.lucene.search.Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildSpatialHashQuery(Coordinates center, double radius, String fieldName) {
-		return new FilteredQuery( new MatchAllDocsQuery(), buildSpatialHashFilter( center, radius, fieldName ) );
+		int bestSpatialHashLevel = SpatialHelper.findBestSpatialHashLevelForSearchRange( 2.0d * radius );
+		if ( bestSpatialHashLevel > SpatialFieldBridgeByHash.DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL ) {
+			bestSpatialHashLevel = SpatialFieldBridgeByHash.DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL;
+		}
+		List<String> spatialHashCellsIds = SpatialHelper.getSpatialHashCellsIds( center, radius, bestSpatialHashLevel );
+		return new SpatialHashQuery( spatialHashCellsIds, SpatialHelper.formatFieldName( bestSpatialHashLevel, fieldName ) );
+	}
+
+	/**
+	 * Returns a Lucene query to match documents by distance to a center.
+	 *
+	 * @param center center of the search discus
+	 * @param radius distance max to center in km
+	 * @param coordinatesField name of the Lucene Field implementing Coordinates
+	 * @param approximationQuery an approximation of the distance query
+	 * (i.e. a query returning all the results returned by the distance query,
+	 * but also some false positives).
+	 * WARNING: when passing {@code null}, every single document will be scanned
+	 * (time/resource consuming!)
+	 * @return Lucene Query to be used in a search
+	 *
+	 * @see org.apache.lucene.search.Query
+	 * @see org.hibernate.search.spatial.Coordinates
+	 */
+	public static Query buildDistanceQuery(Query approximationQuery, Coordinates center, double radius, String coordinatesField) {
+		return new DistanceQuery( approximationQuery, center, radius, coordinatesField );
+	}
+
+	/**
+	 * Returns a Lucene query to match documents by distance to a center.
+	 *
+	 * @param center center of the search discus
+	 * @param radius distance max to center in km
+	 * @param latitudeField name of the Lucene Field hosting latitude
+	 * @param longitudeField name of the Lucene Field hosting longitude
+	 * @param approximationQuery an approximation of the distance query
+	 * (i.e. a query returning all the results returned by the distance query,
+	 * but also some false positives).
+	 * WARNING: when passing {@code null}, every single document will be scanned
+	 * (time/resource consuming!)
+	 * @return Lucene Query to be used in a search
+	 *
+	 * @see org.apache.lucene.search.Query
+	 * @see org.hibernate.search.spatial.Coordinates
+	 */
+	public static Query buildDistanceQuery(Query approximationQuery, Coordinates center, double radius, String latitudeField, String longitudeField) {
+		return new DistanceQuery( approximationQuery, center, radius, latitudeField, longitudeField );
 	}
 
 	/**
@@ -112,34 +92,33 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 * @return Lucene Query to be used in a search
+	 *
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildDistanceQuery(Coordinates center, double radius, String fieldName) {
-		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
-		return new FilteredQuery( new MatchAllDocsQuery(), buildDistanceFilter( allFilter, center, radius, fieldName ) );
+		return buildDistanceQuery( null, center, radius, fieldName );
 	}
 
 	/**
-	 * Returns a Lucene Query which relies on Hibernate Search Spatial
-	 * spatial hash indexation to filter documents at radius and filter its results
-	 * by a fine DistanceFilter
+	 * Returns a Lucene query to match documents by distance to a center,
+	 * relying first on spatial hash to approximate the result, and then on a more
+	 * precise (but more costly) {@link DistanceQuery}.
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 * @return Lucene Query to be used in a search
+	 *
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildSpatialQueryByHash(Coordinates center, double radius, String fieldName) {
-		return new FilteredQuery( new MatchAllDocsQuery(),
-				buildDistanceFilter(
-						buildSpatialHashFilter( center, radius, fieldName ),
-						center,
-						radius,
-						fieldName
-				)
+		return buildDistanceQuery(
+				buildSpatialHashQuery( center, radius, fieldName ),
+				center,
+				radius,
+				fieldName
 		);
 	}
 
@@ -151,6 +130,7 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 * @return Lucene Query to be used in a search
+	 *
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
@@ -185,15 +165,12 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 				.add( longQuery, BooleanClause.Occur.FILTER )
 				.build();
 
-		return new FilteredQuery(
-				new MatchAllDocsQuery(),
-				buildDistanceFilter(
-						new QueryWrapperFilter( boxQuery ),
-						center,
-						radius,
-						latitudeFieldName,
-						longitudeFieldName
-				)
+		return buildDistanceQuery(
+				boxQuery,
+				center,
+				radius,
+				latitudeFieldName,
+				longitudeFieldName
 		);
 	}
 }

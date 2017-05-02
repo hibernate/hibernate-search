@@ -219,7 +219,7 @@ public final class BenchWithGeonames {
 						)
 						.createQuery();
 				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery(
-						SpatialQueryBuilderFromCoordinates.buildDistanceFilter(
+						SpatialQueryBuilderFromCoordinates.buildDistanceQuery(
 								new QueryWrapperFilter( query ),
 								center,
 								radius,

@@ -17,7 +17,6 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -51,8 +50,8 @@ import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.DistanceSortField;
-import org.hibernate.search.spatial.impl.DistanceFilter;
-import org.hibernate.search.spatial.impl.SpatialHashFilter;
+import org.hibernate.search.spatial.impl.DistanceQuery;
+import org.hibernate.search.spatial.impl.SpatialHashQuery;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -232,8 +231,15 @@ public class ToElasticsearch {
 		else if ( query instanceof FilteredQuery ) {
 			return convertFilteredQuery( (FilteredQuery) query );
 		}
-		else if ( query instanceof Filter ) {
-			return fromLuceneFilter( (Filter) query );
+		else if ( query instanceof QueryWrapperFilter ) {
+			JsonObject result = fromLuceneQuery( ( (QueryWrapperFilter) query ).getQuery() );
+			return wrapBoostIfNecessary( result, query.getBoost() );
+		}
+		else if ( query instanceof DistanceQuery ) {
+			return convertDistanceQuery( (DistanceQuery) query );
+		}
+		else if ( query instanceof SpatialHashQuery ) {
+			return convertSpatialHashFilter( (SpatialHashQuery) query );
 		}
 		else if ( query instanceof PhraseQuery ) {
 			return convertPhraseQuery( (PhraseQuery) query );
@@ -248,6 +254,10 @@ public class ToElasticsearch {
 		}
 		else if ( query instanceof org.apache.lucene.search.CachingWrapperQuery ) {
 			JsonObject result = fromLuceneQuery( ( (org.apache.lucene.search.CachingWrapperQuery) query ).getQuery() );
+			return wrapBoostIfNecessary( result, query.getBoost() );
+		}
+		else if ( query instanceof org.apache.lucene.search.CachingWrapperFilter ) {
+			JsonObject result = fromLuceneQuery( ( (org.apache.lucene.search.CachingWrapperFilter) query ).getFilter() );
 			return wrapBoostIfNecessary( result, query.getBoost() );
 		}
 
@@ -587,36 +597,36 @@ public class ToElasticsearch {
 		return filteredQuery;
 	}
 
-	private static JsonObject convertDistanceFilter(DistanceFilter filter) {
+	private static JsonObject convertDistanceQuery(DistanceQuery query) {
 		JsonObject distanceQuery = JsonBuilder.object()
 				.add( "geo_distance",
 						JsonBuilder.object()
-								.addProperty( "distance", filter.getRadius() + "km" )
-								.add( filter.getCoordinatesField(),
+								.addProperty( "distance", query.getRadius() + "km" )
+								.add( query.getCoordinatesField(),
 										JsonBuilder.object()
-												.addProperty( "lat", filter.getCenter().getLatitude() )
-												.addProperty( "lon", filter.getCenter().getLongitude() )
+												.addProperty( "lat", query.getCenter().getLatitude() )
+												.addProperty( "lon", query.getCenter().getLongitude() )
 								)
 				).build();
 
-		distanceQuery = wrapQueryForNestedIfRequired( filter.getCoordinatesField(), distanceQuery );
+		distanceQuery = wrapQueryForNestedIfRequired( query.getCoordinatesField(), distanceQuery );
 
-		// we only implement the previous filter optimization when we use the hash method as Elasticsearch
+		// we only implement the approximation optimization when we use the hash method as Elasticsearch
 		// automatically optimize the geo_distance query with a bounding box filter so we don't need to do it
 		// ourselves when we use the range method.
-		Filter previousFilter = filter.getPreviousFilter();
-		if ( previousFilter instanceof SpatialHashFilter ) {
+		Query approximationQuery = query.getApproximationQuery();
+		if ( approximationQuery instanceof SpatialHashQuery ) {
 			distanceQuery = JsonBuilder.object()
 					.add( "bool", JsonBuilder.object()
 							.add( "must", distanceQuery )
-							.add( "filter", convertSpatialHashFilter( (SpatialHashFilter) previousFilter ) )
+							.add( "filter", convertSpatialHashFilter( (SpatialHashQuery) approximationQuery ) )
 					).build();
 		}
 
 		return distanceQuery;
 	}
 
-	private static JsonObject convertSpatialHashFilter(SpatialHashFilter filter) {
+	private static JsonObject convertSpatialHashFilter(SpatialHashQuery filter) {
 		JsonArray cellsIdsJsonArray = new JsonArray();
 		for ( String cellId : filter.getSpatialHashCellsIds() ) {
 			cellsIdsJsonArray.add( cellId );
@@ -707,23 +717,6 @@ public class ToElasticsearch {
 		//TODO Drive through meta-data
 //		return FieldHelper.isEmbeddedField( field );
 		return false;
-	}
-
-	public static JsonObject fromLuceneFilter(Filter luceneFilter) {
-		if ( luceneFilter instanceof QueryWrapperFilter ) {
-			Query query = ( (QueryWrapperFilter) luceneFilter ).getQuery();
-			return fromLuceneQuery( query );
-		}
-		else if ( luceneFilter instanceof DistanceFilter ) {
-			return convertDistanceFilter( (DistanceFilter) luceneFilter );
-		}
-		else if ( luceneFilter instanceof SpatialHashFilter ) {
-			return convertSpatialHashFilter( (SpatialHashFilter) luceneFilter );
-		}
-		else if ( luceneFilter instanceof org.apache.lucene.search.CachingWrapperFilter ) {
-			return fromLuceneFilter( ( (org.apache.lucene.search.CachingWrapperFilter) luceneFilter ).getFilter() );
-		}
-		throw LOG.cannotTransformLuceneQueryIntoEsQuery( luceneFilter );
 	}
 
 	/**

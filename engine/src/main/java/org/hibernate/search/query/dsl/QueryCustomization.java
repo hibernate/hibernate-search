@@ -7,7 +7,6 @@
 
 package org.hibernate.search.query.dsl;
 
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 
 /**
