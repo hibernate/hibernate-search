@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.filter;
+package org.hibernate.search.test.filter.deprecated;
 
 import java.util.Date;
 
@@ -29,7 +29,7 @@ import org.hibernate.search.bridge.builtin.IntegerBridge;
 @Entity
 @Indexed
 @FullTextFilterDefs({
-		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilterFactory.class, cache = FilterCacheModeType.NONE),
+		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache = FilterCacheModeType.NONE),
 		//actual Filter implementation
 		@FullTextFilterDef(name = "security",
 				impl = SecurityFilterFactory.class,
@@ -48,12 +48,12 @@ import org.hibernate.search.bridge.builtin.IntegerBridge;
 				impl = ExcludeAllFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "cacheinstancetest",
-				impl = InstanceBasedExcludeAllFilterFactory.class,
+				impl = InstanceBasedExcludeAllFilter.class,
 				cache = FilterCacheModeType.INSTANCE_ONLY),
 		@FullTextFilterDef(name = "cacheinstancefromfactorywithoutkeymethodtest",
 				impl = FieldConstraintFilterFactoryWithoutKeyMethod.class,
 				cache = FilterCacheModeType.INSTANCE_ONLY),
-		@FullTextFilterDef(name = "emptyWithDeprecatedFilterType",
+		@FullTextFilterDef(name = "empty",
 				impl = NullReturningEmptyFilter.class,
 				cache = FilterCacheModeType.INSTANCE_ONLY),
 		@FullTextFilterDef(name = "cached_empty",

@@ -7,15 +7,13 @@
 package org.hibernate.search.test.filter;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
-import org.hibernate.search.filter.impl.CachingWrapperFilter;
+import org.hibernate.search.filter.impl.CachingWrapperQuery;
 
 /**
  * Creates a filter for a given field.
@@ -27,11 +25,9 @@ public class FieldConstraintFilterFactory {
 	private String value;
 
 	@Factory
-	public Filter buildFilter() {
+	public Query buildFilter() {
 		Query q = new TermQuery( new Term( field, value ) );
-		Filter filter = new QueryWrapperFilter( q );
-		filter = new CachingWrapperFilter( filter );
-		return filter;
+		return new CachingWrapperQuery( q );
 	}
 
 	public void setField(String field) {

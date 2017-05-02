@@ -7,7 +7,7 @@
 package org.hibernate.search.test.filter;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 /**
@@ -15,10 +15,11 @@ import org.apache.lucene.search.TermQuery;
  * Please keep the code simple and readable, formatted narrowly, and in sync with
  * the reference documentation.
  */
-public class BestDriversFilter extends QueryWrapperFilter {
+public class BestDriversFilterFactory {
 
-	public BestDriversFilter() {
-		super( new TermQuery( new Term( "score", "5" ) ) );
+	@org.hibernate.search.annotations.Factory
+	public Query create() {
+		return new TermQuery( new Term( "score", "5" ) );
 	}
 
 }

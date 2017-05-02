@@ -4,23 +4,27 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.filter;
+package org.hibernate.search.test.filter.deprecated;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.util.Bits;
 
 /**
  * A filter based on a given value for a given field.
  *
  * @author Gunnar Morling
  */
-public class FieldConstraintFilterWithoutKeyMethod extends Query {
+public class FieldConstraintFilterWithoutKeyMethod extends Filter {
 
 	private static List<FieldConstraintFilterWithoutKeyMethod> instances = new ArrayList<>();
 
@@ -47,8 +51,11 @@ public class FieldConstraintFilterWithoutKeyMethod extends Query {
 	}
 
 	@Override
-	public Query rewrite(IndexReader reader) throws IOException {
-		return new TermQuery( new Term( field, value ) );
+	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+		Query q = new TermQuery( new Term( field, value ) );
+		Filter filter = new QueryWrapperFilter( q );
+
+		return filter.getDocIdSet( context, acceptDocs );
 	}
 
 	public static List<FieldConstraintFilterWithoutKeyMethod> getInstances() {

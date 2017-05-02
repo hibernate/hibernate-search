@@ -4,11 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.filter;
+package org.hibernate.search.test.filter.deprecated;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.filter.FilterKey;
@@ -37,7 +40,8 @@ public class SecurityFilterFactory {
 	}
 
 	@Factory
-	public Query getFilter() {
-		return new TermQuery( new Term( "teacher", login ) );
+	public Filter getFilter() {
+		Query query = new TermQuery( new Term( "teacher", login ) );
+		return new QueryWrapperFilter( query );
 	}
 }
