@@ -119,9 +119,11 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	UnsupportedOperationException hsQueryLuceneQueryUnsupported();
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 18,
-			value = "Unexpected numeric encoding type for field '%2$s': %1$s"
+			value = "Unexpected numeric encoding type for field '%2$s' on entity type '%1$s'. "
+					+ "If you used a custom field bridge, make sure it implements MetadataProvidingFieldBridge"
+					+ " and provides metadata for this field."
 	)
-	SearchException unexpectedNumericEncodingType(String fieldType, String fieldName);
+	SearchException unexpectedNumericEncodingType(String entityType, String fieldName);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 20,
 			value = "Could not create mapping for entity type %1$s"

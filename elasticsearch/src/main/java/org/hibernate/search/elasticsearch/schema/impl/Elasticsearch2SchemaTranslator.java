@@ -114,22 +114,12 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 		// normal document fields
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getNonEmbeddedDocumentFieldMetadata() ) {
-			try {
-				addPropertyMapping( mappingBuilder, settingsBuilder, fieldMetadata, executionOptions );
-			}
-			catch (IncompleteDataException e) {
-				LOG.debug( "Not adding a mapping for field " + fieldMetadata.getAbsoluteName() + " because of incomplete data", e );
-			}
+			addPropertyMapping( mappingBuilder, settingsBuilder, fieldMetadata, executionOptions );
 		}
 
 		// bridge-defined fields
 		for ( BridgeDefinedField bridgeDefinedField : getNonEmbeddedBridgeDefinedFields( typeMetadata ) ) {
-			try {
-				addPropertyMapping( mappingBuilder, settingsBuilder, bridgeDefinedField );
-			}
-			catch (IncompleteDataException e) {
-				LOG.debug( "Not adding a mapping for field " + bridgeDefinedField.getAbsoluteName() + " because of incomplete data", e );
-			}
+			addPropertyMapping( mappingBuilder, settingsBuilder, bridgeDefinedField );
 		}
 
 		// Recurse into embedded types
@@ -154,7 +144,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 		PropertyMapping propertyMapping = new PropertyMapping();
 
-		addTypeOptions( propertyMapping, fieldMetadata );
+		addTypeOptions( mappingBuilder, propertyMapping, fieldMetadata );
 
 		if ( propertyMapping.getType() != DataType.OBJECT ) {
 			propertyMapping.setStore( fieldMetadata.getStore() == Store.NO ? false : true );
@@ -220,7 +210,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			// is defined before the double field and we want to keep the geo_point one
 			if ( !mappingBuilder.hasPropertyAbsolute( propertyPath ) ) {
 				PropertyMapping propertyMapping = new PropertyMapping();
-				addTypeOptions( propertyMapping, bridgeDefinedField );
+				addTypeOptions( mappingBuilder, propertyMapping, bridgeDefinedField );
 
 				if ( propertyMapping.getType() != DataType.OBJECT ) {
 					addIndexOptions( propertyMapping, mappingBuilder, settingsBuilder,
@@ -254,7 +244,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 		PropertyMapping fieldMapping = new PropertyMapping();
 
-		addTypeOptions( fieldMapping, facetMetadata, Field.Index.NOT_ANALYZED );
+		addTypeOptions( mappingBuilder, fieldMapping, facetMetadata, Field.Index.NOT_ANALYZED );
 		fieldMapping.setStore( false );
 		addSubfieldIndexOptions( fieldMapping, facetMetadata );
 
@@ -317,22 +307,25 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		return DataType.STRING.equals( fieldType );
 	}
 
-	private void addTypeOptions(PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
-		addTypeOptions( fieldMetadata.getAbsoluteName(), propertyMapping, FieldHelper.getType( fieldMetadata ),
+	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
+			PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
+		addTypeOptions( mappingBuilder, fieldMetadata.getAbsoluteName(), propertyMapping, FieldHelper.getType( fieldMetadata ),
 				fieldMetadata.getIndex() );
 	}
 
-	private void addTypeOptions(PropertyMapping propertyMapping, BridgeDefinedField bridgeDefinedField) {
+	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
+			PropertyMapping propertyMapping, BridgeDefinedField bridgeDefinedField) {
 		ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
 
 		if ( ExtendedFieldType.UNKNOWN.equals( type ) ) {
 			throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getAbsoluteName() );
 		}
 
-		addTypeOptions( bridgeDefinedField.getAbsoluteName(), propertyMapping, type, bridgeDefinedField.getIndex() );
+		addTypeOptions( mappingBuilder, bridgeDefinedField.getAbsoluteName(), propertyMapping, type, bridgeDefinedField.getIndex() );
 	}
 
-	private void addTypeOptions(PropertyMapping fieldMapping, FacetMetadata facetMetadata, Field.Index index) {
+	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
+			PropertyMapping fieldMapping, FacetMetadata facetMetadata, Field.Index index) {
 		ExtendedFieldType type;
 
 		if ( facetMetadata.isEncodingAuto() ) {
@@ -340,7 +333,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			 * If the user didn't ask for a specific encoding, just use the same datatype
 			 * as the source field.
 			 */
-			addTypeOptions( fieldMapping, facetMetadata.getSourceField() );
+			addTypeOptions( mappingBuilder, fieldMapping, facetMetadata.getSourceField() );
 			return;
 		}
 
@@ -365,10 +358,11 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			}
 		}
 
-		addTypeOptions( facetMetadata.getAbsoluteName(), fieldMapping, type, index );
+		addTypeOptions( mappingBuilder, facetMetadata.getAbsoluteName(), fieldMapping, type, index );
 	}
 
-	private DataType addTypeOptions(String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType,
+	private DataType addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
+			String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType,
 			Field.Index index) {
 		DataType elasticsearchType;
 		List<String> formats = new ArrayList<>();
@@ -449,21 +443,12 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 				elasticsearchType = DataType.OBJECT;
 				break;
 			case UNKNOWN_NUMERIC:
-				// Likely a custom field bridge which does not expose the type of the given field; either correctly
-				// so (because the given name is the default field and this bridge does not wish to use that field
-				// name as is) or incorrectly; The field will not be added to the mapping, causing an exception at
-				// runtime if the bridge writes that field nevertheless
-				elasticsearchType = null;
-				break;
+				throw LOG.unexpectedNumericEncodingType( mappingBuilder.getBeanClass().getName(), fieldName );
 			case STRING:
 			case UNKNOWN:
 			default:
 				elasticsearchType = getStringType( propertyMapping, index );
 				break;
-		}
-
-		if ( elasticsearchType == null ) {
-			throw new IncompleteDataException( "Field type could not be determined" );
 		}
 
 		propertyMapping.setType( elasticsearchType );
