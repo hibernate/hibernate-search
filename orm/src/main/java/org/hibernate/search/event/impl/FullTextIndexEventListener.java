@@ -19,7 +19,6 @@ import javax.transaction.Synchronization;
 import org.hibernate.Session;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.EntityEntry;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.AbstractCollectionEvent;
 import org.hibernate.event.spi.AbstractEvent;
 import org.hibernate.event.spi.EventSource;
@@ -113,10 +112,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	private String tenantIdentifier(AbstractEvent event) {
 		EventSource session = event.getSession();
-		if ( session instanceof SessionImplementor ) {
-			return ( (SessionImplementor) session ).getTenantIdentifier();
-		}
-		return null;
+		return session.getTenantIdentifier();
 	}
 
 	@Override
