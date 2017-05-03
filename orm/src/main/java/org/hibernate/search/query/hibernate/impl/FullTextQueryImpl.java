@@ -111,6 +111,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
+	@Deprecated
 	public FullTextQueryImpl setFilter(Filter filter) {
 		hSearchQuery.filter( filter );
 		return this;

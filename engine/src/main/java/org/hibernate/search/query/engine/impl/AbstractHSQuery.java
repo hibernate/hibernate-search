@@ -166,6 +166,7 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	}
 
 	@Override
+	@Deprecated
 	public HSQuery filter(Filter filter) {
 		clearCachedResults();
 		this.userFilter = filter;
