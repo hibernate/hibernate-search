@@ -56,7 +56,7 @@ public final class SpatialHashFilter extends Filter {
 		final LeafReader atomicReader = context.reader();
 
 		BitDocIdSet matchedDocumentsIds = new BitDocIdSet( new FixedBitSet( atomicReader.maxDoc() ) );
-		Boolean found = false;
+		boolean found = false;
 		for ( int i = 0; i < spatialHashCellsIds.size(); i++ ) {
 			Term spatialHashCellTerm = new Term( fieldName, spatialHashCellsIds.get( i ) );
 			DocsEnum spatialHashCellsDocs = atomicReader.termDocsEnum( spatialHashCellTerm );
