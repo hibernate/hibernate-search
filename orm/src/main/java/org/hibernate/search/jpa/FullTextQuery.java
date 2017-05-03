@@ -158,8 +158,6 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	Explanation explain(int documentId);
 
 	/**
-	 * *Experimental* API, subject to change or removal
-	 *
 	 * Limit the time used by Hibernate Search to execute the query. When the limit is reached, results already
 	 * fetched are returned. This time limit is a best effort. The query will likely run for longer than the
 	 * provided time.
@@ -176,8 +174,6 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit);
 
 	/**
-	 * <b>Experimental</b> API, subject to change or removal
-	 *
 	 * @return When using {@link #limitExecutionTimeTo(long, java.util.concurrent.TimeUnit)} }, returns {@code true}
 	 *         if partial results are returned (ie if the time limit has been reached
 	 *         and the result fetching process has been terminated.
