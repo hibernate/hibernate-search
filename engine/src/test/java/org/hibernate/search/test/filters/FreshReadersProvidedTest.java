@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.test.filters;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.index.CompositeReaderContext;
@@ -18,14 +19,12 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.search.BitsFilteredDocIdSet;
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.BulkScorer;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.util.BitDocIdSet;
-import org.apache.lucene.util.Bits;
+import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.FixedBitSet;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -44,8 +43,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 /**
- * Verified filters don't get stale IndexReader instances after a change is applied.
- * Note that filters operate on per-segment sub-readers, while we usually expose
+ * Verified queries don't get stale IndexReader instances after a change is applied.
+ * Note that queries operate on per-segment sub-readers, while we usually expose
  * top level (recursive) global IndexReader views: this usually should not affect
  * their usage but is relevant to how we test them.
  *
@@ -87,15 +86,14 @@ public class FreshReadersProvidedTest {
 		Assert.assertEquals( 1, queryEntityInfos.size() );
 		Assert.assertEquals( 13L, queryEntityInfos.get( 0 ).getId() );
 
-		RecordingFilter filter = new RecordingFilter( "name" );
-		List<EntityInfo> filteredQueryEntityInfos = searchFactory.createHSQuery( queryAllGuests, Guest.class )
-				.filter( filter )
+		RecordingQueryWrapper recordingWrapper = new RecordingQueryWrapper( queryAllGuests, "name" );
+		List<EntityInfo> recordingWrapperEntityInfos = searchFactory.createHSQuery( recordingWrapper, Guest.class )
 				.queryEntityInfos();
 
-		checkFilterInspectedAllSegments( filter );
-		expectedTermsForFilter( filter, "thorin", "oakenshield" );
-		Assert.assertEquals( 1, filteredQueryEntityInfos.size() );
-		Assert.assertEquals( 13L, filteredQueryEntityInfos.get( 0 ).getId() );
+		checkQueryInspectedAllSegments( recordingWrapper );
+		expectedTermsForQuery( recordingWrapper, "thorin", "oakenshield" );
+		Assert.assertEquals( 1, recordingWrapperEntityInfos.size() );
+		Assert.assertEquals( 13L, recordingWrapperEntityInfos.get( 0 ).getId() );
 
 		{ // Store guest "Balin"
 			Guest balin = new Guest();
@@ -115,41 +113,36 @@ public class FreshReadersProvidedTest {
 		Assert.assertEquals( 13L, queryEntityInfosAgain.get( 0 ).getId() );
 		Assert.assertEquals( 7L, queryEntityInfosAgain.get( 1 ).getId() );
 
-		RecordingFilter secondFilter = new RecordingFilter( "name" );
-		List<EntityInfo> secondFilteredQueryEntityInfos = searchFactory.createHSQuery( queryAllGuests, Guest.class )
-				.filter( secondFilter )
+		RecordingQueryWrapper secondRecordingWrapper = new RecordingQueryWrapper( queryAllGuests, "name" );
+		List<EntityInfo> secondRecordingWrapperEntityInfos = searchFactory.createHSQuery( secondRecordingWrapper, Guest.class )
 				.queryEntityInfos();
 
-		checkFilterInspectedAllSegments( secondFilter );
-		expectedTermsForFilter( secondFilter, "thorin", "oakenshield", "balin" );
+		checkQueryInspectedAllSegments( secondRecordingWrapper );
+		expectedTermsForQuery( secondRecordingWrapper, "thorin", "oakenshield", "balin" );
 
-		Assert.assertEquals( 2, secondFilteredQueryEntityInfos.size() );
-		Assert.assertEquals( 13L, secondFilteredQueryEntityInfos.get( 0 ).getId() );
-		Assert.assertEquals( 7L, secondFilteredQueryEntityInfos.get( 1 ).getId() );
+		Assert.assertEquals( 2, secondRecordingWrapperEntityInfos.size() );
+		Assert.assertEquals( 13L, secondRecordingWrapperEntityInfos.get( 0 ).getId() );
+		Assert.assertEquals( 7L, secondRecordingWrapperEntityInfos.get( 1 ).getId() );
 	}
 
-	private void expectedTermsForFilter(RecordingFilter filter, String... term) {
-		Assert.assertEquals( term.length, filter.seenTerms.size() );
-		Assert.assertTrue( filter.seenTerms.containsAll( Arrays.asList( term ) ) );
+	private void expectedTermsForQuery(RecordingQueryWrapper recordingWrapper, String... term) {
+		Assert.assertEquals( term.length, recordingWrapper.seenTerms.size() );
+		assertThat( recordingWrapper.seenTerms ).as( "seen terms" ).contains( (Object[]) term );
 	}
 
 	/**
-	 * Verifies that the current RecordingFilter has been fed all the same sub-readers
+	 * Verifies that the current {@link RecordingQueryWrapper} has been fed all the same sub-readers
 	 * which would be obtained from a freshly checked out IndexReader.
 	 *
-	 * @param filter test filter instance
+	 * @param recordingWrapper test {@link RecordingQueryWrapper} instance
 	 */
-	private void checkFilterInspectedAllSegments(RecordingFilter filter) {
+	private void checkQueryInspectedAllSegments(RecordingQueryWrapper recordingWrapper) {
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		IndexReader currentIndexReader = searchFactory.getIndexReaderAccessor().open( Guest.class );
 		try {
 			List<IndexReader> allSubReaders = getSubIndexReaders( (MultiReader) currentIndexReader );
-			for ( IndexReader ir : allSubReaders ) {
-				Assert.assertTrue( filter.visitedReaders.contains( ir ) );
-			}
-			for ( IndexReader ir : filter.visitedReaders ) {
-				Assert.assertTrue( allSubReaders.contains( ir ) );
-			}
+			assertThat( recordingWrapper.visitedReaders ).as( "visited readers" )
+					.contains( allSubReaders.toArray() );
 		}
 		finally {
 			searchFactory.getIndexReaderAccessor().close( currentIndexReader );
@@ -168,29 +161,42 @@ public class FreshReadersProvidedTest {
 	}
 
 	/**
-	 * Filters are invoked once for each segment, so they are invoked multiple times
-	 * once for each segment, each time being passed a different IndexReader.
+	 * Scorers are created once for each segment, each time being passed a different IndexReader.
 	 * These IndexReader instances are "subreaders", not the global kind representing
 	 * the whole index.
 	 */
-	private static class RecordingFilter extends Filter {
+	private static class RecordingQueryWrapper extends Query {
 
+		final Query delegate;
 		final List<IndexReader> visitedReaders = new ArrayList<IndexReader>();
 		final List<String> seenTerms = new ArrayList<String>();
 		final String fieldName;
 
-		public RecordingFilter(String fieldName) {
+		public RecordingQueryWrapper(Query delegate, String fieldName) {
+			this.delegate = delegate;
 			this.fieldName = fieldName;
 		}
 
 		@Override
-		public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+		public Weight createWeight(IndexSearcher searcher, boolean needsScores) throws IOException {
+			Weight delegateWeight = delegate.createWeight( searcher, needsScores );
+			return new ForwardingWeight( this, delegateWeight ) {
+				@Override
+				public Scorer scorer(LeafReaderContext context) throws IOException {
+					record( context );
+					return super.scorer( context );
+				}
+				@Override
+				public BulkScorer bulkScorer(LeafReaderContext context) throws IOException {
+					record( context );
+					return super.bulkScorer( context );
+				}
+			};
+		}
+
+		private void record(LeafReaderContext context) throws IOException {
 			final LeafReader reader = context.reader();
 			this.visitedReaders.add( reader );
-			FixedBitSet bitSet = new FixedBitSet( reader.maxDoc() );
-			for ( int i = 0; i < reader.maxDoc(); i++ ) {
-				bitSet.set( i );
-			}
 			Terms terms = reader.terms( fieldName );
 			TermsEnum iterator = terms.iterator();
 			BytesRef next = iterator.next();
@@ -198,12 +204,13 @@ public class FreshReadersProvidedTest {
 				seenTerms.add( next.utf8ToString() );
 				next = iterator.next();
 			}
-			return BitsFilteredDocIdSet.wrap( new BitDocIdSet( bitSet ), acceptDocs );
 		}
 
 		@Override
 		public String toString(String fieldName) {
-			return new StringBuilder( "RecordingFilter(" )
+			return new StringBuilder( "RecordingQueryWrapper(" )
+					.append( this.delegate )
+					.append( ", " )
 					.append( this.fieldName )
 					.append( ")" )
 					.toString();
