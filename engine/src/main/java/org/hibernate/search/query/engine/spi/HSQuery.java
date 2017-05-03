@@ -16,6 +16,8 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilter;
+import org.hibernate.search.query.dsl.BooleanJunction;
+import org.hibernate.search.query.dsl.MustJunction;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.CustomTypeMetadata;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -100,11 +102,15 @@ public interface HSQuery extends ProjectionConstants {
 
 	/**
 	 * Allows to use lucene filters.
-	 * Semi-deprecated? a preferred way is to use the @FullTextFilterDef approach
 	 *
 	 * @param filter The Lucene filter.
 	 * @return {@code this}  to allow for method chaining
+	 *
+	 * @deprecated use the {@link org.hibernate.search.annotations.FullTextFilterDef} approach,
+	 *     or handle filtering when building the query (see {@link BooleanJunction#must(Query)}
+	 *     and {@link MustJunction#disableScoring()}).
 	 */
+	@Deprecated
 	HSQuery filter(Filter filter);
 
 	/**
