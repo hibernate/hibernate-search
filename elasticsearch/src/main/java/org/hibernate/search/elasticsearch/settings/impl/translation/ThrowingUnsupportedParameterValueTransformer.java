@@ -6,9 +6,15 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl.translation;
 
+import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
 import com.google.gson.JsonElement;
 
 class ThrowingUnsupportedParameterValueTransformer implements ParameterValueTransformer {
+
+	private static final Log log = LoggerFactory.make( Log.class );
+
 	private final Class<?> factoryClass;
 	private final String parameterName;
 
@@ -19,7 +25,7 @@ class ThrowingUnsupportedParameterValueTransformer implements ParameterValueTran
 
 	@Override
 	public JsonElement transform(String parameterValue) {
-		throw DefaultElasticsearchAnalyzerDefinitionTranslator.LOG.unsupportedAnalysisFactoryParameter( factoryClass, parameterName );
+		throw log.unsupportedAnalysisFactoryParameter( factoryClass, parameterName );
 	}
 
 	@Override

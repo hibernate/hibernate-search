@@ -8,9 +8,15 @@ package org.hibernate.search.elasticsearch.settings.impl.translation;
 
 import java.util.Map;
 
+import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
 import com.google.gson.JsonElement;
 
 class MapParameterValueTransformer implements ParameterValueTransformer {
+
+	private static final Log log = LoggerFactory.make( Log.class );
+
 	private final Class<?> factoryClass;
 	private final String parameterName;
 	private final Map<String, JsonElement> translations;
@@ -25,7 +31,7 @@ class MapParameterValueTransformer implements ParameterValueTransformer {
 	public JsonElement transform(String parameterValue) {
 		JsonElement translatedValue = translations.get( parameterValue );
 		if ( translatedValue == null ) {
-			throw DefaultElasticsearchAnalyzerDefinitionTranslator.LOG.unsupportedAnalysisDefinitionParameterValue( factoryClass, parameterName, parameterValue );
+			throw log.unsupportedAnalysisDefinitionParameterValue( factoryClass, parameterName, parameterValue );
 		}
 		return translatedValue;
 	}
