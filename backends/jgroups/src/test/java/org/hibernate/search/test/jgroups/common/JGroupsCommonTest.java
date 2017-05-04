@@ -14,7 +14,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
@@ -28,7 +27,7 @@ import org.junit.Test;
  * @author Lukasz Moren
  * @author Sanne Grinovero
  */
-public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
+public class JGroupsCommonTest extends StaticMasterSlaveSearchTestCase {
 
 	public static final String TESTING_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
 	public static final Poller POLLER = Poller.milliseconds( 10_000, 100 );
@@ -118,7 +117,6 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	public void configure(Map<String,Object> cfg) {
 		//master jgroups configuration
 		super.configure( cfg );
-		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
 		applyCommonJGroupsChannelConfiguration( cfg );
 	}
 
@@ -126,8 +124,6 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	protected void configureSlave(Map<String,Object> cfg) {
 		//slave jgroups configuration
 		super.configureSlave( cfg );
-		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.put( "hibernate.search.default.retry_initialize_period", "1" );
 		applyCommonJGroupsChannelConfiguration( cfg );
 	}
 
