@@ -21,6 +21,8 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Indexed
 public class TShirt {
+	public static final String INDEX_NAME = TShirt.class.getName();
+
 	@Id
 	@GeneratedValue
 	@DocumentId
