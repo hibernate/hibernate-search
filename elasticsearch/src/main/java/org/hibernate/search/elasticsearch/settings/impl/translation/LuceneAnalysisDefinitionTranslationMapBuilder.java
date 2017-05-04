@@ -87,6 +87,10 @@ class LuceneAnalysisDefinitionTranslationMapBuilder<D extends AnalysisDefinition
 			return transform( luceneParam, new ThrowingUnsupportedParameterValueTransformer( luceneClass, luceneParam ) );
 		}
 
+		public SimpleAnalysisDefinitionFactoryBuilder<D> mandateAndStrip(String luceneParam, String luceneValue) {
+			return transform( new ThrowingMandatoryStrippedParametersTransformer( luceneClass, luceneParam, luceneValue ) );
+		}
+
 		public SimpleAnalysisDefinitionFactoryBuilder<D> rename(String luceneParam, String elasticsearchParam) {
 			if ( parameterNameTranslations == null ) {
 				parameterNameTranslations = new HashMap<>();
