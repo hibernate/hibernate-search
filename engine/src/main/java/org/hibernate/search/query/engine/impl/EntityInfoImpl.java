@@ -10,6 +10,8 @@ import java.io.Serializable;
 
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Wrapper class describing the loading of an element.
@@ -18,6 +20,9 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
  * @author Hardy Ferentschik
  */
 public class EntityInfoImpl implements EntityInfo {
+
+	private static final Log log = LoggerFactory.make();
+
 	/**
 	 * The entity class.
 	 */
@@ -54,11 +59,25 @@ public class EntityInfoImpl implements EntityInfo {
 
 	@Override
 	public Class<?> getClazz() {
+		if ( clazz == null ) {
+			/*
+			 * Only throw an exception here, not in the constructor,
+			 * because in some cases we don't need the class at all (e.g. projections).
+			 */
+			throw log.incompleteEntityInfo( clazz, id );
+		}
 		return clazz;
 	}
 
 	@Override
 	public Serializable getId() {
+		if ( id == null ) {
+			/*
+			 * Only throw an exception here, not in the constructor,
+			 * because in some cases we don't need the identifier at all (e.g. projections).
+			 */
+			throw log.incompleteEntityInfo( clazz, id );
+		}
 		return id;
 	}
 

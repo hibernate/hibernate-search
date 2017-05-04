@@ -1012,4 +1012,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 336, value = "A file could not be deleted: likely lock contention. Not a problem for index replications as it will be attempted again in the future.")
 	void fileDeleteFailureIgnored(@Cause IOException e);
 
+	@Message(id = 338, value = "Incomplete entity information in a document retrieved from the index:"
+			+ " the entity class ('%1$s') or identifier ('%2$s') was missing." )
+	SearchException incompleteEntityInfo(@FormatWith(ClassFormatter.class) Class<?> clazz, Object id);
 }
