@@ -281,6 +281,20 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		return SUPPORTED_PROJECTION_CONSTANTS;
 	}
 
+	@Override
+	protected List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
+		List<IndexManager> indexManagers = super.getIndexManagers( binding );
+		for ( IndexManager indexManager : indexManagers ) {
+			if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
+				throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
+					binding.getDocumentBuilder().getBeanClass(),
+					rawSearchPayload.toString()
+				);
+			}
+		}
+		return indexManagers;
+	}
+
 	private void execute() {
 		IndexSearcher searcher = getOrCreateSearcher();
 		if ( searcher != null ) {
@@ -304,16 +318,9 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		for ( Map.Entry<String, EntityIndexBinding> entry: targetedEntityBindingsByName.entrySet() ) {
 			EntityIndexBinding binding = entry.getValue();
 
-			IndexManager[] indexManagers = binding.getIndexManagers();
+			List<IndexManager> indexManagers = getIndexManagers( binding );
 
 			for ( IndexManager indexManager : indexManagers ) {
-				if ( !( indexManager instanceof ElasticsearchIndexManager ) ) {
-					throw LOG.cannotRunEsQueryTargetingEntityIndexedWithNonEsIndexManager(
-						binding.getDocumentBuilder().getBeanClass(),
-						rawSearchPayload.toString()
-					);
-				}
-
 				ElasticsearchIndexManager esIndexManager = (ElasticsearchIndexManager) indexManager;
 				indexNames.add( URLEncodedString.fromString( esIndexManager.getActualIndexName() ) );
 				if ( elasticsearchService == null ) {
