@@ -1027,4 +1027,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 337, value = "Conflicting usage of @Parameter annotation for parameter name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
 	SearchException conflictingParameterDefined(String name, String value1, String value2);
 
+	@Message(id = 338, value = "Incomplete entity information in a document retrieved from the index:"
+			+ " the entity class ('%1$s') or identifier ('%2$s') was missing." )
+	SearchException incompleteEntityInfo(@FormatWith(ClassFormatter.class) Class<?> clazz, Object id);
+
 }
