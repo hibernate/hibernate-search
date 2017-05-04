@@ -163,7 +163,7 @@ import com.google.gson.JsonPrimitive;
  */
 public class DefaultElasticsearchAnalyzerDefinitionTranslator implements ElasticsearchAnalyzerDefinitionTranslator, Startable, Stoppable {
 
-	static final Log LOG = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private Map<String, String> luceneAnalyzers;
 
@@ -510,7 +510,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 	public String translate(Class<?> luceneClass) {
 		String elasticsearchName = luceneAnalyzers.get( luceneClass.getName() );
 		if ( elasticsearchName == null ) {
-			throw LOG.unsupportedAnalyzerImplementation( luceneClass );
+			throw log.unsupportedAnalyzerImplementation( luceneClass );
 		}
 		return elasticsearchName;
 	}
@@ -520,7 +520,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 		Class<? extends CharFilterFactory> factoryType = hibernateSearchDef.factory();
 		AnalysisDefinitionFactory<CharFilterDefinition> factory = luceneCharFilters.get( factoryType.getName() );
 		if ( factory == null ) {
-			throw LOG.unsupportedCharFilterFactory( factoryType );
+			throw log.unsupportedCharFilterFactory( factoryType );
 		}
 		Map<String, String> map = ParameterAnnotationsReader.toNewMutableMap( hibernateSearchDef.params() );
 		return factory.create( map );
@@ -531,7 +531,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 		Class<? extends TokenizerFactory> factoryType = hibernateSearchDef.factory();
 		AnalysisDefinitionFactory<TokenizerDefinition> factory = luceneTokenizers.get( factoryType.getName() );
 		if ( factory == null ) {
-			throw LOG.unsupportedTokenizerFactory( factoryType );
+			throw log.unsupportedTokenizerFactory( factoryType );
 		}
 		Map<String, String> map = ParameterAnnotationsReader.toNewMutableMap( hibernateSearchDef.params() );
 		return factory.create( map );
@@ -542,7 +542,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 		Class<? extends TokenFilterFactory> factoryType = hibernateSearchDef.factory();
 		AnalysisDefinitionFactory<TokenFilterDefinition> factory = luceneTokenFilters.get( factoryType.getName() );
 		if ( factory == null ) {
-			throw LOG.unsupportedTokenFilterFactory( factoryType );
+			throw log.unsupportedTokenFilterFactory( factoryType );
 		}
 		Map<String, String> map = ParameterAnnotationsReader.toNewMutableMap( hibernateSearchDef.params() );
 		return factory.create( map );
@@ -563,7 +563,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 					DefaultElasticsearchAnalyzerDefinitionTranslator.this.luceneTokenizers.get( parameterValue );
 
 			if ( factory == null ) {
-				throw LOG.unsupportedAnalysisFactoryTokenizerClassNameParameter( factoryClass, parameterName, parameterValue );
+				throw log.unsupportedAnalysisFactoryTokenizerClassNameParameter( factoryClass, parameterName, parameterValue );
 			}
 
 			return new JsonPrimitive( factory.getType() );
