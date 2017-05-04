@@ -69,7 +69,6 @@ public class Location {
 	private BigDecimal visibleStars;
 
 	@Field(store = Store.YES)
-	@NumericField
 	@FieldBridge(impl = CoordinatesPairFieldBridge.class)
 	private final String coordinatePair = "1;2";
 
