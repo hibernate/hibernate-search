@@ -19,10 +19,9 @@ import org.hibernate.search.Search;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
-import org.hibernate.search.test.jgroups.common.MultipleSessionsSearchTestCase;
+import org.hibernate.search.test.jgroups.common.StaticMasterSlaveSearchTestCase;
 import org.hibernate.search.test.jgroups.master.TShirt;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.junit.Test;
@@ -34,7 +33,7 @@ import org.junit.Test;
  * @author Lukasz Moren
  * @author Sanne Grinovero
  */
-public class JGroupsElasticsearchIT extends MultipleSessionsSearchTestCase {
+public class JGroupsElasticsearchIT extends StaticMasterSlaveSearchTestCase {
 
 	public static final String TESTING_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
 	private static final Poller POLLER = JGroupsCommonTest.POLLER;
@@ -121,7 +120,6 @@ public class JGroupsElasticsearchIT extends MultipleSessionsSearchTestCase {
 	public void configure(Map<String,Object> cfg) {
 		//master jgroups configuration
 		super.configure( cfg );
-		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
 		applyCommonJGroupsChannelConfiguration( cfg );
 	}
 
@@ -129,8 +127,6 @@ public class JGroupsElasticsearchIT extends MultipleSessionsSearchTestCase {
 	protected void configureSlave(Map<String,Object> cfg) {
 		//slave jgroups configuration
 		super.configureSlave( cfg );
-		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.put( "hibernate.search.default.retry_initialize_period", "1" );
 		applyCommonJGroupsChannelConfiguration( cfg );
 	}
 

@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.DefaultTestResourceManager;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
@@ -22,11 +23,12 @@ import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
 
 /**
- * Test class to simulate clustered environment (one master, and one slave node)
+ * Test class to simulate clustered environment (one master, and one slave node,
+ * each role being known in advance).
  *
  * @author Lukasz Moren
  */
-public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
+public abstract class StaticMasterSlaveSearchTestCase extends SearchTestBase {
 
 	protected static final String masterCopy = "/master/copy";
 
@@ -45,6 +47,7 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		//master
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
 		cfg.put(
 				"hibernate.search.default.sourceBase",
 				TestConstants.getIndexDirectory( getTargetDir() ) + masterCopy
@@ -61,6 +64,8 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 
 	protected void configureSlave(Map<String,Object> cfg) {
 		//slave(s)
+		cfg.put( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
+		cfg.put( "hibernate.search.default.retry_initialize_period", "1" );
 		cfg.put(
 				"hibernate.search.default.sourceBase",
 				TestConstants.getIndexDirectory( getTargetDir() ) + masterCopy
