@@ -12,7 +12,6 @@ import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResu
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +38,6 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterKey;
-import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.ChainedFilter;
@@ -62,7 +60,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 	static final Log log = LoggerFactory.make();
-	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
 	private static final Set<String> SUPPORTED_PROJECTION_CONSTANTS = Collections.unmodifiableSet(
 			CollectionHelper.asSet(
@@ -287,6 +284,25 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	@Override
 	protected Set<String> getSupportedProjectionConstants() {
 		return SUPPORTED_PROJECTION_CONSTANTS;
+	}
+
+	@Override
+	protected List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
+		List<IndexManager> indexManagers = super.getIndexManagers( binding );
+
+		for ( IndexManager indexManager : indexManagers ) {
+			if ( !( indexManager instanceof DirectoryBasedIndexManager ) ) {
+				//TODO clarify intent:
+				// A) improve the error message so that people understand what they should do
+				// B) Is the point really to not support "directory-based" or rather non-Lucene native based ones?
+				throw log.cannotRunLuceneQueryTargetingEntityIndexedWithNonDirectoryBasedIndexManager(
+						binding.getDocumentBuilder().getBeanClass(),
+						luceneQuery.toString()
+				);
+			}
+		}
+
+		return indexManagers;
 	}
 
 	/**
@@ -609,38 +625,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		}
 
 		return similarity;
-	}
-
-	private List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
-		FullTextFilterImplementor[] fullTextFilters = getFullTextFilters();
-		List<IndexManager> indexManagers = Arrays.asList( binding.getSelectionStrategy().getIndexManagersForQuery( fullTextFilters ) );
-
-		for ( IndexManager indexManager : indexManagers ) {
-			if ( !( indexManager instanceof DirectoryBasedIndexManager ) ) {
-				//TODO clarify intent:
-				// A) improve the error message so that people understand what they should do
-				// B) Is the point really to not support "directory-based" or rather non-Lucene native based ones?
-				throw log.cannotRunLuceneQueryTargetingEntityIndexedWithNonDirectoryBasedIndexManager(
-						binding.getDocumentBuilder().getBeanClass(),
-						luceneQuery.toString()
-				);
-			}
-		}
-
-		return indexManagers;
-	}
-
-	private FullTextFilterImplementor[] getFullTextFilters() {
-		FullTextFilterImplementor[] fullTextFilters;
-
-		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
-			fullTextFilters = filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] );
-		}
-		else {
-			// no filter get all shards
-			fullTextFilters = EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR;
-		}
-		return fullTextFilters;
 	}
 
 	private void buildFilters() {

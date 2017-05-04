@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,8 +27,10 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.FullTextFilter;
+import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
@@ -52,6 +55,8 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	 * Common prefix shared by all defined projection constants.
 	 */
 	public static final String HSEARCH_PROJECTION_FIELD_PREFIX = "__HSearch_";
+
+	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR_ARRAY = new FullTextFilterImplementor[0];
 
 	protected transient ExtendedSearchIntegrator extendedIntegrator;
 	protected transient TimeoutExceptionFactory timeoutExceptionFactory;
@@ -424,6 +429,25 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 					String.valueOf( sortField.getType() ), String.valueOf( indexEncodingType ), sortField.getField()
 			);
 		}
+	}
+
+	protected List<IndexManager> getIndexManagers(EntityIndexBinding binding) {
+		FullTextFilterImplementor[] fullTextFilters = getFullTextFilterImplementors();
+		List<IndexManager> indexManagers = Arrays.asList( binding.getSelectionStrategy().getIndexManagersForQuery( fullTextFilters ) );
+		return indexManagers;
+	}
+
+	private FullTextFilterImplementor[] getFullTextFilterImplementors() {
+		FullTextFilterImplementor[] fullTextFilters;
+
+		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
+			fullTextFilters = filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] );
+		}
+		else {
+			// no filter get all shards
+			fullTextFilters = EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR_ARRAY;
+		}
+		return fullTextFilters;
 	}
 
 	// hooks to be implemented by specific sub-classes
