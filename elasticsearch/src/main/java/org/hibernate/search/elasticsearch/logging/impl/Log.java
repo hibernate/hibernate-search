@@ -455,4 +455,8 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "For simple query string queries, Elasticsearch does not support overriding fields with more than one different analyzers: %1$s.")
 	SearchException unableToOverrideQueryAnalyzerWithMoreThanOneAnalyzersForSimpleQueryStringQueries(Collection<String> analyzers);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 84,
+			value = "The parameter '%2$s' must have value '%3$s' for the factory '%1$s' with Elasticsearch. Current value '%4$s' is invalid." )
+	SearchException invalidAnalysisFactoryParameter(@FormatWith(ClassFormatter.class) Class<?> factoryType, String parameter,
+			String expectedValue, String actualValue);
 }

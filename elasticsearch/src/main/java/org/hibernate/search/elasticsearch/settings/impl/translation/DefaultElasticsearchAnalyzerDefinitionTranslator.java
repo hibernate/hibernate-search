@@ -484,11 +484,11 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.disallow( "enablePositionIncrements" )
 				.end()
 				.builder( TypeTokenFilterFactory.class, "keep_types" )
+						.mandateAndStrip( "useWhitelist", "true" )
 						.transform(
 								"types",
 								new WordSetFileParameterValueTransformer( resourceLoader )
 						)
-						.disallow( "useWhitelist" )
 						.disallow( "enablePositionIncrements" )
 				.end()
 				.builder( ClassicFilterFactory.class, "classic" ).end()
