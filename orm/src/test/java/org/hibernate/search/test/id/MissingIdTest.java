@@ -56,7 +56,7 @@ public class MissingIdTest extends SearchTestBase {
 		s.clear();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000337" );
+		thrown.expectMessage( "HSEARCH000338" );
 		thrown.expectMessage( "Incomplete entity information" );
 		thrown.expectMessage( "'" + EntityWithMissingIdWhenRetrievedFromIndex.class.getName() + "'" );
 
