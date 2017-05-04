@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
 import org.apache.lucene.analysis.cjk.CJKBigramFilterFactory;
+import org.apache.lucene.analysis.core.TypeTokenFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.no.NorwegianLightStemFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternCaptureGroupFilterFactory;
@@ -35,6 +36,7 @@ import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinit
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.translation.DefaultElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.After;
@@ -311,6 +313,68 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslatorTest {
 
 		assertThat( definition.getParameters().keySet() ).as( "parameter names" )
 				.excludes( "han", "hiragana", "katakana", "hangul", "outputUnigrams" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2642")
+	public void typeToken_blacklist_implicit() {
+		TokenFilterDef annotation = annotation(
+				TokenFilterDef.class,
+				TypeTokenFilterFactory.class,
+				param( "types", "org/hibernate/search/elasticsearch/test/typeTokens.properties" )
+				);
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400084" );
+		thrown.expectMessage( TypeTokenFilterFactory.class.getSimpleName() );
+		thrown.expectMessage( "'useWhitelist'" );
+		thrown.expectMessage( "'null'" );
+
+		translator.translate( annotation );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2642")
+	public void typeToken_blacklist_explicit() {
+		TokenFilterDef annotation = annotation(
+				TokenFilterDef.class,
+				TypeTokenFilterFactory.class,
+				param( "types", "org/hibernate/search/elasticsearch/test/typeTokens.properties" ),
+				param( "useWhitelist", "false" )
+				);
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400084" );
+		thrown.expectMessage( TypeTokenFilterFactory.class.getSimpleName() );
+		thrown.expectMessage( "'useWhitelist'" );
+		thrown.expectMessage( "'false'" );
+
+		translator.translate( annotation );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2642")
+	public void typeToken_whitelist() {
+		TokenFilterDef annotation = annotation(
+				TokenFilterDef.class,
+				TypeTokenFilterFactory.class,
+				param( "types", "org/hibernate/search/elasticsearch/test/typeTokens.properties" ),
+				param( "useWhitelist", "true" )
+				);
+
+		TokenFilterDefinition definition = translator.translate( annotation );
+
+		assertThat( definition.getType() ).as( "type" ).isEqualTo( "keep_types" );
+		assertThat( definition.getParameters() ).as( "parameters" )
+				.includes( entry(
+						"types",
+						JsonBuilder.array()
+								.add( new JsonPrimitive( "<FOO>" ) )
+								.add( new JsonPrimitive( "<BAR>" ) )
+						.build()
+				) );
+		// No other parameter is expected, particularly not "useWhitelist"
+		assertThat( definition.getParameters() ).as( "parameters" ).hasSize( 1 );
 	}
 
 	@Test
