@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
@@ -404,8 +405,8 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public OperationDispatcher getRemoteOperationDispatcher() {
-		return delegate.getRemoteOperationDispatcher();
+	public OperationDispatcher createRemoteOperationDispatcher(Predicate<IndexManager> indexManagerFilter) {
+		return delegate.createRemoteOperationDispatcher( indexManagerFilter );
 	}
 
 }
