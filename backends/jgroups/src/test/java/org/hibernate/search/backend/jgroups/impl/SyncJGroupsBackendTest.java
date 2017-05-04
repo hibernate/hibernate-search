@@ -125,7 +125,7 @@ public class SyncJGroupsBackendTest {
 	public void alternativeBackendConfiguration() {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( masterNode, "dvds" );
 		JGroupsReceivingMockBackendQueueProcessor jgroupsProcessor = (JGroupsReceivingMockBackendQueueProcessor) backendQueueProcessor;
-		BackendQueueProcessor delegatedBackend = jgroupsProcessor.getDelegate().getDelegatedBackend();
+		BackendQueueProcessor delegatedBackend = jgroupsProcessor.getDelegate().getExistingDelegate();
 		Assert.assertTrue( "dvds backend was configured with a delegate to blackhole but it's not using it", delegatedBackend instanceof BlackHoleBackendQueueProcessor );
 	}
 
