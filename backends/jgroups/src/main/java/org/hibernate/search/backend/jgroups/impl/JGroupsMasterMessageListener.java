@@ -38,6 +38,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 	private final SearchIntegrator integrator;
 	private final NodeSelectorService selector;
 	private final LuceneWorkSerializer luceneWorkSerializer;
+	private volatile OperationDispatcher operationDispatcher;
 
 	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorService masterNodeSelector, LuceneWorkSerializer luceneWorkSerializer) {
 		this.integrator = context.getUninitializedSearchIntegrator();
@@ -67,17 +68,27 @@ public class JGroupsMasterMessageListener implements Receiver {
 		if ( queue != null && !queue.isEmpty() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debugf(
-						"There are %d Lucene docs received from slave node %s to be processed by master",
+						"There are %d Lucene docs received from slave node %s to be processed if this node is the master",
 						(Integer) queue.size(),
 						message.getSrc()
 				);
 			}
-			OperationDispatcher operationDispatcher = integrator.getRemoteOperationDispatcher();
+
+			OperationDispatcher operationDispatcher = getOperationDispatcher();
 			operationDispatcher.dispatch( queue, null );
 		}
 		else {
 			log.receivedEmptyLuceneWorksInMessage();
 		}
+	}
+
+	private OperationDispatcher getOperationDispatcher() {
+		if ( operationDispatcher == null ) {
+			operationDispatcher = integrator.createRemoteOperationDispatcher(
+					indexManager -> selector.getMasterNodeSelector( indexManager.getIndexName() ).isIndexOwnerLocal()
+			);
+		}
+		return operationDispatcher;
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------

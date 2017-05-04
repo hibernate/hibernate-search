@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
@@ -131,7 +132,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final DatabaseRetrievalMethod defaultDatabaseRetrievalMethod;
 	private final boolean enlistWorkerInTransaction;
 	private final boolean indexUninvertingAllowed;
-	private final OperationDispatcher remoteOperationDispatcher;
 	private volatile LuceneWorkSerializer workSerializer;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
@@ -195,8 +195,6 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.indexUninvertingAllowed = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.INDEX_UNINVERTING_ALLOWED, false
 		);
-
-		this.remoteOperationDispatcher = new TransactionalOperationDispatcher( this );
 	}
 
 	private ObjectLookupMethod determineDefaultObjectLookupMethod() {
@@ -694,8 +692,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public OperationDispatcher getRemoteOperationDispatcher() {
-		return remoteOperationDispatcher;
+	public OperationDispatcher createRemoteOperationDispatcher(Predicate<IndexManager> predicate) {
+		return new TransactionalOperationDispatcher( this, predicate );
 	}
 
 }

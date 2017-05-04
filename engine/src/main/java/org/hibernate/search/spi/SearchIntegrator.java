@@ -7,6 +7,7 @@
 package org.hibernate.search.spi;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
@@ -237,11 +238,16 @@ public interface SearchIntegrator extends AutoCloseable {
 	LuceneWorkSerializer getWorkSerializer();
 
 	/**
+	 * @param indexManagerFilter A predicate allowing to exclude index managers from
+	 * dispatching. Works will not be applied to these index managers.
 	 * @return An operation dispatcher allowing to insert works retrieved from
-	 * remote sources (e.g. JMS or JGroups slaves).
+	 * remote sources (e.g. JMS or JGroups slaves), but only for index managers
+	 * verifying the given predicate.
+	 * This allows JMS or JGroups integrations to perform checks on index managers that
+	 * wouldn't exist before the dispatch, in the case of dynamic sharding in particular.
 	 *
 	 * @hsearch.experimental Operation dispatchers are under active development.
 	 * You should be prepared for incompatible changes in future releases.
 	 */
-	OperationDispatcher getRemoteOperationDispatcher();
+	OperationDispatcher createRemoteOperationDispatcher(Predicate<IndexManager> indexManagerFilter);
 }

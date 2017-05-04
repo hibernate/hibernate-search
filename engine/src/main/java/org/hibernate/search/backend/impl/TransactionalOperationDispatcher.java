@@ -9,6 +9,7 @@ package org.hibernate.search.backend.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -29,34 +30,41 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class TransactionalOperationDispatcher implements OperationDispatcher {
 	private final Function<Class<?>, EntityIndexBinding> bindingLookup;
-	private final TransactionalOperationExecutorSelector executorSelector;
+	private final IndexManagerHolder indexManagerHolder;
+	private final Predicate<IndexManager> indexManagerFilter;
 
 	public TransactionalOperationDispatcher(SearchIntegrator integrator) {
+		this( integrator, indexManager -> true );
+	}
+
+	public TransactionalOperationDispatcher(SearchIntegrator integrator, Predicate<IndexManager> indexManagerFilter) {
 		this( integrator.unwrap( ExtendedSearchIntegrator.class ).getIndexManagerHolder(),
-				integrator::getIndexBinding );
+				integrator::getIndexBinding, indexManagerFilter );
 	}
 
 	public TransactionalOperationDispatcher(IndexManagerHolder indexManagerHolder,
 			Map<Class<?>, EntityIndexBinding> bindings) {
-		this( indexManagerHolder, bindings::get );
+		this( indexManagerHolder, bindings::get, indexManager -> true );
 	}
 
 	private TransactionalOperationDispatcher(IndexManagerHolder indexManagerHolder,
-			Function<Class<?>, EntityIndexBinding> bindingLookup) {
-		this.executorSelector = new TransactionalOperationExecutorSelector( indexManagerHolder );
+			Function<Class<?>, EntityIndexBinding> bindingLookup,
+			Predicate<IndexManager> indexManagerFilter) {
+		this.indexManagerHolder = indexManagerHolder;
 		this.bindingLookup = bindingLookup;
+		this.indexManagerFilter = indexManagerFilter;
 	}
 
 	@Override
 	public void dispatch(LuceneWork work, IndexingMonitor monitor) {
-		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter();
+		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter( indexManagerHolder, indexManagerFilter );
 		appendWork( context, work );
 		context.commitOperations( monitor );
 	}
 
 	@Override
 	public void dispatch(List<LuceneWork> queue, IndexingMonitor monitor) {
-		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter();
+		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter( indexManagerHolder, indexManagerFilter );
 		for ( LuceneWork work : queue ) {
 			appendWork( context, work );
 		}
@@ -67,7 +75,7 @@ public class TransactionalOperationDispatcher implements OperationDispatcher {
 		final Class<?> entityType = work.getEntityClass();
 		EntityIndexBinding entityIndexBinding = bindingLookup.apply( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-		TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( executorSelector, null );
+		TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( TransactionalOperationExecutorSelector.INSTANCE, null );
 		executor.performOperation( work, shardingStrategy, context );
 	}
 

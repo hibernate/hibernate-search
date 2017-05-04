@@ -72,7 +72,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 			 * and update their shard list.
 			 * Thus the index name is rather useless in this case.
 			 */
-			OperationDispatcher dispatcher = integrator.getRemoteOperationDispatcher();
+			OperationDispatcher dispatcher = getOperationDispatcher( integrator );
 			dispatcher.dispatch( queue, null );
 		}
 		catch (JMSException e) {
@@ -86,6 +86,10 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		finally {
 			afterMessage();
 		}
+	}
+
+	private OperationDispatcher getOperationDispatcher(SearchIntegrator integrator) {
+		return integrator.createRemoteOperationDispatcher( indexManager -> true );
 	}
 
 	private void logMessageDetails(ObjectMessage objectMessage, String indexName) throws JMSException {
