@@ -48,7 +48,7 @@
                 </properties>
             </listener>
         </listeners>
-        <chunk checkpoint-policy="custom">
+        <chunk item-count="#{jobParameters['checkpointInterval']}?:200;">
             <reader ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader">
                 <properties>
                 	<!-- Used to re-create the job context data as necessary -->
@@ -78,11 +78,6 @@
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
                 </properties>
             </writer>
-            <checkpoint-algorithm ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.CheckpointAlgorithm">
-                <properties>
-                    <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}?:200;" />
-                </properties>
-            </checkpoint-algorithm>
         </chunk>
         <partition>
             <mapper ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper">
