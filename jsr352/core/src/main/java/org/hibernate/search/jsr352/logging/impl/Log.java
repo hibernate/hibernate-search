@@ -209,7 +209,7 @@ public interface Log extends BaseHibernateSearchLogger {
 	SearchException failedToSerializeJobParameter(@FormatWith(ClassFormatter.class) Class<?> type, @Cause Throwable e);
 
 	@Message(id = JSR_352_MESSAGES_START_ID + 29,
-			value = "Unable to parse value '%1$s' for job parameter '%2$s'."
+			value = "Unable to parse value '%2$s' for job parameter '%1$s'."
 	)
 	SearchException unableToParseJobParameter(String parameterName, Object parameterValue, @Cause Exception e);
 
