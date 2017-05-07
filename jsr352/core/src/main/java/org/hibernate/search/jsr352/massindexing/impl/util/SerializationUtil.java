@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Base64;
 
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -49,13 +50,23 @@ public final class SerializationUtil {
 		}
 	}
 
+	/**
+	 * Given a parameter key-value pair, parses the value into boolean.
+	 * <p>
+	 * Only string literals "true" and "false" are allowed, where case is
+	 * ignored. Parsing any other value, such as {@code null}, "", "t", "f",
+	 * "0", "1", will lead to a parsing failure.
+	 *
+	 * @throws SearchException if the parsing fails.
+	 */
 	public static boolean parseBooleanParameter(String key, String value) {
-		try {
-			return Boolean.parseBoolean( value );
+		if ( "true".equalsIgnoreCase( value ) ) {
+			return true;
 		}
-		catch (NumberFormatException e) {
-			throw log.unableToParseJobParameter( key, value, e );
+		if ( "false".equalsIgnoreCase( value ) ) {
+			return false;
 		}
+		throw log.unableToParseJobParameter( key, value, null );
 	}
 
 	public static int parseIntegerParameter(String key, String value) {

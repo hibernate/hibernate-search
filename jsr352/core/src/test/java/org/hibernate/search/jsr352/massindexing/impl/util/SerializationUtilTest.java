@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -84,14 +85,16 @@ public class SerializationUtilTest {
 
 	@Test
 	public void deserializeBoolean_fromOthers() throws Exception {
-		boolean f0 = SerializationUtil.parseBooleanParameter( "My parameter 1", "0" );
-		boolean f1 = SerializationUtil.parseBooleanParameter( "My parameter 2", "1" );
-		boolean ft = SerializationUtil.parseBooleanParameter( "My parameter 3", "t" );
-		boolean ff = SerializationUtil.parseBooleanParameter( "My parameter 4", "f" );
-		assertThat( f0 ).isFalse();
-		assertThat( f1 ).isFalse();
-		assertThat( ft ).isFalse();
-		assertThat( ff ).isFalse();
+		for ( String value : new String[] { null, "", "0", "1", "t", "f" } ) {
+			try {
+				SerializationUtil.parseBooleanParameter( "My parameter", value );
+				fail();
+			}
+			catch (SearchException e) {
+				String expectedMsg = "HSEARCH500029: Unable to parse value '" + value + "' for job parameter 'My parameter'.";
+				assertThat( e.getMessage() ).isEqualTo( expectedMsg );
+			}
+		}
 	}
 
 	@Test
