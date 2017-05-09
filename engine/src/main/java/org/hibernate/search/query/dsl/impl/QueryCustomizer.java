@@ -7,12 +7,10 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.FilteredQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
-
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.QueryCustomization;
 
@@ -23,7 +21,7 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 	private float boost = 1f;
 	private boolean constantScore;
 	private Query wrappedQuery;
-	private Filter filter;
+	private Query filter;
 
 	@Override
 	public QueryCustomizer boostedTo(float boost) {
@@ -38,7 +36,7 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 	}
 
 	@Override
-	public QueryCustomizer filteredBy(Filter filter) {
+	public QueryCustomizer filteredBy(Query filter) {
 		this.filter = filter;
 		return this;
 	}
@@ -60,10 +58,13 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		}
 		finalQuery.setBoost( boost * finalQuery.getBoost() );
 		if ( filter != null ) {
-			finalQuery = new FilteredQuery( finalQuery, filter );
+			finalQuery = new BooleanQuery.Builder()
+					.add( finalQuery, Occur.MUST )
+					.add( filter, Occur.FILTER )
+					.build();
 		}
 		if ( constantScore ) {
-			finalQuery = new ConstantScoreQuery( new QueryWrapperFilter( finalQuery ) );
+			finalQuery = new ConstantScoreQuery( finalQuery );
 		}
 		return finalQuery;
 	}

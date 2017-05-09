@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
@@ -68,7 +67,7 @@ public class ConnectedAllContext implements AllContext {
 	}
 
 	@Override
-	public AllContext filteredBy(Filter filter) {
+	public AllContext filteredBy(Query filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}

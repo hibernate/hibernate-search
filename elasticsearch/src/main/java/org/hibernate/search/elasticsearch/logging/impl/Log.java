@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
@@ -46,10 +45,6 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 2,
 			value = "Lucene query '%1$s' cannot be transformed into equivalent Elasticsearch query" )
 	SearchException cannotTransformLuceneQueryIntoEsQuery(Query query);
-
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 3,
-			value = "Lucene filter '%1$s' cannot be transformed into equivalent Elasticsearch query" )
-	SearchException cannotTransformLuceneFilterIntoEsQuery(Filter filter);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 4,
 			value = "The sort order RANGE_DEFINITION_ORDER cant not be sent used with Elasticsearch" )

@@ -7,11 +7,10 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Filter;
-
+import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.FuzzyContext;
-import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.query.dsl.TermContext;
+import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.query.dsl.WildcardContext;
 
 /**
@@ -61,7 +60,7 @@ class ConnectedTermContext implements TermContext {
 	}
 
 	@Override
-	public ConnectedTermContext filteredBy(Filter filter) {
+	public ConnectedTermContext filteredBy(Query filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}

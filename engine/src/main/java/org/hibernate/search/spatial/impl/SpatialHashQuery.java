@@ -10,45 +10,56 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.BitDocIdSet;
-import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.FixedBitSet;
+import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 
 /**
- * Lucene Filter for filtering documents which have been indexed with Hibernate Search Spatial SpatialFieldBridge
+ * Lucene distance Query for documents which have been indexed with Hibernate Search {@link SpatialFieldBridgeByHash}
  * Use denormalized spatial hash cell ids to return a sub set of documents near the center
  *
  * @author Nicolas Helleringer
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByHash
  * @see org.hibernate.search.spatial.Coordinates
  */
-public final class SpatialHashFilter extends Filter {
+public final class SpatialHashQuery extends Query {
 
 	private final List<String> spatialHashCellsIds;
 	private final String fieldName;
 
-	public SpatialHashFilter(List<String> spatialHashCellsIds, String fieldName) {
+	public SpatialHashQuery(List<String> spatialHashCellsIds, String fieldName) {
 		this.spatialHashCellsIds = spatialHashCellsIds;
 		this.fieldName = fieldName;
+	}
+
+	@Override
+	public Weight createWeight(IndexSearcher searcher, boolean needsScores) throws IOException {
+		return new ConstantScoreWeight( this ) {
+			@Override
+			public Scorer scorer(LeafReaderContext context) throws IOException {
+				DocIdSetIterator iterator = createDocIdSetIterator( context );
+				return new ConstantScoreScorer( this, score(), iterator );
+			}
+		};
 	}
 
 	/**
 	 * Search the index for document having the correct spatial hash cell id at given grid level.
 	 *
 	 * @param context the {@link LeafReaderContext} for which to return the {@link DocIdSet}.
-	 * @param acceptDocs Bits that represent the allowable docs to match (typically deleted docs but possibly filtering
-	 * other documents)
-	 * @return a {@link DocIdSet} with the document ids matching
+	 * @return a {@link DocIdSetIterator} with the matching document ids
 	 */
-	@Override
-	public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
+	private DocIdSetIterator createDocIdSetIterator(LeafReaderContext context) throws IOException {
 		if ( spatialHashCellsIds.size() == 0 ) {
 			return null;
 		}
@@ -59,7 +70,7 @@ public final class SpatialHashFilter extends Filter {
 		boolean found = false;
 		for ( int i = 0; i < spatialHashCellsIds.size(); i++ ) {
 			Term spatialHashCellTerm = new Term( fieldName, spatialHashCellsIds.get( i ) );
-			DocsEnum spatialHashCellsDocs = atomicReader.termDocsEnum( spatialHashCellTerm );
+			PostingsEnum spatialHashCellsDocs = atomicReader.postings( spatialHashCellTerm );
 			if ( spatialHashCellsDocs != null ) {
 				while ( true ) {
 					final int docId = spatialHashCellsDocs.nextDoc();
@@ -67,20 +78,18 @@ public final class SpatialHashFilter extends Filter {
 						break;
 					}
 					else {
-						if ( acceptDocs == null || acceptDocs.get( docId ) ) {
-							matchedDocumentsIds.bits().set( docId );
-							found = true;
-						}
+						matchedDocumentsIds.bits().set( docId );
+						found = true;
 					}
 				}
 			}
 		}
 
 		if ( found ) {
-			return matchedDocumentsIds;
+			return matchedDocumentsIds.iterator();
 		}
 		else {
-			return null;
+			return DocIdSetIterator.empty();
 		}
 	}
 
@@ -104,8 +113,8 @@ public final class SpatialHashFilter extends Filter {
 		if ( obj == this ) {
 			return true;
 		}
-		if ( obj instanceof SpatialHashFilter ) {
-			SpatialHashFilter other = (SpatialHashFilter) obj;
+		if ( obj instanceof SpatialHashQuery ) {
+			SpatialHashQuery other = (SpatialHashQuery) obj;
 			return spatialHashCellsIds.equals( other.spatialHashCellsIds )
 				&& fieldName.equals( other.fieldName );
 		}

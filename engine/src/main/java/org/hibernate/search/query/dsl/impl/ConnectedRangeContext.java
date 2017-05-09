@@ -7,8 +7,8 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Filter;
 
+import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.RangeContext;
 import org.hibernate.search.query.dsl.RangeMatchingContext;
 
@@ -42,7 +42,7 @@ class ConnectedRangeContext implements RangeContext {
 	}
 
 	@Override
-	public RangeContext filteredBy(Filter filter) {
+	public RangeContext filteredBy(Query filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}

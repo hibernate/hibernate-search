@@ -7,9 +7,7 @@
 package org.hibernate.search.test.configuration;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.CachingWrapperFilter;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
@@ -26,9 +24,8 @@ public class SecurityFilterFactory {
 	}
 
 	@Factory
-	public Filter buildSecurityFilter() {
-		QueryWrapperFilter securityFilter = new QueryWrapperFilter( new TermQuery( new Term( "owner", ownerName ) ) );
-		return new CachingWrapperFilter( securityFilter );
+	public Query buildSecurityFilter() {
+		return new TermQuery( new Term( "owner", ownerName ) );
 	}
 
 	@Key

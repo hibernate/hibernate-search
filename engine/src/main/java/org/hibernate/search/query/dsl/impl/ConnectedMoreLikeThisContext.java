@@ -7,8 +7,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Filter;
-
+import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.MoreLikeThisContext;
 import org.hibernate.search.query.dsl.MoreLikeThisOpenedMatchingContext;
 import org.hibernate.search.query.dsl.MoreLikeThisTerminalMatchingContext;
@@ -73,7 +72,7 @@ public class ConnectedMoreLikeThisContext implements MoreLikeThisContext {
 	}
 
 	@Override
-	public MoreLikeThisContext filteredBy(Filter filter) {
+	public MoreLikeThisContext filteredBy(Query filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}

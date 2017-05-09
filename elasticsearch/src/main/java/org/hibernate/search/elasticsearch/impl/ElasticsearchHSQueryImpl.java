@@ -29,7 +29,6 @@ import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
@@ -421,7 +420,7 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 
 			// user filter
 			if ( userFilter != null ) {
-				filters.add( ToElasticsearch.fromLuceneFilter( userFilter ) );
+				filters.add( ToElasticsearch.fromLuceneQuery( userFilter ) );
 			}
 
 			if ( !filterDefinitions.isEmpty() ) {
@@ -1121,14 +1120,8 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 		if ( def.getFactoryMethod() != null ) {
 			try {
 				Object candidateFilter = def.getFactoryMethod().invoke( filterOrFactory );
-				if ( candidateFilter instanceof Filter ) {
-					jsonFilter = ToElasticsearch.fromLuceneFilter( (Filter) candidateFilter );
-				}
-				else if ( candidateFilter instanceof ElasticsearchFilter ) {
-					jsonFilter = JSON_PARSER.parse( ( (ElasticsearchFilter) candidateFilter ).getJsonFilter() )
-							.getAsJsonObject();
-				}
-				else {
+				jsonFilter = toJsonFilter( candidateFilter );
+				if ( jsonFilter == null ) {
 					throw LOG.filterFactoryMethodReturnsUnsupportedType( def.getImpl().getName(), def.getFactoryMethod().getName() );
 				}
 			}
@@ -1137,18 +1130,26 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 			}
 		}
 		else {
-			if ( filterOrFactory instanceof Filter ) {
-				jsonFilter = ToElasticsearch.fromLuceneFilter( (Filter) filterOrFactory );
-			}
-			else if ( filterOrFactory instanceof ElasticsearchFilter ) {
-				jsonFilter = JSON_PARSER.parse( ( (ElasticsearchFilter) filterOrFactory ).getJsonFilter() ).getAsJsonObject();
-			}
-			else {
+			jsonFilter = toJsonFilter( filterOrFactory );
+			if ( jsonFilter == null ) {
 				throw LOG.filterHasUnsupportedType( filterOrFactory == null ? null : filterOrFactory.getClass().getName() );
 			}
 		}
 
 		return jsonFilter;
+	}
+
+	private JsonObject toJsonFilter(Object candidateFilter) {
+		if ( candidateFilter instanceof Query ) {
+			// This also handles the case where the query extends Filter
+			return ToElasticsearch.fromLuceneQuery( (Query) candidateFilter );
+		}
+		else if ( candidateFilter instanceof ElasticsearchFilter ) {
+			return JSON_PARSER.parse( ( (ElasticsearchFilter) candidateFilter ).getJsonFilter() ).getAsJsonObject();
+		}
+		else {
+			return null;
+		}
 	}
 
 	private boolean isNested(DiscreteFacetRequest facetRequest) {
