@@ -38,12 +38,12 @@ import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
  */
 public final class DistanceQuery extends Query {
 
-	private Query approximationQuery;
-	private Point center;
-	private double radius;
-	private String coordinatesField;
-	private String latitudeField;
-	private String longitudeField;
+	private final Query approximationQuery;
+	private final Point center;
+	private final double radius;
+	private final String coordinatesField;
+	private final String latitudeField;
+	private final String longitudeField;
 
 	/**
 	 * Construct a distance query to match document distant at most of radius from center Point
@@ -58,15 +58,7 @@ public final class DistanceQuery extends Query {
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public DistanceQuery(Query approximationQuery, Coordinates centerCoordinates, double radius, String coordinatesField) {
-		if ( approximationQuery == null ) {
-			this.approximationQuery = new MatchAllDocsQuery();
-		}
-		else {
-			this.approximationQuery = approximationQuery;
-		}
-		this.center = Point.fromCoordinates( centerCoordinates );
-		this.radius = radius;
-		this.coordinatesField = coordinatesField;
+		this( approximationQuery, centerCoordinates, radius, coordinatesField, null, null );
 	}
 
 	/**
@@ -83,6 +75,10 @@ public final class DistanceQuery extends Query {
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public DistanceQuery(Query approximationQuery, Coordinates centerCoordinates, double radius, String latitudeField, String longitudeField) {
+		this( approximationQuery, centerCoordinates, radius, null, latitudeField, longitudeField );
+	}
+
+	private DistanceQuery(Query approximationQuery, Coordinates centerCoordinates, double radius, String coordinatesField, String latitudeField, String longitudeField) {
 		if ( approximationQuery == null ) {
 			this.approximationQuery = new MatchAllDocsQuery();
 		}
@@ -91,7 +87,7 @@ public final class DistanceQuery extends Query {
 		}
 		this.center = Point.fromCoordinates( centerCoordinates );
 		this.radius = radius;
-		this.coordinatesField = null;
+		this.coordinatesField = coordinatesField;
 		this.latitudeField = latitudeField;
 		this.longitudeField = longitudeField;
 	}
@@ -104,8 +100,7 @@ public final class DistanceQuery extends Query {
 		}
 		Query rewrittenApproximationQuery = approximationQuery.rewrite( reader );
 		if ( rewrittenApproximationQuery != approximationQuery ) {
-			DistanceQuery clone = (DistanceQuery) clone();
-			clone.approximationQuery = rewrittenApproximationQuery;
+			DistanceQuery clone = new DistanceQuery( rewrittenApproximationQuery, this.center, this.radius, this.coordinatesField, this.latitudeField, this.longitudeField );
 			return clone;
 		}
 		return this;
