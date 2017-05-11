@@ -16,12 +16,8 @@ import java.lang.annotation.Target;
  * Marks a method as a factory method for a given type. A factory method is called whenever a new instance of a given
  * type is requested. The factory method is used with a higher priority than a plain no-arg constructor when present.
  * <p>
- * Factory methods currently are used to instantiate the following classes:
- * <ul>
- * <li>{@link org.apache.lucene.search.Query}; The factory class is to be given via {@link FullTextFilterDef#impl()}</li>
- * <li>{@link org.hibernate.search.cfg.SearchMapping}; The factory class is to be registered with the bootstrapping
- * configuration using the {@link org.hibernate.search.cfg.Environment#MODEL_MAPPING} key</li>
- * </ul>
+ * Hibernate Search does not support factory methods for all plugable classes.
+ * Please check the javadoc of your extension point to know whether {@code @Factory} is supported.
  *
  * @author Emmanuel Bernard
  */
