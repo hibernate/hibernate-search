@@ -395,7 +395,7 @@ public class Tweet {
 }
 --
 
-===== Custom analyzers
+===== Custom analyzers using the `@AnalyzerDef` annotation
 
 You can also define analyzers within your Hibernate Search mapping using the `@AnalyzerDef` annotation,
 like you would <<section-named-analyzers,do with an embedded Lucene instance>>.
@@ -544,6 +544,48 @@ public class Tweet {
     private String content;
 }
 --
+
+===== Custom analyzers using a definition provider
+
+As <<section-programmatic-analyzer-definition,with Lucene>>, you can define analyzers programmatically.
+
+In the case of Elasticsearch, this requires to set the
+`hibernate.search.elasticsearch.analyzer_definition_provider` configuration property.
+
+The property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
+This class must either implement `org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider` directly
+or expose a `@Factory`-annotated method that returns such implementation. 
+
+[IMPORTANT]
+====
+This feature is considered experimental.
+The builder in particular could be altered in the future.
+====
+
+[source,java]
+.Example of mapping that defines analyzers on Elasticsearch using the `Elasticsearch*Factory` types
+--
+public static class CustomAnalyzerProvider implements ElasticsearchAnalysisDefinitionProvider {
+    @Override
+    public void register(ElasticsearchAnalysisDefinitionRegistryBuilder builder) {
+        builder.analyzer( "tweet_analyzer" )
+                .withTokenizer( "whitespace" )
+                .withCharFilters( "custom_html_strip" )
+                .withCharFilters( "p_br_as_space" );
+        
+        builder.charFilter( "custom_html_strip" )
+                .type( "html_strip" )
+                .param( "escaped_tags", "br", "p" );
+
+        builder.charFilter( "p_br_as_space" )
+                .type( "pattern_replace" )
+                .param( "pattern", "<p/?>|<br/?>" )
+                .param( "replacement", " " )
+                .param( "tags", "CASE_INSENSITIVE" );
+    }
+}
+--
+
 
 ==== Field bridges
 
