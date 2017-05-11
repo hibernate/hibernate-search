@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.cfg;
 
-import org.hibernate.search.elasticsearch.analyzer.definition.spi.ElasticsearchAnalysisDefinitionProvider;
+import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider;
 
 /**
  * Configuration properties for Elasticsearch,

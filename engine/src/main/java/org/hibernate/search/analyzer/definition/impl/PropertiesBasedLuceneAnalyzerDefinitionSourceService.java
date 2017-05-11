@@ -8,7 +8,7 @@ package org.hibernate.search.analyzer.definition.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionProvider;
+import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.Startable;
@@ -23,7 +23,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * The default LuceneAnalyzerDefinitionSourceService.
  *
  * This service allows to set the {@link Environment#ANALYZER_DEFINITION_PROVIDER configuration properties} to
- * point to a custom implementation of {@link org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionProvider}.
+ * point to a custom implementation of {@link org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider}.
  *
  * Integrators which prefer to inject an alternative service by reference rather than setting a configuration
  * property can provide an alternative Service implementation by overriding {@link org.hibernate.search.cfg.spi.SearchConfiguration#getProvidedServices}.

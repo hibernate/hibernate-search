@@ -4,11 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.analyzer.definition.spi;
+package org.hibernate.search.elasticsearch.analyzer.definition;
 
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionRegistryBuilder;
 import org.hibernate.search.annotations.Factory;
-import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 
 /**
  * A provider of analyzer definitions that can be referenced from the mapping,
@@ -18,14 +17,12 @@ import org.hibernate.search.cfg.Environment;
  * or a public static method annotated with {@link Factory}.
  * <p>
  * Users can select a definition provider through the
- * {@link Environment#ANALYZER_DEFINITION_PROVIDER configuration properties}, while
- * framework integrators also have the option to inject an alternative implementation
- * of a {@link LuceneAnalyzerDefinitionSourceService}.
+ * {@link ElasticsearchEnvironment#ANALYZER_DEFINITION_PROVIDER configuration properties}.
  *
  * @author Yoann Rodiere
  */
-public interface LuceneAnalyzerDefinitionProvider {
+public interface ElasticsearchAnalysisDefinitionProvider {
 
-	void register(LuceneAnalyzerDefinitionRegistryBuilder builder);
+	void register(ElasticsearchAnalysisDefinitionRegistryBuilder builder);
 
 }
