@@ -1639,7 +1639,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             </activation>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.host.version>5.3.0</test.elasticsearch.host.version>
+                <test.elasticsearch.host.version>5.4.1</test.elasticsearch.host.version>
                 <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
