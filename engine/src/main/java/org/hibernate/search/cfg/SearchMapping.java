@@ -20,6 +20,9 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
  * used instead of or in conjunction with the annotation based configuration via
  * {@link org.hibernate.search.annotations.Indexed} etc. In case of conflicts the programmatic configuration for an
  * element takes precedence over the annotation-based configuration.
+ * <p>
+ * Users can select a {@link SearchMapping} implementation through the
+ * {@link org.hibernate.search.cfg.Environment#MODEL_MAPPING configuration properties}.
  *
  * @author Emmanuel Bernard
  */

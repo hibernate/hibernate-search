@@ -7,15 +7,11 @@
 package org.hibernate.search.analyzer.definition;
 
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
-import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.Environment;
 
 /**
  * A provider of analyzer definitions that can be referenced from the mapping,
  * e.g. with {@literal @Analyzer(definition = "some-name")}.
- * <p>
- * Implementors should define a concrete class with either a public default constructor
- * or a public static method annotated with {@link Factory}.
  * <p>
  * Users can select a definition provider through the
  * {@link Environment#ANALYZER_DEFINITION_PROVIDER configuration properties}, while
