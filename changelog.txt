@@ -1,6 +1,50 @@
 Hibernate Search Changelog
 ==========================
 
+5.8.0.Beta2 (11-05-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2699 Javassist not being included in the distribution tarballs
+    * HSEARCH-2697 Mapping with @Field @IndexedEmbedded Integer[] field throws InaccessibleObjectException
+    * HSEARCH-2691 Custom filter implementations must provide proper implementations of the #equals() and #hashCode() methods.
+    * HSEARCH-2690 FileHelper based index replication attempts to delete locked files on Windows
+    * HSEARCH-2688 Clearing scroll IDs (when closing ScrollableResults) fails systematically with Elasticsearch
+    * HSEARCH-2675 JGroupsBackendQueueProcessor doesn't switch from slave to master dynamically
+    * HSEARCH-2670 Facet drill-down will never return any result when the source field has a different name
+    * HSEARCH-2642 Automatic translation of TypeTokenFilterFactory to Elasticsearch turns blacklists to whitelists
+    * HSEARCH-2319 NPE on metadata reading when the user entity is not using a package
+    * HSEARCH-1886 Master indexing nodes fail to lookup lazily initialized IndexManager instances
+
+** Improvement
+    * HSEARCH-2709 Add support for converting MatchNoDocsQuery to Elasticsearch
+    * HSEARCH-2704 Avoid frequent URL encoding operations at runtime
+    * HSEARCH-2703 Improve boost handling when translating Lucene queries to Elasticsearch
+    * HSEARCH-2695 Speedup initialization of Elasticsearch client by skipping SSL engine initialization when not required
+    * HSEARCH-2679 Improve error handling/reporting around Elasticsearch request sending
+    * HSEARCH-2636 Be more resilient to the absence of id in the _source
+    * HSEARCH-2606 Disallow conflicting usage of @Parameter
+    * HSEARCH-2502 Support the *.worker.execution configuration option on Elasticsearch
+    * HSEARCH-2458 Report incomplete metadata issues during Elasticsearch mapping generation
+
+** New Feature
+    * HSEARCH-2014 Expose size of the indexes among statistics
+
+** Sub-task
+    * HSEARCH-2667 Fulltext Query timeout methods should no longer be flagged as experimental
+    * HSEARCH-2208 Avoid the org.apache.lucene.search.Filter API
+
+** Task
+    * HSEARCH-2710 Restore master checking code in JGroupsMasterMessageListener
+    * HSEARCH-2701 Allow reflection to all-unnamed modules for JDK9 integration testing
+    * HSEARCH-2698 Investigate and try to solve warnings in build logs
+    * HSEARCH-2694 Reduce verbosity and warnings from the Elasticsearch integration tests
+    * HSEARCH-2687 Upgrade Hibernate ORM to 5.2.10.Final
+    * HSEARCH-2684 Improve timeout handling in tests
+    * HSEARCH-2680 Investigate alerts from lgtm
+    * HSEARCH-2677 Upgrade to Byteman 4.0.0-BETA4 to restore Java 9 compatibility
+    * HSEARCH-2158 Create a Maven profile to allow testing with an externally managed Elasticsearch node
+
 5.8.0.Beta1 (13-04-2017)
 -------------------------
 
