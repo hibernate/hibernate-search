@@ -69,7 +69,7 @@ public final class JobContextUtil {
 		return data;
 	}
 
-	private static EntityManagerFactory getEntityManagerFactory(EntityManagerFactoryRegistry emfRegistry,
+	static EntityManagerFactory getEntityManagerFactory(EntityManagerFactoryRegistry emfRegistry,
 			String entityManagerFactoryScope, String entityManagerFactoryReference) {
 		EntityManagerFactoryRegistry registry =
 				emfRegistry != null ? emfRegistry : ActiveSessionFactoryRegistry.getInstance();

@@ -12,16 +12,29 @@ import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.hibernate.Criteria;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.inject.scope.HibernateSearchJobScoped;
-import org.hibernate.search.jsr352.logging.impl.Log;
-import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.util.JobContextUtil;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
+import org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil;
+import org.hibernate.search.util.StringHelper;
 
-import static org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil.validateCheckpointInterval;
-import static org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil.validatePositive;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHEABLE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_HQL;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_LIMIT;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ENTITY_TYPES;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_ON_FINISH;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.PURGE_ALL_ON_START;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
 
 /**
  * Listener before the start of the job. It aims to validate all the job
@@ -39,34 +52,60 @@ import static org.hibernate.search.jsr352.massindexing.impl.util.ValidationUtil.
 @HibernateSearchJobScoped
 public class JobContextSetupListener extends AbstractJobListener {
 
-	private static final Log log = LoggerFactory.make( Log.class );
-
 	@Inject
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_SCOPE)
+	@BatchProperty(name = ENTITY_MANAGER_FACTORY_SCOPE)
 	private String entityManagerFactoryScope;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE)
+	@BatchProperty(name = ENTITY_MANAGER_FACTORY_REFERENCE)
 	private String entityManagerFactoryReference;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ENTITY_TYPES)
-	private String entityTypes;
+	@BatchProperty(name = ENTITY_TYPES)
+	private String serializedEntityTypes;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA)
-	private String serializedCustomQueryCriteria;
+	@BatchProperty(name = MAX_THREADS)
+	private String serializedMaxThreads;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CHECKPOINT_INTERVAL)
+	@BatchProperty(name = FETCH_SIZE)
+	private String serializedFetchSize;
+
+	@Inject
+	@BatchProperty(name = CACHEABLE)
+	private String serializedCacheable;
+
+	@Inject
+	@BatchProperty(name = OPTIMIZE_ON_FINISH)
+	private String serializedOptimizedOnFinish;
+
+	@Inject
+	@BatchProperty(name = OPTIMIZE_AFTER_PURGE)
+	private String serializedOptimizedAfterPurge;
+
+	@Inject
+	@BatchProperty(name = PURGE_ALL_ON_START)
+	private String serializedPurgeAllOnStart;
+
+	@Inject
+	@BatchProperty(name = CHECKPOINT_INTERVAL)
 	private String serializedCheckpointInterval;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ROWS_PER_PARTITION)
+	@BatchProperty(name = ROWS_PER_PARTITION)
 	private String serializedRowsPerPartition;
+
+	@Inject
+	@BatchProperty(name = CUSTOM_QUERY_CRITERIA)
+	private String serializedCustomQueryCriteria;
+
+	@Inject
+	@BatchProperty(name = CUSTOM_QUERY_LIMIT)
+	private String serializedCustomQueryLimit;
 
 	@Inject
 	private EntityManagerFactoryRegistry emfRegistry;
@@ -76,7 +115,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 		validateParameters();
 		JobContextUtil.getOrCreateData( jobContext,
 				emfRegistry, entityManagerFactoryScope, entityManagerFactoryReference,
-				entityTypes, serializedCustomQueryCriteria );
+				serializedEntityTypes, serializedCustomQueryCriteria );
 	}
 
 	/**
@@ -85,20 +124,50 @@ public class JobContextSetupListener extends AbstractJobListener {
 	 * @throws SearchException if any validation fails.
 	 */
 	private void validateParameters() throws SearchException {
-		int checkpointInterval = parseInt( MassIndexingJobParameters.CHECKPOINT_INTERVAL, serializedCheckpointInterval );
-		int rowsPerPartition = parseInt( MassIndexingJobParameters.ROWS_PER_PARTITION, serializedRowsPerPartition );
-
-		validatePositive( MassIndexingJobParameters.CHECKPOINT_INTERVAL, checkpointInterval );
-		validatePositive( MassIndexingJobParameters.ROWS_PER_PARTITION, rowsPerPartition );
-		validateCheckpointInterval( checkpointInterval, rowsPerPartition );
+		validateEntityTypes();
+		validateQuerying();
+		validateChunkSettings();
+		validateJobSettings();
 	}
 
-	private int parseInt(String parameterName, String parameterValue) {
-		try {
-			return Integer.parseInt( parameterValue );
-		}
-		catch (NumberFormatException e) {
-			throw log.unableToParseJobParameter( parameterName, parameterValue, e );
+	private void validateEntityTypes() {
+		ValidationUtil.validateEntityTypes(
+				emfRegistry,
+				entityManagerFactoryScope,
+				entityManagerFactoryReference,
+				serializedEntityTypes
+		);
+	}
+
+	private void validateChunkSettings() {
+		int checkpointInterval = SerializationUtil.parseIntegerParameter( CHECKPOINT_INTERVAL, serializedCheckpointInterval );
+		int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
+
+		ValidationUtil.validatePositive( CHECKPOINT_INTERVAL, checkpointInterval );
+		ValidationUtil.validatePositive( ROWS_PER_PARTITION, rowsPerPartition );
+		ValidationUtil.validateCheckpointInterval( checkpointInterval, rowsPerPartition );
+	}
+
+	private void validateJobSettings() {
+		int maxThreads = SerializationUtil.parseIntegerParameter( MAX_THREADS, serializedMaxThreads );
+		ValidationUtil.validatePositive( MAX_THREADS, maxThreads );
+
+		// A boolean parameter is validated if its deserialization is successful.
+		SerializationUtil.parseBooleanParameter( OPTIMIZE_ON_FINISH , serializedOptimizedOnFinish );
+		SerializationUtil.parseBooleanParameter( OPTIMIZE_AFTER_PURGE, serializedOptimizedAfterPurge );
+		SerializationUtil.parseBooleanParameter( PURGE_ALL_ON_START, serializedPurgeAllOnStart );
+	}
+
+	private void validateQuerying() {
+		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
+		int customQueryLimit = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
+		ValidationUtil.validatePositive( FETCH_SIZE, fetchSize );
+		ValidationUtil.validatePositive( CUSTOM_QUERY_LIMIT, customQueryLimit );
+
+		SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
+
+		if ( StringHelper.isNotEmpty( serializedCustomQueryCriteria ) ) {
+			SerializationUtil.parseParameter( Criteria.class, CUSTOM_QUERY_HQL, serializedCustomQueryCriteria );
 		}
 	}
 
