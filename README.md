@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 5.8.0.Beta1 - 13-04-2017*
+*Version: 5.8.0.Beta2 - 11-05-2017*
 
 ## Description
 
@@ -48,7 +48,7 @@ Include the following to your dependency list:
     <dependency>
        <groupId>org.hibernate</groupId>
        <artifactId>hibernate-search-orm</artifactId>
-       <version>5.8.0.Beta1</version>
+       <version>5.8.0.Beta2</version>
     </dependency>
 
 ### Sourceforge Bundle
