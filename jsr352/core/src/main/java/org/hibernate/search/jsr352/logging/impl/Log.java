@@ -224,4 +224,10 @@ public interface Log extends BaseHibernateSearchLogger {
 	)
 	SearchException negativeValueOrZero(String parameterName, Number parameterValue);
 
+	@Message(id = JSR_352_MESSAGES_START_ID + 32,
+			value = "The following selected entity types aren't indexable: %1$s. Please check if the annotation"
+					+ " '@Indexed' has been added to each of them."
+	)
+	SearchException failingEntityTypes(String failingEntityNames);
+
 }

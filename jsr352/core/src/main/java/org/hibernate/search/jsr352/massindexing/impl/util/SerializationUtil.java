@@ -13,12 +13,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Base64;
 
+import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Mincong Huang
  */
 public final class SerializationUtil {
+
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private SerializationUtil() {
 		// Private constructor, do not use it.
@@ -44,4 +48,33 @@ public final class SerializationUtil {
 			return ois.readObject();
 		}
 	}
+
+	public static boolean parseBooleanParameter(String key, String value) {
+		try {
+			return Boolean.parseBoolean( value );
+		}
+		catch (NumberFormatException e) {
+			throw log.unableToParseJobParameter( key, value, e );
+		}
+	}
+
+	public static int parseIntegerParameter(String key, String value) {
+		try {
+			return Integer.parseInt( value );
+		}
+		catch (NumberFormatException e) {
+			throw log.unableToParseJobParameter( key, value, e );
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T parseParameter(@SuppressWarnings("unused") Class<T> type, String key, String value) {
+		try {
+			return (T) SerializationUtil.deserialize( value );
+		}
+		catch (IOException | ClassNotFoundException e) {
+			throw log.unableToParseJobParameter( key, value, e );
+		}
+	}
+
 }
