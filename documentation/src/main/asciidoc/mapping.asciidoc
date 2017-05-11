@@ -1170,7 +1170,7 @@ public class Team {
 ====
 
 Analyzer instances declared by `@AnalyzerDef` are also available by their name in the `SearchFactory`
-which is quite useful wen building queries.
+which is quite useful when building queries.
 
 ====
 [source, JAVA]
