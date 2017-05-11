@@ -19,6 +19,10 @@ import org.hibernate.search.cfg.Environment;
  * of a {@link LuceneAnalyzerDefinitionSourceService}.
  *
  * @author Yoann Rodiere
+ *
+ * @hsearch.experimental This interface is a prototype.
+ * Please let us know what you like and what you don't like, and bear in mind
+ * that this will likely change in any future version.
  */
 public interface LuceneAnalyzerDefinitionProvider {
 
