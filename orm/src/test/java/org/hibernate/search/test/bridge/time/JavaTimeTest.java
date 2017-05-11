@@ -69,16 +69,6 @@ public class JavaTimeTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testLocalTime() throws Exception {
-		LocalTime time = LocalTime.of( 13, 15, 55, 7 );
-
-		Sample sample = new Sample( 1L, "LocalTime example" );
-		sample.localTime = time;
-
-		assertThatFieldIsIndexed( "localTime", time, sample );
-	}
-
-	@Test
 	public void testLocalDateTime() throws Exception {
 		LocalDate date = LocalDate.of( 1998, Month.FEBRUARY, 12 );
 		LocalTime time = LocalTime.of( 13, 05, 33 );
