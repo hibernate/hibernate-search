@@ -1421,6 +1421,12 @@ See <<field-annotation>> for more information.
 
 `java.lang.String`:: Strings are indexed as they are.
 
+`boolean`, `Boolean`::
+Are converted into their string representation and indexed.
+
+`char`, `Character`::
+Are converted into their string representation and indexed.
+
 `short`, `Short`, `integer`, `Integer`, `long`, `Long`, `float`, `Float`, `double`, `Double`::
 Are per default indexed numerically using a link:http://en.wikipedia.org/wiki/Trie[Trie structure] which
 allows for efficient range queries and sorting, resulting in better query response times.
