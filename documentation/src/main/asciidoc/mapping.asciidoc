@@ -1474,11 +1474,6 @@ public class Meeting {
 ----
 ====
 +
-[IMPORTANT]
-====
-A Date whose resolution is lower than `MILLISECOND` cannot be a `@DocumentId`
-====
-+
 You can also choose to encode the date as string using the `encoding=EncodingType.STRING`
 of `@DateBridge` and `@CalendarBridge`.
 In this case the dates are stored in the format _yyyyMMddHHmmssSSS_ (using GMT time).
