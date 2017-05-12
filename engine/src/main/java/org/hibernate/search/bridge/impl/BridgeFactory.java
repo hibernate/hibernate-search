@@ -69,9 +69,7 @@ public final class BridgeFactory {
 		annotationBasedProviders.add( new SpatialBridgeProvider() );
 		annotationBasedProviders.add( new TikaBridgeProvider() );
 
-		if ( JavaTimeBridgeProvider.isActive() ) {
-			annotationBasedProviders.add( new JavaTimeBridgeProvider() );
-		}
+		annotationBasedProviders.add( new JavaTimeBridgeProvider() );
 
 		for ( BridgeProvider provider : classLoaderService.loadJavaServices( BridgeProvider.class ) ) {
 			regularProviders.add( provider );

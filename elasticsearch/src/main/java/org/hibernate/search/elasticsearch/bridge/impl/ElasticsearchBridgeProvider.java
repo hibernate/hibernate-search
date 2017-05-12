@@ -30,9 +30,7 @@ public class ElasticsearchBridgeProvider implements IndexManagerTypeSpecificBrid
 		super();
 		delegates.add( new ElasticsearchPrimitiveBridgeProvider() );
 		delegates.add( new ElasticsearchJavaUtilTimeBridgeProvider() );
-		if ( ElasticsearchJavaTimeBridgeProvider.isActive() ) {
-			delegates.add( new ElasticsearchJavaTimeBridgeProvider() );
-		}
+		delegates.add( new ElasticsearchJavaTimeBridgeProvider() );
 	}
 
 	@Override

@@ -21,8 +21,6 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.bridge.FieldBridge;
@@ -42,35 +40,23 @@ import org.hibernate.search.bridge.builtin.time.impl.ZoneOffsetBridge;
 import org.hibernate.search.bridge.builtin.time.impl.ZonedDateTimeBridge;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
  * {@link BridgeProvider} for the classes in java.time.*
- * <p>
- * Note that the bridges are created only if the specific package java.time exists on the classpath
  *
  * @author Davide D'Alto
  */
-public class JavaTimeBridgeProvider implements BridgeProvider {
-
-	private static final Log LOG = LoggerFactory.make();
-
-	private static final boolean ACTIVATED = JavaTimeBridgeProvider.javaTimePackageExists();
+class JavaTimeBridgeProvider implements BridgeProvider {
 
 	private final Map<String, FieldBridge> builtInBridges;
 
 	JavaTimeBridgeProvider() {
-		if ( isActive() ) {
-			this.builtInBridges = populateBridgeMap();
-		}
-		else {
-			this.builtInBridges = Collections.emptyMap();
-		}
+		this.builtInBridges = populateBridgeMap();
 	}
 
 	private static Map<String, FieldBridge> populateBridgeMap() {
-		Map<String, FieldBridge> bridges = new HashMap<String, FieldBridge>( 12 );
+		Map<String, FieldBridge> bridges = CollectionHelper.newHashMap( 14 );
 		bridges.put( Year.class.getName(), YearBridge.INSTANCE );
 		bridges.put( YearMonth.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( YearMonthBridge.INSTANCE ) );
 		bridges.put( MonthDay.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( MonthDayBridge.INSTANCE ) );
@@ -86,21 +72,6 @@ public class JavaTimeBridgeProvider implements BridgeProvider {
 		bridges.put( Duration.class.getName(), DurationBridge.INSTANCE );
 		bridges.put( Instant.class.getName(), InstantBridge.INSTANCE );
 		return bridges;
-	}
-
-	public static boolean isActive() {
-		return ACTIVATED;
-	}
-
-	private static boolean javaTimePackageExists() {
-		try {
-			Class.forName( "java.time.LocalDate" );
-			return true;
-		}
-		catch (ClassNotFoundException e) {
-			LOG.javaTimeBridgeWontBeAdded( e );
-			return false;
-		}
 	}
 
 	@Override

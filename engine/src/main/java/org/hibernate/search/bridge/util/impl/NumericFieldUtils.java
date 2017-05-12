@@ -13,7 +13,6 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.impl.JavaTimeBridgeProvider;
 import org.hibernate.search.bridge.spi.EncodingBridge;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.util.logging.impl.Log;
@@ -76,22 +75,20 @@ public final class NumericFieldUtils {
 			Long toValue = to != null ? ((Calendar) to).getTime().getTime() : null;
 			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
 		}
-		if ( JavaTimeBridgeProvider.isActive() ) {
-			if ( java.time.Duration.class.isAssignableFrom( numericClass ) ) {
-				Long fromValue = from != null ? ( (java.time.Duration) from ).toNanos() : null;
-				Long toValue = to != null ? ( (java.time.Duration) to ).toNanos() : null;
-				return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
-			}
-			if ( java.time.Year.class.isAssignableFrom( numericClass ) ) {
-				Integer fromValue = from != null ? ( (java.time.Year) from ).getValue() : null;
-				Integer toValue = to != null ? ( (java.time.Year) to ).getValue() : null;
-				return NumericRangeQuery.newIntRange( fieldName, fromValue, toValue, includeLower, includeUpper );
-			}
-			if ( java.time.Instant.class.isAssignableFrom( numericClass ) ) {
-				Long fromValue = from != null ? ( (java.time.Instant) from ).toEpochMilli() : null;
-				Long toValue = to != null ? ( (java.time.Instant) to ).toEpochMilli() : null;
-				return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
-			}
+		if ( java.time.Duration.class.isAssignableFrom( numericClass ) ) {
+			Long fromValue = from != null ? ( (java.time.Duration) from ).toNanos() : null;
+			Long toValue = to != null ? ( (java.time.Duration) to ).toNanos() : null;
+			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
+		if ( java.time.Year.class.isAssignableFrom( numericClass ) ) {
+			Integer fromValue = from != null ? ( (java.time.Year) from ).getValue() : null;
+			Integer toValue = to != null ? ( (java.time.Year) to ).getValue() : null;
+			return NumericRangeQuery.newIntRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
+		if ( java.time.Instant.class.isAssignableFrom( numericClass ) ) {
+			Long fromValue = from != null ? ( (java.time.Instant) from ).toEpochMilli() : null;
+			Long toValue = to != null ? ( (java.time.Instant) to ).toEpochMilli() : null;
+			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
 		}
 
 		throw log.numericRangeQueryWithNonNumericToAndFromValues( fieldName );
@@ -134,11 +131,9 @@ public final class NumericFieldUtils {
 				value instanceof Float ||
 				value instanceof Date ||
 				value instanceof Calendar ||
-				( JavaTimeBridgeProvider.isActive() && (
-						value instanceof java.time.Instant ||
-						value instanceof java.time.Year ||
-						value instanceof java.time.Duration
-					));
+				value instanceof java.time.Instant ||
+				value instanceof java.time.Year ||
+				value instanceof java.time.Duration;
 	}
 
 	/**
