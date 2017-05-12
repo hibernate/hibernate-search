@@ -100,8 +100,8 @@ successfully committed, or you make use of flushToIndexes.
 [[search-batchindex]]
 === Rebuilding the whole index
 
-If you change the entity mapping to the index, chances are that the whole Index needs to be updated;
-For example if you decide to index a an existing field using a different analyzer you'll need to
+If you change the entity mapping to the index, chances are that the whole index needs to be updated;
+for example if you decide to index an existing field using a different analyzer you'll need to
 rebuild the index for affected types. Also if the Database is replaced (like restored from a backup,
 imported from a legacy system) you'll want to be able to rebuild the index from existing data.
 Hibernate Search provides two main strategies to choose from:
@@ -110,6 +110,22 @@ Hibernate Search provides two main strategies to choose from:
 * Using `FullTextSession.flushToIndexes()` periodically, while using FullTextSession.index() on all
 entities.
 * Use a MassIndexer.
+
+[NOTE]
+====
+When you change the entity mapping to the index, if you don't know whether the changes require
+a full reindexing or not, you can follow this rule of thumb:
+
+* Rebuilding the whole index is *not* required if all you did was:
+** *adding* new indexed entities that will not have any persisted instance,
+   e.g. adding an `@Indexed` annotation on an entity which has no row in database. 
+** *adding* new fields that will be empty for all currently persisted entities,
+   e.g. adding a new property on an entity type and mapping it to a field,
+   but with the guarantee that this property will initially be null for every instance of this entity;
+** and/or *removing* data from existing indexes/fields,
+   e.g. removing an index field, or removing the need for a field to be stored.
+* Rebuilding the whole index *is* required if you made any change to the mapping that is not mentioned above.
+====
 
 [[search-batchindex-flushtoindexes]]
 ==== Using flushToIndexes()
