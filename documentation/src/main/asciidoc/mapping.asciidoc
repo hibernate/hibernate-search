@@ -1427,7 +1427,7 @@ Are converted into their string representation and indexed.
 `char`, `Character`::
 Are converted into their string representation and indexed.
 
-`short`, `Short`, `integer`, `Integer`, `long`, `Long`, `float`, `Float`, `double`, `Double`::
+`integer`, `Integer`, `long`, `Long`, `float`, `Float`, `double`, `Double`::
 Are per default indexed numerically using a link:http://en.wikipedia.org/wiki/Trie[Trie structure] which
 allows for efficient range queries and sorting, resulting in better query response times.
 You need to use a `NumericRangeQuery` to search for values. See also <<field-annotation>> and
