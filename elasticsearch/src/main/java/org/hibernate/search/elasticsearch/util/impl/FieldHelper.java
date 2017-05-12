@@ -6,6 +6,16 @@
  */
 package org.hibernate.search.elasticsearch.util.impl;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -137,35 +147,34 @@ public class FieldHelper {
 			return ExtendedFieldType.CALENDAR;
 		}
 		// For the following, don't reference the class directly, in case we're in JDK 7
-		// TODO HSEARCH-2350 Reference the class directly when JDK8 becomes mandatory
-		else if ( "java.time.Instant".equals( propertyClass.getName() ) ) {
+		else if ( Instant.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.INSTANT;
 		}
-		else if ( "java.time.LocalDate".equals( propertyClass.getName() ) ) {
+		else if ( LocalDate.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.LOCAL_DATE;
 		}
-		else if ( "java.time.LocalTime".equals( propertyClass.getName() ) ) {
+		else if ( LocalTime.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.LOCAL_TIME;
 		}
-		else if ( "java.time.LocalDateTime".equals( propertyClass.getName() ) ) {
+		else if ( LocalDateTime.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.LOCAL_DATE_TIME;
 		}
-		else if ( "java.time.OffsetDateTime".equals( propertyClass.getName() ) ) {
+		else if ( OffsetDateTime.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.OFFSET_DATE_TIME;
 		}
-		else if ( "java.time.OffsetTime".equals( propertyClass.getName() ) ) {
+		else if ( OffsetTime.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.OFFSET_TIME;
 		}
-		else if ( "java.time.ZonedDateTime".equals( propertyClass.getName() ) ) {
+		else if ( ZonedDateTime.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.ZONED_DATE_TIME;
 		}
-		else if ( "java.time.Year".equals( propertyClass.getName() ) ) {
+		else if ( Year.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.YEAR;
 		}
-		else if ( "java.time.YearMonth".equals( propertyClass.getName() ) ) {
+		else if ( YearMonth.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.YEAR_MONTH;
 		}
-		else if ( "java.time.MonthDay".equals( propertyClass.getName() ) ) {
+		else if ( MonthDay.class.equals( propertyClass ) ) {
 			return ExtendedFieldType.MONTH_DAY;
 		}
 		else {
