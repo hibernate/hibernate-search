@@ -28,6 +28,7 @@ import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +46,8 @@ import com.google.gson.JsonParser;
  * @author Yoann Rodiere
  */
 public class DefaultElasticsearchClientFactoryTest {
+
+	private static final Poller POLLER = Poller.milliseconds( 10_000, 500 );
 
 	private static final JsonParser JSON_PARSER = new JsonParser();
 
@@ -331,15 +334,20 @@ public class DefaultElasticsearchClientFactoryTest {
 			Response result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			Thread.sleep( 2000 ); // Wait for the refresh to occur
+			/*
+			 * Send requests repeatedly until both hosts have been targeted.
+			 * This should happen pretty early (as soon as we sent two requests, actually),
+			 * but there is always the risk that the sniffer would send a request
+			 * between our own requests, effectively making our own requests target the same host
+			 * (since the hosts are each targeted in turn).
+			 */
+			POLLER.pollAssertion( () -> {
+				doPost( client, "/myIndex/myType", payload );
+				assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
-			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
-			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
-
-			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
-			wireMockRule2.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+				wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+				wireMockRule2.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			} );
 		}
 	}
 
