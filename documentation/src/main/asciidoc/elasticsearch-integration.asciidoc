@@ -545,7 +545,68 @@ public class Tweet {
 }
 --
 
-==== Custom field bridges
+==== Field bridges
+
+===== Built-in field bridges
+
+The default field bridges are the same as those mentioned in the <<section-built-in-bridges,main documentation>>,
+with the following exceptions.
+
+[NOTE]
+====
+You can refer to the Elasticsearch documentation for a description of
+https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html[date formats].
+====
+
+`boolean`, `Boolean`::
+are converted to native JSON booleans.
+
+`Date`, `Calendar`::
+are converted to the Elasticsearch `date` type
+with the default format (`strict_date_optional_time||epoch_millis`).
+
+`Instant`::
+are converted to the Elasticsearch `date` type
+with the default format (`strict_date_optional_time||epoch_millis`).
+
+`LocalDate`::
+are converted to the Elasticsearch `date` type
+with format `strict_date||yyyyyyyyy-MM-dd`.
+
+`LocalDateTime`::
+are converted to the Elasticsearch `date` type
+with format `strict_date_hour_minute_second_fraction||yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS`.
+
+`LocalTime`::
+are converted to the Elasticsearch `date` type
+with format `strict_hour_minute_second_fraction`.
+
+`OffsetDateTime`::
+are converted to the Elasticsearch `date` type
+with format `strict_date_time||yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ`.
+
+`OffsetTime`::
+are converted to the Elasticsearch `date` type
+with format `strict_time`.
+
+`ZonedDateTime`::
+are converted to the Elasticsearch `date` type
+with format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'||yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'`.
+
+`Year`::
+are converted to the Elasticsearch `date` type
+with format `strict_year||yyyyyyyyy`.
+
+`YearMonth`::
+are converted to the Elasticsearch `date` type
+with format `strict_year_month||yyyyyyyyy-MM`.
+
+`MonthDay`::
+are converted to the Elasticsearch `date` type
+with format `--MM-dd`.
+
+
+===== Custom field bridges
 
 You can write custom field bridges and class bridges.
 For class bridges and field bridges creating multiple fields,
