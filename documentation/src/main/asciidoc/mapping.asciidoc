@@ -56,21 +56,12 @@ will be indexed. Adding the `@Field` annotation declares a property as indexed a
 configure various aspects of the indexing process. Without `@Field` the property is ignored by
 the indexing process.
 
-Hibernate Search tries to determine the best way to index your property. In most
-cases this will be as string, but for the types int, long, double and float (and their respective
-Java wrapper types) Lucene's numeric field encoding (see <<numeric-field-annotation>>) is used.
-This numeric encoding uses a so called link:http://en.wikipedia.org/wiki/Trie[Trie structure] which
-allows for efficient range queries and sorting, resulting in query response times
-being orders of magnitude faster than with the plain string encoding. Byte and short properties
-will only be encoded in numeric fields if explicitly marked with the `@NumericField` annotation.
-
-[CAUTION]
+[NOTE]
 ====
-Prior to Search 5, numeric field encoding was only chosen if explicitly requested via `@NumericField`.
-As of Search 5 this encoding is automatically chosen for numeric types. To avoid numeric encoding
-you can explicitly specify a non numeric field bridge via `@Field.bridge` or `@FieldBridge`. The
-package `org.hibernate.search.bridge.builtin` contains a set of bridges which encode numbers as strings,
-for example `org.hibernate.search.bridge.builtin.IntegerBridge`.
+Hibernate Search tries to determine the best way to convert your property to an indexable value automatically.
+See <<section-built-in-bridges>> for more information about how property values are converted by default,
+and see the `bridge` attribute of the `@Field` annotation below
+for more information about how to customize conversion. 
 ====
 
 The following attributes of the `@Field` annotation help you control the indexing outcome:
@@ -1428,16 +1419,32 @@ full text representation.
 However, in some situation it can be useful to insert a custom token representing the `null` value.
 See <<field-annotation>> for more information.
 
-`java.lang.String`:: Strings are indexed as are
+`java.lang.String`:: Strings are indexed as they are.
 
-`short`, `Short`, `integer`, `Integer`, `long`, `Long`, `float`, `Float`, `double`, `Double`:: Are
-per default indexed numerically using a link:http://en.wikipedia.org/wiki/Trie[Trie structure]. You
-need to use a `NumericRangeQuery` to search for values. See also <<field-annotation>> and
-<<numeric-field-annotation>>
+`short`, `Short`, `integer`, `Integer`, `long`, `Long`, `float`, `Float`, `double`, `Double`::
+Are per default indexed numerically using a link:http://en.wikipedia.org/wiki/Trie[Trie structure] which
+allows for efficient range queries and sorting, resulting in better query response times.
+You need to use a `NumericRangeQuery` to search for values. See also <<field-annotation>> and
+<<numeric-field-annotation>>.
 
+[CAUTION]
+====
+Prior to Hibernate Search 5, numeric field encoding was only chosen if explicitly requested via `@NumericField`.
+As of Hibernate Search 5, this encoding is automatically chosen for the numeric types mentioned above.
+
+To avoid numeric encoding you can explicitly specify a non numeric field bridge via `@Field.bridge` or `@FieldBridge`.
+The package `org.hibernate.search.bridge.builtin` contains a set of bridges which encode numbers as strings,
+for example `org.hibernate.search.bridge.builtin.IntegerBridge`.
+====
+
+`byte`, `Byte`, `short`, `Short`::
+Are converted into their string representation and indexed.
+They will only be encoded in numeric fields if explicitly marked with the `@NumericField` annotation
+(see <<numeric-field-annotation>>).
+ 
 `BigInteger`, `BigDecimal`::
-`BigInteger` and `BigDecimal` are converted into their string representation and indexed. Note that
-in this form the values cannot be compared by Lucene using for example a `TermRangeQuery`.
+Are converted into their string representation and indexed.
+Note that in this form the values cannot be compared by Lucene using for example a `TermRangeQuery`.
 For that the string representation would need to be padded. An alternative using numeric encoding
 with a potential loss in precision can be seen in <<example-custom-numericfieldbridge>>.
 
