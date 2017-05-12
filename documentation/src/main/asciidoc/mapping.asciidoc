@@ -1452,8 +1452,8 @@ with a potential loss in precision can be seen in <<example-custom-numericfieldb
 of milliseconds since _January 1, 1970, 00:00:00 GMT_. You shouldn't really bother with the
 internal format. It is important, however, to query a numerically indexed date via a `NumericRangeQuery`.
 +
-Usually, storing the date up to the millisecond is not necessary. `@DateBridge` defines the
-appropriate resolution you are willing to store in the index.
+Usually, storing the date up to the millisecond is not necessary.
+`@DateBridge` and `@CalendarBridge` allow to define the appropriate resolution you are willing to store in the index.
 +
 
 `java.time.Year`:: converts the year to the integer representation.
@@ -1483,8 +1483,9 @@ public class Meeting {
 ----
 ====
 
-You can also choose to encode the date as string using the `encoding=EncodingType.STRING` of
-`DateBridge`. In this case the dates are stored in the format _yyyyMMddHHmmssSSS_ (using GMT time).
+You can also choose to encode the date as string using the `encoding=EncodingType.STRING`
+of `@DateBridge` and `@CalendarBridge`.
+In this case the dates are stored in the format _yyyyMMddHHmmssSSS_ (using GMT time).
 
 [IMPORTANT]
 ====
