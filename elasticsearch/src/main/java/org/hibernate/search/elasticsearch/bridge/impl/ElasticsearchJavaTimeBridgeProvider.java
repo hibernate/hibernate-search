@@ -17,8 +17,6 @@ import java.time.OffsetTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.bridge.FieldBridge;
@@ -34,8 +32,7 @@ import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.Elasticsearch
 import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchYearBridge;
 import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchYearMonthBridge;
 import org.hibernate.search.elasticsearch.bridge.builtin.time.impl.ElasticsearchZonedDateTimeBridge;
-import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
  * Creates bridges specific to Elasticsearch for the classes in java.time.*
@@ -47,23 +44,14 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 class ElasticsearchJavaTimeBridgeProvider implements BridgeProvider {
 
-	private static final Log LOG = LoggerFactory.make( Log.class );
-
-	private static final boolean ACTIVATED = ElasticsearchJavaTimeBridgeProvider.javaTimePackageExists();
-
 	private final Map<String, FieldBridge> builtInBridges;
 
 	ElasticsearchJavaTimeBridgeProvider() {
-		if ( isActive() ) {
-			this.builtInBridges = populateBridgeMap();
-		}
-		else {
-			this.builtInBridges = Collections.emptyMap();
-		}
+		this.builtInBridges = populateBridgeMap();
 	}
 
 	private static Map<String, FieldBridge> populateBridgeMap() {
-		Map<String, FieldBridge> bridges = new HashMap<String, FieldBridge>( 7 );
+		Map<String, FieldBridge> bridges = CollectionHelper.newHashMap( 10 );
 		bridges.put( Year.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchYearBridge.INSTANCE ) );
 		bridges.put( YearMonth.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchYearMonthBridge.INSTANCE ) );
 		bridges.put( MonthDay.class.getName(), new TwoWayString2FieldBridgeIgnoreAnalyzerAdaptor( ElasticsearchMonthDayBridge.INSTANCE ) );
@@ -80,21 +68,6 @@ class ElasticsearchJavaTimeBridgeProvider implements BridgeProvider {
 		 */
 
 		return bridges;
-	}
-
-	public static boolean isActive() {
-		return ACTIVATED;
-	}
-
-	private static boolean javaTimePackageExists() {
-		try {
-			Class.forName( "java.time.LocalDate" );
-			return true;
-		}
-		catch (ClassNotFoundException e) {
-			LOG.javaTimeBridgeWontBeAdded( e );
-			return false;
-		}
 	}
 
 	@Override
