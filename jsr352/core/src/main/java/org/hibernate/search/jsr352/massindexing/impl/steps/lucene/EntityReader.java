@@ -37,6 +37,11 @@ import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHEABLE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_LIMIT;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
+import static org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionProperties.PARTITION_ID;
+
 /**
  * Entity reader reads entities from database. During the open of the read stream, this reader builds a scrollable
  * result. Then, it scrolls from one entity to another at each reading. An entity reader reaches its end when there’s no
@@ -76,7 +81,7 @@ public class EntityReader extends AbstractItemReader {
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.ENTITY_TYPES)
-	private String entityTypes;
+	private String serializedEntityTypes;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA)
@@ -90,7 +95,7 @@ public class EntityReader extends AbstractItemReader {
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CACHEABLE)
-	private String cacheable;
+	private String serializedCacheable;
 
 	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
@@ -98,7 +103,7 @@ public class EntityReader extends AbstractItemReader {
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.FETCH_SIZE)
-	private String fetchSize;
+	private String serializedFetchSize;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
@@ -106,7 +111,7 @@ public class EntityReader extends AbstractItemReader {
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_LIMIT)
-	private String customQueryLimit;
+	private String serializedCustomQueryLimit;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
@@ -114,7 +119,7 @@ public class EntityReader extends AbstractItemReader {
 
 	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
-	private String partitionIdStr;
+	private String serializedPartitionId;
 
 	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.LOWER_BOUND)
@@ -138,20 +143,20 @@ public class EntityReader extends AbstractItemReader {
 	/**
 	 * Constructor for unit test TODO should it be done in this way?
 	 */
-	EntityReader(String cacheable,
+	EntityReader(String serializedCacheable,
 			String entityName,
-			String fetchSize,
+			String serializedFetchSize,
 			String hql,
-			String maxResults,
+			String serializedCustomQueryLimit,
 			String partitionIdStr,
 			String serializedLowerBound,
 			String serializedUpperBound) {
-		this.cacheable = cacheable;
+		this.serializedCacheable = serializedCacheable;
 		this.entityName = entityName;
-		this.fetchSize = fetchSize;
+		this.serializedFetchSize = serializedFetchSize;
 		this.customQueryHql = hql;
-		this.customQueryLimit = maxResults;
-		this.partitionIdStr = partitionIdStr;
+		this.serializedCustomQueryLimit = serializedCustomQueryLimit;
+		this.serializedPartitionId = partitionIdStr;
 		this.serializedLowerBound = serializedLowerBound;
 		this.serializedUpperBound = serializedUpperBound;
 	}
@@ -177,7 +182,7 @@ public class EntityReader extends AbstractItemReader {
 	 */
 	@Override
 	public void close() throws Exception {
-		log.closingReader( partitionIdStr, entityName );
+		log.closingReader( serializedPartitionId, entityName );
 		try {
 			scroll.close();
 		}
@@ -211,9 +216,9 @@ public class EntityReader extends AbstractItemReader {
 	 */
 	@Override
 	public void open(Serializable checkpointId) throws Exception {
-		log.openingReader( partitionIdStr, entityName );
+		log.openingReader( serializedPartitionId, entityName );
 
-		final int partitionId = Integer.parseInt( partitionIdStr );
+		final int partitionId = SerializationUtil.parseIntegerParameter( PARTITION_ID, serializedPartitionId );
 
 		JobContextData jobData = getJobContextData();
 
@@ -261,7 +266,7 @@ public class EntityReader extends AbstractItemReader {
 	private JobContextData getJobContextData() throws ClassNotFoundException, IOException {
 		return JobContextUtil.getOrCreateData( jobContext,
 				emfRegistry, entityManagerFactoryScope, entityManagerFactoryReference,
-				entityTypes, serializedCustomQueryCriteria );
+				serializedEntityTypes, serializedCustomQueryCriteria );
 	}
 
 	private PartitionBound getPartitionBound(JobContextData jobContextData) throws IOException, ClassNotFoundException {
@@ -272,16 +277,22 @@ public class EntityReader extends AbstractItemReader {
 	}
 
 	private ScrollableResults buildScrollUsingHQL(StatelessSession ss, String HQL) {
+		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
+		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
+		int maxResults = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
 		return ss.createQuery( HQL )
 				.setReadOnly( true )
-				.setCacheable( Boolean.parseBoolean( cacheable ) )
-				.setFetchSize( Integer.parseInt( fetchSize ) )
-				.setMaxResults( Integer.parseInt( customQueryLimit ) )
+				.setCacheable( cacheable )
+				.setFetchSize( fetchSize )
+				.setMaxResults( maxResults )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
 	private ScrollableResults buildScrollUsingCriteria(StatelessSession ss,
 			PartitionBound unit, Object checkpointId, JobContextData jobData) {
+		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
+		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
+		int maxResults = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
 		Class<?> entityType = unit.getEntityType();
 		String idName = sessionFactory.getClassMetadata( entityType )
 				.getIdentifierPropertyName();
@@ -313,9 +324,9 @@ public class EntityReader extends AbstractItemReader {
 
 		return criteria.addOrder( Order.asc( idName ) )
 				.setReadOnly( true )
-				.setCacheable( Boolean.parseBoolean( cacheable ) )
-				.setFetchSize( Integer.parseInt( fetchSize ) )
-				.setMaxResults( Integer.parseInt( customQueryLimit ) )
+				.setCacheable( cacheable )
+				.setFetchSize( fetchSize )
+				.setMaxResults( maxResults )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 

@@ -20,7 +20,11 @@ import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
+import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.PURGE_ALL_ON_START;
 
 /**
  * Enhancements before the chunk step {@code produceLuceneDoc} (lucene document production)
@@ -36,11 +40,11 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.PURGE_ALL_ON_START)
-	private String purgeAllOnStart;
+	private String serializedPurgeAllOnStart;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE)
-	private String optimizeAfterPurge;
+	private String serializedOptimizeAfterPurge;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
@@ -51,14 +55,17 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-		if ( Boolean.parseBoolean( this.purgeAllOnStart ) ) {
+		boolean purgeAllOnStart = SerializationUtil.parseBooleanParameter( PURGE_ALL_ON_START, serializedPurgeAllOnStart );
+		boolean optimizeAfterPurge = SerializationUtil.parseBooleanParameter( OPTIMIZE_AFTER_PURGE, serializedOptimizeAfterPurge );
+
+		if ( purgeAllOnStart ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			session = PersistenceUtil.openSession( emf, tenantId );
 			fts = Search.getFullTextSession( session );
 			jobData.getEntityTypes().forEach( clz -> fts.purgeAll( clz ) );
 
-			if ( Boolean.parseBoolean( this.optimizeAfterPurge ) ) {
+			if ( optimizeAfterPurge ) {
 				log.startOptimization();
 				ContextHelper.getSearchIntegrator( session ).optimize();
 			}
