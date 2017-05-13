@@ -29,6 +29,8 @@ import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
+
 /**
  * Utility allowing to set up and retrieve the job context data, shared by all the steps.
  * <p>
@@ -106,7 +108,7 @@ public final class JobContextUtil {
 		}
 
 		@SuppressWarnings("unchecked")
-		Set<Criterion> criteria = (Set<Criterion>) SerializationUtil.deserialize( serializedCustomQueryCriteria );
+		Set<Criterion> criteria = SerializationUtil.parseParameter( Set.class, CUSTOM_QUERY_CRITERIA, serializedCustomQueryCriteria );
 		if ( criteria == null ) {
 			criteria = Collections.emptySet();
 		}

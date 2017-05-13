@@ -18,7 +18,10 @@ import org.hibernate.search.jsr352.logging.impl.Log;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
+import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.OPTIMIZE_ON_FINISH;
 
 /**
  * Enhancements after the chunk step {@code produceLuceneDoc} (lucene document production)
@@ -34,7 +37,7 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_ON_FINISH)
-	private String optimizeOnFinish;
+	private String serializedOptimizeOnFinish;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
@@ -44,7 +47,9 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-		if ( Boolean.parseBoolean( this.optimizeOnFinish ) ) {
+		boolean optimizeOnFinish = SerializationUtil.parseBooleanParameter( OPTIMIZE_ON_FINISH, serializedOptimizeOnFinish );
+
+		if ( optimizeOnFinish ) {
 			log.startOptimization();
 
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();

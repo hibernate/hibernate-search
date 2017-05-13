@@ -13,6 +13,9 @@ import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
+import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
+
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
 
 /**
  * This checkpoint algorithm is used to provide a checkpoint decision based on the item count N given by the user. So,
@@ -31,14 +34,15 @@ public class CheckpointAlgorithm extends AbstractCheckpointAlgorithm {
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CHECKPOINT_INTERVAL)
-	private String itemCount;
+	private String serializedCheckpointInterval;
 
 	@Override
 	public boolean isReadyToCheckpoint() throws Exception {
+		int checkpointInterval = SerializationUtil.parseIntegerParameter( CHECKPOINT_INTERVAL, serializedCheckpointInterval );
 		Metric[] metrics = stepContext.getMetrics();
 		for ( final Metric m : metrics ) {
 			if ( m.getType().equals( Metric.MetricType.READ_COUNT ) ) {
-				return m.getValue() % Integer.parseInt( itemCount ) == 0;
+				return m.getValue() % checkpointInterval == 0;
 			}
 		}
 		throw new Exception( "Metric READ_COUNT not found" );

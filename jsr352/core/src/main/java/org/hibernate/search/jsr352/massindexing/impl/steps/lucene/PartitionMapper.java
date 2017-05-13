@@ -35,6 +35,10 @@ import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.FETCH_SIZE;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.MAX_THREADS;
+import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
+
 /**
  * This partition mapper provides a dynamic partition plan for chunk processing.
  * <p>
@@ -56,7 +60,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.FETCH_SIZE)
-	private String fetchSize;
+	private String serializedFetchSize;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
@@ -64,11 +68,11 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.MAX_THREADS)
-	private String maxThreads;
+	private String serializedMaxThreads;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.ROWS_PER_PARTITION)
-	private String rowsPerPartition;
+	private String serializedRowsPerPartition;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
@@ -83,21 +87,18 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	 * Constructor for unit test. TODO should it be done in this way?
 	 *
 	 * @param emf
-	 * @param fetchSize
 	 * @param customQueryHql
-	 * @param maxThreads
-	 * @param rowsPerPartition
 	 */
 	PartitionMapper(EntityManagerFactory emf,
-			String fetchSize,
+			String serializedFetchSize,
 			String customQueryHql,
-			String rowsPerPartition,
-			String maxThreads) {
+			String serializedRowsPerPartition,
+			String serializedMaxThreads) {
 		this.emf = emf;
-		this.fetchSize = fetchSize;
+		this.serializedFetchSize = serializedFetchSize;
 		this.customQueryHql = customQueryHql;
-		this.maxThreads = maxThreads;
-		this.rowsPerPartition = rowsPerPartition;
+		this.serializedMaxThreads = serializedMaxThreads;
+		this.serializedRowsPerPartition = serializedRowsPerPartition;
 	}
 
 	@Override
@@ -138,7 +139,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			}
 
 			// Build partition plan
-			final int threads = Integer.valueOf( maxThreads );
+			final int threads = SerializationUtil.parseIntegerParameter( MAX_THREADS, serializedMaxThreads );
 			final int partitions = partitionBounds.size();
 			final Properties[] props = new Properties[partitions];
 			log.partitionsPlan( partitions, threads );
@@ -196,7 +197,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 	private List<PartitionBound> buildPartitionUnitsFrom(ScrollableResults scroll, Class<?> clazz) {
 		List<PartitionBound> partitionUnits = new ArrayList<>();
-		final int rowsPerPartition = Integer.parseInt( this.rowsPerPartition );
+		int rowsPerPartition = SerializationUtil.parseIntegerParameter( ROWS_PER_PARTITION, serializedRowsPerPartition );
 		Object lowerID = null;
 		Object upperID = null;
 		while ( scroll.scroll( rowsPerPartition ) ) {
@@ -217,9 +218,10 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		if ( criterions != null ) {
 			criterions.forEach( c -> criteria.add( c ) );
 		}
+		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
 		ScrollableResults scroll = criteria
 				.setProjection( Projections.alias( Projections.id(), "aliasedId" ) )
-				.setFetchSize( Integer.parseInt( fetchSize ) )
+				.setFetchSize( fetchSize )
 				.setReadOnly( true )
 				.addOrder( Order.asc( "aliasedId" ) )
 				.scroll( ScrollMode.FORWARD_ONLY );
