@@ -16,7 +16,7 @@ mapping API that elegantly replaces this kind of deployment form (see
 <<hsearch-mapping-programmaticapi>> for more information).
 
 If you want to contribute the XML mapping implementation, see
-link:https://hibernate.onjira.com/browse/HSEARCH-210[HSEARCH-210].
+link:https://hibernate.atlassian.net/browse/HSEARCH-210[HSEARCH-210].
 ====
 
 [[basic-mapping]]

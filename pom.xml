@@ -42,7 +42,7 @@
 
     <issueManagement>
         <system>JIRA</system>
-        <url>https://hibernate.onjira.com/browse/HSEARCH</url>
+        <url>https://hibernate.atlassian.net/browse/HSEARCH</url>
     </issueManagement>
 
     <scm>
