@@ -7,7 +7,6 @@
 package org.hibernate.search.test.query.sorting;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Sort;
@@ -15,7 +14,6 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Book;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -177,10 +175,4 @@ public class SortOnFieldsFromCustomBridgeTest extends SearchTestBase {
 		return new Class[] { Explorer.class, Territory.class };
 	}
 
-	@Override
-	public void configure(Map<String, Object> settings) {
-		// explicitly disallowing transparent uninverting, so the test would fail if the sort fields contributed through
-		// field bridges are not present
-		settings.put( Environment.INDEX_UNINVERTING_ALLOWED, "false" );
-	}
 }
