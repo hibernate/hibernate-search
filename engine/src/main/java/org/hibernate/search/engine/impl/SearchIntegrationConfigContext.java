@@ -33,6 +33,10 @@ public final class SearchIntegrationConfigContext {
 	public SearchIntegrationConfigContext(IndexManagerType type,
 			ServiceManager serviceManager, SearchConfiguration searchConfiguration,
 			SearchIntegration previousIntegrationState) {
+		/*
+		 * Analyzer strategies are re-created on each SearchFactory increment,
+		 * so that the new analyzer definitions can be added between two SearchFactory increments.
+		 */
 		AnalyzerStrategy strategy = type.createAnalyzerStrategy( serviceManager, searchConfiguration );
 		this.analyzerRegistry = new MutableAnalyzerRegistry(
 				strategy, previousIntegrationState == null ? null : previousIntegrationState.getAnalyzerRegistry() );

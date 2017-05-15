@@ -46,12 +46,23 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 		if ( registryState != null ) {
 			this.defaultReference = registryState.getDefaultAnalyzerReference();
 			this.passThroughReference = registryState.getPassThroughAnalyzerReference();
+
+			/*
+			 * We add the provided references first, so that *if* some of them were
+			 * already present in the previous registry state, we'll keep those previous
+			 * references and will not risk replacing them with new ones.
+			 * This avoids duplicate references, but also avoids having multiple
+			 * references with the same name target different analyzers.
+			 */
+			this.referencesByName.putAll( strategy.createProvidedAnalyzerReferences() );
 			this.referencesByName.putAll( registryState.getNamedAnalyzerReferences() );
+
 			this.referencesByLuceneClass.putAll( registryState.getLuceneClassAnalyzerReferences() );
 		}
 		else {
 			this.defaultReference = strategy.createDefaultAnalyzerReference();
 			this.passThroughReference = strategy.createPassThroughAnalyzerReference();
+			this.referencesByName.putAll( strategy.createProvidedAnalyzerReferences() );
 		}
 	}
 
@@ -115,9 +126,7 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 
 	public void initialize(Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
 		List<AnalyzerReference> references = getAllReferences();
-		Map<String, AnalyzerReference> additionalReferences =
-				strategy.initializeAnalyzerReferences( references, mappingAnalyzerDefinitions );
-		referencesByName.putAll( additionalReferences );
+		strategy.initializeAnalyzerReferences( references, mappingAnalyzerDefinitions );
 	}
 
 	public ScopedAnalyzerReference.Builder buildScopedAnalyzerReference() {
