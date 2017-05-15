@@ -16,6 +16,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.AssertionFailure;
@@ -267,6 +268,7 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 	 */
 	@Entity
 	@Indexed
+	@Table(name = "ConcreteOnCompositeEntity")
 	static class ConcreteOnCompositeEntity {
 		@DocumentId
 		@Id
@@ -291,6 +293,7 @@ public class ElasticsearchSchemaNamingErrorsIT extends SearchInitializationTestB
 
 	@Indexed
 	@Entity
+	@Table(name = "BypassingIndexedEmbeddedPrefixEntity")
 	static class BypassingIndexedEmbeddedPrefixEntity {
 		@Id
 		@GeneratedValue
