@@ -285,10 +285,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 		for ( IndexManager indexManager : indexManagers ) {
 			if ( !( indexManager instanceof DirectoryBasedIndexManager ) ) {
-				//TODO clarify intent:
-				// A) improve the error message so that people understand what they should do
-				// B) Is the point really to not support "directory-based" or rather non-Lucene native based ones?
-				throw log.cannotRunLuceneQueryTargetingEntityIndexedWithNonDirectoryBasedIndexManager(
+				throw log.cannotRunLuceneQueryTargetingEntityIndexedWithNonLuceneIndexManager(
 						binding.getDocumentBuilder().getBeanClass(),
 						luceneQuery.toString()
 				);

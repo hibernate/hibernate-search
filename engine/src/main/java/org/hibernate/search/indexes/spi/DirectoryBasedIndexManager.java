@@ -35,6 +35,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * This implementation of {@code IndexManager} is coupled to a
  * {@code DirectoryProvider} and a {@code DirectoryBasedReaderProvider}.
+ * <p>
+ * This is the base class for all embedded-Lucene index managers.
  *
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
