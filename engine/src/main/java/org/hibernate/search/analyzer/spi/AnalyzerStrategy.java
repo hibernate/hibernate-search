@@ -34,6 +34,11 @@ public interface AnalyzerStrategy {
 	AnalyzerReference createPassThroughAnalyzerReference();
 
 	/**
+	 * @return a map of named references to provided analyzers, i.e. those that we know for sure will be available.
+	 */
+	Map<String, AnalyzerReference> createProvidedAnalyzerReferences();
+
+	/**
 	 * @param name The name of the analyzer to be referenced.
 	 * @return a reference that will be {@link #initializeAnalyzerReferences(Collection, Map) initialized later}.
 	 */
@@ -50,10 +55,9 @@ public interface AnalyzerStrategy {
 	 * Initializes references created by this strategy, i.e. make them point to the actual analyzer definition.
 	 * @param references The references to initialize, gathered through calls to methods of this strategy.
 	 * @param mappingAnalyzerDefinitions The analyzer definitions gathered through the Hibernate Search mappings.
-	 * @return The additional named references that should be made available at runtime.
 	 */
-	Map<String, AnalyzerReference> initializeAnalyzerReferences(
-			Collection<AnalyzerReference> references, Map<String, AnalyzerDef> mappingAnalyzerDefinitions);
+	void initializeAnalyzerReferences(Collection<AnalyzerReference> references,
+			Map<String, AnalyzerDef> mappingAnalyzerDefinitions);
 
 	/**
 	 * Creates a {@link ScopedAnalyzerReference} builder.

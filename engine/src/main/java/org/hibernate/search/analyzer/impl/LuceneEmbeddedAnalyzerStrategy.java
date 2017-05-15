@@ -49,10 +49,18 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 
 	private final Version luceneMatchVersion;
 
+	private final Map<String, AnalyzerDef> defaultAnalyzerDefinitions;
+
 	public LuceneEmbeddedAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		this.serviceManager = serviceManager;
 		this.cfg = cfg;
 		this.luceneMatchVersion = getLuceneMatchVersion( cfg );
+		/*
+		 * Make sure to re-create the default definitions with each newly instantiated strategy,
+		 * so that the definition providers can add new definitions between two SearchFactory increments.
+		 * Caching those in a Service, for instance, would prevent that.
+		 */
+		this.defaultAnalyzerDefinitions = createDefaultAnalyzerDefinitions( cfg );
 	}
 
 	private Version getLuceneMatchVersion(SearchConfiguration cfg) {
@@ -79,7 +87,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		return version;
 	}
 
-	private Map<String, AnalyzerDef> createDefaultAnalyzerDefinitions() {
+	private Map<String, AnalyzerDef> createDefaultAnalyzerDefinitions(SearchConfiguration cfg) {
 		final LuceneAnalyzerDefinitionProvider definitionsProvider = getLuceneAnalyzerDefinitionProvider();
 		LuceneAnalyzerDefinitionRegistryBuilderImpl builder = new LuceneAnalyzerDefinitionRegistryBuilderImpl();
 		if ( definitionsProvider != null ) {
@@ -129,6 +137,16 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
+	public Map<String, AnalyzerReference> createProvidedAnalyzerReferences() {
+		Map<String, AnalyzerReference> references = new HashMap<>();
+		for ( String defaultAnalyzerName : defaultAnalyzerDefinitions.keySet() ) {
+			NamedLuceneAnalyzerReference reference = createNamedAnalyzerReference( defaultAnalyzerName );
+			references.put( defaultAnalyzerName, reference );
+		}
+		return references;
+	}
+
+	@Override
 	public LuceneAnalyzerReference createLuceneClassAnalyzerReference(Class<?> analyzerClass) {
 		try {
 			Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
@@ -148,17 +166,17 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> initializeAnalyzerReferences(
-			Collection<AnalyzerReference> references, Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
+	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references,
+			Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
 		/*
-		 * Recreate the default definitions for each call,
-		 * so that the definition providers can add new definitions between two SearchFactory increments.
+		 * Note that the default definitions may be different
+		 * each time a new instance of this strategy is created,
+		 * i.e. each time the SearchFactory is "incremented".
 		 * Changes to pre-existing default definitions don't matter if the definitions weren't used,
 		 * and are harmless if they were already used
 		 * (because in that case the reference is already initialized,
 		 * so the new version of the definition will be ignored).
 		 */
-		Map<String, AnalyzerDef> defaultAnalyzerDefinitions = createDefaultAnalyzerDefinitions();
 		Map<String, AnalyzerDef> analyzerDefinitions = new HashMap<>( defaultAnalyzerDefinitions );
 		analyzerDefinitions.putAll( mappingAnalyzerDefinitions );
 
@@ -179,23 +197,6 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 				}
 			}
 		}
-
-		/*
-		 * Create additional references for default definitions that
-		 * haven't any matching reference, so that they will be available when querying.
-		 * We don't do that for @AnalyzerDefs because they may not all be related to Lucene
-		 * (there may be definitions for another indexing service).
-		 */
-		Map<String, AnalyzerReference> additionalNamedReferences = new HashMap<>();
-		for ( String defaultAnalyzerName : defaultAnalyzerDefinitions.keySet() ) {
-			if ( !existingNamedReferences.contains( defaultAnalyzerName ) ) {
-				NamedLuceneAnalyzerReference reference = createNamedAnalyzerReference( defaultAnalyzerName );
-				initializeReference( reference, analyzerDefinitions );
-				additionalNamedReferences.put( defaultAnalyzerName, reference );
-			}
-		}
-
-		return additionalNamedReferences;
 	}
 
 	private void initializeReference(NamedLuceneAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {

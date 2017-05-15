@@ -9,9 +9,7 @@ package org.hibernate.search.elasticsearch.analyzer.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
@@ -44,14 +42,19 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	private final ServiceManager serviceManager;
 
-	private final SearchConfiguration cfg;
+	private final SimpleElasticsearchAnalysisDefinitionRegistry defaultDefinitionRegistry;
 
 	public ElasticsearchAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		this.serviceManager = serviceManager;
-		this.cfg = cfg;
+		/*
+		 * Make sure to re-create the default definition registry with each newly instantiated strategy,
+		 * so that the definition providers can add new definitions between two SearchFactory increments.
+		 * Caching those in a Service, for instance, would prevent that.
+		 */
+		this.defaultDefinitionRegistry = createDefaultDefinitionRegistry(cfg);
 	}
 
-	private SimpleElasticsearchAnalysisDefinitionRegistry createDefaultDefinitionRegistry() {
+	private SimpleElasticsearchAnalysisDefinitionRegistry createDefaultDefinitionRegistry( SearchConfiguration cfg ) {
 		ElasticsearchAnalysisDefinitionRegistryBuilderImpl builder =
 				new ElasticsearchAnalysisDefinitionRegistryBuilderImpl();
 
@@ -90,6 +93,16 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
+	public Map<String, AnalyzerReference> createProvidedAnalyzerReferences() {
+		Map<String, AnalyzerReference> references = new HashMap<>();
+		for ( String defaultAnalyzerName : defaultDefinitionRegistry.getAnalyzerDefinitions().keySet() ) {
+			NamedElasticsearchAnalyzerReference reference = createNamedAnalyzerReference( defaultAnalyzerName );
+			references.put( defaultAnalyzerName, reference );
+		}
+		return references;
+	}
+
+	@Override
 	public NamedElasticsearchAnalyzerReference createNamedAnalyzerReference(String name) {
 		return new NamedElasticsearchAnalyzerReference( name );
 	}
@@ -100,22 +113,15 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
-	public Map<String, AnalyzerReference> initializeAnalyzerReferences(
-			Collection<AnalyzerReference> references, Map<String, AnalyzerDef> analyzerDefinitions) {
+	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references,
+			Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
 		try ( ServiceReference<ElasticsearchAnalyzerDefinitionTranslator> translatorReference =
 				serviceManager.requestReference( ElasticsearchAnalyzerDefinitionTranslator.class ) ) {
 			ElasticsearchAnalyzerDefinitionTranslator translator = translatorReference.get();
 
 			// First, create a registry containing all relevant definitions
-			/*
-			 * Recreate the default definitions for each call,
-			 * so that the definition providers can add new definitions between two SearchFactory increments.
-			 */
-			SimpleElasticsearchAnalysisDefinitionRegistry defaultDefinitionRegistry = createDefaultDefinitionRegistry();
 			ElasticsearchAnalysisDefinitionRegistry definitionRegistry =
-					createDefinitionRegistry( references, defaultDefinitionRegistry, analyzerDefinitions, translator);
-
-			Set<String> existingNamedReferences = new HashSet<>();
+					createDefinitionRegistry( references, defaultDefinitionRegistry, mappingAnalyzerDefinitions, translator);
 
 			// When all definitions are known and translated, actually initialize the references
 			for ( AnalyzerReference reference : references ) {
@@ -124,7 +130,6 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 					if ( !namedReference.isInitialized() ) {
 						initializeNamedReference( namedReference, definitionRegistry );
 					}
-					existingNamedReferences.add( namedReference.getAnalyzerName() );
 				}
 				else if ( reference.is( LuceneClassElasticsearchAnalyzerReference.class ) ) {
 					LuceneClassElasticsearchAnalyzerReference luceneClassReference = reference.unwrap( LuceneClassElasticsearchAnalyzerReference.class );
@@ -139,23 +144,6 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 					}
 				}
 			}
-
-			/*
-			 * Finally, create additional references for default definitions that
-			 * haven't any matching reference, so that they will be available when querying.
-			 * We don't do that for @AnalyzerDefs because they may not all be related to Elasticsearch,
-			 * and they might even not be translatable to an Elasticsearch definition.
-			 */
-			Map<String, AnalyzerReference> additionalNamedReferences = new HashMap<>();
-			for ( String defaultAnalyzerName : defaultDefinitionRegistry.getAnalyzerDefinitions().keySet() ) {
-				if ( !existingNamedReferences.contains( defaultAnalyzerName ) ) {
-					NamedElasticsearchAnalyzerReference reference = createNamedAnalyzerReference( defaultAnalyzerName );
-					initializeNamedReference( reference, definitionRegistry );
-					additionalNamedReferences.put( defaultAnalyzerName, reference );
-				}
-			}
-
-			return additionalNamedReferences;
 		}
 	}
 
@@ -171,8 +159,7 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		 *
 		 * When fetching definitions, the "local" scope takes precedence over the "default"/"global" scope.
 		 *
-		 * Note that thanks to this setup, changes to pre-existing default definitions are ignored
-		 * if the definitions were already used in pre-existing references.
+		 * Note that thanks to this setup, changes to pre-existing default definitions are ignored.
 		 */
 		ElasticsearchAnalysisDefinitionRegistry definitionRegistry =
 				new ChainingElasticsearchAnalysisDefinitionRegistry( defaultDefinitionRegistry );
