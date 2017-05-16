@@ -63,7 +63,8 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 	public void simple() {
 		ExtendedSearchIntegrator integrator = init( CustomAnalyzerProvider.class, CustomAnalyzerEntity.class );
 
-		assertThat( integrator.getAnalyzerRegistry( ElasticsearchIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( ElasticsearchIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
@@ -79,7 +80,8 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 	public void override() {
 		ExtendedSearchIntegrator integrator = init( CustomAnalyzerProvider.class, AnalyzerDefAnnotationEntity.class );
 
-		assertThat( integrator.getAnalyzerRegistry( ElasticsearchIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( ElasticsearchIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
@@ -100,7 +102,8 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 		MutatingProviderFactory.provider = new CustomAnalyzer2Provider();
 		integrator.addClasses( CustomAnalyzer2Entity.class );
 
-		assertThat( integrator.getAnalyzerRegistry( ElasticsearchIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( ElasticsearchIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_2_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_2_NAME + "' fetched from the integrator" )
 				.isNotNull();
@@ -120,7 +123,8 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 	public void unreferencedAnalyzer() {
 		ExtendedSearchIntegrator integrator = init( CustomAnalyzerProvider.class, NoAnalyzerEntity.class );
 
-		assertThat( integrator.getAnalyzerRegistry( ElasticsearchIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( ElasticsearchIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
@@ -130,7 +134,8 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 	public void instantiation_factorymethod() {
 		ExtendedSearchIntegrator integrator = init( ProviderFactory.class, CustomAnalyzerEntity.class );
 
-		assertThat( integrator.getAnalyzerRegistry( ElasticsearchIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( ElasticsearchIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();

@@ -32,6 +32,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -100,7 +101,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
-	private final Map<IndexManagerType, AnalyzerRegistry> analyzerRegistries;
+	private final Map<IndexManagerType, SearchIntegration> integrations;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
@@ -135,7 +136,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private volatile LuceneWorkSerializer workSerializer;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
-		this.analyzerRegistries = state.getAnalyzerRegistries();
+		this.integrations = state.getIntegrations();
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
 		this.indexBindingForEntities = state.getIndexBindings();
@@ -273,8 +274,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 
 			serviceManager.releaseAllServices();
 
-			for ( AnalyzerRegistry an : this.analyzerRegistries.values() ) {
-				an.close();
+			for ( SearchIntegration integration : this.integrations.values() ) {
+				integration.close();
 			}
 
 			// unregister statistic mbean
@@ -377,7 +378,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	// This method is a bit convoluted but it is going to be removed
 	// At the moment we cannot change this API because it's public
 	public Analyzer getAnalyzer(String name) {
-		final AnalyzerRegistry registry = analyzerRegistries.get( LuceneEmbeddedIndexManagerType.INSTANCE );
+		final SearchIntegration integration = integrations.get( LuceneEmbeddedIndexManagerType.INSTANCE );
+		final AnalyzerRegistry registry = integration.getAnalyzerRegistry();
 		if ( registry == null ) {
 			throw new SearchException( "Unknown Analyzer definition: " + name );
 		}
@@ -393,12 +395,12 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public AnalyzerRegistry getAnalyzerRegistry(IndexManagerType indexManagerType) {
-		final AnalyzerRegistry registry = analyzerRegistries.get( indexManagerType );
-		if ( registry == null ) {
+	public SearchIntegration getIntegration(IndexManagerType indexManagerType) {
+		final SearchIntegration integration = integrations.get( indexManagerType );
+		if ( integration == null ) {
 			throw new SearchException( "Unknown index manager type: " + indexManagerType );
 		}
-		return registry;
+		return integration;
 	}
 
 	@Override
@@ -434,8 +436,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
-	public Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries() {
-		return analyzerRegistries;
+	public Map<IndexManagerType, SearchIntegration> getIntegrations() {
+		return integrations;
 	}
 
 	@Override

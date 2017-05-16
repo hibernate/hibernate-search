@@ -64,7 +64,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 			originalAnalyzerReference = factory.getAnalyzerReference( indexBoundType );
 			queryAnalyzerReferenceBuilder = factory.getAnalyzerReference( indexBoundType ).startCopy();
 			IndexManagerType indexManagerType = factory.getIndexBinding( indexBoundType ).getIndexManagerType();
-			analyzerRegistry = factory.getAnalyzerRegistry( indexManagerType );
+			analyzerRegistry = factory.getIntegration( indexManagerType ).getAnalyzerRegistry();
 		}
 
 		/**
