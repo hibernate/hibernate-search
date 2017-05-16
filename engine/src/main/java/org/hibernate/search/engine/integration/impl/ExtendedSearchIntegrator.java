@@ -12,7 +12,6 @@ import java.util.Set;
 
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -145,23 +144,23 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	boolean isIndexUninvertingAllowed();
 
 	/**
-	 * Returns a map of all known entity index binding (indexed entities) keyed against the indexed type
+	 * Returns a map of all known integrations keyed against the indexed manager type
 	 *
-	 * @return a map of all known entity index binding (indexed entities) keyed against the indexed type. The empty
-	 * map is returned if there are no indexed types.
+	 * @return a map of all integrations keyed against the indexed manager type. The empty
+	 * map is returned if there are no indexed types (hence no integrations).
 	 */
-	Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries();
+	Map<IndexManagerType, SearchIntegration> getIntegrations();
 
 	/**
-	 * Retrieve the analyzer registry for a given index manager type.
+	 * Retrieve the integration information for a given index manager type.
 	 *
-	 * @param indexManagerType the index manager type for which to retrieve the registry
+	 * @param indexManagerType the index manager type for which to retrieve the integration
 	 *
-	 * @return The corresponding analyzer registry
+	 * @return The corresponding integration
 	 *
 	 * @throws org.hibernate.search.exception.SearchException if the index manager type is unknown
 	 */
-	AnalyzerRegistry getAnalyzerRegistry(IndexManagerType indexManagerType);
+	SearchIntegration getIntegration(IndexManagerType indexManagerType);
 
 	/**
 	 * Retrieve the scoped analyzer reference for a given class.

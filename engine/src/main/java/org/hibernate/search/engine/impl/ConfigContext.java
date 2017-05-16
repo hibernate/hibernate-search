@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Factory;
@@ -26,7 +25,7 @@ import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
@@ -39,9 +38,10 @@ import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+
 /**
- * Provides access to some default configuration settings (eg default {@code Analyzer} or default
- * {@code Similarity}) and checks whether certain optional libraries are available.
+ * Provides access to some default configuration settings (eg is JPA present, what is the default null token)
+ * and holds mapping-scoped configuration (such as analyzer definitions).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -61,9 +61,7 @@ public final class ConfigContext {
 	private final MappingDefinitionRegistry<FullTextFilterDef, FilterDef> fullTextFilterDefinitionRegistry =
 			new MappingDefinitionRegistry<>( this::interpretFullTextFilterDef, LOG::fullTextFilterDefinitionNamingConflict );
 
-	private final Map<IndexManagerType, MissingValueStrategy> missingValueStrategies = new HashMap<>();
-
-	private final Map<IndexManagerType, MutableAnalyzerRegistry> analyzerRegistries = new HashMap<>();
+	private final Map<IndexManagerType, SearchIntegrationConfigContext> indexManagerTypeConfigContexts = new HashMap<>();
 
 	private final boolean jpaPresent;
 	private final String nullToken;
@@ -77,19 +75,20 @@ public final class ConfigContext {
 	}
 
 	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping,
-			Map<IndexManagerType, AnalyzerRegistry> previousAnalyzerRegistries) {
+			Map<IndexManagerType, SearchIntegration> previousSearchIntegrations) {
 		this.serviceManager = buildContext.getServiceManager();
 		this.jpaPresent = searchConfiguration.isJPAAnnotationsProcessingEnabled();
 		this.nullToken = initNullToken( searchConfiguration );
 		this.implicitProvidedId = searchConfiguration.isIdProvidedImplicit();
 		this.searchMapping = searchMapping;
 		this.searchConfiguration = searchConfiguration;
-		if ( previousAnalyzerRegistries != null ) {
-			for ( Map.Entry<IndexManagerType, AnalyzerRegistry> entry : previousAnalyzerRegistries.entrySet() ) {
+		if ( previousSearchIntegrations != null ) {
+			for ( Map.Entry<IndexManagerType, SearchIntegration> entry : previousSearchIntegrations.entrySet() ) {
 				IndexManagerType type = entry.getKey();
-				AnalyzerRegistry registryState = entry.getValue();
-				AnalyzerStrategy strategy = type.createAnalyzerStrategy( serviceManager, searchConfiguration );
-				analyzerRegistries.put( type, new MutableAnalyzerRegistry( strategy, registryState ) );
+				SearchIntegration integrationState = entry.getValue();
+				SearchIntegrationConfigContext context = new SearchIntegrationConfigContext(
+						type, serviceManager, searchConfiguration, integrationState );
+				indexManagerTypeConfigContexts.put( type, context );
 			}
 		}
 	}
@@ -106,22 +105,13 @@ public final class ConfigContext {
 		return fullTextFilterDefinitionRegistry;
 	}
 
-	public MissingValueStrategy getMissingValueStrategy(IndexManagerType type) {
-		MissingValueStrategy strategy = missingValueStrategies.get( type );
-		if ( strategy == null ) {
-			strategy = type.createMissingValueStrategy( serviceManager, searchConfiguration );
-			missingValueStrategies.put( type, strategy );
+	public SearchIntegrationConfigContext forType(IndexManagerType type) {
+		SearchIntegrationConfigContext context = indexManagerTypeConfigContexts.get( type );
+		if ( context == null ) {
+			context = new SearchIntegrationConfigContext( type, serviceManager, searchConfiguration );
+			indexManagerTypeConfigContexts.put( type, context );
 		}
-		return strategy;
-	}
-
-	public MutableAnalyzerRegistry getAnalyzerRegistry(IndexManagerType type) {
-		MutableAnalyzerRegistry registry = analyzerRegistries.get( type );
-		if ( registry == null ) {
-			registry = new MutableAnalyzerRegistry( type.createAnalyzerStrategy( serviceManager, searchConfiguration ) );
-			analyzerRegistries.put( type, registry );
-		}
-		return registry;
+		return context;
 	}
 
 	private String initNullToken(SearchConfiguration cfg) {
@@ -182,7 +172,9 @@ public final class ConfigContext {
 	}
 
 	/**
-	 * Initialize the named analyzer references created throughout the mapping creation
+	 * Initialize integrations for all discovered index manager types.
+	 *
+	 * In particular, initialize the named analyzer references created throughout the mapping creation
 	 * with the analyzer definitions collected throughout the mapping creation.
 	 * <p>
 	 * Analyzer definitions and references are handled simultaneously during the mapping
@@ -191,15 +183,14 @@ public final class ConfigContext {
 	 * <p>
 	 * To work around this issue, we do not resolve references immediately, but instead
 	 * create "dangling" references whose initialization will be delayed to the end of
-	 * the mapping (see {@link #getAnalyzerRegistry(IndexManagerType)}).
+	 * the mapping (see {@link SearchIntegrationConfigContext#getAnalyzerRegistry()}).
 	 * <p>
 	 * This method executes the final initialization, resolving dangling references.
 	 *
 	 * @param indexesFactory The index manager holder, giving access to the relevant index manager types.
-	 * @return The named analyzer references, to be accessed through SearchFactory.getAnalyzer(String)
-	 * or ExtendedSearchIntegrator.getAnalyzerReference(String).
+	 * @return The initialized (and immutable) search integrations.
 	 */
-	public Map<IndexManagerType, AnalyzerRegistry> initAnalyzerRegistries(IndexManagerHolder indexesFactory) {
+	public Map<IndexManagerType, SearchIntegration> initIntegrations(IndexManagerHolder indexesFactory) {
 		Map<String, AnalyzerDef> mappingAnalyzerDefs = analyzerDefinitionRegistry.getAll();
 
 		/*
@@ -212,7 +203,8 @@ public final class ConfigContext {
 		 */
 		for ( String name : mappingAnalyzerDefs.keySet() ) {
 			if ( !hasAnalyzerReference( name ) ) {
-				MutableAnalyzerRegistry registry = getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE );
+				MutableAnalyzerRegistry registry = forType( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry();
 				registry.getOrCreateAnalyzerReference( name );
 			}
 		}
@@ -221,21 +213,21 @@ public final class ConfigContext {
 		Set<IndexManagerType> indexManagerTypes = new HashSet<>();
 		indexManagerTypes.addAll( indexesFactory.getIndexManagerTypes() );
 		// Make sure to initialize every registry, even those that are not used by index managers (see the loop above)
-		indexManagerTypes.addAll( analyzerRegistries.keySet() );
+		indexManagerTypes.addAll( indexManagerTypeConfigContexts.keySet() );
 
-		final Map<IndexManagerType, AnalyzerRegistry> immutableAnalyzerRegistries = new HashMap<>( indexManagerTypes.size() );
+		final Map<IndexManagerType, SearchIntegration> immutableSearchIntegrations = new HashMap<>( indexManagerTypes.size() );
 
 		for ( IndexManagerType indexManagerType : indexManagerTypes ) {
-			MutableAnalyzerRegistry registry = getAnalyzerRegistry( indexManagerType );
-			registry.initialize( mappingAnalyzerDefs );
-			immutableAnalyzerRegistries.put( indexManagerType, new ImmutableAnalyzerRegistry( registry ) );
+			ImmutableSearchIntegration searchIntegration = forType( indexManagerType ).initialize( mappingAnalyzerDefs );
+			immutableSearchIntegrations.put( indexManagerType, searchIntegration );
 		}
 
-		return immutableAnalyzerRegistries;
+		return immutableSearchIntegrations;
 	}
 
 	private boolean hasAnalyzerReference(String name) {
-		for ( MutableAnalyzerRegistry registry : analyzerRegistries.values() ) {
+		for ( SearchIntegrationConfigContext context : indexManagerTypeConfigContexts.values() ) {
+			MutableAnalyzerRegistry registry = context.getAnalyzerRegistry();
 			if ( registry.getNamedAnalyzerReferences().containsKey( name ) ) {
 				return true;
 			}

@@ -74,7 +74,8 @@ public class LuceneAnalyzerDefinitionProviderTest {
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
@@ -94,7 +95,8 @@ public class LuceneAnalyzerDefinitionProviderTest {
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
@@ -114,7 +116,8 @@ public class LuceneAnalyzerDefinitionProviderTest {
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
@@ -138,7 +141,8 @@ public class LuceneAnalyzerDefinitionProviderTest {
 				.as( "Analyzer for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
-		assertThat( integrator.getAnalyzerRegistry( LuceneEmbeddedIndexManagerType.INSTANCE )
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getAnalyzerRegistry()
 						.getAnalyzerReference( CUSTOM_ANALYZER_NAME ) )
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();

@@ -40,10 +40,6 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 
 	private final Collection<AnalyzerReference> scopedReferences = new ArrayList<>();
 
-	MutableAnalyzerRegistry(AnalyzerStrategy strategy) {
-		this( strategy, null );
-	}
-
 	MutableAnalyzerRegistry(AnalyzerStrategy strategy, AnalyzerRegistry registryState) {
 		this.strategy = strategy;
 

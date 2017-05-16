@@ -23,6 +23,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -104,8 +105,8 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public Map<IndexManagerType, AnalyzerRegistry> getAnalyzerRegistries() {
-		return delegate.getAnalyzerRegistries();
+	public Map<IndexManagerType, SearchIntegration> getIntegrations() {
+		return delegate.getIntegrations();
 	}
 
 	@Override
@@ -230,8 +231,8 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
-	public AnalyzerRegistry getAnalyzerRegistry(IndexManagerType indexManagerType) {
-		return delegate.getAnalyzerRegistry( indexManagerType );
+	public SearchIntegration getIntegration(IndexManagerType indexManagerType) {
+		return delegate.getIntegration( indexManagerType );
 	}
 
 	@Override

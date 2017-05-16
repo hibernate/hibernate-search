@@ -1498,7 +1498,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			}
 
 			IndexManagerType indexManagerType = parseContext.getIndexManagerType();
-			MissingValueStrategy missingValueStrategy = context.getMissingValueStrategy( indexManagerType );
+			MissingValueStrategy missingValueStrategy = context.forType( indexManagerType ).getMissingValueStrategy();
 
 			return missingValueStrategy.createNullMarkerCodec( indexedType, fieldMetadata, nullMarker );
 		}

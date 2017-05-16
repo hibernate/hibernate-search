@@ -19,6 +19,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -64,7 +65,7 @@ public class AnalyzerDefAnnotationTest {
 		ExtendedSearchIntegrator factory = sfHolder.getSearchFactory();
 		IndexManagerType indexManagerType = factory.getIndexBinding( Sample.class ).getIndexManagerType();
 		Map<String, AnalyzerReference> analyzerReferences =
-				factory.getAnalyzerRegistry( indexManagerType ).getNamedAnalyzerReferences();
+				factory.getIntegration( indexManagerType ).getAnalyzerRegistry().getNamedAnalyzerReferences();
 		assertThat( analyzerReferences.keySet() ).containsOnly( "package-analyzer", "class-analyzer" );
 	}
 
@@ -78,7 +79,8 @@ public class AnalyzerDefAnnotationTest {
 	}
 
 	private void assertAnalyzerExists(String analyzerName) {
-		for ( AnalyzerRegistry registry : sfHolder.getSearchFactory().getAnalyzerRegistries().values() ) {
+		for ( SearchIntegration integration : sfHolder.getSearchFactory().getIntegrations().values() ) {
+			AnalyzerRegistry registry = integration.getAnalyzerRegistry();
 			AnalyzerReference analyzerReference = registry.getAnalyzerReference( analyzerName );
 			if ( analyzerReference != null ) {
 				assertThat( analyzerReference.getAnalyzer() ).isNotNull();

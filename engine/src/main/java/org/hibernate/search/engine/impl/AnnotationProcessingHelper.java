@@ -128,7 +128,8 @@ public final class AnnotationProcessingHelper {
 
 	public static AnalyzerReference getAnalyzerReference(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext,
 			IndexManagerType indexManagerType) {
-		MutableAnalyzerRegistry registry = indexManagerType == null ? null : configContext.getAnalyzerRegistry( indexManagerType );
+		MutableAnalyzerRegistry registry = indexManagerType == null ? null
+				: configContext.forType( indexManagerType ).getAnalyzerRegistry();
 		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
 		if ( analyzerClass != void.class ) {
 			return registry.getOrCreateAnalyzerReference( analyzerClass );
