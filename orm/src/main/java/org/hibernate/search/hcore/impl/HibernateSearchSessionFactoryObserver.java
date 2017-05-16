@@ -18,6 +18,8 @@ import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
+import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
+import org.hibernate.search.hcore.spi.BeanResolver;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.IndexControl;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
@@ -29,6 +31,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.engine.config.spi.StandardConverters.BOOLEAN;
 import static org.hibernate.engine.config.spi.StandardConverters.STRING;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A {@code SessionFactoryObserver} registered with Hibernate ORM during the integration phase. This observer will
@@ -47,48 +51,93 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private final ConfigurationService configurationService;
 	private final JndiService namingService;
 	private final ClassLoaderService classLoaderService;
+	private final EnvironmentSynchronizer environmentSynchronizer;
+	private final BeanResolver beanResolver;
 	private final FullTextIndexEventListener listener;
 	private final Metadata metadata;
 
+	private final CompletableFuture<ExtendedSearchIntegrator> extendedSearchIntegratorFuture = new CompletableFuture<>();
 	private String indexControlMBeanName;
-	private ExtendedSearchIntegrator extendedIntegrator;
-
 
 	public HibernateSearchSessionFactoryObserver(
 			Metadata metadata,
 			ConfigurationService configurationService,
 			FullTextIndexEventListener listener,
 			ClassLoaderService classLoaderService,
+			EnvironmentSynchronizer environmentSynchronizer,
+			BeanResolver beanResolver,
 			JndiService namingService) {
 		this.metadata = metadata;
 		this.configurationService = configurationService;
 		this.listener = listener;
 		this.classLoaderService = classLoaderService;
+		this.environmentSynchronizer = environmentSynchronizer;
+		this.beanResolver = beanResolver;
 		this.namingService = namingService;
 	}
 
 	@Override
 	public void sessionFactoryCreated(SessionFactory factory) {
+		boolean failedBootScheduling = true;
+		try {
+			listener.initialize( extendedSearchIntegratorFuture );
+			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
+			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
+			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedSearchIntegratorFuture );
+
+			if ( environmentSynchronizer != null ) {
+				environmentSynchronizer.whenEnvironmentReady( () -> boot( factory ) );
+			}
+			else {
+				boot( factory );
+			}
+
+			failedBootScheduling = false;
+		}
+		finally {
+			if ( failedBootScheduling ) {
+				cancelBoot();
+			}
+		}
+	}
+
+	/**
+	 * Boot Hibernate Search if it hasn't booted already,
+	 * and complete {@link #extendedSearchIntegratorFuture}.
+	 * <p>
+	 * This method is synchronized in order to avoid booting Hibernate Search
+	 * after (or while) the boot has been canceled.
+	 *
+	 * @param factory The factory on which to graft Hibernate Search.
+	 *
+	 * @see #cancelBoot()
+	 */
+	private synchronized void boot(SessionFactory factory) {
+		if ( extendedSearchIntegratorFuture.isDone() ) {
+			return;
+		}
 		boolean failedBoot = true;
 		try {
-			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
 			HibernateSessionFactoryService sessionService = new DefaultHibernateSessionFactoryService( factory );
-			if ( extendedIntegrator == null ) {
-				SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
-						.configuration( new SearchConfigurationFromHibernateCore( metadata, configurationService, classLoaderService, sessionService, namingService ) )
-						.buildSearchIntegrator();
-				extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
-			}
+			SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
+					.configuration( new SearchConfigurationFromHibernateCore(
+							metadata, configurationService, classLoaderService, beanResolver, sessionService, namingService
+							) )
+					.buildSearchIntegrator();
+			ExtendedSearchIntegrator extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
+			extendedSearchIntegratorFuture.complete( extendedIntegrator );
 
 			Boolean enableJMX = configurationService.getSetting( Environment.JMX_ENABLED, BOOLEAN, Boolean.FALSE );
 			if ( enableJMX.booleanValue() ) {
 				indexControlMBeanName =
 						enableIndexControlBean( configurationService, extendedIntegrator, factory );
 			}
-			listener.initialize( extendedIntegrator );
-			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
-			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedIntegrator );
+
 			failedBoot = false;
+		}
+		catch (RuntimeException e) {
+			extendedSearchIntegratorFuture.completeExceptionally( e );
+			throw e;
 		}
 		finally {
 			if ( failedBoot ) {
@@ -98,7 +147,28 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	}
 
 	@Override
+	public synchronized void sessionFactoryClosing(SessionFactory factory) {
+		cancelBoot();
+	}
+
+	/**
+	 * Cancel the planned boot if it hasn't happened already.
+	 * <p>
+	 * This method is synchronized in order to avoid canceling the boot while it is ongoing,
+	 * which could lead to resource leaks.
+	 *
+	 * @see #boot(SessionFactory)
+	 */
+	private synchronized void cancelBoot() {
+		extendedSearchIntegratorFuture.cancel( false );
+	}
+
+	@Override
 	public void sessionFactoryClosed(SessionFactory factory) {
+		extendedSearchIntegratorFuture.thenAccept( this::cleanup );
+	}
+
+	private void cleanup(ExtendedSearchIntegrator extendedIntegrator) {
 		if ( extendedIntegrator != null ) {
 			extendedIntegrator.close();
 		}

@@ -1,0 +1,26 @@
+# Additional Spring Boot configuration for the "jta" profile
+# See https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# for a list of available properties
+
+spring.jpa.properties:
+  hibernate:
+    connection.isolation: 2
+    current_session_context_class: jta
+    cache:
+      use_second_level_cache: false
+      use_query_cache: false
+  hibernate.search:
+    worker:
+      execution: async
+
+spring.datasource:
+  driver-class-name: org.h2.jdbcx.JdbcDataSource
+
+spring.jta.bitronix:
+  datasource:
+    unique-name: xaDataSource
+    allow-local-transactions: true
+    min-pool-size: 5
+    max-pool-size: 100
+  properties:
+    journal: 'null'

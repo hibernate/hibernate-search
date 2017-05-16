@@ -29,16 +29,16 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinArrayBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
+import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.bridge.spi.IndexManagerTypeSpecificBridgeProvider;
 import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.util.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.cfg.spi.ParameterAnnotationsReader;
-import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.spi.IndexManagerType;
-import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -55,9 +55,11 @@ public final class BridgeFactory {
 	private final Map<IndexManagerType, BridgeProvider> backendSpecificProviders = new HashMap<>();
 	private final List<BridgeProvider> annotationBasedProviders = new ArrayList<>( 6 );
 	private final Set<BridgeProvider> regularProviders = new HashSet<>();
+	private final BeanResolver beanResolver;
 
 	public BridgeFactory(ServiceManager serviceManager) {
 		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
+		this.beanResolver = serviceManager.getBeanResolver();
 
 		for ( IndexManagerTypeSpecificBridgeProvider provider : classLoaderService.loadJavaServices( IndexManagerTypeSpecificBridgeProvider.class ) ) {
 			backendSpecificProviders.put( provider.getIndexManagerType(), provider );
@@ -93,20 +95,27 @@ public final class BridgeFactory {
 			bridgeType = cb.impl();
 			if ( bridgeType != null ) {
 				try {
-					Object instance = bridgeType.newInstance();
-					if ( FieldBridge.class.isAssignableFrom( bridgeType ) ) {
+					Object instance = beanResolver.resolve( bridgeType, Object.class );
+					/*
+					 * Don't use bridgeType directly: the bean resolver might return an instance of
+					 * a subtype of both bridgeType and FieldBridge, even if bridgeType does not
+					 * extend FieldBridge, for instance.
+					 */
+					Class<?> instanceClass = instance.getClass();
+
+					if ( FieldBridge.class.isAssignableFrom( instanceClass ) ) {
 						bridge = (FieldBridge) instance;
 					}
-					else if ( org.hibernate.search.bridge.TwoWayStringBridge.class.isAssignableFrom( bridgeType ) ) {
+					else if ( org.hibernate.search.bridge.TwoWayStringBridge.class.isAssignableFrom( instanceClass ) ) {
 						bridge = new TwoWayString2FieldBridgeAdaptor(
 								(org.hibernate.search.bridge.TwoWayStringBridge) instance
 						);
 					}
-					else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( bridgeType ) ) {
+					else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( instanceClass ) ) {
 						bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
 					}
 					else {
-						throw LOG.noFieldBridgeInterfaceImplementedByClassBridge( bridgeType.getName() );
+						throw LOG.noFieldBridgeInterfaceImplementedByClassBridge( instanceClass.getName() );
 					}
 				}
 				catch (Exception e) {
@@ -115,7 +124,7 @@ public final class BridgeFactory {
 			}
 		}
 		if ( bridge == null ) {
-			throw LOG.unableToDetermineClassBridge( ClassBridge.class.getName() );
+			throw LOG.unableToDetermineClassBridge( clazz.getName() );
 		}
 
 		populateReturnType( clazz, bridgeType, bridge );
@@ -354,27 +363,33 @@ public final class BridgeFactory {
 			throw LOG.noImplementationClassInFieldBridge( appliedOnName );
 		}
 		try {
-			Object instance = ReflectionHelper.createInstance( fieldBridgeClass, true );
+			Object instance = beanResolver.resolve( fieldBridgeClass, Object.class );
+			/*
+			 * Don't use fieldBridgeClass directly: the bean resolver might return an instance of
+			 * a subtype of both fieldBridgeClass and FieldBridge, even if fieldBridgeClass does not
+			 * extend FieldBridge, for instance.
+			 */
+			Class<?> instanceClass = instance.getClass();
 
-			if ( FieldBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
+			if ( FieldBridge.class.isAssignableFrom( instanceClass ) ) {
 				bridge = (FieldBridge) instance;
 			}
-			else if ( TwoWayStringBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
+			else if ( TwoWayStringBridge.class.isAssignableFrom( instanceClass ) ) {
 				bridge = new TwoWayString2FieldBridgeAdaptor(
 						(TwoWayStringBridge) instance
 				);
 			}
-			else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
+			else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( instanceClass ) ) {
 				bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
 			}
 			else {
-				throw LOG.noFieldBridgeInterfaceImplementedByFieldBridge( fieldBridgeClass.getName(), appliedOnName );
+				throw LOG.noFieldBridgeInterfaceImplementedByFieldBridge( instanceClass.getName(), appliedOnName );
 			}
-			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
+			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( instanceClass ) ) {
 				Map<String, String> params = ParameterAnnotationsReader.toNewMutableMap( bridgeAnn.params() );
 				( (ParameterizedBridge) instance ).setParameterValues( params );
 			}
-			populateReturnType( appliedOnType, fieldBridgeClass, instance );
+			populateReturnType( appliedOnType, instanceClass, instance );
 		}
 		catch (Exception e) {
 			throw LOG.unableToInstantiateFieldBridge( appliedOnName, appliedOnType.getName(), e );

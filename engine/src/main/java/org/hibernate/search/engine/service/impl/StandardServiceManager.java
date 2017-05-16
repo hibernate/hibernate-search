@@ -17,6 +17,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.service.beanresolver.impl.ReflectionBeanResolver;
+import org.hibernate.search.engine.service.beanresolver.impl.ReflectionFallbackBeanResolver;
+import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -46,6 +49,7 @@ public class StandardServiceManager implements ServiceManager {
 	private final Map<Class<? extends Service>, Object> providedServices;
 	private final Map<Class<? extends Service>, String> defaultServices;
 	private final ClassLoaderService classloaderService;
+	private final BeanResolver beanResolver;
 	private final boolean failOnUnreleasedService;
 
 	private volatile boolean allServicesReleased = false;
@@ -59,9 +63,17 @@ public class StandardServiceManager implements ServiceManager {
 			Map<Class<? extends Service>, String> defaultServices) {
 		this.buildContext = buildContext;
 		this.properties = searchConfiguration.getProperties();
-		this.providedServices = createProvidedServices( searchConfiguration );
 		this.defaultServices = defaultServices;
 		this.classloaderService = searchConfiguration.getClassLoaderService();
+		BeanResolver configuredBeanResolver = searchConfiguration.getBeanResolver();
+		ReflectionBeanResolver reflectionBeanResolver = new ReflectionBeanResolver();
+		if ( configuredBeanResolver != null ) {
+			this.beanResolver = new ReflectionFallbackBeanResolver( configuredBeanResolver, reflectionBeanResolver );
+		}
+		else {
+			this.beanResolver = reflectionBeanResolver;
+		}
+		this.providedServices = createProvidedServices( searchConfiguration ); // Requires beanResolver and classloaderService to be set
 		this.failOnUnreleasedService = Boolean.getBoolean( "org.hibernate.search.fail_on_unreleased_service" );
 	}
 
@@ -163,7 +175,14 @@ public class StandardServiceManager implements ServiceManager {
 			throw log.classLoaderServiceContainedInProvidedServicesException();
 		}
 		else {
-			tmpServices.put( ClassLoaderService.class, searchConfiguration.getClassLoaderService() );
+			tmpServices.put( ClassLoaderService.class, this.classloaderService );
+		}
+
+		if ( tmpServices.containsKey( BeanResolver.class ) ) {
+			throw log.beanResolverContainedInProvidedServicesException();
+		}
+		else {
+			tmpServices.put( BeanResolver.class, this.beanResolver );
 		}
 
 		return Collections.unmodifiableMap( tmpServices );
@@ -317,6 +336,11 @@ public class StandardServiceManager implements ServiceManager {
 	@Override
 	public ClassLoaderService getClassLoaderService() {
 		return classloaderService;
+	}
+
+	@Override
+	public BeanResolver getBeanResolver() {
+		return beanResolver;
 	}
 
 }

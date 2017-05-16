@@ -27,6 +27,7 @@ import org.hibernate.search.cfg.spi.IdUniquenessResolver;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
+import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.named.spi.NamedResolver;
 import org.hibernate.search.engine.service.spi.Service;
@@ -42,6 +43,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 	private final ConfigurationService configurationService;
 	private final ClassLoaderService classLoaderService;
+	private final BeanResolver beanResolver;
 	private final Map<Class<? extends Service>, Object> providedServices;
 	private final Metadata metadata;
 	private final Properties legacyConfigurationProperties;//For compatibility reasons only. Should be removed? See HSEARCH-1890
@@ -50,7 +52,8 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	private ReflectionManager reflectionManager;
 
 	public SearchConfigurationFromHibernateCore(Metadata metadata, ConfigurationService configurationService,
-			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService,
+			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateOrmClassLoaderService,
+			org.hibernate.search.hcore.spi.BeanResolver hibernateOrmBeanResolver,
 			HibernateSessionFactoryService sessionService, JndiService namingService) {
 		this.metadata = metadata;
 		// hmm, not sure why we throw NullPointerExceptions from these sanity checks
@@ -60,10 +63,12 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		}
 		this.configurationService = configurationService;
 
-		if ( hibernateClassLoaderService == null ) {
+		if ( hibernateOrmClassLoaderService == null ) {
 			throw new NullPointerException( "ClassLoaderService is null" );
 		}
-		this.classLoaderService = new DelegatingClassLoaderService( hibernateClassLoaderService );
+		this.classLoaderService = new DelegatingClassLoaderService( hibernateOrmClassLoaderService );
+		this.beanResolver = hibernateOrmBeanResolver != null ? new DelegatingBeanResolver( hibernateOrmBeanResolver ) : null;
+
 		Map<Class<? extends Service>, Object> providedServices = new HashMap<>( 1 );
 		providedServices.put( IdUniquenessResolver.class, new HibernateCoreIdUniquenessResolver( metadata ) );
 		providedServices.put( HibernateSessionFactoryService.class, sessionService );
@@ -140,6 +145,11 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	@Override
 	public ClassLoaderService getClassLoaderService() {
 		return classLoaderService;
+	}
+
+	@Override
+	public BeanResolver getBeanResolver() {
+		return beanResolver;
 	}
 
 	private static class ClassIterator implements Iterator<Class<?>> {
