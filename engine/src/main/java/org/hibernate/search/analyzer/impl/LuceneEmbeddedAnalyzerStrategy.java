@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.analyzer.impl;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
@@ -180,13 +179,15 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		Map<String, AnalyzerDef> analyzerDefinitions = new HashMap<>( defaultAnalyzerDefinitions );
 		analyzerDefinitions.putAll( mappingAnalyzerDefinitions );
 
+		LuceneAnalyzerBuilder builder = new LuceneAnalyzerBuilder( luceneMatchVersion, serviceManager, analyzerDefinitions );
+
 		Set<String> existingNamedReferences = new HashSet<>();
 
 		for ( AnalyzerReference reference : references ) {
 			if ( reference.is( NamedLuceneAnalyzerReference.class ) ) {
 				NamedLuceneAnalyzerReference namedReference = reference.unwrap( NamedLuceneAnalyzerReference.class );
 				if ( !namedReference.isInitialized() ) {
-					initializeReference( namedReference, analyzerDefinitions );
+					namedReference.initialize( builder );
 				}
 				existingNamedReferences.add( namedReference.getAnalyzerName() );
 			}
@@ -196,27 +197,6 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 					scopedReference.initialize();
 				}
 			}
-		}
-	}
-
-	private void initializeReference(NamedLuceneAnalyzerReference analyzerReference, Map<String, AnalyzerDef> analyzerDefinitions) {
-		String name = analyzerReference.getAnalyzerName();
-
-		AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
-		if ( analyzerDefinition == null ) {
-			throw new SearchException( "Lucene analyzer found with an unknown definition: " + name );
-		}
-		Analyzer analyzer = buildAnalyzer( analyzerDefinition );
-
-		analyzerReference.initialize( analyzer );
-	}
-
-	private Analyzer buildAnalyzer(AnalyzerDef analyzerDefinition) {
-		try {
-			return LuceneAnalyzerBuilder.buildAnalyzer( analyzerDefinition, luceneMatchVersion, serviceManager );
-		}
-		catch (IOException e) {
-			throw new SearchException( "Could not initialize Analyzer definition " + analyzerDefinition, e );
 		}
 	}
 

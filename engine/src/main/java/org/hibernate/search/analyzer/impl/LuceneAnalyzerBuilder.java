@@ -24,14 +24,13 @@ import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.cfg.spi.ParameterAnnotationsReader;
 import org.hibernate.search.engine.impl.TokenizerChain;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass;
 
 /**
- * Instances of this class are used to build Lucene analyzers which are defined using a <code>TokenFilterFactory</code>.
+ * Instances of this class are used to build Lucene analyzers.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -40,23 +39,41 @@ final class LuceneAnalyzerBuilder {
 
 	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
-	private static final Log log = LoggerFactory.make();
+	private final Version luceneMatchVersion;
 
-	private LuceneAnalyzerBuilder() {
+	private final ResourceLoader resourceLoader;
+
+	private final Map<String, AnalyzerDef> analyzerDefinitions;
+
+	public LuceneAnalyzerBuilder(Version luceneMatchVersion, ServiceManager serviceManager,
+			Map<String, AnalyzerDef> analyzerDefinitions) {
+		super();
+		this.luceneMatchVersion = luceneMatchVersion;
+		this.resourceLoader = new HibernateSearchResourceLoader( serviceManager );
+		this.analyzerDefinitions = analyzerDefinitions;
 	}
 
 	/**
-	 * Builds a Lucene <code>Analyzer</code> from the specified <code>AnalyzerDef</code> annotation.
+	 * Build a Lucene {@link Analyzer} for the given name.
 	 *
-	 * @param analyzerDef The <code>AnalyzerDef</code> annotation as found in the annotated domain class.
-	 * @param luceneMatchVersion The lucene version (required since Lucene 3.x)
-	 * @return a Lucene <code>Analyzer</code>
-	 * @throws IOException
+	 * @param name The name of the definition, which should match the name defined in an {@code AnalyzerDef} annotation
+	 * as found in the annotated domain class.
+	 * @return a Lucene {@code Analyzer}
 	 */
-	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef,
-			Version luceneMatchVersion,
-			ServiceManager serviceManager) throws IOException {
-		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader( serviceManager );
+	public Analyzer buildAnalyzer(String name) {
+		AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
+		if ( analyzerDefinition == null ) {
+			throw new SearchException( "Lucene analyzer found with an unknown definition: " + name );
+		}
+		try {
+			return buildAnalyzer( analyzerDefinition );
+		}
+		catch (IOException e) {
+			throw new SearchException( "Could not initialize Analyzer definition " + analyzerDefinition, e );
+		}
+	}
+
+	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) throws IOException {
 		TokenizerDef token = analyzerDef.tokenizer();
 		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( token.params(), luceneMatchVersion );
 		TokenizerFactory tokenFactory = instanceFromClass(
@@ -65,7 +82,7 @@ final class LuceneAnalyzerBuilder {
 				"Tokenizer factory",
 				tokenMapsOfParameters
 		);
-		injectResourceLoader( tokenFactory, defaultResourceLoader, tokenMapsOfParameters );
+		injectResourceLoader( tokenFactory, tokenMapsOfParameters );
 
 		final int length = analyzerDef.filters().length;
 		final int charLength = analyzerDef.charFilters().length;
@@ -80,7 +97,7 @@ final class LuceneAnalyzerBuilder {
 					"Token filter factory",
 					mapOfParameters
 			);
-			injectResourceLoader( filters[index], defaultResourceLoader, mapOfParameters );
+			injectResourceLoader( filters[index], mapOfParameters );
 		}
 		for ( int index = 0; index < charFilters.length; index++ ) {
 			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
@@ -94,14 +111,14 @@ final class LuceneAnalyzerBuilder {
 					"Character filter factory",
 					mapOfParameters
 			);
-			injectResourceLoader( charFilters[index], defaultResourceLoader, mapOfParameters );
+			injectResourceLoader( charFilters[index], mapOfParameters );
 		}
 		return new TokenizerChain( charFilters, tokenFactory, filters );
 	}
 
-	private static void injectResourceLoader(Object processor, ResourceLoader defaultResourceLoader, Map<String, String> mapOfParameters) throws IOException {
+	private void injectResourceLoader(Object processor, Map<String, String> mapOfParameters) throws IOException {
 		if ( processor instanceof ResourceLoaderAware ) {
-			( (ResourceLoaderAware) processor ).inform( defaultResourceLoader );
+			( (ResourceLoaderAware) processor ).inform( resourceLoader );
 		}
 	}
 
