@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.hcore.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.Metadata;
@@ -13,26 +15,14 @@ import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
-import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
 import org.hibernate.search.hcore.spi.BeanResolver;
-import org.hibernate.search.jmx.IndexControlMBean;
-import org.hibernate.search.jmx.impl.IndexControl;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.hcore.spi.EnvironmentSynchronizer;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.engine.config.spi.StandardConverters.BOOLEAN;
-import static org.hibernate.engine.config.spi.StandardConverters.STRING;
-
-import java.util.concurrent.CompletableFuture;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 
 /**
  * A {@code SessionFactoryObserver} registered with Hibernate ORM during the integration phase. This observer will
@@ -46,8 +36,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		Version.touch();
 	}
 
-	private static final Log log = LoggerFactory.make();
-
 	private final ConfigurationService configurationService;
 	private final JndiService namingService;
 	private final ClassLoaderService classLoaderService;
@@ -57,7 +45,9 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private final Metadata metadata;
 
 	private final CompletableFuture<ExtendedSearchIntegrator> extendedSearchIntegratorFuture = new CompletableFuture<>();
-	private String indexControlMBeanName;
+
+	//Guarded by synchronization on this
+	private JMXHook jmx;
 
 	public HibernateSearchSessionFactoryObserver(
 			Metadata metadata,
@@ -125,14 +115,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 							) )
 					.buildSearchIntegrator();
 			ExtendedSearchIntegrator extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
+
+			this.jmx = new JMXHook( configurationService );
+			this.jmx.registerIfEnabled( extendedIntegrator, factory );
+
 			extendedSearchIntegratorFuture.complete( extendedIntegrator );
-
-			Boolean enableJMX = configurationService.getSetting( Environment.JMX_ENABLED, BOOLEAN, Boolean.FALSE );
-			if ( enableJMX.booleanValue() ) {
-				indexControlMBeanName =
-						enableIndexControlBean( configurationService, extendedIntegrator, factory );
-			}
-
 			failedBoot = false;
 		}
 		catch (RuntimeException e) {
@@ -168,37 +155,12 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		extendedSearchIntegratorFuture.thenAccept( this::cleanup );
 	}
 
-	private void cleanup(ExtendedSearchIntegrator extendedIntegrator) {
+	private synchronized void cleanup(ExtendedSearchIntegrator extendedIntegrator) {
 		if ( extendedIntegrator != null ) {
 			extendedIntegrator.close();
 		}
-		if ( indexControlMBeanName != null ) {
-			JMXRegistrar.unRegisterMBean( indexControlMBeanName );
-		}
+		jmx.unRegisterIfRegistered();
 	}
 
-	private static String enableIndexControlBean(ConfigurationService configurationService, ExtendedSearchIntegrator extendedIntegrator, SessionFactory factory) {
-		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
-		if ( StringHelper.isEmpty( configurationService.getSetting( "hibernate.session_factory_name", STRING ) ) ) {
-			log.debug( "In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI" );
-			return null;
-		}
-
-		String mbeanNameSuffix = configurationService.getSetting( Environment.JMX_BEAN_SUFFIX, STRING );
-		String objectName = JMXRegistrar.buildMBeanName(
-				IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME,
-				mbeanNameSuffix
-		);
-
-		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
-		if ( JMXRegistrar.isNameRegistered( objectName ) ) {
-			JMXRegistrar.unRegisterMBean( objectName );
-		}
-
-		IndexControl indexCtrlBean = new IndexControl( extendedIntegrator, factory );
-		JMXRegistrar.registerMBean( indexCtrlBean, IndexControlMBean.class, objectName );
-		return objectName;
-	}
 }
-
 
