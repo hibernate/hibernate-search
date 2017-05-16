@@ -71,9 +71,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		boolean failedBootScheduling = true;
 		try {
 			listener.initialize( extendedSearchIntegratorFuture );
-			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
-			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
-			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedSearchIntegratorFuture );
 
 			if ( environmentSynchronizer != null ) {
 				environmentSynchronizer.whenEnvironmentReady( () -> boot( factory ) );
@@ -120,6 +117,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			this.jmx.registerIfEnabled( extendedIntegrator, factory );
 
 			extendedSearchIntegratorFuture.complete( extendedIntegrator );
+
+			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
+			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
+			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedIntegrator );
+
 			failedBoot = false;
 		}
 		catch (RuntimeException e) {

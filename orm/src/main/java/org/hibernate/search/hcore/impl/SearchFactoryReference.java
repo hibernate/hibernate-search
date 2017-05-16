@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.hcore.impl;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
@@ -22,16 +20,16 @@ import org.hibernate.service.Service;
  */
 public final class SearchFactoryReference implements Service {
 
-	private volatile CompletableFuture<ExtendedSearchIntegrator> extendedIntegratorFuture;
+	private volatile ExtendedSearchIntegrator extendedIntegrator;
 
-	public void initialize(CompletableFuture<ExtendedSearchIntegrator> future) {
-		extendedIntegratorFuture = future;
+	public void initialize(ExtendedSearchIntegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator;
 	}
 
 	public ExtendedSearchIntegrator getSearchIntegrator() {
-		final CompletableFuture<ExtendedSearchIntegrator> value = this.extendedIntegratorFuture;
+		ExtendedSearchIntegrator value = this.extendedIntegrator;
 		if ( value != null ) {
-			return value.join();
+			return value;
 		}
 		else {
 			throw LoggerFactory.make().searchIntegratorNotInitialized();
