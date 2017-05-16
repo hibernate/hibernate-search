@@ -6,18 +6,20 @@
  */
 package org.hibernate.search.cfg.impl;
 
+import java.util.Objects;
+
 import org.hibernate.search.engine.service.beanresolver.spi.BeanResolver;
 
 /**
  * An adapter from the {@link org.hibernate.search.hcore.spi.BeanResolver} interface
  * to {@link org.hibernate.search.engine.service.beanresolver.spi.BeanResolver}.
  */
-public class DelegatingBeanResolver implements BeanResolver {
+final class DelegatingBeanResolver implements BeanResolver {
 
 	private final org.hibernate.search.hcore.spi.BeanResolver hibernateOrmBeanResolver;
 
 	public DelegatingBeanResolver(org.hibernate.search.hcore.spi.BeanResolver hibernateOrmBeanResolver) {
-		super();
+		Objects.requireNonNull( hibernateOrmBeanResolver );
 		this.hibernateOrmBeanResolver = hibernateOrmBeanResolver;
 	}
 
