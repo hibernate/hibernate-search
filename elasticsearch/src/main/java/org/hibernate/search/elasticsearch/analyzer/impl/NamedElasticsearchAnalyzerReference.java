@@ -6,6 +6,13 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -47,11 +54,46 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 		return analyzer != null;
 	}
 
-	public void initialize(ElasticsearchAnalyzer analyzer) {
+	public void initialize(ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
 		if ( this.analyzer != null ) {
 			throw new AssertionFailure( "A named analyzer reference has been initialized more than once: " + this );
 		}
-		this.analyzer = analyzer;
+		this.analyzer = createAnalyzer( definitionRegistry );
+	}
+
+	private ElasticsearchAnalyzer createAnalyzer(ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
+		AnalyzerDefinition analyzerDefinition = definitionRegistry.getAnalyzerDefinition( name );
+		if ( analyzerDefinition == null ) {
+			return new UndefinedElasticsearchAnalyzerImpl( name );
+		}
+
+		String tokenizerName = analyzerDefinition.getTokenizer();
+		TokenizerDefinition tokenizerDefinition = definitionRegistry.getTokenizerDefinition( tokenizerName );
+
+		Map<String, TokenFilterDefinition> tokenFilters = new TreeMap<>();
+		if ( analyzerDefinition.getTokenFilters() != null ) {
+			for ( String name : analyzerDefinition.getTokenFilters() ) {
+				TokenFilterDefinition definition = definitionRegistry.getTokenFilterDefinition( name );
+				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
+					tokenFilters.put( name, definition );
+				}
+			}
+		}
+
+		Map<String, CharFilterDefinition> charFilters = new TreeMap<>();
+		if ( analyzerDefinition.getCharFilters() != null ) {
+			for ( String name : analyzerDefinition.getCharFilters() ) {
+				CharFilterDefinition definition = definitionRegistry.getCharFilterDefinition( name );
+				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
+					charFilters.put( name, definition );
+				}
+			}
+		}
+
+		return new CustomElasticsearchAnalyzerImpl(
+				name, analyzerDefinition,
+				tokenizerName, tokenizerDefinition,
+				charFilters, tokenFilters );
 	}
 
 	@Override

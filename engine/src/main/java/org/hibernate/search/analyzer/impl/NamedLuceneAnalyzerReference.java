@@ -53,11 +53,11 @@ public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference {
 		return analyzer != null;
 	}
 
-	public void initialize(Analyzer analyzer) {
+	public void initialize(LuceneAnalyzerBuilder builder) {
 		if ( this.analyzer != null ) {
 			throw new AssertionFailure( "A lucene analyzer reference has been initialized more than once: " + this );
 		}
-		this.analyzer = analyzer;
+		this.analyzer = builder.buildAnalyzer( name );
 	}
 
 	@Override

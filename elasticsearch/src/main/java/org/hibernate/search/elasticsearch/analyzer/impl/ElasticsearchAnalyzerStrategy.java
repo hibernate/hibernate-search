@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
@@ -20,10 +19,6 @@ import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnaly
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryBuilderImpl;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceReference;
@@ -128,13 +123,13 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 				if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
 					NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
 					if ( !namedReference.isInitialized() ) {
-						initializeNamedReference( namedReference, definitionRegistry );
+						namedReference.initialize( definitionRegistry );
 					}
 				}
 				else if ( reference.is( LuceneClassElasticsearchAnalyzerReference.class ) ) {
 					LuceneClassElasticsearchAnalyzerReference luceneClassReference = reference.unwrap( LuceneClassElasticsearchAnalyzerReference.class );
 					if ( !luceneClassReference.isInitialized() ) {
-						initializeLuceneClassReference( luceneClassReference, translator );
+						luceneClassReference.initialize( translator );
 					}
 				}
 				else if ( reference.is( ScopedElasticsearchAnalyzerReference.class ) ) {
@@ -211,67 +206,12 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		return definitionRegistry;
 	}
 
-	private void initializeNamedReference(NamedElasticsearchAnalyzerReference analyzerReference,
-			ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
-		String name = analyzerReference.getAnalyzerName();
-
-		ElasticsearchAnalyzer analyzer = createAnalyzer( definitionRegistry, name );
-
-		analyzerReference.initialize( analyzer );
-	}
-
-	private void initializeLuceneClassReference(LuceneClassElasticsearchAnalyzerReference analyzerReference,
-			ElasticsearchAnalyzerDefinitionTranslator translator) {
-		Class<?> clazz = analyzerReference.getLuceneClass();
-
-		String name = translator.translate( clazz );
-
-		ElasticsearchAnalyzer analyzer = new UndefinedElasticsearchAnalyzerImpl( name );
-
-		analyzerReference.initialize( name, analyzer );
-	}
-
 	@Override
 	public ScopedElasticsearchAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference) {
 		return new ScopedElasticsearchAnalyzerReference.DeferredInitializationBuilder(
 				initialGlobalAnalyzerReference.unwrap( ElasticsearchAnalyzerReference.class ),
 				Collections.<String, ElasticsearchAnalyzerReference>emptyMap()
 				);
-	}
-
-	private ElasticsearchAnalyzer createAnalyzer(ElasticsearchAnalysisDefinitionRegistry definitionRegistry, String analyzerName) {
-		AnalyzerDefinition analyzerDefinition = definitionRegistry.getAnalyzerDefinition( analyzerName );
-		if ( analyzerDefinition == null ) {
-			return new UndefinedElasticsearchAnalyzerImpl( analyzerName );
-		}
-
-		String tokenizerName = analyzerDefinition.getTokenizer();
-		TokenizerDefinition tokenizerDefinition = definitionRegistry.getTokenizerDefinition( tokenizerName );
-
-		Map<String, TokenFilterDefinition> tokenFilters = new TreeMap<>();
-		if ( analyzerDefinition.getTokenFilters() != null ) {
-			for ( String name : analyzerDefinition.getTokenFilters() ) {
-				TokenFilterDefinition definition = definitionRegistry.getTokenFilterDefinition( name );
-				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
-					tokenFilters.put( name, definition );
-				}
-			}
-		}
-
-		Map<String, CharFilterDefinition> charFilters = new TreeMap<>();
-		if ( analyzerDefinition.getCharFilters() != null ) {
-			for ( String name : analyzerDefinition.getCharFilters() ) {
-				CharFilterDefinition definition = definitionRegistry.getCharFilterDefinition( name );
-				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
-					charFilters.put( name, definition );
-				}
-			}
-		}
-
-		return new CustomElasticsearchAnalyzerImpl(
-				analyzerName, analyzerDefinition,
-				tokenizerName, tokenizerDefinition,
-				charFilters, tokenFilters );
 	}
 
 }

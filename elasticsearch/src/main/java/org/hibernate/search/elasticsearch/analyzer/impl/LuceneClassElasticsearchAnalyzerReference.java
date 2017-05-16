@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -28,10 +29,6 @@ public class LuceneClassElasticsearchAnalyzerReference extends ElasticsearchAnal
 		this.analyzer = null; // Not initialized yet
 	}
 
-	public Class<?> getLuceneClass() {
-		return luceneClass;
-	}
-
 	@Override
 	public ElasticsearchAnalyzer getAnalyzer() {
 		if ( analyzer == null ) {
@@ -44,11 +41,12 @@ public class LuceneClassElasticsearchAnalyzerReference extends ElasticsearchAnal
 		return analyzer != null;
 	}
 
-	public void initialize(String name, ElasticsearchAnalyzer analyzer) {
+	public void initialize(ElasticsearchAnalyzerDefinitionTranslator translator) {
 		if ( this.analyzer != null ) {
-			throw new AssertionFailure( "A named analyzer reference has been initialized more than once: " + this );
+			throw new AssertionFailure( "A Lucene class analyzer reference has been initialized more than once: " + this );
 		}
-		this.analyzer = analyzer;
+		String name = translator.translate( luceneClass );
+		this.analyzer = new UndefinedElasticsearchAnalyzerImpl( name );
 	}
 
 	@Override
