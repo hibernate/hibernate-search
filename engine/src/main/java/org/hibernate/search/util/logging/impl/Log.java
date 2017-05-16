@@ -1030,4 +1030,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 339, value = "BeanResolver cannot be provided via SearchConfiguration#getProvidedServices. Use SearchConfiguration#getBeanResolver!")
 	SearchException beanResolverContainedInProvidedServicesException();
+
+	@Message(id = 340, value = "Multiple full-text filter definitions with the same name: '%1$s'." )
+	SearchException fullTextFilterDefinitionNamingConflict(String filterDefinitionName);
+
 }

@@ -13,11 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
-import org.hibernate.annotations.common.reflection.XAnnotatedElement;
-import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.annotations.common.reflection.XPackage;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.ClassBridge;
@@ -58,43 +55,11 @@ public final class ConfigContext {
 	 */
 	private static final String DEFAULT_NULL_INDEX_TOKEN = "_null_";
 
-	/**
-	 * Constant used as definition point for a global (programmatic) analyzer definition. In this case no annotated
-	 * element is available to be used as definition point.
-	 */
-	private static final String PROGRAMMATIC_ANALYZER_DEFINITION = "PROGRAMMATIC_ANALYZER_DEFINITION";
+	private final MappingDefinitionRegistry<AnalyzerDef, AnalyzerDef> analyzerDefinitionRegistry =
+			new MappingDefinitionRegistry<>( Function.identity(), LOG::analyzerDefinitionNamingConflict );
 
-	/**
-	 * Constant used as definition point for a global (programmatic) filter definition. In this case no annotated
-	 * element is available to be used as definition point.
-	 */
-	private static final String PROGRAMMATIC_FILTER_DEFINITION = "PROGRAMMATIC_FILTER_DEFINITION";
-
-	/**
-	 * Used to keep track of duplicated analyzer definitions. The key of the map is the analyzer definition
-	 * name and the value is a string defining the location of the definition. In most cases the fully specified class
-	 * name together with the annotated element name is used. See also {@link #PROGRAMMATIC_ANALYZER_DEFINITION}.
-	 */
-	private final Map<String, String> analyzerDefinitionPoints = new HashMap<String, String>();
-
-	/**
-	 * Used to keep track of duplicated filter definitions. The key of the map is the filter definition
-	 * name and the value is a string defining the location of the definition. In most cases the fully specified class
-	 * name together with the annotated element name is used.
-	 */
-	private final Map<String, String> filterDefinitionPoints = new HashMap<String, String>();
-
-	/**
-	 * Map of discovered analyzer definitions. The key of the map is the analyzer def name and the value is the
-	 * {@code AnalyzerDef} annotation.
-	 */
-	private final Map<String, AnalyzerDef> mappingAnalyzerDefs = new HashMap<String, AnalyzerDef>();
-
-	/**
-	 * Map of discovered filter definitions. The key of the map is the filter def name and the value is the
-	 * {@code FilterDef} instance.
-	 */
-	private final Map<String, FilterDef> filterDefs = new HashMap<String, FilterDef>();
+	private final MappingDefinitionRegistry<FullTextFilterDef, FilterDef> fullTextFilterDefinitionRegistry =
+			new MappingDefinitionRegistry<>( this::interpretFullTextFilterDef, LOG::fullTextFilterDefinitionNamingConflict );
 
 	private final Map<IndexManagerType, MissingValueStrategy> missingValueStrategies = new HashMap<>();
 
@@ -133,51 +98,12 @@ public final class ConfigContext {
 		return serviceManager;
 	}
 
-	/**
-	 * Add an analyzer definition which was defined as annotation.
-	 *
-	 * @param analyzerDef the analyzer definition annotation
-	 * @param annotatedElement the annotated element it was defined on
-	 */
-	public void addAnalyzerDef(AnalyzerDef analyzerDef, XAnnotatedElement annotatedElement) {
-		if ( analyzerDef == null ) {
-			return;
-		}
-		addAnalyzerDef( analyzerDef, buildAnnotationDefinitionPoint( annotatedElement ) );
+	public MappingDefinitionRegistry<AnalyzerDef, ?> getAnalyzerDefinitionRegistry() {
+		return analyzerDefinitionRegistry;
 	}
 
-	/** Add a full-filter definition which was defined as annotation
-	 *
-	 * @param filterDef the filter definition annotation
-	 * @param annotatedElement the annotated element it was defined on
-	 */
-	public void addFullTextFilterDef(FullTextFilterDef filterDef, XAnnotatedElement annotatedElement) {
-		if ( filterDef == null ) {
-			return;
-		}
-		addFullTextFilterDef( filterDef, buildAnnotationDefinitionPoint( annotatedElement ) );
-	}
-
-	public void addGlobalAnalyzerDef(AnalyzerDef analyzerDef) {
-		addAnalyzerDef( analyzerDef, PROGRAMMATIC_ANALYZER_DEFINITION );
-	}
-
-	public void addGlobalFullTextFilterDef(FullTextFilterDef filterDef) {
-		addFullTextFilterDef( filterDef, PROGRAMMATIC_FILTER_DEFINITION );
-	}
-
-	private void addAnalyzerDef(AnalyzerDef analyzerDef, String annotationDefinitionPoint) {
-		String analyzerDefinitionName = analyzerDef.name();
-
-		if ( analyzerDefinitionPoints.containsKey( analyzerDefinitionName ) ) {
-			if ( !analyzerDefinitionPoints.get( analyzerDefinitionName ).equals( annotationDefinitionPoint ) ) {
-				throw LOG.analyzerDefinitionNamingConflict( analyzerDefinitionName );
-			}
-		}
-		else {
-			mappingAnalyzerDefs.put( analyzerDefinitionName, analyzerDef );
-			analyzerDefinitionPoints.put( analyzerDefinitionName, annotationDefinitionPoint );
-		}
+	public MappingDefinitionRegistry<FullTextFilterDef, ?> getFullTextFilterDefinitionRegistry() {
+		return fullTextFilterDefinitionRegistry;
 	}
 
 	public MissingValueStrategy getMissingValueStrategy(IndexManagerType type) {
@@ -210,26 +136,11 @@ public final class ConfigContext {
 		return nullToken;
 	}
 
-	private void addFullTextFilterDef(FullTextFilterDef filterDef, String filterDefinitionPoint) {
-		String filterDefinitionName = filterDef.name();
-
-		if ( filterDefinitionPoints.containsKey( filterDefinitionName ) ) {
-			if ( !filterDefinitionPoints.get( filterDefinitionName ).equals( filterDefinitionPoint ) ) {
-				throw new SearchException( "Multiple filter definitions with the same name: " + filterDef.name() );
-			}
-		}
-		else {
-			filterDefinitionPoints.put( filterDefinitionName, filterDefinitionPoint );
-			addFilterDef( filterDef );
-		}
-	}
-
-	private void addFilterDef(FullTextFilterDef defAnn) {
+	private FilterDef interpretFullTextFilterDef(FullTextFilterDef defAnn) {
 		FilterDef filterDef = new FilterDef( defAnn );
 		if ( filterDef.getImpl().equals( ShardSensitiveOnlyFilter.class ) ) {
 			//this is a placeholder don't process regularly
-			filterDefs.put( defAnn.name(), filterDef );
-			return;
+			return filterDef;
 		}
 		try {
 			filterDef.getImpl().newInstance();
@@ -267,7 +178,7 @@ public final class ConfigContext {
 				filterDef.addSetter( Introspector.decapitalize( name.substring( 3 ) ), method );
 			}
 		}
-		filterDefs.put( defAnn.name(), filterDef );
+		return filterDef;
 	}
 
 	/**
@@ -289,6 +200,7 @@ public final class ConfigContext {
 	 * or ExtendedSearchIntegrator.getAnalyzerReference(String).
 	 */
 	public Map<IndexManagerType, AnalyzerRegistry> initAnalyzerRegistries(IndexManagerHolder indexesFactory) {
+		Map<String, AnalyzerDef> mappingAnalyzerDefs = analyzerDefinitionRegistry.getAll();
 
 		/*
 		 * For analyzer defined in the mapping, but not referenced in this mapping,
@@ -332,33 +244,11 @@ public final class ConfigContext {
 	}
 
 	public Map<String, FilterDef> initFilters() {
-		return Collections.unmodifiableMap( filterDefs );
+		return fullTextFilterDefinitionRegistry.getAll();
 	}
 
 	public boolean isJpaPresent() {
 		return jpaPresent;
-	}
-
-	/**
-	 * @param annotatedElement an annotated element
-	 *
-	 * @return a string which identifies the location/point the annotation was placed on. Something of the
-	 * form package.[[className].[field|member]]
-	 */
-	private String buildAnnotationDefinitionPoint(XAnnotatedElement annotatedElement) {
-		if ( annotatedElement instanceof XClass ) {
-			return ( (XClass) annotatedElement ).getName();
-		}
-		else if ( annotatedElement instanceof XMember ) {
-			XMember member = (XMember) annotatedElement;
-			return member.getType().getName() + '.' + member.getName();
-		}
-		else if ( annotatedElement instanceof XPackage ) {
-			return ( (XPackage) annotatedElement ).getName();
-		}
-		else {
-			throw new SearchException( "Unknown XAnnotatedElement: " + annotatedElement );
-		}
 	}
 
 	/**

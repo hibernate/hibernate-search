@@ -79,6 +79,7 @@ import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
+import org.hibernate.search.engine.impl.MappingDefinitionRegistry;
 import org.hibernate.search.engine.nulls.codec.impl.NotEncodingCodec;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
@@ -1667,25 +1668,33 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private void checkForAnalyzerDefs(XAnnotatedElement annotatedElement, ConfigContext context) {
+		MappingDefinitionRegistry<AnalyzerDef, ?> registry = context.getAnalyzerDefinitionRegistry();
+
 		AnalyzerDefs defs = annotatedElement.getAnnotation( AnalyzerDefs.class );
 		if ( defs != null ) {
 			for ( AnalyzerDef def : defs.value() ) {
-				context.addAnalyzerDef( def, annotatedElement );
+				registry.registerFromAnnotation( def.name(), def, annotatedElement );
 			}
 		}
 		AnalyzerDef def = annotatedElement.getAnnotation( AnalyzerDef.class );
-		context.addAnalyzerDef( def, annotatedElement );
+		if ( def != null ) {
+			registry.registerFromAnnotation( def.name(), def, annotatedElement );
+		}
 	}
 
 	private void checkForFullTextFilterDefs(XAnnotatedElement annotatedElement, ConfigContext context) {
+		MappingDefinitionRegistry<FullTextFilterDef, ?> registry = context.getFullTextFilterDefinitionRegistry();
+
 		FullTextFilterDefs defs = annotatedElement.getAnnotation( FullTextFilterDefs.class );
 		if ( defs != null ) {
 			for ( FullTextFilterDef def : defs.value() ) {
-				context.addFullTextFilterDef( def, annotatedElement );
+				registry.registerFromAnnotation( def.name(), def, annotatedElement );
 			}
 		}
 		FullTextFilterDef def = annotatedElement.getAnnotation( FullTextFilterDef.class );
-		context.addFullTextFilterDef( def, annotatedElement );
+		if ( def != null ) {
+			registry.registerFromAnnotation( def.name(), def, annotatedElement );
+		}
 	}
 
 	private void checkForAnalyzerDiscriminator(XAnnotatedElement annotatedElement,
