@@ -44,6 +44,7 @@ import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.ImmutableSearchFactory;
 import org.hibernate.search.engine.impl.IncrementalSearchConfiguration;
+import org.hibernate.search.engine.impl.MappingDefinitionRegistry;
 import org.hibernate.search.engine.impl.MappingModelMetadataProvider;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
@@ -567,8 +568,9 @@ public class SearchIntegratorBuilder {
 		if ( defaults != null ) {
 			AnalyzerDef[] defs = (AnalyzerDef[]) defaults.get( AnalyzerDefs.class );
 			if ( defs != null ) {
+				MappingDefinitionRegistry<AnalyzerDef, ?> registry = context.getAnalyzerDefinitionRegistry();
 				for ( AnalyzerDef def : defs ) {
-					context.addGlobalAnalyzerDef( def );
+					registry.registerGlobal( def.name(), def );
 				}
 			}
 		}
@@ -578,12 +580,14 @@ public class SearchIntegratorBuilder {
 		Map<?, ?> defaults = reflectionManager.getDefaults();
 		FullTextFilterDef[] filterDefs = (FullTextFilterDef[]) defaults.get( FullTextFilterDefs.class );
 		if ( filterDefs != null && filterDefs.length != 0 ) {
+			MappingDefinitionRegistry<FullTextFilterDef, ?> registry = context.getFullTextFilterDefinitionRegistry();
 			final Map<String, FilterDef> filterDefinitions = factoryState.getFilterDefinitions();
 			for ( FullTextFilterDef defAnn : filterDefs ) {
-				if ( filterDefinitions.containsKey( defAnn.name() ) ) {
+				String name = defAnn.name();
+				if ( filterDefinitions.containsKey( name ) ) {
 					throw new SearchException( "Multiple definition of @FullTextFilterDef.name=" + defAnn.name() );
 				}
-				context.addGlobalFullTextFilterDef( defAnn );
+				registry.registerGlobal( name, defAnn );
 			}
 		}
 	}
