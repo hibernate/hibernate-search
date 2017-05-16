@@ -69,9 +69,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	private static final Log log = LoggerFactory.make();
 
-	private boolean disabled;
-	private boolean skipDirtyChecks = true;
-	private volatile CompletableFuture<ExtendedSearchIntegrator> extendedIntegratorFuture;
+	private volatile EventsIntegratorState state = new NonInitializedIntegratorState();
 
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
 	// transient because it's not serializable (and state doesn't need to live longer than a flush).
@@ -82,7 +80,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
-		if ( disabled ) {
+		if ( state.eventsDisabled() ) {
 			return;
 		}
 
@@ -100,7 +98,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	@Override
 	public void onPostInsert(PostInsertEvent event) {
-		if ( disabled ) {
+		if ( state.eventsDisabled() ) {
 			return;
 		}
 
@@ -118,13 +116,13 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	@Override
 	public void onPostUpdate(PostUpdateEvent event) {
-		if ( disabled ) {
+		if ( state.eventsDisabled() ) {
 			return;
 		}
 
 		final Object entity = event.getEntity();
 		final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
-		if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty(
+		if ( docBuilder != null && ( state.skipDirtyChecks() || docBuilder.isDirty(
 				getDirtyPropertyNames(
 						event
 				)
@@ -155,7 +153,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	 */
 	@Override
 	public void onFlush(FlushEvent event) {
-		if ( disabled ) {
+		if ( state.eventsDisabled() ) {
 			return;
 		}
 
@@ -171,13 +169,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	}
 
 	public ExtendedSearchIntegrator getExtendedSearchFactoryIntegrator() {
-		final CompletableFuture<ExtendedSearchIntegrator> value = this.extendedIntegratorFuture;
-		if ( value != null ) {
-			return value.join();
-		}
-		else {
-			throw log.searchIntegratorNotInitialized();
-		}
+		return state.getExtendedSearchIntegrator();
 	}
 
 	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
@@ -202,24 +194,18 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	 * @param extendedIntegratorFuture a completable future that will eventually hold the {@link ExtendedSearchIntegrator}
 	 */
 	public void initialize(CompletableFuture<ExtendedSearchIntegrator> extendedIntegratorFuture) {
-		this.extendedIntegratorFuture = extendedIntegratorFuture.thenApply( this::doInitialize );
+		this.state = new InitializingIntegratorState( extendedIntegratorFuture.thenApply( this::doInitialize ) );
 	}
 
 	private ExtendedSearchIntegrator doInitialize(ExtendedSearchIntegrator extendedIntegrator) {
-		if ( extendedIntegrator.getIndexingMode() == IndexingMode.EVENT ) {
-			disabled = extendedIntegrator.getIndexBindings().size() == 0;
-		}
-		else if ( extendedIntegrator.getIndexingMode() == IndexingMode.MANUAL ) {
-			disabled = true;
-		}
-
+		final boolean disabled = eventsDisabled( extendedIntegrator );
+		final boolean skipDirtyChecks = skipDirtyChecks( extendedIntegrator );
 		log.debug( "Hibernate Search event listeners " + ( disabled ? "deactivated" : "activated" ) );
-
 		if ( ! disabled ) {
-			skipDirtyChecks = !extendedIntegrator.isDirtyChecksEnabled();
 			log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
 		}
-
+		OptimalEventsIntegratorState newState = new OptimalEventsIntegratorState( disabled, skipDirtyChecks, extendedIntegrator );
+		this.state = newState; // discard the suboptimal EventsIntegratorState instances
 		return extendedIntegrator;
 	}
 
@@ -245,7 +231,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	}
 
 	protected void processCollectionEvent(AbstractCollectionEvent event) {
-		if ( disabled ) {
+		if ( state.eventsDisabled() ) {
 			return;
 		}
 
@@ -337,6 +323,22 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		// TODO Tests seem to pass using _false_ but we might be able to take
 		// advantage of this new hook?
 		return false;
+	}
+
+	public static boolean skipDirtyChecks(ExtendedSearchIntegrator extendedIntegrator) {
+		return !extendedIntegrator.isDirtyChecksEnabled();
+	}
+
+	public static boolean eventsDisabled(ExtendedSearchIntegrator extendedIntegrator) {
+		if ( extendedIntegrator.getIndexingMode() == IndexingMode.EVENT ) {
+			return extendedIntegrator.getIndexBindings().size() == 0;
+		}
+		else if ( extendedIntegrator.getIndexingMode() == IndexingMode.MANUAL ) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 }
