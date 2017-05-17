@@ -49,12 +49,10 @@ public class ElasticsearchAnalysisDefinitionRegistryBuilderImpl implements Elast
 		return context;
 	}
 
-	public SimpleElasticsearchAnalysisDefinitionRegistry build() {
-		SimpleElasticsearchAnalysisDefinitionRegistry registry = new SimpleElasticsearchAnalysisDefinitionRegistry();
+	public void build(ElasticsearchAnalysisDefinitionRegistry registry) {
 		for ( ElasticsearchAnalysisDefinitionRegistryPopulator populator : populators ) {
 			populator.populate( registry );
 		}
-		return registry;
 	}
 
 }

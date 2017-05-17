@@ -18,16 +18,20 @@ import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldPath;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.spi.IndexManagerType;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A helper classes dealing with the processing of annotation. It is there to share some annotation processing
@@ -37,6 +41,8 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Hardy Ferentschik
  */
 public final class AnnotationProcessingHelper {
+
+	private static final Log log = LoggerFactory.make();
 
 	private AnnotationProcessingHelper() {
 		//not allowed
@@ -126,8 +132,20 @@ public final class AnnotationProcessingHelper {
 		}
 	}
 
-	public static AnalyzerReference getAnalyzerReference(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext,
-			IndexManagerType indexManagerType) {
+	public static AnalyzerReference getAnalyzerReference(
+			Class<?> entityType, DocumentFieldPath fieldPath,
+			org.hibernate.search.annotations.Analyzer analyzerAnn,
+			Normalizer normalizerAnn, ConfigContext configContext, IndexManagerType indexManagerType) {
+		AnalyzerReference analyzerReference = getAnalyzerReference( analyzerAnn, configContext, indexManagerType );
+		AnalyzerReference normalizerReference = getNormalizerReference( normalizerAnn, configContext, indexManagerType );
+		if ( analyzerReference != null && normalizerReference != null ) {
+			throw log.cannotReferenceAnalyzerAndNormalizer( entityType, fieldPath.getRelativeName() );
+		}
+		return analyzerReference != null ? analyzerReference : normalizerReference;
+	}
+
+	public static AnalyzerReference getAnalyzerReference(org.hibernate.search.annotations.Analyzer analyzerAnn,
+			ConfigContext configContext, IndexManagerType indexManagerType) {
 		MutableAnalyzerRegistry registry = indexManagerType == null ? null
 				: configContext.forType( indexManagerType ).getAnalyzerRegistry();
 		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
@@ -140,6 +158,23 @@ public final class AnnotationProcessingHelper {
 				return null;
 			}
 			return registry.getOrCreateAnalyzerReference( definition );
+		}
+	}
+
+	public static AnalyzerReference getNormalizerReference(Normalizer normalizerAnn,
+			ConfigContext configContext, IndexManagerType indexManagerType) {
+		MutableNormalizerRegistry registry = indexManagerType == null ? null
+				: configContext.forType( indexManagerType ).getNormalizerRegistry();
+		Class<?> analyzerClass = normalizerAnn == null ? void.class : normalizerAnn.impl();
+		if ( analyzerClass != void.class ) {
+			return registry.getOrCreateLuceneClassNormalizerReference( analyzerClass );
+		}
+		else {
+			String definition = normalizerAnn == null ? "" : normalizerAnn.definition();
+			if ( StringHelper.isEmpty( definition ) ) {
+				return null;
+			}
+			return registry.getOrCreateNamedNormalizerReference( definition );
 		}
 	}
 

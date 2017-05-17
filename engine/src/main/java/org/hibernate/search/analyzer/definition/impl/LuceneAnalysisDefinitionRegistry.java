@@ -7,6 +7,7 @@
 package org.hibernate.search.analyzer.definition.impl;
 
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -25,10 +26,25 @@ public interface LuceneAnalysisDefinitionRegistry {
 	void register(String name, AnalyzerDef definition);
 
 	/**
+	 * Register a normalizer definition.
+	 * @param name The name of the definition to be registered.
+	 * @param definition The definition to be registered.
+	 * @throws SearchException if the name is already associated with a different definition.
+	 */
+	void register(String name, NormalizerDef definition);
+
+	/**
 	 * @param name An analyzer name
 	 * @return The analyzer definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */
 	AnalyzerDef getAnalyzerDefinition(String name);
+
+	/**
+	 * @param name A normalizer name
+	 * @return The normalizer definition associated with the given name,
+	 * or {@code null} if there isn't any.
+	 */
+	NormalizerDef getNormalizerDefinition(String name);
 
 }

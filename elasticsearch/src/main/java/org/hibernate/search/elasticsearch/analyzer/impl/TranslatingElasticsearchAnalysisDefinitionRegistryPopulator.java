@@ -10,12 +10,14 @@ import java.util.Map;
 
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.NormalizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
@@ -58,6 +60,25 @@ public class TranslatingElasticsearchAnalysisDefinitionRegistryPopulator {
 		TokenizerDef hibernateSearchTokenizerDef = hibernateSearchDefinition.tokenizer();
 		String tokenizerName = registerTokenizerDef( localName, hibernateSearchTokenizerDef );
 		elasticsearchDefinition.setTokenizer( tokenizerName );
+
+		for ( CharFilterDef hibernateSearchCharFilterDef : hibernateSearchDefinition.charFilters() ) {
+			String charFilterName = registerCharFilterDef( localName, hibernateSearchCharFilterDef );
+			elasticsearchDefinition.addCharFilter( charFilterName );
+		}
+
+		for ( TokenFilterDef hibernateSearchTokenFilterDef : hibernateSearchDefinition.filters() ) {
+			String tokenFilterName = registerTokenFilterDef( localName, hibernateSearchTokenFilterDef );
+			elasticsearchDefinition.addTokenFilter( tokenFilterName );
+		}
+
+		registry.register( remoteName, elasticsearchDefinition );
+	}
+
+	public void registerNormalizerDef(NormalizerDef hibernateSearchDefinition) {
+		NormalizerDefinition elasticsearchDefinition = new NormalizerDefinition();
+
+		String localName = hibernateSearchDefinition.name();
+		String remoteName = localName; // We use the same definition name in Elasticsearch
 
 		for ( CharFilterDef hibernateSearchCharFilterDef : hibernateSearchDefinition.charFilters() ) {
 			String charFilterName = registerCharFilterDef( localName, hibernateSearchCharFilterDef );

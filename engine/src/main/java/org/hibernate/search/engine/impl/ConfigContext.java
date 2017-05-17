@@ -20,6 +20,7 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Key;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.Environment;
@@ -57,6 +58,9 @@ public final class ConfigContext {
 
 	private final MappingDefinitionRegistry<AnalyzerDef, AnalyzerDef> analyzerDefinitionRegistry =
 			new MappingDefinitionRegistry<>( Function.identity(), LOG::analyzerDefinitionNamingConflict );
+
+	private final MappingDefinitionRegistry<NormalizerDef, NormalizerDef> normalizerDefinitionRegistry =
+			new MappingDefinitionRegistry<>( Function.identity(), LOG::normalizerDefinitionNamingConflict );
 
 	private final MappingDefinitionRegistry<FullTextFilterDef, FilterDef> fullTextFilterDefinitionRegistry =
 			new MappingDefinitionRegistry<>( this::interpretFullTextFilterDef, LOG::fullTextFilterDefinitionNamingConflict );
@@ -99,6 +103,10 @@ public final class ConfigContext {
 
 	public MappingDefinitionRegistry<AnalyzerDef, ?> getAnalyzerDefinitionRegistry() {
 		return analyzerDefinitionRegistry;
+	}
+
+	public MappingDefinitionRegistry<NormalizerDef, ?> getNormalizerDefinitionRegistry() {
+		return normalizerDefinitionRegistry;
 	}
 
 	public MappingDefinitionRegistry<FullTextFilterDef, ?> getFullTextFilterDefinitionRegistry() {
@@ -192,20 +200,27 @@ public final class ConfigContext {
 	 */
 	public Map<IndexManagerType, SearchIntegration> initIntegrations(IndexManagerHolder indexesFactory) {
 		Map<String, AnalyzerDef> mappingAnalyzerDefs = analyzerDefinitionRegistry.getAll();
+		Map<String, NormalizerDef> mappingNormalizerDefs = normalizerDefinitionRegistry.getAll();
 
 		/*
-		 * For analyzer defined in the mapping, but not referenced in this mapping,
+		 * For analyzers/normalizers defined in the mapping, but not referenced in this mapping,
 		 * we assume these are Lucene analyzer definitions that will be used
 		 * when querying.
 		 * Thus we create references to these definitions, so that the references
-		 * are initialized below, making the analyzers available through
-		 * SearchFactory.getAnalyzer(String).
+		 * are initialized below, making the analyzers available at runtime.
 		 */
 		for ( String name : mappingAnalyzerDefs.keySet() ) {
 			if ( !hasAnalyzerReference( name ) ) {
 				MutableAnalyzerRegistry registry = forType( LuceneEmbeddedIndexManagerType.INSTANCE )
 						.getAnalyzerRegistry();
 				registry.getOrCreateAnalyzerReference( name );
+			}
+		}
+		for ( String name : mappingNormalizerDefs.keySet() ) {
+			if ( !hasNormalizerReference( name ) ) {
+				MutableNormalizerRegistry registry = forType( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getNormalizerRegistry();
+				registry.getOrCreateNamedNormalizerReference( name );
 			}
 		}
 
@@ -218,7 +233,8 @@ public final class ConfigContext {
 		final Map<IndexManagerType, SearchIntegration> immutableSearchIntegrations = new HashMap<>( indexManagerTypes.size() );
 
 		for ( IndexManagerType indexManagerType : indexManagerTypes ) {
-			ImmutableSearchIntegration searchIntegration = forType( indexManagerType ).initialize( mappingAnalyzerDefs );
+			ImmutableSearchIntegration searchIntegration = forType( indexManagerType )
+					.initialize( mappingAnalyzerDefs, mappingNormalizerDefs );
 			immutableSearchIntegrations.put( indexManagerType, searchIntegration );
 		}
 
@@ -229,6 +245,16 @@ public final class ConfigContext {
 		for ( SearchIntegrationConfigContext context : indexManagerTypeConfigContexts.values() ) {
 			MutableAnalyzerRegistry registry = context.getAnalyzerRegistry();
 			if ( registry.getNamedAnalyzerReferences().containsKey( name ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean hasNormalizerReference(String name) {
+		for ( SearchIntegrationConfigContext context : indexManagerTypeConfigContexts.values() ) {
+			MutableNormalizerRegistry registry = context.getNormalizerRegistry();
+			if ( registry.getNamedNormalizerReferences().containsKey( name ) ) {
 				return true;
 			}
 		}

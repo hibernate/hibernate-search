@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordTokenizer;
+import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.util.Version;
@@ -19,6 +21,7 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.analyzer.definition.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
@@ -40,6 +43,8 @@ final class LuceneAnalyzerBuilder {
 
 	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
+	private static final Parameter[] EMPTY_PARAMETERS = new Parameter[]{};
+
 	private final Version luceneMatchVersion;
 
 	private final ResourceLoader resourceLoader;
@@ -55,7 +60,7 @@ final class LuceneAnalyzerBuilder {
 	}
 
 	/**
-	 * Build a Lucene {@link Analyzer} for the given name.
+	 * Build a Lucene {@link Analyzer} for the given analyzer name.
 	 *
 	 * @param name The name of the definition, which should match the name defined in an {@code AnalyzerDef} annotation
 	 * as found in the annotated domain class.
@@ -74,47 +79,75 @@ final class LuceneAnalyzerBuilder {
 		}
 	}
 
+	/**
+	 * Build a Lucene {@link Analyzer} for the given normalizer name.
+	 *
+	 * @param name The name of the definition, which should match the name defined in a {@code NormalizerDef} annotation
+	 * as found in the annotated domain class.
+	 * @return a Lucene {@code Analyzer} with a {@link KeywordTokenizer}, but otherwise matching the the matching {@link NormalizerDef}.
+	 */
+	public Analyzer buildNormalizer(String name) {
+		NormalizerDef definition = definitionRegistry.getNormalizerDefinition( name );
+		if ( definition == null ) {
+			throw new SearchException( "Lucene normalizer found with an unknown definition: " + name );
+		}
+		try {
+			return buildNormalizer( definition );
+		}
+		catch (IOException e) {
+			throw new SearchException( "Could not initialize normalizer definition " + definition, e );
+		}
+	}
+
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) throws IOException {
-		TokenizerDef token = analyzerDef.tokenizer();
-		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( token.params(), luceneMatchVersion );
-		TokenizerFactory tokenFactory = instanceFromClass(
-				TokenizerFactory.class,
-				token.factory(),
+		TokenizerDef tokenizer = analyzerDef.tokenizer();
+		TokenizerFactory tokenizerFactory = buildAnalysisComponent(
+				TokenizerFactory.class, tokenizer.factory(), tokenizer.params() );
+
+		return buildAnalyzer( tokenizerFactory, analyzerDef.charFilters(), analyzerDef.filters() );
+	}
+
+	private Analyzer buildNormalizer(NormalizerDef normalizerDef) throws IOException {
+		TokenizerFactory tokenizerFactory = buildAnalysisComponent( TokenizerFactory.class,
+				KeywordTokenizerFactory.class, EMPTY_PARAMETERS );
+
+		return buildAnalyzer( tokenizerFactory, normalizerDef.charFilters(), normalizerDef.filters() );
+	}
+
+	private Analyzer buildAnalyzer(TokenizerFactory tokenizerFactory,
+			CharFilterDef[] charFilterDefs, TokenFilterDef[] filterDefs) throws IOException {
+		final int tokenFiltersLength = filterDefs.length;
+		TokenFilterFactory[] filters = new TokenFilterFactory[tokenFiltersLength];
+		for ( int index = 0; index < tokenFiltersLength; index++ ) {
+			TokenFilterDef filterDef = filterDefs[index];
+			filters[index] = buildAnalysisComponent( TokenFilterFactory.class,
+					filterDef.factory(),
+					filterDef.params() );
+		}
+
+		final int charFiltersLength = charFilterDefs.length;
+		CharFilterFactory[] charFilters = new CharFilterFactory[charFiltersLength];
+		for ( int index = 0; index < charFiltersLength; index++ ) {
+			CharFilterDef charFilterDef = charFilterDefs[index];
+			charFilters[index] = buildAnalysisComponent( CharFilterFactory.class,
+					charFilterDef.factory(), charFilterDef.params() );
+		}
+
+		return new TokenizerChain( charFilters, tokenizerFactory, filters );
+	}
+
+	private <T> T buildAnalysisComponent(Class<T> expectedFactoryClass,
+			Class<? extends T> factoryClass,
+			Parameter[] parameters) throws IOException {
+		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( parameters, luceneMatchVersion );
+		T tokenizerFactory = instanceFromClass(
+				expectedFactoryClass,
+				factoryClass,
 				"Tokenizer factory",
 				tokenMapsOfParameters
 		);
-		injectResourceLoader( tokenFactory, tokenMapsOfParameters );
-
-		final int length = analyzerDef.filters().length;
-		final int charLength = analyzerDef.charFilters().length;
-		TokenFilterFactory[] filters = new TokenFilterFactory[length];
-		CharFilterFactory[] charFilters = new CharFilterFactory[charLength];
-		for ( int index = 0; index < length; index++ ) {
-			TokenFilterDef filterDef = analyzerDef.filters()[index];
-			final Map<String, String> mapOfParameters = getMapOfParameters( filterDef.params(), luceneMatchVersion );
-			filters[index] = instanceFromClass(
-					TokenFilterFactory.class,
-					filterDef.factory(),
-					"Token filter factory",
-					mapOfParameters
-			);
-			injectResourceLoader( filters[index], mapOfParameters );
-		}
-		for ( int index = 0; index < charFilters.length; index++ ) {
-			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
-			final Map<String, String> mapOfParameters = getMapOfParameters(
-					charFilterDef.params(),
-					luceneMatchVersion
-			);
-			charFilters[index] = instanceFromClass(
-					CharFilterFactory.class,
-					charFilterDef.factory(),
-					"Character filter factory",
-					mapOfParameters
-			);
-			injectResourceLoader( charFilters[index], mapOfParameters );
-		}
-		return new TokenizerChain( charFilters, tokenFactory, filters );
+		injectResourceLoader( tokenizerFactory, tokenMapsOfParameters );
+		return tokenizerFactory;
 	}
 
 	private void injectResourceLoader(Object processor, Map<String, String> mapOfParameters) throws IOException {

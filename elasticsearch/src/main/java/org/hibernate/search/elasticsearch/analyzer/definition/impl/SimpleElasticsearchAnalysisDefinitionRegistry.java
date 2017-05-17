@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.model.NormalizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -30,6 +31,7 @@ public final class SimpleElasticsearchAnalysisDefinitionRegistry implements Elas
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
 	private final Map<String, AnalyzerDefinition> analyzerDefinitions = new TreeMap<>();
+	private final Map<String, NormalizerDefinition> normalizerDefinitions = new TreeMap<>();
 	private final Map<String, TokenizerDefinition> tokenizerDefinitions = new TreeMap<>();
 	private final Map<String, TokenFilterDefinition> tokenFilterDefinitions = new TreeMap<>();
 	private final Map<String, CharFilterDefinition> charFilterDefinitions = new TreeMap<>();
@@ -39,6 +41,14 @@ public final class SimpleElasticsearchAnalysisDefinitionRegistry implements Elas
 		AnalyzerDefinition previous = analyzerDefinitions.putIfAbsent( name, definition );
 		if ( previous != null && previous != definition ) {
 			throw LOG.analyzerNamingConflict( name );
+		}
+	}
+
+	@Override
+	public void register(String name, NormalizerDefinition definition) {
+		NormalizerDefinition previous = normalizerDefinitions.putIfAbsent( name, definition );
+		if ( previous != null && previous != definition ) {
+			throw LOG.normalizerNamingConflict( name );
 		}
 	}
 
@@ -72,6 +82,11 @@ public final class SimpleElasticsearchAnalysisDefinitionRegistry implements Elas
 	}
 
 	@Override
+	public NormalizerDefinition getNormalizerDefinition(String name) {
+		return normalizerDefinitions.get( name );
+	}
+
+	@Override
 	public TokenizerDefinition getTokenizerDefinition(String name) {
 		return tokenizerDefinitions.get( name );
 	}
@@ -88,6 +103,10 @@ public final class SimpleElasticsearchAnalysisDefinitionRegistry implements Elas
 
 	public Map<String, AnalyzerDefinition> getAnalyzerDefinitions() {
 		return Collections.unmodifiableMap( analyzerDefinitions );
+	}
+
+	public Map<String, NormalizerDefinition> getNormalizerDefinitions() {
+		return Collections.unmodifiableMap( normalizerDefinitions );
 	}
 
 	public Map<String, TokenizerDefinition> getTokenizerDefinitions() {
