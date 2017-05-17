@@ -28,11 +28,12 @@ import org.hibernate.search.elasticsearch.settings.impl.translation.Elasticsearc
  * <li>to break {@literal @AnalyzerDef}s into their components ({@literal @TokenizerDef}, etc.)
  * <li>to determine the correct name for each components (generating names automatically if needed)
  * <li>to store the translated definitions in the registry
- * <li>to detect illegal definitions that override pre-existing definitions
  * </ul>
  * <p>
  * The actual translation job (e.g. {@literal @AnalyzerDef} to {@link AnalyzerDefinition})
  * is delegated to an {@link ElasticsearchAnalyzerDefinitionTranslator}.
+ * <p>
+ * The detection of duplicate definitions is handled in {@link ElasticsearchAnalysisDefinitionRegistry}.
  *
  * @author Yoann Rodiere
  */
