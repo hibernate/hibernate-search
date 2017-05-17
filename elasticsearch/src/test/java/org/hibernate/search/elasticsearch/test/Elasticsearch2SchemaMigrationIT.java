@@ -126,6 +126,10 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'string',"
 									+ "'analyzer': 'customAnalyzer'"
+							+ "},"
+							+ "'normalizer': {"
+									+ "'type': 'string',"
+									+ "'analyzer': 'customNormalizer'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -190,6 +194,10 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'string',"
 									+ "'analyzer': 'customAnalyzer'"
+							+ "},"
+							+ "'normalizer': {"
+									+ "'type': 'string',"
+									+ "'analyzer': 'customNormalizer'"
 							+ "}"
 					+ "}"
 				+ "}",
@@ -368,6 +376,54 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'string',"
 									+ "'analyzer': 'standard'" // Invalid
+							+ "},"
+							+ "'normalizer': {"
+									+ "'type': 'string',"
+									+ "'analyzer': 'customNormalizer'"
+							+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		thrown.expect(
+				isException( SearchException.class )
+						.withMessage( UPDATE_FAILED_MESSAGE_ID )
+				.causedBy( SearchException.class )
+						.withMessage( MAPPING_CREATION_FAILED_MESSAGE_ID )
+				.causedBy( SearchException.class )
+						.withMessage( ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID )
+						.withMessage( "analyzer" )
+				.build()
+		);
+
+		init( SimpleStringEntity.class );
+	}
+
+	@Test
+	public void property_attribute_invalid_conflictingNormalizer() throws Exception {
+		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate();
+		putAnalysisSettings( SimpleStringEntity.class );
+		elasticSearchClient.type( SimpleStringEntity.class ).putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'string',"
+									+ "'index': 'not_analyzed',"
+									+ "'store': true"
+							+ "},"
+							+ "'defaultAnalyzer': {"
+									+ "'type': 'string'"
+							+ "},"
+							+ "'nonDefaultAnalyzer': {"
+									+ "'type': 'string',"
+									+ "'index': 'analyzed',"
+									+ "'analyzer': 'customAnalyzer'"
+							+ "},"
+							+ "'normalizer': {"
+									+ "'type': 'string',"
+									+ "'index': 'analyzed',"
+									+ "'analyzer': 'standard'" // Invalid
 							+ "}"
 					+ "}"
 				+ "}"
@@ -393,6 +449,9 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 					+ "'analyzer': {"
 							+ "'customAnalyzer': {"
 									+ "'tokenizer': 'whitespace'"
+							+ "},"
+							+ "'customNormalizer': {"
+									+ "'tokenizer': 'keyword'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -433,6 +492,9 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 
 		@Field(analyzer = @Analyzer(definition = "customAnalyzer"))
 		String nonDefaultAnalyzer;
+
+		@Field(analyzer = @Analyzer(definition = "customNormalizer"))
+		String normalizer;
 	}
 
 }
