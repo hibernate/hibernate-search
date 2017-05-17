@@ -32,11 +32,6 @@ public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference {
 		this.analyzer = null; // Not initialized yet
 	}
 
-	public NamedLuceneAnalyzerReference(String name, Analyzer analyzer) {
-		this.name = name;
-		this.analyzer = analyzer; // Initialized from the start
-	}
-
 	public String getAnalyzerName() {
 		return name;
 	}
