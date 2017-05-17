@@ -6,11 +6,7 @@
  */
 package org.hibernate.search.event.impl;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -46,7 +42,6 @@ import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.util.impl.Maps;
-import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -64,19 +59,15 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public final class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
-		PostCollectionUpdateEventListener, FlushEventListener,
-		Serializable {
+		PostCollectionUpdateEventListener, FlushEventListener {
 
 	private static final Log log = LoggerFactory.make();
 
 	private volatile EventsIntegratorState state = new NonInitializedIntegratorState();
 
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
-	// transient because it's not serializable (and state doesn't need to live longer than a flush).
-	// final because its initialization should be published to other threads.
-	// ! update the readObject() method in case of name changes !
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
-	private final transient Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
+	private final Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
@@ -275,23 +266,6 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 			id = entityEntry == null ? null : entityEntry.getId();
 		}
 		return id;
-	}
-
-	private void writeObject(ObjectOutputStream os) throws IOException {
-		os.defaultWriteObject();
-	}
-
-	//needs to implement custom readObject to restore the transient fields
-
-	private void readObject(ObjectInputStream is)
-			throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
-		is.defaultReadObject();
-		Class<FullTextIndexEventListener> cl = FullTextIndexEventListener.class;
-		Field f = cl.getDeclaredField( "flushSynch" );
-		ReflectionHelper.setAccessible( f );
-		Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
-		// setting a final field by reflection during a readObject is considered as safe as in a constructor:
-		f.set( this, flushSynch );
 	}
 
 	/**
