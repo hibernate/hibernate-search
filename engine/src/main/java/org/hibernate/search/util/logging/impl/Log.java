@@ -1027,4 +1027,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 340, value = "Multiple full-text filter definitions with the same name: '%1$s'." )
 	SearchException fullTextFilterDefinitionNamingConflict(String filterDefinitionName);
 
+	@Message(id = 341, value = "Multiple normalizer definitions with the same name: '%1$s'." )
+	SearchException normalizerDefinitionNamingConflict(String normalizerDefinitionName);
+
+	@Message(id = 342, value = "Field '%2$s' on entity '%1$s' refers to both an analyzer and a normalizer." )
+	SearchException cannotReferenceAnalyzerAndNormalizer(@FormatWith(ClassFormatter.class) Class<?> entityType, String relativeFieldPath);
+
 }

@@ -9,21 +9,11 @@ package org.hibernate.search.elasticsearch.settings.impl.model;
 import com.google.gson.annotations.JsonAdapter;
 
 /**
- * A definition of an Elasticsearch analyzer, to be included in index settings.
+ * A definition of an Elasticsearch normalizer, to be included in index settings.
  *
  * @author Yoann Rodiere
  */
-@JsonAdapter(AnalyzerDefinitionJsonAdapterFactory.class)
-public class AnalyzerDefinition extends AbstractCompositeAnalysisDefinition {
-
-	private String tokenizer;
-
-	public String getTokenizer() {
-		return tokenizer;
-	}
-
-	public void setTokenizer(String tokenizer) {
-		this.tokenizer = tokenizer;
-	}
+@JsonAdapter(NormalizerDefinitionJsonAdapterFactory.class)
+public class NormalizerDefinition extends AbstractCompositeAnalysisDefinition {
 
 }

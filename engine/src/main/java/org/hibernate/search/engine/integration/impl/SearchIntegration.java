@@ -8,6 +8,7 @@ package org.hibernate.search.engine.integration.impl;
 
 
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
+import org.hibernate.search.engine.impl.NormalizerRegistry;
 
 /**
  * Groups metadata relative to a specific integration (Lucene, Elasticsearch, ...).
@@ -17,6 +18,8 @@ import org.hibernate.search.engine.impl.AnalyzerRegistry;
 public interface SearchIntegration {
 
 	AnalyzerRegistry getAnalyzerRegistry();
+
+	NormalizerRegistry getNormalizerRegistry();
 
 	void close();
 

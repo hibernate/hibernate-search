@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryPopulator;
@@ -32,7 +34,7 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private final String name;
+	protected final String name;
 
 	private ElasticsearchAnalysisDefinitionRegistryPopulator definitionRegistryPopulator;
 
@@ -75,30 +77,29 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 		String tokenizerName = analyzerDefinition.getTokenizer();
 		TokenizerDefinition tokenizerDefinition = definitionRegistry.getTokenizerDefinition( tokenizerName );
 
-		Map<String, TokenFilterDefinition> tokenFilters = new TreeMap<>();
-		if ( analyzerDefinition.getTokenFilters() != null ) {
-			for ( String name : analyzerDefinition.getTokenFilters() ) {
-				TokenFilterDefinition definition = definitionRegistry.getTokenFilterDefinition( name );
-				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
-					tokenFilters.put( name, definition );
-				}
-			}
-		}
+		Map<String, TokenFilterDefinition> tokenFilters =
+				collectDefinitions( definitionRegistry::getTokenFilterDefinition, analyzerDefinition.getTokenFilters() );
 
-		Map<String, CharFilterDefinition> charFilters = new TreeMap<>();
-		if ( analyzerDefinition.getCharFilters() != null ) {
-			for ( String name : analyzerDefinition.getCharFilters() ) {
-				CharFilterDefinition definition = definitionRegistry.getCharFilterDefinition( name );
-				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
-					charFilters.put( name, definition );
-				}
-			}
-		}
+		Map<String, CharFilterDefinition> charFilters =
+				collectDefinitions( definitionRegistry::getCharFilterDefinition, analyzerDefinition.getCharFilters() );
 
 		return new SimpleElasticsearchAnalysisDefinitionRegistryPopulator(
 				name, analyzerDefinition,
 				tokenizerName, tokenizerDefinition,
 				charFilters, tokenFilters );
+	}
+
+	protected final <T> Map<String, T> collectDefinitions(Function<String, T> registry, Collection<String> names) {
+		Map<String, T> result = new TreeMap<>();
+		if ( names != null ) {
+			for ( String name : names ) {
+				T definition = registry.apply( name );
+				if ( definition != null ) { // Ignore missing definitions: they may be already available on the server
+					result.put( name, definition );
+				}
+			}
+		}
+		return result;
 	}
 
 	@Override

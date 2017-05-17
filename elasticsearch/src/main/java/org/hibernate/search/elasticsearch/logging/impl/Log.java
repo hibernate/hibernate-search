@@ -461,4 +461,19 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 85,
 			value = "Hibernate Search may not work correctly, because an unknown Elasticsearch version runs on the Elasticsearch cluster: '%s'." )
 	void unexpectedElasticsearchVersion(String name);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 86,
+			value = "The same normalizer name '%1$s' is assigned to multiple definitions. The analyzer names must be unique." )
+	SearchException normalizerNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 87,
+			value = "The same name '%1$s' is assigned to a normalizer definition and an analyzer definition."
+					+ " This is not possible on Elasticsearch 5.1 and below, since normalizers are translated to analyzers under the hood." )
+	SearchException analyzerNormalizerNamingConflict(String remoteName);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 88,
+			value = "You cannot use @Normalizer(impl = \"%1$s\") on entities mapped to Elasticsearch:"
+					+ " there are no built-in normalizers in Elasticsearch."
+					+ " Use @Normalizer(definition = \"...\") instead." )
+	SearchException cannotUseNormalizerImpl(@FormatWith(ClassFormatter.class) Class<?> analyzerType);
 }

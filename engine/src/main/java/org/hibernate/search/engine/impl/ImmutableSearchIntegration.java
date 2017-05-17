@@ -15,14 +15,23 @@ public class ImmutableSearchIntegration implements SearchIntegration {
 
 	private final AnalyzerRegistry analyzerRegistry;
 
-	public ImmutableSearchIntegration(AnalyzerRegistry analyzerRegistry) {
+	private final NormalizerRegistry normalizerRegistry;
+
+	public ImmutableSearchIntegration(AnalyzerRegistry analyzerRegistry,
+			NormalizerRegistry normalizerRegistry) {
 		super();
 		this.analyzerRegistry = new ImmutableAnalyzerRegistry( analyzerRegistry );
+		this.normalizerRegistry = new ImmutableNormalizerRegistry( normalizerRegistry );
 	}
 
 	@Override
 	public AnalyzerRegistry getAnalyzerRegistry() {
 		return analyzerRegistry;
+	}
+
+	@Override
+	public NormalizerRegistry getNormalizerRegistry() {
+		return normalizerRegistry;
 	}
 
 	@Override

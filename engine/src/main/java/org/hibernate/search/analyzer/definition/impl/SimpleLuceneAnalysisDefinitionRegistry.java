@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -28,11 +29,15 @@ public class SimpleLuceneAnalysisDefinitionRegistry implements LuceneAnalysisDef
 
 	private final Map<String, AnalyzerDef> analyzerDefinitions = new TreeMap<>();
 
+	private final Map<String, NormalizerDef> normalizerDefinitions = new TreeMap<>();
+
 	public SimpleLuceneAnalysisDefinitionRegistry() {
 	}
 
-	public SimpleLuceneAnalysisDefinitionRegistry(Map<String, AnalyzerDef> analyzerDefinitions) {
+	public SimpleLuceneAnalysisDefinitionRegistry(Map<String, AnalyzerDef> analyzerDefinitions,
+			Map<String, NormalizerDef> normalizerDefinitions) {
 		this.analyzerDefinitions.putAll( analyzerDefinitions );
+		this.normalizerDefinitions.putAll( normalizerDefinitions );
 	}
 
 	@Override
@@ -44,13 +49,29 @@ public class SimpleLuceneAnalysisDefinitionRegistry implements LuceneAnalysisDef
 	}
 
 	@Override
+	public void register(String name, NormalizerDef definition) {
+		NormalizerDef previous = normalizerDefinitions.putIfAbsent( name, definition );
+		if ( previous != null && previous != definition ) {
+			throw log.normalizerDefinitionNamingConflict( name );
+		}
+	}
+
+	@Override
 	public AnalyzerDef getAnalyzerDefinition(String name) {
 		return analyzerDefinitions.get( name );
 	}
 
+	@Override
+	public NormalizerDef getNormalizerDefinition(String name) {
+		return normalizerDefinitions.get( name );
+	}
 
 	public Map<String, AnalyzerDef> getAnalyzerDefinitions() {
 		return Collections.unmodifiableMap( analyzerDefinitions );
+	}
+
+	public Map<String, NormalizerDef> getNormalizerDefinitions() {
+		return Collections.unmodifiableMap( normalizerDefinitions );
 	}
 
 }

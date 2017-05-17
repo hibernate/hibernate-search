@@ -51,6 +51,8 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.NormalizerDefs;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
@@ -635,6 +637,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void initializePackageLevelAnnotations(XPackage xPackage, ConfigContext configContext) {
 		if ( xPackage != null ) {
 			checkForAnalyzerDefs( xPackage, configContext );
+			checkForNormalizerDefs( xPackage, configContext );
 			checkForFullTextFilterDefs( xPackage, configContext );
 		}
 	}
@@ -664,10 +667,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			}
 		}
 
-		// check for AnalyzerDefs annotations
 		checkForAnalyzerDefs( clazz, configContext );
-
-		// check for FullTextFilterDefs annotations
+		checkForNormalizerDefs( clazz, configContext );
 		checkForFullTextFilterDefs( clazz, configContext );
 
 		// Check for any ClassBridges annotation.
@@ -769,7 +770,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		if ( !parseContext.skipAnalyzers() ) {
 			AnalyzerReference analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
+					typeMetadataBuilder.getIndexedType(), fieldPath,
 					classBridgeAnnotation.analyzer(),
+					classBridgeAnnotation.normalizer(),
 					configContext,
 					parseContext.getIndexManagerType() );
 			typeMetadataBuilder.addToScopedAnalyzerReference( fieldPath, analyzerReference, index );
@@ -1040,6 +1043,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		checkForSortableField( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, false, pathsContext, parseContext );
 		checkForSortableFields( member, typeMetadataBuilder, propertyMetadataBuilder, prefix, false, pathsContext, parseContext );
 		checkForAnalyzerDefs( member, configContext );
+		checkForNormalizerDefs( member, configContext );
 		checkForAnalyzerDiscriminator( member, typeMetadataBuilder, configContext );
 		checkForIndexedEmbedded(
 				member,
@@ -1316,7 +1320,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			analyzerReference = null;
 		}
 		else {
-			analyzerReference = determineAnalyzer( fieldAnnotation, member, configContext, parseContext );
+			analyzerReference = determineAnalyzer(
+					typeMetadataBuilder, fieldPath,
+					fieldAnnotation, member, configContext, parseContext );
 			// adjust the type analyzer
 			analyzerReference = typeMetadataBuilder.addToScopedAnalyzerReference(
 					fieldPath,
@@ -1519,17 +1525,21 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
-	private AnalyzerReference determineAnalyzer(org.hibernate.search.annotations.Field fieldAnnotation,
+	private AnalyzerReference determineAnalyzer(
+			TypeMetadata.Builder typeMetadataBuilder, DocumentFieldPath fieldPath,
+			org.hibernate.search.annotations.Field fieldAnnotation,
 			XProperty member,
 			ConfigContext context,
 			ParseContext parseContext) {
 		AnalyzerReference analyzerReference = null;
 
 		if ( !parseContext.skipAnalyzers() ) {
-			// check for a nested @Analyzer annotation with @Field
+			// check for a nested @Analyzer/@Normalizer annotation with @Field
 			if ( fieldAnnotation != null ) {
 				analyzerReference = AnnotationProcessingHelper.getAnalyzerReference(
+						typeMetadataBuilder.getIndexedType(), fieldPath,
 						fieldAnnotation.analyzer(),
+						fieldAnnotation.normalizer(),
 						context,
 						parseContext.getIndexManagerType() );
 			}
@@ -1677,6 +1687,21 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			}
 		}
 		AnalyzerDef def = annotatedElement.getAnnotation( AnalyzerDef.class );
+		if ( def != null ) {
+			registry.registerFromAnnotation( def.name(), def, annotatedElement );
+		}
+	}
+
+	private void checkForNormalizerDefs(XAnnotatedElement annotatedElement, ConfigContext context) {
+		MappingDefinitionRegistry<NormalizerDef, ?> registry = context.getNormalizerDefinitionRegistry();
+
+		NormalizerDefs defs = annotatedElement.getAnnotation( NormalizerDefs.class );
+		if ( defs != null ) {
+			for ( NormalizerDef def : defs.value() ) {
+				registry.registerFromAnnotation( def.name(), def, annotatedElement );
+			}
+		}
+		NormalizerDef def = annotatedElement.getAnnotation( NormalizerDef.class );
 		if ( def != null ) {
 			registry.registerFromAnnotation( def.name(), def, annotatedElement );
 		}

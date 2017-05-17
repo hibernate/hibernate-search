@@ -7,6 +7,7 @@
 package org.hibernate.search.analyzer.definition.impl;
 
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.NormalizerDef;
 
 /**
  * An {@link LuceneAnalysisDefinitionRegistry} that delegate calls
@@ -33,10 +34,24 @@ public final class ChainingLuceneAnalysisDefinitionRegistry implements LuceneAna
 	}
 
 	@Override
+	public void register(String name, NormalizerDef definition) {
+		self.register( name, definition );
+	}
+
+	@Override
 	public AnalyzerDef getAnalyzerDefinition(String name) {
 		AnalyzerDef result = self.getAnalyzerDefinition( name );
 		if ( result == null ) {
 			result = parent.getAnalyzerDefinition( name );
+		}
+		return result;
+	}
+
+	@Override
+	public NormalizerDef getNormalizerDefinition(String name) {
+		NormalizerDef result = self.getNormalizerDefinition( name );
+		if ( result == null ) {
+			result = parent.getNormalizerDefinition( name );
 		}
 		return result;
 	}

@@ -17,7 +17,6 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference.Builder;
-import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.util.impl.Closeables;
 
 /**
@@ -124,18 +123,13 @@ public class MutableAnalyzerRegistry implements AnalyzerRegistry {
 		Closeables.closeQuietly( getAllReferences() );
 	}
 
-	public void initialize(Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
-		List<AnalyzerReference> references = getAllReferences();
-		strategy.initializeAnalyzerReferences( references, mappingAnalyzerDefinitions );
-	}
-
 	public ScopedAnalyzerReference.Builder buildScopedAnalyzerReference() {
 		return new ScopedAnalyzerReferenceBuilderRegisteringWrapper(
 				strategy.buildScopedAnalyzerReference( getDefaultAnalyzerReference() )
 				);
 	}
 
-	private List<AnalyzerReference> getAllReferences() {
+	public List<AnalyzerReference> getAllReferences() {
 		List<AnalyzerReference> references = new ArrayList<>();
 		references.add( defaultReference );
 		references.add( passThroughReference );

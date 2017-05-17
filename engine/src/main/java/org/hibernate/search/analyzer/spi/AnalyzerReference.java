@@ -10,6 +10,9 @@ import java.io.Closeable;
 
 /**
  * Reference to an analyzer implementation.
+ * <p>
+ * Note that the implementation can be a normalizer
+ * (a normalizer is a specific sort of analyzer).
  *
  * @author Davide D'Alto
  * @hsearch.experimental This type is under active development as part of the Elasticsearch integration. You should be
@@ -39,4 +42,5 @@ public interface AnalyzerReference extends Closeable {
 	 */
 	@Override
 	void close();
+
 }

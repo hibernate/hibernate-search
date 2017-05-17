@@ -10,9 +10,8 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -26,6 +25,7 @@ import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSour
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -150,16 +150,8 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public LuceneAnalyzerReference createLuceneClassAnalyzerReference(Class<?> analyzerClass) {
-		try {
-			Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
-			return new SimpleLuceneAnalyzerReference( analyzer );
-		}
-		catch (ClassCastException e) {
-			throw new SearchException( "Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(), e );
-		}
-		catch (Exception e) {
-			throw new SearchException( "Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e );
-		}
+		Analyzer analyzer = createAnalyzerInstance( analyzerClass );
+		return new SimpleLuceneAnalyzerReference( analyzer );
 	}
 
 	@Override
@@ -168,23 +160,35 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	@Override
-	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references,
-			Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
-		LuceneAnalysisDefinitionRegistry definitionRegistry = createAnalyzerDefinitionRegistry( mappingAnalyzerDefinitions );
+	public Map<String, AnalyzerReference> createProvidedNormalizerReferences() {
+		Map<String, AnalyzerReference> references = new HashMap<>();
+		for ( String defaultAnalyzerName : defaultDefinitionRegistry.getNormalizerDefinitions().keySet() ) {
+			NamedLuceneAnalyzerReference reference = createNamedNormalizerReference( defaultAnalyzerName );
+			references.put( defaultAnalyzerName, reference );
+		}
+		return references;
+	}
+
+	@Override
+	public LuceneAnalyzerReference createLuceneClassNormalizerReference(Class<?> analyzerClass) {
+		Analyzer analyzer = createAnalyzerInstance( analyzerClass );
+		return new SimpleLuceneNormalizerReference( analyzer );
+	}
+
+	@Override
+	public NamedLuceneAnalyzerReference createNamedNormalizerReference(String name) {
+		return new NamedLuceneNormalizerReference( name );
+	}
+
+	@Override
+	public void initializeReferences(Collection<AnalyzerReference> analyzerReferences, Map<String, AnalyzerDef> mappingAnalyzerDefinitions,
+			Collection<AnalyzerReference> normalizerReferences, Map<String, NormalizerDef> mappingNormalizerDefinitions) {
+		LuceneAnalysisDefinitionRegistry definitionRegistry = createAnalyzerDefinitionRegistry( mappingAnalyzerDefinitions, mappingNormalizerDefinitions );
 
 		LuceneAnalyzerBuilder builder = new LuceneAnalyzerBuilder( luceneMatchVersion, serviceManager, definitionRegistry );
 
-		Set<String> existingNamedReferences = new HashSet<>();
-
-		for ( AnalyzerReference reference : references ) {
-			if ( reference.is( NamedLuceneAnalyzerReference.class ) ) {
-				NamedLuceneAnalyzerReference namedReference = reference.unwrap( NamedLuceneAnalyzerReference.class );
-				if ( !namedReference.isInitialized() ) {
-					namedReference.initialize( builder );
-				}
-				existingNamedReferences.add( namedReference.getAnalyzerName() );
-			}
-		}
+		Stream.concat( analyzerReferences.stream(), normalizerReferences.stream() )
+				.forEach( r -> initializeReference( r, definitionRegistry, builder ) );
 	}
 
 	@Override
@@ -194,8 +198,10 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 				Collections.<String, LuceneAnalyzerReference>emptyMap() );
 	}
 
-	private LuceneAnalysisDefinitionRegistry createAnalyzerDefinitionRegistry(Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
-		LuceneAnalysisDefinitionRegistry mappingDefinitionRegistry = new SimpleLuceneAnalysisDefinitionRegistry( mappingAnalyzerDefinitions );
+	private LuceneAnalysisDefinitionRegistry createAnalyzerDefinitionRegistry(Map<String, AnalyzerDef> mappingAnalyzerDefinitions,
+			Map<String, NormalizerDef> mappingNormalizerDefinitions) {
+		LuceneAnalysisDefinitionRegistry mappingDefinitionRegistry =
+				new SimpleLuceneAnalysisDefinitionRegistry( mappingAnalyzerDefinitions, mappingNormalizerDefinitions );
 
 		/*
 		 * Make default definitions accessible in the final definition registry.
@@ -217,5 +223,27 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 				new ChainingLuceneAnalysisDefinitionRegistry( mappingDefinitionRegistry, defaultDefinitionRegistry );
 
 		return definitionRegistry;
+	}
+
+	private void initializeReference(AnalyzerReference reference, LuceneAnalysisDefinitionRegistry definitionRegistry,
+			LuceneAnalyzerBuilder builder) {
+		if ( reference.is( NamedLuceneAnalyzerReference.class ) ) {
+			NamedLuceneAnalyzerReference namedReference = reference.unwrap( NamedLuceneAnalyzerReference.class );
+			if ( !namedReference.isInitialized() ) {
+				namedReference.initialize( builder );
+			}
+		}
+	}
+
+	private Analyzer createAnalyzerInstance(Class<?> analyzerClass) {
+		try {
+			return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
+		}
+		catch (ClassCastException e) {
+			throw new SearchException( "Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(), e );
+		}
+		catch (Exception e) {
+			throw new SearchException( "Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e );
+		}
 	}
 }
