@@ -18,7 +18,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
+import org.hibernate.search.analyzer.definition.impl.ChainingLuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.analyzer.definition.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.analyzer.definition.impl.LuceneAnalyzerDefinitionRegistryBuilderImpl;
+import org.hibernate.search.analyzer.definition.impl.SimpleLuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
@@ -48,7 +51,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 
 	private final Version luceneMatchVersion;
 
-	private final Map<String, AnalyzerDef> defaultAnalyzerDefinitions;
+	private final SimpleLuceneAnalysisDefinitionRegistry defaultDefinitionRegistry;
 
 	public LuceneEmbeddedAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		this.serviceManager = serviceManager;
@@ -59,7 +62,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		 * so that the definition providers can add new definitions between two SearchFactory increments.
 		 * Caching those in a Service, for instance, would prevent that.
 		 */
-		this.defaultAnalyzerDefinitions = createDefaultAnalyzerDefinitions( cfg );
+		this.defaultDefinitionRegistry = createDefaultDefinitionRegistry( cfg );
 	}
 
 	private Version getLuceneMatchVersion(SearchConfiguration cfg) {
@@ -86,7 +89,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		return version;
 	}
 
-	private Map<String, AnalyzerDef> createDefaultAnalyzerDefinitions(SearchConfiguration cfg) {
+	private SimpleLuceneAnalysisDefinitionRegistry createDefaultDefinitionRegistry(SearchConfiguration cfg) {
 		final LuceneAnalyzerDefinitionProvider definitionsProvider = getLuceneAnalyzerDefinitionProvider();
 		LuceneAnalyzerDefinitionRegistryBuilderImpl builder = new LuceneAnalyzerDefinitionRegistryBuilderImpl();
 		if ( definitionsProvider != null ) {
@@ -138,7 +141,7 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	@Override
 	public Map<String, AnalyzerReference> createProvidedAnalyzerReferences() {
 		Map<String, AnalyzerReference> references = new HashMap<>();
-		for ( String defaultAnalyzerName : defaultAnalyzerDefinitions.keySet() ) {
+		for ( String defaultAnalyzerName : defaultDefinitionRegistry.getAnalyzerDefinitions().keySet() ) {
 			NamedLuceneAnalyzerReference reference = createNamedAnalyzerReference( defaultAnalyzerName );
 			references.put( defaultAnalyzerName, reference );
 		}
@@ -167,19 +170,9 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	@Override
 	public void initializeAnalyzerReferences(Collection<AnalyzerReference> references,
 			Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
-		/*
-		 * Note that the default definitions may be different
-		 * each time a new instance of this strategy is created,
-		 * i.e. each time the SearchFactory is "incremented".
-		 * Changes to pre-existing default definitions don't matter if the definitions weren't used,
-		 * and are harmless if they were already used
-		 * (because in that case the reference is already initialized,
-		 * so the new version of the definition will be ignored).
-		 */
-		Map<String, AnalyzerDef> analyzerDefinitions = new HashMap<>( defaultAnalyzerDefinitions );
-		analyzerDefinitions.putAll( mappingAnalyzerDefinitions );
+		LuceneAnalysisDefinitionRegistry definitionRegistry = createAnalyzerDefinitionRegistry( mappingAnalyzerDefinitions );
 
-		LuceneAnalyzerBuilder builder = new LuceneAnalyzerBuilder( luceneMatchVersion, serviceManager, analyzerDefinitions );
+		LuceneAnalyzerBuilder builder = new LuceneAnalyzerBuilder( luceneMatchVersion, serviceManager, definitionRegistry );
 
 		Set<String> existingNamedReferences = new HashSet<>();
 
@@ -205,5 +198,30 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		return new ScopedLuceneAnalyzerReference.DeferredInitializationBuilder(
 				initialGlobalAnalyzerReference.unwrap( LuceneAnalyzerReference.class ),
 				Collections.<String, LuceneAnalyzerReference>emptyMap() );
+	}
+
+	private LuceneAnalysisDefinitionRegistry createAnalyzerDefinitionRegistry(Map<String, AnalyzerDef> mappingAnalyzerDefinitions) {
+		LuceneAnalysisDefinitionRegistry mappingDefinitionRegistry = new SimpleLuceneAnalysisDefinitionRegistry( mappingAnalyzerDefinitions );
+
+		/*
+		 * Make default definitions accessible in the final definition registry.
+		 * This final registry has two scopes:
+		 *  - the "local" scope, which contains every definitions from the mapping (see above);
+		 *  - the "default"/"global" scope, which contains definitions from the default registry.
+		 *
+		 * When fetching definitions, the "local" scope takes precedence over the "default"/"global" scope.
+		 *
+		 * Note that the default definitions may be different
+		 * each time a new instance of this strategy is created,
+		 * i.e. each time the SearchFactory is "incremented".
+		 * Changes to pre-existing default definitions don't matter if the definitions weren't used,
+		 * and are harmless if they were already used
+		 * (because in that case the reference is already initialized,
+		 * so the new version of the definition will be ignored).
+		 */
+		LuceneAnalysisDefinitionRegistry definitionRegistry =
+				new ChainingLuceneAnalysisDefinitionRegistry( mappingDefinitionRegistry, defaultDefinitionRegistry );
+
+		return definitionRegistry;
 	}
 }

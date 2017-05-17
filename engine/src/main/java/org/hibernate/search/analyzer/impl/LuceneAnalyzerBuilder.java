@@ -16,6 +16,7 @@ import org.apache.lucene.util.Version;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.hibernate.search.analyzer.definition.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
@@ -43,14 +44,14 @@ final class LuceneAnalyzerBuilder {
 
 	private final ResourceLoader resourceLoader;
 
-	private final Map<String, AnalyzerDef> analyzerDefinitions;
+	private final LuceneAnalysisDefinitionRegistry definitionRegistry;
 
 	public LuceneAnalyzerBuilder(Version luceneMatchVersion, ServiceManager serviceManager,
-			Map<String, AnalyzerDef> analyzerDefinitions) {
+			LuceneAnalysisDefinitionRegistry definitionRegistry) {
 		super();
 		this.luceneMatchVersion = luceneMatchVersion;
 		this.resourceLoader = new HibernateSearchResourceLoader( serviceManager );
-		this.analyzerDefinitions = analyzerDefinitions;
+		this.definitionRegistry = definitionRegistry;
 	}
 
 	/**
@@ -61,7 +62,7 @@ final class LuceneAnalyzerBuilder {
 	 * @return a Lucene {@code Analyzer}
 	 */
 	public Analyzer buildAnalyzer(String name) {
-		AnalyzerDef analyzerDefinition = analyzerDefinitions.get( name );
+		AnalyzerDef analyzerDefinition = definitionRegistry.getAnalyzerDefinition( name );
 		if ( analyzerDefinition == null ) {
 			throw new SearchException( "Lucene analyzer found with an unknown definition: " + name );
 		}

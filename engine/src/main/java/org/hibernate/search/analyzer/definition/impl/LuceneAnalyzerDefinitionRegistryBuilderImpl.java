@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionRegistryBuilder;
-import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -35,12 +34,12 @@ public class LuceneAnalyzerDefinitionRegistryBuilderImpl implements LuceneAnalyz
 		return definition;
 	}
 
-	public Map<String, AnalyzerDef> build() {
-		Map<String, AnalyzerDef> result = new LinkedHashMap<>();
+	public SimpleLuceneAnalysisDefinitionRegistry build() {
+		SimpleLuceneAnalysisDefinitionRegistry registry = new SimpleLuceneAnalysisDefinitionRegistry();
 		for ( Map.Entry<String, LuceneAnalyzerDefinitionContextImpl> entry : definitions.entrySet() ) {
-			result.put( entry.getKey(), entry.getValue().build() );
+			registry.register( entry.getKey(), entry.getValue().build() );
 		}
-		return result;
+		return registry;
 	}
 
 }
