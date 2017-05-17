@@ -54,7 +54,7 @@ public class DoubleAnalyzerTest extends SearchTestBase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "id", TestConstants.keywordAnalyzer );
 		{
 			Query luceneQuery = new MatchAllDocsQuery();
 			FullTextQuery query = s.createFullTextQuery( luceneQuery );
@@ -77,6 +77,11 @@ public class DoubleAnalyzerTest extends SearchTestBase {
 		}
 		{
 			Query luceneQuery = parser.parse( "description_analyzer3:music" );
+			FullTextQuery query = s.createFullTextQuery( luceneQuery, AlarmEntity.class );
+			assertEquals( 1, query.getResultSize() );
+		}
+		{
+			Query luceneQuery = parser.parse( "description_normalizer1:symphony" );
 			FullTextQuery query = s.createFullTextQuery( luceneQuery, AlarmEntity.class );
 			assertEquals( 1, query.getResultSize() );
 		}

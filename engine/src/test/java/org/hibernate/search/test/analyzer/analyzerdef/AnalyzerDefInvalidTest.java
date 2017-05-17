@@ -7,12 +7,16 @@
 package org.hibernate.search.test.analyzer.analyzerdef;
 
 import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
+import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Normalizer;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
@@ -34,12 +38,22 @@ public class AnalyzerDefInvalidTest {
 	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
-	public void shouldNotBePossibleToHaveTwoAnalyzerDefsWithTheSameName() throws Exception {
+	public void shouldNotBePossibleToHaveTwoAnalyzerParametersWithTheSameName() throws Exception {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Conflicting usage of @Parameter annotation for parameter name: 'maxGramSize'. Can't assign both value '15' and '1'" );
 
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
-		cfg.addClass( Sample.class );
+		cfg.addClass( SampleWithAnalyzer.class );
+		integratorResource.create( cfg );
+	}
+
+	@Test
+	public void shouldNotBePossibleToHaveTwoNormalizerParametersWithTheSameName() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Conflicting usage of @Parameter annotation for parameter name: 'pattern'. Can't assign both value '[[:digit:]]' and '[[:digit:]]+'" );
+
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.addClass( SampleWithNormalizer.class );
 		integratorResource.create( cfg );
 	}
 
@@ -50,12 +64,29 @@ public class AnalyzerDefInvalidTest {
 					@Parameter(name = "maxGramSize", value = "15") // Illegal: mentioned the same Parameter name again
 			})
 	})
-	static class Sample {
+	static class SampleWithAnalyzer {
 
 		@DocumentId
 		long id;
 
 		@Field(analyzer = @Analyzer(definition = "ngram"))
+		String description;
+	}
+
+	@Indexed
+	@NormalizerDef(name = "ngram", charFilters = {
+			@CharFilterDef(factory = PatternReplaceCharFilterFactory.class, params = {
+					@Parameter(name = "pattern", value = "[[:digit:]]+"),
+					@Parameter(name = "pattern", value = "[[:digit:]]"), // Illegal: mentioned the same Parameter name again
+					@Parameter(name = "replacement", value = "0")
+			})
+	})
+	static class SampleWithNormalizer {
+
+		@DocumentId
+		long id;
+
+		@Field(normalizer = @Normalizer(definition = "ngram"))
 		String description;
 	}
 }

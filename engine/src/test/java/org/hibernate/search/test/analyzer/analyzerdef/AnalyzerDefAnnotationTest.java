@@ -10,6 +10,7 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.Map;
 
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
@@ -17,8 +18,11 @@ import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
+import org.hibernate.search.engine.impl.NormalizerRegistry;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.exception.SearchException;
@@ -53,11 +57,13 @@ public class AnalyzerDefAnnotationTest {
 	@Test
 	public void shouldBePossibleToAnnotatePackage() throws Exception {
 		assertAnalyzerExists( "package-analyzer" );
+		assertNormalizerExists( "package-normalizer" );
 	}
 
 	@Test
 	public void shouldBePossibleToAnnotateClass() throws Exception {
 		assertAnalyzerExists( "class-analyzer" );
+		assertNormalizerExists( "class-normalizer" );
 	}
 
 	@Test
@@ -68,6 +74,9 @@ public class AnalyzerDefAnnotationTest {
 		Map<String, AnalyzerReference> analyzerReferences =
 				factory.getIntegration( indexManagerType ).getAnalyzerRegistry().getNamedAnalyzerReferences();
 		assertThat( analyzerReferences.keySet() ).containsOnly( "package-analyzer", "class-analyzer" );
+		Map<String, AnalyzerReference> normalizerReferences =
+				factory.getIntegration( indexManagerType ).getNormalizerRegistry().getNamedNormalizerReferences();
+		assertThat( normalizerReferences.keySet() ).containsOnly( "package-normalizer", "class-normalizer" );
 	}
 
 	@Test
@@ -75,7 +84,16 @@ public class AnalyzerDefAnnotationTest {
 		thrown.expect( SearchException.class );
 
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
-		cfg.addClass( SampleWithError.class );
+		cfg.addClass( SampleWithAnalyzerError.class );
+		integratorResource.create( cfg );
+	}
+
+	@Test
+	public void shouldNotBePossibleToHaveTwoNormalizerDefsWithTheSameName() throws Exception {
+		thrown.expect( SearchException.class );
+
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.addClass( SampleWithNormalizerError.class );
 		integratorResource.create( cfg );
 	}
 
@@ -93,10 +111,28 @@ public class AnalyzerDefAnnotationTest {
 		Assert.fail( "Analyzer does not exist: " + analyzerName );
 	}
 
+	private void assertNormalizerExists(String normalizerName) {
+		for ( SearchIntegration integration : sfHolder.getSearchFactory().getIntegrations().values() ) {
+			NormalizerRegistry registry = integration.getNormalizerRegistry();
+			AnalyzerReference normalizerReference = registry.getNamedNormalizerReference( normalizerName );
+			if ( normalizerReference != null ) {
+				if ( normalizerReference.is( LuceneAnalyzerReference.class ) ) {
+					assertThat( normalizerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer() ).isNotNull();
+				}
+				return;
+			}
+		}
+		Assert.fail( "Normalizer does not exist: " + normalizerName );
+	}
+
 	@Indexed
 	@AnalyzerDef(
 			name = "class-analyzer",
 			tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class)
+	)
+	@NormalizerDef(
+			name = "class-normalizer",
+			filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class)
 	)
 	static class Sample {
 
@@ -112,7 +148,21 @@ public class AnalyzerDefAnnotationTest {
 			name = "package-analyzer",
 			tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class)
 	)
-	static class SampleWithError {
+	static class SampleWithAnalyzerError {
+
+		@DocumentId
+		final long id = 1;
+
+		@Field
+		final String description = "";
+	}
+
+	@Indexed
+	@NormalizerDef(
+			name = "package-normalizer",
+			filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class)
+	)
+	static class SampleWithNormalizerError {
 
 		@DocumentId
 		final long id = 1;
