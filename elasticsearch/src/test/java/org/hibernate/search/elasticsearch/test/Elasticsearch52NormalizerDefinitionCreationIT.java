@@ -33,7 +33,7 @@ import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
-import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch52;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
@@ -47,13 +47,11 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * Tests for {@link ElasticsearchIndexManager}'s normalizer definition creation feature.
  *
- * Note: normalizers are implemented as analyzers.
- *
  * @author Yoann Rodiere
  */
 @RunWith(Parameterized.class)
-@Category(SkipFromElasticsearch52.class)
-public class ElasticsearchNormalizerDefinitionCreationIT extends SearchInitializationTestBase {
+@Category(SkipBelowElasticsearch52.class)
+public class Elasticsearch52NormalizerDefinitionCreationIT extends SearchInitializationTestBase {
 
 	@Parameters(name = "With strategy {0}")
 	public static EnumSet<IndexSchemaManagementStrategy> strategies() {
@@ -71,7 +69,7 @@ public class ElasticsearchNormalizerDefinitionCreationIT extends SearchInitializ
 
 	private final IndexSchemaManagementStrategy strategy;
 
-	public ElasticsearchNormalizerDefinitionCreationIT(IndexSchemaManagementStrategy strategy) {
+	public Elasticsearch52NormalizerDefinitionCreationIT(IndexSchemaManagementStrategy strategy) {
 		super();
 		this.strategy = strategy;
 	}
@@ -95,24 +93,20 @@ public class ElasticsearchNormalizerDefinitionCreationIT extends SearchInitializ
 
 		assertJsonEquals(
 				"{"
-					+ "'analyzer': {"
+					+ "'normalizer': {"
 							+ "'normalizerWithSimpleComponents': {"
-									+ "'tokenizer': 'keyword',"
 									+ "'filter': ['lowercase']"
 							+ "},"
 							+ "'normalizerWithComplexComponents': {"
 									+ "'char_filter': ['normalizerWithComplexComponents_MappingCharFilterFactory'],"
-									+ "'tokenizer': 'keyword',"
 									+ "'filter': ['normalizerWithComplexComponents_ElisionFilterFactory']"
 							+ "},"
 							+ "'normalizerWithNamedComponents': {"
 									+ "'char_filter': ['custom-char-mapping'],"
-									+ "'tokenizer': 'keyword',"
 									+ "'filter': ['custom-elision']"
 							+ "},"
 							+ "'normalizerWithElasticsearchFactories': {"
 									+ "'char_filter': ['custom-char-mapping-esFactory'],"
-									+ "'tokenizer': 'keyword',"
 									+ "'filter': ['custom-elision-esFactory']"
 							+ "}"
 					+ "},"
