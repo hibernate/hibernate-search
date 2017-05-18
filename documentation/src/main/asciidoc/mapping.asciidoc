@@ -1135,11 +1135,11 @@ public class Team {
 
 The other way to define analyzers is programmatically.
 You can of course use the <<hsearch-mapping-programmaticapi,programmatic mapping API>> to do so,
-but an easier way may be to use the `hibernate.search.lucene.analyzer_definition_provider`
+but an easier way may be to use the `hibernate.search.lucene.analysis_definition_provider`
 configuration property.
 
 This property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
-This class must either implement `org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider` directly
+This class must either implement `org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider` directly
 or expose a `@Factory`-annotated method that returns such implementation.
 
 [IMPORTANT]
@@ -1149,11 +1149,11 @@ The builder in particular could be altered in the future.
 ====
 
 [[example-programmatic-analyzer-def]]
-.Analyzer definition using a LuceneAnalyzerDefinitionProvider
+.Analyzer definition using a LuceneAnalysisDefinitionProvider
 ====
 [source, JAVA]
 ----
-public static class CustomAnalyzerProvider implements LuceneAnalyzerDefinitionProvider {
+public static class CustomAnalyzerProvider implements LuceneAnalysisDefinitionProvider {
     @Override
     public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
         builder

@@ -60,7 +60,7 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		ElasticsearchAnalysisDefinitionRegistryBuilderImpl builder =
 				new ElasticsearchAnalysisDefinitionRegistryBuilderImpl();
 
-		String providerClassName = cfg.getProperty( ElasticsearchEnvironment.ANALYZER_DEFINITION_PROVIDER );
+		String providerClassName = cfg.getProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER );
 		if ( providerClassName != null ) {
 			ElasticsearchAnalysisDefinitionProvider provider;
 			try {

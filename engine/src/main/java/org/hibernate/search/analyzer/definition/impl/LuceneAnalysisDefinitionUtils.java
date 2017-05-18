@@ -12,9 +12,9 @@ import java.util.function.IntFunction;
 /**
  * @author Yoann Rodiere
  */
-public final class LuceneAnalyzerDefinitionUtils {
+public final class LuceneAnalysisDefinitionUtils {
 
-	private LuceneAnalyzerDefinitionUtils() {
+	private LuceneAnalysisDefinitionUtils() {
 		// Cannot be instantiated.
 	}
 

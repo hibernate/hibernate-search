@@ -986,7 +986,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 328, value = "Cannot create context for class: %1$s" )
 	SearchException cannotCreateBridgeDefinedField(@FormatWith(ClassFormatter.class) Class<?> backend, @Cause Exception e);
 
-	@Message(id = 329, value = "Property '" + Environment.ANALYZER_DEFINITION_PROVIDER + "' set to value '%1$s' is invalid."
+	@Message(id = 329, value = "Property '" + Environment.ANALYSIS_DEFINITION_PROVIDER + "' set to value '%1$s' is invalid."
 			+ " The value must be the fully-qualified name of a class with a public, no-arg constructor in your classpath."
 			+ " Also, the class must either implement LuceneAnalyzerDefinitionProvider or expose a public,"
 			+ " @Factory-annotated method returning a LuceneAnalyzerDefinitionProvider.")

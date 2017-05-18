@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.analyzer.definition;
 
-import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
+import org.hibernate.search.analyzer.definition.spi.LuceneAnalysisDefinitionSourceService;
 import org.hibernate.search.cfg.Environment;
 
 /**
- * A provider of analyzer definitions that can be referenced from the mapping,
- * e.g. with {@literal @Analyzer(definition = "some-name")}.
+ * A provider of analysis-related definitions that can be referenced from the mapping,
+ * e.g. with {@literal @Analyzer(definition = "some-name")}
+ * or {@literal @Normalizer(definition = "some-other-name")}.
  * <p>
  * Users can select a definition provider through the
- * {@link Environment#ANALYZER_DEFINITION_PROVIDER configuration properties}, while
+ * {@link Environment#ANALYSIS_DEFINITION_PROVIDER configuration properties}, while
  * framework integrators also have the option to inject an alternative implementation
- * of a {@link LuceneAnalyzerDefinitionSourceService}.
+ * of a {@link LuceneAnalysisDefinitionSourceService}.
  *
  * @author Yoann Rodiere
  *
@@ -24,8 +25,8 @@ import org.hibernate.search.cfg.Environment;
  * Please let us know what you like and what you don't like, and bear in mind
  * that this will likely change in any future version.
  */
-public interface LuceneAnalyzerDefinitionProvider {
+public interface LuceneAnalysisDefinitionProvider {
 
-	void register(LuceneAnalyzerDefinitionRegistryBuilder builder);
+	void register(LuceneAnalysisDefinitionRegistryBuilder builder);
 
 }

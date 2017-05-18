@@ -16,12 +16,12 @@ import java.util.stream.Stream;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
 import org.hibernate.search.analyzer.definition.impl.ChainingLuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.analyzer.definition.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.analyzer.definition.impl.LuceneAnalyzerDefinitionRegistryBuilderImpl;
+import org.hibernate.search.analyzer.definition.impl.LuceneAnalysisDefinitionRegistryBuilderImpl;
 import org.hibernate.search.analyzer.definition.impl.SimpleLuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
+import org.hibernate.search.analyzer.definition.spi.LuceneAnalysisDefinitionSourceService;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -90,8 +90,8 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 	}
 
 	private SimpleLuceneAnalysisDefinitionRegistry createDefaultDefinitionRegistry(SearchConfiguration cfg) {
-		final LuceneAnalyzerDefinitionProvider definitionsProvider = getLuceneAnalyzerDefinitionProvider();
-		LuceneAnalyzerDefinitionRegistryBuilderImpl builder = new LuceneAnalyzerDefinitionRegistryBuilderImpl();
+		final LuceneAnalysisDefinitionProvider definitionsProvider = getLuceneAnalyzerDefinitionProvider();
+		LuceneAnalysisDefinitionRegistryBuilderImpl builder = new LuceneAnalysisDefinitionRegistryBuilderImpl();
 		if ( definitionsProvider != null ) {
 			try {
 				definitionsProvider.register( builder );
@@ -106,9 +106,9 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		return builder.build();
 	}
 
-	private LuceneAnalyzerDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
+	private LuceneAnalysisDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
 		// Uses a Service so that integrators can inject alternative Lucene Analyzer definition providers
-		try ( ServiceReference<LuceneAnalyzerDefinitionSourceService> serviceRef = serviceManager.requestReference( LuceneAnalyzerDefinitionSourceService.class ) ) {
+		try ( ServiceReference<LuceneAnalysisDefinitionSourceService> serviceRef = serviceManager.requestReference( LuceneAnalysisDefinitionSourceService.class ) ) {
 			return serviceRef.get().getLuceneAnalyzerDefinitionProvider();
 		}
 	}

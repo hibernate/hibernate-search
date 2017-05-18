@@ -6,21 +6,21 @@
  */
 package org.hibernate.search.analyzer.definition.spi;
 
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
 import org.hibernate.search.engine.service.spi.Service;
 
 /**
- * This service allows to inject a custom {@link org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider}.
+ * This service allows to inject a custom {@link org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider}.
  *
  * Integrators which prefer to inject an alternative service by reference rather than setting a configuration
  * property can provide an alternative Service implementation by overriding {@link org.hibernate.search.cfg.spi.SearchConfiguration#getProvidedServices}.
  *
- * When not injecting one, the default implementation will be used: {@link org.hibernate.search.analyzer.definition.impl.PropertiesBasedLuceneAnalyzerDefinitionSourceService}.
+ * When not injecting one, the default implementation will be used: {@link org.hibernate.search.analyzer.definition.impl.PropertiesBasedLuceneAnalysisDefinitionSourceService}.
  *
  * @author Sanne Grinovero
  */
-public interface LuceneAnalyzerDefinitionSourceService extends Service {
+public interface LuceneAnalysisDefinitionSourceService extends Service {
 
-	LuceneAnalyzerDefinitionProvider getLuceneAnalyzerDefinitionProvider();
+	LuceneAnalysisDefinitionProvider getLuceneAnalyzerDefinitionProvider();
 
 }
