@@ -24,11 +24,14 @@ import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistry
 import org.hibernate.search.analyzer.definition.spi.LuceneAnalysisDefinitionSourceService;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
@@ -60,6 +63,10 @@ public class LuceneAnalysisDefinitionProviderTest {
 
 	private static final String CUSTOM_ANALYZER_2_NAME = "custom-analyzer-2";
 
+	private static final String CUSTOM_NORMALIZER_NAME = "custom-normalizer";
+
+	private static final String CUSTOM_NORMALIZER_2_NAME = "custom-normalizer-2";
+
 	@Rule
 	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
@@ -80,11 +87,18 @@ public class LuceneAnalysisDefinitionProviderTest {
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getNormalizerRegistry()
+						.getNamedNormalizerReference( CUSTOM_NORMALIZER_NAME ) )
+				.as( "Normalizer reference for '" + CUSTOM_NORMALIZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
 		CustomAnalyzerEntity entity = new CustomAnalyzerEntity();
 		entity.id = 0;
 		entity.field = "charFilterShouldReplace|foo";
 		index( integrator, entity );
 		assertMatchesExactly( integrator, entity, "field", "charfilterdidreplace" );
+		assertMatchesExactly( integrator, entity, "normalized", "charfilterdidreplace|foo" );
 	}
 
 	@Test
@@ -101,11 +115,18 @@ public class LuceneAnalysisDefinitionProviderTest {
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getNormalizerRegistry()
+						.getNamedNormalizerReference( CUSTOM_NORMALIZER_NAME ) )
+				.as( "Normalizer reference for '" + CUSTOM_NORMALIZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
 		CustomAnalyzerEntity entity = new CustomAnalyzerEntity();
 		entity.id = 0;
 		entity.field = "charFilterShouldReplace|foo";
 		index( integrator, entity );
 		assertMatchesExactly( integrator, entity, "field", "charfilterdidreplace" );
+		assertMatchesExactly( integrator, entity, "normalized", "charfilterdidreplace|foo" );
 	}
 
 	@Test
@@ -122,11 +143,18 @@ public class LuceneAnalysisDefinitionProviderTest {
 				.as( "Analyzer reference for '" + CUSTOM_ANALYZER_NAME + "' fetched from the integrator" )
 				.isNotNull();
 
+		assertThat( integrator.getIntegration( LuceneEmbeddedIndexManagerType.INSTANCE )
+						.getNormalizerRegistry()
+						.getNamedNormalizerReference( CUSTOM_NORMALIZER_NAME ) )
+				.as( "Normalizer reference for '" + CUSTOM_NORMALIZER_NAME + "' fetched from the integrator" )
+				.isNotNull();
+
 		AnalyzerDefAnnotationEntity entity = new AnalyzerDefAnnotationEntity();
 		entity.id = 0;
 		entity.field = "charFilterShouldReplace|foo";
 		index( integrator, entity );
 		assertMatchesExactly( integrator, entity, "field", "charFilterShouldReplace|foo" );
+		assertMatchesExactly( integrator, entity, "normalized", "charfiltershouldreplace|foo" );
 	}
 
 	/**
@@ -170,11 +198,19 @@ public class LuceneAnalysisDefinitionProviderTest {
 	}
 
 	@Test
-	public void namingConflict_withinProvider() {
+	public void namingConflict_withinProvider_analyzer() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH000330" );
 
-		init( ProviderWithInternalNamingConflict.class, CustomAnalyzerEntity.class );
+		init( ProviderWithInternalAnalyzerNamingConflict.class, CustomAnalyzerEntity.class );
+	}
+
+	@Test
+	public void namingConflict_withinProvider_normalizer() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000341" );
+
+		init( ProviderWithInternalNormalizerNamingConflict.class, CustomAnalyzerEntity.class );
 	}
 
 	private ExtendedSearchIntegrator initUsingService(LuceneAnalysisDefinitionProvider analyzerProvider, Class<?> ... entityClasses) {
@@ -250,6 +286,7 @@ public class LuceneAnalysisDefinitionProviderTest {
 		long id;
 
 		@Field(analyzer = @Analyzer(definition = CUSTOM_ANALYZER_NAME))
+		@Field(name = "normalized", normalizer = @Normalizer(definition = CUSTOM_NORMALIZER_NAME))
 		String field;
 
 		@Override
@@ -260,6 +297,7 @@ public class LuceneAnalysisDefinitionProviderTest {
 
 	@Indexed
 	@AnalyzerDef(name = CUSTOM_ANALYZER_NAME, tokenizer = @TokenizerDef(factory = KeywordTokenizerFactory.class))
+	@NormalizerDef(name = CUSTOM_NORMALIZER_NAME, filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class))
 	static class AnalyzerDefAnnotationEntity extends CustomAnalyzerEntity {
 	}
 
@@ -269,6 +307,7 @@ public class LuceneAnalysisDefinitionProviderTest {
 		long id;
 
 		@Field(analyzer = @Analyzer(definition = CUSTOM_ANALYZER_2_NAME))
+		@Field(name = "normalized", normalizer = @Normalizer(definition = CUSTOM_NORMALIZER_2_NAME))
 		String field;
 
 		@Override
@@ -284,6 +323,11 @@ public class LuceneAnalysisDefinitionProviderTest {
 					.analyzer( CUSTOM_ANALYZER_NAME )
 							.tokenizer( PatternTokenizerFactory.class )
 									.param( "pattern", "\\|" )
+							.charFilter( PatternReplaceCharFilterFactory.class )
+									.param( "pattern", "charFilterShouldReplace" )
+									.param( "replacement", "charFilterDidReplace" )
+							.tokenFilter( LowerCaseFilterFactory.class )
+					.normalizer( CUSTOM_NORMALIZER_NAME )
 							.charFilter( PatternReplaceCharFilterFactory.class )
 									.param( "pattern", "charFilterShouldReplace" )
 									.param( "replacement", "charFilterDidReplace" )
@@ -303,11 +347,12 @@ public class LuceneAnalysisDefinitionProviderTest {
 		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			builder
 					.analyzer( CUSTOM_ANALYZER_2_NAME )
-							.tokenizer( WhitespaceTokenizerFactory.class );
+							.tokenizer( WhitespaceTokenizerFactory.class )
+					.normalizer( CUSTOM_NORMALIZER_2_NAME );
 		}
 	}
 
-	public static class ProviderWithInternalNamingConflict implements LuceneAnalysisDefinitionProvider {
+	public static class ProviderWithInternalAnalyzerNamingConflict implements LuceneAnalysisDefinitionProvider {
 		@Override
 		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			builder
@@ -315,6 +360,15 @@ public class LuceneAnalysisDefinitionProviderTest {
 							.tokenizer( StandardTokenizerFactory.class )
 					.analyzer( CUSTOM_ANALYZER_NAME )
 							.tokenizer( StandardTokenizerFactory.class );
+		}
+	}
+
+	public static class ProviderWithInternalNormalizerNamingConflict implements LuceneAnalysisDefinitionProvider {
+		@Override
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
+			builder
+					.normalizer( CUSTOM_NORMALIZER_NAME )
+					.normalizer( CUSTOM_NORMALIZER_NAME );
 		}
 	}
 
