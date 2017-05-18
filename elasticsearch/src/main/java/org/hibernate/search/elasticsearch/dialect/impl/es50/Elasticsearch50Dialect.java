@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.dialect.impl.es5;
+package org.hibernate.search.elasticsearch.dialect.impl.es50;
 
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
@@ -32,7 +32,7 @@ import com.google.gson.GsonBuilder;
 /**
  * @author Yoann Rodiere
  */
-public class Elasticsearch5Dialect implements ElasticsearchDialect {
+public class Elasticsearch50Dialect implements ElasticsearchDialect {
 
 	@Override
 	public GsonProvider createGsonProvider() {

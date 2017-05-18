@@ -20,7 +20,8 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.dialect.impl.DefaultElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.dialect.impl.es2.Elasticsearch2Dialect;
-import org.hibernate.search.elasticsearch.dialect.impl.es5.Elasticsearch5Dialect;
+import org.hibernate.search.elasticsearch.dialect.impl.es50.Elasticsearch50Dialect;
+import org.hibernate.search.elasticsearch.dialect.impl.es52.Elasticsearch52Dialect;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
@@ -79,7 +80,12 @@ public class DefaultElasticsearchDialectFactoryTest {
 
 	@Test
 	public void es50() {
-		testSuccess( "5.0.0", Elasticsearch5Dialect.class );
+		testSuccess( "5.0.0", Elasticsearch50Dialect.class );
+	}
+
+	@Test
+	public void es52() {
+		testSuccess( "5.2.0", Elasticsearch52Dialect.class );
 	}
 
 	@Test
@@ -88,7 +94,7 @@ public class DefaultElasticsearchDialectFactoryTest {
 		doMock( "6.0.0" );
 		logged.expectMessage( "HSEARCH400085", "'6.0.0'" );
 		ElasticsearchDialect dialect = dialectFactory.createDialect( clientMock, new Properties() );
-		assertThat( dialect ).isInstanceOf( Elasticsearch5Dialect.class );
+		assertThat( dialect ).isInstanceOf( Elasticsearch52Dialect.class );
 	}
 
 	private void testSuccess(String versionString, Class<?> expectedDialectClass) {
