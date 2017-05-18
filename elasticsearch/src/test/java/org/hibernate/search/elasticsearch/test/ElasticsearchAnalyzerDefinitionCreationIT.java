@@ -47,7 +47,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Tests for {@link ElasticsearchIndexManager}'s schema creation feature.
+ * Tests for {@link ElasticsearchIndexManager}'s analyzer definition creation feature.
  *
  * @author Yoann Rodiere
  */
