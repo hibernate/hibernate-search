@@ -11,8 +11,8 @@ package org.hibernate.search.elasticsearch.testutil.junit;
  * JUnit category marker.
  * <p>
  * Used to ignore tests which are not sensible when testing against
- * Elasticsearch version 5.x.
+ * an Elasticsearch version higher than or equal to 5.2.0.
  */
-public class SkipOnElasticsearch5 {
+public class SkipFromElasticsearch52 {
 
 }

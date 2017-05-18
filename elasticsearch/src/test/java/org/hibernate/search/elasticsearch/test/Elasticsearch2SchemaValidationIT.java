@@ -28,7 +28,7 @@ import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.impl.ToElasticsearch;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
-import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
@@ -41,7 +41,7 @@ import org.junit.rules.ExpectedException;
  *
  * @author Yoann Rodiere
  */
-@Category(SkipOnElasticsearch5.class)
+@Category(SkipFromElasticsearch50.class)
 public class Elasticsearch2SchemaValidationIT extends SearchInitializationTestBase {
 
 	private static final String VALIDATION_FAILED_MESSAGE_ID = "HSEARCH400033";

@@ -25,10 +25,10 @@ cache:
   directories:
     - $HOME/.m2
 env:
-  # for now, only test with the most recent version of ES for each major
   #- DB=h2 ELASTICSEARCH=2.0
   - DB=h2 ELASTICSEARCH=2.2
   - DB=h2 ELASTICSEARCH=5.0
+  - DB=h2 ELASTICSEARCH=5.2
   # for now, let's test only with H2
   #- DB=pgsql
   #- DB=mariadb
@@ -53,8 +53,9 @@ script:
     "mariadb") BUILD_OPTIONS+=' -Pci-mariadb' ;;
     esac
   - case $ELASTICSEARCH in
-    2.0) BUILD_OPTIONS+=' -P!elasticsearch-5.0,elasticsearch-2.0' ;;
-    2.2) BUILD_OPTIONS+=' -P!elasticsearch-5.0,elasticsearch-2.2' ;;
-    5.0) ;;
+    2.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-2.0' ;;
+    2.2) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-2.2' ;;
+    5.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-5.0' ;;
+    5.2) ;;
     esac
   - ./mvnw -s settings-example.xml -Pdist $BUILD_OPTIONS clean install
