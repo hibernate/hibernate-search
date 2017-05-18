@@ -21,7 +21,7 @@ import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.ElasticsearchQueries;
 import org.hibernate.search.elasticsearch.testutil.JsonHelper;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
-import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
 import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.test.SearchTestBase;
@@ -34,7 +34,7 @@ import org.junit.experimental.categories.Category;
 /**
  * @author Gunnar Morling
  */
-@Category(SkipOnElasticsearch5.class)
+@Category(SkipFromElasticsearch50.class)
 public class Elasticsearch2IndexMappingIT extends SearchTestBase {
 
 	@Rule

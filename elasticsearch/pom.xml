@@ -356,7 +356,12 @@
                             <execution>
                                 <id>elasticsearch-it</id>
                                 <configuration>
-                                <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch2</excludedGroups>
+                                    <excludedGroups>
+                                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
+                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
+                                    </excludedGroups>
                                 </configuration>
                             </execution>
                         </executions>
@@ -448,7 +453,12 @@
                             <execution>
                                 <id>elasticsearch-it</id>
                                 <configuration>
-                                <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch2</excludedGroups>
+                                    <excludedGroups>
+                                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
+                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
+                                    </excludedGroups>
                                 </configuration>
                             </execution>
                         </executions>
@@ -484,6 +494,56 @@
         </profile>
         <profile>
             <id>elasticsearch-5.0</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>elasticsearch-it</id>
+                                <configuration>
+                                    <excludedGroups>
+                                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50,
+                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
+                                    </excludedGroups>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.alexcojocaru</groupId>
+                        <artifactId>elasticsearch-maven-plugin</artifactId>
+                        <configuration>
+                            <pathConf>${project.build.directory}/test-classes/elasticsearch/5.0/configuration/</pathConf>
+                            <pathInitScript>${project.build.directory}/test-classes/elasticsearch/5.0/init/init.script</pathInitScript>
+                            <autoCreateIndex>false</autoCreateIndex>
+                        </configuration>
+                        <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
+                        <executions>
+                            <execution >
+                                <id>start-elasticsearch</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>runforked</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop-elasticsearch</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>elasticsearch-5.2</id>
             <!-- Activation rules are not inherited from the profile definition in the parent, so we must copy them here -->
             <activation>
                 <property>
@@ -499,7 +559,12 @@
                             <execution>
                                 <id>elasticsearch-it</id>
                                 <configuration>
-                                <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5</excludedGroups>
+                                    <excludedGroups>
+                                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50,
+                                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch52
+                                    </excludedGroups>
                                 </configuration>
                             </execution>
                         </executions>

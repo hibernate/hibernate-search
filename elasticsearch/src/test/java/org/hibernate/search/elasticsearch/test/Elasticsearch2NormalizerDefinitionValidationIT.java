@@ -8,13 +8,13 @@ package org.hibernate.search.elasticsearch.test;
 
 import java.io.IOException;
 
-import org.hibernate.search.elasticsearch.testutil.junit.SkipOnElasticsearch5;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50;
 import org.junit.experimental.categories.Category;
 
 /**
  * @author Yoann Rodiere
  */
-@Category(SkipOnElasticsearch5.class)
+@Category(SkipFromElasticsearch50.class)
 public class Elasticsearch2NormalizerDefinitionValidationIT extends AbstractElasticsearchNormalizerDefinitionValidationIT {
 
 	@Override
