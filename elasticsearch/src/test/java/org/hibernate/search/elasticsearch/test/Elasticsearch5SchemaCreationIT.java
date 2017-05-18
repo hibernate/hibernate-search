@@ -16,25 +16,11 @@ import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
-import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilterFactory;
-import org.apache.lucene.analysis.standard.ClassicTokenizerFactory;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.AnalyzerDefs;
-import org.hibernate.search.annotations.CharFilterDef;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Norms;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory;
-import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory;
-import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenizerFactory;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
@@ -139,6 +125,31 @@ public class Elasticsearch5SchemaCreationIT extends SearchInitializationTestBase
 	}
 
 	@Test
+	public void keywordField() throws Exception {
+		elasticSearchClient.index( SimpleKeywordEntity.class )
+				.ensureDoesNotExist().registerForCleanup();
+
+		init( SimpleKeywordEntity.class );
+
+		assertJsonEquals(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'id': {"
+									+ "'type': 'keyword',"
+									+ "'store': true"
+							+ "},"
+							+ "'myField': {"
+									+ "'type': 'keyword',"
+									+ "'norms': true"
+							+ "}"
+					+ "}"
+				+ "}",
+				elasticSearchClient.type( SimpleKeywordEntity.class ).getMapping()
+				);
+	}
+
+	@Test
 	public void textField() throws Exception {
 		elasticSearchClient.index( SimpleTextEntity.class )
 				.ensureDoesNotExist().registerForCleanup();
@@ -187,147 +198,6 @@ public class Elasticsearch5SchemaCreationIT extends SearchInitializationTestBase
 				);
 	}
 
-	@Test
-	public void analyzers() throws Exception {
-		elasticSearchClient.index( SimpleAnalyzedEntity.class )
-				.ensureDoesNotExist().registerForCleanup();
-
-		init( SimpleAnalyzedEntity.class );
-
-		assertJsonEquals(
-				"{"
-					+ "'analyzer': {"
-							+ "'analyzerWithSimpleComponents': {"
-									+ "'char_filter': ['html_strip'],"
-									+ "'tokenizer': 'whitespace',"
-									+ "'filter': ['lowercase']"
-							+ "},"
-							+ "'analyzerWithNamedSimpleComponents': {"
-									+ "'char_filter': ['namedCharFilter'],"
-									+ "'tokenizer': 'namedTokenizer',"
-									+ "'filter': ['namedTokenFilter']"
-							+ "},"
-							+ "'analyzerWithComplexComponents': {"
-									+ "'char_filter': ['analyzerWithComplexComponents_HTMLStripCharFilterFactory'],"
-									+ "'tokenizer': 'classic',"
-									+ "'filter': ['analyzerWithComplexComponents_WordDelimiterFilterFactory']"
-							+ "},"
-							+ "'analyzerWithNamedComplexComponents': {"
-									+ "'char_filter': ['custom-html-stripper'],"
-									+ "'tokenizer': 'custom-classic-tokenizer',"
-									+ "'filter': ['custom-word-delimiter']"
-							+ "},"
-							+ "'analyzerWithElasticsearchFactories': {"
-									+ "'char_filter': ['custom-pattern-replace'],"
-									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
-							+ "}"
-					+ "},"
-					+ "'char_filter': {"
-							+ "'namedCharFilter': {"
-									+ "'type': 'html_strip'"
-							+ "},"
-							+ "'analyzerWithComplexComponents_HTMLStripCharFilterFactory': {"
-									+ "'type': 'html_strip',"
-									+ "'escaped_tags': ['br', 'p']"
-							+ "},"
-							+ "'custom-html-stripper': {"
-									+ "'type': 'html_strip',"
-									+ "'escaped_tags': ['br', 'p']"
-							+ "},"
-							+ "'custom-pattern-replace': {"
-									+ "'type': 'pattern_replace',"
-									+ "'pattern': '[^0-9]',"
-									+ "'replacement': '0',"
-									+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-							+ "}"
-					+ "},"
-					+ "'tokenizer': {"
-							+ "'namedTokenizer': {"
-									+ "'type': 'whitespace'"
-							+ "},"
-							+ "'custom-classic-tokenizer': {"
-									+ "'type': 'classic'"
-							+ "},"
-							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
-									+ "'min_gram': '1',"
-									+ "'max_gram': '10'"
-							+ "}"
-					+ "},"
-					+ "'filter': {"
-							+ "'namedTokenFilter': {"
-									+ "'type': 'lowercase'"
-							+ "},"
-							+ "'analyzerWithComplexComponents_WordDelimiterFilterFactory': {"
-									+ "'type': 'word_delimiter',"
-									+ "'generate_word_parts': '1',"
-									+ "'generate_number_parts': '1',"
-									+ "'catenate_words': '0',"
-									+ "'catenate_numbers': '0',"
-									+ "'catenate_all': '0',"
-									+ "'split_on_case_change': '0',"
-									+ "'split_on_numerics': '0',"
-									+ "'preserve_original': '1'"
-							+ "},"
-							+ "'custom-word-delimiter': {"
-									+ "'type': 'word_delimiter',"
-									+ "'generate_word_parts': '1',"
-									+ "'generate_number_parts': '1',"
-									+ "'catenate_words': '0',"
-									+ "'catenate_numbers': '0',"
-									+ "'catenate_all': '0',"
-									+ "'split_on_case_change': '0',"
-									+ "'split_on_numerics': '0',"
-									+ "'preserve_original': '1'"
-							+ "},"
-							+ "'custom-keep-types': {"
-									+ "'type': 'keep_types',"
-									+ "'types': ['<NUM>', '<DOUBLE>']"
-							+ "}"
-					+ "}"
-				+ "}",
-				elasticSearchClient.index( SimpleAnalyzedEntity.class ).settings( "index.analysis" ).get()
-				);
-		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'keyword',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField1': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'analyzerWithSimpleComponents'"
-							+ "},"
-							+ "'myField2': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'analyzerWithNamedSimpleComponents'"
-							+ "},"
-							+ "'myField3': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'analyzerWithComplexComponents'"
-							+ "},"
-							+ "'myField4': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'analyzerWithNamedComplexComponents'"
-							+ "},"
-							+ "'myField5': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
-							+ "}"
-					+ "}"
-				+ "}",
-				elasticSearchClient.type( SimpleAnalyzedEntity.class ).getMapping()
-				);
-	}
-
 	@Indexed
 	@Entity
 	private static class SimpleBooleanEntity {
@@ -352,6 +222,17 @@ public class Elasticsearch5SchemaCreationIT extends SearchInitializationTestBase
 
 	@Indexed
 	@Entity
+	private static class SimpleKeywordEntity {
+		@DocumentId
+		@Id
+		Long id;
+
+		@Field(analyze = Analyze.NO)
+		String myField;
+	}
+
+	@Indexed
+	@Entity
 	private static class SimpleTextEntity {
 		@DocumentId
 		@Id
@@ -369,118 +250,6 @@ public class Elasticsearch5SchemaCreationIT extends SearchInitializationTestBase
 		Long id;
 
 		@Field(norms = Norms.NO)
-		String myField;
-	}
-
-	@Indexed
-	@Entity
-	@AnalyzerDefs({
-			@AnalyzerDef(
-					name = "analyzerWithSimpleComponents",
-					charFilters = @CharFilterDef(factory = HTMLStripCharFilterFactory.class),
-					tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class),
-					filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class)
-			),
-			@AnalyzerDef(
-					name = "analyzerWithNamedSimpleComponents",
-					charFilters = @CharFilterDef(name = "namedCharFilter", factory = HTMLStripCharFilterFactory.class),
-					tokenizer = @TokenizerDef(name = "namedTokenizer", factory = WhitespaceTokenizerFactory.class),
-					filters = @TokenFilterDef(name = "namedTokenFilter", factory = LowerCaseFilterFactory.class)
-			),
-			@AnalyzerDef(
-					name = "analyzerWithComplexComponents",
-					charFilters = @CharFilterDef(
-							factory = HTMLStripCharFilterFactory.class,
-							params = {
-									@Parameter(name = "escapedTags", value = "br p")
-							}
-					),
-					tokenizer = @TokenizerDef(
-							factory = ClassicTokenizerFactory.class
-					),
-					filters = @TokenFilterDef(
-							factory = WordDelimiterFilterFactory.class,
-							params = {
-									@Parameter(name = "generateWordParts", value = "1"),
-									@Parameter(name = "generateNumberParts", value = "1"),
-									@Parameter(name = "catenateWords", value = "0"),
-									@Parameter(name = "catenateNumbers", value = "0"),
-									@Parameter(name = "catenateAll", value = "0"),
-									@Parameter(name = "splitOnCaseChange", value = "0"),
-									@Parameter(name = "splitOnNumerics", value = "0"),
-									@Parameter(name = "preserveOriginal", value = "1")
-							}
-					)
-			),
-			@AnalyzerDef(
-					name = "analyzerWithNamedComplexComponents",
-					charFilters = @CharFilterDef(
-							name = "custom-html-stripper",
-							factory = HTMLStripCharFilterFactory.class,
-							params = {
-									@Parameter(name = "escapedTags", value = "br p")
-							}
-					),
-					tokenizer = @TokenizerDef(
-							name = "custom-classic-tokenizer",
-							factory = ClassicTokenizerFactory.class
-					),
-					filters = @TokenFilterDef(
-							name = "custom-word-delimiter",
-							factory = WordDelimiterFilterFactory.class,
-							params = {
-									@Parameter(name = "generateWordParts", value = "1"),
-									@Parameter(name = "generateNumberParts", value = "1"),
-									@Parameter(name = "catenateWords", value = "0"),
-									@Parameter(name = "catenateNumbers", value = "0"),
-									@Parameter(name = "catenateAll", value = "0"),
-									@Parameter(name = "splitOnCaseChange", value = "0"),
-									@Parameter(name = "splitOnNumerics", value = "0"),
-									@Parameter(name = "preserveOriginal", value = "1")
-							}
-					)
-			),
-			@AnalyzerDef(
-					name = "analyzerWithElasticsearchFactories",
-					charFilters = @CharFilterDef(
-							name = "custom-pattern-replace",
-							factory = ElasticsearchCharFilterFactory.class,
-							params = {
-									@Parameter(name = "type", value = "'pattern_replace'"),
-									@Parameter(name = "pattern", value = "'[^0-9]'"),
-									@Parameter(name = "replacement", value = "'0'"),
-									@Parameter(name = "tags", value = "'CASE_INSENSITIVE|COMMENTS'")
-							}
-					),
-					tokenizer = @TokenizerDef(
-							name = "custom-edgeNGram",
-							factory = ElasticsearchTokenizerFactory.class,
-							params = {
-									@Parameter(name = "type", value = "'edgeNGram'"),
-									@Parameter(name = "min_gram", value = "1"),
-									@Parameter(name = "max_gram", value = "10")
-							}
-					),
-					filters = @TokenFilterDef(
-							name = "custom-keep-types",
-							factory = ElasticsearchTokenFilterFactory.class,
-							params = {
-									@Parameter(name = "type", value = "'keep_types'"),
-									@Parameter(name = "types", value = "['<NUM>','<DOUBLE>']")
-							}
-					)
-			)
-	})
-	private static class SimpleAnalyzedEntity {
-		@DocumentId
-		@Id
-		Long id;
-
-		@Field(name = "myField1", analyzer = @Analyzer(definition = "analyzerWithSimpleComponents"))
-		@Field(name = "myField2", analyzer = @Analyzer(definition = "analyzerWithNamedSimpleComponents"))
-		@Field(name = "myField3", analyzer = @Analyzer(definition = "analyzerWithComplexComponents"))
-		@Field(name = "myField4", analyzer = @Analyzer(definition = "analyzerWithNamedComplexComponents"))
-		@Field(name = "myField5", analyzer = @Analyzer(definition = "analyzerWithElasticsearchFactories"))
 		String myField;
 	}
 

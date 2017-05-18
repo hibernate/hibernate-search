@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.test;
 import static org.hibernate.search.elasticsearch.testutil.JsonHelper.assertJsonEquals;
 import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isException;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,18 +17,10 @@ import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.apache.lucene.analysis.ngram.EdgeNGramTokenizerFactory;
 import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory;
-import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
@@ -116,45 +109,9 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
-				"{"
-					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
-									+ "'char_filter': ['custom-pattern-replace'],"
-									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
-							+ "}"
-					+ "},"
-					+ "'char_filter': {"
-							+ "'custom-pattern-replace': {"
-									+ "'type': 'pattern_replace',"
-									+ "'pattern': '[^0-9]',"
-									+ "'replacement': '0',"
-									+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-							+ "}"
-					+ "},"
-					+ "'tokenizer': {"
-							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
-									+ "'min_gram': '1',"
-									+ "'max_gram': '10'"
-							+ "}"
-					+ "},"
-					+ "'filter': {"
-							+ "'custom-keep-types': {"
-									+ "'type': 'keep_types',"
-									+ "'types': ['<NUM>', '<DOUBLE>']"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
+		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate();
+		putAnalysisSettings( SimpleStringEntity.class );
+		elasticSearchClient.type( SimpleStringEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -163,15 +120,18 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 									+ "'index': 'not_analyzed',"
 									+ "'store': true"
 							+ "},"
-							+ "'myField': {"
+							+ "'defaultAnalyzer': {"
+									+ "'type': 'string'"
+							+ "},"
+							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'string',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
+									+ "'analyzer': 'customAnalyzer'"
 							+ "}"
 					+ "}"
 				+ "}"
 				);
 
-		init( SimpleDateEntity.class, SimpleBooleanEntity.class, AnalyzedEntity.class );
+		init( SimpleDateEntity.class, SimpleBooleanEntity.class, SimpleStringEntity.class );
 
 		assertJsonEquals(
 				"{"
@@ -217,44 +177,6 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 
 		assertJsonEquals(
 				"{"
-						+ "'analyzer': {"
-								+ "'analyzerWithElasticsearchFactories': {"
-										+ "'char_filter': ['custom-pattern-replace'],"
-										+ "'tokenizer': 'custom-edgeNGram',"
-										+ "'filter': ['custom-keep-types']"
-								+ "}"
-						+ "},"
-						+ "'char_filter': {"
-								+ "'custom-pattern-replace': {"
-										+ "'type': 'pattern_replace',"
-										+ "'pattern': '[^0-9]',"
-										+ "'replacement': '0',"
-										+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-								+ "}"
-						+ "},"
-						+ "'tokenizer': {"
-								+ "'custom-edgeNGram': {"
-										+ "'type': 'edgeNGram',"
-										/*
-										 * Strangely enough, even if you send properly typed numbers
-										 * to Elasticsearch, when you ask for the current settings it
-										 * will spit back strings instead of numbers...
-										 */
-										+ "'min_gram': '1',"
-										+ "'max_gram': '10'"
-								+ "}"
-						+ "},"
-						+ "'filter': {"
-								+ "'custom-keep-types': {"
-										+ "'type': 'keep_types',"
-										+ "'types': ['<NUM>', '<DOUBLE>']"
-								+ "}"
-						+ "}"
-					+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
-				);
-		assertJsonEquals(
-				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
 							+ "'id': {"
@@ -262,13 +184,16 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 									+ "'index': 'not_analyzed',"
 									+ "'store': true"
 							+ "},"
-							+ "'myField': {"
+							+ "'defaultAnalyzer': {"
+									+ "'type': 'string'"
+							+ "},"
+							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'string',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
+									+ "'analyzer': 'customAnalyzer'"
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
+				elasticSearchClient.type( SimpleStringEntity.class ).getMapping()
 				);
 	}
 
@@ -426,8 +351,9 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 
 	@Test
 	public void property_attribute_invalid_conflictingAnalyzer() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
+		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate();
+		putAnalysisSettings( SimpleStringEntity.class );
+		elasticSearchClient.type( SimpleStringEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
@@ -436,7 +362,10 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 									+ "'index': 'not_analyzed',"
 									+ "'store': true"
 							+ "},"
-							+ "'myField': {"
+							+ "'defaultAnalyzer': {"
+									+ "'type': 'string'"
+							+ "},"
+							+ "'nonDefaultAnalyzer': {"
 									+ "'type': 'string',"
 									+ "'analyzer': 'standard'" // Invalid
 							+ "}"
@@ -455,436 +384,21 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 				.build()
 		);
 
-		init( AnalyzedEntity.class );
+		init( SimpleStringEntity.class );
 	}
 
-	@Test
-	public void analyzer_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
-				"{"
-					+ "'char_filter': {"
-							+ "'custom-pattern-replace': {"
-									+ "'type': 'pattern_replace',"
-									+ "'pattern': '[^0-9]',"
-									+ "'replacement': '0',"
-									+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-							+ "}"
-					+ "},"
-					+ "'tokenizer': {"
-							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
-									+ "'min_gram': 1,"
-									+ "'max_gram': 10"
-							+ "}"
-					+ "},"
-					+ "'filter': {"
-							+ "'custom-keep-types': {"
-									+ "'type': 'keep_types',"
-									+ "'types': ['<NUM>', '<DOUBLE>']"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
-									+ "'store': true"
-							+ "}"
-							/*
-							 * We cannot update analyzers in the mapping,
-							 * so the only way adding an analyzer can succeed is
-							 * if the fields using it do not exist yet.
-							 * Thus we don't mention "myField" here.
-							 */
-					+ "}"
-				+ "}"
-				);
-
-		init( AnalyzedEntity.class );
-
-		assertJsonEquals(
-				"{"
-						+ "'analyzer': {"
-								+ "'analyzerWithElasticsearchFactories': {"
-										+ "'char_filter': ['custom-pattern-replace'],"
-										+ "'tokenizer': 'custom-edgeNGram',"
-										+ "'filter': ['custom-keep-types']"
-								+ "}"
-						+ "},"
-						+ "'char_filter': {"
-								+ "'custom-pattern-replace': {"
-										+ "'type': 'pattern_replace',"
-										+ "'pattern': '[^0-9]',"
-										+ "'replacement': '0',"
-										+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-								+ "}"
-						+ "},"
-						+ "'tokenizer': {"
-								+ "'custom-edgeNGram': {"
-										+ "'type': 'edgeNGram',"
-										/*
-										 * Strangely enough, even if you send properly typed numbers
-										 * to Elasticsearch, when you ask for the current settings it
-										 * will spit back strings instead of numbers...
-										 */
-										+ "'min_gram': '1',"
-										+ "'max_gram': '10'"
-								+ "}"
-						+ "},"
-						+ "'filter': {"
-								+ "'custom-keep-types': {"
-										+ "'type': 'keep_types',"
-										+ "'types': ['<NUM>', '<DOUBLE>']"
-								+ "}"
-						+ "}"
-					+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
-				);
-		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'string',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
-							+ "}"
-					+ "}"
-				+ "}",
-				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
-				);
-	}
-
-	@Test
-	public void analyzer_componentDefinition_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
-				"{"
-					/*
-					 * We don't add the analyzer here: since a component is missing
-					 * the analyzer can't reference it and thus it must be missing too.
-					 */
-					// missing: 'char_filter'
-					+ "'tokenizer': {"
-							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
-									+ "'min_gram': 1,"
-									+ "'max_gram': 10"
-							+ "}"
-					+ "},"
-					+ "'filter': {"
-							+ "'custom-keep-types': {"
-									+ "'type': 'keep_types',"
-									+ "'types': ['<NUM>', '<DOUBLE>']"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
-									+ "'store': true"
-							+ "}"
-							/*
-							 * We cannot update analyzers in the mapping,
-							 * so the only way adding an analyzer can succeed is
-							 * if the fields using it do not exist yet.
-							 * Thus we don't mention "myField" here.
-							 */
-					+ "}"
-				+ "}"
-				);
-
-		init( AnalyzedEntity.class );
-
-		assertJsonEquals(
-				"{"
-						+ "'analyzer': {"
-								+ "'analyzerWithElasticsearchFactories': {"
-										+ "'char_filter': ['custom-pattern-replace'],"
-										+ "'tokenizer': 'custom-edgeNGram',"
-										+ "'filter': ['custom-keep-types']"
-								+ "}"
-						+ "},"
-						+ "'char_filter': {"
-								+ "'custom-pattern-replace': {"
-										+ "'type': 'pattern_replace',"
-										+ "'pattern': '[^0-9]',"
-										+ "'replacement': '0',"
-										+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-								+ "}"
-						+ "},"
-						+ "'tokenizer': {"
-								+ "'custom-edgeNGram': {"
-										+ "'type': 'edgeNGram',"
-										/*
-										 * Strangely enough, even if you send properly typed numbers
-										 * to Elasticsearch, when you ask for the current settings it
-										 * will spit back strings instead of numbers...
-										 */
-										+ "'min_gram': '1',"
-										+ "'max_gram': '10'"
-								+ "}"
-						+ "},"
-						+ "'filter': {"
-								+ "'custom-keep-types': {"
-										+ "'type': 'keep_types',"
-										+ "'types': ['<NUM>', '<DOUBLE>']"
-								+ "}"
-						+ "}"
-					+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
-				);
-		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'string',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
-							+ "}"
-					+ "}"
-				+ "}",
-				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
-				);
-	}
-
-	@Test
-	public void analyzer_componentReference_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+	private void putAnalysisSettings(Class<?> clazz) throws IOException {
+		elasticSearchClient.index( clazz ).settings( "index.analysis" ).put(
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
-									+ "'char_filter': ['html_strip']," // Invalid
-									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
-							+ "}"
-					+ "},"
-					+ "'char_filter': {"
-							+ "'custom-pattern-replace': {"
-									+ "'type': 'pattern_replace',"
-									+ "'pattern': '[^0-9]',"
-									+ "'replacement': '0',"
-									+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-							+ "}"
-					+ "},"
-					+ "'tokenizer': {"
-							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
-									+ "'min_gram': 1,"
-									+ "'max_gram': 10"
-							+ "}"
-					+ "},"
-					+ "'filter': {"
-							+ "'custom-keep-types': {"
-									+ "'type': 'keep_types',"
-									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "'customAnalyzer': {"
+									+ "'tokenizer': 'whitespace'"
 							+ "}"
 					+ "}"
 				+ "}"
-				);
-		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'string',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		init( AnalyzedEntity.class );
-
-		assertJsonEquals(
-				"{"
-						+ "'analyzer': {"
-								+ "'analyzerWithElasticsearchFactories': {"
-										+ "'char_filter': ['custom-pattern-replace'],"
-										+ "'tokenizer': 'custom-edgeNGram',"
-										+ "'filter': ['custom-keep-types']"
-								+ "}"
-						+ "},"
-						+ "'char_filter': {"
-								+ "'custom-pattern-replace': {"
-										+ "'type': 'pattern_replace',"
-										+ "'pattern': '[^0-9]',"
-										+ "'replacement': '0',"
-										+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-								+ "}"
-						+ "},"
-						+ "'tokenizer': {"
-								+ "'custom-edgeNGram': {"
-										+ "'type': 'edgeNGram',"
-										/*
-										 * Strangely enough, even if you send properly typed numbers
-										 * to Elasticsearch, when you ask for the current settings it
-										 * will spit back strings instead of numbers...
-										 */
-										+ "'min_gram': '1',"
-										+ "'max_gram': '10'"
-								+ "}"
-						+ "},"
-						+ "'filter': {"
-								+ "'custom-keep-types': {"
-										+ "'type': 'keep_types',"
-										+ "'types': ['<NUM>', '<DOUBLE>']"
-								+ "}"
-						+ "}"
-					+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
-				);
-		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'string',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
-							+ "}"
-					+ "}"
-				+ "}",
-				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
 				);
 	}
 
-	@Test
-	public void analyzer_componentDefinition_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
-				"{"
-					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
-									+ "'char_filter': ['custom-pattern-replace']," // Correct, but the actual definition is not
-									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
-							+ "}"
-					+ "},"
-					+ "'char_filter': {"
-							+ "'custom-pattern-replace': {"
-									+ "'type': 'html_strip'" // Invalid
-							+ "}"
-					+ "},"
-					+ "'tokenizer': {"
-							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
-									+ "'min_gram': 1,"
-									+ "'max_gram': 10"
-							+ "}"
-					+ "},"
-					+ "'filter': {"
-							+ "'custom-keep-types': {"
-									+ "'type': 'keep_types',"
-									+ "'types': ['<NUM>', '<DOUBLE>']"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-		elasticSearchClient.type( AnalyzedEntity.class ).putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'string',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		init( AnalyzedEntity.class );
-
-		assertJsonEquals(
-				"{"
-						+ "'analyzer': {"
-								+ "'analyzerWithElasticsearchFactories': {"
-										+ "'char_filter': ['custom-pattern-replace'],"
-										+ "'tokenizer': 'custom-edgeNGram',"
-										+ "'filter': ['custom-keep-types']"
-								+ "}"
-						+ "},"
-						+ "'char_filter': {"
-								+ "'custom-pattern-replace': {"
-										+ "'type': 'pattern_replace',"
-										+ "'pattern': '[^0-9]',"
-										+ "'replacement': '0',"
-										+ "'tags': 'CASE_INSENSITIVE|COMMENTS'"
-								+ "}"
-						+ "},"
-						+ "'tokenizer': {"
-								+ "'custom-edgeNGram': {"
-										+ "'type': 'edgeNGram',"
-										/*
-										 * Strangely enough, even if you send properly typed numbers
-										 * to Elasticsearch, when you ask for the current settings it
-										 * will spit back strings instead of numbers...
-										 */
-										+ "'min_gram': '1',"
-										+ "'max_gram': '10'"
-								+ "}"
-						+ "},"
-						+ "'filter': {"
-								+ "'custom-keep-types': {"
-										+ "'type': 'keep_types',"
-										+ "'types': ['<NUM>', '<DOUBLE>']"
-								+ "}"
-						+ "}"
-					+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
-				);
-		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'string',"
-									+ "'index': 'not_analyzed',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'string',"
-									+ "'analyzer': 'analyzerWithElasticsearchFactories'"
-							+ "}"
-					+ "}"
-				+ "}",
-				elasticSearchClient.type( AnalyzedEntity.class ).getMapping()
-				);
-	}
 	@Indexed
 	@Entity
 	public static class SimpleBooleanEntity {
@@ -909,42 +423,16 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 
 	@Indexed
 	@Entity
-	@AnalyzerDef(
-			name = "analyzerWithElasticsearchFactories",
-			charFilters = @CharFilterDef(
-					name = "custom-pattern-replace",
-					factory = ElasticsearchCharFilterFactory.class,
-					params = {
-							@Parameter(name = "type", value = "'pattern_replace'"),
-							@Parameter(name = "pattern", value = "'[^0-9]'"),
-							@Parameter(name = "replacement", value = "'0'"),
-							@Parameter(name = "tags", value = "'CASE_INSENSITIVE|COMMENTS'")
-					}
-			),
-			tokenizer = @TokenizerDef(
-					name = "custom-edgeNGram",
-					factory = EdgeNGramTokenizerFactory.class,
-					params = {
-							@Parameter(name = "minGramSize", value = "1"),
-							@Parameter(name = "maxGramSize", value = "10")
-					}
-			),
-			filters = @TokenFilterDef(
-					name = "custom-keep-types",
-					factory = ElasticsearchTokenFilterFactory.class,
-					params = {
-							@Parameter(name = "type", value = "'keep_types'"),
-							@Parameter(name = "types", value = "['<NUM>','<DOUBLE>']")
-					}
-			)
-	)
-	public static class AnalyzedEntity {
+	public static class SimpleStringEntity {
 		@DocumentId
 		@Id
 		Long id;
 
-		@Field(analyzer = @Analyzer(definition = "analyzerWithElasticsearchFactories"))
-		String myField;
+		@Field
+		String defaultAnalyzer;
+
+		@Field(analyzer = @Analyzer(definition = "customAnalyzer"))
+		String nonDefaultAnalyzer;
 	}
 
 }
