@@ -126,6 +126,20 @@ public class FieldMapping {
 		return this;
 	}
 
+	public FieldMapping normalizer(Class<?> analyzerClass) {
+		final Map<String, Object> normalizer = new HashMap<String, Object>();
+		normalizer.put( "impl", analyzerClass );
+		field.put( "normalizer", normalizer );
+		return this;
+	}
+
+	public FieldMapping normalizer(String analyzerDef) {
+		final Map<String, Object> normalizer = new HashMap<String, Object>();
+		normalizer.put( "definition", analyzerDef );
+		field.put( "normalizer", normalizer );
+		return this;
+	}
+
 	public FieldMapping indexNullAs(String indexNullAs) {
 		field.put( "indexNullAs", indexNullAs );
 		return this;
@@ -174,6 +188,10 @@ public class FieldMapping {
 
 	public AnalyzerDefMapping analyzerDef(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, mapping );
+	}
+
+	public NormalizerDefMapping normalizerDef(String name) {
+		return new NormalizerDefMapping( name, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
