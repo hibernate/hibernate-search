@@ -16,7 +16,10 @@ import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ChainingElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryBuilderImpl;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
@@ -187,8 +190,8 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		 * and users may decide to add such definitions anyway because they need them
 		 * for entities indexed in an embedded Lucene instance (not ES).
 		 */
-		TranslatingElasticsearchAnalyzerDefinitionRegistryPopulator translatingPopulator =
-				new TranslatingElasticsearchAnalyzerDefinitionRegistryPopulator( definitionRegistry, translator );
+		TranslatingElasticsearchAnalysisDefinitionRegistryPopulator translatingPopulator =
+				new TranslatingElasticsearchAnalysisDefinitionRegistryPopulator( definitionRegistry, translator );
 
 		for ( AnalyzerReference reference : references ) {
 			if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {

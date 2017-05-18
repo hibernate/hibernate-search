@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 
 /**
  * A {@code ScopedElasticsearchAnalyzer} is a wrapper class containing all remote analyzers for a given class.

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
+
 /**
  * An Elasticsearch analyzer for which no definition was found in the Hibernate Search mapping.
  * <p>

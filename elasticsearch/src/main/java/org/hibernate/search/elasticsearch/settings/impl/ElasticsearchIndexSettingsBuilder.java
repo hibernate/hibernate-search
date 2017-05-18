@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.settings.impl;
 
-import org.hibernate.search.elasticsearch.analyzer.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
 

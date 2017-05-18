@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.definition.impl;
 
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalysisDefinitionRegistry;
-
 /**
  * @author Yoann Rodiere
  */

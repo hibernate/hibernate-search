@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.analyzer.impl;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
