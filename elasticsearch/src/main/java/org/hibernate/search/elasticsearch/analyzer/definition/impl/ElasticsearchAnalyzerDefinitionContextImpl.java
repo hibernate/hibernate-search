@@ -8,7 +8,6 @@ package org.hibernate.search.elasticsearch.analyzer.definition.impl;
 
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalyzerDefinitionContext;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalyzerDefinitionWithTokenizerContext;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.util.StringHelper;

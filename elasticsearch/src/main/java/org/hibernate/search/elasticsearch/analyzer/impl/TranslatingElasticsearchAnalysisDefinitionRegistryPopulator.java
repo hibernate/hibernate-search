@@ -12,6 +12,7 @@ import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
@@ -35,13 +36,13 @@ import org.hibernate.search.elasticsearch.settings.impl.translation.Elasticsearc
  *
  * @author Yoann Rodiere
  */
-public class TranslatingElasticsearchAnalyzerDefinitionRegistryPopulator {
+public class TranslatingElasticsearchAnalysisDefinitionRegistryPopulator {
 
 	private final ElasticsearchAnalysisDefinitionRegistry registry;
 
 	private final ElasticsearchAnalyzerDefinitionTranslator translator;
 
-	public TranslatingElasticsearchAnalyzerDefinitionRegistryPopulator(ElasticsearchAnalysisDefinitionRegistry registry,
+	public TranslatingElasticsearchAnalysisDefinitionRegistryPopulator(ElasticsearchAnalysisDefinitionRegistry registry,
 			ElasticsearchAnalyzerDefinitionTranslator translator) {
 		this.registry = registry;
 		this.translator = translator;

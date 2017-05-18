@@ -12,7 +12,6 @@ import java.util.List;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisComponentDefinitionContext;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionRegistryBuilder;
 import org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalyzerDefinitionContext;
-import org.hibernate.search.elasticsearch.analyzer.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
 
 
 /**

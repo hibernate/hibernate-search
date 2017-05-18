@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import org.hibernate.search.analyzer.impl.RemoteAnalyzer;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 
 /**
  * A description of an Elasticsearch analyzer.
