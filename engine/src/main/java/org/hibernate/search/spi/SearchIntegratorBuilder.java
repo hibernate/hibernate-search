@@ -30,6 +30,8 @@ import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.annotations.NormalizerDefs;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
@@ -359,6 +361,7 @@ public class SearchIntegratorBuilder {
 				factoryState.getIntegrations() );
 
 		initProgrammaticAnalyzers( configContext, searchConfiguration.getReflectionManager() );
+		initProgrammaticNormalizers( configContext, searchConfiguration.getReflectionManager() );
 		initProgrammaticallyDefinedFilterDef( configContext, searchConfiguration.getReflectionManager() );
 		final TypeHierarchy configuredTypeHierarchy = factoryState.getConfiguredTypeHierarchy();
 		final TypeHierarchy indexedTypeHierarchy = factoryState.getIndexedTypeHierarchy();
@@ -570,6 +573,20 @@ public class SearchIntegratorBuilder {
 			if ( defs != null ) {
 				MappingDefinitionRegistry<AnalyzerDef, ?> registry = context.getAnalyzerDefinitionRegistry();
 				for ( AnalyzerDef def : defs ) {
+					registry.registerGlobal( def.name(), def );
+				}
+			}
+		}
+	}
+
+	private void initProgrammaticNormalizers(ConfigContext context, ReflectionManager reflectionManager) {
+		final Map<?, ?> defaults = reflectionManager.getDefaults();
+
+		if ( defaults != null ) {
+			NormalizerDef[] defs = (NormalizerDef[]) defaults.get( NormalizerDefs.class );
+			if ( defs != null ) {
+				MappingDefinitionRegistry<NormalizerDef, ?> registry = context.getNormalizerDefinitionRegistry();
+				for ( NormalizerDef def : defs ) {
 					registry.registerGlobal( def.name(), def );
 				}
 			}

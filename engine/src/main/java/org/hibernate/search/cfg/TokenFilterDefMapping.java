@@ -90,6 +90,10 @@ public class TokenFilterDefMapping {
 		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, mapping );
 	}
 
+	public NormalizerDefMapping normalizerDef(String name) {
+		return new NormalizerDefMapping( name, mapping );
+	}
+
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
 		return new FullTextFilterDefMapping( mapping, name, impl );
 	}

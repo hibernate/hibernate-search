@@ -16,33 +16,15 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 /**
  * @author Emmanuel Bernard
  */
-public class AnalyzerDefMapping {
+public class NormalizerDefMapping {
 	private SearchMapping mapping;
-	private Map<String, Object> analyzerDef;
-	private Map<String, Object> tokenizer;
+	private Map<String, Object> definition;
 
-	AnalyzerDefMapping(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory, SearchMapping mapping) {
+	NormalizerDefMapping(String name, SearchMapping mapping) {
 		this.mapping = mapping;
-		this.analyzerDef = new HashMap<String, Object>();
-		mapping.addAnalyzerDef( analyzerDef );
-		analyzerDef.put( "name", name );
-		tokenizer = new HashMap<String, Object>();
-		tokenizer.put( "name", tokenizerName );
-		tokenizer.put( "factory", tokenizerFactory );
-		analyzerDef.put( "tokenizer", tokenizer );
-	}
-
-	/**
-	 * {@code &#064;TokenizerDef(, ... params={&#064;Parameter(name="name", value="value"), ...}) }
-	 * @param name the name of the paramater
-	 * @param value the value of the paramater
-	 * @return {@code  this} for method chaining
-	 */
-	public AnalyzerDefMapping tokenizerParam(String name, String value) {
-		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( tokenizer, "params" );
-		param.put( "name", name );
-		param.put( "value", value );
-		return this;
+		this.definition = new HashMap<String, Object>();
+		mapping.addNormalizerDef( definition );
+		definition.put( "name", name );
 	}
 
 	/**
@@ -61,7 +43,7 @@ public class AnalyzerDefMapping {
 	 * @return a new {@link CharFilterDefMapping}
 	 */
 	public CharFilterDefMapping charFilter(String name, Class<? extends CharFilterFactory> factory) {
-		return new CharFilterDefMapping( name, factory, analyzerDef, mapping );
+		return new CharFilterDefMapping( name, factory, definition, mapping );
 	}
 
 	/**
@@ -80,7 +62,7 @@ public class AnalyzerDefMapping {
 	 * @return a new {@link TokenFilterDefMapping}
 	 */
 	public TokenFilterDefMapping filter(String name, Class<? extends TokenFilterFactory> factory) {
-		return new TokenFilterDefMapping( factory, analyzerDef, mapping );
+		return new TokenFilterDefMapping( factory, definition, mapping );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
