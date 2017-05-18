@@ -19,9 +19,9 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionRegistryBuilder;
-import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistryBuilder;
+import org.hibernate.search.analyzer.definition.spi.LuceneAnalysisDefinitionSourceService;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -52,9 +52,9 @@ import org.junit.rules.ExpectedException;
 /**
  * @author Yoann Rodiere
  */
-@Category(SkipOnElasticsearch.class) // LuceneAnalyzerDefinitionProvider is Lucene-specific
+@Category(SkipOnElasticsearch.class) // LuceneAnalysisDefinitionProvider is Lucene-specific
 @TestForIssue(jiraKey = "HSEARCH-2418")
-public class LuceneAnalyzerDefinitionProviderTest {
+public class LuceneAnalysisDefinitionProviderTest {
 
 	private static final String CUSTOM_ANALYZER_NAME = "custom-analyzer";
 
@@ -161,7 +161,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 	public void invalid() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( CustomAnalyzerEntity.class );
-		cfg.addProperty( Environment.ANALYZER_DEFINITION_PROVIDER, "invalidValue" );
+		cfg.addProperty( Environment.ANALYSIS_DEFINITION_PROVIDER, "invalidValue" );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH000329" );
@@ -177,15 +177,15 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		init( ProviderWithInternalNamingConflict.class, CustomAnalyzerEntity.class );
 	}
 
-	private ExtendedSearchIntegrator initUsingService(LuceneAnalyzerDefinitionProvider analyzerProvider, Class<?> ... entityClasses) {
+	private ExtendedSearchIntegrator initUsingService(LuceneAnalysisDefinitionProvider analyzerProvider, Class<?> ... entityClasses) {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		for ( Class<?> entityClass : entityClasses ) {
 			cfg.addClass( entityClass );
 		}
-		cfg.getProvidedServices().put( LuceneAnalyzerDefinitionSourceService.class, new LuceneAnalyzerDefinitionSourceService() {
+		cfg.getProvidedServices().put( LuceneAnalysisDefinitionSourceService.class, new LuceneAnalysisDefinitionSourceService() {
 
 					@Override
-					public LuceneAnalyzerDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
+					public LuceneAnalysisDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
 						return analyzerProvider;
 					}
 
@@ -198,7 +198,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		for ( Class<?> entityClass : entityClasses ) {
 			cfg.addClass( entityClass );
 		}
-		cfg.addProperty( Environment.ANALYZER_DEFINITION_PROVIDER, providerClass.getName() );
+		cfg.addProperty( Environment.ANALYSIS_DEFINITION_PROVIDER, providerClass.getName() );
 		return integratorResource.create( cfg );
 	}
 
@@ -277,9 +277,9 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		}
 	}
 
-	public static class CustomAnalyzerProvider implements LuceneAnalyzerDefinitionProvider {
+	public static class CustomAnalyzerProvider implements LuceneAnalysisDefinitionProvider {
 		@Override
-		public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			builder
 					.analyzer( CUSTOM_ANALYZER_NAME )
 							.tokenizer( PatternTokenizerFactory.class )
@@ -298,18 +298,18 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		}
 	}
 
-	public static class CustomAnalyzer2Provider implements LuceneAnalyzerDefinitionProvider {
+	public static class CustomAnalyzer2Provider implements LuceneAnalysisDefinitionProvider {
 		@Override
-		public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			builder
 					.analyzer( CUSTOM_ANALYZER_2_NAME )
 							.tokenizer( WhitespaceTokenizerFactory.class );
 		}
 	}
 
-	public static class ProviderWithInternalNamingConflict implements LuceneAnalyzerDefinitionProvider {
+	public static class ProviderWithInternalNamingConflict implements LuceneAnalysisDefinitionProvider {
 		@Override
-		public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			builder
 					.analyzer( CUSTOM_ANALYZER_NAME )
 							.tokenizer( StandardTokenizerFactory.class )

@@ -14,8 +14,8 @@ import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionRegistryBuilder;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistryBuilder;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -145,7 +145,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 	public void invalid_notAClass() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( CustomAnalyzerEntity.class );
-		cfg.addProperty( ElasticsearchEnvironment.ANALYZER_DEFINITION_PROVIDER, "invalidValue" );
+		cfg.addProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, "invalidValue" );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400075" );
@@ -157,7 +157,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 	public void invalid_luceneProvider() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( CustomAnalyzerEntity.class );
-		cfg.addProperty( ElasticsearchEnvironment.ANALYZER_DEFINITION_PROVIDER, LuceneAnalyzerDefinitionProviderImpl.class.getName() );
+		cfg.addProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, LuceneAnalyzerDefinitionProviderImpl.class.getName() );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400075" );
@@ -202,7 +202,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 		for ( Class<?> entityClass : entityClasses ) {
 			cfg.addClass( entityClass );
 		}
-		cfg.addProperty( ElasticsearchEnvironment.ANALYZER_DEFINITION_PROVIDER, providerClass.getName() );
+		cfg.addProperty( ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, providerClass.getName() );
 		return integratorResource.create( cfg );
 	}
 
@@ -368,9 +368,9 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 		}
 	}
 
-	public static class LuceneAnalyzerDefinitionProviderImpl implements LuceneAnalyzerDefinitionProvider {
+	public static class LuceneAnalyzerDefinitionProviderImpl implements LuceneAnalysisDefinitionProvider {
 		@Override
-		public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
+		public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
 			// Never called
 		}
 	}

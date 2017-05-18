@@ -13,7 +13,7 @@ package org.hibernate.search.analyzer.definition;
  * Please let us know what you like and what you don't like, and bear in mind
  * that this will likely change in any future version.
  */
-public interface LuceneAnalyzerDefinitionRegistryBuilder {
+public interface LuceneAnalysisDefinitionRegistryBuilder {
 
 	/**
 	 * Start a new analyzer definition.
@@ -22,5 +22,13 @@ public interface LuceneAnalyzerDefinitionRegistryBuilder {
 	 * @return A context allowing to further define the analyzer.
 	 */
 	LuceneAnalyzerDefinitionContext analyzer(String name);
+
+	/**
+	 * Start a new normalizer definition.
+	 *
+	 * @param name The name used to reference this normalizer in Hibernate Search.
+	 * @return A context allowing to further define the normalizer.
+	 */
+	LuceneNormalizerDefinitionContext normalizer(String name);
 
 }

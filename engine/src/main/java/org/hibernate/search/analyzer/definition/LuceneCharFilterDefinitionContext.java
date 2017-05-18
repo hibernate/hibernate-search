@@ -13,7 +13,7 @@ package org.hibernate.search.analyzer.definition;
  * Please let us know what you like and what you don't like, and bear in mind
  * that this will likely change in any future version.
  */
-public interface LuceneCharFilterDefinitionContext extends LuceneAnalyzerDefinitionWithTokenizerContext {
+public interface LuceneCharFilterDefinitionContext extends LuceneCompositeAnalysisDefinitionContext {
 
 	/**
 	 * Set a char filter parameter.
@@ -22,7 +22,6 @@ public interface LuceneCharFilterDefinitionContext extends LuceneAnalyzerDefinit
 	 * @param value The value of the parameter.
 	 * @return This context, allowing to chain calls.
 	 */
-	@Override
 	LuceneCharFilterDefinitionContext param(String name, String value);
 
 }

@@ -8,8 +8,8 @@ package org.hibernate.search.analyzer.definition.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider;
-import org.hibernate.search.analyzer.definition.spi.LuceneAnalyzerDefinitionSourceService;
+import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
+import org.hibernate.search.analyzer.definition.spi.LuceneAnalysisDefinitionSourceService;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.spi.BuildContext;
@@ -22,26 +22,26 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * The default LuceneAnalyzerDefinitionSourceService.
  *
- * This service allows to set the {@link Environment#ANALYZER_DEFINITION_PROVIDER configuration properties} to
- * point to a custom implementation of {@link org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionProvider}.
+ * This service allows to set the {@link Environment#ANALYSIS_DEFINITION_PROVIDER configuration properties} to
+ * point to a custom implementation of {@link org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider}.
  *
  * Integrators which prefer to inject an alternative service by reference rather than setting a configuration
  * property can provide an alternative Service implementation by overriding {@link org.hibernate.search.cfg.spi.SearchConfiguration#getProvidedServices}.
  *
  * @author Sanne Grinovero
  */
-public class PropertiesBasedLuceneAnalyzerDefinitionSourceService implements LuceneAnalyzerDefinitionSourceService, Startable {
+public class PropertiesBasedLuceneAnalysisDefinitionSourceService implements LuceneAnalysisDefinitionSourceService, Startable {
 
 	private static final Log log = LoggerFactory.make();
-	private LuceneAnalyzerDefinitionProvider provider;
+	private LuceneAnalysisDefinitionProvider provider;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
-		String providerClassName = properties.getProperty( Environment.ANALYZER_DEFINITION_PROVIDER );
+		String providerClassName = properties.getProperty( Environment.ANALYSIS_DEFINITION_PROVIDER );
 		if ( providerClassName != null ) {
 			try {
 				Class<?> providerClazz = ClassLoaderHelper.classForName( providerClassName, context.getServiceManager() );
-				provider = (LuceneAnalyzerDefinitionProvider) ReflectionHelper.createInstance( providerClazz, true );
+				provider = (LuceneAnalysisDefinitionProvider) ReflectionHelper.createInstance( providerClazz, true );
 			}
 			catch (RuntimeException e) {
 				throw log.invalidLuceneAnalyzerDefinitionProvider( providerClassName, e );
@@ -50,7 +50,7 @@ public class PropertiesBasedLuceneAnalyzerDefinitionSourceService implements Luc
 	}
 
 	@Override
-	public LuceneAnalyzerDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
+	public LuceneAnalysisDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
 		return provider;
 	}
 

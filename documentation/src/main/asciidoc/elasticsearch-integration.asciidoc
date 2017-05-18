@@ -555,7 +555,7 @@ public class Tweet {
 As <<section-programmatic-analyzer-definition,with Lucene>>, you can define analyzers programmatically.
 
 In the case of Elasticsearch, this requires to set the
-`hibernate.search.elasticsearch.analyzer_definition_provider` configuration property.
+`hibernate.search.elasticsearch.analysis_definition_provider` configuration property.
 
 The property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
 This class must either implement `org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider` directly
