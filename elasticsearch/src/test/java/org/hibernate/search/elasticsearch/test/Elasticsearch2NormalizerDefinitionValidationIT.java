@@ -15,7 +15,7 @@ import org.junit.experimental.categories.Category;
  * @author Yoann Rodiere
  */
 @Category(SkipFromElasticsearch50.class)
-public class Elasticsearch2NormalizerDefinitionValidationIT extends AbstractElasticsearchNormalizerDefinitionValidationIT {
+public class Elasticsearch2NormalizerDefinitionValidationIT extends AbstractElasticsearch2And50NormalizerDefinitionValidationIT {
 
 	@Override
 	protected void putMapping() throws IOException {

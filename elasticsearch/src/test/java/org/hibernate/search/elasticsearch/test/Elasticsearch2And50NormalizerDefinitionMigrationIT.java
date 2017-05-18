@@ -42,7 +42,7 @@ import org.junit.rules.ExpectedException;
  * @author Yoann Rodiere
  */
 @Category(SkipFromElasticsearch52.class)
-public class ElasticsearchNormalizerDefinitionMigrationIT extends SearchInitializationTestBase {
+public class Elasticsearch2And50NormalizerDefinitionMigrationIT extends SearchInitializationTestBase {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();

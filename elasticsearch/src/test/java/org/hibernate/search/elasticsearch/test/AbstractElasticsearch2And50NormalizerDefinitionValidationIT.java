@@ -44,7 +44,7 @@ import org.junit.rules.ExpectedException;
  *
  * @author Yoann Rodiere
  */
-public abstract class AbstractElasticsearchNormalizerDefinitionValidationIT extends SearchInitializationTestBase {
+public abstract class AbstractElasticsearch2And50NormalizerDefinitionValidationIT extends SearchInitializationTestBase {
 
 	private static final String VALIDATION_FAILED_MESSAGE_ID = "HSEARCH400033";
 
