@@ -21,6 +21,7 @@ import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch52;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchInitializationTestBase;
@@ -28,6 +29,7 @@ import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.testing.TestForIssue;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -52,6 +54,7 @@ public class ElasticsearchUnsupportedFeaturesIT extends SearchInitializationTest
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2726")
+	@Category( SkipFromElasticsearch52.class )
 	public void conflictingAnalyzerNormalizerDefinitions() throws Exception {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400087" );
