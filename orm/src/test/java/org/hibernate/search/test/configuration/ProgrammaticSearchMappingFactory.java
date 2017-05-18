@@ -34,6 +34,8 @@ public class ProgrammaticSearchMappingFactory {
 			"org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory" + "_deutsch";
 	private static final String NGRAM_ANALYZER_NAME =
 			"org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory" + "_ngram";
+	private static final String LOWERCASE_NORMALIZER_NAME =
+			"org_hibernate_search_test_configuration_ProgrammaticSearchMappingFactory" + "_lowercase";
 
 	@Factory
 	public SearchMapping build() {
@@ -51,6 +53,8 @@ public class ProgrammaticSearchMappingFactory {
 				.analyzerDef( DEUTSCH_ANALYZER_NAME, StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( GermanStemFilterFactory.class )
+				.normalizerDef( LOWERCASE_NORMALIZER_NAME )
+					.filter( LowerCaseFilterFactory.class )
 				/*
 				 * End of analyzer definitions that are duplicated in the elasticsearch.yml for test with Elasticsearch.
 				 */
@@ -76,6 +80,7 @@ public class ProgrammaticSearchMappingFactory {
 						.field()
 							.name( "street1_abridged" )
 							.bridge( ConcatStringBridge.class ).param( ConcatStringBridge.SIZE, "4" )
+						.field().name( "street1_normalized" ).normalizer( LOWERCASE_NORMALIZER_NAME )
 					.property( "street2", ElementType.METHOD )
 						.field().name( "idx_street2" ).store( Store.YES ).boost( 2 )
 				.entity( ProvidedIdEntry.class ).indexed()
