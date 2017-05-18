@@ -16,6 +16,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientImpleme
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.nulls.impl.ElasticsearchMissingValueStrategy;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
 import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaCreator;
@@ -107,7 +108,7 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 			this.schemaDropper = new DefaultElasticsearchSchemaDropper( schemaAccessor );
 			this.schemaMigrator = new DefaultElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
 
-			this.missingValueStrategy = dialect.createMissingValueStrategy();
+			this.missingValueStrategy = new ElasticsearchMissingValueStrategy( schemaTranslator );
 
 			this.queryFactory = dialect.createQueryFactory();
 		}

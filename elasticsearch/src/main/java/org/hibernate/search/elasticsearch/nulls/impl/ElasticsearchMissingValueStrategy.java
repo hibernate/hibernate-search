@@ -8,31 +8,35 @@ package org.hibernate.search.elasticsearch.nulls.impl;
 
 import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
+import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchAsNullStringNullMarkerCodec;
 import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchAsTokenStringNullMarkerCodec;
 import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchBooleanNullMarkerCodec;
 import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchDoubleNullMarkerCodec;
 import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchFloatNullMarkerCodec;
 import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchIntegerNullMarkerCodec;
 import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchLongNullMarkerCodec;
-import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchAsNullStringNullMarkerCodec;
-import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
-import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
+import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
 import org.hibernate.search.engine.metadata.impl.PartialDocumentFieldMetadata;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-public final class Elasticsearch5MissingValueStrategy implements MissingValueStrategy {
+public final class ElasticsearchMissingValueStrategy implements MissingValueStrategy {
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	public static final Elasticsearch5MissingValueStrategy INSTANCE = new Elasticsearch5MissingValueStrategy();
+	private final ElasticsearchSchemaTranslator schemaTranslator;
+
+	public ElasticsearchMissingValueStrategy(ElasticsearchSchemaTranslator schemaTranslator) {
+		super();
+		this.schemaTranslator = schemaTranslator;
+	}
 
 	@Override
 	public NullMarkerCodec createNullMarkerCodec(Class<?> entityType,
 			PartialDocumentFieldMetadata fieldMetadata, NullMarker nullMarker) {
 		Object nullEncoded = nullMarker.nullEncoded();
 		if ( nullEncoded instanceof String ) {
-			if ( isTextDataType( fieldMetadata ) ) {
+			if ( schemaTranslator.isTextDataType( fieldMetadata ) ) {
 				/*
 				 * The "text" datatype does not support null_value,
 				 * which implies a slightly different null value handling
@@ -63,19 +67,5 @@ public final class Elasticsearch5MissingValueStrategy implements MissingValueStr
 			throw LOG.unsupportedNullTokenType( entityType, fieldMetadata.getPath().getRelativeName(),
 					nullEncoded.getClass() );
 		}
-	}
-
-	@SuppressWarnings("deprecation")
-	private boolean isTextDataType(PartialDocumentFieldMetadata fieldMetadata) {
-		// The text datatype is always analyzed, otherwise we use the "keyword" datatype
-		if ( fieldMetadata.getIndex().isAnalyzed() ) {
-			ExtendedFieldType fieldType = FieldHelper.getType( fieldMetadata );
-			if ( ExtendedFieldType.STRING.equals( fieldType )
-					// We also use strings when the type is unknown
-					|| ExtendedFieldType.UNKNOWN.equals( fieldType ) ) {
-				return true;
-			}
-		}
-		return false;
 	}
 }
