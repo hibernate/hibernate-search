@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Tests for {@link ElasticsearchIndexManager}'s schema validation feature.
+ * Tests for {@link ElasticsearchIndexManager}'s analyzer definition migration feature.
  *
  * @author Yoann Rodiere
  */
