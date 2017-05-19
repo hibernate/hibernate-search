@@ -18,7 +18,6 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
 import org.hibernate.search.util.logging.impl.LoggerInfoStream;
 import org.hibernate.search.util.logging.impl.LuceneLogCategories;
 import org.junit.After;
@@ -29,7 +28,6 @@ import static junit.framework.TestCase.assertFalse;
 
 public class LoggerInfoStreamTest {
 
-	private static final Version VERSION = Version.LUCENE_5_4_0;
 	private Level hsearchLevel;
 	private final Logger hsearchLogger = Logger.getLogger( "org.hibernate.search" );
 	private final Logger rootLogger = Logger.getRootLogger();
