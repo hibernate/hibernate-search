@@ -11,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.IOException;
@@ -27,12 +28,18 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest.Build
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
+import org.hibernate.search.testsupport.BytemanHelper;
+import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -45,6 +52,7 @@ import com.google.gson.JsonParser;
 /**
  * @author Yoann Rodiere
  */
+@RunWith(BMUnitRunner.class)
 public class DefaultElasticsearchClientFactoryTest {
 
 	private static final Poller POLLER = Poller.milliseconds( 10_000, 500 );
@@ -61,10 +69,13 @@ public class DefaultElasticsearchClientFactoryTest {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Rule
-	public WireMockRule wireMockRule1 = new WireMockRule( 0 /* Automatic port selection */ );
+	public BytemanAccessor byteman = BytemanHelper.createAccessor();
 
 	@Rule
-	public WireMockRule wireMockRule2 = new WireMockRule( 0 /* Automatic port selection */ );
+	public WireMockRule wireMockRule1 = new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
+
+	@Rule
+	public WireMockRule wireMockRule2 = new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
 
 	private DefaultElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
 
@@ -347,6 +358,47 @@ public class DefaultElasticsearchClientFactoryTest {
 
 				wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 				wireMockRule2.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
+			} );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2736")
+	@BMRule(
+		name = "trackHttpsHostsDiscovery",
+		targetClass = "org.elasticsearch.client.RestClient",
+		targetMethod = "setHosts(HttpHost[])",
+		helper = "org.hibernate.search.testsupport.BytemanHelper",
+		binding = "host0 : HttpHost = $1.length >= 1 ? $1[0] : null, host1 : HttpHost = $1.length >= 2 ? $1[1] : null;",
+		condition = "host0 != null && host0.getSchemeName().equals( \"https\" )"
+				+ " || host1 != null && host1.getSchemeName().equals( \"https\" )",
+		action = "pushEvent( \"https\" )"
+	)
+	@Ignore // HSEARCH-2481 Byteman-based tests executed in the Elasticsearch module won't work
+	public void discoveryScheme() throws Exception {
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
+				// Need to use HTTP here, so that the sniffer can at least retrieve the host list
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.DISCOVERY_ENABLED, "true" )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.DISCOVERY_REFRESH_INTERVAL, "1" )
+				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.DISCOVERY_SCHEME, "https" );
+
+		String nodesInfoResult = dummyNodeInfoResponse(
+				wireMockRule1.httpsPort(),
+				wireMockRule2.httpsPort()
+				);
+
+		wireMockRule1.stubFor( get( WireMock.urlMatching( "/_nodes.*" ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ).withBody( nodesInfoResult ) ) );
+
+		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
+			/*
+			 * We can't use a valid SSL/TLS certificate, so we just check, using Byteman,
+			 * that the sniffer found some HTTPS hosts at some point.
+			 */
+			POLLER.pollAssertion( () -> {
+				assertThat( byteman.isEventStackEmpty() ? null : byteman.consumeNextRecordedEvent() )
+						.as( "An event confirming that HTTPS was used" ).isEqualTo( "https" );
 			} );
 		}
 	}
