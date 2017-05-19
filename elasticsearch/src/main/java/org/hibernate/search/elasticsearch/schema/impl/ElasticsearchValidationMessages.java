@@ -45,6 +45,11 @@ public interface ElasticsearchValidationMessages {
 	String analyzerContext(String name);
 
 	@Message(
+			value = "normalizer '%1$s'"
+	)
+	String normalizerContext(String name);
+
+	@Message(
 			value = "char filter '%1$s'"
 	)
 	String charFilterContext(String name);
@@ -96,6 +101,11 @@ public interface ElasticsearchValidationMessages {
 			value = "Missing analyzer definition"
 	)
 	String analyzerMissing();
+
+	@Message(
+			value = "Missing normalizer definition"
+	)
+	String normalizerMissing();
 
 	@Message(
 			value = "Invalid char filters. Expected '%1$s', actual is '%2$s'"

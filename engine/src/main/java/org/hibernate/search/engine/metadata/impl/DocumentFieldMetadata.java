@@ -291,6 +291,11 @@ public class DocumentFieldMetadata implements PartialDocumentFieldMetadata {
 			return this;
 		}
 
+		@Override
+		public AnalyzerReference getAnalyzerReference() {
+			return analyzerReference;
+		}
+
 		public Builder id() {
 			this.isId = true;
 			return this;

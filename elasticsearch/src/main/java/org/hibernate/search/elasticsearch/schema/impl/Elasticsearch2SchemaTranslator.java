@@ -250,7 +250,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 		PropertyMapping fieldMapping = new PropertyMapping();
 
-		addTypeOptions( mappingBuilder, fieldMapping, facetMetadata, Field.Index.NOT_ANALYZED );
+		addTypeOptions( mappingBuilder, fieldMapping, facetMetadata, Field.Index.NOT_ANALYZED, null );
 		fieldMapping.setStore( false );
 		addSubfieldIndexOptions( fieldMapping, facetMetadata );
 
@@ -315,7 +315,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
 			PropertyMapping propertyMapping, DocumentFieldMetadata fieldMetadata) {
 		addTypeOptions( mappingBuilder, fieldMetadata.getAbsoluteName(), propertyMapping, FieldHelper.getType( fieldMetadata ),
-				fieldMetadata.getIndex() );
+				fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
 	}
 
 	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
@@ -326,11 +326,13 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getAbsoluteName() );
 		}
 
-		addTypeOptions( mappingBuilder, bridgeDefinedField.getAbsoluteName(), propertyMapping, type, bridgeDefinedField.getIndex() );
+		addTypeOptions( mappingBuilder, bridgeDefinedField.getAbsoluteName(), propertyMapping, type,
+				bridgeDefinedField.getIndex(), bridgeDefinedField.getSourceField().getAnalyzerReference() );
 	}
 
 	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
-			PropertyMapping fieldMapping, FacetMetadata facetMetadata, Field.Index index) {
+			PropertyMapping fieldMapping, FacetMetadata facetMetadata,
+			Field.Index index, AnalyzerReference analyzerReference) {
 		ExtendedFieldType type;
 
 		if ( facetMetadata.isEncodingAuto() ) {
@@ -363,12 +365,13 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			}
 		}
 
-		addTypeOptions( mappingBuilder, facetMetadata.getAbsoluteName(), fieldMapping, type, index );
+		addTypeOptions( mappingBuilder, facetMetadata.getAbsoluteName(), fieldMapping, type,
+				index, analyzerReference );
 	}
 
 	private DataType addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
 			String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType,
-			Field.Index index) {
+			Field.Index index, AnalyzerReference analyzerReference) {
 		DataType elasticsearchType;
 		List<String> formats = new ArrayList<>();
 
@@ -452,7 +455,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			case STRING:
 			case UNKNOWN:
 			default:
-				elasticsearchType = getStringType( index );
+				elasticsearchType = getStringType( fieldName, index, analyzerReference );
 				break;
 		}
 
@@ -465,7 +468,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		return elasticsearchType;
 	}
 
-	protected DataType getStringType(Index index) {
+	protected DataType getStringType(String propertyPath, Index index, AnalyzerReference analyzerReference) {
 		return DataType.STRING;
 	}
 

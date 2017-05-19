@@ -62,13 +62,20 @@ public class PropertyMapping extends TypeMapping {
 
 	/*
 	 * Text datatype
-	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/string.html
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html
 	 */
 
 	private String analyzer;
 
 	@SerializedName("fielddata")
 	private FieldDataType fieldData;
+
+	/*
+	 * Keyword datatype
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html
+	 */
+
+	private String normalizer;
 
 	/*
 	 * Date datatype
@@ -166,6 +173,14 @@ public class PropertyMapping extends TypeMapping {
 
 	public void setAnalyzer(String analyzer) {
 		this.analyzer = analyzer;
+	}
+
+	public String getNormalizer() {
+		return normalizer;
+	}
+
+	public void setNormalizer(String normalizer) {
+		this.normalizer = normalizer;
 	}
 
 	public FieldDataType getFieldData() {

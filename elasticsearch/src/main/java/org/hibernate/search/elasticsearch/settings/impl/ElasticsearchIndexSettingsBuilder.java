@@ -28,6 +28,9 @@ public class ElasticsearchIndexSettingsBuilder {
 		if ( !analysisDefinitionRegistry.getAnalyzerDefinitions().isEmpty() ) {
 			getAnalysis( settings ).setAnalyzers( analysisDefinitionRegistry.getAnalyzerDefinitions() );
 		}
+		if ( !analysisDefinitionRegistry.getNormalizerDefinitions().isEmpty() ) {
+			getAnalysis( settings ).setNormalizers( analysisDefinitionRegistry.getNormalizerDefinitions() );
+		}
 		if ( !analysisDefinitionRegistry.getTokenizerDefinitions().isEmpty() ) {
 			getAnalysis( settings ).setTokenizers( analysisDefinitionRegistry.getTokenizerDefinitions() );
 		}

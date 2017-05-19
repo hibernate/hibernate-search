@@ -19,9 +19,9 @@ import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinitio
 /**
  * @author Yoann Rodiere
  */
-public class NamedElasticsearchNormalizerReference extends NamedElasticsearchAnalyzerReference {
+public class NamedElasticsearch2NormalizerReference extends NamedElasticsearchAnalyzerReference {
 
-	public NamedElasticsearchNormalizerReference(String name) {
+	public NamedElasticsearch2NormalizerReference(String name) {
 		super( name );
 	}
 
@@ -60,4 +60,5 @@ public class NamedElasticsearchNormalizerReference extends NamedElasticsearchAna
 		analyzerDefinition.setTokenFilters( definition.getTokenFilters() );
 		return analyzerDefinition;
 	}
+
 }

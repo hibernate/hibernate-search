@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl.es2;
 
+import org.hibernate.search.elasticsearch.analyzer.impl.Elasticsearch2AnalyzerStrategy;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -24,6 +26,7 @@ import org.hibernate.search.elasticsearch.util.impl.gson.ES2IndexTypeJsonAdapter
 import org.hibernate.search.elasticsearch.util.impl.gson.ES2NormsTypeJsonAdapter;
 import org.hibernate.search.elasticsearch.work.impl.factory.Elasticsearch2WorkFactory;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 
 import com.google.gson.GsonBuilder;
 
@@ -55,6 +58,11 @@ public class Elasticsearch2Dialect implements ElasticsearchDialect {
 	@Override
 	public ElasticsearchSchemaValidator createSchemaValidator(ElasticsearchSchemaAccessor schemaAccessor) {
 		return new Elasticsearch2SchemaValidator( schemaAccessor );
+	}
+
+	@Override
+	public ElasticsearchAnalyzerStrategyFactory createAnalyzerStrategyFactory(ServiceManager serviceManager) {
+		return configuration -> new Elasticsearch2AnalyzerStrategy( serviceManager, configuration );
 	}
 
 	@Override

@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.impl;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClientFactory;
@@ -72,6 +73,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 	private ElasticsearchSchemaTranslator schemaTranslator;
 
+	private ElasticsearchAnalyzerStrategyFactory analyzerStrategyFactory;
+
 	private MissingValueStrategy missingValueStrategy;
 
 	private ElasticsearchQueryFactory queryFactory;
@@ -110,6 +113,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 			this.schemaCreator = new DefaultElasticsearchSchemaCreator( schemaAccessor );
 			this.schemaDropper = new DefaultElasticsearchSchemaDropper( schemaAccessor );
 			this.schemaMigrator = new DefaultElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
+
+			this.analyzerStrategyFactory = dialect.createAnalyzerStrategyFactory( serviceManager );
 
 			this.missingValueStrategy = new ElasticsearchMissingValueStrategy( schemaTranslator );
 
@@ -171,6 +176,11 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public ElasticsearchSchemaTranslator getSchemaTranslator() {
 		return schemaTranslator;
+	}
+
+	@Override
+	public ElasticsearchAnalyzerStrategyFactory getAnalyzerStrategyFactory() {
+		return analyzerStrategyFactory;
 	}
 
 	@Override

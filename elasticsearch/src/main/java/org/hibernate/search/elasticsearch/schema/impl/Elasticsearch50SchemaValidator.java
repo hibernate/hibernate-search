@@ -15,13 +15,13 @@ import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import com.google.gson.JsonPrimitive;
 
 /**
- * An {@link ElasticsearchSchemaValidator} implementation for Elasticsearch 5.
+ * An {@link ElasticsearchSchemaValidator} implementation for Elasticsearch 5.0/5.1.
  *
  * @author Yoann Rodiere
  */
-public class Elasticsearch5SchemaValidator extends Elasticsearch2SchemaValidator {
+public class Elasticsearch50SchemaValidator extends Elasticsearch2SchemaValidator {
 
-	public Elasticsearch5SchemaValidator(ElasticsearchSchemaAccessor schemaAccessor) {
+	public Elasticsearch50SchemaValidator(ElasticsearchSchemaAccessor schemaAccessor) {
 		super( schemaAccessor );
 	}
 
