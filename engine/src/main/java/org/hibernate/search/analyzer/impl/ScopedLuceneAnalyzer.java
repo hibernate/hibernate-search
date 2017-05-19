@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
-import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 
 /**
  * A {@code ScopedLuceneAnalyzer} is a wrapper class containing all analyzers for a given class.
@@ -23,7 +22,7 @@ import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public final class ScopedLuceneAnalyzer extends AnalyzerWrapper implements ScopedAnalyzer {
+public final class ScopedLuceneAnalyzer extends AnalyzerWrapper {
 
 	private final Analyzer globalAnalyzer;
 	private final Map<String, Analyzer> scopedAnalyzers;

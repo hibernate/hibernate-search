@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 
 /**
@@ -21,7 +20,7 @@ import org.hibernate.search.elasticsearch.analyzer.definition.impl.Elasticsearch
  *
  * @author Guillaume Smet
  */
-public class ScopedElasticsearchAnalyzer implements ElasticsearchAnalyzer, ScopedAnalyzer {
+public class ScopedElasticsearchAnalyzer implements ElasticsearchAnalyzer {
 
 	private final ElasticsearchAnalyzer globalAnalyzer;
 	private final Map<String, ElasticsearchAnalyzer> scopedAnalyzers;
