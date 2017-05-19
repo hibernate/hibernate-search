@@ -123,16 +123,10 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 			// When all definitions are known and translated, actually initialize the references
 			for ( AnalyzerReference reference : references ) {
-				if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
-					NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
-					if ( !namedReference.isInitialized() ) {
-						namedReference.initialize( definitionRegistry );
-					}
-				}
-				else if ( reference.is( LuceneClassElasticsearchAnalyzerReference.class ) ) {
-					LuceneClassElasticsearchAnalyzerReference luceneClassReference = reference.unwrap( LuceneClassElasticsearchAnalyzerReference.class );
-					if ( !luceneClassReference.isInitialized() ) {
-						luceneClassReference.initialize( translator );
+				if ( reference.is( ElasticsearchAnalyzerReference.class ) ) {
+					ElasticsearchAnalyzerReference esReference = reference.unwrap( ElasticsearchAnalyzerReference.class );
+					if ( !esReference.isInitialized() ) {
+						esReference.initialize( definitionRegistry, translator );
 					}
 				}
 			}
@@ -169,8 +163,8 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 			if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
 				NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
 				if ( namedReference.isInitialized() ) {
-					// Note: these analyzers don't handle scope, we don't care about the field name
-					namedReference.getAnalyzer().registerDefinitions( definitionRegistry, null );
+					// Note: these references don't handle scope, we don't care about the field name
+					namedReference.registerDefinitions( null, definitionRegistry );
 				}
 			}
 		}
@@ -191,7 +185,8 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 			if ( reference.is( NamedElasticsearchAnalyzerReference.class ) ) {
 				NamedElasticsearchAnalyzerReference namedReference = reference.unwrap( NamedElasticsearchAnalyzerReference.class );
 				if ( !namedReference.isInitialized() ) {
-					String name = namedReference.getAnalyzerName();
+					// Note: these references don't handle scope, we don't care about the field name
+					String name = namedReference.getAnalyzerName( null );
 					AnalyzerDef hibernateSearchAnalyzerDef = analyzerDefinitions.get( name );
 					if ( hibernateSearchAnalyzerDef != null ) {
 						translatingPopulator.registerAnalyzerDef( hibernateSearchAnalyzerDef );

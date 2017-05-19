@@ -18,7 +18,6 @@ import org.apache.lucene.document.Field.Index;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.spi.NullMarker;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchBridgeDefinedField;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
@@ -279,8 +278,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			}
 			else {
 				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
-				ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
-				String analyzerName = settingsBuilder.register( analyzer, propertyPath );
+				String analyzerName = settingsBuilder.register( elasticsearchReference, propertyPath );
 				propertyMapping.setAnalyzer( analyzerName );
 			}
 		}

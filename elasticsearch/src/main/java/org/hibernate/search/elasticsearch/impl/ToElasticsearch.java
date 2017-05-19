@@ -449,7 +449,7 @@ public class ToElasticsearch {
 						JsonBuilder.object().add( query.getField(),
 								JsonBuilder.object()
 										.addProperty( "query", query.getPhrase().trim() )
-										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzer().getName( query.getField() ) )
+										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzerName( query.getField() ) )
 										.append( slopAppender( query.getSlop() ) )
 										.append( boostAppender( query ) )
 								)
@@ -464,7 +464,7 @@ public class ToElasticsearch {
 						JsonBuilder.object().add( query.getField(),
 								JsonBuilder.object()
 										.addProperty( "query", query.getSearchTerms() )
-										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzer().getName( query.getField() ) )
+										.addProperty( "analyzer", query.getAnalyzerReference().getAnalyzerName( query.getField() ) )
 										.append( fuzzinessAppender( query.getMaxEditDistance() ) )
 										.append( boostAppender( query ) )
 						)
@@ -489,8 +489,8 @@ public class ToElasticsearch {
 			}
 			fieldArray.add( sb.toString() );
 
-			String originalRemoteAnalyzerName = query.getOriginalRemoteAnalyzerReference().getAnalyzer().getName( field.getName() );
-			String queryRemoteAnalyzerName = query.getQueryRemoteAnalyzerReference().getAnalyzer().getName( field.getName() );
+			String originalRemoteAnalyzerName = query.getOriginalRemoteAnalyzerReference().getAnalyzerName( field.getName() );
+			String queryRemoteAnalyzerName = query.getQueryRemoteAnalyzerReference().getAnalyzerName( field.getName() );
 			analyzers.add( queryRemoteAnalyzerName );
 			if ( !queryRemoteAnalyzerName.equals( originalRemoteAnalyzerName ) ) {
 				if ( overridingRemoteAnalyzerName == null ) {

@@ -16,7 +16,6 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
  */
 public abstract class LuceneAnalyzerReference implements AnalyzerReference {
 
-	@Override
 	public abstract Analyzer getAnalyzer();
 
 	@Override

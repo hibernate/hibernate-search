@@ -7,6 +7,7 @@
 package org.hibernate.search.test.configuration.mutablefactory;
 
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DocumentId;
@@ -68,8 +69,13 @@ public class DefinitionsOnHotRebootTest {
 		for ( SearchIntegration integration : sf.unwrap( ExtendedSearchIntegrator.class ).getIntegrations().values() ) {
 			AnalyzerRegistry registry = integration.getAnalyzerRegistry();
 			AnalyzerReference analyzerReference = registry.getAnalyzerReference( analyzerName );
-			if ( analyzerReference != null && analyzerReference.getAnalyzer() != null ) {
-				return true;
+			if ( analyzerReference != null ) {
+				if ( analyzerReference.is( LuceneAnalyzerReference.class ) ) {
+					return analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer() != null;
+				}
+				else {
+					return true;
+				}
 			}
 		}
 		return false;

@@ -18,11 +18,6 @@ import java.io.Closeable;
 public interface AnalyzerReference extends Closeable {
 
 	/**
-	 * @return The referenced analyzer.
-	 */
-	Object getAnalyzer();
-
-	/**
 	 * Check if the analyzer can be represented using a specific class.
 	 *
 	 * @param analyzerType an {@link AnalyzerReference} type

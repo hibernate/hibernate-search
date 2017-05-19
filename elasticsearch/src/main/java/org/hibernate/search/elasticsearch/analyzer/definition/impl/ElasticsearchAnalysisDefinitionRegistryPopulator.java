@@ -9,7 +9,7 @@ package org.hibernate.search.elasticsearch.analyzer.definition.impl;
 /**
  * @author Yoann Rodiere
  */
-interface ElasticsearchAnalysisDefinitionRegistryPopulator {
+public interface ElasticsearchAnalysisDefinitionRegistryPopulator {
 
 	void populate(ElasticsearchAnalysisDefinitionRegistry registry);
 

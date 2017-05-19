@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -91,7 +92,9 @@ public class AnalyzerDefsAnnotationTest {
 			AnalyzerRegistry registry = integration.getAnalyzerRegistry();
 			AnalyzerReference analyzerReference = registry.getAnalyzerReference( analyzerName );
 			if ( analyzerReference != null ) {
-				assertThat( analyzerReference.getAnalyzer() ).isNotNull();
+				if ( analyzerReference.is( LuceneAnalyzerReference.class ) ) {
+					assertThat( analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer() ).isNotNull();
+				}
 				return;
 			}
 		}
