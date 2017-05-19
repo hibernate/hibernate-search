@@ -7,7 +7,6 @@
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
@@ -22,33 +21,26 @@ import org.hibernate.search.elasticsearch.analyzer.definition.impl.Elasticsearch
  */
 public class ScopedElasticsearchAnalyzer implements ElasticsearchAnalyzer {
 
-	private final ElasticsearchAnalyzer globalAnalyzer;
-	private final Map<String, ElasticsearchAnalyzer> scopedAnalyzers;
+	private final ElasticsearchAnalyzerReference globalAnalyzerReference;
+	private final Map<String, ElasticsearchAnalyzerReference> scopedAnalyzerReferences;
 
-	public ScopedElasticsearchAnalyzer(ElasticsearchAnalyzer globalAnalyzer) {
-		this( globalAnalyzer, Collections.<String, ElasticsearchAnalyzer>emptyMap() );
+	public ScopedElasticsearchAnalyzer(ElasticsearchAnalyzerReference globalAnalyzer) {
+		this( globalAnalyzer, Collections.<String, ElasticsearchAnalyzerReference>emptyMap() );
 	}
 
-	public ScopedElasticsearchAnalyzer(ElasticsearchAnalyzer globalAnalyzer,
-			Map<String, ElasticsearchAnalyzer> scopedAnalyzers) {
-		this.globalAnalyzer = globalAnalyzer;
-		this.scopedAnalyzers = Collections.unmodifiableMap( new HashMap<>( scopedAnalyzers ) );
-	}
-
-	ElasticsearchAnalyzer getGlobalAnalyzer() {
-		return globalAnalyzer;
-	}
-
-	Map<String, ElasticsearchAnalyzer> getScopedAnalyzers() {
-		return scopedAnalyzers;
+	// For package use only; assumes the map is immutable
+	ScopedElasticsearchAnalyzer(ElasticsearchAnalyzerReference globalAnalyzerReference,
+			Map<String, ElasticsearchAnalyzerReference> scopedAnalyzerReferences) {
+		this.globalAnalyzerReference = globalAnalyzerReference;
+		this.scopedAnalyzerReferences = scopedAnalyzerReferences;
 	}
 
 	private ElasticsearchAnalyzer getDelegate(String fieldName) {
-		ElasticsearchAnalyzer analyzer = scopedAnalyzers.get( fieldName );
-		if ( analyzer == null ) {
-			analyzer = globalAnalyzer;
+		ElasticsearchAnalyzerReference analyzerReference = scopedAnalyzerReferences.get( fieldName );
+		if ( analyzerReference == null ) {
+			analyzerReference = globalAnalyzerReference;
 		}
-		return analyzer;
+		return analyzerReference.getAnalyzer();
 	}
 
 	@Override
@@ -71,9 +63,9 @@ public class ScopedElasticsearchAnalyzer implements ElasticsearchAnalyzer {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() );
 		sb.append( "<" );
-		sb.append( globalAnalyzer );
+		sb.append( globalAnalyzerReference );
 		sb.append( "," );
-		sb.append( scopedAnalyzers );
+		sb.append( scopedAnalyzerReferences );
 		sb.append( ">" );
 		return sb.toString();
 	}

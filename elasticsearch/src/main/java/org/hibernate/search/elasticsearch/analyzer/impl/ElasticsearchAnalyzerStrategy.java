@@ -135,12 +135,6 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 						luceneClassReference.initialize( translator );
 					}
 				}
-				else if ( reference.is( ScopedElasticsearchAnalyzerReference.class ) ) {
-					ScopedElasticsearchAnalyzerReference scopedReference = reference.unwrap( ScopedElasticsearchAnalyzerReference.class );
-					if ( !scopedReference.isInitialized() ) {
-						scopedReference.initialize();
-					}
-				}
 			}
 		}
 	}
@@ -211,7 +205,7 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public ScopedElasticsearchAnalyzerReference.Builder buildScopedAnalyzerReference(AnalyzerReference initialGlobalAnalyzerReference) {
-		return new ScopedElasticsearchAnalyzerReference.DeferredInitializationBuilder(
+		return new ScopedElasticsearchAnalyzerReference.Builder(
 				initialGlobalAnalyzerReference.unwrap( ElasticsearchAnalyzerReference.class ),
 				Collections.<String, ElasticsearchAnalyzerReference>emptyMap()
 				);
