@@ -10,21 +10,19 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryPopulator;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 
 /**
- * A description of an Elasticsearch analyzer built through an analyzer definition.
- * <p>
- * This implementation is used whenever {@code @Analyzer(definition = "foo")} is encountered
- * and an {@code @AnalyzerDefinition} exists with the given name ("foo" in this example).
+ * A populator of an Elasticsearch analysis definitions provided explicitly.
  *
  * @author Guillaume Smet
  * @author Yoann Rodiere
  */
-public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
+public class SimpleElasticsearchAnalysisDefinitionRegistryPopulator implements ElasticsearchAnalysisDefinitionRegistryPopulator {
 
 	private final String analyzerName;
 	private final AnalyzerDefinition analyzerDefinition;
@@ -32,7 +30,7 @@ public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 	private final Map<String, CharFilterDefinition> charFilters;
 	private final Map<String, TokenFilterDefinition> tokenFilters;
 
-	public CustomElasticsearchAnalyzerImpl(String analyzerName,
+	public SimpleElasticsearchAnalysisDefinitionRegistryPopulator(String analyzerName,
 			AnalyzerDefinition analyzerDefinition,
 			String tokenizerName,
 			TokenizerDefinition tokenizerDefinition,
@@ -47,12 +45,7 @@ public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 	}
 
 	@Override
-	public String getName(String fieldName) {
-		return analyzerName;
-	}
-
-	@Override
-	public String registerDefinitions(ElasticsearchAnalysisDefinitionRegistry registry, String fieldName) {
+	public void populate(ElasticsearchAnalysisDefinitionRegistry registry) {
 		registry.register( analyzerName, analyzerDefinition );
 		if ( tokenizerDefinition != null ) {
 			registry.register( analyzerDefinition.getTokenizer(), tokenizerDefinition );
@@ -63,12 +56,6 @@ public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 		for ( Map.Entry<String, TokenFilterDefinition> entry : tokenFilters.entrySet() ) {
 			registry.register( entry.getKey(), entry.getValue() );
 		}
-		return analyzerName;
-	}
-
-	@Override
-	public void close() {
-		// nothing to close
 	}
 
 	@Override
@@ -85,8 +72,8 @@ public class CustomElasticsearchAnalyzerImpl implements ElasticsearchAnalyzer {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( obj instanceof CustomElasticsearchAnalyzerImpl ) {
-			CustomElasticsearchAnalyzerImpl other = (CustomElasticsearchAnalyzerImpl) obj;
+		if ( obj instanceof SimpleElasticsearchAnalysisDefinitionRegistryPopulator ) {
+			SimpleElasticsearchAnalysisDefinitionRegistryPopulator other = (SimpleElasticsearchAnalysisDefinitionRegistryPopulator) obj;
 			return Objects.equals( analyzerName, other.analyzerName )
 					&& Objects.equals( analyzerDefinition, other.analyzerDefinition )
 					&& Objects.equals( tokenizerDefinition, other.tokenizerDefinition )

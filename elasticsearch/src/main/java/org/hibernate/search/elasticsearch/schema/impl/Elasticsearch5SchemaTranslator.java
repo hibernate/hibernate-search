@@ -9,7 +9,6 @@ package org.hibernate.search.elasticsearch.schema.impl;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzer;
 import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
@@ -72,8 +71,7 @@ public class Elasticsearch5SchemaTranslator extends Elasticsearch2SchemaTranslat
 			}
 			else {
 				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
-				ElasticsearchAnalyzer analyzer = elasticsearchReference.getAnalyzer();
-				String analyzerName = settingsBuilder.register( analyzer, propertyPath );
+				String analyzerName = settingsBuilder.register( elasticsearchReference, propertyPath );
 				propertyMapping.setAnalyzer( analyzerName );
 			}
 		}

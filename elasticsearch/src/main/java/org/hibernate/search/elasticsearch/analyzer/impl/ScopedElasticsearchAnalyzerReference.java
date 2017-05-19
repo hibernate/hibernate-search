@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -24,27 +26,43 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 
 	private final ElasticsearchAnalyzerReference globalAnalyzerReference;
 	private final Map<String, ElasticsearchAnalyzerReference> scopedAnalyzerReferences;
-	private final ScopedElasticsearchAnalyzer scopedAnalyzer;
 
 	public ScopedElasticsearchAnalyzerReference(Builder builder) {
 		this.globalAnalyzerReference = builder.globalAnalyzerReference;
 		this.scopedAnalyzerReferences = Collections.unmodifiableMap( new HashMap<>( builder.scopedAnalyzerReferences ) );
-		this.scopedAnalyzer = new ScopedElasticsearchAnalyzer( globalAnalyzerReference, scopedAnalyzerReferences );
 	}
 
 	@Override
-	public ScopedElasticsearchAnalyzer getAnalyzer() {
-		return scopedAnalyzer;
+	public String getAnalyzerName(String fieldName) {
+		return getDelegate( fieldName ).getAnalyzerName( fieldName );
 	}
 
 	@Override
-	public void close() {
-		getAnalyzer().close();
+	public void registerDefinitions(String fieldName, ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
+		getDelegate( fieldName ).registerDefinitions( fieldName, definitionRegistry );
+	}
+
+	@Override
+	public boolean isInitialized() {
+		return true;
+	}
+
+	@Override
+	public void initialize(ElasticsearchAnalysisDefinitionRegistry definitionRegistry, ElasticsearchAnalyzerDefinitionTranslator translator) {
+		// Nothing to do
 	}
 
 	@Override
 	public CopyBuilder startCopy() {
 		return new Builder( globalAnalyzerReference, scopedAnalyzerReferences );
+	}
+
+	private ElasticsearchAnalyzerReference getDelegate(String fieldName) {
+		ElasticsearchAnalyzerReference analyzerReference = scopedAnalyzerReferences.get( fieldName );
+		if ( analyzerReference == null ) {
+			analyzerReference = globalAnalyzerReference;
+		}
+		return analyzerReference;
 	}
 
 	public static class Builder implements ScopedAnalyzerReference.Builder, ScopedAnalyzerReference.CopyBuilder {

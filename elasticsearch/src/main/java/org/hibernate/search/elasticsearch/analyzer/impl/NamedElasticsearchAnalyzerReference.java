@@ -10,10 +10,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryPopulator;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
+import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -32,40 +34,42 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 
 	private final String name;
 
-	private ElasticsearchAnalyzer analyzer;
+	private ElasticsearchAnalysisDefinitionRegistryPopulator definitionRegistryPopulator;
 
 	public NamedElasticsearchAnalyzerReference(String name) {
 		this.name = name;
-		this.analyzer = null; // Not initialized yet
 	}
 
-	public String getAnalyzerName() {
+	@Override
+	public String getAnalyzerName(String fieldName) {
 		return name;
 	}
 
 	@Override
-	public ElasticsearchAnalyzer getAnalyzer() {
-		if ( analyzer == null ) {
+	public void registerDefinitions(String fieldName, ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
+		if ( definitionRegistryPopulator == null ) {
 			throw LOG.lazyRemoteAnalyzerReferenceNotInitialized( this );
 		}
-		return analyzer;
+		definitionRegistryPopulator.populate( definitionRegistry );
 	}
 
+	@Override
 	public boolean isInitialized() {
-		return analyzer != null;
+		return definitionRegistryPopulator != null;
 	}
 
-	public void initialize(ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
-		if ( this.analyzer != null ) {
+	@Override
+	public void initialize(ElasticsearchAnalysisDefinitionRegistry definitionRegistry, ElasticsearchAnalyzerDefinitionTranslator translator) {
+		if ( this.definitionRegistryPopulator != null ) {
 			throw new AssertionFailure( "A named analyzer reference has been initialized more than once: " + this );
 		}
-		this.analyzer = createAnalyzer( definitionRegistry );
+		this.definitionRegistryPopulator = createRegistryPopulator( definitionRegistry );
 	}
 
-	private ElasticsearchAnalyzer createAnalyzer(ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
+	protected ElasticsearchAnalysisDefinitionRegistryPopulator createRegistryPopulator(ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
 		AnalyzerDefinition analyzerDefinition = definitionRegistry.getAnalyzerDefinition( name );
 		if ( analyzerDefinition == null ) {
-			return new UndefinedElasticsearchAnalyzerImpl( name );
+			return (r) -> { }; // No-op
 		}
 
 		String tokenizerName = analyzerDefinition.getTokenizer();
@@ -91,17 +95,10 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 			}
 		}
 
-		return new CustomElasticsearchAnalyzerImpl(
+		return new SimpleElasticsearchAnalysisDefinitionRegistryPopulator(
 				name, analyzerDefinition,
 				tokenizerName, tokenizerDefinition,
 				charFilters, tokenFilters );
-	}
-
-	@Override
-	public void close() {
-		if ( analyzer != null ) {
-			analyzer.close();
-		}
 	}
 
 	@Override
@@ -111,7 +108,7 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 		sb.append( "<" );
 		sb.append( name );
 		sb.append( "," );
-		sb.append( analyzer );
+		sb.append( definitionRegistryPopulator );
 		sb.append( ">" );
 		return sb.toString();
 	}
