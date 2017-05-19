@@ -26,12 +26,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Yoann Rodiere
  */
-public final class SimpleElasticsearchAnalysisDefinitionRegistry implements ElasticsearchAnalysisDefinitionRegistry {
+public class SimpleElasticsearchAnalysisDefinitionRegistry implements ElasticsearchAnalysisDefinitionRegistry {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private final Map<String, AnalyzerDefinition> analyzerDefinitions = new TreeMap<>();
-	private final Map<String, NormalizerDefinition> normalizerDefinitions = new TreeMap<>();
+	protected final Map<String, AnalyzerDefinition> analyzerDefinitions = new TreeMap<>();
+	protected final Map<String, NormalizerDefinition> normalizerDefinitions = new TreeMap<>();
 	private final Map<String, TokenizerDefinition> tokenizerDefinitions = new TreeMap<>();
 	private final Map<String, TokenFilterDefinition> tokenFilterDefinitions = new TreeMap<>();
 	private final Map<String, CharFilterDefinition> charFilterDefinitions = new TreeMap<>();

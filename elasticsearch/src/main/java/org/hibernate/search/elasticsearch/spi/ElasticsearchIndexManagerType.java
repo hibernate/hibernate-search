@@ -8,7 +8,6 @@ package org.hibernate.search.elasticsearch.spi;
 
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchService;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -25,7 +24,9 @@ public final class ElasticsearchIndexManagerType implements IndexManagerType {
 
 	@Override
 	public AnalyzerStrategy createAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
-		return new ElasticsearchAnalyzerStrategy( serviceManager, cfg );
+		try ( ServiceReference<ElasticsearchService> esService = serviceManager.requestReference( ElasticsearchService.class ) ) {
+			return esService.get().getAnalyzerStrategyFactory().create( cfg );
+		}
 	}
 
 	@Override

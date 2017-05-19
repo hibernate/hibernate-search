@@ -42,6 +42,9 @@ public class IndexSettings {
 		@SerializedName("analyzer")
 		private Map<String, AnalyzerDefinition> analyzers;
 
+		@SerializedName("normalizer")
+		private Map<String, NormalizerDefinition> normalizers;
+
 		@SerializedName("tokenizer")
 		private Map<String, TokenizerDefinition> tokenizers;
 
@@ -52,7 +55,7 @@ public class IndexSettings {
 		private Map<String, CharFilterDefinition> charFilters;
 
 		public boolean isEmpty() {
-			return ! hasContent( analyzers, tokenizers, tokenFilters, charFilters );
+			return ! hasContent( analyzers, normalizers, tokenizers, tokenFilters, charFilters );
 		}
 
 		private boolean hasContent(Map<?, ?> ... maps) {
@@ -70,6 +73,14 @@ public class IndexSettings {
 
 		public void setAnalyzers(Map<String, AnalyzerDefinition> analyzers) {
 			this.analyzers = analyzers;
+		}
+
+		public Map<String, NormalizerDefinition> getNormalizers() {
+			return normalizers;
+		}
+
+		public void setNormalizers(Map<String, NormalizerDefinition> normalizers) {
+			this.normalizers = normalizers;
 		}
 
 		public Map<String, TokenizerDefinition> getTokenizers() {

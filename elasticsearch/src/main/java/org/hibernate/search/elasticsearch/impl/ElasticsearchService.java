@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.impl;
 
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
@@ -39,6 +40,8 @@ public interface ElasticsearchService extends Service {
 	ElasticsearchSchemaValidator getSchemaValidator();
 
 	ElasticsearchSchemaTranslator getSchemaTranslator();
+
+	ElasticsearchAnalyzerStrategyFactory getAnalyzerStrategyFactory();
 
 	MissingValueStrategy getMissingValueStrategy();
 

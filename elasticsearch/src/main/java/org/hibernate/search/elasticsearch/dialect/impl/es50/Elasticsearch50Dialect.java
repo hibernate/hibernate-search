@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl.es50;
 
+import org.hibernate.search.elasticsearch.analyzer.impl.Elasticsearch2AnalyzerStrategy;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerStrategyFactory;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.query.impl.Elasticsearch5QueryFactory;
 import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
-import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch5SchemaTranslator;
-import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch5SchemaValidator;
+import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch50SchemaTranslator;
+import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch50SchemaValidator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaAccessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
@@ -24,6 +26,7 @@ import org.hibernate.search.elasticsearch.util.impl.gson.ES5IndexTypeJsonAdapter
 import org.hibernate.search.elasticsearch.util.impl.gson.ES5NormsTypeJsonAdapter;
 import org.hibernate.search.elasticsearch.work.impl.factory.Elasticsearch5WorkFactory;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 
 import com.google.gson.GsonBuilder;
 
@@ -49,12 +52,17 @@ public class Elasticsearch50Dialect implements ElasticsearchDialect {
 
 	@Override
 	public ElasticsearchSchemaTranslator createSchemaTranslator() {
-		return new Elasticsearch5SchemaTranslator();
+		return new Elasticsearch50SchemaTranslator();
 	}
 
 	@Override
 	public ElasticsearchSchemaValidator createSchemaValidator(ElasticsearchSchemaAccessor schemaAccessor) {
-		return new Elasticsearch5SchemaValidator( schemaAccessor );
+		return new Elasticsearch50SchemaValidator( schemaAccessor );
+	}
+
+	@Override
+	public ElasticsearchAnalyzerStrategyFactory createAnalyzerStrategyFactory(ServiceManager serviceManager) {
+		return configuration -> new Elasticsearch2AnalyzerStrategy( serviceManager, configuration );
 	}
 
 	@Override

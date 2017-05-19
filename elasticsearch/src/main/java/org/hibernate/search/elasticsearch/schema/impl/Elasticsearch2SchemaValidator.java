@@ -28,6 +28,7 @@ import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
+import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings.Analysis;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.exception.AssertionFailure;
@@ -51,7 +52,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
-	private static final ElasticsearchValidationMessages MESSAGES = Messages.getBundle( ElasticsearchValidationMessages.class );
+	static final ElasticsearchValidationMessages MESSAGES = Messages.getBundle( ElasticsearchValidationMessages.class );
 
 	private static final double DEFAULT_DOUBLE_DELTA = 0.001;
 	private static final float DEFAULT_FLOAT_DELTA = 0.001f;
@@ -218,40 +219,35 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	}
 
 	private void appendContextElement(StringBuilder builder, ValidationContextType type, String name) {
-		String formatted;
-		switch ( type ) {
-			case INDEX:
-				formatted = MESSAGES.indexContext( name );
-				break;
-			case MAPPING:
-				formatted = MESSAGES.mappingContext( name );
-				break;
-			case MAPPING_PROPERTY:
-				formatted = MESSAGES.mappingPropertyContext( name );
-				break;
-			case MAPPING_PROPERTY_FIELD:
-				formatted = MESSAGES.mappingPropertyFieldContext( name );
-				break;
-			case ANALYZER:
-				formatted = MESSAGES.analyzerContext( name );
-				break;
-			case CHAR_FILTER:
-				formatted = MESSAGES.charFilterContext( name );
-				break;
-			case TOKENIZER:
-				formatted = MESSAGES.tokenizerContext( name );
-				break;
-			case TOKEN_FILTER:
-				formatted = MESSAGES.tokenFilterContext( name );
-				break;
-			default:
-				throw new AssertionFailure( "Unexpected validation context element type: " + type );
-		}
+		String formatted = formatContextElement( type, name );
 
 		if ( builder.length() > 0 ) {
 			builder.append( ", " );
 		}
 		builder.append( formatted );
+	}
+
+	protected String formatContextElement(ValidationContextType type, String name) {
+		switch ( type ) {
+			case INDEX:
+				return MESSAGES.indexContext( name );
+			case MAPPING:
+				return MESSAGES.mappingContext( name );
+			case MAPPING_PROPERTY:
+				return MESSAGES.mappingPropertyContext( name );
+			case MAPPING_PROPERTY_FIELD:
+				return MESSAGES.mappingPropertyFieldContext( name );
+			case ANALYZER:
+				return MESSAGES.analyzerContext( name );
+			case CHAR_FILTER:
+				return MESSAGES.charFilterContext( name );
+			case TOKENIZER:
+				return MESSAGES.tokenizerContext( name );
+			case TOKEN_FILTER:
+				return MESSAGES.tokenFilterContext( name );
+			default:
+				throw new AssertionFailure( "Unexpected validation context element type: " + type );
+		}
 	}
 
 	private void validate(ValidationErrorCollector errorCollector, IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
@@ -269,6 +265,10 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 		IndexSettings.Analysis actualAnalysis = actualSettings.getAnalysis();
 
+		validateAnalysisSettings( errorCollector, expectedAnalysis, actualAnalysis );
+	}
+
+	protected void validateAnalysisSettings(ValidationErrorCollector errorCollector, Analysis expectedAnalysis, Analysis actualAnalysis) {
 		validateAll(
 				errorCollector, ValidationContextType.ANALYZER, MESSAGES.analyzerMissing(), analyzerDefinitionValidator,
 				expectedAnalysis.getAnalyzers(), actualAnalysis == null ? null : actualAnalysis.getAnalyzers() );
@@ -284,7 +284,6 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		validateAll(
 				errorCollector, ValidationContextType.TOKEN_FILTER, MESSAGES.tokenFilterMissing(), tokenFilterDefinitionValidator,
 				expectedAnalysis.getTokenFilters(), actualAnalysis == null ? null : actualAnalysis.getTokenFilters() );
-
 	}
 
 	/*
@@ -451,7 +450,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	private interface Validator<T> {
+	interface Validator<T> {
 		void validate(ValidationErrorCollector errorCollector, T expected, T actual);
 	}
 
@@ -490,7 +489,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	private class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Validator<T> {
+	class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Validator<T> {
 		private final AnalysisParameterEquivalenceRegistry equivalences;
 
 		public AnalysisDefinitionValidator(AnalysisParameterEquivalenceRegistry equivalences) {
@@ -615,7 +614,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 			validateJsonPrimitive( errorCollector, expectedMapping.getType(), "null_value",
 					expectedMapping.getNullValue(), actualMapping.getNullValue() );
 
-			validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), "default" );
+			validateAnalyzerOptions( errorCollector, expectedMapping, actualMapping );
 
 			super.validate( errorCollector, expectedMapping, actualMapping );
 
@@ -644,6 +643,10 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 			 */
 			validateEqualWithDefault( errorCollector, "doc_values", expectedDocValues, actualMapping.getDocValues(), false );
 		}
+	}
+
+	protected void validateAnalyzerOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+		validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), "default" );
 	}
 
 }

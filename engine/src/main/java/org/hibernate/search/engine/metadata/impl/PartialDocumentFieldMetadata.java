@@ -9,6 +9,7 @@ package org.hibernate.search.engine.metadata.impl;
 import java.util.Map;
 
 import org.apache.lucene.document.Field.Index;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
@@ -31,5 +32,7 @@ public interface PartialDocumentFieldMetadata {
 
 	@SuppressWarnings("deprecation")
 	Index getIndex();
+
+	AnalyzerReference getAnalyzerReference();
 
 }

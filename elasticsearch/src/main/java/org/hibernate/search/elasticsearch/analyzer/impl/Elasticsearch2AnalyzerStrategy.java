@@ -36,9 +36,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
 /**
+ * An {@link AnalyzerStrategy} for Elasticsearch 2 to 5.1.
+ *
  * @author Yoann Rodiere
  */
-public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
+public class Elasticsearch2AnalyzerStrategy implements AnalyzerStrategy {
 
 	private static final Log LOG = LoggerFactory.make( Log.class );
 
@@ -46,7 +48,7 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 
 	private final SimpleElasticsearchAnalysisDefinitionRegistry defaultDefinitionRegistry;
 
-	public ElasticsearchAnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
+	public Elasticsearch2AnalyzerStrategy(ServiceManager serviceManager, SearchConfiguration cfg) {
 		this.serviceManager = serviceManager;
 		/*
 		 * Make sure to re-create the default definition registry with each newly instantiated strategy,
@@ -82,8 +84,12 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 		}
 
 		SimpleElasticsearchAnalysisDefinitionRegistry registry = new SimpleElasticsearchAnalysisDefinitionRegistry();
-		builder.build( new NamespaceMergingElasticsearchAnalysisDefinitionRegistry( registry ) );
+		builder.build( wrapForAdditions( registry ) );
 		return registry;
+	}
+
+	protected ElasticsearchAnalysisDefinitionRegistry wrapForAdditions(ElasticsearchAnalysisDefinitionRegistry registry) {
+		return new NamespaceMergingElasticsearchAnalysisDefinitionRegistry( registry );
 	}
 
 	@Override
@@ -120,15 +126,15 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 	public Map<String, AnalyzerReference> createProvidedNormalizerReferences() {
 		Map<String, AnalyzerReference> references = new HashMap<>();
 		for ( String name : defaultDefinitionRegistry.getNormalizerDefinitions().keySet() ) {
-			NamedElasticsearchNormalizerReference reference = createNamedNormalizerReference( name );
+			AnalyzerReference reference = createNamedNormalizerReference( name );
 			references.put( name, reference );
 		}
 		return references;
 	}
 
 	@Override
-	public NamedElasticsearchNormalizerReference createNamedNormalizerReference(String name) {
-		return new NamedElasticsearchNormalizerReference( name );
+	public ElasticsearchAnalyzerReference createNamedNormalizerReference(String name) {
+		return new NamedElasticsearch2NormalizerReference( name );
 	}
 
 	@Override
@@ -182,8 +188,7 @@ public class ElasticsearchAnalyzerStrategy implements AnalyzerStrategy {
 				new ChainingElasticsearchAnalysisDefinitionRegistry(
 						localDefinitionRegistry, defaultDefinitionRegistry );
 
-		ElasticsearchAnalysisDefinitionRegistry definitionRegistry =
-				new NamespaceMergingElasticsearchAnalysisDefinitionRegistry( chainingRegistry );
+		ElasticsearchAnalysisDefinitionRegistry definitionRegistry = wrapForAdditions( chainingRegistry );
 
 		/*
 		 * First, populate the registry with definitions from already initialized references.

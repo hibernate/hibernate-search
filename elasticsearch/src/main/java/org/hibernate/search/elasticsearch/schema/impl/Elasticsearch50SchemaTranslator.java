@@ -25,17 +25,19 @@ import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * An {@link ElasticsearchSchemaTranslator} implementation for Elasticsearch 5.
+ * An {@link ElasticsearchSchemaTranslator} implementation for Elasticsearch 5.0/5.1.
  *
  * @author Yoann Rodiere
  */
-public class Elasticsearch5SchemaTranslator extends Elasticsearch2SchemaTranslator {
+public class Elasticsearch50SchemaTranslator extends Elasticsearch2SchemaTranslator {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
 	@Override
 	public boolean isTextDataType(PartialDocumentFieldMetadata fieldMetadata) {
-		if ( DataType.TEXT.equals( getStringType( fieldMetadata.getIndex() ) ) ) {
+		DataType stringDataType = getStringType( fieldMetadata.getPath().getAbsoluteName(),
+				fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
+		if ( DataType.TEXT.equals( stringDataType ) ) {
 			// Also check that this is actually a string field
 			ExtendedFieldType fieldType = FieldHelper.getType( fieldMetadata );
 			if ( ExtendedFieldType.STRING.equals( fieldType )
@@ -80,6 +82,20 @@ public class Elasticsearch5SchemaTranslator extends Elasticsearch2SchemaTranslat
 			}
 		}
 
+		addAnalyzerOptions( propertyMapping, mappingBuilder, settingsBuilder,
+				propertyPath, index, analyzerReference );
+
+		// Only text and keyword fields can have norms
+		if ( DataType.TEXT.equals( type ) || DataType.KEYWORD.equals( type ) ) {
+			propertyMapping.setNorms( index.omitNorms() ? NormsType.FALSE : NormsType.TRUE );
+		}
+	}
+
+	protected void addAnalyzerOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder,
+			ElasticsearchIndexSettingsBuilder settingsBuilder, String propertyPath,
+			Field.Index index, AnalyzerReference analyzerReference) {
+		DataType type = propertyMapping.getType();
+
 		// Only text fields can be analyzed
 		if ( DataType.TEXT.equals( type ) && analyzerReference != null ) {
 			if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
@@ -91,16 +107,11 @@ public class Elasticsearch5SchemaTranslator extends Elasticsearch2SchemaTranslat
 				propertyMapping.setAnalyzer( analyzerName );
 			}
 		}
-
-		// Only text and keyword fields can have norms
-		if ( DataType.TEXT.equals( type ) || DataType.KEYWORD.equals( type ) ) {
-			propertyMapping.setNorms( index.omitNorms() ? NormsType.FALSE : NormsType.TRUE );
-		}
 	}
 
 	@Override
 	@SuppressWarnings("deprecation")
-	protected DataType getStringType(Index index) {
+	protected DataType getStringType(String propertyPath, Index index, AnalyzerReference analyzerReference) {
 		return index.isAnalyzed() ? DataType.TEXT : DataType.KEYWORD;
 	}
 
