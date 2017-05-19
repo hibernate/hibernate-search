@@ -15,7 +15,10 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.conn.NoopIOSessionStrategy;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.sniff.ElasticsearchHostsSniffer;
+import org.elasticsearch.client.sniff.HostsSniffer;
 import org.elasticsearch.client.sniff.Sniffer;
+import org.elasticsearch.client.sniff.SnifferBuilder;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -81,7 +84,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 				ElasticsearchEnvironment.Defaults.DISCOVERY_ENABLED
 		);
 		if ( discoveryEnabled ) {
-			return Sniffer.builder( client )
+			SnifferBuilder builder = Sniffer.builder( client )
 					.setSniffIntervalMillis(
 							ConfigurationParseHelper.getIntValue(
 									properties,
@@ -89,8 +92,18 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 									ElasticsearchEnvironment.Defaults.DISCOVERY_REFRESH_INTERVAL
 							)
 							* 1_000 // The configured value is in seconds
-					)
-					.build();
+					);
+			String scheme = ConfigurationParseHelper.getString(properties, propertyPrefix + ElasticsearchEnvironment.DISCOVERY_SCHEME, "http");
+
+			// https discovery support
+			if ( scheme.equals(ElasticsearchHostsSniffer.Scheme.HTTPS.toString()) ) {
+				HostsSniffer hostsSniffer = new ElasticsearchHostsSniffer(
+						client,
+						ElasticsearchHostsSniffer.DEFAULT_SNIFF_REQUEST_TIMEOUT, // 1sec
+						ElasticsearchHostsSniffer.Scheme.HTTPS );
+				builder.setHostsSniffer( hostsSniffer );
+			}
+			return builder.build();
 		}
 		else {
 			return null;
