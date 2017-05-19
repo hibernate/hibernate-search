@@ -26,7 +26,6 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
-import org.hibernate.search.analyzer.spi.ScopedAnalyzer;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
@@ -934,12 +933,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 309, value = "Analyzer reference %1$s is not a Lucene analyzer reference.")
 	SearchException analyzerReferenceIsNotLucene(AnalyzerReference analyzerReference);
-
-	@Message(id = 310, value = "Analyzer %1$s is not a scoped remote analyzer.")
-	SearchException scopedAnalyzerIsNotRemote(ScopedAnalyzer analyzer);
-
-	@Message(id = 311, value = "Analyzer %1$s is not a scoped Lucene analyzer.")
-	SearchException scopedAnalyzerIsNotLucene(ScopedAnalyzer analyzer);
 
 	@Message(id = 312, value = "Lazy Lucene analyzer reference %1$s is not initialized.")
 	SearchException lazyLuceneAnalyzerReferenceNotInitialized(LuceneAnalyzerReference reference);
