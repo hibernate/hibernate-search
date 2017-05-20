@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.batch.operations.JobOperator;
+import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.persistence.EntityManagerFactory;
@@ -20,7 +21,6 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
-import org.hibernate.search.jsr352.test.util.JobFactory;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.test.SearchTestBase;
 
@@ -43,7 +43,7 @@ public class MassIndexingJobWithMultiTenancyIT extends SearchTestBase {
 
 	private static final int JOB_TIMEOUT_MS = 10_000;
 
-	private JobOperator jobOperator = JobFactory.getJobOperator();
+	private JobOperator jobOperator = BatchRuntime.getJobOperator();
 
 	private final List<Company> companies = Arrays.asList(
 			new Company( "Google" ),

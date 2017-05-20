@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 import javax.batch.operations.JobOperator;
+import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
@@ -23,7 +24,6 @@ import javax.persistence.Persistence;
 
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
-import org.hibernate.search.jsr352.test.util.JobFactory;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 
 import org.jboss.byteman.contrib.bmunit.BMRule;
@@ -66,7 +66,7 @@ public class RestartChunkIT {
 	private static final long DB_COMP_ROWS = 100;
 	private static final long DB_PERS_ROWS = 50;
 
-	private JobOperator jobOperator;
+	private JobOperator jobOperator = BatchRuntime.getJobOperator();
 	private EntityManagerFactory emf;
 
 	@Before
@@ -79,7 +79,6 @@ public class RestartChunkIT {
 				{ "Amazon", "Jeff", "Bezos" }
 		};
 
-		jobOperator = JobFactory.getJobOperator();
 		emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
 
 		EntityManager em = emf.createEntityManager();
