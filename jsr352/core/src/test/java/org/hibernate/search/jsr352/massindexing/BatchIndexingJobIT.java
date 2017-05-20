@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.batch.operations.JobOperator;
+import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.Metric;
@@ -31,7 +32,6 @@ import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.StepProgress;
 import org.hibernate.search.jsr352.massindexing.test.entity.Company;
 import org.hibernate.search.jsr352.massindexing.test.entity.Person;
 import org.hibernate.search.jsr352.massindexing.test.entity.WhoAmI;
-import org.hibernate.search.jsr352.test.util.JobFactory;
 import org.hibernate.search.jsr352.test.util.JobTestUtil;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -51,13 +51,11 @@ public class BatchIndexingJobIT {
 
 	private static final int JOB_TIMEOUT_MS = 10_000;
 
-	private JobOperator jobOperator;
+	private JobOperator jobOperator = BatchRuntime.getJobOperator();
 	private EntityManagerFactory emf;
 
 	@Before
 	public void setup() {
-		jobOperator = JobFactory.getJobOperator();
-
 		List<Company> companies = Arrays.asList(
 				new Company( "Google" ),
 				new Company( "Red Hat" ),
