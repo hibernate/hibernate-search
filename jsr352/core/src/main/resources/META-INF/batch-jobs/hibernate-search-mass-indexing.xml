@@ -15,17 +15,17 @@
                 <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
                 <property name="entityTypes" value="#{jobParameters['entityTypes']}" />
 
-                <property name="maxThreads" value="#{jobParameters['maxThreads']}?:8;" />
-                <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
+                <property name="maxThreads" value="#{jobParameters['maxThreads']}?:10;" />
+                <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
                 <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
-                <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:false;" />
-                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:false;" />
-                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}?:false;" />
+                <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:true;" />
+                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:true;" />
+                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}?:true;" />
                 <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}?:200;" />
-                <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:250;" />
+                <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:1000;" />
 
                 <property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />
-                <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}?:10000000;" />
+                <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}" />
             </properties>
         </listener>
     </listeners>
@@ -33,8 +33,8 @@
     <step id="beforeChunk" next="produceLuceneDoc">
         <batchlet ref="org.hibernate.search.jsr352.massindexing.impl.steps.beforechunk.BeforeChunkBatchlet">
             <properties>
-                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:false;" />
-                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}?:false;" />
+                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}?:true;" />
+                <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}?:true;" />
                 <property name="tenantId" value="#{jobParameters['tenantId']}" />
             </properties>
         </batchlet>
@@ -63,9 +63,9 @@
                     <property name="upperBound" value="#{partitionPlan['upperBound']}" />
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="cacheable" value="#{jobParameters['cacheable']}?:false;" />
-                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
+                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
-                    <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}?:10000000;" />
+                    <property name="customQueryLimit" value="#{jobParameters['customQueryLimit']}" />
                 </properties>
             </reader>
             <processor ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.LuceneDocProducer">
@@ -85,10 +85,10 @@
             <mapper ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.PartitionMapper">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:200000;" />
+                    <property name="fetchSize" value="#{jobParameters['fetchSize']}?:100;" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
-                    <property name="maxThreads" value="#{jobParameters['maxThreads']}?:8;" />
-                    <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:250;" />
+                    <property name="maxThreads" value="#{jobParameters['maxThreads']}?:10;" />
+                    <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}?:1000;" />
                 </properties>
             </mapper>
             <collector ref="org.hibernate.search.jsr352.massindexing.impl.steps.lucene.ProgressCollector" />
@@ -99,7 +99,7 @@
     <step id="afterChunk">
         <batchlet ref="org.hibernate.search.jsr352.massindexing.impl.steps.afterchunk.AfterChunkBatchlet">
             <properties>
-                <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:false;" />
+                <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}?:true;" />
                 <property name="tenantId" value="#{jobParameters['tenantId']}" />
             </properties>
         </batchlet>
