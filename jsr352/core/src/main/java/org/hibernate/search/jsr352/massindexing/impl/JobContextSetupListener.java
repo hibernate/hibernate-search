@@ -160,9 +160,15 @@ public class JobContextSetupListener extends AbstractJobListener {
 
 	private void validateQuerying() {
 		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
-		int customQueryLimit = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
 		ValidationUtil.validatePositive( FETCH_SIZE, fetchSize );
-		ValidationUtil.validatePositive( CUSTOM_QUERY_LIMIT, customQueryLimit );
+
+		if ( StringHelper.isNotEmpty( serializedCustomQueryLimit ) ) {
+			int customQueryLimit = SerializationUtil.parseIntegerParameter(
+					CUSTOM_QUERY_LIMIT,
+					serializedCustomQueryLimit
+			);
+			ValidationUtil.validatePositive( CUSTOM_QUERY_LIMIT, customQueryLimit );
+		}
 
 		SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 

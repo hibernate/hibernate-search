@@ -432,21 +432,21 @@ long executionId = BatchRuntime
 |`purgeAllOnStart`
 |`purgeAllOnStart(boolean)`
 |Optional
-|False
+|True
 |Specify whether the existing index should be purged at the beginning of the job. This operation
 takes place before indexing.
 
 |`optimizeAfterPurge`
 |`optimizeAfterPurge(boolean)`
 |Optional
-|False
+|True
 |Specify whether the mass indexer should be optimized at the beginning of the job. This operation
 takes place after the purge operation and before indexing.
 
 |`optimizeOnFinish`
 |`optimizeOnFinish(boolean)`
 |Optional
-|False
+|True
 |Specify whether the mass indexer should be optimized at the end of the job. This operation takes
 place after indexing.
 
@@ -460,7 +460,7 @@ entity reader class. Set it to true when reading a complex graph with relations.
 |`fetchSize`
 |`fetchSize(int)`
 |Optional
-|200,000
+|100
 |The number of rows to retrieve for each database query.
 
 |`customQueryHQL`
@@ -482,7 +482,7 @@ will be indexed. However, mixing this approach with the HQL restriction is not a
 |`customQueryLimit`
 |`customQueryLimit(int)`
 |Optional
-|1,000,000
+|-
 |The limit of number of entities read in a custom query. This parameter is only used under
 custom query approaches (HQL and criteria). The value defined must be greater than 0.
 
@@ -496,14 +496,14 @@ than 0, and less than the value of `rowsPerPartition`.
 |`rowsPerPartition`
 |`rowsPerPartition(int)`
 |Optional
-|250
+|1000
 |The maximum number of rows to process per partition. The value defined must be greater than 0, and
 greater than the value of `checkpointInterval`.
 
 |`maxThreads`
 |`maxThreads(int)`
 |Optional
-|8
+|10
 |The maximum number of threads to use for processing the job. Note the batch runtime cannot
 guarantee the request number of threads are available; it will use as many as it can up to the
 request maximum.

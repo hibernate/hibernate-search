@@ -25,6 +25,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.hibernate.search.jsr352.context.jpa.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.inject.scope.HibernateSearchPartitionScoped;
 import org.hibernate.search.jsr352.logging.impl.Log;
@@ -35,6 +36,7 @@ import org.hibernate.search.jsr352.massindexing.impl.util.MassIndexingPartitionP
 import org.hibernate.search.jsr352.massindexing.impl.util.PartitionBound;
 import org.hibernate.search.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.jsr352.massindexing.impl.util.SerializationUtil;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters.CACHEABLE;
@@ -268,14 +270,18 @@ public class EntityReader extends AbstractItemReader {
 	}
 
 	private ScrollableResults buildScrollUsingHQL(StatelessSession ss, String HQL) {
+		Query query = ss.createQuery( HQL );
+
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
-		int maxResults = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
-		return ss.createQuery( HQL )
-				.setReadOnly( true )
+
+		if ( StringHelper.isNotEmpty( serializedCustomQueryLimit ) ) {
+			int maxResults = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
+			query.setMaxResults( maxResults );
+		}
+		return query.setReadOnly( true )
 				.setCacheable( cacheable )
 				.setFetchSize( fetchSize )
-				.setMaxResults( maxResults )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
@@ -283,7 +289,6 @@ public class EntityReader extends AbstractItemReader {
 			PartitionBound unit, Object checkpointId, JobContextData jobData) {
 		boolean cacheable = SerializationUtil.parseBooleanParameter( CACHEABLE, serializedCacheable );
 		int fetchSize = SerializationUtil.parseIntegerParameter( FETCH_SIZE, serializedFetchSize );
-		int maxResults = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
 		Class<?> entityType = unit.getEntityType();
 		String idName = sessionFactory.getClassMetadata( entityType )
 				.getIdentifierPropertyName();
@@ -313,11 +318,14 @@ public class EntityReader extends AbstractItemReader {
 		// build criteria using job context data
 		jobData.getCustomQueryCriteria().forEach( c -> criteria.add( c ) );
 
+		if ( StringHelper.isNotEmpty( serializedCustomQueryLimit ) ) {
+			int maxResults = SerializationUtil.parseIntegerParameter( CUSTOM_QUERY_LIMIT, serializedCustomQueryLimit );
+			criteria.setMaxResults( maxResults );
+		}
 		return criteria.addOrder( Order.asc( idName ) )
 				.setReadOnly( true )
 				.setCacheable( cacheable )
 				.setFetchSize( fetchSize )
-				.setMaxResults( maxResults )
 				.scroll( ScrollMode.FORWARD_ONLY );
 	}
 
