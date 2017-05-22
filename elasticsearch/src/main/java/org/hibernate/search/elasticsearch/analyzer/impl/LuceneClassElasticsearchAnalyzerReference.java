@@ -39,6 +39,11 @@ public class LuceneClassElasticsearchAnalyzerReference extends ElasticsearchAnal
 	}
 
 	@Override
+	public boolean isNormalizer(String fieldName) {
+		return false;
+	}
+
+	@Override
 	public void registerDefinitions(String fieldName, ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
 		// Nothing to do
 	}

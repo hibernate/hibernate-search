@@ -26,6 +26,11 @@ public class NamedElasticsearchNormalizerReference extends NamedElasticsearchAna
 	}
 
 	@Override
+	public boolean isNormalizer(String fieldName) {
+		return true;
+	}
+
+	@Override
 	protected ElasticsearchAnalysisDefinitionRegistryPopulator createRegistryPopulator(ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
 		NormalizerDefinition normalizerDefinition = definitionRegistry.getNormalizerDefinition( name );
 		if ( normalizerDefinition == null ) {

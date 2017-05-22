@@ -38,6 +38,11 @@ public class ScopedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerR
 	}
 
 	@Override
+	public boolean isNormalizer(String fieldName) {
+		return getDelegate( fieldName ).isNormalizer( fieldName );
+	}
+
+	@Override
 	public void registerDefinitions(String fieldName, ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
 		getDelegate( fieldName ).registerDefinitions( fieldName, definitionRegistry );
 	}

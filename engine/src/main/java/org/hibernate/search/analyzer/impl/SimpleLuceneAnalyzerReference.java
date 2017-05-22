@@ -33,6 +33,11 @@ public class SimpleLuceneAnalyzerReference extends LuceneAnalyzerReference {
 		return analyzer;
 	}
 
+	@Override
+	public boolean isNormalizer(String fieldName) {
+		return false;
+	}
+
 	public boolean isInitialized() {
 		return true;
 	}

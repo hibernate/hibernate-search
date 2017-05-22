@@ -37,6 +37,11 @@ public class NamedLuceneAnalyzerReference extends LuceneAnalyzerReference {
 	}
 
 	@Override
+	public boolean isNormalizer(String fieldName) {
+		return false;
+	}
+
+	@Override
 	public Analyzer getAnalyzer() {
 		if ( analyzer == null ) {
 			throw LOG.lazyLuceneAnalyzerReferenceNotInitialized( this );

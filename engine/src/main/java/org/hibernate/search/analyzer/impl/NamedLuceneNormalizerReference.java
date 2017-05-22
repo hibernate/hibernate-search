@@ -18,6 +18,11 @@ public class NamedLuceneNormalizerReference extends NamedLuceneAnalyzerReference
 	}
 
 	@Override
+	public boolean isNormalizer(String fieldName) {
+		return true;
+	}
+
+	@Override
 	protected Analyzer createAnalyzer(LuceneAnalyzerBuilder builder) {
 		return builder.buildNormalizer( getAnalyzerName() );
 	}
