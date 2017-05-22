@@ -25,6 +25,7 @@ import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.backend.impl.lucene.analysis.HibernateSearchNormalizerWrapper;
 import org.hibernate.search.cfg.spi.ParameterAnnotationsReader;
 import org.hibernate.search.engine.impl.TokenizerChain;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -111,7 +112,10 @@ final class LuceneAnalyzerBuilder {
 		TokenizerFactory tokenizerFactory = buildAnalysisComponent( TokenizerFactory.class,
 				KeywordTokenizerFactory.class, EMPTY_PARAMETERS );
 
-		return buildAnalyzer( tokenizerFactory, normalizerDef.charFilters(), normalizerDef.filters() );
+		Analyzer normalizer = buildAnalyzer(
+				tokenizerFactory, normalizerDef.charFilters(), normalizerDef.filters() );
+
+		return new HibernateSearchNormalizerWrapper( normalizer, normalizerDef.name() );
 	}
 
 	private Analyzer buildAnalyzer(TokenizerFactory tokenizerFactory,

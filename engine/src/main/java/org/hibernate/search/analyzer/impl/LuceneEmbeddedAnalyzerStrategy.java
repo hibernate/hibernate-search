@@ -26,6 +26,7 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.analyzer.spi.AnalyzerStrategy;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.NormalizerDef;
+import org.hibernate.search.backend.impl.lucene.analysis.HibernateSearchNormalizerWrapper;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -171,8 +172,8 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 
 	@Override
 	public LuceneAnalyzerReference createLuceneClassNormalizerReference(Class<?> analyzerClass) {
-		Analyzer analyzer = createAnalyzerInstance( analyzerClass );
-		return new SimpleLuceneNormalizerReference( analyzer );
+		Analyzer normalizer = createNormalizerInstance( analyzerClass );
+		return new SimpleLuceneNormalizerReference( normalizer );
 	}
 
 	@Override
@@ -245,5 +246,10 @@ public class LuceneEmbeddedAnalyzerStrategy implements AnalyzerStrategy {
 		catch (Exception e) {
 			throw new SearchException( "Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e );
 		}
+	}
+
+	private Analyzer createNormalizerInstance(Class<?> analyzerClass) {
+		Analyzer normalizer = createAnalyzerInstance( analyzerClass );
+		return new HibernateSearchNormalizerWrapper( normalizer, analyzerClass.getName() );
 	}
 }

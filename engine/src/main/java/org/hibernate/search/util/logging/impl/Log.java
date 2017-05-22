@@ -1036,4 +1036,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 343, value = "Normalizer definition for '%s' must define at least a char filter or a token filter (or both)." )
 	SearchException invalidEmptyNormalizerDefinition(String name);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 344, value = "The normalizer for definition '%s' produced %d tokens."
+			+ " Normalizers should never produce more than one token."
+			+ " The tokens have been concatenated by Hibernate Search,"
+			+ " but you should fix your normalizer definition." )
+	void normalizerProducedMultipleTokens(String normalizerName, int token);
+
 }
