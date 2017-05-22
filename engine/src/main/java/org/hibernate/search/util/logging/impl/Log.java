@@ -1043,4 +1043,10 @@ public interface Log extends BasicLogger {
 			+ " but you should fix your normalizer definition." )
 	void normalizerProducedMultipleTokens(String normalizerName, int token);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 345, value = "Field '%2$s' on entity '%1$s' is marked as sortable and will be analyzed,"
+			+ " but is assigned an Analyzer instead of a Normalizer."
+			+ " Sortable fields should be assigned normalizers in order to avoid problems with tokenization.")
+	void sortableFieldWithNonNormalizerAnalyzer(@FormatWith(ClassFormatter.class) Class<?> entityType, String absoluteFieldPath);
+
 }
