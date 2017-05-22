@@ -989,12 +989,20 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
-		if ( !sortedFieldAbsoluteName.equals( idFieldAbsoluteName ) && !containsField( propertyMetadataBuilder, sortedFieldAbsoluteName ) ) {
+		DocumentFieldMetadata targetField = getField( propertyMetadataBuilder, sortedFieldAbsoluteName );
+		if ( !sortedFieldAbsoluteName.equals( idFieldAbsoluteName ) && targetField == null ) {
 			if ( parseContext.getLevel() != 0 ) {
 				// Sortable defined on a property not indexed when the entity is embedded. We can skip it.
 				return;
 			}
 			throw log.sortableFieldRefersToUndefinedField( typeMetadataBuilder.getIndexedType(), propertyMetadataBuilder.getPropertyAccessor().getName(), sortedFieldRelativeName );
+		}
+		if ( targetField != null ) {
+			AnalyzerReference analyzerReference = targetField.getAnalyzerReference();
+			if ( targetField.getIndex().isAnalyzed() && analyzerReference != null
+					&& !analyzerReference.isNormalizer( sortedFieldAbsoluteName ) ) {
+				log.sortableFieldWithNonNormalizerAnalyzer( typeMetadataBuilder.getIndexedType(), sortedFieldRelativeName );
+			}
 		}
 
 		SortableFieldMetadata fieldMetadata = new SortableFieldMetadata.Builder( sortedFieldAbsoluteName ).build();
@@ -1002,14 +1010,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		propertyMetadataBuilder.addSortableField( fieldMetadata );
 	}
 
-	private boolean containsField(PropertyMetadata.Builder propertyMetadataBuilder, String fieldName) {
+	private DocumentFieldMetadata getField(PropertyMetadata.Builder propertyMetadataBuilder, String fieldName) {
 		for ( DocumentFieldMetadata field : propertyMetadataBuilder.getFieldMetadata() ) {
 			if ( field.getAbsoluteName().equals( fieldName ) ) {
-				return true;
+				return field;
 			}
 		}
 
-		return false;
+		return null;
 	}
 
 	private void initializeMemberLevelAnnotations(String prefix,

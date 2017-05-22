@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -28,6 +29,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.backend.spi.Work;
@@ -125,6 +127,17 @@ public class AnalyzerDefInvalidTest {
 		tc.end();
 	}
 
+	@Test
+	public void shouldWarnOnSortableFieldWithNonNormalizerAnalyzer() throws Exception {
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.addClass( SampleWithTokenizedSortableField.class );
+
+		logged.expectMessage( "HSEARCH000345", "'" + SampleWithTokenizedSortableField.class.getName() + "'",
+				"'sortableField'", "Sortable fields should be assigned normalizers" );
+
+		integratorResource.create( cfg );
+	}
+
 	@Indexed
 	@AnalyzerDef(name = "ngram", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class), filters = {
 			@TokenFilterDef(factory = EdgeNGramFilterFactory.class, params = {
@@ -188,6 +201,18 @@ public class AnalyzerDefInvalidTest {
 
 		@Field(normalizer = @Normalizer(impl = StandardAnalyzer.class))
 		String description;
+	}
+
+	@Indexed
+	@AnalyzerDef(name = "tokenizing_analyzer", tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class))
+	static class SampleWithTokenizedSortableField {
+
+		@DocumentId
+		long id;
+
+		@Field(analyzer = @Analyzer(definition = "tokenizing_analyzer"))
+		@SortableField
+		String sortableField;
 	}
 
 	public static final class CustomFilterFactory extends TokenFilterFactory {
