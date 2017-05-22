@@ -57,6 +57,18 @@ public class AnalyzerDefInvalidTest {
 		integratorResource.create( cfg );
 	}
 
+	@Test
+	public void shouldNotBePossibleToHaveEmptyNormalizer() throws Exception {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH000343" );
+		thrown.expectMessage( "'empty_normalizer'" );
+		thrown.expectMessage( "must define at least a char filter or a token filter" );
+
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.addClass( SampleWithEmptyNormalizer.class );
+		integratorResource.create( cfg );
+	}
+
 	@Indexed
 	@AnalyzerDef(name = "ngram", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class), filters = {
 			@TokenFilterDef(factory = EdgeNGramFilterFactory.class, params = {
@@ -87,6 +99,17 @@ public class AnalyzerDefInvalidTest {
 		long id;
 
 		@Field(normalizer = @Normalizer(definition = "ngram"))
+		String description;
+	}
+
+	@Indexed
+	@NormalizerDef(name = "empty_normalizer")
+	static class SampleWithEmptyNormalizer {
+
+		@DocumentId
+		long id;
+
+		@Field(normalizer = @Normalizer(definition = "empty_normalizer"))
 		String description;
 	}
 }

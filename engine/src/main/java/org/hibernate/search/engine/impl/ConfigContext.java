@@ -60,7 +60,7 @@ public final class ConfigContext {
 			new MappingDefinitionRegistry<>( Function.identity(), LOG::analyzerDefinitionNamingConflict );
 
 	private final MappingDefinitionRegistry<NormalizerDef, NormalizerDef> normalizerDefinitionRegistry =
-			new MappingDefinitionRegistry<>( Function.identity(), LOG::normalizerDefinitionNamingConflict );
+			new MappingDefinitionRegistry<>( this::interpretNormalizerDef, LOG::normalizerDefinitionNamingConflict );
 
 	private final MappingDefinitionRegistry<FullTextFilterDef, FilterDef> fullTextFilterDefinitionRegistry =
 			new MappingDefinitionRegistry<>( this::interpretFullTextFilterDef, LOG::fullTextFilterDefinitionNamingConflict );
@@ -132,6 +132,21 @@ public final class ConfigContext {
 
 	public String getDefaultNullToken() {
 		return nullToken;
+	}
+
+	/**
+	 * Check that a given {@link NormalizerDef} is "well-formed",
+	 * i.e. that it defines at least one char filter or token filter.
+	 *
+	 * @param normalizerDef The normalizer def to check
+	 * @return The same normalizer def
+	 */
+	private NormalizerDef interpretNormalizerDef(NormalizerDef normalizerDef) {
+		if ( normalizerDef.charFilters().length == 0 && normalizerDef.filters().length == 0 ) {
+			throw LOG.invalidEmptyNormalizerDefinition( normalizerDef.name() );
+		}
+
+		return normalizerDef;
 	}
 
 	private FilterDef interpretFullTextFilterDef(FullTextFilterDef defAnn) {
