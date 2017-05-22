@@ -1033,4 +1033,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 342, value = "Field '%2$s' on entity '%1$s' refers to both an analyzer and a normalizer." )
 	SearchException cannotReferenceAnalyzerAndNormalizer(@FormatWith(ClassFormatter.class) Class<?> entityType, String relativeFieldPath);
 
+	@Message(id = 343, value = "Normalizer definition for '%s' must define at least a char filter or a token filter (or both)." )
+	SearchException invalidEmptyNormalizerDefinition(String name);
+
 }
