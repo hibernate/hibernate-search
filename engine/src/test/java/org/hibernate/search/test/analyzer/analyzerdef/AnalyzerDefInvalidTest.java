@@ -6,9 +6,19 @@
  */
 package org.hibernate.search.test.analyzer.analyzerdef;
 
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Map;
+
+import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
@@ -20,12 +30,19 @@ import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
+import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 @TestForIssue(jiraKey = "HSEARCH-2606")
@@ -36,6 +53,9 @@ public class AnalyzerDefInvalidTest {
 
 	@Rule
 	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
+	@Rule
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
 	public void shouldNotBePossibleToHaveTwoAnalyzerParametersWithTheSameName() throws Exception {
@@ -67,6 +87,42 @@ public class AnalyzerDefInvalidTest {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( SampleWithEmptyNormalizer.class );
 		integratorResource.create( cfg );
+	}
+
+	@Test
+	@Category(SkipOnElasticsearch.class) // This test only works with locally-executed normalizers
+	public void shouldWarnOnTokenizingNormalizerDefinition() throws Exception {
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.addClass( SampleWithTokenizingNormalizerDefinition.class );
+		SearchIntegrator integrator = integratorResource.create( cfg );
+
+		logged.expectMessage( "HSEARCH000344", "'tokenizing_normalizer'", "3 tokens" );
+
+		SampleWithTokenizingNormalizerDefinition entity = new SampleWithTokenizingNormalizerDefinition();
+		entity.id = 1;
+		entity.description = "to be tokenized";
+		Work work = new Work( entity, entity.id, WorkType.ADD, false );
+		TransactionContextForTest tc = new TransactionContextForTest();
+		integrator.getWorker().performWork( work, tc );
+		tc.end();
+	}
+
+	@Test
+	@Category(SkipOnElasticsearch.class) // This test only works with locally-executed normalizers
+	public void shouldWarnOnTokenizingNormalizerImplementation() throws Exception {
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.addClass( SampleWithTokenizingNormalizerImplementation.class );
+		SearchIntegrator integrator = integratorResource.create( cfg );
+
+		logged.expectMessage( "HSEARCH000344", "'" + StandardAnalyzer.class.getName() + "'", "2 tokens" );
+
+		SampleWithTokenizingNormalizerImplementation entity = new SampleWithTokenizingNormalizerImplementation();
+		entity.id = 1;
+		entity.description = "a description to be tokenized";
+		Work work = new Work( entity, entity.id, WorkType.ADD, false );
+		TransactionContextForTest tc = new TransactionContextForTest();
+		integrator.getWorker().performWork( work, tc );
+		tc.end();
 	}
 
 	@Indexed
@@ -111,5 +167,59 @@ public class AnalyzerDefInvalidTest {
 
 		@Field(normalizer = @Normalizer(definition = "empty_normalizer"))
 		String description;
+	}
+
+	@Indexed
+	@NormalizerDef(name = "tokenizing_normalizer", filters = @TokenFilterDef(factory = CustomFilterFactory.class))
+	static class SampleWithTokenizingNormalizerDefinition {
+
+		@DocumentId
+		long id;
+
+		@Field(normalizer = @Normalizer(definition = "tokenizing_normalizer"))
+		String description;
+	}
+
+	@Indexed
+	static class SampleWithTokenizingNormalizerImplementation {
+
+		@DocumentId
+		long id;
+
+		@Field(normalizer = @Normalizer(impl = StandardAnalyzer.class))
+		String description;
+	}
+
+	public static final class CustomFilterFactory extends TokenFilterFactory {
+
+		public CustomFilterFactory(Map<String, String> args) {
+			super( args );
+		}
+
+		@Override
+		public TokenStream create(TokenStream input) {
+			return new TokenFilter( input ) {
+				private final Deque<String> nextTokens = new ArrayDeque<>();
+				private final CharTermAttribute termAtt = addAttribute( CharTermAttribute.class );
+				@Override
+				public boolean incrementToken() throws IOException {
+					if ( !nextTokens.isEmpty() ) {
+						termAtt.setEmpty().append( nextTokens.removeFirst() );
+						return true;
+					}
+					if ( input.incrementToken() ) {
+						for ( String token : termAtt.toString().split( " " ) ) {
+							nextTokens.addLast( token );
+						}
+						if ( !nextTokens.isEmpty() ) {
+							termAtt.setEmpty().append( nextTokens.removeFirst() );
+							return true;
+						}
+					}
+					return false;
+				}
+			};
+		}
+
 	}
 }
