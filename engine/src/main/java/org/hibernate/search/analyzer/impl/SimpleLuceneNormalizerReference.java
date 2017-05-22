@@ -17,4 +17,9 @@ public class SimpleLuceneNormalizerReference extends SimpleLuceneAnalyzerReferen
 		super( analyzer );
 	}
 
+	@Override
+	public boolean isNormalizer(String fieldName) {
+		return true;
+	}
+
 }

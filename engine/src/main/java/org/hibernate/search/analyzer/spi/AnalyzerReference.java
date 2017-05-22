@@ -21,6 +21,13 @@ import java.io.Closeable;
 public interface AnalyzerReference extends Closeable {
 
 	/**
+	 * @param fieldName name of the field whose analyzer is to be inspected
+	 * @return {@code true} if the analyzer for the field with the given name is
+	 * a normalizer, {@code false} otherwise.
+	 */
+	boolean isNormalizer(String fieldName);
+
+	/**
 	 * Check if the analyzer can be represented using a specific class.
 	 *
 	 * @param analyzerType an {@link AnalyzerReference} type

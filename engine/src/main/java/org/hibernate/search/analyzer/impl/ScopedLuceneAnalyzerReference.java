@@ -38,6 +38,11 @@ public class ScopedLuceneAnalyzerReference extends LuceneAnalyzerReference imple
 	}
 
 	@Override
+	public boolean isNormalizer(String fieldName) {
+		return getDelegate( fieldName ).isNormalizer( fieldName );
+	}
+
+	@Override
 	public void close() {
 		getAnalyzer().close();
 	}
@@ -45,6 +50,14 @@ public class ScopedLuceneAnalyzerReference extends LuceneAnalyzerReference imple
 	@Override
 	public CopyBuilder startCopy() {
 		return new Builder( globalAnalyzerReference, scopedAnalyzerReferences );
+	}
+
+	private LuceneAnalyzerReference getDelegate(String fieldName) {
+		LuceneAnalyzerReference analyzerReference = scopedAnalyzerReferences.get( fieldName );
+		if ( analyzerReference == null ) {
+			analyzerReference = globalAnalyzerReference;
+		}
+		return analyzerReference;
 	}
 
 	public static class Builder implements ScopedAnalyzerReference.Builder, ScopedAnalyzerReference.CopyBuilder {

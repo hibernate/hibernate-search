@@ -48,6 +48,11 @@ public class NamedElasticsearchAnalyzerReference extends ElasticsearchAnalyzerRe
 	}
 
 	@Override
+	public boolean isNormalizer(String fieldName) {
+		return false;
+	}
+
+	@Override
 	public void registerDefinitions(String fieldName, ElasticsearchAnalysisDefinitionRegistry definitionRegistry) {
 		if ( definitionRegistryPopulator == null ) {
 			throw LOG.lazyRemoteAnalyzerReferenceNotInitialized( this );
