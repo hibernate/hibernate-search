@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -46,7 +47,8 @@ public class Book {
 	Long id;
 
 	@Field(analyzer = @Analyzer(definition = "titleAnalyzer"))
-	@SortableField
+	@Field(name = "title_sort", analyze = Analyze.NO)
+	@SortableField(forField = "title_sort")
 	private String title;
 
 	@Field(analyzer = @Analyzer(definition = "authorAnalyzer"))

@@ -17,6 +17,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.fest.assertions.Assertions;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -200,7 +201,7 @@ public class CustomTypeMetadataSortingTest {
 		@DocumentId
 		int id;
 
-		@Field(name = "properties.firstName")
+		@Field(name = "properties.firstName", analyze = Analyze.NO)
 		@SortableField(forField = "properties.firstName")
 		String firstName;
 

@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.envers.Audited;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -59,7 +60,7 @@ public class Person {
 		this.name = name;
 	}
 
-	@Field
+	@Field(analyze = Analyze.NO)
 	@SortableField
 	private String surname;
 

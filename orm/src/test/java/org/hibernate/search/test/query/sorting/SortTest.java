@@ -275,7 +275,7 @@ public class SortTest extends SearchTestBase {
 		// order by summary
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "mainAuthor.name", SortField.Type.STRING ) ); //ASC
+		Sort sort = new Sort( new SortField( "mainAuthor.name_sort", SortField.Type.STRING ) ); //ASC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
