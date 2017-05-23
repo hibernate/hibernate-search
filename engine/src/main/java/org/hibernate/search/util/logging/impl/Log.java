@@ -647,8 +647,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 220, value = "Could not lookup JMS ConnectionFactory named '%1s' for the index '%2s" )
 	SearchException jmsQueueFactoryLookupException(String jmsConnectionFactoryName, String indexName, @Cause Exception e);
 
-	@Message(id = 221, value = "Circular reference. Duplicate use of %1s in root entity %2s#%3s Set the @IndexedEmbedded.depth value explicitly to fix the problem.")
-	SearchException detectInfiniteTypeLoopInIndexedEmbedded(String elementClass, String rootEntity, String path);
+	@Message(id = 221, value = "Circular reference. Entity %1s was already encountered, and was encountered again in entity %2s at path '%3s'."
+			+ " Set the @IndexedEmbedded.depth value explicitly to fix the problem.")
+	SearchException detectInfiniteTypeLoopInIndexedEmbedded(String elementClass, String parentEntity, String path);
 
 	@Message(id = 222, value = "The SearchFactory was not initialized" )
 	SearchException searchIntegratorNotInitialized();

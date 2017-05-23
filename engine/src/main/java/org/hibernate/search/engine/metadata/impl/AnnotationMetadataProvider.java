@@ -990,7 +990,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				// Sortable defined on a property not indexed when the entity is embedded. We can skip it.
 				return;
 			}
-			throw log.sortableFieldRefersToUndefinedField( typeMetadataBuilder.getIndexedType(), propertyMetadataBuilder.getPropertyAccessor().getName(), sortedFieldAbsoluteName );
+			throw log.sortableFieldRefersToUndefinedField( typeMetadataBuilder.getIndexedType(), propertyMetadataBuilder.getPropertyAccessor().getName(), sortedFieldRelativeName );
 		}
 
 		SortableFieldMetadata fieldMetadata = new SortableFieldMetadata.Builder( sortedFieldAbsoluteName ).build();
