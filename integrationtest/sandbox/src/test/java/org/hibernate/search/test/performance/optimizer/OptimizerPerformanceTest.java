@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
@@ -28,6 +29,7 @@ import org.hibernate.search.test.util.TargetDirHelper;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,8 +66,9 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	public void testConcurrency() throws Exception {
 		int nThreads = PERFORMANCE_TESTS_ENABLED ? 15 : 1;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
-		Work work = new Work( getSessionFactory() );
-		ReverseWork reverseWork = new ReverseWork( getSessionFactory() );
+		final AtomicBoolean testFailed = new AtomicBoolean( false );
+		Work work = new Work( getSessionFactory(), testFailed );
+		ReverseWork reverseWork = new ReverseWork( getSessionFactory(), testFailed );
 		long start = System.nanoTime();
 		int iteration = PERFORMANCE_TESTS_ENABLED ? 100 : 1;
 		for ( int i = 0; i < iteration; i++ ) {
@@ -74,10 +77,8 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 		}
 
 		es.shutdown();
-
-		while ( work.count.get() < iteration - 1 ) {
-			Thread.sleep( 20 );
-		}
+		es.awaitTermination( 2, TimeUnit.HOURS );
+		Assert.assertFalse( "Some failure happened in background threads. The first cause should be logged to standard output", testFailed.get() );
 		System.out.println(
 				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: "
 						+ TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start )
@@ -86,10 +87,12 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 
 	protected static class Work implements Runnable {
 		private final SessionFactory sf;
-		public AtomicInteger count = new AtomicInteger( 0 );
+		private final AtomicInteger count = new AtomicInteger( 0 );
+		private final AtomicBoolean testFailed;
 
-		public Work(SessionFactory sf) {
+		public Work(SessionFactory sf, AtomicBoolean testFailed) {
 			this.sf = sf;
+			this.testFailed = testFailed;
 		}
 
 		@Override
@@ -117,7 +120,9 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 					Thread.sleep( 50 );
 				}
 				catch (InterruptedException e) {
-					e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
+					failure( e );
+					Thread.currentThread().interrupt();
+					return;
 				}
 
 				s = sf.openSession();
@@ -129,7 +134,8 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 					query = parser.parse( "name:Gavin" );
 				}
 				catch (ParseException e) {
-					throw new RuntimeException( e );
+					failure( e );
+					return;
 				}
 				boolean results = fts.createFullTextQuery( query ).list().size() > 0;
 				//don't test because in case of async, it query happens before actual saving
@@ -148,16 +154,27 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 				count.incrementAndGet();
 			}
 			catch (Throwable t) {
-				t.printStackTrace();
+				failure( t );
+			}
+		}
+
+		private void failure(Throwable e) {
+			if ( testFailed.compareAndSet( false, true ) ) {
+				//Use a conditional CAS to log only the first error:
+				//much more helpful to figure out issues as logs might get
+				//out of order.
+				e.printStackTrace();
 			}
 		}
 	}
 
 	protected static class ReverseWork implements Runnable {
 		private final SessionFactory sf;
+		private final AtomicBoolean testFailed;
 
-		public ReverseWork(SessionFactory sf) {
+		public ReverseWork(SessionFactory sf, AtomicBoolean testFailed) {
 			this.sf = sf;
+			this.testFailed = testFailed;
 		}
 
 		@Override
@@ -191,7 +208,9 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 				s.close();
 			}
 			catch (Throwable t) {
-				t.printStackTrace();
+				if ( testFailed.compareAndSet( false, true ) ) {
+					t.printStackTrace();
+				}
 			}
 		}
 	}
