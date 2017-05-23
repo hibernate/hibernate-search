@@ -70,43 +70,54 @@ Hibernate Search expects an Elasticsearch cluster running version 2.x or 5.x.
 The version running on your cluster will be automatically detected on startup,
 and Hibernate Search will adapt its behavior based on the detected version.
 
-When upgrading your Elasticsearch cluster though, some
-https://www.elastic.co/guide/en/elasticsearch/reference/5.0/setup-upgrade.html[administrative tasks]
-are still required on your cluster: Hibernate Search will not take care of those.
-
-[WARNING]
---
-Hibernate Search does not support the `string` datatype on Elasticsearch 5.x.
-Thus, if you upgrade your cluster from 2.x to 5.x,
-you will need to delete your indexes manually and <<search-batchindex,reindex your data>>.
---
-
 The targeted version is largely transparent to Hibernate Search users,
 but there are a few differences in how Hibernate Search behaves depending
 on the Elasticsearch version that may affect you.
 The table details those differences.
 
-[cols="h,2*",options="header"]
+[cols="h,3*",options="header"]
 |===============
-||2.x|5.x
-|Configuration required for purges|<<elasticsearch-integration-server-configuration,Enable the delete-by-query plugin>>|None
-|Datatype used for text fields in Elasticsearch|`string`|`text` (if analyzed) or `keyword` (if not).
-The string datatype https://www.elastic.co/guide/en/elasticsearch/reference/5.0/string.html[has been deprecated in Elasticsearch 5.0].
-|<<field-annotation-norms,Norms>>|Not implemented|Implemented
+||2.x|5.0/5.1|5.2+
+|Configuration required for purges|<<elasticsearch-integration-server-configuration,Enable the delete-by-query plugin>> 2+|None
+|Datatype used for String fields in Elasticsearch
+ |`string`
+ |`text` (if analyzed) or `keyword` (if not).
+ The `string` datatype https://www.elastic.co/guide/en/elasticsearch/reference/5.0/string.html[has been deprecated in Elasticsearch 5.0].
+ |`text` (if analyzed with an <<analyzer,analyzer>>) or `keyword` (if not analyzed or analyzed with a <<section-normalizers,normalizer>>).
+|<<field-annotation-norms,Norms>>|Not implemented 2+|Implemented
 |Implementation of <<field-annotation-indexNullAs,`@Field.indexNullAs`>> for analyzed text fields
  |https://www.elastic.co/guide/en/elasticsearch/reference/2.4/null-value.html[`null_value`] is added to the mapping,
   `null` values are indexed as such.
- |https://www.elastic.co/guide/en/elasticsearch/reference/5.0/null-value.html[`null_value`] is not available for `text` fields,
+ 2+|https://www.elastic.co/guide/en/elasticsearch/reference/5.0/null-value.html[`null_value`] is not available for `text` fields,
   null values are replaced with the `indexNullAs` value explicitly when indexing.
-|Configuration required for spatial projections without a spatial sort|<<elasticsearch-integration-server-configuration,Enable and configure the groovy plugin>>|None
+  +
+  This does not apply to `keyword` fields.
+|Configuration required for spatial projections without a spatial sort
+ |<<elasticsearch-integration-server-configuration,Enable and configure the groovy plugin>>
+ 2+|None
 |===============
-
-
 
 [NOTE]
 --
 Hibernate Search internal tests run against Elasticsearch {testElasticsearchVersion} by default.
 --
+
+===== Upgrading Elasticsearch
+
+When upgrading your Elasticsearch cluster, some
+https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html[administrative tasks]
+are still required on your cluster: Hibernate Search will not take care of those.
+
+On top of that, there are some fundamental differences between some versions of Elasticsearch,
+and for that reason, some upgrades will require you to delete your indexes manually and <<search-batchindex,reindex your data>>.
+
+The upgrades that require such changes are the following:
+
+* upgrading from 2.x to 5.x, because Hibernate Search does not support the `string` datatype on Elasticsearch 5.x;
+* upgrading from 5.0/5.1 to 5.2+ if you used <<section-normalizer,normalizers>>,
+because Hibernate Seach normalizers are mapped to native Elasticsearch normalizers starting from Elasticsearch 5.2,
+thereby changing the datatype of fields using normalizers from `text` to `keyword`.
+
 
 ==== Dependencies in your Java application
 
@@ -593,12 +604,19 @@ public static class CustomAnalyzerProvider implements ElasticsearchAnalysisDefin
 
 ===== Normalizers
 
-<<section-normalizers,Normalizers>> are translated to analyzers with a keyword tokenizer
-when they are propagated to Elasticsearch.
+Depending on the Elasticsearch version you're using,
+<<section-normalizers,normalizers>> will be handled differently:
+
+* On version 5.2 and above, Elasticsearch supports normalizers natively and
+thus Hibernate Search normalizers will be translated directly to Elasticsearch normalizers.
+* On version 5.1 and below, Elasticsearch does not support normalizers natively,
+thus Hibernate Search normalizers will be translated to Elasticsearch analyzers
+with a keyword tokenizer.
 
 [WARNING]
 ====
-The fact that normalizers are translated to Elasticsearch analyzers
+On Elasticsearch 5.1 and below,
+the fact that normalizers are translated to Elasticsearch analyzers
 means in particular that no normalizer definition should have the
 same name as an analyzer definition.
 ====
