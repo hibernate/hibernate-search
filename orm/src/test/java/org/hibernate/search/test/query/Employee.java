@@ -66,10 +66,7 @@ public class Employee {
 		this.id = id;
 	}
 
-	// TODO HSEARCH-1849 This used to work with index = NO; But the implicit uninverting used for sorting requires the
-	// field to be indexed
-	@Field(index = Index.YES, store = Store.YES)
-	@SortableField
+	@Field(index = Index.NO, store = Store.YES)
 	public String getLastname() {
 		return lastname;
 	}

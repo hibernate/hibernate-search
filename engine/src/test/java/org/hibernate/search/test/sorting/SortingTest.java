@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
@@ -23,13 +22,14 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Normalizer;
+import org.hibernate.search.annotations.NormalizerDef;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
@@ -395,24 +395,21 @@ public class SortingTest {
 		return hsQuery;
 	}
 
-	@AnalyzerDefs({
-		@AnalyzerDef(
-				name = Person.COLLATING_ANALYZER_NAME,
-				tokenizer = @TokenizerDef(factory = KeywordTokenizerFactory.class),
-				filters = {
-						@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
-						@TokenFilterDef(factory = LowerCaseFilterFactory.class)
-				}
-		),
-		@AnalyzerDef(
-				name = Person.TOKENIZING_ANALYZER_NAME,
-				tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class)
-		)
-	})
+	@NormalizerDef(
+			name = Person.COLLATING_NORMALIZER_NAME,
+			filters = {
+					@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+					@TokenFilterDef(factory = LowerCaseFilterFactory.class)
+			}
+	)
+	@AnalyzerDef(
+			name = Person.TOKENIZING_ANALYZER_NAME,
+			tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class)
+	)
 	@Indexed
 	private class Person {
 
-		public static final String COLLATING_ANALYZER_NAME = "org_hibernate_search_test_sorting_SortingTest_Person_collatingAnalyzer";
+		public static final String COLLATING_NORMALIZER_NAME = "org_hibernate_search_test_sorting_SortingTest_Person_collatingNormalizer";
 		public static final String TOKENIZING_ANALYZER_NAME = "org_hibernate_search_test_sorting_SortingTest_Person_tokenizingAnalyzer";
 
 		@DocumentId
@@ -437,7 +434,7 @@ public class SortingTest {
 		})
 		@Fields({
 				@Field(name = "name", store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN),
-				@Field(name = "collatedName", store = Store.YES, analyzer = @Analyzer(definition = COLLATING_ANALYZER_NAME)),
+				@Field(name = "collatedName", store = Store.YES, normalizer = @Normalizer(definition = COLLATING_NORMALIZER_NAME)),
 				@Field(name = "tokenizedName", store = Store.YES, analyzer = @Analyzer(definition = TOKENIZING_ANALYZER_NAME))
 		})
 		final String name;
@@ -507,7 +504,7 @@ public class SortingTest {
 		String id;
 
 		@org.hibernate.search.annotations.SortableField
-		@Field(store = Store.YES, analyze = Analyze.YES)
+		@Field(store = Store.YES, analyze = Analyze.NO)
 		String description;
 
 		@org.hibernate.search.annotations.SortableField

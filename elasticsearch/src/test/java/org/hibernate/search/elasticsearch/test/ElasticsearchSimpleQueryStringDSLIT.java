@@ -20,6 +20,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -71,7 +72,7 @@ public class ElasticsearchSimpleQueryStringDSLIT extends SearchTestBase {
 					.createQuery();
 
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
-			fullTextQuery.setSort( new Sort( new SortField( "title", SortField.Type.STRING ) ) );
+			fullTextQuery.setSort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
 			fullTextQuery.getResultList();
 		}
 		finally {
@@ -120,7 +121,8 @@ public class ElasticsearchSimpleQueryStringDSLIT extends SearchTestBase {
 		Long id;
 
 		@Field(analyzer = @Analyzer(definition = "titleAnalyzer"))
-		@SortableField
+		@Field(name = "title_sort", analyze = Analyze.NO)
+		@SortableField(forField = "title_sort")
 		private String title;
 
 		@Field(analyzer = @Analyzer(definition = "authorAnalyzer"))
