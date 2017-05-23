@@ -591,6 +591,29 @@ public static class CustomAnalyzerProvider implements ElasticsearchAnalysisDefin
 }
 --
 
+===== Normalizers
+
+<<section-normalizers,Normalizers>> are translated to analyzers with a keyword tokenizer
+when they are propagated to Elasticsearch.
+
+[WARNING]
+====
+The fact that normalizers are translated to Elasticsearch analyzers
+means in particular that no normalizer definition should have the
+same name as an analyzer definition.
+====
+
+All the features mentioned above for analyzers are also available when using normalizers:
+
+* They can be defined using Lucene factories with `@NormalizerDef`,
+which will be translated to the equivalent types in Elasticsearch.
+* They can be defined using the special factories `ElasticsearchCharFilterFactory`
+and `ElasticsearchTokenFilterFactory` with `@NormalizerDef`.
+* They can be defined using an `ElasticsearchAnalysisDefinitionProvider`
+(use `builder.normalizer(name)`).
+* The definitions can be referenced using
+`@Field(normalizer = @Normalizer(definition = "myDefinition"))`
+
 
 ==== Field bridges
 

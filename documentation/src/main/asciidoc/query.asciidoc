@@ -804,7 +804,8 @@ factor
 * `withConstantScore` (on query): all results matching the query have a constant score equals to the
 boost
 * `filteredBy(Filter)` (on query): filter query results using the Filter instance
-* `ignoreAnalyzer` (on field): ignore the analyzer when processing this field
+* `ignoreAnalyzer` (on field): ignore the <<analyzer,analyzer>> (or <<section-normalizers,normalizer>>)
+when processing this field
 * `ignoreFieldBridge` (on field): ignore field bridge when processing this field
 
 Let's check out an example using some of these options
