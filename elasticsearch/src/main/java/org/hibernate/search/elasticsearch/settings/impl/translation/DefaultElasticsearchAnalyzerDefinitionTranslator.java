@@ -303,14 +303,23 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 				.end()
 				.builder( WordDelimiterFilterFactory.class, "word_delimiter" ) // "protected_words" array, "protected_words_path" file path, "type_table" array, "type_table_path" file path
 						.rename( "generateWordParts", "generate_word_parts" )
+						.transform( "generateWordParts", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "generateNumberParts", "generate_number_parts" )
+						.transform( "generateNumberParts", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "catenateWords", "catenate_words" )
+						.transform( "catenateWords", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "catenateNumbers", "catenate_numbers" )
+						.transform( "catenateNumbers", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "catenateAll", "catenate_all" )
+						.transform( "catenateAll", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "splitOnCaseChange", "split_on_case_change" )
+						.transform( "splitOnCaseChange", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "splitOnNumerics", "split_on_numerics" )
+						.transform( "splitOnNumerics", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "preserveOriginal", "preserve_original" )
+						.transform( "preserveOriginal", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "stemEnglishPossessive", "stem_english_possessive" )
+						.transform( "stemEnglishPossessive", NumericToBooleanParameterValueTransformer.INSTANCE )
 						.rename( "protected", "protected_words" )
 						.transform(
 								"protected",
