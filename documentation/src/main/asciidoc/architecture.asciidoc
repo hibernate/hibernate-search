@@ -63,16 +63,16 @@ pattern aka. atomic conversation.
 ====
 
 
-=== Back end
+=== Backend
 
-Hibernate Search offers the ability to let the batched work being processed by different back ends.
-Several back ends are provided out of the box and you have the option to plugin your own. It is
-important to understand that in this context back end encompasses more than just the configuration
-option `hibernate.search.default.worker.backend`. This property just specifies a implementation of
+Hibernate Search offers the ability to let the batched work be processed by different backends.
+Several backends are provided out of the box and you have the option to plug in your own. It is
+important to understand that in this context backend encompasses more than just the configuration
+option `hibernate.search.default.worker.backend`. This property just specifies an implementation of
 the `BackendQueueProcessor` interface (or the `Backend` interface, see <<table-backend-configuration, the configuration options>>)
-which is a part of a back end configuration. In most cases,
+which is a part of a backend configuration. In most cases,
 however, additional configuration settings are needed to successfully configure a specific backend
-setup, like for example the JMS back end.
+setup, like for example the JMS backend.
 
 
 ==== Lucene
@@ -81,7 +81,7 @@ In this mode, all index update operations applied on a given node (JVM) will be 
 Lucene directories (through the directory providers) by the same node. This mode is typically used
 in non clustered environment or in clustered environments where the directory store is shared.
 
-image::lucene-backend.png[Lucene back end configuration]
+image::lucene-backend.png[Lucene backend configuration]
 
 This mode targets non clustered applications, or clustered applications where the Directory is
 taking care of the locking strategy.
@@ -89,7 +89,7 @@ taking care of the locking strategy.
 The main advantage is simplicity and immediate visibility of the changes in Lucene queries (a
 requirement in some applications).
 
-An alternative back end viable for non-clustered and non-shared index configurations is the near-
+An alternative backend viable for non-clustered and non-shared index configurations is the near-
 real-time backend.
 
 [[search-architecture-jms]]
@@ -102,7 +102,7 @@ responsible for updating the Lucene index. The slaves can accept read as well as
 However, while they process the read operations on their local index copy, they will delegate the
 update operations to the master.
 
-image::jms-backend.png[JMS back end configuration]
+image::jms-backend.png[JMS backend configuration]
 
 This mode targets clustered environments where throughput is critical, and index update delays are
 affordable. Reliability is ensured by the JMS provider and by having the slaves working on a local
@@ -110,7 +110,7 @@ copy of the index.
 
 The JMS integration can be transactional. With this backend (and currently only this backend) you
 can have Hibernate Search send the indexing work into the queue within the same transaction
-applying changes to the relational database. This options requires you to use an XA transaction.
+applying changes to the relational database. This option requires you to use an XA transaction.
 
 By default this backend's transactional capabilities are disabled: messages will be
 enqueued as a post-transaction event, consistently with other backends.
@@ -119,9 +119,9 @@ To change this configuration see also <<configuration-worker>>.
 
 ==== JGroups
 
-The JGroups based back end works similar to the JMS one and is designed after the same master/slave
-pattern. However, instead of JMS the JGroups toolkit is used as a replication mechanism. This back
-end can be used as an alternative to JMS when response time is critical, but i.e. JNDI service is
+The JGroups based backend works similar to the JMS one and is designed after the same master/slaves
+pattern. However, instead of JMS, the JGroups toolkit is used as a replication mechanism. This backend
+can be used as an alternative to JMS when response time is critical, but i.e. JNDI service is
 not available.
 
 Note that while JMS can usually be configured to use persistent queues, JGroups talks directly to
