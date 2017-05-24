@@ -123,6 +123,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	}
 
 	@Override
+	@Deprecated
 	public float getBoost() {
 		return fieldLevelBoost;
 	}

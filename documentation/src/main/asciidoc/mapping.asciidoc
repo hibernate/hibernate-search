@@ -102,9 +102,9 @@ field.
 Fields used for sorting or faceting _must not_ be analyzed.
 ====
 
-* [[field-annotation-norms]]`norms`: describes whether index time boosting information should be stored (`Norms.YES`) or
+* [[field-annotation-norms]]`norms`: describes whether index time scoring information should be stored (`Norms.YES`) or
 not (`Norms.NO`). Not storing the norms can save a considerable amount of memory, but index time
-boosting will not be available in this case. The default value is `Norms.YES`.
+boosting (in particular) will not be available in this case. The default value is `Norms.YES`.
 
 * `termVector`: describes collections of term-frequency pairs. This attribute enables the storing
 of the term vectors within the documents during indexing. The default value is `TermVector.NO`.
@@ -866,6 +866,13 @@ following sections show you how you can achieve index time boosting using Hibern
 [[section-boost-annotation]]
 ==== Static index time boosting
 
+[WARNING]
+====
+Index-time boosting is deprecated: support for this approach will be removed in Apache Lucene since version 7.
+
+We recommend to use query-time boosting instead: see <<search-query>>.
+====
+
 To define a static boost value for an indexed class or property you can use the `@Boost` annotation.
 You can use this annotation within `@Field` or specify it directly on method or class level.
 
@@ -908,6 +915,16 @@ Lucene In Action from Otis Gospodnetic and Erik Hatcher.
 
 [[section-dynamic-boost]]
 ==== Dynamic index time boosting
+
+[WARNING]
+====
+Index-time boosting is deprecated: support for this approach will be removed in Apache Lucene since version 7.
+
+We recommend to use query-time boosting instead: see <<search-query>>.
+
+If query-time boosting is not enough for your use case, you can implement dynamic boosting
+using a <<section-custom-similarity,custom similarity>> (advanced use).
+====
 
 The `@Boost` annotation used in <<section-boost-annotation>> defines a static boost factor which
 is independent of the state of of the indexed entity at runtime. However, there are use cases in
@@ -2934,6 +2951,16 @@ public class Departments {
 
 
 ==== Mapping dynamic boost
+
+[WARNING]
+====
+Index-time boosting is deprecated: support for this approach will be removed in Apache Lucene since version 7.
+
+We recommend to use query-time boosting instead: see <<search-query>>.
+
+If query-time boosting is not enough for your use case, you can implement dynamic boosting
+using a <<section-custom-similarity,custom similarity>> (advanced use).
+====
 
 You can apply a dynamic boost factor on either a field or a whole entity:
 

@@ -11,6 +11,7 @@ import org.hibernate.search.engine.BoostStrategy;
 /**
  * @author Hardy Ferentschik
  */
+@Deprecated
 public final class DefaultBoostStrategy implements BoostStrategy {
 
 	public static final DefaultBoostStrategy INSTANCE = new DefaultBoostStrategy();

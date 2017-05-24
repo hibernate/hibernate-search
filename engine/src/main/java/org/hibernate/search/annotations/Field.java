@@ -79,7 +79,13 @@ public @interface Field {
 
 	/**
 	 * @return Returns the boost factor for the field. Default boost factor is 1.0.
+	 *
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
 	 */
+	@Deprecated
 	Boost boost() default @Boost(value = 1.0F);
 
 	/**

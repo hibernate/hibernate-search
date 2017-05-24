@@ -13,7 +13,13 @@ package org.hibernate.search.engine;
  *
  * @author Hardy Ferentschik
  * @see org.hibernate.search.annotations.Boost
+ *
+ * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+ * You should use query-time boosting instead, for instance by calling
+ * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+ * when building queries with the Hibernate Search query DSL.
  */
+@Deprecated
 public interface BoostStrategy {
 
 	float defineBoost(Object value);

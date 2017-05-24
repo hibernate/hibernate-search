@@ -18,7 +18,13 @@ import org.hibernate.search.engine.BoostStrategy;
  * Apply a dynamic boost factor on a field or a whole entity.
  *
  * @author Hardy Ferentschik
+ *
+ * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+ * You should use query-time boosting instead, for instance by calling
+ * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+ * when building queries with the Hibernate Search query DSL.
  */
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Documented

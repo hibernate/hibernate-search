@@ -48,13 +48,25 @@ public interface IndexedTypeDescriptor extends FieldContributor {
 
 	/**
 	 * @return the class boost value, 1 being the default.
+	 *
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
 	 */
+	@Deprecated
 	float getStaticBoost();
 
 	/**
 	 * @return Dynamic boost strategy. There will always be a boost strategy, but the default strategy will apply a
 	 *         boost of 1.0.
+	 *
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
 	 */
+	@Deprecated
 	BoostStrategy getDynamicBoost();
 
 	/**

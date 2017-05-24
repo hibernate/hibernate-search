@@ -32,6 +32,7 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 
 	private final Class<?> indexedType;
 	private final float classBoost;
+	@Deprecated
 	private final BoostStrategy boostStrategy;
 	private final Map<String, PropertyDescriptor> keyedPropertyDescriptors;
 	private final Set<PropertyDescriptor> propertyDescriptors;
@@ -94,11 +95,13 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	}
 
 	@Override
+	@Deprecated
 	public float getStaticBoost() {
 		return classBoost;
 	}
 
 	@Override
+	@Deprecated
 	public BoostStrategy getDynamicBoost() {
 		return boostStrategy;
 	}
