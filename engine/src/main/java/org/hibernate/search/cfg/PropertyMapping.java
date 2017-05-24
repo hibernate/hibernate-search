@@ -73,6 +73,16 @@ public class PropertyMapping {
 		return this;
 	}
 
+	/**
+	 * @param impl The class for an implementation of {@link BoostStrategy}.
+	 * @return this mapping, for chained calls.
+	 *
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
+	 */
+	@Deprecated
 	public PropertyMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
 		final Map<String, Object> dynamicBoostAnn = new HashMap<String, Object>();
 		dynamicBoostAnn.put( "impl", impl );

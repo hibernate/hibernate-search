@@ -299,9 +299,13 @@ the provided string must not include the zone offset (`+01:00`) or the zone ID (
 Even when they make sense for the type of your field, the time and time zone may be omitted
  (if omitted, the time zone will be interpreted as the default JVM time zone).
 
-===== Dynamic boosting
+===== Index-time boosting
 
-The `org.hibernate.search.annotations.DynamicBoost` annotation is not (and cannot be) supported with Elasticsearch, because the platform lacks per-document, index-time boosting capabilities. Static boosts (`@Boost`) are, however, supported.
+The `org.hibernate.search.annotations.DynamicBoost` annotation is not (and cannot be)
+supported with Elasticsearch, because the platform lacks per-document, index-time boosting capabilities.
+
+The `@Boost` annotation will work, but since it's deprecated
+we suggest to use query-time boosting instead: see <<search-query>>>.
 
 ==== [[elasticsearch-mapping-analyzer]] Analyzers
 

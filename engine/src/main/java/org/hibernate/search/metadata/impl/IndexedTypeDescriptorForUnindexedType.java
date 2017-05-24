@@ -44,11 +44,13 @@ public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescrip
 	}
 
 	@Override
+	@Deprecated
 	public float getStaticBoost() {
 		return 1;
 	}
 
 	@Override
+	@Deprecated
 	public BoostStrategy getDynamicBoost() {
 		return DefaultBoostStrategy.INSTANCE;
 	}
