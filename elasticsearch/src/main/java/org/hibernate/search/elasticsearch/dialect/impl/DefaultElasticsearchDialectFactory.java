@@ -30,7 +30,7 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	private static final JsonAccessor VERSION_ACCESSOR = JsonAccessor.root().property( "version" ).property( "number" );
+	private static final JsonAccessor<String> VERSION_ACCESSOR = JsonAccessor.root().property( "version" ).property( "number" ).asString();
 
 	@Override
 	public ElasticsearchDialect createDialect(ElasticsearchClient client, Properties properties) {
@@ -69,7 +69,7 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 						null );
 			}
 
-			return VERSION_ACCESSOR.get( responseAsJsonObject ).getAsString();
+			return VERSION_ACCESSOR.get( responseAsJsonObject );
 		}
 		catch (SearchException e) {
 			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory

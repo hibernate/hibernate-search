@@ -119,17 +119,17 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 
 	static class SearchResultImpl implements SearchResult {
 
-		private static final JsonAccessor HITS_HITS_ACCESSOR = JsonAccessor.root().property( "hits" ).property( "hits" );
+		private static final JsonAccessor<JsonArray> HITS_HITS_ACCESSOR = JsonAccessor.root().property( "hits" ).property( "hits" ).asArray();
 
-		private static final JsonAccessor COUNT_ACCESSOR = JsonAccessor.root().property( "hits" ).property( "total" );
+		private static final JsonAccessor<Integer> COUNT_ACCESSOR = JsonAccessor.root().property( "hits" ).property( "total" ).asInteger();
 
-		private static final JsonAccessor AGGREGATIONS_ACCESSOR = JsonAccessor.root().property( "aggregations" );
+		private static final JsonAccessor<JsonObject> AGGREGATIONS_ACCESSOR = JsonAccessor.root().property( "aggregations" ).asObject();
 
-		private static final JsonAccessor TOOK_ACCESSOR = JsonAccessor.root().property( "took" );
+		private static final JsonAccessor<Integer> TOOK_ACCESSOR = JsonAccessor.root().property( "took" ).asInteger();
 
-		private static final JsonAccessor TIMED_OUT_ACCESSOR = JsonAccessor.root().property( "timed_out" );
+		private static final JsonAccessor<Boolean> TIMED_OUT_ACCESSOR = JsonAccessor.root().property( "timed_out" ).asBoolean();
 
-		private static final JsonAccessor SCROLL_ID_ACCESSOR = JsonAccessor.root().property( "_scroll_id" );
+		private static final JsonAccessor<String> SCROLL_ID_ACCESSOR = JsonAccessor.root().property( "_scroll_id" ).asString();
 
 		private final JsonObject jsonObject;
 
@@ -140,12 +140,12 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 
 		@Override
 		public JsonArray getHits() {
-			return HITS_HITS_ACCESSOR.get( jsonObject ).getAsJsonArray();
+			return HITS_HITS_ACCESSOR.get( jsonObject );
 		}
 
 		@Override
 		public int getTotalHitCount() {
-			return COUNT_ACCESSOR.get( jsonObject ).getAsInt();
+			return COUNT_ACCESSOR.get( jsonObject );
 		}
 
 		@Override
@@ -156,18 +156,17 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 
 		@Override
 		public int getTook() {
-			return TOOK_ACCESSOR.get( jsonObject ).getAsInt();
+			return TOOK_ACCESSOR.get( jsonObject );
 		}
 
 		@Override
 		public boolean getTimedOut() {
-			return TIMED_OUT_ACCESSOR.get( jsonObject ).getAsBoolean();
+			return TIMED_OUT_ACCESSOR.get( jsonObject );
 		}
 
 		@Override
 		public String getScrollId() {
-			JsonElement element = SCROLL_ID_ACCESSOR.get( jsonObject );
-			return element == null ? null : element.getAsString();
+			return SCROLL_ID_ACCESSOR.get( jsonObject );
 		}
 
 	}

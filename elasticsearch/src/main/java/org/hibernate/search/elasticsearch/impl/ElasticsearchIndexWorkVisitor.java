@@ -30,6 +30,7 @@ import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.gson.impl.JsonElementType;
 import org.hibernate.search.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
+import org.hibernate.search.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
@@ -292,7 +293,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 					}
 					else {
 						// should only be the case for class-bridge fields; in that case we'd miss proper handling of boolean/Date for now
-						JsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
+						UnknownTypeJsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
 						String stringValue = field.stringValue();
 						Number numericValue = field.numericValue();
 						if ( stringValue != null ) {
@@ -307,7 +308,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 					}
 				}
 				else {
-					JsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
+					UnknownTypeJsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
 
 					// If the value was initially null, explicitly propagate null and let ES handle the default token.
 					if ( field instanceof NullMarker ) {
@@ -342,7 +343,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 		}
 		catch (UnexpectedJsonElementTypeException e) {
 			List<JsonElementType<?>> expectedTypes = e.getExpectedTypes();
-			JsonAccessor accessor = e.getAccessor();
+			JsonAccessor<?> accessor = e.getAccessor();
 			JsonElement actualValue = e.getActualElement();
 
 			if ( expectedTypes.contains( JsonElementType.OBJECT ) || JsonElementType.OBJECT.isInstance( actualValue ) ) {

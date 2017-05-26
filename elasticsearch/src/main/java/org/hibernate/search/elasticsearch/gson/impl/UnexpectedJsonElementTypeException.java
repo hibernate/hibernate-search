@@ -11,33 +11,31 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.exception.AssertionFailure;
+
 import com.google.gson.JsonElement;
 
 /**
  * @author Yoann Rodiere
  */
-public class UnexpectedJsonElementTypeException extends Exception /** Non-runtime */ {
+public class UnexpectedJsonElementTypeException extends AssertionFailure {
 
-	private final JsonAccessor accessor;
+	private final JsonAccessor<?> accessor;
 	private final List<JsonElementType<?>> expectedTypes;
 	private final JsonElement actualElement;
 
-	public UnexpectedJsonElementTypeException(JsonAccessor accessor, JsonElementType<?> expectedType, JsonElement actualElement) {
+	public UnexpectedJsonElementTypeException(JsonAccessor<?> accessor, JsonElementType<?> expectedType, JsonElement actualElement) {
 		this( accessor, Arrays.asList( expectedType ), actualElement );
 	}
 
-	public UnexpectedJsonElementTypeException(JsonAccessor accessor, List<? extends JsonElementType<?>> expectedTypes, JsonElement actualElement) {
+	public UnexpectedJsonElementTypeException(JsonAccessor<?> accessor, List<? extends JsonElementType<?>> expectedTypes, JsonElement actualElement) {
+		super( "Unexpected type at '" + accessor + "'. Expected one of " + expectedTypes + ", got '" + actualElement + "'" );
 		this.accessor = accessor;
 		this.expectedTypes = Collections.unmodifiableList( new ArrayList<JsonElementType<?>>( expectedTypes ) );
 		this.actualElement = actualElement;
 	}
 
-	@Override
-	public String getMessage() {
-		return "Unexpected type at '" + accessor + "'. Expected one of " + expectedTypes + ", got '" + actualElement + "'";
-	}
-
-	public JsonAccessor getAccessor() {
+	public JsonAccessor<?> getAccessor() {
 		return accessor;
 	}
 

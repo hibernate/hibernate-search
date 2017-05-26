@@ -101,7 +101,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 	private static class CountWork extends SimpleElasticsearchWork<Integer> {
 
-		private static final JsonAccessor COUNT_ACCESSOR = JsonAccessor.root().property( "count" );
+		private static final JsonAccessor<Integer> COUNT_ACCESSOR = JsonAccessor.root().property( "count" ).asInteger();
 
 		protected CountWork(Builder builder) {
 			super( builder );
@@ -109,7 +109,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 		@Override
 		protected Integer generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
-			return COUNT_ACCESSOR.get( parsedResponseBody ).getAsInt();
+			return COUNT_ACCESSOR.get( parsedResponseBody );
 		}
 
 		private static class Builder extends SimpleElasticsearchWork.Builder<Builder> {
