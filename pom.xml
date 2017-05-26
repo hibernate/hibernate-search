@@ -206,6 +206,9 @@
         <activeMQVersion>5.13.3</activeMQVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
         <commonsLang3Version>3.5</commonsLang3Version>
+        <httpCoreVersion>4.4.5</httpCoreVersion>
+        <httpClientVersion>4.5.2</httpClientVersion>
+        <commonsCodecVersion>1.10</commonsCodecVersion>
 
         <!-- Elasticsearch -->
         <elasticsearchClientVersion>5.4.1</elasticsearchClientVersion>
@@ -470,6 +473,21 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commonsLang3Version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpClientVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${httpCoreVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commonsCodecVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
