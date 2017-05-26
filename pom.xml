@@ -225,6 +225,11 @@
         <shrinkwrapResolverVersion>2.2.2</shrinkwrapResolverVersion>
         <wildflyVersion>10.1.0.Final</wildflyVersion>
         <jmhVersion>1.11.2</jmhVersion>
+        
+        <!-- Elasticsearch -->
+        <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
+        <test.elasticsearch.host.username></test.elasticsearch.host.username>
+        <test.elasticsearch.host.password></test.elasticsearch.host.password>
 
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1576,7 +1581,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>2.0.0</test.elasticsearch.host.version>
-                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
                 <pluginManagement>
@@ -1614,7 +1618,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <test.elasticsearch.mavenPlugin.version>2.2</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>2.4.4</test.elasticsearch.host.version>
-                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
                 <pluginManagement>
@@ -1697,7 +1700,6 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <properties>
                 <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>5.4.1</test.elasticsearch.host.version>
-                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
             </properties>
             <build>
                 <pluginManagement>
