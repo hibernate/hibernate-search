@@ -18,7 +18,6 @@ import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isExce
 import java.io.IOException;
 
 import org.eclipse.jetty.http.HttpHeader;
-import org.elasticsearch.client.ResponseException;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
@@ -491,7 +490,7 @@ public class DefaultElasticsearchClientFactoryTest {
 		}
 	}
 
-	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) throws IOException, ResponseException {
+	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) {
 		return client.execute( buildRequest( ElasticsearchRequest.post(), path, payload ) );
 	}
 
