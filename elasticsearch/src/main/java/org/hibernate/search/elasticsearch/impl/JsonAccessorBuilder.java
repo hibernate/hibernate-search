@@ -11,6 +11,7 @@ import java.util.Deque;
 import java.util.List;
 
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.elasticsearch.impl.NestingMarker.NestingPathComponent;
 import org.hibernate.search.elasticsearch.util.impl.ParentPathMismatchException;
 import org.hibernate.search.elasticsearch.util.impl.PathComponentExtractor;
@@ -38,7 +39,7 @@ import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
  */
 final class JsonAccessorBuilder {
 
-	private JsonAccessor currentAccessor = JsonAccessor.root();
+	private UnknownTypeJsonAccessor currentAccessor = null;
 
 	/*
 	 * This variable allows to keep in memory the fact that a previous path component could not have its index handled,
@@ -55,7 +56,7 @@ final class JsonAccessorBuilder {
 	public void reset() {
 		this.indexes.clear();
 		this.pathComponentExtractor.reset();
-		this.currentAccessor = JsonAccessor.root();
+		this.currentAccessor = null;
 	}
 
 	/**
@@ -78,7 +79,7 @@ final class JsonAccessorBuilder {
 				indexes.addLast( currentComponentArrayIndex );
 			}
 
-			JsonAccessor newAccessor = consumePath( pathComponentExtractor, ConsumptionLimit.SECOND_BUT_LAST );
+			UnknownTypeJsonAccessor newAccessor = consumePath( pathComponentExtractor, ConsumptionLimit.SECOND_BUT_LAST );
 			if ( newAccessor != currentAccessor ) {
 				currentAccessor = newAccessor;
 				indexes.clear();
@@ -97,13 +98,18 @@ final class JsonAccessorBuilder {
 	 * @param consumptionLimit The consumption limit to pass to {@link PathComponentExtractor#next(ConsumptionLimit)).
 	 * @return The resulting accessor.
 	 */
-	private JsonAccessor consumePath(PathComponentExtractor extractor, ConsumptionLimit consumptionLimit ) {
+	private UnknownTypeJsonAccessor consumePath(PathComponentExtractor extractor, ConsumptionLimit consumptionLimit ) {
 		String childName = extractor.next( consumptionLimit );
-		JsonAccessor newAccessor = currentAccessor;
+		UnknownTypeJsonAccessor newAccessor = currentAccessor;
 		boolean consumeIndexes = !indexes.isEmpty();
 
 		while ( childName != null ) {
-			newAccessor = newAccessor.property( childName );
+			if ( newAccessor == null ) {
+				newAccessor = JsonAccessor.root().property( childName );
+			}
+			else {
+				newAccessor = newAccessor.property( childName );
+			}
 
 			if ( consumeIndexes ) {
 				for ( Integer index : indexes ) {
@@ -119,7 +125,7 @@ final class JsonAccessorBuilder {
 		return newAccessor;
 	}
 
-	public JsonAccessor buildForPath(String absolutePath) throws ParentPathMismatchException {
+	public UnknownTypeJsonAccessor buildForPath(String absolutePath) throws ParentPathMismatchException {
 		/*
 		 * We must run the path through a field path builder again to handle cases
 		 * where the field name contains dots (and therefore requires creating containing
