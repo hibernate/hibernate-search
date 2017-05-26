@@ -8,6 +8,7 @@ package org.hibernate.search.elasticsearch.work.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.elasticsearch.client.Response;
@@ -109,17 +110,18 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 		}
 		// Result items have the following format: { "actionName" : { "status" : 201, ... } }
 		JsonObject content = resultItem.entrySet().iterator().next().getValue().getAsJsonObject();
-		int statusCode = BULK_ITEM_STATUS_CODE.get( content );
-		return ElasticsearchClientUtils.isSuccessCode( statusCode )
-			|| ignoredErrorStatuses.contains( statusCode )
-			|| ignoredErrorTypes.contains( BULK_ITEM_ERROR_TYPE.get( content ) );
+		Optional<Integer> statusCode = BULK_ITEM_STATUS_CODE.get( content );
+		return statusCode.map( (c) ->
+						ElasticsearchClientUtils.isSuccessCode( c ) || ignoredErrorStatuses.contains( c )
+				).orElse( false )
+				|| BULK_ITEM_ERROR_TYPE.get( content ).map( ignoredErrorTypes::contains ).orElse( false );
 	}
 
 	private boolean isSuccess(Response response, JsonObject parsedResponseBody) {
 		int code = response.getStatusLine().getStatusCode();
 		return ElasticsearchClientUtils.isSuccessCode( code )
 				|| ignoredErrorStatuses.contains( code )
-				|| ignoredErrorTypes.contains( ROOT_ERROR_TYPE.get( parsedResponseBody ) );
+				|| ROOT_ERROR_TYPE.get( parsedResponseBody ).map( ignoredErrorTypes::contains ).orElse( false );
 	}
 
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.gson.impl;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.google.gson.JsonNull;
@@ -27,12 +28,12 @@ public interface JsonAccessor<T> {
 	 * Get the current value of the element this accessor points to for the given {@code root}.
 	 *
 	 * @param root The root to be accessed.
-	 * @return The current value pointed to by this accessor on the {@code root},
-	 * or null if it doesn't exist.
+	 * @return An {@link java.util.Optional} containing the current value pointed to by this accessor on the {@code root},
+	 * or {@link java.util.Optional#empty()} if it doesn't exist.
 	 * @throws UnexpectedJsonElementTypeException If an element in the path has unexpected type,
 	 * preventing access to the element this accessor points to.
 	 */
-	T get(JsonObject root) throws UnexpectedJsonElementTypeException;
+	Optional<T> get(JsonObject root) throws UnexpectedJsonElementTypeException;
 
 	/**
 	 * Set the given value on the element this accessor points to for the given {@code root}.

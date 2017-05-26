@@ -69,7 +69,7 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 						null );
 			}
 
-			return VERSION_ACCESSOR.get( responseAsJsonObject );
+			return VERSION_ACCESSOR.get( responseAsJsonObject ).get();
 		}
 		catch (SearchException e) {
 			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory

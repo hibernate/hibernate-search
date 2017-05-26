@@ -109,7 +109,7 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 
 		@Override
 		protected Integer generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
-			return COUNT_ACCESSOR.get( parsedResponseBody );
+			return COUNT_ACCESSOR.get( parsedResponseBody ).get();
 		}
 
 		private static class Builder extends SimpleElasticsearchWork.Builder<Builder> {
