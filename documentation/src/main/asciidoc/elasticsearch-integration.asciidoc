@@ -237,6 +237,22 @@ Maximum time to wait for a connection to the Elasticsearch server before failing
 Maximum time to wait for a response from the Elasticsearch server before failing (in ms):: `hibernate.search.default.elasticsearch.read_timeout 60000` (default)
 Maximum number of simultaneous connections to the Elasticsearch cluster:: `hibernate.search.default.elasticsearch.max_total_connection 20` (default)
 Maximum number of simultaneous connections to a single Elasticsearch server:: `hibernate.search.default.elasticsearch.max_total_connection_per_route 2` (default)
+Custom class used to configure the HTTP Client:: `hibernate.search.default.elasticsearch.http_client_configurer com.example.MyElasticsearchHttpClientConfigurer` (default is empty)
++
+Allows fine tuning of the underlying Apache HTTP Client.
+This enables in particular connecting to cloud services requiring particular authentication method,
+such as request signing on Amazon Web Services.
++
+The property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
+This class must either implement `org.hibernate.search.elasticsearch.client.ElasticsearchHttpClientConfigurer` directly
+or expose a `@Factory`-annotated method that returns such implementation. 
++
+The `ElasticsearchHttpClientConfigurer` implementation will be given access to the HTTP client builder
+on startup.
+See http://hc.apache.org/httpcomponents-client-ga/ for more information on Apache HTTP Client
+and how to configure it.
+Note that you don't have to configure the client unless you have specific needs:
+the default configuration should work just fine for an on-premises Elasticsearch server.
 Whether to enable automatic discovery of servers in the Elasticsearch cluster (`true` or `false`):: `hibernate.search.default.elasticsearch.discovery.enabled false` (default)
 +
 When using automatic discovery, the Elasticsearch client will periodically probe for new nodes in the cluster,
@@ -278,7 +294,8 @@ Properties prefixed with `hibernate.search.default` can be given globally as sho
 `hibernate.search.someindex.elasticsearch.index_schema_management_strategy update`
 
 This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
-Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `discovery.enabled`, `discovery.refresh_interval` and `discovery.scheme`.
+Excluded properties are `host`, `username`, `password`, `read_timeout`, `connection_timeout`, `max_total_connection`, `max_total_connection_per_route`, `http_client_configurer`,
+`discovery.enabled`, `discovery.refresh_interval` and `discovery.scheme`.
 --
 
 === Mapping and indexing

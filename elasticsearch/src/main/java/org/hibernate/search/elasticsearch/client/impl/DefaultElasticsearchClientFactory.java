@@ -20,14 +20,33 @@ import org.elasticsearch.client.sniff.HostsSniffer;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.elasticsearch.client.sniff.SnifferBuilder;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
+import org.hibernate.search.elasticsearch.client.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.engine.service.spi.Stoppable;
+import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.SearchThreadFactory;
 
 /**
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchClientFactory implements ElasticsearchClientFactory {
+public class DefaultElasticsearchClientFactory implements ElasticsearchClientFactory, Startable, Stoppable {
+
+	private ServiceManager serviceManager;
+
+	@Override
+	public void start(Properties properties, BuildContext context) {
+		this.serviceManager = context.getServiceManager();
+	}
+
+	@Override
+	public void stop() {
+		this.serviceManager = null;
+	}
 
 	@Override
 	public ElasticsearchClientImplementor create(Properties properties) {
@@ -135,6 +154,14 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 					);
 
 			builder = builder.setDefaultCredentialsProvider( credentialsProvider );
+		}
+
+		String configurerClassName = properties.getProperty( ElasticsearchEnvironment.HTTP_CLIENT_CONFIGURER );
+		if ( StringHelper.isNotEmpty( configurerClassName ) ) {
+			ElasticsearchHttpClientConfigurer httpClientConfigurer = ClassLoaderHelper.instanceFromName(
+					ElasticsearchHttpClientConfigurer.class, configurerClassName,
+					"Elasticsearch HTTP client configurer", serviceManager );
+			builder = httpClientConfigurer.configure( builder );
 		}
 
 		return builder;
