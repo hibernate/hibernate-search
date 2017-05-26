@@ -29,6 +29,7 @@ import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch52;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipOnAWS;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.junit.Rule;
@@ -41,7 +42,10 @@ import org.junit.rules.ExpectedException;
  *
  * @author Yoann Rodiere
  */
-@Category(SkipFromElasticsearch52.class)
+@Category({
+		SkipFromElasticsearch52.class,
+		SkipOnAWS.class // Cannot alter Elasticsearch settings on AWS, because indexes cannot be closed.
+})
 public class Elasticsearch2And50NormalizerDefinitionMigrationIT extends SearchInitializationTestBase {
 
 	@Rule

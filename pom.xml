@@ -230,6 +230,7 @@
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
+        <test.elasticsearch.client.http_client_configurer></test.elasticsearch.client.http_client_configurer>
 
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -19,7 +19,7 @@
 
     <name>Hibernate Search Elasticsearch</name>
     <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>
-
+    
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -175,6 +175,13 @@
             <artifactId>takari-cpsuite</artifactId>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+          <groupId>uk.co.lucasweb</groupId>
+          <artifactId>aws-v4-signer-java</artifactId>
+          <version>1.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -494,25 +501,16 @@
         </profile>
         <profile>
             <id>elasticsearch-5.0</id>
+            <properties>
+                <test.elasticsearch.failsafe.excludedGroups.version>
+                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
+                </test.elasticsearch.failsafe.excludedGroups.version>
+            </properties>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>elasticsearch-it</id>
-                                <configuration>
-                                    <excludedGroups>
-                                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
-                                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
-                                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50,
-                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
-                                    </excludedGroups>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
@@ -597,6 +595,15 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        
+        <profile>
+            <id>aws</id>
+            <properties>
+                <test.elasticsearch.client.http_client_configurer>
+                    org.hibernate.search.elasticsearch.testutil.aws.AWSElasticsearchHttpClientConfigurer
+                </test.elasticsearch.client.http_client_configurer>
+            </properties>
         </profile>
     </profiles>
 </project>
