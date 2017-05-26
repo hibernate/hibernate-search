@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.gson.impl;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.google.gson.JsonElement;
@@ -26,8 +27,8 @@ abstract class TypingJsonAccessor<T> extends NonRootJsonAccessor<JsonElement, T>
 	}
 
 	@Override
-	public T get(JsonObject root) throws UnexpectedJsonElementTypeException {
-		return fromElement( getParentAccessor().get( root ) );
+	public Optional<T> get(JsonObject root) throws UnexpectedJsonElementTypeException {
+		return getParentAccessor().get( root ).map( this::fromElement );
 	}
 
 	@Override

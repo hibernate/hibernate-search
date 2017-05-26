@@ -19,11 +19,11 @@ import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.SearchWorkBuilder;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.DefaultLogCategories;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -140,33 +140,47 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 
 		@Override
 		public JsonArray getHits() {
-			return HITS_HITS_ACCESSOR.get( jsonObject );
+			return HITS_HITS_ACCESSOR.get( jsonObject )
+					.orElseGet( JsonArray::new );
 		}
 
 		@Override
 		public int getTotalHitCount() {
-			return COUNT_ACCESSOR.get( jsonObject );
+			return COUNT_ACCESSOR.get( jsonObject )
+					.orElse( 0 );
 		}
 
 		@Override
 		public JsonObject getAggregations() {
-			JsonElement element = AGGREGATIONS_ACCESSOR.get( jsonObject );
-			return element == null ? null : element.getAsJsonObject();
+			return AGGREGATIONS_ACCESSOR.get( jsonObject )
+					.orElseGet( JsonObject::new );
 		}
 
 		@Override
 		public int getTook() {
-			return TOOK_ACCESSOR.get( jsonObject );
+			return TOOK_ACCESSOR.get( jsonObject )
+					.orElseThrow( () -> new AssertionFailure(
+							"Elasticsearch response lacked a value for '"
+							+ TOOK_ACCESSOR.getStaticAbsolutePath() + "'"
+					) );
 		}
 
 		@Override
 		public boolean getTimedOut() {
-			return TIMED_OUT_ACCESSOR.get( jsonObject );
+			return TIMED_OUT_ACCESSOR.get( jsonObject )
+					.orElseThrow( () -> new AssertionFailure(
+							"Elasticsearch response lacked a value for '"
+							+ TIMED_OUT_ACCESSOR.getStaticAbsolutePath() + "'"
+					) );
 		}
 
 		@Override
 		public String getScrollId() {
-			return SCROLL_ID_ACCESSOR.get( jsonObject );
+			return SCROLL_ID_ACCESSOR.get( jsonObject )
+					.orElseThrow( () -> new AssertionFailure(
+							"Elasticsearch response lacked a value for '"
+							+ SCROLL_ID_ACCESSOR.getStaticAbsolutePath() + "'"
+					) );
 		}
 
 	}

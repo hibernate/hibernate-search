@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.gson.impl;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.hibernate.search.exception.AssertionFailure;
@@ -24,11 +25,17 @@ class RootJsonAccessor implements JsonObjectAccessor, JsonCompositeAccessor<Json
 	}
 
 	@Override
-	public JsonObject get(JsonObject root) {
+	public Optional<JsonObject> get(JsonObject root) {
+		return Optional.of( requireRoot( root ) );
+	}
+
+	private JsonObject requireRoot(JsonObject root) {
 		if ( root == null ) {
 			throw new AssertionFailure( "A null root was encountered" );
 		}
-		return root;
+		else {
+			return root;
+		}
 	}
 
 	@Override
@@ -43,12 +50,12 @@ class RootJsonAccessor implements JsonObjectAccessor, JsonCompositeAccessor<Json
 
 	@Override
 	public JsonObject getOrCreate(JsonObject root, Supplier<? extends JsonObject> newValueSupplier) throws UnexpectedJsonElementTypeException {
-		return get( root );
+		return requireRoot( root );
 	}
 
 	@Override
 	public JsonObject getOrCreate(JsonObject root) throws UnexpectedJsonElementTypeException {
-		return get( root );
+		return requireRoot( root );
 	}
 
 	@Override

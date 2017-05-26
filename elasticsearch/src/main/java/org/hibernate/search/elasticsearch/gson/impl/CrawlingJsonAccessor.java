@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.gson.impl;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
@@ -32,12 +33,8 @@ abstract class CrawlingJsonAccessor<P extends JsonElement> extends NonRootJsonAc
 		return (JsonCompositeAccessor<P>) super.getParentAccessor();
 	}
 	@Override
-	public JsonElement get(JsonObject root) throws UnexpectedJsonElementTypeException {
-		P parent = getParentAccessor().get( root );
-		if ( parent == null ) {
-			return null;
-		}
-		return doGet( parent );
+	public Optional<JsonElement> get(JsonObject root) throws UnexpectedJsonElementTypeException {
+		return getParentAccessor().get( root ).map( this::doGet );
 	}
 
 	protected abstract JsonElement doGet(P parent);
