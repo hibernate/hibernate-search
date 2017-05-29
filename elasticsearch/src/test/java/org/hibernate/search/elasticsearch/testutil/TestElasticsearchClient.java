@@ -88,6 +88,12 @@ public class TestElasticsearchClient extends ExternalResource {
 			return this;
 		}
 
+		public IndexClient deleteAndCreate(String settingsPath, String settings) {
+			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			TestElasticsearchClient.this.deleteAndCreateIndex( indexName, settingsAsJsonObject );
+			return this;
+		}
+
 		public IndexClient ensureDoesNotExist() {
 			TestElasticsearchClient.this.ensureIndexDoesNotExist( indexName );
 			return this;
@@ -162,9 +168,28 @@ public class TestElasticsearchClient extends ExternalResource {
 			return TestElasticsearchClient.this.getSettings( indexName, settingsPath );
 		}
 
-		public void put(String settings) {
+		/**
+		 * Put settings without closing the index first.
+		 *
+		 * @param settings The settings value to put
+		 * @throws IOException
+		 */
+		public void putDynamic(String settings) {
 			URLEncodedString indexName = indexClient.indexName;
-			TestElasticsearchClient.this.putSettings( indexName, settingsPath, settings );
+			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			TestElasticsearchClient.this.putDynamicSettings( indexName, settingsAsJsonObject );
+		}
+
+		/**
+		 * Put settings, closing the index first and reopening the index afterwards.
+		 *
+		 * @param settings The settings value to put
+		 * @throws IOException
+		 */
+		public void putNonDynamic(String settings) {
+			URLEncodedString indexName = indexClient.indexName;
+			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			TestElasticsearchClient.this.putNonDynamicSettings( indexName, settingsAsJsonObject );
 		}
 	}
 
@@ -212,11 +237,25 @@ public class TestElasticsearchClient extends ExternalResource {
 	}
 
 	private void deleteAndCreateIndex(URLEncodedString indexName) {
+		doDeleteAndCreateIndex(
+				indexName,
+				ElasticsearchRequest.put().pathComponent( indexName ).build()
+				);
+	}
+
+	private void deleteAndCreateIndex(URLEncodedString indexName, JsonObject settingsAsJsonObject) {
+		doDeleteAndCreateIndex(
+				indexName,
+				ElasticsearchRequest.put().pathComponent( indexName ).body( settingsAsJsonObject ).build()
+				);
+	}
+
+	private void doDeleteAndCreateIndex(URLEncodedString indexName, ElasticsearchRequest createRequest) {
 		// Ignore the result: if the deletion fails, we don't care unless the creation just after also fails
 		tryDeleteESIndex( indexName );
 
 		registerIndexForCleanup( indexName );
-		performRequest( ElasticsearchRequest.put().pathComponent( indexName ).build() );
+		performRequest( createRequest );
 
 		waitForRequiredIndexStatus( indexName );
 	}
@@ -289,13 +328,14 @@ public class TestElasticsearchClient extends ExternalResource {
 		return mapping.toString();
 	}
 
-	private void putSettings(URLEncodedString indexName, String settingsPath, String settings) {
-		JsonElement settingsJsonElement = toJsonElement( settings );
+	private void putDynamicSettings(URLEncodedString indexName, JsonObject settingsJsonObject) {
+		performRequest( ElasticsearchRequest.put()
+				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
+				.body( settingsJsonObject )
+				.build() );
+	}
 
-		for ( String property : Lists.reverse( Arrays.asList( settingsPath.split( "\\." ) ) ) ) {
-			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
-		}
-
+	private void putNonDynamicSettings(URLEncodedString indexName, JsonObject settingsJsonObject) {
 		performRequest( ElasticsearchRequest.post()
 				.pathComponent( indexName )
 				.pathComponent( Paths._CLOSE )
@@ -303,13 +343,23 @@ public class TestElasticsearchClient extends ExternalResource {
 
 		performRequest( ElasticsearchRequest.put()
 				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
-				.body( settingsJsonElement.getAsJsonObject() )
+				.body( settingsJsonObject )
 				.build() );
 
 		performRequest( ElasticsearchRequest.post()
 				.pathComponent( indexName )
 				.pathComponent( Paths._OPEN )
 				.build() );
+	}
+
+	private JsonObject buildSettings(String settingsPath, String settings) {
+		JsonElement settingsJsonElement = toJsonElement( settings );
+
+		for ( String property : Lists.reverse( Arrays.asList( settingsPath.split( "\\." ) ) ) ) {
+			settingsJsonElement = JsonBuilder.object().add( property, settingsJsonElement ).build();
+		}
+
+		return settingsJsonElement.getAsJsonObject();
 	}
 
 	private String getSettings(URLEncodedString indexName, String path) {

@@ -50,7 +50,6 @@ public class ElasticsearchFlushIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2491")
 	public void testFlushByEntity() throws Exception {
-
 		increaseRefreshTime( Entity1.class, Entity2.class );
 
 		Entity1 entity1 = new Entity1( 1 );
@@ -76,7 +75,7 @@ public class ElasticsearchFlushIT {
 
 	private void increaseRefreshTime(Class<?>... indexes) throws IOException {
 		for ( Class<?> index : indexes ) {
-			elasticsearchClient.index( index ).settings( "index.refresh_interval" ).put( "'3600s'" );
+			elasticsearchClient.index( index ).settings( "index.refresh_interval" ).putDynamic( "'3600s'" );
 			elasticsearchClient.index( index ).waitForRequiredIndexStatus();
 		}
 	}
@@ -91,7 +90,7 @@ public class ElasticsearchFlushIT {
 	}
 
 	private LuceneWork createUpdateWork(Serializable id, Object entity) {
-		Class clazz = entity.getClass();
+		Class<?> clazz = entity.getClass();
 		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( clazz );
 		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
@@ -112,7 +111,6 @@ public class ElasticsearchFlushIT {
 	}
 
 	@Indexed
-	@SuppressWarnings("unused")
 	private static class Entity1 {
 
 		@Field
@@ -124,7 +122,6 @@ public class ElasticsearchFlushIT {
 	}
 
 	@Indexed
-	@SuppressWarnings("unused")
 	private static class Entity2 {
 
 		@Field

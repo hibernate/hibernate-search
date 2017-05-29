@@ -65,8 +65,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void success_simple() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -124,8 +124,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void analyzer_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'char_filter': {"
 							+ "'custom-pattern-replace': {"
@@ -167,8 +167,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void analyzer_charFilters_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -219,8 +219,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void analyzer_tokenizer_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -271,8 +271,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void analyzer_tokenFilters_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -323,8 +323,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void charFilter_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
@@ -358,8 +358,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void tokenizer_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'char_filter': {"
 							+ "'custom-pattern-replace': {"
@@ -394,8 +394,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void tokenFilter_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'char_filter': {"
 							+ "'custom-pattern-replace': {"
@@ -427,8 +427,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void charFilter_type_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -478,8 +478,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void charFilter_parameter_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -529,8 +529,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void charFilter_parameter_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -581,8 +581,8 @@ public abstract class AbstractAnalyzerDefinitionValidationIT extends SearchIniti
 
 	@Test
 	public void tokenFilter_parameter_unexpected() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"

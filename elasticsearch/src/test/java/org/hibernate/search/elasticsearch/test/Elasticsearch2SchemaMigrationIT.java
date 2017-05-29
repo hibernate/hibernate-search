@@ -109,8 +109,9 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 					+ "}"
 				+ "}"
 				);
-		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate();
-		putAnalysisSettings( SimpleStringEntity.class );
+		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate(
+				"index.analysis", generateAnalysisSettings()
+				);
 		elasticSearchClient.type( SimpleStringEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
@@ -359,8 +360,9 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 
 	@Test
 	public void property_attribute_invalid_conflictingAnalyzer() throws Exception {
-		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate();
-		putAnalysisSettings( SimpleStringEntity.class );
+		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate(
+				"index.analysis", generateAnalysisSettings()
+				);
 		elasticSearchClient.type( SimpleStringEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
@@ -401,8 +403,9 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 
 	@Test
 	public void property_attribute_invalid_conflictingNormalizer() throws Exception {
-		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate();
-		putAnalysisSettings( SimpleStringEntity.class );
+		elasticSearchClient.index( SimpleStringEntity.class ).deleteAndCreate(
+				"index.analysis", generateAnalysisSettings()
+				);
 		elasticSearchClient.type( SimpleStringEntity.class ).putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
@@ -443,9 +446,8 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 		init( SimpleStringEntity.class );
 	}
 
-	private void putAnalysisSettings(Class<?> clazz) throws IOException {
-		elasticSearchClient.index( clazz ).settings( "index.analysis" ).put(
-				"{"
+	private String generateAnalysisSettings() throws IOException {
+		return "{"
 					+ "'analyzer': {"
 							+ "'customAnalyzer': {"
 									+ "'tokenizer': 'whitespace'"
@@ -454,8 +456,7 @@ public class Elasticsearch2SchemaMigrationIT extends SearchInitializationTestBas
 									+ "'tokenizer': 'keyword'"
 							+ "}"
 					+ "}"
-				+ "}"
-				);
+				+ "}";
 	}
 
 	@Indexed

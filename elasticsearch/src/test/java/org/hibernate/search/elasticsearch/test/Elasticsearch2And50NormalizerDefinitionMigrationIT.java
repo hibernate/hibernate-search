@@ -62,8 +62,8 @@ public class Elasticsearch2And50NormalizerDefinitionMigrationIT extends SearchIn
 
 	@Test
 	public void nothingToDo() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'normalizerWithElasticsearchFactories': {"
@@ -117,8 +117,8 @@ public class Elasticsearch2And50NormalizerDefinitionMigrationIT extends SearchIn
 
 	@Test
 	public void normalizer_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'char_filter': {"
 							+ "'custom-char-mapping-esFactory': {"
@@ -165,8 +165,8 @@ public class Elasticsearch2And50NormalizerDefinitionMigrationIT extends SearchIn
 
 	@Test
 	public void normalizer_componentDefinition_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					/*
 					 * We don't add the analyzer here: since a component is missing
@@ -212,8 +212,8 @@ public class Elasticsearch2And50NormalizerDefinitionMigrationIT extends SearchIn
 
 	@Test
 	public void normalizer_componentReference_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'normalizerWithElasticsearchFactories': {"
@@ -275,8 +275,8 @@ public class Elasticsearch2And50NormalizerDefinitionMigrationIT extends SearchIn
 
 	@Test
 	public void normalizer_componentDefinition_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'normalizerWithElasticsearchFactories': {"

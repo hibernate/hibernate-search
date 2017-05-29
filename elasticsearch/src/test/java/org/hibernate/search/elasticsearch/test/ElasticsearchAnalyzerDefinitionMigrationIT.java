@@ -61,8 +61,8 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 
 	@Test
 	public void nothingToDo() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -144,8 +144,8 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 
 	@Test
 	public void analyzer_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'char_filter': {"
 							+ "'custom-pattern-replace': {"
@@ -215,8 +215,8 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 
 	@Test
 	public void analyzer_componentDefinition_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					/*
 					 * We don't add the analyzer here: since a component is missing
@@ -283,8 +283,8 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 
 	@Test
 	public void analyzer_componentReference_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
@@ -361,8 +361,8 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 
 	@Test
 	public void analyzer_componentDefinition_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate();
-		elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).put(
+		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+				"index.analysis",
 				"{"
 					+ "'analyzer': {"
 							+ "'analyzerWithElasticsearchFactories': {"
