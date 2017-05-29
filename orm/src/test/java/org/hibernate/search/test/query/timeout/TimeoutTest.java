@@ -19,14 +19,12 @@ import javax.persistence.QueryTimeoutException;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
-import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.testing.SkipForDialect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -107,9 +105,6 @@ public class TimeoutTest extends SearchTestBase {
 //		fts.clear();
 	}
 
-	@SkipForDialect(value = PostgreSQLDialect.class,
-			jiraKey = "JBPAPP-2945",
-			comment = "PostgreSQL driver does not implement query timeout")
 	@Test
 	public void testEnoughTime() {
 		Transaction tx = fts.beginTransaction();
