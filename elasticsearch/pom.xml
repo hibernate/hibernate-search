@@ -20,6 +20,11 @@
     <name>Hibernate Search Elasticsearch</name>
     <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>
     
+    <properties>
+        <test.elasticsearch.failsafe.excludedGroups.version></test.elasticsearch.failsafe.excludedGroups.version>
+        <test.elasticsearch.failsafe.excludedGroups.aws></test.elasticsearch.failsafe.excludedGroups.aws>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -305,6 +310,10 @@
                                 <!-- HSEARCH-2404 Enable CollectionUpdateEventTest for Elasticsearch -->
                                 <exclude>**/CollectionUpdateEventTest.java</exclude><!-- Only fails on CI (Travis) -->
                             </excludes>
+                            <excludedGroups>
+                                ${test.elasticsearch.failsafe.excludedGroups.version}
+                                ${test.elasticsearch.failsafe.excludedGroups.aws}
+                            </excludedGroups>
                         </configuration>
                     </execution>
                 </executions>
@@ -329,6 +338,14 @@
     <profiles>
         <profile>
             <id>elasticsearch-2.0</id>
+            <properties>
+                <test.elasticsearch.failsafe.excludedGroups.version>
+                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
+                </test.elasticsearch.failsafe.excludedGroups.version>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -353,23 +370,6 @@
                                             <outputDirectory>${project.build.directory}/_ES_PLUGINS_/delete-by-query</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>elasticsearch-it</id>
-                                <configuration>
-                                    <excludedGroups>
-                                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
-                                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
-                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
-                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
-                                    </excludedGroups>
                                 </configuration>
                             </execution>
                         </executions>
@@ -417,6 +417,14 @@
         </profile>
         <profile>
             <id>elasticsearch-2.2</id>
+            <properties>
+                <test.elasticsearch.failsafe.excludedGroups.version>
+                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
+                </test.elasticsearch.failsafe.excludedGroups.version>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -450,23 +458,6 @@
                                             <outputDirectory>${project.build.directory}/_ES_PLUGINS_/lang-groovy</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>elasticsearch-it</id>
-                                <configuration>
-                                    <excludedGroups>
-                                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
-                                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
-                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
-                                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
-                                    </excludedGroups>
                                 </configuration>
                             </execution>
                         </executions>
@@ -549,25 +540,16 @@
                     <name>!test.elasticsearch.host.version</name>
                 </property>
             </activation>
+            <properties>
+                <test.elasticsearch.failsafe.excludedGroups.version>
+                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch52
+                </test.elasticsearch.failsafe.excludedGroups.version>
+            </properties>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>elasticsearch-it</id>
-                                <configuration>
-                                    <excludedGroups>
-                                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
-                                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
-                                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50,
-                                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch52
-                                    </excludedGroups>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
@@ -604,6 +586,10 @@
                 <test.elasticsearch.client.http_client_configurer>
                     org.hibernate.search.elasticsearch.testutil.aws.AWSElasticsearchHttpClientConfigurer
                 </test.elasticsearch.client.http_client_configurer>
+                <test.elasticsearch.failsafe.excludedGroups.aws>
+                    ,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipOnAWS
+                </test.elasticsearch.failsafe.excludedGroups.aws>
             </properties>
         </profile>
     </profiles>

@@ -202,6 +202,16 @@ This will delete all content from the indexes!
 |`drop-and-create-and-drop`|Similar to `drop-and-create` but will also delete the index at shutdown. Commonly used for tests.
 |===============
 +
+[WARNING]
+--
+Since Elasticsearch on Amazon Web Services (AWS)
+https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-es-operations.html[does not support the `_close`/`_open` operations],
+the `update` strategy will fail when trying to update analyzer definitions
+on an AWS Elasticsearch cluster.
+
+The only workaround is to avoid the `update` strategy on AWS.
+--
++
 [CAUTION]
 .Strategies in production environments
 ====
