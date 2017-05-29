@@ -10,12 +10,15 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class ConflictingBridgeDefinitionTest {
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void testMultipleMatchingFieldBridges() throws Exception {
@@ -24,8 +27,7 @@ public class ConflictingBridgeDefinitionTest {
 				.addClass( Chain.class );
 		boolean throwException = false;
 		try {
-			SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( conf ).buildSearchIntegrator();
-			searchIntegrator.close();
+			integratorResource.create( conf );
 		}
 		catch (SearchException e) {
 			assertThat( e.getMessage() ).contains( "TheaterBridgeProvider1" );

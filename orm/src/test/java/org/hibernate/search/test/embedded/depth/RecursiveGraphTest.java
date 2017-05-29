@@ -25,10 +25,11 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.backend.LeakingLocalBackend;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -40,6 +41,9 @@ import org.junit.Test;
  * @author Sanne Grinovero
  */
 public class RecursiveGraphTest extends SearchTestBase {
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void testCorrectDepthIndexed() {
@@ -76,7 +80,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 		final SearchConfiguration configuration = new HibernateManualConfiguration()
 				.addClass( BrokenMammal.class );
 		try {
-			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
+			integratorResource.create( configuration );
 		}
 		catch (SearchException e) {
 			assertThat( e.getMessage() ).contains( "HSEARCH000221" );

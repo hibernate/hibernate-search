@@ -18,10 +18,11 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -33,34 +34,33 @@ import static org.junit.Assert.assertEquals;
 @TestForIssue(jiraKey = "HSEARCH-1824")
 public class DefinitionsOnHotRebootTest {
 
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
 	@Test
 	public void notForgettingDefinedFilters() {
-		SearchIntegratorBuilder emptySearchBuilder = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest().addClass( A.class ) );
-		try ( SearchIntegrator sf = emptySearchBuilder.buildSearchIntegrator() ) {
-			int defaultFilterCount = countFilters( sf );
-			sf.addClasses( B.class );
-			assertEquals( defaultFilterCount + 1, countFilters( sf ) );
-			assertTrue( filterExists( sf, "anyFilter" ) );
-			sf.addClasses( C.class );
-			assertEquals( defaultFilterCount + 2, countFilters( sf ) );
-			assertTrue( filterExists( sf, "anyFilter" ) );
-			assertTrue( filterExists( sf, "anotherFilter" ) );
-		}
+		SearchIntegrator sf = integratorResource.create( new SearchConfigurationForTest().addClass( A.class ) );
+		int defaultFilterCount = countFilters( sf );
+		sf.addClasses( B.class );
+		assertEquals( defaultFilterCount + 1, countFilters( sf ) );
+		assertTrue( filterExists( sf, "anyFilter" ) );
+		sf.addClasses( C.class );
+		assertEquals( defaultFilterCount + 2, countFilters( sf ) );
+		assertTrue( filterExists( sf, "anyFilter" ) );
+		assertTrue( filterExists( sf, "anotherFilter" ) );
 	}
 
 	@Test
 	public void notForgettingDefinedAnalyzers() {
-		SearchIntegratorBuilder emptySearchBuilder = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest().addClass( A.class ) );
-		try ( SearchIntegrator sf = emptySearchBuilder.buildSearchIntegrator() ) {
-			int defaultAnalyzerCount = countAnalyzers( sf );
-			sf.addClasses( B.class );
-			assertEquals( defaultAnalyzerCount + 1, countAnalyzers( sf ) );
-			assertTrue( analyzerExists( sf, "anAnalyzer" ) );
-			sf.addClasses( C.class );
-			assertEquals( defaultAnalyzerCount + 2, countAnalyzers( sf ) );
-			assertTrue( analyzerExists( sf, "anAnalyzer" ) );
-			assertTrue( analyzerExists( sf, "anotherAnalyzer" ) );
-		}
+		SearchIntegrator sf = integratorResource.create( new SearchConfigurationForTest().addClass( A.class ) );
+		int defaultAnalyzerCount = countAnalyzers( sf );
+		sf.addClasses( B.class );
+		assertEquals( defaultAnalyzerCount + 1, countAnalyzers( sf ) );
+		assertTrue( analyzerExists( sf, "anAnalyzer" ) );
+		sf.addClasses( C.class );
+		assertEquals( defaultAnalyzerCount + 2, countAnalyzers( sf ) );
+		assertTrue( analyzerExists( sf, "anAnalyzer" ) );
+		assertTrue( analyzerExists( sf, "anotherAnalyzer" ) );
 	}
 
 	private boolean analyzerExists(SearchIntegrator sf, String analyzerName) {

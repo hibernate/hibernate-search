@@ -9,13 +9,13 @@ package org.hibernate.search.test.configuration;
 import java.lang.annotation.ElementType;
 
 import org.junit.Assert;
-
+import org.junit.Rule;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
@@ -26,6 +26,9 @@ import org.junit.Test;
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class TransactionsExpectedTest {
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void testDefaultImplementation() {
@@ -56,17 +59,12 @@ public class TransactionsExpectedTest {
 			;
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addClass( Document.class );
-		MutableSearchFactory sf = (MutableSearchFactory) new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
-		try {
-			Assert.assertEquals( expectation, sf.isTransactionManagerExpected() );
-			// trigger a SearchFactory rebuild:
-			sf.addClasses( Dvd.class );
-			// and verify the option is not lost:
-			Assert.assertEquals( expectation, sf.isTransactionManagerExpected() );
-		}
-		finally {
-			sf.close();
-		}
+		MutableSearchFactory sf = (MutableSearchFactory) integratorResource.create( cfg );
+		Assert.assertEquals( expectation, sf.isTransactionManagerExpected() );
+		// trigger a SearchFactory rebuild:
+		sf.addClasses( Dvd.class );
+		// and verify the option is not lost:
+		Assert.assertEquals( expectation, sf.isTransactionManagerExpected() );
 	}
 
 	public static final class Document {

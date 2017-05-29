@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.test.jmx;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
@@ -16,21 +20,17 @@ import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -39,6 +39,9 @@ import static org.junit.Assert.fail;
 public class MultipleStatisticsMBeanTest {
 	private static Path simpleJndiDir;
 	private static MBeanServer mbeanServer;
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -126,7 +129,7 @@ public class MultipleStatisticsMBeanTest {
 			configuration.addProperty( Environment.JMX_BEAN_SUFFIX, suffix );
 		}
 
-		return new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
+		return integratorResource.create( configuration );
 	}
 }
 

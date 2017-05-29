@@ -13,10 +13,9 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +30,9 @@ import static org.junit.Assert.fail;
 public class IndexedEmbeddedWithAbstractClassTest {
 
 	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
+	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
@@ -42,8 +44,7 @@ public class IndexedEmbeddedWithAbstractClassTest {
 
 		logged.expectMessage( "HSEARCH000044", "@Indexed", AbstractA.class.getName() );
 
-		SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
-		searchIntegrator.close();
+		integratorResource.create( configuration );
 	}
 
 	@Test
@@ -56,7 +57,7 @@ public class IndexedEmbeddedWithAbstractClassTest {
 
 			logged.expectMessageMissing( "HSEARCH000044", "@Indexed", AbstractB.class.getName() );
 
-			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
+			integratorResource.create( configuration );
 			fail( "Invalid configuration should throw an exception" );
 		}
 		catch (SearchException e) {
@@ -74,7 +75,7 @@ public class IndexedEmbeddedWithAbstractClassTest {
 
 			logged.expectMessage( "HSEARCH000044", "@Indexed", AbstractC.class.getName() );
 
-			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
+			integratorResource.create( configuration );
 			fail( "Invalid configuration should throw an exception" );
 		}
 		catch (SearchException e) {

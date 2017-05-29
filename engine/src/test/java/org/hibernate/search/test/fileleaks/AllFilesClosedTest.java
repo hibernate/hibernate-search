@@ -8,7 +8,6 @@ package org.hibernate.search.test.fileleaks;
 
 import java.io.Serializable;
 
-import org.junit.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -18,13 +17,14 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
-import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.leakdetection.FileMonitoringDirectory;
 import org.hibernate.search.testsupport.leakdetection.FileMonitoringDirectoryProvider;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -36,7 +36,10 @@ import org.junit.experimental.categories.Category;
 @Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 public class AllFilesClosedTest {
 
-	private SearchIntegrator searchIntegrator;
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
+	private ExtendedSearchIntegrator searchIntegrator;
 
 	@Test
 	public void testFileHandlesReleased() {
@@ -146,7 +149,7 @@ public class AllFilesClosedTest {
 		tc.end();
 	}
 
-	protected SearchIntegrator initializeSearchFactory() {
+	protected ExtendedSearchIntegrator initializeSearchFactory() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", FileMonitoringDirectoryProvider.class.getName() )
 			.addProperty( "hibernate.search.default.reader.strategy", "shared" )
@@ -156,9 +159,7 @@ public class AllFilesClosedTest {
 			.addClass( Dvd.class )
 			;
 		overrideProperties( cfg ); //allow extending tests with different configuration
-		return new SearchIntegratorBuilder()
-			.configuration( cfg )
-			.buildSearchIntegrator();
+		return integratorResource.create( cfg );
 	}
 
 	protected void overrideProperties(SearchConfigurationForTest cfg) {

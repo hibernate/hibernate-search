@@ -16,8 +16,8 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
@@ -32,6 +32,9 @@ import org.junit.rules.ExpectedException;
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */
 public class ImplicitProvidedIdTest {
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Rule
 	public ExpectedException exceptions = ExpectedException.none();
@@ -143,7 +146,7 @@ public class ImplicitProvidedIdTest {
 		SearchIntegrator searchIntegrator = null;
 		try {
 			//Should fail right here when @ProvidedId is not enabled:
-			searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+			searchIntegrator = integratorResource.create( cfg );
 
 			Book book = new Book();
 			book.title = "Less is nice";

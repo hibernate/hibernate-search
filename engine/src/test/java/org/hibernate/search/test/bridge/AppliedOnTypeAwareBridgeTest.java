@@ -21,10 +21,11 @@ import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,6 +35,9 @@ import static org.junit.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 public class AppliedOnTypeAwareBridgeTest {
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void testTypeIsSetForField() {
@@ -75,7 +79,7 @@ public class AppliedOnTypeAwareBridgeTest {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addClass( clazz );
 
-		return new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
+		return integratorResource.create( configuration );
 	}
 
 	@Indexed

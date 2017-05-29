@@ -9,9 +9,9 @@ package org.hibernate.search.test.backend.lucene;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.CountingErrorHandler;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -64,6 +64,9 @@ public class ResourcesClosedInOrderTest {
 	private static final int NUMBER_ENTITIES = 2;
 
 	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
+	@Rule
 	public BytemanAccessor byteman = BytemanHelper.createAccessor();
 
 	@Test
@@ -100,12 +103,12 @@ public class ResourcesClosedInOrderTest {
 		cfg.addProperty( "hibernate.search.default.exclusive_index_use", exclusiveIndexing ? "true" : "false" );
 		cfg.addProperty( "hibernate.search.error_handler", CountingErrorHandler.class.getName() );
 		cfg.addClass( Quote.class );
-		try ( SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
-			final CountingErrorHandler errorHandler = (CountingErrorHandler) searchIntegrator.getErrorHandler();
-			writeData( searchIntegrator, NUMBER_ENTITIES );
-			//Check no errors happened in the asynchronous threads
-			assertEquals( 0, errorHandler.getTotalCount() );
-		}
+		SearchIntegrator searchIntegrator = integratorResource.create( cfg );
+		final CountingErrorHandler errorHandler = (CountingErrorHandler) searchIntegrator.getErrorHandler();
+		writeData( searchIntegrator, NUMBER_ENTITIES );
+		//Check no errors happened in the asynchronous threads
+		assertEquals( 0, errorHandler.getTotalCount() );
+		searchIntegrator.close();
 
 		//Now the SearchIntegrator was closed, let's unwind the recorder events and compare them with expectations:
 		for ( int i = 0; i < expectedStack.length; i++ ) {

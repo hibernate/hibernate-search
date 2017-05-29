@@ -35,8 +35,8 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
@@ -55,6 +55,9 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void simple() {
@@ -142,7 +145,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400075" );
 
-		new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+		integratorResource.create( cfg );
 	}
 
 	@Test
@@ -154,7 +157,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH400075" );
 
-		new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+		integratorResource.create( cfg );
 	}
 
 	@Test
@@ -195,8 +198,7 @@ public class ElasticsearchAnalysisDefinitionProviderIT {
 			cfg.addClass( entityClass );
 		}
 		cfg.addProperty( ElasticsearchEnvironment.ANALYZER_DEFINITION_PROVIDER, providerClass.getName() );
-		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator()
-				.unwrap( ExtendedSearchIntegrator.class );
+		return integratorResource.create( cfg );
 	}
 
 	private void index(SearchIntegrator integrator, Identifiable entity) {

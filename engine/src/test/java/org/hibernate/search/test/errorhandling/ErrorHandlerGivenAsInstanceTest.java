@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.test.errorhandling;
 
+import static org.junit.Assert.assertSame;
+
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertSame;
 
 /**
  * Test for making sure error handlers can also be passed as instances rather than via their FQN.
@@ -26,6 +27,9 @@ import static org.junit.Assert.assertSame;
 @TestForIssue(jiraKey = "HSEARCH-1624")
 public class ErrorHandlerGivenAsInstanceTest {
 
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
 	@Test
 	public void canPassErrorHandlerInstanceToConfiguration() {
 		// given
@@ -33,7 +37,7 @@ public class ErrorHandlerGivenAsInstanceTest {
 
 		// when
 		SearchConfiguration cfg = getSearchConfiguration( errorHandler );
-		SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+		SearchIntegrator searchIntegrator = integratorResource.create( cfg );
 
 		// then
 		assertSame( errorHandler, searchIntegrator.getErrorHandler() );

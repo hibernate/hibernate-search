@@ -17,8 +17,8 @@ import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +30,9 @@ public class AnalyzerDefInvalidTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
 	@Test
 	public void shouldNotBePossibleToHaveTwoAnalyzerDefsWithTheSameName() throws Exception {
 		thrown.expect( SearchException.class );
@@ -37,7 +40,7 @@ public class AnalyzerDefInvalidTest {
 
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( Sample.class );
-		new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator().close();
+		integratorResource.create( cfg );
 	}
 
 	@Indexed

@@ -23,12 +23,12 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.BytemanHelper.SimulatedFailureException;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMRules;
@@ -47,6 +47,9 @@ public class SearchFactoryTest {
 	@Rule
 	public BytemanAccessor bytemanAccessor = BytemanHelper.createAccessor();
 
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
 	@Test
 	public void testTypeWithNoDocumentIdThrowsException() {
 		SearchConfigurationForTest cfg = getManualConfiguration();
@@ -58,7 +61,7 @@ public class SearchFactoryTest {
 		cfg.setProgrammaticMapping( mapping );
 
 		try {
-			new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+			integratorResource.create( cfg );
 			fail( "Invalid configuration should have thrown an exception" );
 		}
 		catch (SearchException e) {
@@ -91,7 +94,7 @@ public class SearchFactoryTest {
 				.addClass( AnnotatedClass.class ).addClass( SecondAnnotatedClass.class );
 
 		try {
-			new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+			integratorResource.create( cfg );
 			failBecauseBytemanRulesDidNotWork();
 		}
 		catch (SearchException e) {
@@ -127,7 +130,7 @@ public class SearchFactoryTest {
 				.addClass( AnnotatedClass.class ).addClass( SecondAnnotatedClass.class );
 
 		try {
-			new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+			integratorResource.create( cfg );
 			failBecauseBytemanRulesDidNotWork();
 		}
 		catch (SearchException e) {
@@ -162,7 +165,7 @@ public class SearchFactoryTest {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest().addClass( AnnotatedClass.class );
 
 		try {
-			new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+			integratorResource.create( cfg );
 			failBecauseBytemanRulesDidNotWork();
 		}
 		catch (SimulatedFailureException e) {
@@ -195,7 +198,7 @@ public class SearchFactoryTest {
 				.addClass( AnnotatedClass.class ).addClass( SecondAnnotatedClass.class );
 
 		try {
-			new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+			integratorResource.create( cfg );
 			failBecauseBytemanRulesDidNotWork();
 		}
 		catch (SimulatedFailureException e) {
@@ -208,10 +211,9 @@ public class SearchFactoryTest {
 	public void testGetIndexedTypesNoTypeIndexed() {
 		SearchConfigurationForTest cfg = getManualConfiguration();
 
-		try ( SearchIntegrator si = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
-			Set<Class<?>> indexedClasses = si.getIndexedTypes();
-			assertEquals( "Wrong number of indexed entities", 0, indexedClasses.size() );
-		}
+		SearchIntegrator si = integratorResource.create( cfg );
+		Set<Class<?>> indexedClasses = si.getIndexedTypes();
+		assertEquals( "Wrong number of indexed entities", 0, indexedClasses.size() );
 	}
 
 	@Test
@@ -225,11 +227,10 @@ public class SearchFactoryTest {
 		;
 		cfg.setProgrammaticMapping( mapping );
 
-		try ( SearchIntegrator si = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
-			Set<Class<?>> indexedClasses = si.getIndexedTypes();
-			assertEquals( "Wrong number of indexed entities", 1, indexedClasses.size() );
-			assertTrue( indexedClasses.iterator().next().equals( Foo.class ) );
-		}
+		SearchIntegrator si = integratorResource.create( cfg );
+		Set<Class<?>> indexedClasses = si.getIndexedTypes();
+		assertEquals( "Wrong number of indexed entities", 1, indexedClasses.size() );
+		assertTrue( indexedClasses.iterator().next().equals( Foo.class ) );
 	}
 
 	@Test
@@ -245,7 +246,7 @@ public class SearchFactoryTest {
 		;
 		cfg.setProgrammaticMapping( mapping );
 
-		SearchIntegrator si = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+		SearchIntegrator si = integratorResource.create( cfg );
 		Set<Class<?>> indexedClasses = si.getIndexedTypes();
 		assertEquals( "Wrong number of indexed entities", 2, indexedClasses.size() );
 	}
@@ -254,11 +255,10 @@ public class SearchFactoryTest {
 	public void testGetTypeDescriptorForUnindexedType() {
 		SearchConfigurationForTest cfg = getManualConfiguration();
 
-		try ( SearchIntegrator si = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
-			IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class );
-			assertNotNull( indexedTypeDescriptor );
-			assertFalse( indexedTypeDescriptor.isIndexed() );
-		}
+		SearchIntegrator si = integratorResource.create( cfg );
+		IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class );
+		assertNotNull( indexedTypeDescriptor );
+		assertFalse( indexedTypeDescriptor.isIndexed() );
 	}
 
 	@Test
@@ -272,11 +272,10 @@ public class SearchFactoryTest {
 		;
 		cfg.setProgrammaticMapping( mapping );
 
-		try ( SearchIntegrator si = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
-			IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class );
-			assertNotNull( indexedTypeDescriptor );
-			assertTrue( indexedTypeDescriptor.isIndexed() );
-		}
+		SearchIntegrator si = integratorResource.create( cfg );
+		IndexedTypeDescriptor indexedTypeDescriptor = si.getIndexedTypeDescriptor( Foo.class );
+		assertNotNull( indexedTypeDescriptor );
+		assertTrue( indexedTypeDescriptor.isIndexed() );
 	}
 
 	private SearchConfigurationForTest getManualConfiguration() {

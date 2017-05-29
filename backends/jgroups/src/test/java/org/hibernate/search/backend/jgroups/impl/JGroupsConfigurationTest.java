@@ -10,8 +10,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +28,9 @@ public class JGroupsConfigurationTest {
 	@Rule
 	public ExpectedException error = ExpectedException.none();
 
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
 	@Test
 	public void refuseConfigurationFileOnDefaultIndex() throws Throwable {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
@@ -37,7 +39,7 @@ public class JGroupsConfigurationTest {
 			;
 		error.expect( SearchException.class );
 		error.expectMessage( "JGroups channel configuration should be specified in the global section" );
-		bootConfiguration( cfg );
+		init( cfg );
 	}
 
 	@Test
@@ -48,7 +50,7 @@ public class JGroupsConfigurationTest {
 			;
 		error.expect( SearchException.class );
 		error.expectMessage( "JGroups channel configuration should be specified in the global section" );
-		bootConfiguration( cfg );
+		init( cfg );
 	}
 
 	@Test
@@ -59,26 +61,12 @@ public class JGroupsConfigurationTest {
 			;
 		error.expect( SearchException.class );
 		error.expectMessage( "Error while trying to create a channel using config file: some non existing file" );
-		bootConfiguration( cfg );
+		init( cfg );
 	}
 
-	/**
-	 * Attempts to start a SearchIntegrator, and make sure we close it if it happens to start
-	 * correctly.
-	 * @param cfg a configuration to try booting
-	 * @throws Throwable
-	 */
-	private static void bootConfiguration(SearchConfigurationForTest cfg) throws Throwable {
+	private void init(SearchConfigurationForTest cfg) throws Throwable {
 		cfg.addClass( Dvd.class );
-		SearchIntegrator searchIntegrator = null;
-		try {
-			searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
-		}
-		finally {
-			if ( searchIntegrator != null ) {
-				searchIntegrator.close();
-			}
-		}
+		integratorResource.create( cfg );
 	}
 
 	@Indexed(index = "dvds")

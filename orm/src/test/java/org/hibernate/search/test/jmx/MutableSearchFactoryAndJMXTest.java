@@ -10,15 +10,18 @@ import java.nio.file.Path;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
-
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
  */
 public class MutableSearchFactoryAndJMXTest {
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void testRebuildFactory() {
@@ -29,10 +32,10 @@ public class MutableSearchFactoryAndJMXTest {
 				.addProperty( Environment.JMX_ENABLED, "true" );
 		SimpleJNDIHelper.enableSimpleJndi( configuration, jndiStorage );
 
-		new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
+		integratorResource.create( configuration );
 
 		// if there are problems with the JMX registration there will be an exception when the new factory is build
-		new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
+		integratorResource.create( configuration );
 	}
 
 }
