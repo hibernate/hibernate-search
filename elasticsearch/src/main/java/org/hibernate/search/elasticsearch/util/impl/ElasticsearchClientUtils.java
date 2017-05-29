@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -60,9 +62,9 @@ public class ElasticsearchClientUtils {
 		}
 
 		Gson gson = gsonProvider.getGson();
-		ContentType contentType = ContentType.get( entity );
+		Charset charset = getCharset( entity );
 		try ( InputStream inputStream = entity.getContent();
-				Reader reader = new InputStreamReader( inputStream, contentType.getCharset() ) ) {
+				Reader reader = new InputStreamReader( inputStream, charset ) ) {
 			return gson.fromJson( reader, JsonObject.class );
 		}
 	}
@@ -123,6 +125,12 @@ public class ElasticsearchClientUtils {
 		}
 
 		return sb.toString();
+	}
+
+	private static Charset getCharset(HttpEntity entity) {
+		ContentType contentType = ContentType.get( entity );
+		Charset charset = contentType.getCharset();
+		return charset != null ? charset : StandardCharsets.UTF_8;
 	}
 
 	private static JsonElement property(JsonObject parent, String name) {
