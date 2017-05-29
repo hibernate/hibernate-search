@@ -21,10 +21,11 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -34,6 +35,9 @@ import org.junit.Test;
 public class IndexNameOverrideTest {
 	public static final String INDEXED_ANNOTATION_OVERRIDDEN_INDEX_NAME = "indexed_annotation_overridden_index_name";
 	public static final String CONFIGURATION_OVERRIDDEN_INDEX_NAME = "configuration_overridden_index_name";
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void noOverride() throws Exception {
@@ -134,7 +138,7 @@ public class IndexNameOverrideTest {
 	}
 
 	private SearchIntegrator init(SearchConfigurationForTest cfg) {
-		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+		return integratorResource.create( cfg );
 	}
 
 	/*

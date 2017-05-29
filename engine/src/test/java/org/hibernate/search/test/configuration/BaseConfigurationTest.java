@@ -17,13 +17,17 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Rule;
 
 /**
  * @author gustavonalle
  */
 public class BaseConfigurationTest {
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	protected static AbstractWorkspaceImpl extractWorkspace(MutableSearchFactory sf, Class<?> type) {
 		EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( type );
@@ -41,8 +45,7 @@ public class BaseConfigurationTest {
 		;
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addClass( Document.class );
-		return (MutableSearchFactory) new SearchIntegratorBuilder().configuration( cfg )
-				.buildSearchIntegrator();
+		return (MutableSearchFactory) integratorResource.create( cfg );
 	}
 
 	public static final class Document {

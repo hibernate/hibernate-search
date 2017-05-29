@@ -22,8 +22,8 @@ import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.engine.impl.AnalyzerRegistry;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -43,6 +43,9 @@ public class AnalyzerDefsAnnotationTest {
 
 	@Rule
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class );
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void shouldBePossibleToAnnotatePackage() throws Exception {
@@ -78,7 +81,7 @@ public class AnalyzerDefsAnnotationTest {
 
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addClass( SampleWithError.class );
-		new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator().close();
+		integratorResource.create( cfg );
 	}
 
 	private void assertThatAnalyzerExists(String analyzerName) {

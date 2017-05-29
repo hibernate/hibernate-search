@@ -9,15 +9,16 @@ package org.hibernate.search.test.configuration;
 import java.lang.annotation.ElementType;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.ExplicitOnlyOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
@@ -32,6 +33,9 @@ import org.junit.experimental.categories.Category;
  */
 @Category(SkipOnElasticsearch.class) // Optimizer strategies are specific to the Lucene backend
 public class OptimizerStrategyLoadTest {
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void testDefaultImplementation() {
@@ -77,12 +81,11 @@ public class OptimizerStrategyLoadTest {
 			;
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addClass( Document.class );
-		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
-			EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( Document.class );
-			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
-			OptimizerStrategy optimizerStrategy = indexManager.getOptimizerStrategy();
-			Assert.assertTrue( type.isAssignableFrom( optimizerStrategy.getClass() ) );
-		}
+		SearchIntegrator sf = integratorResource.create( cfg );
+		EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( Document.class );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
+		OptimizerStrategy optimizerStrategy = indexManager.getOptimizerStrategy();
+		Assert.assertTrue( type.isAssignableFrom( optimizerStrategy.getClass() ) );
 	}
 
 	@SuppressWarnings("unused")

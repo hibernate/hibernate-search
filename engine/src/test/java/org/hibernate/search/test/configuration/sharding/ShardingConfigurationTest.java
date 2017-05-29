@@ -33,7 +33,6 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
@@ -42,6 +41,7 @@ import org.hibernate.search.store.impl.NotShardedStrategy;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
@@ -58,6 +58,9 @@ public class ShardingConfigurationTest {
 
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void testNoShardingIsUsedPerDefault() {
@@ -258,9 +261,7 @@ public class ShardingConfigurationTest {
 		}
 		configuration.addClass( Foo.class );
 
-		return (MutableSearchFactory) new SearchIntegratorBuilder().configuration(
-				configuration
-		).buildSearchIntegrator();
+		return (MutableSearchFactory) integratorResource.create( configuration );
 	}
 
 	private static Path getTargetDir() {

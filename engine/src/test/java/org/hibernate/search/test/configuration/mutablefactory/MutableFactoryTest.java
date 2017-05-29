@@ -26,14 +26,15 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -42,20 +43,18 @@ import org.junit.experimental.categories.Category;
  */
 public class MutableFactoryTest {
 
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
+
 	@Test
 	public void testCreateEmptyFactory() throws Exception {
-		try ( SearchIntegrator si = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
-			// no-op
-		}
+		integratorResource.create( new SearchConfigurationForTest() );
 	}
 
 	@Test
 	public void testAddingClassFullModel() throws Exception {
-		SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator();
-		final SearchIntegratorBuilder builder = new SearchIntegratorBuilder();
-		searchIntegrator = builder.currentSearchIntegrator( searchIntegrator )
-				.addClass( A.class )
-				.buildSearchIntegrator();
+		SearchIntegrator searchIntegrator = integratorResource.create( new SearchConfigurationForTest() );
+		searchIntegrator = integratorResource.create( searchIntegrator, A.class );
 
 		TransactionContextForTest tc = new TransactionContextForTest();
 
@@ -73,9 +72,7 @@ public class MutableFactoryTest {
 		int size = hsQuery.queryResultSize();
 		assertEquals( 1, size );
 
-		searchIntegrator = builder.currentSearchIntegrator( searchIntegrator )
-				.addClass( B.class )
-				.buildSearchIntegrator();
+		searchIntegrator = integratorResource.create( searchIntegrator, B.class );
 
 		tc = new TransactionContextForTest();
 
@@ -88,13 +85,11 @@ public class MutableFactoryTest {
 		hsQuery = searchIntegrator.createHSQuery( luceneQuery, B.class );
 		size = hsQuery.queryResultSize();
 		assertEquals( 1, size );
-
-		searchIntegrator.close();
 	}
 
 	@Test
 	public void testAddingClassSimpleAPI() throws Exception {
-		SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator();
+		SearchIntegrator sf = integratorResource.create( new SearchConfigurationForTest() );
 
 		sf.addClasses( A.class );
 
@@ -131,21 +126,17 @@ public class MutableFactoryTest {
 		hsQuery = sf.createHSQuery( luceneQuery, C.class );
 		size = hsQuery.queryResultSize();
 		assertEquals( 1, size );
-
-		sf.close();
 	}
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2421 Support statistics with Elasticsearch
 	public void testAddingClassSimpleAPIwithJMX() throws Exception {
-		SearchIntegrator sf = new SearchIntegratorBuilder()
-				.configuration(
+		SearchIntegrator sf = integratorResource.create(
 						new SearchConfigurationForTest()
 							.addClass( A.class )
 							.addProperty( "hibernate.search.jmx_enabled" , Boolean.TRUE.toString() )
 							.addProperty( "hibernate.search.generate_statistics", Boolean.TRUE.toString() )
-							.addProperty( "com.sun.management.jmxremote", Boolean.TRUE.toString() ) )
-				.buildSearchIntegrator();
+							.addProperty( "com.sun.management.jmxremote", Boolean.TRUE.toString() ) );
 
 		TransactionContextForTest tc = new TransactionContextForTest();
 
@@ -201,8 +192,6 @@ public class MutableFactoryTest {
 		assertEquals( 3 , sf.getStatistics().getIndexedClassNames().size() );
 
 		hsQuery.getTimeoutManager().stop();
-
-		sf.close();
 	}
 
 	private static void doIndexWork(Object entity, Integer id, SearchIntegrator sfi, TransactionContextForTest tc) {
@@ -213,27 +202,26 @@ public class MutableFactoryTest {
 	@Test
 	public void testMultiThreadedAddClasses() throws Exception {
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
-		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
-			int numberOfClasses = 100;
-			int numberOfThreads = 10;
-			new ConcurrentRunner( numberOfClasses, numberOfThreads,
-					new TaskFactory() {
-						@Override
-						public Runnable createRunnable(int i) throws Exception {
-							return new DoAddClass( sf, i );
-						}
+		SearchIntegrator sf = integratorResource.create( new SearchConfigurationForTest() );
+		int numberOfClasses = 100;
+		int numberOfThreads = 10;
+		new ConcurrentRunner( numberOfClasses, numberOfThreads,
+				new TaskFactory() {
+					@Override
+					public Runnable createRunnable(int i) throws Exception {
+						return new DoAddClass( sf, i );
 					}
-				)
-				.setTimeout( 1, TimeUnit.MINUTES )
-				.execute();
+				}
+			)
+			.setTimeout( 1, TimeUnit.MINUTES )
+			.execute();
 
-			for ( int i = 0; i < numberOfClasses; i++ ) {
-				Query luceneQuery = parser.parse( "Emmanuel" + i );
-				final Class<?> classByNumber = getClassByNumber( i, sf.getServiceManager() );
-				HSQuery hsQuery = sf.createHSQuery( luceneQuery, classByNumber );
-				int size = hsQuery.queryResultSize();
-				assertEquals( "Expected 1 document for class " + classByNumber, 1, size );
-			}
+		for ( int i = 0; i < numberOfClasses; i++ ) {
+			Query luceneQuery = parser.parse( "Emmanuel" + i );
+			final Class<?> classByNumber = getClassByNumber( i, sf.getServiceManager() );
+			HSQuery hsQuery = sf.createHSQuery( luceneQuery, classByNumber );
+			int size = hsQuery.queryResultSize();
+			assertEquals( "Expected 1 document for class " + classByNumber, 1, size );
 		}
 	}
 

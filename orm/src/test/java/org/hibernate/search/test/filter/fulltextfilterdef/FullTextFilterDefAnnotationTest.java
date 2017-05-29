@@ -16,11 +16,11 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.test.filter.RoleFilterFactory;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,6 +38,9 @@ public class FullTextFilterDefAnnotationTest {
 
 	@Rule
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class );
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Test
 	public void shouldBePossibleToAnnotatePackage() throws Exception {
@@ -61,7 +64,7 @@ public class FullTextFilterDefAnnotationTest {
 
 		HibernateManualConfiguration cfg = new HibernateManualConfiguration();
 		cfg.addClass( SampleWithError.class );
-		new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator().close();
+		integratorResource.create( cfg );
 	}
 
 	private void assertThatFilterExists(String filterName) {

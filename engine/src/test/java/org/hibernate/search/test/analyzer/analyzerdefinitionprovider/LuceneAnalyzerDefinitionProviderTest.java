@@ -39,8 +39,8 @@ import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
@@ -59,6 +59,9 @@ public class LuceneAnalyzerDefinitionProviderTest {
 	private static final String CUSTOM_ANALYZER_NAME = "custom-analyzer";
 
 	private static final String CUSTOM_ANALYZER_2_NAME = "custom-analyzer-2";
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -159,7 +162,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH000329" );
 
-		new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+		integratorResource.create( cfg );
 	}
 
 	@Test
@@ -183,8 +186,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 					}
 
 				});
-		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator()
-				.unwrap( ExtendedSearchIntegrator.class );
+		return integratorResource.create( cfg );
 	}
 
 	private ExtendedSearchIntegrator init(Class<?> providerClass, Class<?> ... entityClasses) {
@@ -193,8 +195,7 @@ public class LuceneAnalyzerDefinitionProviderTest {
 			cfg.addClass( entityClass );
 		}
 		cfg.addProperty( Environment.ANALYZER_DEFINITION_PROVIDER, providerClass.getName() );
-		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator()
-				.unwrap( ExtendedSearchIntegrator.class );
+		return integratorResource.create( cfg );
 	}
 
 	private void index(SearchIntegrator integrator, Identifiable entity) {

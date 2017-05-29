@@ -34,13 +34,12 @@ import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.test.util.impl.ClasspathResourceAsFile;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,6 +53,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class TikaBridgeTest extends SearchTestBase {
 	private static final String TEST_MP3_DOCUMENT = "/org/hibernate/search/test/bridge/tika/mysong.mp3";
+
+	@Rule
+	public SearchIntegratorResource integratorResource = new SearchIntegratorResource();
 
 	@Rule
 	public ClasspathResourceAsFile testMp3 = new ClasspathResourceAsFile( getClass(), TEST_MP3_DOCUMENT );
@@ -96,8 +98,7 @@ public class TikaBridgeTest extends SearchTestBase {
 				.addClass( Foo.class );
 		boolean throwException = false;
 		try {
-			SearchIntegrator sf = new SearchIntegratorBuilder().configuration( conf ).buildSearchIntegrator();
-			sf.close();
+			integratorResource.create( conf );
 		}
 		catch (SearchException e) {
 			assertThat( e.getMessage() ).startsWith( "HSEARCH000151" );
