@@ -1921,7 +1921,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 </dependency>
             </dependencies>
             <properties>
-                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.PostgreSQL82Dialect</db.dialect>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
                 <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
