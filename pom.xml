@@ -1176,6 +1176,15 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                                  <targetVersion>1.8</targetVersion>
                                  <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                  <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
+                                 <excludes>
+                                 <!--
+                                     Only those two classes are allowed to build search integrators,
+                                     because they do it right (with guaranteed calls to close at the end of the test).
+                                 -->
+                                    <exclude>**/org/hibernate/search/testsupport/junit/SearchFactoryHolder.class</exclude>
+                                    <exclude>**/org/hibernate/search/testsupport/junit/SearchIntegratorResource.class</exclude>
+                                 </excludes>
                                  <bundledSignatures>
                                      <!-- This will automatically choose the right signatures based on 'targetVersion': -->
                                      <bundledSignature>jdk-unsafe</bundledSignature>
@@ -1183,6 +1192,9 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                                      <bundledSignature>jdk-non-portable</bundledSignature>
                                      <bundledSignature>jdk-internal</bundledSignature>
                                  </bundledSignatures>
+                                 <signatures>
+org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
+                                 </signatures>
                              </configuration>
                              <phase>test-compile</phase>
                              <goals>
