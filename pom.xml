@@ -1887,13 +1887,14 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             ###################################################################
         -->
 
-        <!-- The MySQL 5.1 test envionment -->
+        <!-- The MySQL 5.1 test environment -->
         <profile>
             <id>mysql51</id>
             <dependencies>
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
+                    <!-- Version 6.0.5 fails with a ArrayIndexOutOfBoundsException during connection, so we'll stick to 5.x for now -->
                     <version>5.1.13</version>
                     <scope>test</scope>
                 </dependency>
@@ -1913,9 +1914,9 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
             <id>postgresql84</id>
             <dependencies>
                 <dependency>
-                    <groupId>postgresql</groupId>
+                    <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>9.0-801.jdbc4</version>
+                    <version>42.1.1</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1936,7 +1937,8 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <dependency>
                     <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>9.3-1103-jdbc41</version>
+                    <version>42.1.1</version>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
             <properties>
