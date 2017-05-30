@@ -95,8 +95,27 @@ public class SearchFactoryHolder extends ExternalResource {
 	@Override
 	protected void after() {
 		if ( searchIntegrator != null ) {
-			for ( SearchIntegrator sf : searchIntegrator ) {
-				sf.close();
+			RuntimeException exception = null;
+			try {
+				for ( SearchIntegrator sf : searchIntegrator ) {
+					try {
+						sf.close();
+					}
+					catch (RuntimeException e) {
+						if ( exception == null ) {
+							exception = e;
+						}
+						else {
+							exception.addSuppressed( e );
+						}
+					}
+				}
+				if ( exception != null ) {
+					throw exception;
+				}
+			}
+			finally {
+				searchIntegrator = null;
 			}
 		}
 	}
