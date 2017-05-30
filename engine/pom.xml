@@ -268,30 +268,4 @@
             </plugin>
         </plugins>
     </reporting>
-
-    <profiles>
-        <!-- tools classes are needed by byteman -->
-        <profile>
-            <id>default-toolsjar-profile</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <jdk-toolsjar>${java.home}/../lib/tools.jar</jdk-toolsjar>
-            </properties>
-        </profile>
-        <profile>
-            <id>mac-toolsjar-profile</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../Classes/classes.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <jdk-toolsjar>${java.home}/../Classes/classes.jar</jdk-toolsjar>
-            </properties>
-        </profile>
-    </profiles>
 </project>
