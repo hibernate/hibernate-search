@@ -137,18 +137,16 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		}
 		try {
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
-			int first = firstResult;
-			int max = max( first, queryHits.getTotalHits() );
-
-			int size = max - first + 1 < 0 ? 0 : max - first + 1;
-			if ( size == 0 ) {
+			final int first = firstResult;
+			final int max = max( first, queryHits.getTotalHits() );
+			final int size = max - first + 1;
+			if ( size <= 0 ) {
 				return Collections.emptyList();
 			}
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
 			DocumentExtractor extractor = buildDocumentExtractor( searcher, queryHits, first, max );
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
-				//TODO should we measure on each extractor?
 				if ( index % 10 == 0 ) {
 					getTimeoutManager().isTimedOut();
 				}
