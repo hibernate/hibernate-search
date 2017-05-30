@@ -98,6 +98,7 @@ The string datatype https://www.elastic.co/guide/en/elasticsearch/reference/5.0/
   `null` values are indexed as such.
  |https://www.elastic.co/guide/en/elasticsearch/reference/5.0/null-value.html[`null_value`] is not available for `text` fields,
   null values are replaced with the `indexNullAs` value explicitly when indexing.
+|Configuration required for spatial projections without a spatial sort|<<elasticsearch-integration-server-configuration,Enable and configure the groovy plugin>>|None
 |===============
 
 
@@ -134,7 +135,7 @@ However some features offered by Hibernate Search require specific configuration
 * on Elasticsearch 2.x only (not necessary on 5.x): if you want to be able to use the Hibernate Search <<search-batchindex-massindexer,MassIndexer>>
 with `purgeAllOnStart` enabled - it is enabled by default -, or to use `FullTextSession.purge()` or `FullTextSession.purgeAll()`,
 install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/2.2/plugins-delete-by-query.html[`delete-by-query` plugin]
-* if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
+* on Elasticsearch 2.x only (not necessary on 5.x): if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,
 see <<elasticsearch-query-spatial, Elasticsearch Spatial queries>>
 * if you want to use paging (as opposed to <<elasticsearch-scrolling,scrolling>>) on result sets larger than 10000 elements
 (for instance access the 10001st result),
@@ -779,13 +780,17 @@ The Elasticsearch integration supports spatial queries by using either the DSL o
 
 For regular usage, there are no particular requirements for spatial support.
 
-However, if you want to calculate the distance from your entities to a point without sorting by the distance to this point,
+[CAUTION]
+--
+On Elasticsearch 2.x only (not necessary on 5.x),
+if you want to calculate the distance from your entities to a point *without sorting* by the distance to this point,
 you need to enable the Groovy plugin by adding the following snippet to your Elasticsearch configuration:
 
 .Enabling Groovy support in your elasticsearch.yml
 ----
 script.engine.groovy.inline.search: true
 ----
+--
 
 ==== [[elasticsearch-scrolling]] Paging and scrolling
 
