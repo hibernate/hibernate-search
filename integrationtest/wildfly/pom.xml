@@ -235,9 +235,6 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
-                        <configuration>
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
