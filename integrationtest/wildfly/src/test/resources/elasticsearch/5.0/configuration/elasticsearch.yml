@@ -64,7 +64,3 @@ discovery.zen.minimum_master_nodes: 1
 # Disable starting multiple nodes on a single system:
 #
 node.max_local_storage_nodes: 1
-#
-# Enable Groovy scripting support for search: useful for spatial queries
-#
-script.engine.groovy.inline.search: true

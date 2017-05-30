@@ -7,6 +7,7 @@
 package org.hibernate.search.elasticsearch.dialect.impl;
 
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaAccessor;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaTranslator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaValidator;
@@ -30,5 +31,7 @@ public interface ElasticsearchDialect {
 	ElasticsearchSchemaValidator createSchemaValidator(ElasticsearchSchemaAccessor schemaAccessor);
 
 	MissingValueStrategy createMissingValueStrategy();
+
+	ElasticsearchQueryFactory createQueryFactory();
 
 }

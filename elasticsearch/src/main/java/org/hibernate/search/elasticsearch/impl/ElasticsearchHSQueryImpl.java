@@ -657,15 +657,10 @@ public class ElasticsearchHSQueryImpl extends AbstractHSQuery {
 				// the results. If we don't sort by distance, we need to request for the distance using a script_field.
 				payloadBuilder.add( "script_fields",
 						JsonBuilder.object().add( SPATIAL_DISTANCE_FIELD, JsonBuilder.object()
-							.add( "script", JsonBuilder.object()
-								.add( "params",
-										JsonBuilder.object()
-												.addProperty( "lat", spatialSearchCenter.getLatitude() )
-												.addProperty( "lon", spatialSearchCenter.getLongitude() )
-								)
-								// We multiply by 0.001 to Convert from meters to kilmeters
-								.addProperty( "inline", "doc['" + spatialFieldName + "'] ? doc['" + spatialFieldName + "'].arcDistance(lat,lon)*0.001 : null" )
-								.addProperty( "lang", "groovy" )
+							.add(
+									"script",
+									elasticsearchService.getQueryFactory()
+											.createSpatialDistanceScript( spatialSearchCenter, spatialFieldName )
 							)
 						)
 				);
