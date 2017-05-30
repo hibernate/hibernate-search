@@ -27,7 +27,6 @@ import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.BytemanHelper.SimulatedFailureException;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
@@ -35,7 +34,6 @@ import org.jboss.byteman.contrib.bmunit.BMRules;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 /**
@@ -70,7 +68,6 @@ public class SearchFactoryTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 	@TestForIssue(jiraKey = "HSEARCH-2277")
 	@BMRules(rules = {
 			@BMRule(
@@ -103,7 +100,6 @@ public class SearchFactoryTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 	@TestForIssue(jiraKey = "HSEARCH-2277")
 	@BMRules(rules = {
 			@BMRule(
@@ -143,7 +139,6 @@ public class SearchFactoryTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 	@TestForIssue(jiraKey = "HSEARCH-2277")
 	@BMRules(rules = {
 			@BMRule(
@@ -174,7 +169,6 @@ public class SearchFactoryTest {
 	}
 
 	@Test
-	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 	@TestForIssue(jiraKey = "HSEARCH-2277")
 	@BMRules(rules = {
 			@BMRule(

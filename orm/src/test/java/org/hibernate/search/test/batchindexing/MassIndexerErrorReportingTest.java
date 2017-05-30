@@ -15,16 +15,13 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
-import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 @RunWith(BMUnitRunner.class)
-@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2481 Byteman-based tests re-executed in the Elasticsearch module won't work
 public class MassIndexerErrorReportingTest extends SearchTestBase {
 
 	@Test

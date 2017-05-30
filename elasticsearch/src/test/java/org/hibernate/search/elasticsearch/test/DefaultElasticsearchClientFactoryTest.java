@@ -35,7 +35,6 @@ import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -374,7 +373,6 @@ public class DefaultElasticsearchClientFactoryTest {
 				+ " || host1 != null && host1.getSchemeName().equals( \"https\" )",
 		action = "pushEvent( \"https\" )"
 	)
-	@Ignore // HSEARCH-2481 Byteman-based tests executed in the Elasticsearch module won't work
 	public void discoveryScheme() throws Exception {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				// Need to use HTTP here, so that the sniffer can at least retrieve the host list
