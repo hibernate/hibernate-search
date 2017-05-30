@@ -1067,8 +1067,22 @@
                     <!-- 2.19.1 seems buggy, see https://hibernate.atlassian.net/browse/HV-1117 -->
                     <version>2.18.1</version>
                     <configuration>
+                        <forkCount>1</forkCount>
+                        <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <runOrder>alphabetical</runOrder>
+                        <systemPropertyVariables>
+                            <!-- See HSEARCH-1444 -->
+                            <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
+                            <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
+                            <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
+                            <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
+                        </systemPropertyVariables>
                         <argLine>${additionalRuntimeArgLine}</argLine>
+                        <additionalClasspathElements>
+                            <!-- Needed by Byteman to load the agent on demand -->
+                            <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
+                        </additionalClasspathElements>
                     </configuration>
                 </plugin>
                 <plugin>
