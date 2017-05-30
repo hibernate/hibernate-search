@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.test.engine;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
@@ -20,10 +18,9 @@ import org.hibernate.search.annotations.Store;
  * @author Gunnar Morling
  */
 @Indexed
-@Entity
-public class TouristAttraction {
+class TouristAttraction {
 
-	@Id
+	@DocumentId
 	int id;
 
 	@Fields({

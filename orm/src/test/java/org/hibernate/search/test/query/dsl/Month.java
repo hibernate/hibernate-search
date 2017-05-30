@@ -9,14 +9,11 @@ package org.hibernate.search.test.query.dsl;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
@@ -27,15 +24,12 @@ import org.hibernate.search.annotations.Resolution;
 /**
  * @author Emmanuel Bernard
  */
-@Entity
 @Indexed
 @ClassBridge(impl = MonthClassBridge.class)
-public class Month {
-
-	public Month() {
-	}
+class Month {
 
 	public Month(String name, int monthValue, String mythology, String history, Date estimatedCreation) {
+		this.id = monthValue;
 		this.name = name;
 		this.mythology = mythology;
 		this.history = history;
@@ -51,8 +45,7 @@ public class Month {
 		this.htmlDescription = htmlDescription;
 	}
 
-	@Id
-	@GeneratedValue
+	@DocumentId
 	public Integer getId() {
 		return id;
 	}

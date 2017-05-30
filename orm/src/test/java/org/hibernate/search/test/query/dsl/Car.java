@@ -6,26 +6,20 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 
 /**
  * @author Gunnar Morling
  */
-@MappedSuperclass
-public class Car {
+class Car {
 
-	@Id
+	@DocumentId
 	Integer id;
 
 	@Field(analyze = Analyze.NO)
 	String name;
-
-	public Car() {
-	}
 
 	public Car(Integer id, String name) {
 		this.id = id;

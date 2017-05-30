@@ -16,7 +16,6 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -40,8 +39,6 @@ public class NumericTypeGuessedTest {
 
 	@Test
 	public void numericRangeQueryOnCustomField() {
-		final ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
-
 		storeData( "title-one", "1" );
 		storeData( "title-two", "2" );
 		storeData( "title-three", "3" );

@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.test.engine;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
 import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
@@ -19,11 +16,10 @@ import org.hibernate.search.annotations.Store;
 /**
  * @author Gustavo Fernandes
  */
-@Entity
 @Indexed (index = "numeric_field_test")
-public class PinPoint {
+class PinPoint {
 
-	@Id
+	@DocumentId
 	@Field(name = "numeric_id")
 	@NumericField(forField = "numeric_id")
 	private int id;
@@ -31,7 +27,6 @@ public class PinPoint {
 	@Field(store = Store.YES)
 	private Integer stars;
 
-	@ManyToOne
 	@ContainedIn
 	private Location location;
 

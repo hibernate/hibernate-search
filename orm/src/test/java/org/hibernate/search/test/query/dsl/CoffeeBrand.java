@@ -7,10 +7,7 @@
 
 package org.hibernate.search.test.query.dsl;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
@@ -18,11 +15,9 @@ import org.hibernate.search.annotations.TermVector;
 /**
  * @author Emmanuel Bernard
  */
-@Entity
-public class CoffeeBrand {
+class CoffeeBrand {
 
-	@Id
-	@GeneratedValue
+	@DocumentId
 	public Integer getId() { return id; }
 	public void setId(Integer id) { this.id = id; }
 	private Integer id;

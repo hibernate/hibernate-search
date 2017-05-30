@@ -25,13 +25,8 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 import org.apache.lucene.search.Query;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -39,10 +34,12 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants;
 import org.hibernate.search.elasticsearch.testutil.JsonHelper;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.junit.After;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -53,18 +50,12 @@ import com.google.gson.JsonNull;
  * @author Yoann Rodiere
  */
 @TestForIssue(jiraKey = "HSEARCH-2415")
-public class ElasticsearchIndexNullAsIT extends SearchTestBase {
+public class ElasticsearchIndexNullAsIT {
 
-	@After
-	public void deleteEntity() {
-		try (org.hibernate.Session s = openSession()) {
-			Transaction tx = s.beginTransaction();
-			s.delete( s.load( Sample.class, 1L ) );
-			s.delete( s.load( Sample.class, 2L ) );
-			s.flush();
-			tx.commit();
-		}
-	}
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void testString() throws Exception {
@@ -272,86 +263,69 @@ public class ElasticsearchIndexNullAsIT extends SearchTestBase {
 		assertNullFieldIndexingAndQuerying( "monthDay", value, sample );
 	}
 
-	@SuppressWarnings("unchecked")
 	private void assertNullFieldIndexingAndQuerying(String field, Object expectedValue, Sample sampleWithValue) {
 		Sample sampleWithoutValue = new Sample( 2L, sampleWithValue.description + " - without value" );
 
-		try (org.hibernate.Session s = openSession()) {
-			Transaction tx = s.beginTransaction();
-			s.persist( sampleWithValue );
-			s.persist( sampleWithoutValue );
-			s.flush();
-			tx.commit();
+		ExtendedSearchIntegrator factory = sfHolder.getSearchFactory();
 
-			tx = s.beginTransaction();
-			final FullTextSession session = Search.getFullTextSession( s );
+		helper.add()
+				.push( sampleWithValue, sampleWithValue.id )
+				.push( sampleWithoutValue, sampleWithoutValue.id )
+				.execute();
 
-			Query query = queryBuilder( session ).keyword().onField( field ).ignoreAnalyzer().matching( expectedValue ).createQuery();
-			List<Object[]> result = session.createFullTextQuery( query )
-					.setProjection( ElasticsearchProjectionConstants.ID )
-					.list();
-			assertThat( result ).as( "Both documents (with field '" + field + "' index as null and with the same field"
-					+ " equal to indexNullAs) should be found when querying the indexNullAs value" )
-					.hasSize( 2 );
+		Query query = helper.queryBuilder( Sample.class ).keyword().onField( field ).ignoreAnalyzer().matching( expectedValue ).createQuery();
+		List<EntityInfo> result = factory.createHSQuery( query, Sample.class )
+				.projection( ElasticsearchProjectionConstants.ID )
+				.queryEntityInfos();
+		assertThat( result ).as( "Both documents (with field '" + field + "' index as null and with the same field"
+				+ " equal to indexNullAs) should be found when querying the indexNullAs value" )
+				.hasSize( 2 );
 
-			result = session.createFullTextQuery( query )
-					.setProjection( ElasticsearchProjectionConstants.ID, field, ElasticsearchProjectionConstants.SOURCE )
-					.list();
-			for ( Object[] projection : result ) {
-				if ( projection[0].equals( 1L ) ) {
-					assertThat( projection[1] ).as( "Document with field '" + field + "' non-null should have a non-null"
-							+ " projection on this field" )
-							.isEqualTo( expectedValue );
+		result = factory.createHSQuery( query, Sample.class )
+				.projection( ElasticsearchProjectionConstants.ID, field, ElasticsearchProjectionConstants.SOURCE )
+				.queryEntityInfos();
+		for ( EntityInfo entityInfo : result ) {
+			Object[] projection = entityInfo.getProjection();
+			if ( projection[0].equals( 1L ) ) {
+				assertThat( projection[1] ).as( "Document with field '" + field + "' non-null should have a non-null"
+						+ " projection on this field" )
+						.isEqualTo( expectedValue );
 
-					JsonElement json = new Gson().fromJson( (String) projection[2], JsonElement.class );
-					JsonElement propertyValue = json.getAsJsonObject().get( field );
-					assertThat( propertyValue ).as( "Document with field '" + field + "' non-null should have a value for"
-							+ " this field in their source" )
-							.isNotNull();
-					assertThat( propertyValue ).as( "Document with field '" + field + "' non-null should have a non-null"
-							+ " value for this field in their source" )
-							.isNotEqualTo( JsonNull.INSTANCE );
-				}
-				else {
-					assertThat( projection[1] ).as( "Document with field '" + field + "' indexed as null should have a null"
-							+ " projection on this field" )
-							.isNull();
-					// Document with a field indexed as null should have null for this field in their source
-					JsonHelper.assertJsonEqualsIgnoringUnknownFields( "{'" + field + "': null}", (String) projection[2] );
-				}
+				JsonElement json = new Gson().fromJson( (String) projection[2], JsonElement.class );
+				JsonElement propertyValue = json.getAsJsonObject().get( field );
+				assertThat( propertyValue ).as( "Document with field '" + field + "' non-null should have a value for"
+						+ " this field in their source" )
+						.isNotNull();
+				assertThat( propertyValue ).as( "Document with field '" + field + "' non-null should have a non-null"
+						+ " value for this field in their source" )
+						.isNotEqualTo( JsonNull.INSTANCE );
 			}
-
-			query = queryBuilder( session ).keyword().onField( field ).ignoreAnalyzer().matching( null ).createQuery();
-			result = session.createFullTextQuery( query )
-					.setProjection( ElasticsearchProjectionConstants.ID )
-					.list();
-			assertThat( result ).as( "Both documents (with field '" + field + "' index as null and with the same field equal"
-					+ " to indexNullAs) should be found when querying the null value" )
-					.hasSize( 2 );
-
-			tx.commit();
+			else {
+				assertThat( projection[1] ).as( "Document with field '" + field + "' indexed as null should have a null"
+						+ " projection on this field" )
+						.isNull();
+				// Document with a field indexed as null should have null for this field in their source
+				JsonHelper.assertJsonEqualsIgnoringUnknownFields( "{'" + field + "': null}", (String) projection[2] );
+			}
 		}
+
+		query = helper.queryBuilder( Sample.class ).keyword().onField( field ).ignoreAnalyzer().matching( null ).createQuery();
+		result = factory.createHSQuery( query, Sample.class )
+				.projection( ElasticsearchProjectionConstants.ID )
+				.queryEntityInfos();
+		assertThat( result ).as( "Both documents (with field '" + field + "' index as null and with the same field equal"
+				+ " to indexNullAs) should be found when querying the null value" )
+				.hasSize( 2 );
 	}
 
-	@Field(analyze = Analyze.NO, store = Store.YES)
-	private QueryBuilder queryBuilder(final FullTextSession session) {
-		QueryBuilder builder = session.getSearchFactory().buildQueryBuilder().forEntity( Sample.class ).get();
-		return builder;
-	}
-
-	@Entity
 	@Indexed
-	static class Sample {
-
-		public Sample() {
-		}
+	private static class Sample {
 
 		public Sample(long id, String description) {
 			this.id = id;
 			this.description = description;
 		}
 
-		@Id
 		@DocumentId
 		long id;
 
@@ -415,10 +389,5 @@ public class ElasticsearchIndexNullAsIT extends SearchTestBase {
 
 		@Field(analyze = Analyze.NO, store = Store.YES, indexNullAs = "--12-01")
 		private MonthDay monthDay;
-	}
-
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { Sample.class };
 	}
 }

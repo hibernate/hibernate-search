@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.test.bridge;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
@@ -24,7 +22,7 @@ import org.junit.experimental.categories.Category;
  *
  * @author Davide D'Alto
  */
-@Category(SkipOnElasticsearch.class)
+@Category(SkipOnElasticsearch.class) // There is a similar test extending the same class for Elasticsearch
 public class CheckCustomFieldDefaultsTest extends CheckCustomFieldDefaultAnalyzer {
 
 	@Override
@@ -41,16 +39,9 @@ public class CheckCustomFieldDefaultsTest extends CheckCustomFieldDefaultAnalyze
 		return Experiment.class;
 	}
 
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class[]{ Experiment.class };
-	}
-
-	@Entity
 	@Indexed
-	public static class Experiment {
-
-		@Id
+	private static class Experiment {
+		@DocumentId
 		@FieldBridge(impl = AdditionalFieldBridge.class)
 		public String id;
 
@@ -62,54 +53,5 @@ public class CheckCustomFieldDefaultsTest extends CheckCustomFieldDefaultAnalyze
 		@FieldBridge(impl = AdditionalFieldBridge.class)
 		@Analyzer(impl = WhitespaceAnalyzer.class)
 		public String result;
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ( ( id == null ) ? 0 : id.hashCode() );
-			result = prime * result + ( ( this.result == null ) ? 0 : this.result.hashCode() );
-			result = prime * result + ( ( subject == null ) ? 0 : subject.hashCode() );
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if ( this == obj ) {
-				return true;
-			}
-			if ( obj == null ) {
-				return false;
-			}
-			if ( getClass() != obj.getClass() ) {
-				return false;
-			}
-			Experiment other = (Experiment) obj;
-			if ( id == null ) {
-				if ( other.id != null ) {
-					return false;
-				}
-			}
-			else if ( !id.equals( other.id ) ) {
-				return false;
-			}
-			if ( result == null ) {
-				if ( other.result != null ) {
-					return false;
-				}
-			}
-			else if ( !result.equals( other.result ) ) {
-				return false;
-			}
-			if ( subject == null ) {
-				if ( other.subject != null ) {
-					return false;
-				}
-			}
-			else if ( !subject.equals( other.subject ) ) {
-				return false;
-			}
-			return true;
-		}
 	}
 }

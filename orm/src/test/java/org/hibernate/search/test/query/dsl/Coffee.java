@@ -7,13 +7,8 @@
 
 package org.hibernate.search.test.query.dsl;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -24,19 +19,17 @@ import org.hibernate.search.annotations.TermVector;
 /**
  * @author Emmanuel Bernard
  */
-@Entity
 @Indexed
-public class Coffee {
+class Coffee {
 
 	public static final String NAME_SORT = "name_sort";
 
-	@Id
-	@GeneratedValue
-	public Integer getId() { return id; }
-	public void setId(Integer id) {
+	@DocumentId
+	public String getId() { return id; }
+	public void setId(String id) {
 		this.id = id;
 	}
-	private Integer id;
+	private String id;
 
 	@Field(termVector = TermVector.NO, store = Store.YES)
 	@Field(name = NAME_SORT, analyze = Analyze.NO)
@@ -50,7 +43,6 @@ public class Coffee {
 	public void setSummary(String summary) { this.summary = summary; }
 	private String summary;
 
-	@Column(length = 2000)
 	@Field(termVector = TermVector.YES)
 	public String getDescription() { return description; }
 	public void setDescription(String description) { this.description = description; }
@@ -66,7 +58,6 @@ public class Coffee {
 	public void setInternalDescription(String internalDescription) { this.internalDescription = internalDescription; }
 	private String internalDescription;
 
-	@ManyToOne
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	public CoffeeBrand getBrand() { return brand; }
 	public void setBrand(CoffeeBrand brand) { this.brand = brand; }

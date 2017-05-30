@@ -9,197 +9,131 @@ package org.hibernate.search.test.bridge.tika;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
+import javax.sql.rowset.serial.SerialBlob;
+
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.test.util.impl.ClasspathResourceAsFile;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class TikaBridgeInputTypeTest extends SearchTestBase {
+public class TikaBridgeInputTypeTest {
 
 	private static final String TEST_DOCUMENT_PDF_1 = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
 	private static final String TEST_DOCUMENT_PDF_2 = "/org/hibernate/search/test/bridge/tika/test-document-2.pdf";
 
 	@Rule
-	public ClasspathResourceAsFile testDocumentPdf1 = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF_1 );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Rule
-	public ClasspathResourceAsFile testDocumentPdf2 = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF_2 );
+	public final ClasspathResourceAsFile testDocumentPdf1 = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF_1 );
+
+	@Rule
+	public final ClasspathResourceAsFile testDocumentPdf2 = new ClasspathResourceAsFile( getClass(), TEST_DOCUMENT_PDF_2 );
 
 	@Test
 	public void testDefaultTikaBridgeWithListOfString() throws Exception {
-		try ( Session session = openSession() ) {
-			String content1 = testDocumentPdf1.get().getAbsolutePath();
-			String content2 = testDocumentPdf2.get().getAbsolutePath();
+		String content1 = testDocumentPdf1.get().getAbsolutePath();
+		String content2 = testDocumentPdf2.get().getAbsolutePath();
 
-			persistBook( session, new Book( content1, content2 ) );
+		helper.add( new Book( 1, content1, content2 ) );
 
-			indexBook( session );
+		List<EntityInfo> resultWithLucene = search( "contentAsListOfString", "Lucene" );
+		assertEquals( "there should be a match", 1, resultWithLucene.size() );
 
-			List<Book> resultWithLucene = search( session, "contentAsListOfString", "Lucene" );
-			assertEquals( "there should be a match", 1, resultWithLucene.size() );
-
-			List<Book> resultWithTika = search( session, "contentAsListOfString", "Tika" );
-			assertEquals( "there should be a match", 1, resultWithTika.size() );
-		}
-	}
-
-	private List<Book> search(Session session, String field, String keyword) throws ParseException {
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		Transaction transaction = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( field, TestConstants.standardAnalyzer );
-		Query query = parser.parse( keyword );
-		@SuppressWarnings("unchecked")
-		List<Book> result = fullTextSession.createFullTextQuery( query ).list();
-		transaction.commit();
-		fullTextSession.clear();
-		return result;
+		List<EntityInfo> resultWithTika = search( "contentAsListOfString", "Tika" );
+		assertEquals( "there should be a match", 1, resultWithTika.size() );
 	}
 
 	@Test
 	public void testDefaultTikaBridgeWithBlob() throws Exception {
-		try ( Session session = openSession() ) {
-			Blob content = dataAsBlob( testDocumentPdf1.get(), session );
+		Blob content = dataAsBlob( testDocumentPdf1.get() );
 
-			persistBook( session, new Book( content ) );
-			persistBook( session, new Book() );
+		helper.add(
+				new Book( 1, content ),
+				new Book( 2 )
+		);
 
-			// we have to index manually. Using the Blob (streaming approach) the indexing would try to re-read the
-			// input stream of the blob after it was persisted into the database
-			indexBook( session );
-			searchBook( session, "contentAsBlob" );
-		}
+		assertSearchMatches( "contentAsBlob" );
 	}
 
 	@Test
 	public void testDefaultTikaBridgeWithByteArray() throws Exception {
-		try ( Session session = openSession() ) {
-			byte[] content = dataAsBytes( testDocumentPdf1.get() );
+		byte[] content = dataAsBytes( testDocumentPdf1.get() );
 
-			persistBook( session, new Book( content ) );
-			persistBook( session, new Book() );
+		helper.add(
+				new Book( 1, content ),
+				new Book( 2 )
+		);
 
-			indexBook( session );
-			searchBook( session, "contentAsBytes" );
-		}
+		assertSearchMatches( "contentAsBytes" );
 	}
 
 	@Test
 	public void testDefaultTikaBridgeWithURI() throws Exception {
-		try ( Session session = openSession() ) {
-			URI content = testDocumentPdf1.get().toURI();
+		URI content = testDocumentPdf1.get().toURI();
 
-			persistBook( session, new Book( content ) );
-			persistBook( session, new Book() );
-
-			indexBook( session );
-			searchBook( session, "contentAsURI" );
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void searchBook(Session session, String field) throws ParseException {
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		Transaction transaction = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser(
-				field,
-				TestConstants.standardAnalyzer
+		helper.add(
+				new Book( 1, content ),
+				new Book( 2 )
 		);
-		Query query = parser.parse( "foo" );
 
-		List<Book> result = fullTextSession.createFullTextQuery( query ).list();
-		assertEquals( "there should be no match", 0, result.size() );
-
-		query = parser.parse( "Lucene" );
-
-		result = fullTextSession.createFullTextQuery( query ).list();
-		assertEquals( "there should be match", 1, result.size() );
-
-		query = parser.parse( "<NULL>" );
-
-		result = fullTextSession.createFullTextQuery( query ).list();
-		assertEquals( "there should be match", 1, result.size() );
-
-		result = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
-		assertEquals( "there should be match", 2, result.size() );
-		transaction.commit();
-		fullTextSession.clear();
+		assertSearchMatches( "contentAsURI" );
 	}
 
-	private void persistBook(Session session, Book book) throws IOException {
-		Transaction tx = session.beginTransaction();
-		session.save( book );
-		session.flush();
-		tx.commit();
-		session.clear();
+	private List<EntityInfo> search(String field, String keyword) throws ParseException {
+		ExtendedSearchIntegrator integrator = sfHolder.getSearchFactory();
+		QueryParser parser = new QueryParser( field, TestConstants.standardAnalyzer );
+		Query query = parser.parse( keyword );
+		List<EntityInfo> result = integrator.createHSQuery( query, Book.class ).queryEntityInfos();
+		return result;
 	}
 
-	void indexBook(Session session) {
-		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( session );
-		fullTextSession.setFlushMode( FlushMode.MANUAL );
-		fullTextSession.setCacheMode( CacheMode.IGNORE );
+	private void assertSearchMatches(String field) throws ParseException {
+		helper.assertThat( field, "foo" )
+				.from( Book.class )
+				.hasResultSize( 0 );
 
-		Transaction transaction = fullTextSession.beginTransaction();
+		helper.assertThat( field, "lucene" )
+				.from( Book.class )
+				.hasResultSize( 1 );
 
-		int BATCH_SIZE = 10;
-		ScrollableResults results = fullTextSession.createCriteria( Book.class )
-				.setFetchSize( BATCH_SIZE )
-				.scroll( ScrollMode.FORWARD_ONLY );
-		int index = 0;
-		while ( results.next() ) {
-			index++;
-			fullTextSession.index( results.get( 0 ) );
-			if ( index % BATCH_SIZE == 0 ) {
-				fullTextSession.flushToIndexes();
-				fullTextSession.clear();
-			}
+		helper.assertThat( field, "null" )
+				.from( Book.class )
+				.hasResultSize( 1 );
+
+		helper.assertThat()
+				.from( Book.class )
+				.hasResultSize( 2 );
+	}
+
+	private Blob dataAsBlob(File file) throws IOException {
+		byte[] byteArray = dataAsBytes( file );
+		try {
+			return new SerialBlob( byteArray );
 		}
-		fullTextSession.flush();
-		transaction.commit();
-		fullTextSession.clear();
-	}
-
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class[]{
-				Book.class
-		};
-	}
-
-	@Override
-	public void configure(Map<String, Object> cfg) {
-		super.configure( cfg );
-		cfg.put( Environment.INDEXING_STRATEGY, "manual" );
-	}
-
-	private Blob dataAsBlob(File file, Session session) throws IOException {
-		FileInputStream in = FileUtils.openInputStream( file );
-		return session.getLobHelper().createBlob( in, file.length() );
+		catch (SQLException e) {
+			throw new AssertionFailure( "Unexpected error creating a blob", e );
+		}
 	}
 
 	private byte[] dataAsBytes(File file) throws IOException {

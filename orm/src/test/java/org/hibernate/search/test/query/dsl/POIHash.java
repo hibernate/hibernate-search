@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -23,10 +20,9 @@ import org.hibernate.search.spatial.Coordinates;
  *
  * @author Nicolas Helleringer
  */
-@Entity
 @Indexed
-public class POIHash {
-	@Id
+class POIHash {
+	@DocumentId
 	Integer id;
 
 	@Field(store = Store.YES)
@@ -40,7 +36,6 @@ public class POIHash {
 	double longitude;
 
 	@Spatial(spatialMode = SpatialMode.HASH)
-	@Embedded
 	public Coordinates getLocation() {
 		return new Coordinates() {
 			@Override

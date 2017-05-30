@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
@@ -16,11 +14,10 @@ import org.hibernate.search.annotations.NumericField;
 /**
  * @author Gunnar Morling
  */
-@Entity
 @Indexed
-public class Day {
+class Day {
 
-	@Id
+	@DocumentId
 	@Field(name = "idNumeric")
 	@NumericField
 	private int id;
@@ -28,9 +25,6 @@ public class Day {
 	@Field
 	private int number;
 
-	Day() {
-
-	}
 	public Day(int id, int number) {
 		this.id = id;
 		this.number = number;

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.bridge.time;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -24,40 +22,29 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import org.apache.lucene.search.Query;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.junit.After;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Davide D'Alto
  */
 @TestForIssue(jiraKey = "HSEARCH-1947")
-public class JavaTimeTest extends SearchTestBase {
+public class JavaTimeTest {
 
-	@After
-	public void deleteEntity() {
-		try (org.hibernate.Session s = openSession()) {
-			Transaction tx = s.beginTransaction();
-			s.delete( s.load( Sample.class, 1L ) );
-			s.flush();
-			tx.commit();
-		}
-	}
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Test
 	public void testLocalDate() throws Exception {
@@ -183,7 +170,6 @@ public class JavaTimeTest extends SearchTestBase {
 		assertThatFieldIsIndexed( "zonedDateTime", value, sample );
 	}
 
-
 	@Test
 	public void testYear() throws Exception {
 		/* Elasticsearch only accepts years in the range [-292275054,292278993]
@@ -217,43 +203,28 @@ public class JavaTimeTest extends SearchTestBase {
 	}
 
 	private void assertThatFieldIsIndexed(String field, Object expectedValue, Sample sample) {
-		try (org.hibernate.Session s = openSession()) {
-			Transaction tx = s.beginTransaction();
-			s.persist( sample );
-			s.flush();
-			tx.commit();
+		helper.add( sample, sample.id );
 
-			tx = s.beginTransaction();
-			final FullTextSession session = Search.getFullTextSession( s );
+		Query query = queryBuilder().keyword().onField( field ).ignoreAnalyzer().matching( expectedValue ).createQuery();
 
-			Query query = queryBuilder( session ).keyword().onField( field ).ignoreAnalyzer().matching( expectedValue ).createQuery();
-			Object[] result = (Object[]) session.createFullTextQuery( query ).setProjection( field ).uniqueResult();
-
-			assertThat( result ).as( "Indexed value for field '" + field + "' not found" ).containsOnly( expectedValue );
-
-			tx.commit();
-		}
+		helper.assertThat( query )
+				.from( Sample.class )
+				.projecting( field )
+				.matchesExactlySingleProjections( expectedValue );
 	}
 
-	@Field(analyze = Analyze.NO, store = Store.YES)
-	private QueryBuilder queryBuilder(final FullTextSession session) {
-		QueryBuilder builder = session.getSearchFactory().buildQueryBuilder().forEntity( Sample.class ).get();
-		return builder;
+	private QueryBuilder queryBuilder() {
+		return helper.queryBuilder( Sample.class );
 	}
 
-	@Entity
 	@Indexed
-	static class Sample {
-
-		public Sample() {
-		}
+	private static class Sample {
 
 		public Sample(long id, String description) {
 			this.id = id;
 			this.description = description;
 		}
 
-		@Id
 		@DocumentId
 		long id;
 
@@ -263,7 +234,6 @@ public class JavaTimeTest extends SearchTestBase {
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private LocalDate localDate;
 
-		@Column(name = "LOCAL_TIME") // localTime is a special keywork for some db
 		@Field(analyze = Analyze.NO, store = Store.YES)
 		private LocalTime localTime;
 
@@ -304,8 +274,4 @@ public class JavaTimeTest extends SearchTestBase {
 		private MonthDay monthDay;
 	}
 
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { Sample.class };
-	}
 }

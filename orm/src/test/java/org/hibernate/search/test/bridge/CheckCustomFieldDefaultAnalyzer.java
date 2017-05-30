@@ -7,19 +7,15 @@
 package org.hibernate.search.test.bridge;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
-import org.fest.assertions.Assertions;
-import org.hibernate.Session;
-import org.hibernate.search.Search;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
-import org.hibernate.search.test.SearchTestBase;
-import org.junit.After;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -31,112 +27,78 @@ import org.junit.Test;
  *
  * @author Davide D'Alto
  */
-public abstract class CheckCustomFieldDefaultAnalyzer extends SearchTestBase {
+public abstract class CheckCustomFieldDefaultAnalyzer {
+
+	private static final String ENTITY_ID = "GLaDOS";
+
+	@Rule
+	public final SearchFactoryHolder holder = new SearchFactoryHolder( getEntityType() );
+
+	private final SearchITHelper helper = new SearchITHelper( holder );
 
 	@Before
 	public void before() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			session.persist( entity() );
-			session.getTransaction().commit();
-		}
+		helper.add( entity() );
 	}
 
 	private Object entity() {
-		return entity( "GLaDOS", "CHELL", "WELL DONE. HERE COME THE TEST RESULTS: 'YOU ARE A HORRIBLE PERSON." );
+		return entity( ENTITY_ID, "CHELL", "WELL DONE. HERE COME THE TEST RESULTS: 'YOU ARE A HORRIBLE PERSON." );
 	}
 
 	protected abstract Object entity(String id, String notAnalyzedField, String analyzedField);
 
 	protected abstract Class<?> getEntityType();
 
-	@After
-	public void after() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			session.delete( entity() );
-			session.getTransaction().commit();
-		}
-	}
-
 	@Test
 	public void shouldBeAbleToFindTheCustomIdField() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			TermQuery termQuery = new TermQuery( new Term( "copy_of_id", "GLaDOS" ) );
-			Object result = Search.getFullTextSession( session ).createFullTextQuery( termQuery, getEntityType() ).uniqueResult();
-			Assertions.assertThat( result ).isEqualTo( entity() );
-			session.getTransaction().commit();
-		}
+		helper.assertThat( "copy_of_id", "GLaDOS" )
+				.from( getEntityType() )
+				.matchesExactlyIds( ENTITY_ID );
 	}
 
 	@Test
 	public void shouldNotAnalyzeCustomIdField() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			TermQuery termQuery = new TermQuery( new Term( "copy_of_id", "glados" ) );
-			Object result = Search.getFullTextSession( session ).createFullTextQuery( termQuery, getEntityType() ).uniqueResult();
-			Assertions.assertThat( result ).isNull();
-			session.getTransaction().commit();
-		}
+		helper.assertThat( "copy_of_id", "glados" )
+				.from( getEntityType() )
+				.matchesNone();
 	}
 
 	@Test
 	public void shouldBeAbleToFindNotAnalyzedCustomField() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			TermQuery termQuery = new TermQuery( new Term( "copy_of_subject", "CHELL" ) );
-			Object result = Search.getFullTextSession( session ).createFullTextQuery( termQuery, getEntityType() ).uniqueResult();
-			Assertions.assertThat( result ).isEqualTo( entity() );
-			session.getTransaction().commit();
-		}
+		helper.assertThat( "copy_of_subject", "CHELL" )
+				.from( getEntityType() )
+				.matchesExactlyIds( ENTITY_ID );
 	}
 
 	@Test
 	public void shouldNotAnalyzeCustomField() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			TermQuery termQuery = new TermQuery( new Term( "copy_of_subject", "chell" ) );
-			Object result = Search.getFullTextSession( session ).createFullTextQuery( termQuery, getEntityType() ).uniqueResult();
-			Assertions.assertThat( result ).isNull();
-			session.getTransaction().commit();
-		}
+		helper.assertThat( "copy_of_subject", "chell" )
+				.from( getEntityType() )
+				.matchesNone();
 	}
 
 	@Test
 	// The analyzer is applied for the annotated field
 	public void shouldBeAbleToFindAnalyzedAnnotatedField() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			TermQuery termQuery = new TermQuery( new Term( "result", "HORRIBLE" ) );
-			Object result = Search.getFullTextSession( session ).createFullTextQuery( termQuery, getEntityType() ).uniqueResult();
-			Assertions.assertThat( result ).isEqualTo( entity() );
-			session.getTransaction().commit();
-		}
+		helper.assertThat( "result", "HORRIBLE" )
+				.from( getEntityType() )
+				.matchesExactlyIds( ENTITY_ID );
 	}
 
 	@Test
 	// The custom field will use the default analyzer instead of the one defined on the field
 	public void shouldNotBeAbleToFindAnalyzedCustomField() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			TermQuery termQuery = new TermQuery( new Term( "copy_of_result", "HORRIBLE" ) );
-			Object result = Search.getFullTextSession( session ).createFullTextQuery( termQuery, getEntityType() ).uniqueResult();
-			Assertions.assertThat( result ).isNull();
-			session.getTransaction().commit();
-		}
+		helper.assertThat( "copy_of_result", "HORRIBLE" )
+				.from( getEntityType() )
+				.matchesNone();
 	}
 
 	@Test
 	// The custom field used the default analyzer instead of the one defined on the field
 	public void shouldBeAbleToFindAnalyzedCustomField() throws Exception {
-		try ( Session session = openSession() ) {
-			session.beginTransaction();
-			TermQuery termQuery = new TermQuery( new Term( "copy_of_result", "horrible" ) );
-			Object result = Search.getFullTextSession( session ).createFullTextQuery( termQuery, getEntityType() ).uniqueResult();
-			Assertions.assertThat( result ).isEqualTo( entity() );
-			session.getTransaction().commit();
-		}
+		helper.assertThat( "copy_of_result", "horrible" )
+				.from( getEntityType() )
+				.matchesExactlyIds( ENTITY_ID );
 	}
 
 	public static class AdditionalFieldBridge implements MetadataProvidingFieldBridge, TwoWayFieldBridge {

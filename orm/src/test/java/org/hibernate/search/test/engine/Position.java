@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.test.engine;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import static org.hibernate.search.annotations.FieldCacheType.CLASS;
+import static org.hibernate.search.annotations.FieldCacheType.ID;
 
 import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
@@ -16,19 +15,13 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
-import static org.hibernate.search.annotations.FieldCacheType.CLASS;
-import static org.hibernate.search.annotations.FieldCacheType.ID;
-
 /**
  * @author Gunnar Morling
  */
-@Entity
 @Indexed
 @CacheFromIndex({ CLASS, ID })
-@Table(name = "geopositions")
-public class Position {
+class Position {
 
-	@Id
 	@DocumentId
 	private byte id;
 

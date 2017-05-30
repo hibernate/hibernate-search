@@ -6,22 +6,15 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
 import org.apache.lucene.search.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.test.SearchTestBase;
-import org.junit.After;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -30,29 +23,21 @@ import org.junit.Test;
  */
 //DO NOT AUTO INDENT THIS FILE.
 //MY DSL IS BEAUTIFUL, DUMB INDENTATION IS SCREWING IT UP
-public class SpatialDSLTest extends SearchTestBase {
-	private FullTextSession fullTextSession;
+public class SpatialDSLTest {
 
-	@Override
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( POI.class, POIHash.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
+
 	@Before
 	public void setUp() throws Exception {
-		super.setUp();
-		Session session = openSession();
-		fullTextSession = Search.getFullTextSession( session );
 		indexTestData();
-	}
-
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
 	}
 
 	@Test
 	public void testSpatialRangeQueries() {
-		Transaction transaction = fullTextSession.beginTransaction();
-		final QueryBuilder builder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder().forEntity( POI.class ).get();
+		final QueryBuilder builder = helper.queryBuilder( POI.class );
 
 		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );
 		Query query = builder
@@ -62,10 +47,8 @@ public class SpatialDSLTest extends SearchTestBase {
 						.ofCoordinates( coordinates )
 					.createQuery();
 
-		List<?> results = fullTextSession.createFullTextQuery( query, POI.class ).list();
-
-		assertEquals( "test spatial hash based spatial query", 1, results.size() );
-		assertEquals( "test spatial hash based spatial query", "Bozo", ( (POI) results.get( 0 ) ).getName() );
+		helper.assertThat( query ).from( POI.class )
+				.matchesExactlyIds( 2 );
 
 		query = builder
 				.spatial()
@@ -73,19 +56,14 @@ public class SpatialDSLTest extends SearchTestBase {
 					.within( 500, Unit.KM )
 						.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
 					.createQuery();
-		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 
-		assertEquals( "test spatial hash based spatial query", 1, results.size() );
-		assertEquals( "test spatial hash based spatial query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
-
-		transaction.commit();
+		helper.assertThat( query ).from( POI.class )
+				.matchesExactlyIds( 1 );
 	}
 
 	@Test
 	public void testSpatialHashQueries() {
-		Transaction transaction = fullTextSession.beginTransaction();
-		final QueryBuilder builder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder().forEntity( POIHash.class ).get();
+		final QueryBuilder builder = helper.queryBuilder( POIHash.class );
 
 		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );
 		Query query = builder
@@ -95,10 +73,8 @@ public class SpatialDSLTest extends SearchTestBase {
 				.ofCoordinates( coordinates )
 				.createQuery();
 
-		List<?> results = fullTextSession.createFullTextQuery( query, POIHash.class ).list();
-
-		assertEquals( "test spatial hash based spatial query", 1, results.size() );
-		assertEquals( "test spatial hash based spatial query", "Bozo", ( (POIHash) results.get( 0 ) ).getName() );
+		helper.assertThat( query ).from( POIHash.class )
+				.matchesExactlyIds( 2 );
 
 		query = builder
 				.spatial()
@@ -106,36 +82,21 @@ public class SpatialDSLTest extends SearchTestBase {
 				.within( 500, Unit.KM )
 				.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
 				.createQuery();
-		results = fullTextSession.createFullTextQuery( query, POIHash.class ).list();
 
-		assertEquals( "test spatial hash based spatial query", 1, results.size() );
-		assertEquals( "test spatial hash based spatial query", "Tour Eiffel", ( (POIHash) results.get( 0 ) ).getName() );
-
-		transaction.commit();
+		helper.assertThat( query ).from( POIHash.class )
+				.matchesExactlyIds( 1 );
 	}
 
 	private void indexTestData() {
-		Transaction tx = fullTextSession.beginTransaction();
-
 		POI poi = new POI( 1, "Tour Eiffel", 48.858333d, 2.294444d, "Monument" );
-		fullTextSession.persist( poi );
+		helper.add( poi );
 		poi = new POI( 2, "Bozo", 24d, 32d, "Monument" );
-		fullTextSession.persist( poi );
+		helper.add( poi );
 
 		POIHash poiHash = new POIHash( 1, "Tour Eiffel", 48.858333d, 2.294444d, "Monument" );
-		fullTextSession.persist( poiHash );
+		helper.add( poiHash );
 		poiHash = new POIHash( 2, "Bozo", 24d, 32d, "Monument" );
-		fullTextSession.persist( poiHash );
-
-		tx.commit();
-		fullTextSession.clear();
-	}
-
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] {
-				POI.class, POIHash.class
-		};
+		helper.add( poiHash );
 	}
 
 }
