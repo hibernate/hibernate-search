@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
@@ -27,7 +24,6 @@ import org.hibernate.search.annotations.TokenizerDef;
  * @author Guillaume Smet
  */
 @Indexed
-@Entity
 @AnalyzerDefs({
 		@AnalyzerDef(name = "titleAnalyzer",
 				tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class),
@@ -40,11 +36,10 @@ import org.hibernate.search.annotations.TokenizerDef;
 				tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class)
 		)
 })
-public class Book {
+class Book {
 
 	@DocumentId
-	@Id
-	Long id;
+	String id;
 
 	@Field(analyzer = @Analyzer(definition = "titleAnalyzer"))
 	@Field(name = "title_sort", analyze = Analyze.NO)
@@ -57,13 +52,13 @@ public class Book {
 	public Book() {
 	}
 
-	public Book(Long id, String title, String author) {
-		this.id = id;
+	public Book(String title, String author) {
+		this.id = title;
 		this.title = title;
 		this.author = author;
 	}
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 

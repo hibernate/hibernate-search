@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.test.engine;
 
+import static org.hibernate.search.annotations.FieldCacheType.CLASS;
+import static org.hibernate.search.annotations.FieldCacheType.ID;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
@@ -26,19 +24,14 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Store;
 
-import static org.hibernate.search.annotations.FieldCacheType.CLASS;
-import static org.hibernate.search.annotations.FieldCacheType.ID;
-
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  * @author Gustavo Fernandes
  */
-@Entity
 @Indexed(index = "numeric_field_test")
 @CacheFromIndex({ CLASS, ID })
-public class Location {
+class Location {
 
-	@Id
 	@DocumentId
 	@Field(name = "overriddenFieldName")
 	@NumericField(forField = "overriddenFieldName")
@@ -75,7 +68,6 @@ public class Location {
 	@Field
 	private String description;
 
-	@OneToMany(mappedBy = "location", cascade = { CascadeType.ALL })
 	@IndexedEmbedded
 	private final Collection<PinPoint> pinPoints = new ArrayList<PinPoint>();
 

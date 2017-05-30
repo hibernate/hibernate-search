@@ -6,11 +6,7 @@
  */
 package org.hibernate.search.test.query.dsl.embedded;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -18,18 +14,15 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 /**
  * @author neek
  */
-@Entity
 @Indexed
-public class ContainerEntity {
+class ContainerEntity {
 
-	@Id
-	@GeneratedValue
+	@DocumentId
 	private Long id;
 
 	@Field
 	private String parentStringValue;
 
-	@Embedded
 	@IndexedEmbedded(depth = 1, prefix = "emb.")
 	private EmbeddedEntity embeddedEntity;
 

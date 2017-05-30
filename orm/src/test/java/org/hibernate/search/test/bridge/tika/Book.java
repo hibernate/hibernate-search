@@ -11,14 +11,7 @@ import java.sql.Blob;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Basic;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -27,9 +20,8 @@ import org.hibernate.search.annotations.TikaBridge;
 /**
  * @author Hardy Ferentschik
  */
-@Entity
 @Indexed
-public class Book {
+class Book {
 
 	private Integer id;
 	private Blob contentAsBlob;
@@ -38,10 +30,8 @@ public class Book {
 
 	private Set<String> contentAsListOfString;
 
-	public Book() {
-	}
-
-	public Book(String... contents) {
+	public Book(int id, String... contents) {
+		this( id );
 		Set<String> temp = new HashSet<>();
 		for ( String string : contents ) {
 			temp.add( string );
@@ -49,20 +39,26 @@ public class Book {
 		this.contentAsListOfString = temp;
 	}
 
-	public Book(Blob content) {
+	public Book(int id, Blob content) {
+		this( id );
 		this.contentAsBlob = content;
 	}
 
-	public Book(byte[] content) {
+	public Book(int id, byte[] content) {
+		this( id );
 		this.contentAsBytes = content;
 	}
 
-	public Book(URI content) {
+	public Book(int id, URI content) {
+		this( id );
 		this.contentAsURI = content;
 	}
 
-	@Id
-	@GeneratedValue
+	public Book(int id) {
+		this.id = id;
+	}
+
+	@DocumentId
 	public Integer getId() {
 		return id;
 	}
@@ -71,8 +67,6 @@ public class Book {
 		this.id = id;
 	}
 
-	@Lob
-	@Basic(fetch = FetchType.LAZY)
 	@Field(indexNullAs = "<NULL>")
 	@TikaBridge
 	public Blob getContentAsBlob() {
@@ -83,8 +77,6 @@ public class Book {
 		this.contentAsBlob = contentAsBlob;
 	}
 
-	@Lob
-	@Basic(fetch = FetchType.LAZY)
 	@Field(indexNullAs = "<NULL>")
 	@TikaBridge
 	public byte[] getContentAsBytes() {
@@ -95,7 +87,6 @@ public class Book {
 		this.contentAsBytes = contentAsBytes;
 	}
 
-	@Basic(fetch = FetchType.LAZY)
 	@Field(indexNullAs = "<NULL>")
 	@TikaBridge
 	public URI getContentAsURI() {
@@ -109,7 +100,6 @@ public class Book {
 	@IndexedEmbedded
 	@Field
 	@TikaBridge
-	@ElementCollection
 	public Set<String> getContentAsListOfString() {
 		return contentAsListOfString;
 	}

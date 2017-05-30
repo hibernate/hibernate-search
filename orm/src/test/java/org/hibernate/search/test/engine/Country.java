@@ -9,13 +9,10 @@ package org.hibernate.search.test.engine;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Store;
 
-import javax.persistence.Embeddable;
-
 /**
  * author: Gustavo Fernandes
  */
-@Embeddable
-public class Country {
+class Country {
 
 	@Field( store = Store.YES )
 	private double idh;

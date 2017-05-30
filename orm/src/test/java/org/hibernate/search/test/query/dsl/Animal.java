@@ -6,26 +6,20 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 
 /**
  * @author Gunnar Morling
  */
-@Entity
-public class Animal {
+class Animal {
 
-	@Id
+	@DocumentId
 	Integer id;
 
 	@Field(analyze = Analyze.NO)
 	private String name;
-
-	public Animal() {
-	}
 
 	public Animal(int id, String name) {
 		this.id = id;

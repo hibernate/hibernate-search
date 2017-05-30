@@ -6,262 +6,180 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import static org.fest.assertions.Assertions.assertThat;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.query.dsl.DSLTest.MappingFactory;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Guillaume Smet
  */
-public class SimpleQueryStringDSLTest extends SearchTestBase {
-	private FullTextSession fullTextSession;
+public class SimpleQueryStringDSLTest {
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class, CoffeeBrand.class, Book.class )
+			.withProperty( Environment.MODEL_MAPPING, MappingFactory.class.getName() );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
-		super.setUp();
-		Session session = openSession();
-		fullTextSession = Search.getFullTextSession( session );
 		indexTestData();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@SuppressWarnings({ "unchecked" })
 	public void testSimpleQueryString() {
-		Transaction transaction = fullTextSession.beginTransaction();
+		QueryBuilder qb = getCoffeeQueryBuilder();
 
-		try {
-			QueryBuilder qb = getCoffeeQueryBuilder();
+		Query query = qb.simpleQueryString()
+				.onFields( "name", "summary", "description" )
+				.withAndAsDefaultOperator()
+				.matching( "balanced arabica" )
+				.createQuery();
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.matchesExactlyIds( "Dulsão do Brasil", "Kazaar", "Livanto" );
 
-			Query query = qb.simpleQueryString()
-					.onFields( "name", "summary", "description" )
-					.withAndAsDefaultOperator()
-					.matching( "balanced arabica" )
-					.createQuery();
-			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
-			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
-			List<Coffee> results = fullTextQuery.getResultList();
+		query = qb.simpleQueryString()
+				.onFields( "name", "summary", "description" )
+				.withAndAsDefaultOperator()
+				.matching( "-balanced arabica" )
+				.createQuery();
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.matchesExactlyIds( "Bukeela ka Ethiopia", "Linizio Lungo", "Volluto" );
 
-			compareCoffeeResultsAndExpected( Arrays.asList( "Dulsão do Brasil", "Kazaar", "Livanto" ), results );
+		query = qb.simpleQueryString()
+				.onFields( "name", "summary", "description" )
+				.withAndAsDefaultOperator()
+				.matching( "powerful \"fruity note\"" )
+				.createQuery();
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.matchesExactlyIds( "Ristretto" );
 
-			query = qb.simpleQueryString()
-					.onFields( "name", "summary", "description" )
-					.withAndAsDefaultOperator()
-					.matching( "-balanced arabica" )
-					.createQuery();
-			fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
-			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
-			results = fullTextQuery.getResultList();
-
-			compareCoffeeResultsAndExpected( Arrays.asList( "Bukeela ka Ethiopia", "Linizio Lungo", "Volluto" ), results );
-
-			query = qb.simpleQueryString()
-					.onFields( "name", "summary", "description" )
-					.withAndAsDefaultOperator()
-					.matching( "powerful \"fruity note\"" )
-					.createQuery();
-			fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
-			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
-			results = fullTextQuery.getResultList();
-
-			compareCoffeeResultsAndExpected( Arrays.asList( "Ristretto" ), results );
-
-			query = qb.simpleQueryString()
-					.onFields( "name", "summary", "description" )
-					.matching( "sweet robust" )
-					.createQuery();
-			fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
-			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
-			results = fullTextQuery.getResultList();
-
-			compareCoffeeResultsAndExpected( Arrays.asList( "Caramelito", "Dulsão do Brasil", "Roma", "Volluto" ), results );
-		}
-		finally {
-			transaction.commit();
-		}
+		query = qb.simpleQueryString()
+				.onFields( "name", "summary", "description" )
+				.matching( "sweet robust" )
+				.createQuery();
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.matchesExactlyIds( "Caramelito", "Dulsão do Brasil", "Roma", "Volluto" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@SuppressWarnings({ "unchecked" })
 	public void testBoost() {
-		Transaction transaction = fullTextSession.beginTransaction();
+		QueryBuilder qb = getCoffeeQueryBuilder();
 
-		try {
-			QueryBuilder qb = getCoffeeQueryBuilder();
+		Query query = qb.simpleQueryString()
+			.onFields( "name", "summary" ).boostedTo( 5f )
+			.andField( "description" )
+			.withAndAsDefaultOperator()
+			.matching( "fruity arabicas south american" )
+			.createQuery();
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( SortField.FIELD_SCORE ) )
+				.matchesExactlyIds( "Decaffeinato", "Ristretto" );
 
-			Query query = qb.simpleQueryString()
-				.onFields( "name", "summary" ).boostedTo( 5f )
-				.andField( "description" )
+		query = qb.simpleQueryString()
+				.onFields( "name", "summary" )
+				.andField( "description" ).boostedTo( 10f )
 				.withAndAsDefaultOperator()
 				.matching( "fruity arabicas south american" )
 				.createQuery();
-
-			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
-			fullTextQuery.setSort( new Sort( SortField.FIELD_SCORE ) );
-			List<Coffee> results = fullTextQuery.getResultList();
-
-			compareCoffeeResultsAndExpected( Arrays.asList( "Decaffeinato", "Ristretto" ), results );
-
-			query = qb.simpleQueryString()
-					.onFields( "name", "summary" )
-					.andField( "description" ).boostedTo( 10f )
-					.withAndAsDefaultOperator()
-					.matching( "fruity arabicas south american" )
-					.createQuery();
-			fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
-			fullTextQuery.setSort( new Sort( SortField.FIELD_SCORE ) );
-			results = fullTextQuery.getResultList();
-
-			compareCoffeeResultsAndExpected( Arrays.asList( "Ristretto", "Decaffeinato" ), results );
-		}
-		finally {
-			transaction.commit();
-		}
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( SortField.FIELD_SCORE ) )
+				.matchesExactlyIds( "Ristretto", "Decaffeinato" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@SuppressWarnings({ "unchecked" })
 	public void testFuzzy() {
-		Transaction transaction = fullTextSession.beginTransaction();
+		QueryBuilder qb = getCoffeeQueryBuilder();
 
-		try {
-			QueryBuilder qb = getCoffeeQueryBuilder();
+		Query query = qb.simpleQueryString()
+			.onFields( "name", "summary", "description" )
+			.withAndAsDefaultOperator()
+			.matching( "fruity arabica~2" )
+			.createQuery();
 
-			Query query = qb.simpleQueryString()
-				.onFields( "name", "summary", "description" )
+		helper.assertThat( query ).from( Coffee.class )
+				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.matchesExactlyIds( "Decaffeinato", "Ristretto", "Rosabaya de Colombia", "Volluto" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2678")
+	public void testAnalyzer() {
+		QueryBuilder qb = getBookQueryBuilder();
+
+		Query query = qb.simpleQueryString()
+				.onFields( "title", "author" )
 				.withAndAsDefaultOperator()
-				.matching( "fruity arabica~2" )
+				.matching( "Molière" )
 				.createQuery();
 
-			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Coffee.class );
-			fullTextQuery.setSort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) );
-			List<Coffee> results = fullTextQuery.getResultList();
+		helper.assertThat( query ).from( Book.class )
+				.sort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) )
+				.matchesExactlyIds( "Le Grand Molière illustré", "Tartuffe" );
 
-			compareCoffeeResultsAndExpected( Arrays.asList( "Decaffeinato", "Ristretto", "Rosabaya de Colombia", "Volluto" ), results );
-		}
-		finally {
-			transaction.commit();
-		}
-	}
+		query = qb.simpleQueryString()
+				.onFields( "title", "author" )
+				.withAndAsDefaultOperator()
+				.matching( "deplacait" )
+				.createQuery();
 
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@SuppressWarnings({ "unchecked" })
-	public void testAnalyzer() {
-		Transaction transaction = fullTextSession.beginTransaction();
+		helper.assertThat( query ).from( Book.class )
+				.sort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) )
+				.matchesExactlyIds( "Le chat qui déplaçait des montagnes" );
 
-		try {
-			QueryBuilder qb = getBookQueryBuilder();
+		qb = sfHolder.getSearchFactory()
+				.buildQueryBuilder()
+				.forEntity( Book.class )
+				.overridesForField( "author", "titleAnalyzer" )
+				.get();
+		query = qb.simpleQueryString()
+				.onFields( "title", "author" )
+				.withAndAsDefaultOperator()
+				.matching( "Molière" )
+				.createQuery();
 
-			Query query = qb.simpleQueryString()
-					.onFields( "title", "author" )
-					.withAndAsDefaultOperator()
-					.matching( "Molière" )
-					.createQuery();
-
-			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
-			fullTextQuery.setSort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
-			List<Book> results = fullTextQuery.getResultList();
-
-			compareBookResultsAndExpected( Arrays.asList( "Le Grand Molière illustré", "Tartuffe" ), results );
-
-			query = qb.simpleQueryString()
-					.onFields( "title", "author" )
-					.withAndAsDefaultOperator()
-					.matching( "deplacait" )
-					.createQuery();
-
-			fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
-			fullTextQuery.setSort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
-			results = fullTextQuery.getResultList();
-
-			compareBookResultsAndExpected( Arrays.asList( "Le chat qui déplaçait des montagnes" ), results );
-
-			qb = fullTextSession.getSearchFactory()
-					.buildQueryBuilder()
-					.forEntity( Book.class )
-					.overridesForField( "author", "titleAnalyzer" )
-					.get();
-			query = qb.simpleQueryString()
-					.onFields( "title", "author" )
-					.withAndAsDefaultOperator()
-					.matching( "Molière" )
-					.createQuery();
-
-			fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
-			fullTextQuery.setSort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
-			results = fullTextQuery.getResultList();
-
-			compareBookResultsAndExpected( Arrays.asList( "Dom Garcie de Navarre", "Le Grand Molière illustré" ), results );
-		}
-		finally {
-			transaction.commit();
-		}
-	}
-
-	private void compareCoffeeResultsAndExpected(List<String> expected, List<Coffee> results) {
-		assertThat( results ).onProperty( "name" ).isEqualTo( expected );
-	}
-
-	private void compareBookResultsAndExpected(List<String> expected, List<Book> results) {
-		assertThat( results ).onProperty( "title" ).isEqualTo( expected );
-	}
-
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] {
-				Coffee.class,
-				CoffeeBrand.class,
-				Book.class
-		};
+		helper.assertThat( query ).from( Book.class )
+				.sort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) )
+				.matchesExactlyIds( "Dom Garcie de Navarre", "Le Grand Molière illustré" );
 	}
 
 	private QueryBuilder getCoffeeQueryBuilder() {
-		return fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Coffee.class )
-				.get();
+		return helper.queryBuilder( Coffee.class );
 	}
 
 	private QueryBuilder getBookQueryBuilder() {
-		return fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Book.class )
-				.get();
+		return helper.queryBuilder( Book.class );
 	}
 
 	private void indexTestData() {
-		Transaction tx = fullTextSession.beginTransaction();
-
 		CoffeeBrand brandPony = new CoffeeBrand();
+		brandPony.setId( 0 );
 		brandPony.setName( "My little pony" );
 		brandPony.setDescription( "Sells goods for horseback riding and good coffee blends" );
-		fullTextSession.persist( brandPony );
+
 		CoffeeBrand brandMonkey = new CoffeeBrand();
+		brandMonkey.setId( 1 );
 		brandMonkey.setName( "Monkey Monkey Do" );
 		brandPony.setDescription(
 				"Offers mover services via monkeys instead of trucks for difficult terrains. Coffees from this brand make monkeys work much faster."
 		);
-		fullTextSession.persist( brandMonkey );
+
 		createCoffee(
 				"Kazaar",
 				"EXCEPTIONALLY INTENSE AND SYRUPY",
@@ -417,23 +335,23 @@ public class SimpleQueryStringDSLTest extends SearchTestBase {
 				brandMonkey
 		);
 
-		fullTextSession.persist( new Book( 1L, "Le chat qui regardait les étoiles", "Lilian Jackson Braun" ) );
-		fullTextSession.persist( new Book( 2L, "Le chat qui déplaçait des montagnes", "Lilian Jackson Braun" ) );
-		fullTextSession.persist( new Book( 3L, "Le Grand Molière illustré", "Caroline Guillot" ) );
-		fullTextSession.persist( new Book( 4L, "Tartuffe", "Molière" ) );
-		fullTextSession.persist( new Book( 5L, "Dom Garcie de Navarre", "moliere" ) ); // Molière all lowercase and without an accent
-
-		tx.commit();
-		fullTextSession.clear();
+		helper.add(
+				new Book( "Le chat qui regardait les étoiles", "Lilian Jackson Braun" ),
+				new Book( "Le chat qui déplaçait des montagnes", "Lilian Jackson Braun" ) ,
+				new Book( "Le Grand Molière illustré", "Caroline Guillot" ),
+				new Book( "Tartuffe", "Molière" ),
+				new Book( "Dom Garcie de Navarre", "moliere" ) // Molière all lowercase and without an accent
+		);
 	}
 
 	private void createCoffee(String title, String summary, String description, int intensity, CoffeeBrand brand) {
 		Coffee coffee = new Coffee();
+		coffee.setId( title );
 		coffee.setName( title );
 		coffee.setSummary( summary );
 		coffee.setDescription( description );
 		coffee.setIntensity( intensity );
 		coffee.setBrand( brand );
-		fullTextSession.persist( coffee );
+		helper.add( coffee );
 	}
 }

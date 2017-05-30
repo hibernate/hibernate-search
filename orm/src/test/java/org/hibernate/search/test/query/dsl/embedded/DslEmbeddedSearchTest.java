@@ -7,34 +7,24 @@
 package org.hibernate.search.test.query.dsl.embedded;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.lucene.search.Query;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.junit.After;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.testsupport.junit.SearchITHelper.AssertBuildingHSQueryContext;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Davide D'Alto
  */
-public class DslEmbeddedSearchTest extends SearchTestBase {
-
-	private Session s = null;
+public class DslEmbeddedSearchTest {
 
 	private static Calendar initCalendar(int year, int month, int day) {
 		Calendar instance = createCalendar();
@@ -47,24 +37,24 @@ public class DslEmbeddedSearchTest extends SearchTestBase {
 		return Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ITALY );
 	}
 
-	@Override
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( ContainerEntity.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
+
 	@Before
 	public void setUp() throws Exception {
-		super.setUp();
-
 		EmbeddedEntity ee = new EmbeddedEntity();
 		ee.setEmbeddedField( "embedded" );
 		ee.setNumber( 7 );
 		ee.setDate( initCalendar( 2007, Calendar.JANUARY, 14 ).getTime() );
 
 		ContainerEntity pe = new ContainerEntity();
+		pe.setId( 1L );
 		pe.setEmbeddedEntity( ee );
 		pe.setParentStringValue( "theparentvalue" );
 
-		s = openSession();
-		s.getTransaction().begin();
-		s.persist( pe );
-		s.getTransaction().commit();
+		helper.add( pe );
 
 		EmbeddedEntity ee2 = new EmbeddedEntity();
 		ee2.setEmbeddedField( "otherembedded" );
@@ -72,85 +62,41 @@ public class DslEmbeddedSearchTest extends SearchTestBase {
 		ee2.setDate( initCalendar( 2007, Calendar.JANUARY, 12 ).getTime() );
 
 		ContainerEntity pe2 = new ContainerEntity();
+		pe2.setId( 2L );
 		pe2.setEmbeddedEntity( ee2 );
 		pe2.setParentStringValue( "theotherparentvalue" );
 
-		s.getTransaction().begin();
-		s.persist( pe2 );
-		s.getTransaction().commit();
-	}
-
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		if ( s != null ) {
-			s.clear();
-			deleteAll( s, ContainerEntity.class );
-			s.close();
-		}
-		super.tearDown();
+		helper.add( pe2 );
 	}
 
 	@Test
 	public void testSearchString() throws Exception {
-		FullTextSession fullTextSession = Search.getFullTextSession( s );
-		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder()
-				.forEntity( ContainerEntity.class ).get();
+		QueryBuilder qb = helper.queryBuilder( ContainerEntity.class );
 		Query q = qb.keyword().onField( "emb.embeddedField" ).matching( "embedded" ).createQuery();
-		List<ContainerEntity> results = execute( fullTextSession, q );
 
-		assertEquals( "DSL didn't find the embedded string field", 1, results.size() );
-		assertEquals( "embedded", results.get( 0 ).getEmbeddedEntity().getEmbeddedField() );
-
+		assertQuery( q ).matchesExactlyIds( 1L );
 	}
 
 	@Test
 	public void testSearchNumberWithFieldBridge() throws Exception {
-		FullTextSession fullTextSession = Search.getFullTextSession( s );
-		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder()
-				.forEntity( ContainerEntity.class ).get();
+		QueryBuilder qb = helper.queryBuilder( ContainerEntity.class );
 		Query q = qb.keyword().onField( "emb.num" ).matching( 7 ).createQuery();
-		List<ContainerEntity> results = execute( fullTextSession, q );
 
-		assertEquals( "DSL didn't find the embedded numeric field", 1, results.size() );
-		assertEquals( Integer.valueOf( 7 ), results.get( 0 ).getEmbeddedEntity().getNumber() );
+		assertQuery( q ).matchesExactlyIds( 1L );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2070")
 	public void testSearchDateWithoutFieldBridge() throws Exception {
-		FullTextSession fullTextSession = Search.getFullTextSession( s );
-		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder()
-				.forEntity( ContainerEntity.class ).get();
+		QueryBuilder qb = helper.queryBuilder( ContainerEntity.class );
 		Query q = qb.range().onField( "emb.date" )
 				.above( initCalendar( 2007, Calendar.JANUARY, 14 ).getTime() )
 				.createQuery();
-		List<ContainerEntity> results = execute( fullTextSession, q );
 
-		assertEquals( "DSL didn't find the embedded date field.", 1, results.size() );
-		assertEquals( initCalendar( 2007, Calendar.JANUARY, 14 ).getTime(), results.get( 0 ).getEmbeddedEntity().getDate() );
+		assertQuery( q ).matchesExactlyIds( 1L );
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<ContainerEntity> execute(FullTextSession fullTextSession, Query q) {
-		FullTextQuery combinedQuery = fullTextSession.createFullTextQuery( q, ContainerEntity.class );
-
-		return combinedQuery.list();
-	}
-
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] { ContainerEntity.class };
-	}
-
-	private void deleteAll(Session s, Class<?>... classes) {
-		Transaction tx = s.beginTransaction();
-		for ( Class<?> each : classes ) {
-			List<?> list = s.createCriteria( each ).list();
-			for ( Object object : list ) {
-				s.delete( object );
-			}
-		}
-		tx.commit();
+	private AssertBuildingHSQueryContext assertQuery(Query q) {
+		return helper.assertThat( q ).from( ContainerEntity.class );
 	}
 }

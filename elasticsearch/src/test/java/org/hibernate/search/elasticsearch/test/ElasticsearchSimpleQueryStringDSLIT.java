@@ -15,11 +15,6 @@ import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -32,72 +27,57 @@ import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Guillaume Smet
  */
-public class ElasticsearchSimpleQueryStringDSLIT extends SearchTestBase {
+public class ElasticsearchSimpleQueryStringDSLIT {
 
-	private FullTextSession fullTextSession;
+	@Rule
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class );
+
+	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
-		super.setUp();
-		Session session = openSession();
-		fullTextSession = Search.getFullTextSession( session );
 		indexTestData();
 	}
 
 	@Test(expected = SearchException.class)
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	public void testOverridingSeveralAnalyzers() {
-		Transaction transaction = fullTextSession.beginTransaction();
+		QueryBuilder qb = sfHolder.getSearchFactory()
+				.buildQueryBuilder()
+				.forEntity( Book.class )
+				.overridesForField( "author", "titleAnalyzer" )
+				.overridesForField( "title", "authorAnalyzer" )
+				.get();
+		Query query = qb.simpleQueryString()
+				.onFields( "title", "author" )
+				.withAndAsDefaultOperator()
+				.matching( "Molière" )
+				.createQuery();
 
-		try {
-			QueryBuilder qb = fullTextSession.getSearchFactory()
-					.buildQueryBuilder()
-					.forEntity( Book.class )
-					.overridesForField( "author", "titleAnalyzer" )
-					.overridesForField( "title", "authorAnalyzer" )
-					.get();
-			Query query = qb.simpleQueryString()
-					.onFields( "title", "author" )
-					.withAndAsDefaultOperator()
-					.matching( "Molière" )
-					.createQuery();
-
-			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Book.class );
-			fullTextQuery.setSort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
-			fullTextQuery.getResultList();
-		}
-		finally {
-			transaction.commit();
-		}
-	}
-
-	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] {
-				Book.class
-		};
+		HSQuery hsQuery = sfHolder.getSearchFactory().createHSQuery( query, Book.class );
+		hsQuery.sort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) );
+		hsQuery.queryEntityInfos();
 	}
 
 	private void indexTestData() {
-		Transaction tx = fullTextSession.beginTransaction();
-
-		fullTextSession.persist( new Book( 1L, "Le chat qui regardait les étoiles", "Lilian Jackson Braun" ) );
-		fullTextSession.persist( new Book( 2L, "Le chat qui déplaçait des montagnes", "Lilian Jackson Braun" ) );
-		fullTextSession.persist( new Book( 3L, "Le Grand Molière illustré", "Caroline Guillot" ) );
-		fullTextSession.persist( new Book( 4L, "Tartuffe", "Molière" ) );
-		fullTextSession.persist( new Book( 5L, "Dom Garcie de Navarre", "moliere" ) ); // Molière all lowercase and without an accent
-
-		tx.commit();
-		fullTextSession.clear();
+		helper.add(
+				new Book( 1L, "Le chat qui regardait les étoiles", "Lilian Jackson Braun" ),
+				new Book( 2L, "Le chat qui déplaçait des montagnes", "Lilian Jackson Braun" ),
+				new Book( 3L, "Le Grand Molière illustré", "Caroline Guillot" ),
+				new Book( 4L, "Tartuffe", "Molière" ),
+				new Book( 5L, "Dom Garcie de Navarre", "moliere" ) // Molière all lowercase and without an accent
+		);
 	}
 
 	@Indexed
@@ -114,8 +94,7 @@ public class ElasticsearchSimpleQueryStringDSLIT extends SearchTestBase {
 					tokenizer = @TokenizerDef(factory = WhitespaceTokenizerFactory.class)
 			)
 	})
-	public class Book {
-
+	private static class Book {
 		@DocumentId
 		@Id
 		Long id;
@@ -128,25 +107,10 @@ public class ElasticsearchSimpleQueryStringDSLIT extends SearchTestBase {
 		@Field(analyzer = @Analyzer(definition = "authorAnalyzer"))
 		private String author;
 
-		public Book() {
-		}
-
 		public Book(Long id, String title, String author) {
 			this.id = id;
 			this.title = title;
 			this.author = author;
-		}
-
-		public Long getId() {
-			return id;
-		}
-
-		public String getTitle() {
-			return title;
-		}
-
-		public String getAuthor() {
-			return author;
 		}
 	}
 }

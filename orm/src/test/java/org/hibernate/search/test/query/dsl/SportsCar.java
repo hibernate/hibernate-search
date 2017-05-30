@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import javax.persistence.Entity;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -15,15 +13,11 @@ import org.hibernate.search.annotations.Indexed;
 /**
  * @author Gunnar Morling
  */
-@Entity
 @Indexed
-public class SportsCar extends Car {
+class SportsCar extends Car {
 
 	@Field(analyze = Analyze.NO)
 	private int enginePower;
-
-	public SportsCar() {
-	}
 
 	public SportsCar(Integer id, String name, int enginePower) {
 		super( id, name );

@@ -8,17 +8,13 @@ package org.hibernate.search.test.query.dsl.embedded;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
-@Embeddable
-public class EmbeddedEntity {
+class EmbeddedEntity {
 
 	@Field
 	private String embeddedField;
@@ -29,11 +25,9 @@ public class EmbeddedEntity {
 		params = { @Parameter(name = "padding", value = "4") }
 	)
 
-	@Column(name = "num")
 	private Integer number;
 
 	@Field(name = "date", analyze = Analyze.NO)
-	@Column(name = "date")
 	private Date date;
 
 	public String getEmbeddedField() {
