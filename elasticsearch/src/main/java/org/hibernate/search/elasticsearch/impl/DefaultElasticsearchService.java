@@ -17,6 +17,7 @@ import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.processor.impl.ElasticsearchWorkProcessor;
+import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
 import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaCreator;
 import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaDropper;
 import org.hibernate.search.elasticsearch.schema.impl.DefaultElasticsearchSchemaMigrator;
@@ -52,8 +53,6 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 
 	private static final String QUERY_PROPERTIES_PREFIX = "hibernate.search.";
 
-	private ElasticsearchQueryOptions queryOptions;
-
 	private ElasticsearchClient client;
 
 	private GsonProvider gsonProvider;
@@ -73,6 +72,10 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	private ElasticsearchSchemaTranslator schemaTranslator;
 
 	private MissingValueStrategy missingValueStrategy;
+
+	private ElasticsearchQueryFactory queryFactory;
+
+	private ElasticsearchQueryOptions queryOptions;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
@@ -108,6 +111,8 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 			this.schemaMigrator = new DefaultElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
 
 			this.missingValueStrategy = dialect.createMissingValueStrategy();
+
+			this.queryFactory = dialect.createQueryFactory();
 		}
 	}
 
@@ -170,6 +175,11 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 	@Override
 	public MissingValueStrategy getMissingValueStrategy() {
 		return missingValueStrategy;
+	}
+
+	@Override
+	public ElasticsearchQueryFactory getQueryFactory() {
+		return queryFactory;
 	}
 
 	@Override

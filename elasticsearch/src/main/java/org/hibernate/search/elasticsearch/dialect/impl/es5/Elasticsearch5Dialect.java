@@ -10,6 +10,8 @@ import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.nulls.impl.Elasticsearch5MissingValueStrategy;
+import org.hibernate.search.elasticsearch.query.impl.Elasticsearch5QueryFactory;
+import org.hibernate.search.elasticsearch.query.impl.ElasticsearchQueryFactory;
 import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch5SchemaTranslator;
 import org.hibernate.search.elasticsearch.schema.impl.Elasticsearch5SchemaValidator;
 import org.hibernate.search.elasticsearch.schema.impl.ElasticsearchSchemaAccessor;
@@ -60,6 +62,11 @@ public class Elasticsearch5Dialect implements ElasticsearchDialect {
 	@Override
 	public MissingValueStrategy createMissingValueStrategy() {
 		return Elasticsearch5MissingValueStrategy.INSTANCE;
+	}
+
+	@Override
+	public ElasticsearchQueryFactory createQueryFactory() {
+		return new Elasticsearch5QueryFactory();
 	}
 
 }
