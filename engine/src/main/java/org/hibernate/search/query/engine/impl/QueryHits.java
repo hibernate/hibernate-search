@@ -51,7 +51,6 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
-import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
@@ -91,14 +90,11 @@ public class QueryHits {
 	private Coordinates spatialSearchCenter = null;
 	private String spatialFieldName = null;
 
-	private final TimeoutExceptionFactory timeoutExceptionFactory;
-
 	public QueryHits(LazyQueryState searcher,
 			QueryFilters filters,
 			Sort sort,
 			TimeoutManagerImpl timeoutManager,
 			Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata,
-			TimeoutExceptionFactory timeoutExceptionFactory,
 			Coordinates spatialSearchCenter,
 			String spatialFieldName)
 			throws IOException {
@@ -109,7 +105,6 @@ public class QueryHits {
 				DEFAULT_TOP_DOC_RETRIEVAL_SIZE,
 				timeoutManager,
 				facetingRequestsAndMetadata,
-				timeoutExceptionFactory,
 				spatialSearchCenter,
 				spatialFieldName
 		);
@@ -121,7 +116,6 @@ public class QueryHits {
 			Integer n,
 			TimeoutManagerImpl timeoutManager,
 			Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata,
-			TimeoutExceptionFactory timeoutExceptionFactory,
 			Coordinates spatialSearchCenter,
 			String spatialFieldName)
 			throws IOException {
@@ -130,7 +124,6 @@ public class QueryHits {
 		this.filters = filters;
 		this.sort = sort;
 		this.facetingRequestsAndMetadata = facetingRequestsAndMetadata;
-		this.timeoutExceptionFactory = timeoutExceptionFactory;
 		this.spatialSearchCenter = spatialSearchCenter;
 		this.spatialFieldName = spatialFieldName;
 		updateTopDocs( n );
@@ -161,13 +154,6 @@ public class QueryHits {
 		// TODO - Is there a better way to get more TopDocs? Get more or less?
 		if ( index >= topDocs.scoreDocs.length ) {
 			updateTopDocs( 2 * index );
-		}
-		//if the refresh timed out, raise an exception
-		if ( timeoutManager.isTimedOut() && index >= topDocs.scoreDocs.length ) {
-			throw timeoutExceptionFactory.createTimeoutException(
-					"Timeout period exceeded. Cannot load document: " + index,
-					searcher.describeQuery()
-			);
 		}
 		return topDocs.scoreDocs[index];
 	}

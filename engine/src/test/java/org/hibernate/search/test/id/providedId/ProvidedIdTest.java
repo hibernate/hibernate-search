@@ -108,7 +108,6 @@ public class ProvidedIdTest {
 				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, extendedIntegrator.getTimingSource() ),
 				null,
 				null,
-				null,
 				null
 		);
 		Set<String> identifiers = new HashSet<String>();

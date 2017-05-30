@@ -147,7 +147,8 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			DocumentExtractor extractor = buildDocumentExtractor( searcher, queryHits, first, max );
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
-				if ( index % 10 == 0 ) {
+				//Check for timeout each 16 elements:
+				if ( (index & 0x000F) == 0 ) {
 					getTimeoutManager().isTimedOut();
 				}
 			}
@@ -324,7 +325,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					sort,
 					getTimeoutManager(),
 					facetingRequestsAndMetadata,
-					this.timeoutExceptionFactory,
 					spatialSearchCenter,
 					spatialFieldName
 			);
@@ -337,7 +337,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					0,
 					getTimeoutManager(),
 					null,
-					this.timeoutExceptionFactory,
 					spatialSearchCenter,
 					spatialFieldName
 			);
@@ -350,7 +349,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					n,
 					getTimeoutManager(),
 					facetingRequestsAndMetadata,
-					this.timeoutExceptionFactory,
 					spatialSearchCenter,
 					spatialFieldName
 			);
