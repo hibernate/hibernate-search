@@ -18,6 +18,11 @@
     <artifactId>hibernate-search-engine-performance</artifactId>
     <name>Hibernate Search Engine Performance Testing</name>
     <description>Performance testing for the Hibernate Search engine module</description>
+
+    <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
  
     <dependencies>
         <dependency>
