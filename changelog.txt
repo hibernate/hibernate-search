@@ -1,6 +1,28 @@
 Hibernate Search Changelog
 ==========================
 
+5.7.1.Final (31-05-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2691 Custom filter implementations must provide proper implementations of the #equals() and #hashCode() methods.
+    * HSEARCH-2690 FileHelper based index replication attempts to delete locked files on Windows
+    * HSEARCH-2664 Broken links in doc: delete-by-query plugin
+    * HSEARCH-2651 Calls to numericField in the programmatic API create duplicate fields
+    * HSEARCH-2631 Iterating on results of query on single class with criteria generates wrong statistics
+    * HSEARCH-2630 Queries on multiple classes returning a single result generates wrong statistics
+    * HSEARCH-2602 The documentation recommends using the deprecated byField(String, SortField.Type) method in the sort DSL
+    * HSEARCH-2477 Shard filtering doesn't work with Elasticsearch queries
+    * HSEARCH-1862 Allow configuration of facets via programmatic configuration API
+
+** Improvement
+    * HSEARCH-2715 Mention in the documentation *when* a full reindex may be necessary
+    * HSEARCH-2636 Be more resilient to the absence of id in the _source
+    * HSEARCH-2600 Update javadoc configuration
+
+** Task
+    * HSEARCH-2635 Some clarifications in the Elasticsearch related documentation
+
 5.7.0.Final (21-02-2017)
 -------------------------
 
