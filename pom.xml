@@ -814,7 +814,8 @@
                             <Implementation-URL>http://search.hibernate.org</Implementation-URL>
                         </manifestEntries>
                     </archive>
-                    <skipIfEmpty>true</skipIfEmpty>
+                    <!-- We need an empty JAR, otherwise the build will fail -->
+                    <skipIfEmpty>false</skipIfEmpty>
                 </configuration>
                 <executions>
                     <execution>
