@@ -1,6 +1,14 @@
 Hibernate Search Changelog
 ==========================
 
+5.5.7.Final (31-05-2017)
+-------------------------
+
+** Bug
+    * HSEARCH-2691 Custom filter implementations must provide proper implementations of the #equals() and #hashCode() methods.
+    * HSEARCH-2690 FileHelper based index replication attempts to delete locked files on Windows
+    * HSEARCH-2547 Nesting @IndexedEmbeddeds with "includePaths" results in invalid path restrictions
+
 5.5.6.Final (09-01-2017)
 -------------------------
 
