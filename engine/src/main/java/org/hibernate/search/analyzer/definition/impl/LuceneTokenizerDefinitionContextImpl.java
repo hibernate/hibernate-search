@@ -17,6 +17,10 @@ import org.hibernate.search.annotations.TokenizerDef;
  */
 public class LuceneTokenizerDefinitionContextImpl implements LuceneAnalysisDefinitionBuilder<TokenizerDef> {
 
+	private static final String PARAMS2 = "params";
+
+	private static final String FACTORY = "factory";
+
 	private Class<? extends TokenizerFactory> factoryClass;
 
 	private final ParametersBuilder params = new ParametersBuilder();
@@ -32,8 +36,8 @@ public class LuceneTokenizerDefinitionContextImpl implements LuceneAnalysisDefin
 	@Override
 	public TokenizerDef build() {
 		AnnotationDescriptor descriptor = new AnnotationDescriptor( TokenizerDef.class );
-		descriptor.setValue( "factory", factoryClass );
-		descriptor.setValue( "params", params.build() );
+		descriptor.setValue( FACTORY, factoryClass );
+		descriptor.setValue( PARAMS2, params.build() );
 		return AnnotationFactory.create( descriptor );
 	}
 
