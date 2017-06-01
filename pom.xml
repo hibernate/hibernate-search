@@ -1779,7 +1779,7 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <dependency>
                     <groupId>org.mariadb.jdbc</groupId>
                     <artifactId>mariadb-java-client</artifactId>
-                    <version>1.1.7</version>
+                    <version>1.5.9</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
