@@ -42,7 +42,7 @@ import org.junit.experimental.categories.Category;
  * @author Sanne Grinovero
  * @since 3.2
  */
-@Category(SkipOnElasticsearch.class) // This test is Lucene-specific. The equivalent for Elasticsearch is ElasticsearchExceptionHandlingIT
+@Category(SkipOnElasticsearch.class) // This test is Lucene-specific. The equivalent for Elasticsearch is ElasticsearchIndexWorkProcessorErrorHandlingTest
 public class LuceneErrorHandlingTest extends SearchTestBase {
 
 	static final AtomicInteger WORK_COUNTER = new AtomicInteger();
