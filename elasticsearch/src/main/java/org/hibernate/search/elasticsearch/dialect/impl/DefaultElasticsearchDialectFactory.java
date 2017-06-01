@@ -39,14 +39,18 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 			throw log.failedToDetectElasticsearchVersion( e );
 		}
 
-		if ( version.startsWith( "2." ) ) {
+		if ( version.startsWith( "0." ) || version.startsWith( "1." ) ) {
+			throw log.unsupportedElasticsearchVersion( version );
+		}
+		else if ( version.startsWith( "2." ) ) {
 			return new Elasticsearch2Dialect();
 		}
 		else if ( version.startsWith( "5." ) ) {
 			return new Elasticsearch5Dialect();
 		}
 		else {
-			throw log.unexpectedElasticsearchVersion( version );
+			log.unexpectedElasticsearchVersion( version );
+			return new Elasticsearch5Dialect();
 		}
 	}
 
