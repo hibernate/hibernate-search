@@ -438,9 +438,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	SearchException failedToDetectElasticsearchVersion(@Cause Exception e);
 
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 81,
-			value = "An unexpected Elasticsearch version runs on the Elasticsearch cluster: '%s'."
+			value = "An unsupported Elasticsearch version runs on the Elasticsearch cluster: '%s'."
 					+ " Please refer to the documentation to know which versions are supported." )
-	SearchException unexpectedElasticsearchVersion(String name);
+	SearchException unsupportedElasticsearchVersion(String name);
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 82,
@@ -456,4 +456,9 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			value = "The parameter '%2$s' must have value '%3$s' for the factory '%1$s' with Elasticsearch. Current value '%4$s' is invalid." )
 	SearchException invalidAnalysisFactoryParameter(@FormatWith(ClassFormatter.class) Class<?> factoryType, String parameter,
 			String expectedValue, String actualValue);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 85,
+			value = "Hibernate Search may not work correctly, because an unknown Elasticsearch version runs on the Elasticsearch cluster: '%s'." )
+	void unexpectedElasticsearchVersion(String name);
 }
