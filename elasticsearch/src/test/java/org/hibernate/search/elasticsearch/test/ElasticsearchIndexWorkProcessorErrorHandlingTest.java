@@ -39,6 +39,7 @@ import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,17 +72,18 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 
 		expect( buildContextMock.getErrorHandler() ).andReturn( errorHandlerMock );
 
-		expect( clientMock.execute( anyObject() ) ).andReturn( new ElasticsearchResponse( 200, "OK", new JsonObject() ) );
+		expect( clientMock.execute( anyObject() ) ).andReturn( new ElasticsearchResponse( 200, "OK", new JsonObject() ) )
+				.anyTimes();
 
 		expect( workFactoryMock.bulk( anyObject() ) ).andAnswer( () -> {
 			@SuppressWarnings("unchecked")
 			List<BulkableElasticsearchWork<?>> bulkableWorks =
 					(List<BulkableElasticsearchWork<?>>) EasyMock.getCurrentArguments()[0];
 			return new BulkWork.Builder( bulkableWorks );
-		} );
+		} ).anyTimes();
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		expect( gsonProviderMock.getGsonPrettyPrinting() ).andReturn( gson );
+		expect( gsonProviderMock.getGsonPrettyPrinting() ).andReturn( gson ).anyTimes();
 
 		replay( buildContextMock, clientMock, gsonProviderMock, workFactoryMock );
 
@@ -169,6 +171,113 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 		assertThat( errorContext.getOperationAtFault() ).isSameAs( luceneWork( 3 ) );
 		// work4 shouldn't be marked as failed: bulk execution doesn't stop after a failure
 		assertThat( errorContext.getFailingOperations() ).containsOnly( luceneWork( 3 ) );
+	}
+
+	@Test
+	public void asyncItem() throws Exception {
+		Capture<ErrorContext> capture = new Capture<>();
+
+		errorHandlerMock.handle( capture( capture ) );
+		expectLastCall().once();
+
+		ElasticsearchWork<?> work = work( 1 );
+		expect( work.execute( anyObject() ) ).andThrow( new SearchException() );
+
+		replay( errorHandlerMock, work );
+
+		processor.executeAsync( work );
+		processor.awaitAsyncProcessingCompletion();
+
+		verify( errorHandlerMock, work );
+
+		ErrorContext errorContext = capture.getValue();
+		assertThat( errorContext.getThrowable() ).isExactlyInstanceOf( SearchException.class );
+		assertThat( errorContext.getOperationAtFault() ).isSameAs( luceneWork( 1 ) );
+		assertThat( errorContext.getFailingOperations() ).containsOnly( luceneWork( 1 ) );
+	}
+
+	@Test
+	public void asyncList_single() throws Exception {
+		Capture<ErrorContext> capture = new Capture<>();
+
+		errorHandlerMock.handle( capture( capture ) );
+		expectLastCall().once();
+
+		ElasticsearchWork<?> work = work( 1 );
+		expect( work.execute( anyObject() ) ).andThrow( new SearchException() );
+
+		replay( errorHandlerMock, work );
+
+		processor.executeAsync( Arrays.asList( work ) );
+		processor.awaitAsyncProcessingCompletion();
+
+		verify( errorHandlerMock, work );
+
+		ErrorContext errorContext = capture.getValue();
+		assertThat( errorContext.getThrowable() ).isExactlyInstanceOf( SearchException.class );
+		assertThat( errorContext.getOperationAtFault() ).isSameAs( luceneWork( 1 ) );
+		assertThat( errorContext.getFailingOperations() ).containsOnly( luceneWork( 1 ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2652")
+	public void asyncList_multiple_noBulk() throws Exception {
+		Capture<ErrorContext> capture = new Capture<>();
+
+		errorHandlerMock.handle( capture( capture ) );
+		expectLastCall().once();
+
+		ElasticsearchWork<?> work1 = work( 1 );
+		ElasticsearchWork<?> work2 = work( 2 );
+		ElasticsearchWork<?> work3 = work( 3 );
+		ElasticsearchWork<?> work4 = work( 4 );
+		expect( work1.execute( anyObject() ) ).andReturn( null );
+		expect( work2.execute( anyObject() ) ).andThrow( new SearchException() );
+
+		replay( errorHandlerMock, work1, work2, work3, work4 );
+
+		processor.executeAsync( Arrays.asList( work1, work2, work3, work4 ) );
+		processor.awaitAsyncProcessingCompletion();
+
+		verify( errorHandlerMock, work1, work2, work3, work4 );
+
+		ErrorContext errorContext = capture.getValue();
+		assertThat( errorContext.getThrowable() ).isExactlyInstanceOf( SearchException.class );
+		assertThat( errorContext.getOperationAtFault() ).isSameAs( luceneWork( 2 ) );
+		assertThat( errorContext.getFailingOperations() )
+				.containsOnly( luceneWork( 2 ), luceneWork( 3 ), luceneWork( 4 ) );
+	}
+
+	@Test
+	public void asyncList_multiple_bulk() throws Exception {
+		Capture<ErrorContext> capture = new Capture<>();
+
+		errorHandlerMock.handle( capture( capture ) );
+		expectLastCall().once();
+
+		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
+		BulkableElasticsearchWork<?> work2 = bulkableWork( 2 );
+		BulkableElasticsearchWork<?> work3 = bulkableWork( 3 );
+		BulkableElasticsearchWork<?> work4 = bulkableWork( 4 );
+		ElasticsearchWork<?> work5 = work( 5 );
+		expect( work1.handleBulkResult( anyObject(), anyObject() ) ).andReturn( true );
+		expect( work2.handleBulkResult( anyObject(), anyObject() ) ).andReturn( true );
+		expect( work3.handleBulkResult( anyObject(), anyObject() ) ).andReturn( false );
+		expect( work4.handleBulkResult( anyObject(), anyObject() ) ).andReturn( true );
+
+		replay( errorHandlerMock, work1, work2, work3, work4, work5 );
+
+		processor.executeAsync( Arrays.asList( work1, work2, work3, work4, work5 ) );
+		processor.awaitAsyncProcessingCompletion();
+
+		verify( errorHandlerMock, work1, work2, work3, work4, work5 );
+
+		ErrorContext errorContext = capture.getValue();
+		assertThat( errorContext.getThrowable() ).isExactlyInstanceOf( BulkRequestFailedException.class );
+		assertThat( errorContext.getOperationAtFault() ).isSameAs( luceneWork( 3 ) );
+		assertThat( errorContext.getFailingOperations() )
+				// work4 shouldn't be marked as failed: bulk execution doesn't stop after a failure
+				.containsOnly( luceneWork( 3 ), luceneWork( 5 ) );
 	}
 
 	private ElasticsearchWork<?> work(int index) {
