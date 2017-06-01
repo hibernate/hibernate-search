@@ -6,21 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.util.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 
 import com.google.gson.Gson;
@@ -55,20 +48,6 @@ public class ElasticsearchClientUtils {
 		return new StringEntity( builder.toString(), JSON_CONTENT_TYPE );
 	}
 
-	public static JsonObject parseJsonResponse(GsonProvider gsonProvider, Response response) throws IOException {
-		HttpEntity entity = response.getEntity();
-		if ( entity == null ) {
-			return null;
-		}
-
-		Gson gson = gsonProvider.getGson();
-		Charset charset = getCharset( entity );
-		try ( InputStream inputStream = entity.getContent();
-				Reader reader = new InputStreamReader( inputStream, charset ) ) {
-			return gson.fromJson( reader, JsonObject.class );
-		}
-	}
-
 	public static String formatRequest(GsonProvider gsonProvider, ElasticsearchRequest request) {
 		StringBuilder sb = new StringBuilder();
 
@@ -97,19 +76,19 @@ public class ElasticsearchClientUtils {
 		return gson.toJson( body );
 	}
 
-	public static String formatResponse(GsonProvider gsonProvider, Response response, JsonObject parsedResponse) {
+	public static String formatResponse(GsonProvider gsonProvider, ElasticsearchResponse response) {
 		if ( response == null ) {
 			return null;
 		}
+		JsonObject body = response.getBody();
 		StringBuilder sb = new StringBuilder();
-		StatusLine statusLine = response.getStatusLine();
-		sb.append( "Status: " ).append( statusLine.getStatusCode() ).append( " " ).append( statusLine.getReasonPhrase() ).append( "\n" );
-		sb.append( "Error message: " ).append( propertyAsString( parsedResponse, "error" ) ).append( "\n" );
-		sb.append( "Cluster name: " ).append( propertyAsString( parsedResponse, "cluster_name" ) ).append( "\n" );
-		sb.append( "Cluster status: " ).append( propertyAsString( parsedResponse, "status" ) ).append( "\n" );
+		sb.append( "Status: " ).append( response.getStatusCode() ).append( " " ).append( response.getStatusMessage() ).append( "\n" );
+		sb.append( "Error message: " ).append( propertyAsString( body, "error" ) ).append( "\n" );
+		sb.append( "Cluster name: " ).append( propertyAsString( body, "cluster_name" ) ).append( "\n" );
+		sb.append( "Cluster status: " ).append( propertyAsString( body, "status" ) ).append( "\n" );
 		sb.append( "\n" );
 
-		JsonElement items = property( parsedResponse, "items" );
+		JsonElement items = property( body, "items" );
 		if ( items != null && items.isJsonArray() ) {
 			for ( JsonElement item : items.getAsJsonArray() ) {
 				for ( Map.Entry<String, JsonElement> entry : item.getAsJsonObject().entrySet() ) {
@@ -125,12 +104,6 @@ public class ElasticsearchClientUtils {
 		}
 
 		return sb.toString();
-	}
-
-	private static Charset getCharset(HttpEntity entity) {
-		ContentType contentType = ContentType.get( entity );
-		Charset charset = contentType.getCharset();
-		return charset != null ? charset : StandardCharsets.UTF_8;
 	}
 
 	private static JsonElement property(JsonObject parent, String name) {

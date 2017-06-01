@@ -10,8 +10,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -50,8 +50,9 @@ public class SearchWork extends SimpleElasticsearchWork<SearchResult> {
 	}
 
 	@Override
-	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
-		return new SearchResultImpl( parsedResponseBody );
+	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+		JsonObject body = response.getBody();
+		return new SearchResultImpl( body );
 	}
 
 	public static class Builder

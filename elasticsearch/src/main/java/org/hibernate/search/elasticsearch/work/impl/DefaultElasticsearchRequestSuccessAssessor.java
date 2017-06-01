@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -84,20 +84,20 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 	}
 
 	@Override
-	public void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, Response response,
-			JsonObject parsedResponseBody) throws SearchException {
-		if ( !isSuccess( response, parsedResponseBody ) ) {
+	public void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException {
+		JsonObject body = response.getBody();
+		if ( !isSuccess( response, body ) ) {
 			GsonProvider gsonProvider = context.getGsonProvider();
-			if ( response.getStatusLine().getStatusCode() == TIME_OUT_HTTP_STATUS_CODE ) {
+			if ( response.getStatusCode() == TIME_OUT_HTTP_STATUS_CODE ) {
 				throw LOG.elasticsearchRequestTimeout(
 						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-						ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody )
+						ElasticsearchClientUtils.formatResponse( gsonProvider, response )
 						);
 			}
 			else {
 				throw LOG.elasticsearchRequestFailed(
 						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-						ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
+						ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
 						null );
 			}
 		}
@@ -117,8 +117,8 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 				|| BULK_ITEM_ERROR_TYPE.get( content ).map( ignoredErrorTypes::contains ).orElse( false );
 	}
 
-	private boolean isSuccess(Response response, JsonObject parsedResponseBody) {
-		int code = response.getStatusLine().getStatusCode();
+	private boolean isSuccess(ElasticsearchResponse response, JsonObject parsedResponseBody) {
+		int code = response.getStatusCode();
 		return ElasticsearchClientUtils.isSuccessCode( code )
 				|| ignoredErrorStatuses.contains( code )
 				|| ROOT_ERROR_TYPE.get( parsedResponseBody ).map( ignoredErrorTypes::contains ).orElse( false );

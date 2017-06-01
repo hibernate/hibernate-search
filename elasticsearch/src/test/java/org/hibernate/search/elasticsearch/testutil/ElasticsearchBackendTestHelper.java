@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
@@ -108,8 +108,9 @@ public class ElasticsearchBackendTestHelper extends BackendTestHelper {
 		}
 
 		@Override
-		protected Integer generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
-			return COUNT_ACCESSOR.get( parsedResponseBody ).get();
+		protected Integer generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+			JsonObject body = response.getBody();
+			return COUNT_ACCESSOR.get( body ).get();
 		}
 
 		private static class Builder extends SimpleElasticsearchWork.Builder<Builder> {

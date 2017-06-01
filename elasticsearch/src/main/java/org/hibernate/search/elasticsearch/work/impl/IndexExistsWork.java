@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.elasticsearch.work.impl.builder.IndexExistsWorkBuilder;
-
-import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
@@ -28,8 +26,8 @@ public class IndexExistsWork extends SimpleElasticsearchWork<Boolean> {
 
 	@Override
 	protected Boolean generateResult(ElasticsearchWorkExecutionContext context,
-			Response response, JsonObject parsedResponseBody) {
-		return ElasticsearchClientUtils.isSuccessCode( response.getStatusLine().getStatusCode() );
+			ElasticsearchResponse response) {
+		return ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() );
 	}
 
 	public static class Builder

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.ScrollWorkBuilder;
@@ -24,8 +24,9 @@ public class ScrollWork extends SimpleElasticsearchWork<SearchResult> {
 	}
 
 	@Override
-	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
-		return new SearchWork.SearchResultImpl( parsedResponseBody );
+	protected SearchResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+		JsonObject body = response.getBody();
+		return new SearchWork.SearchResultImpl( body );
 	}
 
 	public static class Builder

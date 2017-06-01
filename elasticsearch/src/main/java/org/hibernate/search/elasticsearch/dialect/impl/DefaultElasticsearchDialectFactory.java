@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.elasticsearch.dialect.impl;
 
-import java.io.IOException;
 import java.util.Properties;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.dialect.impl.es2.Elasticsearch2Dialect;
 import org.hibernate.search.elasticsearch.dialect.impl.es5.Elasticsearch5Dialect;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -20,8 +19,6 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
@@ -56,28 +53,26 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 	private String getVersion(ElasticsearchClient client) {
 		ElasticsearchRequest request = ElasticsearchRequest.get().build();
 		GsonProvider gsonProvider = DialectIndependentGsonProvider.INSTANCE;
-		Response response = null;
-		JsonObject responseAsJsonObject = null;
+		ElasticsearchResponse response = null;
 		try {
 			response = client.execute( request );
-			responseAsJsonObject = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
 
-			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusLine().getStatusCode() ) ) {
+			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
 				throw log.elasticsearchRequestFailed(
 						ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-						ElasticsearchClientUtils.formatResponse( gsonProvider, response, responseAsJsonObject ),
+						ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
 						null );
 			}
 
-			return VERSION_ACCESSOR.get( responseAsJsonObject ).get();
+			return VERSION_ACCESSOR.get( response.getBody() ).get();
 		}
 		catch (SearchException e) {
 			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
 		}
-		catch (IOException | RuntimeException e) {
+		catch (RuntimeException e) {
 			throw log.elasticsearchRequestFailed(
 					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, response, responseAsJsonObject ),
+					ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
 					e );
 		}
 	}

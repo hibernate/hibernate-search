@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.exception.SearchException;
 
 import com.google.gson.JsonObject;
@@ -22,11 +22,9 @@ public interface ElasticsearchRequestSuccessAssessor {
 	 * @param context The context in which the request was executed.
 	 * @param request The request whose success is to be assessed.
 	 * @param response The response, containing information about the outcome of the request.
-	 * @param parsedResponseBody The response body parsed as JSON.
 	 * @throws SearchException If the result is a failure.
 	 */
-	void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, Response response,
-			JsonObject parsedResponseBody) throws SearchException;
+	void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request, ElasticsearchResponse response) throws SearchException;
 
 	/**
 	 * Check the given response, return {@code true} if it is successful, {@code false} otherwise.

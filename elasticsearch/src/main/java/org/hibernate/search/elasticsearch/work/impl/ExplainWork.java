@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.ExplainWorkBuilder;
@@ -25,8 +25,9 @@ public class ExplainWork extends SimpleElasticsearchWork<ExplainResult> {
 
 	@Override
 	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context,
-			Response response, JsonObject parsedResponseBody) {
-		return new ExplainResultImpl( parsedResponseBody );
+			ElasticsearchResponse response) {
+		JsonObject body = response.getBody();
+		return new ExplainResultImpl( body );
 	}
 
 	public static class Builder
