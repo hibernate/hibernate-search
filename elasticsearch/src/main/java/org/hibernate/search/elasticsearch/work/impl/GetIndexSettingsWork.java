@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -29,15 +29,16 @@ public class GetIndexSettingsWork extends SimpleElasticsearchWork<IndexSettings>
 
 	@Override
 	protected IndexSettings generateResult(ElasticsearchWorkExecutionContext context,
-			Response response, JsonObject parsedResponseBody) {
-		JsonElement index = parsedResponseBody.get( indexName.original );
+			ElasticsearchResponse response) {
+		JsonObject body = response.getBody();
+		JsonElement index = body.get( indexName.original );
 		if ( index == null || !index.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + parsedResponseBody );
+			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + body );
 		}
 
 		JsonElement settings = index.getAsJsonObject().get( "settings" );
 		if ( settings == null || !settings.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + parsedResponseBody );
+			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + body );
 		}
 
 		JsonElement indexSettings = settings.getAsJsonObject().get( "index" );

@@ -6,15 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -80,23 +79,21 @@ public class BulkWork implements ElasticsearchWork<Void> {
 
 		GsonProvider gsonProvider = context.getGsonProvider();
 
-		Response response = null;
-		JsonObject parsedResponseBody = null;
+		ElasticsearchResponse response = null;
 		try {
 			response = context.getClient().execute( request );
-			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
 
-			handleResults( context, response, parsedResponseBody );
+			handleResults( context, response );
 
 			return null;
 		}
 		catch (SearchException e) {
 			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
 		}
-		catch (IOException | RuntimeException e) {
+		catch (RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed(
 					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
+					ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
 					e );
 		}
 	}
@@ -123,13 +120,14 @@ public class BulkWork implements ElasticsearchWork<Void> {
 	 * If at least one work or its result handler failed,
 	 * an exception will be thrown after every result has been handled.
 	 */
-	private void handleResults(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+	private void handleResults(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		Map<BulkableElasticsearchWork<?>, JsonObject> successfulItems =
 				CollectionHelper.newHashMap( works.size() );
 
 		List<BulkableElasticsearchWork<?>> erroneousItems = new ArrayList<>();
 		int i = 0;
 
+		JsonObject parsedResponseBody = response.getBody();
 		JsonArray resultItems = parsedResponseBody.has( "items" ) ? parsedResponseBody.get( "items" ).getAsJsonArray() : null;
 
 		List<RuntimeException> resultHandlingExceptions = null;
@@ -162,7 +160,7 @@ public class BulkWork implements ElasticsearchWork<Void> {
 			GsonProvider gsonProvider = context.getGsonProvider();
 			BulkRequestFailedException exception = LOG.elasticsearchBulkRequestFailed(
 					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
+					ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
 					successfulItems,
 					erroneousItems
 			);

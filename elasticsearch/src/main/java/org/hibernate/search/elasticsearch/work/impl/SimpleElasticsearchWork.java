@@ -6,20 +6,17 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import com.google.gson.JsonObject;
 
 /**
  * @author Gunnar Morling
@@ -57,26 +54,24 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 	@Override
 	public final R execute(ElasticsearchWorkExecutionContext executionContext) {
 		GsonProvider gsonProvider = executionContext.getGsonProvider();
-		Response response = null;
-		JsonObject parsedResponseBody = null;
+		ElasticsearchResponse response = null;
 		R result;
 
 		try {
 			beforeExecute( executionContext, request );
 			response = executionContext.getClient().execute( request );
-			parsedResponseBody = ElasticsearchClientUtils.parseJsonResponse( gsonProvider, response );
 
-			resultAssessor.checkSuccess( executionContext, request, response, parsedResponseBody );
+			resultAssessor.checkSuccess( executionContext, request, response );
 
-			result = generateResult( executionContext, response, parsedResponseBody );
+			result = generateResult( executionContext, response );
 		}
 		catch (SearchException e) {
 			throw e; // Do not add context for those: we expect SearchExceptions to be self-explanatory
 		}
-		catch (IOException | RuntimeException e) {
+		catch (RuntimeException e) {
 			throw LOG.elasticsearchRequestFailed(
 					ElasticsearchClientUtils.formatRequest( gsonProvider, request ),
-					ElasticsearchClientUtils.formatResponse( gsonProvider, response, parsedResponseBody ),
+					ElasticsearchClientUtils.formatResponse( gsonProvider, response ),
 					e );
 		}
 
@@ -97,7 +92,7 @@ public abstract class SimpleElasticsearchWork<R> implements ElasticsearchWork<R>
 		// Do nothing by default
 	}
 
-	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody);
+	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response);
 
 	@Override
 	public void aggregate(ElasticsearchWorkAggregator aggregator) {

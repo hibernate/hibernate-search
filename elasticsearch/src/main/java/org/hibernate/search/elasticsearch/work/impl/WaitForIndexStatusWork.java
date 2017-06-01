@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
@@ -29,7 +29,7 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		return null;
 	}
 
@@ -93,10 +93,10 @@ public class WaitForIndexStatusWork extends SimpleElasticsearchWork<Void> {
 
 		@Override
 		public void checkSuccess(ElasticsearchWorkExecutionContext context, ElasticsearchRequest request,
-				Response response, JsonObject parsedResponseBody) throws SearchException {
-			this.delegate.checkSuccess( context, request, response, parsedResponseBody );
-			if ( response.getStatusLine().getStatusCode() == TIMED_OUT_HTTP_STATUS_CODE ) {
-				String status = parsedResponseBody.get( "status" ).getAsString();
+				ElasticsearchResponse response) throws SearchException {
+			this.delegate.checkSuccess( context, request, response );
+			if ( response.getStatusCode() == TIMED_OUT_HTTP_STATUS_CODE ) {
+				String status = response.getBody().get( "status" ).getAsString();
 				throw LOG.unexpectedIndexStatus( indexName.original, requiredIndexStatus.getElasticsearchString(), status, timeoutAndUnit );
 			}
 		}

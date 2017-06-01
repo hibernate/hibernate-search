@@ -10,8 +10,8 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
@@ -39,10 +39,11 @@ public class GetIndexTypeMappingsWork extends SimpleElasticsearchWork<Map<String
 
 	@Override
 	protected Map<String, TypeMapping> generateResult(ElasticsearchWorkExecutionContext context,
-			Response response, JsonObject parsedResponseBody) {
-		JsonElement index = parsedResponseBody.get( indexName.original );
+			ElasticsearchResponse response) {
+		JsonObject body = response.getBody();
+		JsonElement index = body.get( indexName.original );
 		if ( index == null || !index.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + parsedResponseBody );
+			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + body );
 		}
 		JsonElement mappings = index.getAsJsonObject().get( "mappings" );
 

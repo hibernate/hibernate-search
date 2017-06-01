@@ -13,20 +13,22 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.search.test.util.impl.ExceptionMatcherBuilder.isException;
 
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpHeader;
-import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest.Builder;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
+import org.hibernate.search.elasticsearch.testutil.JsonHelper;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
@@ -85,13 +87,19 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
+		String statusMessage = "StatusMessage";
+		String responseBody = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
-				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withStatusMessage( statusMessage )
+						.withBody( responseBody )) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			JsonHelper.assertJsonEquals( responseBody, result.getBody().toString() );
 
 			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 		}
@@ -103,18 +111,18 @@ public class DefaultElasticsearchClientFactoryTest {
 				.addProperty( CLIENT_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_URI, httpUrlFor( wireMockRule1 ) );
 
 		String payload = "{ \"foo\": \"bar\" }";
-		String errorMessage = "ErrorMessageExplainingTheError";
+		String responseBody = "{ \"error\": \"ErrorMessageExplainingTheError\" }";
 		wireMockRule1.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse().withStatus( 500 )
-						.withBody( "{ \"error\": \"" + errorMessage + "\" }" )
+						.withBody( responseBody )
 				) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 500 );
-			assertThat( IOUtils.toString( result.getEntity().getContent() ) ).as( "response body" ).contains( errorMessage );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 500 );
+			JsonHelper.assertJsonEquals( responseBody, result.getBody().toString() );
 		}
 	}
 
@@ -133,7 +141,11 @@ public class DefaultElasticsearchClientFactoryTest {
 						.withFixedDelay( 2000 )
 				) );
 
-		thrown.expect( IOException.class );
+		thrown.expect(
+				isException( SearchException.class )
+						.causedBy( IOException.class )
+				.build()
+		);
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			doPost( client, "/myIndex/myType", payload );
@@ -155,7 +167,11 @@ public class DefaultElasticsearchClientFactoryTest {
 						.withFixedDelay( 2000 )
 				) );
 
-		thrown.expect( IOException.class );
+		thrown.expect(
+				isException( SearchException.class )
+						.causedBy( IOException.class )
+				.build()
+		);
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
 			doPost( client, "/myIndex/myType", payload );
@@ -178,10 +194,10 @@ public class DefaultElasticsearchClientFactoryTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
@@ -204,10 +220,10 @@ public class DefaultElasticsearchClientFactoryTest {
 				.willReturn( elasticsearchResponse().withStatus( 503 ) ) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( 1, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
@@ -216,9 +232,9 @@ public class DefaultElasticsearchClientFactoryTest {
 			wireMockRule2.resetRequests();
 
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
 			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
@@ -243,10 +259,10 @@ public class DefaultElasticsearchClientFactoryTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withFixedDelay( 10_000 /* 10s => will time out */ ) ) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 			/*
@@ -268,9 +284,9 @@ public class DefaultElasticsearchClientFactoryTest {
 					.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
 			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
@@ -295,10 +311,10 @@ public class DefaultElasticsearchClientFactoryTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ).withFault( Fault.MALFORMED_RESPONSE_CHUNK ) ) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( 1, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
@@ -307,9 +323,9 @@ public class DefaultElasticsearchClientFactoryTest {
 			wireMockRule2.resetRequests();
 
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
 			wireMockRule1.verify( 2, postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
@@ -341,8 +357,8 @@ public class DefaultElasticsearchClientFactoryTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			/*
 			 * Send requests repeatedly until both hosts have been targeted.
@@ -353,7 +369,7 @@ public class DefaultElasticsearchClientFactoryTest {
 			 */
 			POLLER.pollAssertion( () -> {
 				doPost( client, "/myIndex/myType", payload );
-				assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+				assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 				wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
 				wireMockRule2.verify( postRequestedFor( urlPathLike( "/myIndex/myType" ) ) );
@@ -431,8 +447,8 @@ public class DefaultElasticsearchClientFactoryTest {
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType/_search", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathLike( "/myIndex/myType/_search" ) ) );
 		}
@@ -454,9 +470,9 @@ public class DefaultElasticsearchClientFactoryTest {
 				) );
 
 		try ( ElasticsearchClient client = clientFactory.create( CLIENT_SCOPE_NAME, configuration.getProperties() ) ) {
-			Response result = doPost( client, "/myIndex/myType/_search", payload );
-			assertThat( result.getStatusLine().getStatusCode() ).as( "status code" ).isEqualTo( 401 );
-			assertThat( result.getStatusLine().getReasonPhrase() ).as( "reason phrase" ).contains( statusMessage );
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
+			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 401 );
+			assertThat( result.getStatusMessage() ).as( "status message" ).isEqualTo( statusMessage );
 		}
 	}
 
@@ -478,7 +494,7 @@ public class DefaultElasticsearchClientFactoryTest {
 		}
 	}
 
-	private Response doPost(ElasticsearchClient client, String path, String payload) throws IOException, ResponseException {
+	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) throws IOException, ResponseException {
 		return client.execute( buildRequest( ElasticsearchRequest.post(), path, payload ) );
 	}
 

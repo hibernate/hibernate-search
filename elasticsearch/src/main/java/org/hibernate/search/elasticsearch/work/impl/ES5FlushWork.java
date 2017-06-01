@@ -9,15 +9,13 @@ package org.hibernate.search.elasticsearch.work.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.FlushWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.builder.RefreshWorkBuilder;
 import org.hibernate.search.elasticsearch.work.impl.factory.ElasticsearchWorkFactory;
-
-import com.google.gson.JsonObject;
 
 /**
  * A flush work for ES5, using the Flush API then the Refresh API.
@@ -43,7 +41,7 @@ public class ES5FlushWork extends SimpleElasticsearchWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		return null;
 	}
 

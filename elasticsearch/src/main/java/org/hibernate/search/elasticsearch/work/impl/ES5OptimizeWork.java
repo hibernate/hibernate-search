@@ -9,13 +9,11 @@ package org.hibernate.search.elasticsearch.work.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.OptimizeWorkBuilder;
-
-import com.google.gson.JsonObject;
 
 /**
  * An optimize work for ES5, using the ForceMerge API.
@@ -31,7 +29,7 @@ public class ES5OptimizeWork extends SimpleElasticsearchWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		return null;
 	}
 

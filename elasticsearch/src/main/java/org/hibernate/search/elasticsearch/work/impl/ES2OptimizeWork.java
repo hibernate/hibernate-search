@@ -9,13 +9,11 @@ package org.hibernate.search.elasticsearch.work.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.Paths;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.work.impl.builder.OptimizeWorkBuilder;
-
-import com.google.gson.JsonObject;
 
 /**
  * An optimize work for ES2, using the Optimize API.
@@ -33,7 +31,7 @@ public class ES2OptimizeWork extends SimpleElasticsearchWork<Void> {
 	}
 
 	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
+	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		return null;
 	}
 

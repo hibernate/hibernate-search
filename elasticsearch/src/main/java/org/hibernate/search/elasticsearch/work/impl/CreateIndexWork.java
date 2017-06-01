@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.elasticsearch.work.impl;
 
-import org.elasticsearch.client.Response;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
+import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
@@ -27,8 +27,8 @@ public class CreateIndexWork extends SimpleElasticsearchWork<CreateIndexResult> 
 	}
 
 	@Override
-	protected CreateIndexResult generateResult(ElasticsearchWorkExecutionContext context, Response response, JsonObject parsedResponseBody) {
-		int statusCode = response.getStatusLine().getStatusCode();
+	protected CreateIndexResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+		int statusCode = response.getStatusCode();
 		if ( ElasticsearchClientUtils.isSuccessCode( statusCode ) ) {
 			return CreateIndexResult.CREATED;
 		}
