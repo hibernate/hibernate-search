@@ -116,6 +116,33 @@ public class ElasticsearchIndexWorkProcessorErrorHandlingTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2652")
+	public void syncSafe_multiple_noBulk() throws Exception {
+		Capture<ErrorContext> capture = new Capture<>();
+
+		errorHandlerMock.handle( capture( capture ) );
+		expectLastCall().once();
+
+		ElasticsearchWork<?> work1 = work( 1 );
+		ElasticsearchWork<?> work2 = work( 2 );
+		ElasticsearchWork<?> work3 = work( 3 );
+		ElasticsearchWork<?> work4 = work( 4 );
+		expect( work1.execute( anyObject() ) ).andReturn( null );
+		expect( work2.execute( anyObject() ) ).andThrow( new SearchException() );
+
+		replay( errorHandlerMock, work1, work2, work3, work4 );
+
+		processor.executeSyncSafe( Arrays.asList( work1, work2, work3, work4 ) );
+
+		verify( errorHandlerMock, work1, work2, work3, work4 );
+
+		ErrorContext errorContext = capture.getValue();
+		assertThat( errorContext.getThrowable() ).isExactlyInstanceOf( SearchException.class );
+		assertThat( errorContext.getOperationAtFault() ).isSameAs( luceneWork( 2 ) );
+		assertThat( errorContext.getFailingOperations() ).containsOnly( luceneWork( 2 ), luceneWork( 3 ), luceneWork( 4 ) );
+	}
+
+	@Test
 	public void syncSafe_multiple_bulk() throws Exception {
 		Capture<ErrorContext> capture = new Capture<>();
 

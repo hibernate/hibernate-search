@@ -12,6 +12,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.MultiWriteDrainableLinkedList;
@@ -89,7 +92,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * @param works The works to be executed.
 	 */
 	public void executeSyncSafe(Iterable<ElasticsearchWork<?>> works) {
-		executeSafely( works );
+		executeSafe( works );
 	}
 
 	/**
@@ -113,64 +116,65 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	 * Groups the given work list into executable bulks and executes them. For each bulk, the error handler - if
 	 * registered - will be invoked with the items of that bulk.
 	 */
-	private void executeSafely(Iterable<ElasticsearchWork<?>> requests) {
+	private void executeSafe(Iterable<ElasticsearchWork<?>> allWorks) {
 		SequentialWorkExecutionContext context = new SequentialWorkExecutionContext(
 				client, gsonProvider, workFactory, this, errorHandler );
+		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
 
-		for ( ElasticsearchWork<?> work : createRequestGroups( requests, true ) ) {
-			executeSafely( work, context );
+		for ( ElasticsearchWork<?> work : createRequestGroups( allWorks, true ) ) {
+			try {
+				executeUnsafe( work, context );
+				work.getLuceneWorks().forEach( errorContextBuilder::workCompleted );
+			}
+			catch (BulkRequestFailedException brfe) {
+				brfe.getSuccessfulItems().keySet().stream()
+						.flatMap( ElasticsearchWork::getLuceneWorks )
+						.forEach( errorContextBuilder::workCompleted );
+
+				handleError(
+						errorContextBuilder,
+						brfe,
+						allWorks,
+						brfe.getErroneousItems().stream()
+								.flatMap( ElasticsearchWork::getLuceneWorks )
+						);
+				break;
+			}
+			catch (RuntimeException e) {
+				handleError(
+						errorContextBuilder,
+						e,
+						allWorks,
+						work.getLuceneWorks()
+						);
+				break;
+			}
 		}
 
 		context.flush();
 	}
 
-	private void executeSafely(ElasticsearchWork<?> work, ElasticsearchWorkExecutionContext context) {
+	private void executeUnsafe(ElasticsearchWork<?> work, ElasticsearchWorkExecutionContext context) {
 		if ( LOG.isTraceEnabled() ) {
 			LOG.tracef( "Processing %s", work );
 		}
 
-		try {
-			work.execute( context );
-		}
-		catch (BulkRequestFailedException brfe) {
-			ErrorContextBuilder builder = new ErrorContextBuilder();
-			List<LuceneWork> allWorks = new ArrayList<>();
+		work.execute( context );
+	}
 
-			for ( BulkableElasticsearchWork<?> successfulWork : brfe.getSuccessfulItems().keySet() ) {
-				successfulWork.getLuceneWorks().forEach( (w) -> {
-						allWorks.add( w );
-						builder.workCompleted( w );
-				});
-			}
+	private void handleError(ErrorContextBuilder errorContextBuilder, Throwable e,
+			Iterable<ElasticsearchWork<?>> allWorks, Stream<LuceneWork> worksThatFailed) {
+		errorContextBuilder.allWorkToBeDone(
+				StreamSupport.stream( allWorks.spliterator(), false )
+						.flatMap( w -> w.getLuceneWorks() )
+						.collect( Collectors.toList() )
+				);
 
-			for ( BulkableElasticsearchWork<?> failedWork : brfe.getErroneousItems() ) {
-				failedWork.getLuceneWorks().forEach( (w) -> {
-						allWorks.add( w );
-						builder.addWorkThatFailed( w );
-				});
-			}
+		worksThatFailed.forEach( errorContextBuilder::addWorkThatFailed );
 
-			builder.allWorkToBeDone( allWorks );
+		errorContextBuilder.errorThatOccurred( e );
 
-			builder.errorThatOccurred( brfe );
-
-			errorHandler.handle( builder.createErrorContext() );
-		}
-		catch (RuntimeException e) {
-			ErrorContextBuilder builder = new ErrorContextBuilder();
-			List<LuceneWork> allWorks = new ArrayList<>();
-
-			work.getLuceneWorks().forEach( (w) -> {
-					allWorks.add( w );
-					builder.addWorkThatFailed( w );
-			});
-
-			builder.allWorkToBeDone( allWorks );
-
-			builder.errorThatOccurred( e );
-
-			errorHandler.handle( builder.createErrorContext() );
-		}
+		errorHandler.handle( errorContextBuilder.createErrorContext() );
 	}
 
 	/**
